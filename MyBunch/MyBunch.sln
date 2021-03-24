@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBunchApp.iOS", "MyBunchAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBunchApp", "MyBunchApp\MyBunchApp\MyBunchApp.csproj", "{CC408C1F-2448-48DF-ABBB-24EA8AF70AE7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBunchServer", "MyBunchServer\MyBunchServer.csproj", "{C645111A-05C9-4DA8-BE63-32A90ACD60D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,18 @@ Global
 		{CC408C1F-2448-48DF-ABBB-24EA8AF70AE7}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{CC408C1F-2448-48DF-ABBB-24EA8AF70AE7}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{CC408C1F-2448-48DF-ABBB-24EA8AF70AE7}.Release|iPhoneSimulator.Deploy.0 = Release|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Release|iPhone.Build.0 = Release|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{C645111A-05C9-4DA8-BE63-32A90ACD60D1}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
