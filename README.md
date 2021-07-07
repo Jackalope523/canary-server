@@ -1,2 +1,2 @@
-# MyBunch
-App to help families stay connected
+# Sparrow-Album
+Photo Album App Project under Sparrow
