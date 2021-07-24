@@ -1,2 +1,2 @@
-# Sparrow-Album
-Photo Album App Project under Sparrow
+# project-sparrow
+Project coming from Sparrow
