@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SparrowServer.Server.Models
+namespace SparrowServer.Models
 {
     public class AccountCredentials
     {
