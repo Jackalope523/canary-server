@@ -9,7 +9,7 @@ namespace SparrowServer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ErrorController : ControllerBase
+    public class ErrorController : Controller
     {
 
         [HttpGet]

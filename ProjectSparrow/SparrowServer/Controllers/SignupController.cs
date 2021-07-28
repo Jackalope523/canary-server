@@ -9,7 +9,7 @@ namespace SparrowServer.Controllers
 {
     [Route("accounts/sign-up")]
     [ApiController]
-    public class SignupController : ControllerBase
+    public class SignupController : Controller
     {
 
         [HttpGet]

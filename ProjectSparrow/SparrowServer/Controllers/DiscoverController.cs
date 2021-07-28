@@ -8,7 +8,7 @@ namespace SparrowServer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class DiscoverController : ControllerBase
+    public class DiscoverController : Controller
     {
         
         [HttpGet]
