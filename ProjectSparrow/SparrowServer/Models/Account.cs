@@ -5,18 +5,29 @@ using System.Threading.Tasks;
 
 namespace SparrowServer.Models
 {
-    public class AccountCredentials
+
+    public enum EventInterest
+    {
+        
+    }
+
+    public class AccountCredentialsModel
     {
         public string Email { get; set; }
 
         public string Password { get; set; }
     }
 
-    public class AccountDetails
+    public class AccountDetailsModel
     {
-        public ulong ID { get; set; }
-        
-        public string[] Interests { get; set; }
+        public string Name { get; set; }
+
+        public DateTime DateOfBirth { get; set; }
+
+        public string Language { get; set; }
+
+        public EventInterest[] Interests { get; set; }
+
     }
 
 }
