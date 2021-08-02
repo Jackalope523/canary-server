@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace SparrowServer.Models
 {
+    using Utilities;
 
     public enum EventType
     {
@@ -22,7 +23,7 @@ namespace SparrowServer.Models
 
         public EventType EventType { get; set; }
 
-        // public Location Location { get; set; } // Have to figure this one out
+        public GeoLocation Location { get; set; }
     
         public EventStatus EventStatus { get; set; }
     }
