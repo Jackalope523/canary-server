@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace SparrowServer.Models
+{
+
+    public enum EventType
+    {
+        // Might want this to be a String, goes back to Colt Express enum converting. Drawbacks will appear though, especially with scaling
+    }
+
+    public enum EventStatus
+    {
+        //
+    }
+
+    public class EventModel
+    {
+        public string EventUUID { get; set; }
+
+        public EventType EventType { get; set; }
+
+        // public Location Location { get; set; } // Have to figure this one out
+    
+        public EventStatus EventStatus { get; set; }
+    }
+
+    public class EventOverviewModel : EventModel
+    {
+        public DateTime StartTime { get; set; }
+
+        public string HostUUID { get; set; } // May be better if we don't give out the Host's UUID and instead just give relevant information or have calls that use the Event's UUID instead
+
+        public uint NumberOfParticipants { get; set; }
+    }
+
+}
