@@ -6,16 +6,22 @@ using System.Collections.Immutable;
 
 namespace Server.Entities
 {
-    public class Event
+    internal class Event
     {
-        #region Variables
-
-        public string EventID { get; init; }
-        public string HostID { get; init; }
-        // Location class needed
-        public DateTime StartTime { get; init; }
+        #region Properties
 
         public IList<Participant> Participants => ImmutableList.CreateRange(Participants.ToList());
+
+        public DateTime StartTime { get; init; }
+
+        #endregion
+
+        #region Fields
+
+        public string EventID { get; }
+        public string HostID { get; }
+        // Location class needed
+
 
         private SortedSet<Participant> currentParticipants = new(Participant.CompareID);
         private List<PastParticipant> participantHistory = new();
@@ -23,6 +29,11 @@ namespace Server.Entities
 
         #endregion
 
+        public Event(string hostID)
+        {
+            HostID = hostID;
+            
+        }
 
         public void AddParticipant(string participantID)
         {
@@ -36,7 +47,7 @@ namespace Server.Entities
 
     }
 
-    public struct Participant : IComparable<Participant>
+    internal struct Participant : IComparable<Participant>
     {
         public static IComparer<Participant> CompareID => Comparer<Participant>.Create((participantA, participantB) => string.Compare(participantA.ID, participantB.ID));
 

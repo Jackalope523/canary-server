@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Server.Entities
 {
-    public class User
+    internal class User
     {
     }
 }
