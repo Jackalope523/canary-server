@@ -8,31 +8,26 @@ namespace Server.Entities
 {
     internal class Event
     {
-        #region Properties
-
-        public IList<Participant> Participants => ImmutableList.CreateRange(Participants.ToList());
-
-        public DateTime StartTime { get; init; }
-
-        #endregion
-
-        #region Fields
+        #region Variables
 
         public string EventID { get; }
         public string HostID { get; }
-        // Location class needed
+        public DateTime StartTime { get; private init; }
 
+        public IList<Participant> Participants => ImmutableList.CreateRange(Participants.ToList());
+
+        // Event Status data type needed
 
         private SortedSet<Participant> currentParticipants = new(Participant.CompareID);
         private List<PastParticipant> participantHistory = new();
-        // Event Status data type needed
 
         #endregion
 
         public Event(string hostID)
         {
             HostID = hostID;
-            
+
+            StartTime = DateTime.UtcNow;
         }
 
         public void AddParticipant(string participantID)
@@ -51,13 +46,13 @@ namespace Server.Entities
     {
         public static IComparer<Participant> CompareID => Comparer<Participant>.Create((participantA, participantB) => string.Compare(participantA.ID, participantB.ID));
 
-        public readonly string ID;
-        public readonly DateTime JoinedTime;
+        public string ID { get; }
+        public DateTime JoinedTime { get; }
 
         public Participant(string userID)
         {
             ID = userID;
-            JoinedTime = DateTime.Now.ToUniversalTime();
+            JoinedTime = DateTime.UtcNow;
         }
 
         public int CompareTo(Participant other)
@@ -68,15 +63,15 @@ namespace Server.Entities
 
     struct PastParticipant
     {
-        public readonly string ID;
-        public readonly DateTime JoinedTime;
-        public readonly DateTime LeftTime;
+        public string ID { get; }
+        public DateTime JoinedTime { get; }
+        public DateTime LeftTime { get; }
 
         public PastParticipant(Participant participant)
         {
             ID = participant.ID;
             JoinedTime = participant.JoinedTime;
-            LeftTime = DateTime.Now.ToUniversalTime();
+            LeftTime = DateTime.UtcNow;
         }
     }
 }
