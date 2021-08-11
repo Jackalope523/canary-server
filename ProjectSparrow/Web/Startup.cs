@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SparrowServer
+namespace Web
 {
     public class Startup
     {
@@ -30,7 +30,7 @@ namespace SparrowServer
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SparrowServer", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
         }
 
@@ -41,7 +41,7 @@ namespace SparrowServer
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SparrowServer v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web v1"));
             }
 
             app.UseHttpsRedirection();

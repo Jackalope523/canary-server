@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SparrowServer.Models.Utilities
+namespace Web.Models.Utilities
 {
     public class GeoLocation
     {
