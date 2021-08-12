@@ -12,6 +12,7 @@ namespace Server.Entities
 
         public string EventID { get; }
         public string HostID { get; }
+        public GeoLocation Location { get; }
         public DateTime StartTime { get; private init; }
 
         public IList<Participant> Participants => ImmutableList.CreateRange(Participants.ToList());
@@ -42,6 +43,7 @@ namespace Server.Entities
 
     }
 
+
     internal struct Participant : IComparable<Participant>
     {
         public static IComparer<Participant> CompareID => Comparer<Participant>.Create((participantA, participantB) => string.Compare(participantA.ID, participantB.ID));
@@ -60,6 +62,7 @@ namespace Server.Entities
             return ID.CompareTo(other.ID);
         }
     }
+
 
     struct PastParticipant
     {
