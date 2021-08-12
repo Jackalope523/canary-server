@@ -15,11 +15,11 @@ namespace Server.Entities
         public GeoLocation Location { get; }
         public DateTime StartTime { get; private init; }
 
-        public IList<Participant> Participants => ImmutableList.CreateRange(Participants.ToList());
+        public IList<Participant> Participants => ImmutableList.CreateRange(currentParticipants.ToList());
 
         // Event Status data type needed
 
-        private SortedSet<Participant> currentParticipants = new(Participant.CompareID);
+        private SortedSet<Participant> currentParticipants = new();
         private List<PastParticipant> participantHistory = new();
 
         #endregion
@@ -27,6 +27,9 @@ namespace Server.Entities
         public Event(string hostID)
         {
             HostID = hostID;
+
+            Participant host = new(hostID);
+            currentParticipants.Add(host);
 
             StartTime = DateTime.UtcNow;
         }
@@ -46,8 +49,6 @@ namespace Server.Entities
 
     internal struct Participant : IComparable<Participant>
     {
-        public static IComparer<Participant> CompareID => Comparer<Participant>.Create((participantA, participantB) => string.Compare(participantA.ID, participantB.ID));
-
         public string ID { get; }
         public DateTime JoinedTime { get; }
 
