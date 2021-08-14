@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 
 namespace Server.Entities
 {
-    internal abstract class Account
+    internal abstract class Account : IExportable
     {
-        public string UniqueID { get; }
+        public string AccountID { get; }
         public string Identification { get; }
 
         private readonly string passkey;
@@ -21,7 +21,7 @@ namespace Server.Entities
 
         public bool VerifyPasskey(string otherPasskey)
         {
-            bool isValid = true;
+            bool isValid = otherPasskey.Length == passkey.Length;
 
             for (int i = 0; i < otherPasskey.Length && i < passkey.Length; i++)
             {
@@ -34,5 +34,15 @@ namespace Server.Entities
             return isValid;
         }
 
+        public object[] ExportObject()
+        {
+            object[] information = { AccountID, Identification, passkey };
+
+            object[] data = Export();
+
+            return information.Concat(data).ToArray();
+        }
+
+        public virtual object[] Export() { return Array.Empty<object>(); }
     }
 }
