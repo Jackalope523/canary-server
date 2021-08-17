@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Shared;
 
 namespace Server.Entities
 {
@@ -9,7 +10,7 @@ namespace Server.Entities
     {
         public string Name { get; init; }
         public DateTime DateOfBirth { get; init; }
-        public Interest Interests { get; set; }
+        public UserInterest Interests { get; set; }
 
         public DateTime JoinDate { get; init; }
         public Reputation GoerReputation { get; private set; }
@@ -25,19 +26,6 @@ namespace Server.Entities
 
             return details.Concat(information).ToArray();
         }
-    }
-
-
-    [Flags]
-    internal enum Interest : ushort
-    {
-        None = 0,
-        Sports = 1,
-        Cars = 2,
-        Socials = 4,
-        Parties = 8,
-
-        Everything = 0xFFFF
     }
 
 
