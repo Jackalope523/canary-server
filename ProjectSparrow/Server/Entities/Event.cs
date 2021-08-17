@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Immutable;
+using Shared;
 
 namespace Server.Entities
 {
@@ -13,6 +14,7 @@ namespace Server.Entities
         public string EventID { get; }
         public string HostID { get; }
         public GeoLocation Location { get; }
+        public EventType EventType { get; init; }
         public DateTime StartTime { get; private init; }
 
         public IList<Participant> Participants => ImmutableList.CreateRange(currentParticipants.ToList());
