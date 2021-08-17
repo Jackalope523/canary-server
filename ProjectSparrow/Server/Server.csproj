@@ -10,5 +10,9 @@
 			<_Parameter1>Tests</_Parameter1>
 		</AssemblyAttribute>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Shared\Shared.csproj" />
+	</ItemGroup>
 	
 </Project>
