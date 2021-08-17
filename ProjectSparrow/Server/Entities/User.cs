@@ -16,7 +16,7 @@ namespace Server.Entities
         public Reputation HostReputation { get; private set; }
 
         public string CurrentEventID { get; private set; }
-
+        
         public sealed override object[] Export()
         {
             object[] details = { Name, DateOfBirth, Interests, JoinDate };
@@ -43,14 +43,18 @@ namespace Server.Entities
 
     internal struct Reputation
     {
+        public const ushort DefaultReputation = 300;
+
         public ushort ReputationScore { get; }
         public ReputationTier ReputationTier 
-        { 
+        {
             get
             {
-                foreach (ReputationTier tier in Enum.GetValues<ReputationTier>().Reverse())
+                var tiers = Enum.GetValues<ReputationTier>().Reverse();
+
+                foreach (ReputationTier tier in tiers)
                 {
-                    if (ReputationScore > (ushort)tier)
+                    if (ReputationScore >= (ushort)tier)
                     {
                         return tier;
                     }
@@ -59,6 +63,8 @@ namespace Server.Entities
                 return ReputationTier.Poor;
             }
         }
+
+
     }
 
 

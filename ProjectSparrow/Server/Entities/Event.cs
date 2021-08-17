@@ -47,7 +47,7 @@ namespace Server.Entities
     }
 
 
-    internal struct Participant : IComparable<Participant>
+    internal readonly struct Participant : IComparable<Participant>
     {
         public string ID { get; }
         public DateTime JoinedTime { get; }
@@ -65,7 +65,7 @@ namespace Server.Entities
     }
 
 
-    struct PastParticipant
+    readonly struct PastParticipant
     {
         public string ID { get; }
         public DateTime JoinedTime { get; }
