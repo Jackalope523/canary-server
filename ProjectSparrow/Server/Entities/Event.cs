@@ -21,8 +21,16 @@ namespace Server.Entities
 
         // Event Status data type needed
 
-        private SortedSet<Participant> currentParticipants = new();
-        private List<PastParticipant> participantHistory = new();
+        /*
+         * Idea for new participant tracking/history system.
+         * Single list with each participant, past or present.
+         * Each participant has an array of tuples representing an 'action' (joined, left) and a timestamp.
+         * Can have a parameter that returns all active participants, otherwise just give them the entire dump.
+         * This allows for participants to leave and rejoin without object duplication. It also allows for any future actions to be integrated seamlessly.
+         */
+
+        private readonly SortedSet<Participant> currentParticipants = new();
+        private readonly List<PastParticipant> participantHistory = new();
 
         #endregion
 
@@ -38,12 +46,20 @@ namespace Server.Entities
 
         public void AddParticipant(string participantID)
         {
-            // Processing
+            Participant participant = new(participantID);
+
+            currentParticipants.Add(participant);
         }
 
         public void RemoveParticipant(string participantID)
         {
-            // Processing
+            Participant participant = currentParticipants.ToList().Find(x => x.ID.Equals(participantID));
+
+            currentParticipants.Remove(participant);
+
+            PastParticipant pastParticipant = new(participant);
+
+            participantHistory.Add(pastParticipant);
         }
 
     }
