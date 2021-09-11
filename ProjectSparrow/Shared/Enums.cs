@@ -3,7 +3,7 @@
 namespace Shared
 {
     [Flags]
-    public enum UserInterest : ushort // ushort only allows for 15 different interests (plus None). Need to change to uint when we need more bits
+    public enum UserInterest : ushort // ushort only allows for 15 different interests (1 - 2^16). Need to change to uint when we need more bits
     {
         None = 0,
         Sports = 1,

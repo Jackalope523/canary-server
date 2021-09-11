@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-    interface OutputBoundary
+    interface IOutputBoundary
     {
     }
 }

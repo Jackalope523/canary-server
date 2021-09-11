@@ -8,12 +8,12 @@ namespace Server.Entities
 {
     internal readonly struct GeoLocation
     {
-        public static Distance DistanceBetween(GeoLocation locationAlpha, GeoLocation locationBravo)
+        public static Distance DistanceBetween(GeoLocation locationAlpha, GeoLocation locationBeta)
         {
 
-            float sdlat = MathF.Sin((locationBravo.LatitudeInRadians - locationAlpha.LatitudeInRadians) / 2);
-            float sdlon = MathF.Sin((locationBravo.LongitudeInRadians - locationAlpha.LongitudeInRadians) / 2);
-            float q = sdlat * sdlat + MathF.Cos(locationAlpha.LatitudeInRadians) * MathF.Cos(locationBravo.LatitudeInRadians) * sdlon * sdlon;
+            float sdlat = MathF.Sin((locationBeta.LatitudeInRadians - locationAlpha.LatitudeInRadians) / 2);
+            float sdlon = MathF.Sin((locationBeta.LongitudeInRadians - locationAlpha.LongitudeInRadians) / 2);
+            float q = sdlat * sdlat + MathF.Cos(locationAlpha.LatitudeInRadians) * MathF.Cos(locationBeta.LatitudeInRadians) * sdlon * sdlon;
             float d = 2 * EarthRadius.Kilometres * MathF.Asin(MathF.Sqrt(q));
 
             Distance distance = new() { Kilometres = d };
@@ -21,9 +21,9 @@ namespace Server.Entities
             return distance;
         }
 
-        public static bool AreInRange(GeoLocation locationAlpha, GeoLocation locationBravo, Distance range)
+        public static bool AreInRange(GeoLocation locationAlpha, GeoLocation locationBeta, Distance range)
         {
-            Distance distance = DistanceBetween(locationAlpha, locationBravo);
+            Distance distance = DistanceBetween(locationAlpha, locationBeta);
             
             return distance.Kilometres <= range.Kilometres;
         }
