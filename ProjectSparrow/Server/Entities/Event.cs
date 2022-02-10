@@ -17,7 +17,7 @@ namespace Server.Entities
         public EventType EventType { get; init; }
         public DateTime StartTime { get; private init; }
 
-        public IList<Participant> Participants => ImmutableList.CreateRange(participantLog.activeParticipants.ToList());
+        public IList<Participant> Participants => ImmutableList.CreateRange(participantLog.ActiveParticipants.ToList());
 
         // Event Status data type needed. e.g. gaining popularity
 
@@ -42,16 +42,31 @@ namespace Server.Entities
 
         public void ParticipantLeft(string participantID)
         {
+            // TODO Host leaves, too few participants, only host, etc
+
+
             participantLog.RemoveParticipant(participantID);
+		}
+
+        public bool TransferOwnership()
+		{
+            // TODO
+
+            return true;
 		}
 
 	}
 
-	internal class ParticipantLog
-	{
+    internal class ParticipantLog
+    {
+        public IList<Participant> ActiveParticipants => GetActiveParticipants();
+
+
         private Dictionary<string, LinkedList<ParticipantAction>> log;
 
-        public IList<Participant> activeParticipants => null; // TODO
+        private IList<Participant> cachedActiveParticipants;
+        private bool participantsIsStale = true;
+
 
         public ParticipantLog()
 		{
@@ -60,6 +75,8 @@ namespace Server.Entities
 
         public void AddParticipant(string participantID)
 		{
+            participantsIsStale = true;
+
             if (!log.ContainsKey(participantID))
 			{
                 log.Add(participantID, new LinkedList<ParticipantAction>());
@@ -70,18 +87,89 @@ namespace Server.Entities
 
         public void RemoveParticipant(string participantID)
         {
+            participantsIsStale = true;
+
             if (log.ContainsKey(participantID))
             {
                 log[participantID].AddLast(new ParticipantAction(PerformedAction.Left));
             }
+            else
+			{
+                // TODO Log error. Could be concurrency or internal logic issue.
+			}
+
         }
 
-        public float ParticipantActivityRatio(float timeInMinutes = 15)
+        public int ParticipantsPerformedActionWithin(PerformedAction action, float timeInMinutes = 15)
 		{
-            // TODO
-            // Returns 1 if participants left to participants joined is equal. <1 if more left, >1 if more joined.
-            return 0;
+            int count = 0;
+
+            var currentTime = DateTime.Now;
+
+            foreach (string participant in log.Keys)
+			{
+                ParticipantAction lastAction = log[participant].Last.Value;
+
+                if (lastAction.Type == action && currentTime - lastAction.Time < TimeSpan.FromMinutes(timeInMinutes))
+                {
+                    count += 1;
+                }
+			}
+
+            return count;
 		}
+
+        public float ParticipantJoinRatio(float timeInMinutes = 15)
+		{
+            float countJoined = 0, countLeft = 0;
+
+            var currentTime = DateTime.Now;
+
+            foreach (string participant in log.Keys)
+			{
+                ParticipantAction lastAction = log[participant].Last.Value;
+
+                if (currentTime - lastAction.Time < TimeSpan.FromMinutes(timeInMinutes))
+                { 
+                    if (lastAction.Type == PerformedAction.Joined)
+					{
+                        countJoined += 1;
+					}
+                    else
+					{
+                        countLeft += 1;
+					}
+                }
+			}
+
+            return countJoined / countLeft;
+		}
+
+        private IList<Participant> GetActiveParticipants()
+	    {
+            if (!participantsIsStale)
+			{
+                return cachedActiveParticipants;
+			}
+
+            participantsIsStale = false;
+
+            List<Participant> activeParticipants = new List<Participant>();
+
+            foreach (string participant in log.Keys)
+			{
+                ParticipantAction lastAction = log[participant].Last.Value;
+
+                if (lastAction.Type == PerformedAction.Joined)
+				{
+                    activeParticipants.Add(new Participant(participant, lastAction.Time));
+				}
+			}
+
+            cachedActiveParticipants = activeParticipants;
+
+            return activeParticipants;
+	    }
     }
 
 
@@ -94,6 +182,12 @@ namespace Server.Entities
         {
             ID = userID;
             JoinedTime = DateTime.UtcNow;
+        }
+        
+        public Participant(string userID, DateTime timeJoined)
+        {
+            ID = userID;
+            JoinedTime = timeJoined;
         }
 
         public int CompareTo(Participant other)
