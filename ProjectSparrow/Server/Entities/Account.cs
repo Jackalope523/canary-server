@@ -12,7 +12,7 @@ namespace Server.Entities
         public string AccountID { get; }
         public string Identification { get; }
 
-        private readonly string passkey;
+        private readonly string passkey; // TODO Passkey may change. Create new instance? Change from readonly?
 
         protected Account()
         {

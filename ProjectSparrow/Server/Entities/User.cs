@@ -61,7 +61,7 @@ namespace Server.Entities
         Poor = 0,
         Mediocre = 200,
         Normal = 400,
-        Good = 600,
+		Good = 600,
         Great = 800,
         Excellent = 900
     }
