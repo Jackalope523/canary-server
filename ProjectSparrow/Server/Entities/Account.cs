@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Server.Entities
 {
-    internal abstract class Account : IExportable
+    internal abstract class Account
     {
         public string AccountID { get; }
         public string Identification { get; }
@@ -34,15 +34,5 @@ namespace Server.Entities
             return isValid;
         }
 
-        public object[] ExportObject()
-        {
-            object[] information = { AccountID, Identification, passkey };
-
-            object[] data = Export();
-
-            return information.Concat(data).ToArray();
-        }
-
-        public virtual object[] Export() { return Array.Empty<object>(); }
     }
 }

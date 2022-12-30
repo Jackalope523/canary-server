@@ -18,14 +18,7 @@ namespace Server.Entities
 
         public string CurrentEventID { get; private set; }
         
-        public sealed override object[] Export()
-        {
-            object[] details = { Name, DateOfBirth, Interests, JoinDate };
-
-            object[] information = { CurrentEventID };
-
-            return details.Concat(information).ToArray();
-        }
+        
     }
 
 
