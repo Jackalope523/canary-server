@@ -8,7 +8,7 @@ namespace Server.Entities
 {
     internal class User : Account
     {
-        public string Name { get; init; }
+        public string Name { get; private init; }
         public DateTime DateOfBirth { get; init; }
         public UserInterest Interests { get; set; }
 
@@ -17,8 +17,26 @@ namespace Server.Entities
         public Reputation HostReputation { get; private set; }
 
         public string CurrentEventID { get; private set; }
-        
-        
+
+        public bool Verified { get; set; }
+
+        public User(string identification, string name, string passkey) : base(identification, passkey)
+        {
+            Name = name;
+            GoerReputation = new Reputation();
+            HostReputation = new Reputation();
+        }
+
+        public bool ValidateUser()
+        {
+            if (!ValidateAccount()) { return false; }
+
+            // Check Name is suitable
+
+            // Verify DateOfBirth
+
+            return true;
+        }
     }
 
 
@@ -26,7 +44,7 @@ namespace Server.Entities
     {
         public const ushort DefaultReputation = 300;
 
-        public ushort ReputationScore { get; }
+        public ushort ReputationScore { get; set; }
         public ReputationTier ReputationTier 
         {
             get
@@ -45,6 +63,7 @@ namespace Server.Entities
             }
         }
 
+        public Reputation() { ReputationScore = DefaultReputation; }
 
     }
 
