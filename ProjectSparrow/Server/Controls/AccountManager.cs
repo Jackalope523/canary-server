@@ -56,7 +56,13 @@ namespace Server.Controls
 
         public void DeleteUser(string identification)
         {
+            Account account = accounts.FindAccount(identification);
+            
+            if (account == null)
+            { return; } // TODO Error
 
+            accounts.DeleteAccount(account.AccountID);
+            // TODO Handle possible errors
         }
     }
 }

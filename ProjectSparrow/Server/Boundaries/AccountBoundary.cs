@@ -15,6 +15,8 @@ namespace Server.Boundaries
 
 		public Account UpdateAccount(Account account);
 
+		public void DeleteAccount(string accountID);
+
 		public User GetUser(string accountID);
 
 		public User UpdateUser(User user);
