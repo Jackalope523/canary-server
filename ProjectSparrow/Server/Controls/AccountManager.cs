@@ -19,6 +19,11 @@ namespace Server.Controls
 
         public void CreateUser(string identification, string name, DateTime dateOfBirth)
         {
+            // Check identification not in use
+
+            if (accounts.FindAccount(identification) != null)
+            { return; } // TODO Error
+
             // Create Profile
 
             User newUser = new(identification, name, "")
@@ -33,7 +38,8 @@ namespace Server.Controls
 
             bool valid = newUser.ValidateUser();
 
-            if (!valid) { return; } // TODO Add error codes, dispose of account
+            if (!valid)
+            { return; } // TODO Add error codes, dispose of account
 
             // Store Profile
             
@@ -41,10 +47,15 @@ namespace Server.Controls
             // TODO Verify created successfully
         }
 
-        public void UpdateUser(string identification)
+        public void EditUser(string identification)
         {
             // Verify updates are valid
 
+
+        }
+
+        public void DeleteUser(string identification)
+        {
 
         }
     }

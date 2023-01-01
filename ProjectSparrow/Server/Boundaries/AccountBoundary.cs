@@ -11,6 +11,8 @@ namespace Server.Boundaries
 	{
 		public Account GetAccount(string accountID);
 
+		public Account FindAccount(string identification);
+
 		public Account UpdateAccount(Account account);
 
 		public User GetUser(string accountID);
