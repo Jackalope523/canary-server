@@ -9,7 +9,7 @@ namespace Server.Entities
 {
     internal abstract class Account
     {
-        public string AccountID { get; }
+        public string AccountID { get; init; }
         public string Identification { get; }
 
         private readonly string accountPasskey; // TODO Passkey may change. Create new instance? Change from readonly?
