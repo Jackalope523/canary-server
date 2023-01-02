@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Server.Boundaries;
 
 namespace Web.Controllers
 {
@@ -11,6 +12,12 @@ namespace Web.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private IAccountOperations accounts;
+
+        public AccountController(IAccountOperations accountOperations)
+        {
+            accounts = accountOperations;
+        }
 
         [HttpGet]
         public IActionResult GetLoginToken() // Takes in account model.
