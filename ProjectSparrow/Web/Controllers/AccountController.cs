@@ -9,7 +9,7 @@ namespace Web.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class AccountsController : ControllerBase
+    public class AccountController : ControllerBase
     {
 
         [HttpGet]
