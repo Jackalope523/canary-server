@@ -24,7 +24,7 @@ namespace Server.Controls
             if (accounts.FindAccount(identification) != null)
             { return; } // TODO Error
 
-            // Create Profile
+            // Create profile
 
             User newUser = new(identification, name, "")
             {
@@ -34,14 +34,14 @@ namespace Server.Controls
                 Verified = false
             };
 
-            // Validate Profile
+            // Validate profile
 
             bool valid = newUser.ValidateUser();
 
             if (!valid)
             { return; } // TODO Add error codes, dispose of account
 
-            // Store Profile
+            // Store profile
             
             accounts.UpdateUser(newUser);
             // TODO Verify created successfully
@@ -52,6 +52,15 @@ namespace Server.Controls
             // Verify updates are valid
 
 
+        }
+
+        public void UpdatePhoto(string identification)
+        {
+            Account account = accounts.FindAccount(identification);
+
+            User user = accounts.GetUser(account.AccountID);
+
+            accounts.UpdateUser(user);
         }
 
         public void DeleteUser(string identification)
