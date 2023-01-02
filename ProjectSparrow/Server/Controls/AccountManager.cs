@@ -2,6 +2,7 @@
 using Server.Entities;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,14 @@ namespace Server.Controls
         public AccountManager(IAccountDatabase accountDatabase)
         {
             accounts = accountDatabase;
+        }
+
+        public void GetUserProfile(string identification, string targetIdentification)
+        {
+            // Cases to handle
+            // Is my own profile (send everything not hidden, include number of followers) 
+            // Is someone else's profile (send everything public)
+            //
         }
 
         public void CreateUser(string identification, string name, DateTime dateOfBirth)
@@ -58,7 +67,10 @@ namespace Server.Controls
         {
             Account account = accounts.FindAccount(identification);
 
-            User user = accounts.GetUser(account.AccountID);
+			if (account == null)
+			{ return; } // TODO Error
+
+			User user = accounts.GetUser(account.AccountID);
 
             accounts.UpdateUser(user);
         }
@@ -73,6 +85,30 @@ namespace Server.Controls
             accounts.DeleteAccount(account.AccountID);
             // TODO Handle possible errors
         }
+
+        public void GetFollowed(string identification)
+        {
+			Account account = accounts.FindAccount(identification);
+
+			if (account == null)
+			{ return; } // TODO Error
+
+			User user = accounts.GetUser(account.AccountID);
+
+            user.FollowedUserIDs.ToImmutableHashSet(); // TODO Return contents
+		}
+
+        public void GetBlocked(string identification)
+		{
+			Account account = accounts.FindAccount(identification);
+
+			if (account == null)
+			{ return; } // TODO Error
+
+			User user = accounts.GetUser(account.AccountID);
+
+			user.BlockedUserIDs.ToImmutableHashSet(); // TODO Return contents
+		}
 
         public void FollowUser(string identification, string targetIdentification)
         {
