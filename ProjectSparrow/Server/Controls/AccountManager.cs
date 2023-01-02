@@ -73,5 +73,65 @@ namespace Server.Controls
             accounts.DeleteAccount(account.AccountID);
             // TODO Handle possible errors
         }
-    }
+
+        public void FollowUser(string identification, string targetIdentification)
+        {
+            Account userAccount = accounts.FindAccount(identification);
+            Account targetAccount = accounts.FindAccount(targetIdentification);
+
+            if (userAccount == null || targetAccount == null)
+            { return; }
+
+            User user = accounts.GetUser(userAccount.AccountID);
+
+            user.FollowedUserIDs.Add(targetAccount.AccountID);
+
+            accounts.UpdateUser(user);
+		}
+
+		public void UnfollowUser(string identification, string targetIdentification)
+		{
+			Account userAccount = accounts.FindAccount(identification);
+			Account targetAccount = accounts.FindAccount(targetIdentification);
+
+			if (userAccount == null || targetAccount == null)
+			{ return; }
+
+			User user = accounts.GetUser(userAccount.AccountID);
+
+			user.FollowedUserIDs.Remove(targetAccount.AccountID);
+
+			accounts.UpdateUser(user);
+		}
+
+		public void BlockUser(string identification, string targetIdentification)
+		{
+			Account userAccount = accounts.FindAccount(identification);
+			Account targetAccount = accounts.FindAccount(targetIdentification);
+
+			if (userAccount == null || targetAccount == null)
+			{ return; }
+
+			User user = accounts.GetUser(userAccount.AccountID);
+
+			user.BlockedUserIDs.Add(targetAccount.AccountID);
+
+			accounts.UpdateUser(user);
+		}
+
+		public void UnblockUser(string identification, string targetIdentification)
+		{
+			Account userAccount = accounts.FindAccount(identification);
+			Account targetAccount = accounts.FindAccount(targetIdentification);
+
+			if (userAccount == null || targetAccount == null)
+			{ return; }
+
+			User user = accounts.GetUser(userAccount.AccountID);
+
+			user.BlockedUserIDs.Remove(targetAccount.AccountID);
+
+			accounts.UpdateUser(user);
+		}
+	}
 }

@@ -17,6 +17,9 @@ namespace Server.Entities
         public Reputation GoerReputation { get; private set; }
         public Reputation HostReputation { get; private set; }
 
+        public HashSet<string> FollowedUserIDs { get; init; }
+        public HashSet<string> BlockedUserIDs { get; init; }
+
         public string CurrentEventID { get; private set; }
 
         public bool Verified { get; set; }
