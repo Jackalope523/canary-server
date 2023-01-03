@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Server.Boundaries;
 
 namespace Web.Controllers
 {
@@ -11,6 +12,13 @@ namespace Web.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
+
+        IEventOperations events;
+
+        public EventsController(IEventOperations eventOperations)
+        {
+            events = eventOperations;
+        }
 
         [HttpGet]
         public IActionResult GetEventsList() // Takes in a position model.
