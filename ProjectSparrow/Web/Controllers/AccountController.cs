@@ -32,6 +32,12 @@ namespace Web.Controllers
 
             return Ok();
         }
+
+        [HttpPost("sign-up")]
+        public IActionResult CreateAccount()
+        {
+            return Ok();
+        }
     }
 
 }
