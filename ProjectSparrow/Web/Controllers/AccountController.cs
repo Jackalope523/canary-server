@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Server.Boundaries;
+using Web.Models;
+using System.Net;
 
 namespace Web.Controllers
 {
@@ -12,7 +14,16 @@ namespace Web.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private IAccountOperations accounts;
+		enum AccountError
+		{
+			MissingInformation,
+			InvalidLoginCombination,
+			CouldNotLoginUser,
+			CouldNotCreateUser,
+            CouldNotModifyUser
+		}
+
+		private IAccountOperations accounts;
 
         public AccountController(IAccountOperations accountOperations)
         {
@@ -20,22 +31,71 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetLoginToken() // Takes in account model.
+        public IActionResult GetLoginToken([FromBody] AccountCredentialsModel credentials)
         {
+            if (credentials == null || !ModelState.IsValid)
+            {
+                return BadRequest(AccountError.MissingInformation.ToString());
+            }
 
-            return Ok();
+            string token;
+
+            try
+            {
+                token = accounts.TryLogin(credentials.Identification, credentials.Passkey);
+            }
+            catch
+            {
+                return BadRequest(AccountError.CouldNotLoginUser.ToString());
+            }
+
+            if (token == string.Empty)
+            {
+                return BadRequest(AccountError.InvalidLoginCombination.ToString());
+            }
+            else
+            {
+                return Ok(token);
+            }
         }
 
         [HttpPut]
-        public IActionResult ModifyAccount() // Takes in account and options models.
+        public IActionResult ModifyAccount([FromBody] AccountDetailsModel details)
         {
+			if (details == null || !ModelState.IsValid)
+			{
+				return BadRequest(AccountError.MissingInformation.ToString());
+			}
+
+            try
+            {
+                accounts.EditUser(details.Identification, details.Name, details.DateOfBirth, details.Photo);
+            }
+            catch
+            {
+                return BadRequest(AccountError.CouldNotModifyUser.ToString());
+            }
 
             return Ok();
         }
 
         [HttpPost("sign-up")]
-        public IActionResult CreateAccount()
-        {
+        public IActionResult CreateAccount([FromBody] AccountSignUpModel details)
+		{
+			if (details == null || !ModelState.IsValid)
+			{
+				return BadRequest(AccountError.MissingInformation.ToString());
+			}
+
+            try
+			{
+				accounts.CreateUser(details.Identification, details.Passkey, details.Name, details.DateOfBirth);
+			}
+            catch
+            {
+                return BadRequest(AccountError.CouldNotCreateUser.ToString());
+            }
+
             return Ok();
         }
     }
