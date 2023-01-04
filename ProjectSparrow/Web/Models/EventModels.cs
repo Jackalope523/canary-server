@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace Web.Models
 {
@@ -17,22 +18,23 @@ namespace Web.Models
         //
     }
 
-    public class EventModel
+    public class EventModel : IdentifierModel
     {
-        public string EventUUID { get; set; }
+        [Required]
+        public string EventID { get; set; }
 
+        [Required]
         public EventType EventType { get; set; }
 
+        [Required]
         public GeoLocation Location { get; set; }
-    
-        public EventStatus EventStatus { get; set; }
     }
 
     public class EventOverviewModel : EventModel
     {
         public DateTime StartTime { get; set; }
 
-        public string HostUUID { get; set; } // May be better if we don't give out the Host's UUID and instead just give relevant information or have calls that use the Event's UUID instead
+        public string HostID { get; set; }
 
         public uint NumberOfParticipants { get; set; }
     }

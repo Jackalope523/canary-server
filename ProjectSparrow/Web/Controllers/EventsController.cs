@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Server.Boundaries;
+using Web.Models;
 
 namespace Web.Controllers
 {
@@ -21,7 +22,7 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetEventsList() // Takes in a position model.
+        public IActionResult GetEventsList()
         {
 
             return Ok();

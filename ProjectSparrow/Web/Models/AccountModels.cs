@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace Web.Models
 {
-    public class AccountCredentialsModel
-    {
-        [Required]
-        public string Identification { get; set; }
+	public class IdentifierModel
+	{
+		[Required]
+		public string Identification { get; set; }
+	}
 
+    public class AccountCredentialsModel : IdentifierModel
+    {
         [Required]
         public string Passkey { get; set; }
     }
 
-    public class AccountSignUpModel
+    public class AccountSignUpModel : IdentifierModel
 	{
-		[Required]
-		public string Identification { get; set; }
-
 		[Required]
 		public string Passkey { get; set; }
 
@@ -32,11 +32,8 @@ namespace Web.Models
 		public string Photo { get; set; }
     }
 
-	public class AccountDetailsModel
+	public class AccountDetailsModel : IdentifierModel
 	{
-		[Required]
-		public string Identification { get; set; }
-
 		public string Name { get; set; }
 
 		public DateTime DateOfBirth { get; set; }

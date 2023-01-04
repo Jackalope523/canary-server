@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Web.Models
 {
-    public class ProfileModel
+    public class ProfileModel : IdentifierModel
     {
         [Required]
-        public string Identification { get; set; }
-
         public string TargetIdentification { get; set; }
     }
 

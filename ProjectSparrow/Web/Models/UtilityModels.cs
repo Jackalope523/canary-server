@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace Web.Models.Utilities
 {
-    public class GeoLocation
+    public class GeoLocation : IdentifierModel
     {
+        [Required]
         public float Latitude { get; set; }
 
-        public float Longitude { get; set; }
+		[Required]
+		public float Longitude { get; set; }
     }
 }

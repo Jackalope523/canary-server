@@ -49,7 +49,7 @@ namespace Web.Controllers
         }
 
         [HttpGet("following")]
-        public IActionResult GetFollowed([FromBody] ProfileModel user)
+        public IActionResult GetFollowed([FromBody] IdentifierModel user)
         {
 			if (user == null || !ModelState.IsValid)
 			{
@@ -73,8 +73,7 @@ namespace Web.Controllers
 		[HttpPost("following")]
 		public IActionResult FollowUser([FromBody] ProfileModel info)
 		{
-			if (info == null || !ModelState.IsValid ||
-				info.TargetIdentification == null || info.TargetIdentification == string.Empty)
+			if (info == null || !ModelState.IsValid)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
@@ -94,8 +93,7 @@ namespace Web.Controllers
 		[HttpPut("following")]
 		public IActionResult UnfollowUser([FromBody] ProfileModel info)
 		{
-			if (info == null || !ModelState.IsValid ||
-				info.TargetIdentification == null || info.TargetIdentification == string.Empty)
+			if (info == null || !ModelState.IsValid)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
@@ -113,7 +111,7 @@ namespace Web.Controllers
 		}
 
 		[HttpGet("blocked")]
-		public IActionResult GetBlocked([FromBody] ProfileModel user)
+		public IActionResult GetBlocked([FromBody] IdentifierModel user)
 		{
 			if (user == null || !ModelState.IsValid)
 			{
@@ -137,8 +135,7 @@ namespace Web.Controllers
 		[HttpPost("blocked")]
 		public IActionResult BlockUser([FromBody] ProfileModel info)
 		{
-			if (info == null || !ModelState.IsValid ||
-				info.TargetIdentification == null || info.TargetIdentification == string.Empty)
+			if (info == null || !ModelState.IsValid)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
@@ -158,8 +155,7 @@ namespace Web.Controllers
 		[HttpPut("blocked")]
 		public IActionResult UnblockUser([FromBody] ProfileModel info)
 		{
-			if (info == null || !ModelState.IsValid ||
-				info.TargetIdentification == null || info.TargetIdentification == string.Empty)
+			if (info == null || !ModelState.IsValid)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
