@@ -8,15 +8,15 @@ namespace Server.Boundaries
 {
 	public interface IEventOperations
 	{
-		public void GetEventInformation(string identification, string eventID);
-		public void GetEventsInArea(string identification, float latitude, float longitude, float distance);
-		public void GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
+		void GetEventInformation(string identification, string eventID);
+		void GetEventsInArea(string identification, float latitude, float longitude, float distance);
+		void GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
 
-		public void CreateEvent(string identification, float latitude, float longitude);
-		public void JoinEvent(string identification, string eventID);
-		public void LeaveEvent(string identification);
-		public void EndEvent(string identification);
+		void CreateEvent(string identification, float latitude, float longitude);
+		void JoinEvent(string identification, string eventID);
+		void LeaveEvent(string identification);
+		void EndEvent(string identification);
 
-		public void GetAttendees(string identification, string eventID);
+		void GetAttendees(string identification, string eventID);
 	}
 }

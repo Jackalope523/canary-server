@@ -8,20 +8,20 @@ namespace Server.Boundaries
 {
 	public interface IAccountOperations
 	{
-		public void GetUserProfile(string targetIdentification);
+		void GetUserProfile(string targetIdentification);
 
-		public string TryLogin(string identification, string passkey);
-		public void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth);
-		public void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto);
-		public void DeleteUser(string identification);
+		string TryLogin(string identification, string passkey);
+		void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth);
+		void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto);
+		void DeleteUser(string identification);
 
-		public List<string> GetFollowedUsers(string identification);
-		public List<string> GetBlockedUsers(string identification);
+		List<string> GetFollowedUsers(string identification);
+		List<string> GetBlockedUsers(string identification);
 
-		public void FollowUser(string identification, string targetIdentification);
-		public void UnfollowUser(string identification, string targetIdentification);
-		public void BlockUser(string identification, string targetIdentification);
-		public void UnblockUser(string identification, string targetIdentification);
+		void FollowUser(string identification, string targetIdentification);
+		void UnfollowUser(string identification, string targetIdentification);
+		void BlockUser(string identification, string targetIdentification);
+		void UnblockUser(string identification, string targetIdentification);
 
 	}
 }
