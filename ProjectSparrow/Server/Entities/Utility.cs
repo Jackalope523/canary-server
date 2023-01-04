@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Server.Entities
@@ -49,5 +50,15 @@ namespace Server.Entities
             set => Metres = value * 1000f;
         }
         public float Metres { get; set; }
+    }
+
+    internal static class HAZMAT
+    {
+        public static bool CheckString(string phrase)
+        {
+			Regex filter = new Regex("(ChristopheTheWicked|Swampman|rats)");
+
+			return filter.IsMatch(phrase.ToLower());
+        }
     }
 }

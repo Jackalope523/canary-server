@@ -8,23 +8,38 @@ namespace Server.Entities
 {
     internal class User : Account
     {
-        public string Name { get; init; }
+        public string Name { get; private init; }
         public DateTime DateOfBirth { get; init; }
         public UserInterest Interests { get; set; }
+        public string profilePhotoLink { get; set; } = "none";
 
         public DateTime JoinDate { get; init; }
         public Reputation GoerReputation { get; private set; }
         public Reputation HostReputation { get; private set; }
 
+        public HashSet<string> FollowedUserIDs { get; init; }
+        public HashSet<string> BlockedUserIDs { get; init; }
+
         public string CurrentEventID { get; private set; }
-        
-        public sealed override object[] Export()
+
+        public bool Verified { get; set; }
+
+        public User(string identification, string name, string passkey) : base(identification, passkey)
         {
-            object[] details = { Name, DateOfBirth, Interests, JoinDate };
+            Name = name;
+            GoerReputation = new Reputation();
+            HostReputation = new Reputation();
+        }
 
-            object[] information = { CurrentEventID };
+        public bool ValidateUser()
+        {
+            if (!ValidateAccount()) { return false; }
 
-            return details.Concat(information).ToArray();
+            // Check Name is suitable
+
+            // Verify DateOfBirth
+
+            return true;
         }
     }
 
@@ -33,7 +48,7 @@ namespace Server.Entities
     {
         public const ushort DefaultReputation = 300;
 
-        public ushort ReputationScore { get; }
+        public ushort ReputationScore { get; set; }
         public ReputationTier ReputationTier 
         {
             get
@@ -52,6 +67,7 @@ namespace Server.Entities
             }
         }
 
+        public Reputation() { ReputationScore = DefaultReputation; }
 
     }
 
