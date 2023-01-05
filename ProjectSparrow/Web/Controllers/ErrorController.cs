@@ -13,11 +13,10 @@ namespace Web.Controllers
     {
 
         [HttpGet]
-        public IActionResult GetPage()
-        {
-
-            return Ok();
-        }
+        public IActionResult Error()
+		{
+			return new StatusCodeResult(418);
+		}
 
     }
 

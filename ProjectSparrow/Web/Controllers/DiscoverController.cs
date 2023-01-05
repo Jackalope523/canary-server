@@ -12,16 +12,14 @@ namespace Web.Controllers
     {
         
         [HttpGet]
-        public IActionResult GetPage()
+        public IActionResult IAmDiscover()
+		{
+			return new StatusCodeResult(418);
+		}
+
+        [HttpGet("{latitude}-{longitude}")]
+        public IActionResult GetMapFiles(uint latitude, float longitude)
         {
-
-            return Ok();
-        }
-
-        [HttpGet("{pos}")]
-        public IActionResult GetMapFiles(uint pos) // Either will take in parameters or location model.
-        {
-
             return Ok();
         }
 
