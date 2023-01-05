@@ -17,6 +17,6 @@ namespace Server.Boundaries
 		void LeaveEvent(string identification);
 		void EndEvent(string identification);
 
-		void GetAttendees(string identification, string eventID);
+		List<string> GetAttendees(string identification, string eventID);
 	}
 }
