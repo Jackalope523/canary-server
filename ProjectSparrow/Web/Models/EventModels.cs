@@ -22,19 +22,19 @@ namespace Web.Models
     {
         [Required]
         public string EventID { get; set; }
+    }
 
+    public class EventDetailsModel : EventModel
+    {
         [Required]
         public EventType EventType { get; set; }
 
         [Required]
         public GeoLocation Location { get; set; }
-    }
-
-    public class EventOverviewModel : EventModel
-    {
-        public DateTime StartTime { get; set; }
 
         public string HostID { get; set; }
+
+        public DateTime StartTime { get; set; }
 
         public uint NumberOfParticipants { get; set; }
     }

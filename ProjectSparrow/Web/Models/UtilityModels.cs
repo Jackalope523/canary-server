@@ -13,5 +13,8 @@ namespace Web.Models.Utilities
 
 		[Required]
 		public float Longitude { get; set; }
+
+        [Required]
+        public float Distance { get; set; } = 1;
     }
 }

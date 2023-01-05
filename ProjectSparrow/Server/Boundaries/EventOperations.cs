@@ -9,8 +9,8 @@ namespace Server.Boundaries
 	public interface IEventOperations
 	{
 		void GetEventInformation(string identification, string eventID);
-		void GetEventsInArea(string identification, float latitude, float longitude, float distance);
-		void GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
+		List<string> GetEventsInArea(string identification, float latitude, float longitude, float distance);
+		List<string> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
 
 		void CreateEvent(string identification, float latitude, float longitude);
 		void JoinEvent(string identification, string eventID);
