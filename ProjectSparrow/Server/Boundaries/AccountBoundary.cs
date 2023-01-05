@@ -9,18 +9,18 @@ namespace Server.Boundaries
 {
 	internal interface IAccountDatabase
 	{
-		public Account GetAccount(string accountID);
+		Account GetAccount(string accountID);
 
-		public Account FindAccount(string identification);
+		Account FindAccount(string identification);
 
-		public Account UpdateAccount(Account account);
+		Account UpdateAccount(Account account);
 
-		public void DeleteAccount(string accountID);
+		void DeleteAccount(string accountID);
 
-		public User GetUser(string accountID);
+		User GetUser(string accountID);
 
-		public User UpdateUser(User user);
+		User UpdateUser(User user);
 
-		public string GenerateAccountID();
+		string GenerateAccountID();
 	}
 }
