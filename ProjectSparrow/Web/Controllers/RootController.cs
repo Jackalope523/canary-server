@@ -13,10 +13,9 @@ namespace Web.Controllers
     {
 
         [HttpGet]
-        public IActionResult GetPage()
+        public IActionResult IAmRoot()
         {
-
-            return Ok();
+            return new StatusCodeResult(418);
         }
 
     }
