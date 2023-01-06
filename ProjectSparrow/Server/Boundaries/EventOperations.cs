@@ -14,8 +14,8 @@ namespace Server.Boundaries
 
 		void CreateEvent(string identification, float latitude, float longitude);
 		void JoinEvent(string identification, string eventID);
-		void LeaveEvent(string identification);
-		void EndEvent(string identification);
+		void LeaveEvent(string identification, string eventID);
+		void EndEvent(string identification, string eventID);
 
 		List<string> GetAttendees(string identification, string eventID);
 	}
