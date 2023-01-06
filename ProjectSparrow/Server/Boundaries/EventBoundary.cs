@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	public record ThinEvent(string HostID, float Latitude, float Longitude, string EventType, DateTime StartTime);
-	public record ThinListEvent(string HostID, float Latitude, float Longitude, string EventType);
+	public record ThinEvent(string HostID, float EventName, string EventType, DateTime StartTime, float Latitude, float Longitude);
+	public record ThinListEvent(string HostID, string EventType, float Latitude, float Longitude);
 
 	public record ThinListUser(string UserID, string Name, string ProfilePhoto);
 
@@ -17,7 +17,7 @@ namespace Server.Boundaries
 		ThinEvent GetEvent(string eventID);
 		List<ThinListEvent> GetEvents(float latitude, float longitude, float distance);
 
-		void CreateEvent(string hostID, float latitude, float longitude);
+		void CreateEvent(string hostID, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
 		void AddUserToEvent(string identification, string eventID);
 		void RemoveUserFromEvent(string identification, string eventID);
 		void EndEvent(string identification, string eventID);
@@ -31,7 +31,7 @@ namespace Server.Boundaries
 		List<ThinListEvent> GetEventsInArea(string identification, float latitude, float longitude, float distance);
 		List<ThinListEvent> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
 
-		void CreateEvent(string identification, float latitude, float longitude);
+		void CreateEvent(string identification, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
 		void JoinEvent(string identification, string eventID);
 		void LeaveEvent(string identification, string eventID);
 		void EndEvent(string identification, string eventID);

@@ -104,7 +104,9 @@ namespace Web.Controllers
 
             try
             {
-                events.CreateEvent(eventDetails.Identification, eventDetails.Location.Latitude, eventDetails.Location.Longitude); // TODO Add more event relevant information
+                events.CreateEvent(eventDetails.Identification,
+					eventDetails.EventName, eventDetails.EventType, eventDetails.StartTime,
+					eventDetails.Location.Latitude, eventDetails.Location.Longitude);
             }
             catch
             {

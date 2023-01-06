@@ -43,11 +43,11 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public void CreateEvent(string identification, float latitude, float longitude)
+		public void CreateEvent(string identification, string eventName, string eventType, DateTime startTime, float latitude, float longitude)
 		{
 			// Get hostID from identification and send it in
 
-			events.CreateEvent("hostID", latitude, longitude);
+			events.CreateEvent("hostID", eventName, eventType, startTime, latitude, longitude);
 		}
 
 		public void JoinEvent(string identification, string eventID)
@@ -67,7 +67,7 @@ namespace Server.Controls
 
 		public List<ThinListUser> GetAttendees(string identification, string eventID)
 		{
-			return events.GetGuestList(identification, eventID); // Do we do user verification on server or DB? Maybe change DB boundary verbs to things like 'AccountCreated()'
+			return events.GetGuestList(identification, eventID);
 		}
 	}
 }
