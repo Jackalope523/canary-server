@@ -1,51 +1,73 @@
 ﻿using Server.Boundaries;
+using Server.Entities;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 namespace Server.Controls
 {
 	public class EventManager : IEventOperations
 	{
-		public void GetEventInformation(string identification, string eventID)
+		private IEventDatabase events;
+
+		public EventManager(IEventDatabase eventDatabase)
 		{
-			throw new NotImplementedException();
+			events = eventDatabase;
 		}
 
-		public List<string> GetEventsInArea(string identification, float latitude, float longitude, float distance)
+		public (string hostID, float latitude, float longitude, string eventType, DateTime startTime) GetEventInformation(string identification, string eventID)
 		{
-			throw new NotImplementedException();
+			var eventInformation = events.GetEvent(eventID);
+
+			return eventInformation;
 		}
 
-		public List<string> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance)
+		public List<(string eventID, float latitude, float longitude, string eventType)> GetEventsInArea(string identification, float latitude, float longitude, float distance)
 		{
-			throw new NotImplementedException();
+			List<(string eventID, float latitude, float longitude, string eventType)> nearbyEvents = events.GetEvents(latitude, longitude);
+
+			// Distance calculations here
+
+			return nearbyEvents;
+		}
+
+		public List<(string eventID, float latitude, float longitude, string eventType)> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance)
+		{
+			List<(string eventID, float latitude, float longitude, string eventType)> nearbyEvents = GetEventsInArea(identification, latitude, longitude, distance);
+
+			// User interest weighting here
+
+			return nearbyEvents;
 		}
 
 		public void CreateEvent(string identification, float latitude, float longitude)
 		{
-			throw new NotImplementedException();
+			// Get hostID from identification and send it in
+
+			events.CreateEvent("hostID", latitude, longitude);
 		}
 
 		public void JoinEvent(string identification, string eventID)
 		{
-			throw new NotImplementedException();
+			events.JoinEvent(identification, eventID);
 		}
 
-		public void LeaveEvent(string identification)
+		public void LeaveEvent(string identification, string eventID)
 		{
-			throw new NotImplementedException();
+			events.LeaveEvent(identification, eventID);
 		}
 
-		public void EndEvent(string identification)
+		public void EndEvent(string identification, string eventID)
 		{
-			throw new NotImplementedException();
+			events.EndEvent(identification, eventID);
 		}
 
-		public List<string> GetAttendees(string identification, string eventID)
+		public List<(string userID, string name, string profilePhoto)> GetAttendees(string identification, string eventID)
 		{
-			throw new NotImplementedException();
+			return events.GetGuestList(identification, eventID); // Do we do user verification on server or DB? Maybe change DB boundary verbs to things like 'AccountCreated()'
 		}
 	}
 }
