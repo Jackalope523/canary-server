@@ -7,20 +7,16 @@ using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	internal interface IAccountDatabase
+	public interface IAccountDatabase
 	{
-		Account GetAccount(string accountID);
+		void GetAccount(string accountID);
+		void FindAccount(string identification);
 
-		Account FindAccount(string identification);
-
-		Account UpdateAccount(Account account);
-
+		void UpdateAccount(string accountID);
 		void DeleteAccount(string accountID);
 
-		User GetUser(string accountID);
-
-		User UpdateUser(User user);
-
-		string GenerateAccountID();
+		void GetUser(string accountID);
+		void CreateUser(string identification);
+		void UpdateUser(string userID);
 	}
 }
