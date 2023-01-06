@@ -27,7 +27,7 @@ namespace Server.Controls
 
 		public List<ThinListEvent> GetEventsInArea(string identification, float latitude, float longitude, float distance)
 		{
-			List<ThinListEvent> nearbyEvents = events.GetEvents(latitude, longitude);
+			List<ThinListEvent> nearbyEvents = events.GetEvents(latitude, longitude, distance);
 
 			// Distance calculations here
 
@@ -52,12 +52,12 @@ namespace Server.Controls
 
 		public void JoinEvent(string identification, string eventID)
 		{
-			events.JoinEvent(identification, eventID);
+			events.AddUserToEvent(identification, eventID);
 		}
 
 		public void LeaveEvent(string identification, string eventID)
 		{
-			events.LeaveEvent(identification, eventID);
+			events.RemoveUserFromEvent(identification, eventID);
 		}
 
 		public void EndEvent(string identification, string eventID)

@@ -15,11 +15,11 @@ namespace Server.Boundaries
 	public interface IEventDatabase
 	{
 		ThinEvent GetEvent(string eventID);
-		List<ThinListEvent> GetEvents(float latitude, float longitude, int eventLimit = 20);
+		List<ThinListEvent> GetEvents(float latitude, float longitude, float distance);
 
 		void CreateEvent(string hostID, float latitude, float longitude);
-		void JoinEvent(string identification, string eventID);
-		void LeaveEvent(string identification, string eventID);
+		void AddUserToEvent(string identification, string eventID);
+		void RemoveUserFromEvent(string identification, string eventID);
 		void EndEvent(string identification, string eventID);
 
 		List<ThinListUser> GetGuestList(string identification, string eventID);
