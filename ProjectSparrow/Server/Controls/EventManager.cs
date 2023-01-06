@@ -18,25 +18,25 @@ namespace Server.Controls
 			events = eventDatabase;
 		}
 
-		public (string hostID, float latitude, float longitude, string eventType, DateTime startTime) GetEventInformation(string identification, string eventID)
+		public ThinEvent GetEventInformation(string identification, string eventID)
 		{
 			var eventInformation = events.GetEvent(eventID);
 
 			return eventInformation;
 		}
 
-		public List<(string eventID, float latitude, float longitude, string eventType)> GetEventsInArea(string identification, float latitude, float longitude, float distance)
+		public List<ThinListEvent> GetEventsInArea(string identification, float latitude, float longitude, float distance)
 		{
-			List<(string eventID, float latitude, float longitude, string eventType)> nearbyEvents = events.GetEvents(latitude, longitude);
+			List<ThinListEvent> nearbyEvents = events.GetEvents(latitude, longitude);
 
 			// Distance calculations here
 
 			return nearbyEvents;
 		}
 
-		public List<(string eventID, float latitude, float longitude, string eventType)> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance)
+		public List<ThinListEvent> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance)
 		{
-			List<(string eventID, float latitude, float longitude, string eventType)> nearbyEvents = GetEventsInArea(identification, latitude, longitude, distance);
+			List<ThinListEvent> nearbyEvents = GetEventsInArea(identification, latitude, longitude, distance);
 
 			// User interest weighting here
 
@@ -65,7 +65,7 @@ namespace Server.Controls
 			events.EndEvent(identification, eventID);
 		}
 
-		public List<(string userID, string name, string profilePhoto)> GetAttendees(string identification, string eventID)
+		public List<ThinListUser> GetAttendees(string identification, string eventID)
 		{
 			return events.GetGuestList(identification, eventID); // Do we do user verification on server or DB? Maybe change DB boundary verbs to things like 'AccountCreated()'
 		}

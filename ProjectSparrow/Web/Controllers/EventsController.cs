@@ -38,7 +38,7 @@ namespace Web.Controllers
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
-			List<string> eventList;
+			List<ThinListEvent> eventList;
 
             try
             {
@@ -60,7 +60,7 @@ namespace Web.Controllers
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
-			List<string> eventList;
+			List<ThinListEvent> eventList;
 
 			try
 			{
