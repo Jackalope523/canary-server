@@ -89,7 +89,7 @@ namespace Web.Controllers
 
             try
 			{
-				accounts.CreateUser(details.Identification, details.Passkey, details.Name, details.DateOfBirth);
+				accounts.CreateUser(details.Identification, details.Passkey, details.Name, details.DateOfBirth, details.Photo);
 			}
             catch
             {

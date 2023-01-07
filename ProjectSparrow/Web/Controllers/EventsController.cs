@@ -38,7 +38,7 @@ namespace Web.Controllers
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
-			List<string> eventList;
+			List<ThinListEvent> eventList;
 
             try
             {
@@ -60,7 +60,7 @@ namespace Web.Controllers
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
-			List<string> eventList;
+			List<ThinListEvent> eventList;
 
 			try
 			{
@@ -104,7 +104,9 @@ namespace Web.Controllers
 
             try
             {
-                events.CreateEvent(eventDetails.Identification, eventDetails.Location.Latitude, eventDetails.Location.Longitude); // TODO Add more event relevant information
+                events.CreateEvent(eventDetails.Identification,
+					eventDetails.EventName, eventDetails.EventType, eventDetails.StartTime,
+					eventDetails.Location.Latitude, eventDetails.Location.Longitude);
             }
             catch
             {
@@ -135,7 +137,7 @@ namespace Web.Controllers
 		}
 
         [HttpDelete("{eventID}")]
-        public IActionResult EndEvent([FromBody] IdentifierModel user)
+        public IActionResult EndEvent([FromBody] EventModel user)
 		{
 			if (user == null || !ModelState.IsValid)
 			{
@@ -144,7 +146,7 @@ namespace Web.Controllers
 
 			try
 			{
-				events.EndEvent(user.Identification);
+				events.EndEvent(user.Identification, user.EventID);
 			}
 			catch
 			{
@@ -175,7 +177,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPut("{eventID}")]
-		public IActionResult LeaveEvent([FromBody] IdentifierModel user)
+		public IActionResult LeaveEvent([FromBody] EventModel user)
 		{
 			if (user == null || !ModelState.IsValid)
 			{
@@ -184,7 +186,7 @@ namespace Web.Controllers
 
 			try
 			{
-				events.LeaveEvent(user.Identification);
+				events.LeaveEvent(user.Identification, user.EventID);
 			}
 			catch
 			{

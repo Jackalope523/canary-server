@@ -11,7 +11,7 @@ namespace Server.Entities
         public string Name { get; private init; }
         public DateTime DateOfBirth { get; init; }
         public UserInterest Interests { get; set; }
-        public string profilePhotoLink { get; set; } = "none";
+        public string ProfilePhoto { get; set; } = "none";
 
         public DateTime JoinDate { get; init; }
         public Reputation GoerReputation { get; private set; }

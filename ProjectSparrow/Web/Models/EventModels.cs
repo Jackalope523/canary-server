@@ -8,16 +8,6 @@ namespace Web.Models
 {
     using Utilities;
 
-    public enum EventType
-    {
-        // Might want this to be a String, goes back to Colt Express enum converting. Drawbacks will appear though, especially with scaling
-    }
-
-    public enum EventStatus
-    {
-        //
-    }
-
     public class EventModel : IdentifierModel
     {
         [Required]
@@ -27,14 +17,18 @@ namespace Web.Models
     public class EventDetailsModel : EventModel
     {
         [Required]
-        public EventType EventType { get; set; }
+        public string EventName { get; set; }
+
+        [Required]
+        public string EventType { get; set; }
 
         [Required]
         public GeoLocation Location { get; set; }
 
-        public string HostID { get; set; }
-
+        [Required]
         public DateTime StartTime { get; set; }
+
+        public string HostID { get; set; }
 
         public uint NumberOfParticipants { get; set; }
     }
