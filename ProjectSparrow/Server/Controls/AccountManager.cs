@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Server.Controls
 {
-    internal class AccountManager
+    internal class AccountManager : IAccountOperations
     {
         private IAccountDatabase accounts { get; init; }
 
@@ -18,7 +18,7 @@ namespace Server.Controls
             accounts = accountDatabase;
         }
 
-        public void GetUserProfile(string identification, string targetIdentification)
+        public ThinUser GetUserProfile(string identification, string targetIdentification)
         {
             // Cases to handle
             // Is my own profile (send everything not hidden, include number of followers) 
@@ -26,7 +26,12 @@ namespace Server.Controls
             //
         }
 
-        public void CreateUser(string identification, string name, DateTime dateOfBirth)
+        public string TryLogin(string identification, string passkey)
+        {
+
+        }
+
+        public void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth, string profilePhoto)
         {
             // Check identification not in use
 
@@ -37,7 +42,6 @@ namespace Server.Controls
 
             User newUser = new(identification, name, "")
             {
-                AccountID = accounts.GenerateAccountID(),
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTime.Now,
                 Verified = false
@@ -56,21 +60,16 @@ namespace Server.Controls
             // TODO Verify created successfully
         }
 
-        public void EditUser(string identification)
+        public void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto)
         {
             // Verify updates are valid
 
-
-        }
-
-        public void UpdatePhoto(string identification)
-        {
-            Account account = accounts.FindAccount(identification);
+            ThinAccount account = accounts.FindAccount(identification);
 
 			if (account == null)
 			{ return; } // TODO Error
 
-			User user = accounts.GetUser(account.AccountID);
+			ThinUser user = accounts.GetUser(account.AccountID);
 
             accounts.UpdateUser(user);
         }
@@ -86,7 +85,7 @@ namespace Server.Controls
             // TODO Handle possible errors
         }
 
-        public void GetFollowed(string identification)
+        public List<ThinListUser> GetFollowedUsers(string identification)
         {
 			Account account = accounts.FindAccount(identification);
 
@@ -98,7 +97,7 @@ namespace Server.Controls
             user.FollowedUserIDs.ToImmutableHashSet(); // TODO Return contents
 		}
 
-        public void GetBlocked(string identification)
+        public List<ThinListUser> GetBlockedUsers(string identification)
 		{
 			Account account = accounts.FindAccount(identification);
 

@@ -10,8 +10,6 @@ namespace Server.Boundaries
 	public record ThinEvent(string HostID, float EventName, string EventType, DateTime StartTime, float Latitude, float Longitude);
 	public record ThinListEvent(string HostID, string EventType, float Latitude, float Longitude);
 
-	public record ThinListUser(string UserID, string Name, string ProfilePhoto);
-
 	public interface IEventDatabase
 	{
 		ThinEvent GetEvent(string eventID);
