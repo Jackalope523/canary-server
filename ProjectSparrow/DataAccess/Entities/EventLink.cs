@@ -2,15 +2,15 @@
 {
     internal class EventLink : Link
     {
-        private int EventId { get; init; }
-        private Event Event { get; init; }
-        private EventLinkType Type { get; set; }
+        internal enum EventLinkType { Attending, Hosting, Watching, Left}
 
-        internal EventLink(int userId, User user, int eventId, Event @event, EventLinkType type) : base(userId, user)
-        {       
-            EventId = eventId;
-            Event = @event;
-            Type = type;
-        }
+        public int EventId { get; init; }
+        internal Event Event { get; init; }
+        internal EventLinkType Type { get; set; }
+        internal DateTime Time { get; init; }
+
+        
+      
+        
     }
 }

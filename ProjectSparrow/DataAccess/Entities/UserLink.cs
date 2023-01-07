@@ -2,15 +2,11 @@
 {
     internal class UserLink : Link
     {
-        private int UserId { get; init; }
-        private User User { get; init; }
-        private UserLinkType Type { get; set; }
+        internal enum UserLinkType { Following, Blocked }
 
-        internal UserLink(int selfId, User self, int otherId, User other, UserLinkType type) : base(selfId, self)
-        {
-            UserId = otherId;
-            User = other;
-            Type = type;
-        }
+        public int OtherId { get; init; }
+        internal User Other { get; init; }
+        internal UserLinkType Type { get; set; }
+       
     }
 }
