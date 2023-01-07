@@ -11,10 +11,12 @@ namespace Server.Controls
 {
 	public class EventManager : IEventOperations
 	{
+		private IAccountDatabase accounts;
 		private IEventDatabase events;
 
-		public EventManager(IEventDatabase eventDatabase)
+		public EventManager(IAccountDatabase accountDatabase, IEventDatabase eventDatabase)
 		{
+			accounts = accountDatabase;
 			events = eventDatabase;
 		}
 
@@ -29,7 +31,7 @@ namespace Server.Controls
 		{
 			List<ThinListEvent> nearbyEvents = events.GetEvents(latitude, longitude, distance);
 
-			// Distance calculations here
+			// TODO Distance calculations here
 
 			return nearbyEvents;
 		}
@@ -38,14 +40,14 @@ namespace Server.Controls
 		{
 			List<ThinListEvent> nearbyEvents = GetEventsInArea(identification, latitude, longitude, distance);
 
-			// User interest weighting here
+			// TODO User interest weighting here
 
 			return nearbyEvents;
 		}
 
 		public void CreateEvent(string identification, string eventName, string eventType, DateTime startTime, float latitude, float longitude)
 		{
-			// Get hostID from identification and send it in
+			accounts.FindAccount(identification);
 
 			events.CreateEvent("hostID", eventName, eventType, startTime, latitude, longitude);
 		}
