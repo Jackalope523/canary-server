@@ -29,23 +29,25 @@ namespace Web.Controllers
 		}
 
 		[HttpGet("{targetIdentification}")]
-        public IActionResult GetUser(string targetIdentification)
+        public IActionResult GetUser([FromBody] ProfileModel info)
         {
-			if (targetIdentification == null || targetIdentification == string.Empty)
+			if (info == null || !ModelState.IsValid)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
 
+			ThinProfile profile;
+
 			try
 			{
-				accounts.GetUserProfile(targetIdentification);
+				profile = accounts.GetUserProfile(info.Identification, info.TargetIdentification);
 			}
 			catch
 			{
 				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
 			}
 
-            return Ok();
+            return Ok(profile);
         }
 
         [HttpGet("following")]
@@ -56,7 +58,7 @@ namespace Web.Controllers
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
 
-			List<string> followedUsers; // Change to something more meaningful
+			List<ThinListUser> followedUsers; // Change to something more meaningful
 
 			try
 			{
@@ -118,7 +120,7 @@ namespace Web.Controllers
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
 
-			List<string> blockedUsers; // Change to something more meaningful
+			List<ThinListUser> blockedUsers; // Change to something more meaningful
 
 			try
 			{

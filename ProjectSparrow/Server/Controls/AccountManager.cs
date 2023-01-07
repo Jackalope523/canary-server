@@ -6,10 +6,11 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Server.Controls
 {
-    internal class AccountManager
+    internal class AccountManager : IAccountOperations
     {
         private IAccountDatabase accounts { get; init; }
 
@@ -18,15 +19,24 @@ namespace Server.Controls
             accounts = accountDatabase;
         }
 
-        public void GetUserProfile(string identification, string targetIdentification)
+        public ThinProfile GetUserProfile(string identification, string targetIdentification)
         {
-            // Cases to handle
-            // Is my own profile (send everything not hidden, include number of followers) 
-            // Is someone else's profile (send everything public)
-            //
+            ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
+
+            if (targetAccount == null)
+            { return; } // TODO Error
+
+            ThinUser targetUser = accounts.GetUser(targetAccount.AccountID);
+
+            return new ThinProfile(targetUser.AccountID, targetUser.Name, targetUser.ProfilePhoto, targetUser.Reputation, targetUser.NumberOfFollowers);
         }
 
-        public void CreateUser(string identification, string name, DateTime dateOfBirth)
+        public string TryLogin(string identification, string passkey)
+        {
+            // TODO Add security manager
+        }
+
+        public void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth, string profilePhoto)
         {
             // Check identification not in use
 
@@ -37,9 +47,9 @@ namespace Server.Controls
 
             User newUser = new(identification, name, "")
             {
-                AccountID = accounts.GenerateAccountID(),
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTime.Now,
+                ProfilePhoto = profilePhoto,
                 Verified = false
             };
 
@@ -52,32 +62,44 @@ namespace Server.Controls
 
             // Store profile
             
-            accounts.UpdateUser(newUser);
+            accounts.CreateUser(newUser.Identification, passkey, newUser.Name, newUser.DateOfBirth, newUser.ProfilePhoto);
             // TODO Verify created successfully
         }
 
-        public void EditUser(string identification)
+        public void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto)
         {
             // Verify updates are valid
 
-
-        }
-
-        public void UpdatePhoto(string identification)
-        {
-            Account account = accounts.FindAccount(identification);
+            ThinAccount account = accounts.FindAccount(identification);
 
 			if (account == null)
 			{ return; } // TODO Error
 
-			User user = accounts.GetUser(account.AccountID);
+			ThinUser user = accounts.GetUser(account.AccountID);
 
-            accounts.UpdateUser(user);
+            // TODO Use only what is given
+
+			User userValidation = new(identification, newName, "")
+			{
+				DateOfBirth = newDateOfBirth,
+				JoinDate = DateTime.Now,
+				ProfilePhoto = newPhoto,
+				Verified = false
+			};
+
+			// Validate profile
+
+			bool valid = userValidation.ValidateUser();
+
+			if (!valid)
+			{ return; } // TODO Add error codes
+
+			accounts.UpdateUser(user.AccountID, newName, newDateOfBirth, newPhoto);
         }
 
         public void DeleteUser(string identification)
         {
-            Account account = accounts.FindAccount(identification);
+            ThinAccount account = accounts.FindAccount(identification);
             
             if (account == null)
             { return; } // TODO Error
@@ -86,88 +108,68 @@ namespace Server.Controls
             // TODO Handle possible errors
         }
 
-        public void GetFollowed(string identification)
+        public List<ThinListUser> GetFollowedUsers(string identification)
         {
-			Account account = accounts.FindAccount(identification);
+			ThinAccount account = accounts.FindAccount(identification);
 
 			if (account == null)
 			{ return; } // TODO Error
 
-			User user = accounts.GetUser(account.AccountID);
-
-            user.FollowedUserIDs.ToImmutableHashSet(); // TODO Return contents
+            return accounts.GetFollowedUsers(account.AccountID);
 		}
 
-        public void GetBlocked(string identification)
+        public List<ThinListUser> GetBlockedUsers(string identification)
 		{
-			Account account = accounts.FindAccount(identification);
+			ThinAccount account = accounts.FindAccount(identification);
 
 			if (account == null)
 			{ return; } // TODO Error
 
-			User user = accounts.GetUser(account.AccountID);
-
-			user.BlockedUserIDs.ToImmutableHashSet(); // TODO Return contents
+			return accounts.GetBlockedUsers(account.AccountID);
 		}
 
         public void FollowUser(string identification, string targetIdentification)
         {
-            Account userAccount = accounts.FindAccount(identification);
-            Account targetAccount = accounts.FindAccount(targetIdentification);
+            ThinAccount userAccount = accounts.FindAccount(identification);
+            ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
 
             if (userAccount == null || targetAccount == null)
-            { return; }
+            { return; } // TODO Error
 
-            User user = accounts.GetUser(userAccount.AccountID);
-
-            user.FollowedUserIDs.Add(targetAccount.AccountID);
-
-            accounts.UpdateUser(user);
+            accounts.FollowUser(identification, targetIdentification);
 		}
 
 		public void UnfollowUser(string identification, string targetIdentification)
 		{
-			Account userAccount = accounts.FindAccount(identification);
-			Account targetAccount = accounts.FindAccount(targetIdentification);
+			ThinAccount userAccount = accounts.FindAccount(identification);
+			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
 
 			if (userAccount == null || targetAccount == null)
-			{ return; }
+			{ return; } // TODO Error
 
-			User user = accounts.GetUser(userAccount.AccountID);
-
-			user.FollowedUserIDs.Remove(targetAccount.AccountID);
-
-			accounts.UpdateUser(user);
+			accounts.UnfollowUser(identification, targetIdentification);
 		}
 
 		public void BlockUser(string identification, string targetIdentification)
 		{
-			Account userAccount = accounts.FindAccount(identification);
-			Account targetAccount = accounts.FindAccount(targetIdentification);
+			ThinAccount userAccount = accounts.FindAccount(identification);
+			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
 
 			if (userAccount == null || targetAccount == null)
-			{ return; }
+			{ return; } // TODO Error
 
-			User user = accounts.GetUser(userAccount.AccountID);
-
-			user.BlockedUserIDs.Add(targetAccount.AccountID);
-
-			accounts.UpdateUser(user);
+			accounts.BlockUser(identification, targetIdentification);
 		}
 
 		public void UnblockUser(string identification, string targetIdentification)
 		{
-			Account userAccount = accounts.FindAccount(identification);
-			Account targetAccount = accounts.FindAccount(targetIdentification);
+			ThinAccount userAccount = accounts.FindAccount(identification);
+			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
 
 			if (userAccount == null || targetAccount == null)
-			{ return; }
+			{ return; } // TODO Error
 
-			User user = accounts.GetUser(userAccount.AccountID);
-
-			user.BlockedUserIDs.Remove(targetAccount.AccountID);
-
-			accounts.UpdateUser(user);
+			accounts.UnblockUser(identification, targetIdentification);
 		}
 	}
 }
