@@ -3,6 +3,8 @@
 
 namespace Shared
 {
+    #region Accounts
+
     [Serializable]
 	public class InvalidUserException : Exception
 	{
@@ -36,7 +38,6 @@ namespace Shared
             : base(message, innerException) { }
     }
 
-
     [Serializable]
     public class UnexpectedFailureException : Exception
     {
@@ -47,4 +48,21 @@ namespace Shared
         public UnexpectedFailureException(string message, Exception innerException)
             : base(message, innerException) { }
     }
+
+    #endregion
+
+    #region Events
+
+    [Serializable]
+    public class InvalidEventException : Exception
+    {
+        public InvalidEventException()
+            : base() { }
+        public InvalidEventException(string message)
+            : base(message) { }
+        public InvalidEventException(string message, Exception innerException)
+            : base(message, innerException) { }
+    }
+
+    #endregion
 }

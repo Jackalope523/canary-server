@@ -62,15 +62,21 @@ namespace Server.Controls
 		{
 			// TODO Verify user
 
-			events.AddUserToEvent(userID, eventID);
+			bool success = events.AddUserToEvent(userID, eventID);
+
+			if (!success)
+			{ throw new UnexpectedFailureException("Could not join event."); }
 		}
 
 		public void LeaveEvent(Guid userID, Guid eventID)
 		{
 			// TODO Verify user
 
-			events.RemoveUserFromEvent(userID, eventID);
-		}
+			bool success = events.RemoveUserFromEvent(userID, eventID);
+
+            if (!success)
+            { throw new UnexpectedFailureException("Could not leave event."); }
+        }
 
 		public void EndEvent(Guid userID, Guid eventID)
 		{
@@ -78,12 +84,17 @@ namespace Server.Controls
 
 			// TODO Verify user is event host
 
-			events.EndEvent(eventID);
-		}
+			bool success = events.EndEvent(eventID);
+
+            if (!success)
+            { throw new UnexpectedFailureException("Could not end event."); }
+        }
 
 		public List<ThinnerUser> GetAttendees(Guid userID, Guid eventID)
 		{
 			// TODO Verify user
+
+			// TODO Verify user is event host
 
 			return events.GetGuestList(eventID);
 		}
