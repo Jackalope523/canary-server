@@ -9,17 +9,29 @@ namespace Web.Models
 	public class IdentifierModel
 	{
 		[Required]
-		public string Identification { get; set; }
+		public Guid UserID { get; set; }
 	}
 
-    public class AccountCredentialsModel : IdentifierModel
+    public class TargetModel : IdentifierModel
     {
+        [Required]
+        public Guid TargetID { get; set; }
+    }
+
+    public class AccountCredentialsModel
+    {
+		[Required]
+		public string PhoneNumber { get; set; }
+
         [Required]
         public string Passkey { get; set; }
     }
 
-    public class AccountSignUpModel : IdentifierModel
+    public class AccountSignUpModel
 	{
+		[Required]
+		public string PhoneNumber { get; set; }
+
 		[Required]
 		public string Passkey { get; set; }
 
@@ -28,17 +40,13 @@ namespace Web.Models
 
 		[Required]
 		public DateTime DateOfBirth { get; set; }
-
-		public string Photo { get; set; }
     }
 
 	public class AccountDetailsModel : IdentifierModel
 	{
+		public string PhoneNumber { get; set; }
+
 		public string Name { get; set; }
-
-		public DateTime DateOfBirth { get; set; }
-
-		public string Photo { get; set; }
 	}
 
 }

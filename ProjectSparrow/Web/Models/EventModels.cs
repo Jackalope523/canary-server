@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using Server.Boundaries;
 
 namespace Web.Models
 {
@@ -11,7 +12,7 @@ namespace Web.Models
     public class EventModel : IdentifierModel
     {
         [Required]
-        public string EventID { get; set; }
+        public Guid EventID { get; set; }
     }
 
     public class EventDetailsModel : EventModel
@@ -28,7 +29,7 @@ namespace Web.Models
         [Required]
         public DateTime StartTime { get; set; }
 
-        public string HostID { get; set; }
+        public ThinnerUser Host { get; set; }
 
         public uint NumberOfParticipants { get; set; }
     }

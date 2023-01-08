@@ -29,7 +29,7 @@ namespace Web.Controllers
 		}
 
 		[HttpGet("{targetIdentification}")]
-        public IActionResult GetUser([FromBody] ProfileModel info)
+        public IActionResult GetUser([FromBody] TargetModel info)
         {
 			if (info == null || !ModelState.IsValid)
 			{
@@ -40,7 +40,7 @@ namespace Web.Controllers
 
 			try
 			{
-				profile = accounts.GetUserProfile(info.Identification, info.TargetIdentification);
+				profile = accounts.GetUserProfile(info.UserID, info.TargetID);
 			}
 			catch
 			{
@@ -58,11 +58,11 @@ namespace Web.Controllers
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
 
-			List<ThinListUser> followedUsers; // Change to something more meaningful
+			List<ThinnerUser> followedUsers; // Change to something more meaningful
 
 			try
 			{
-				followedUsers = accounts.GetFollowedUsers(user.Identification);
+				followedUsers = accounts.GetFollowedUsers(user.UserID);
 			}
 			catch
 			{
@@ -73,7 +73,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPost("following")]
-		public IActionResult FollowUser([FromBody] ProfileModel info)
+		public IActionResult FollowUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -82,7 +82,7 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.FollowUser(info.Identification, info.TargetIdentification);
+				accounts.FollowUser(info.UserID, info.TargetID);
 			}
 			catch
 			{
@@ -93,7 +93,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPut("following")]
-		public IActionResult UnfollowUser([FromBody] ProfileModel info)
+		public IActionResult UnfollowUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -102,7 +102,7 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.UnfollowUser(info.Identification, info.TargetIdentification);
+				accounts.UnfollowUser(info.UserID, info.TargetID);
 			}
 			catch
 			{
@@ -120,11 +120,11 @@ namespace Web.Controllers
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
 
-			List<ThinListUser> blockedUsers; // Change to something more meaningful
+			List<ThinnerUser> blockedUsers; // Change to something more meaningful
 
 			try
 			{
-				blockedUsers = accounts.GetBlockedUsers(user.Identification);
+				blockedUsers = accounts.GetBlockedUsers(user.UserID);
 			}
 			catch
 			{
@@ -135,7 +135,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPost("blocked")]
-		public IActionResult BlockUser([FromBody] ProfileModel info)
+		public IActionResult BlockUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -144,7 +144,7 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.BlockUser(info.Identification, info.TargetIdentification);
+				accounts.BlockUser(info.UserID, info.TargetID);
 			}
 			catch
 			{
@@ -155,7 +155,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPut("blocked")]
-		public IActionResult UnblockUser([FromBody] ProfileModel info)
+		public IActionResult UnblockUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -164,7 +164,7 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.UnblockUser(info.Identification, info.TargetIdentification);
+				accounts.UnblockUser(info.UserID, info.TargetID);
 			}
 			catch
 			{

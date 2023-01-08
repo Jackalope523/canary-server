@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Shared;
 
 namespace Server.Controls
 {
@@ -19,16 +20,16 @@ namespace Server.Controls
             accounts = accountDatabase;
         }
 
-        public ThinProfile GetUserProfile(string identification, string targetIdentification)
+        public ThinProfile GetUserProfile(Guid userID, Guid targetID)
         {
-            ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
+            ThinUser targetAccount = accounts.FindUser(targetID);
 
             if (targetAccount == null)
             { return null; ; } // TODO Error
 
             ThinUser targetUser = accounts.GetUser(targetAccount.AccountID);
 
-            return new ThinProfile(targetUser.AccountID, targetUser.Name, targetUser.ProfilePhoto, targetUser.Reputation, targetUser.NumberOfFollowers);
+            return new ThinProfile(targetUser.AccountId, targetUser.Name, targetUser.ProfilePhoto, targetUser.Reputation, targetUser.NumberOfFollowers);
         }
 
         public string TryLogin(string identification, string passkey)
@@ -37,7 +38,7 @@ namespace Server.Controls
             throw new NotImplementedException();
         }
 
-        public void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth, string profilePhoto)
+        public void CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth)
         {
             // Check identification not in use
 
@@ -67,7 +68,7 @@ namespace Server.Controls
             // TODO Verify created successfully
         }
 
-        public void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto)
+        public void EditUser(Guid userID, string newName, DateTime newDateOfBirth)
         {
             // Verify updates are valid
 
@@ -98,7 +99,7 @@ namespace Server.Controls
 			accounts.UpdateUser(user.AccountID, newName, newDateOfBirth, newPhoto);
         }
 
-        public void DeleteUser(string identification)
+        public void DeleteUser(Guid userID)
         {
             ThinAccount account = accounts.FindAccount(identification);
             
@@ -109,7 +110,7 @@ namespace Server.Controls
             // TODO Handle possible errors
         }
 
-        public List<ThinListUser> GetFollowedUsers(string identification)
+        public List<ThinnerUser> GetFollowedUsers(Guid userID)
         {
 			ThinAccount account = accounts.FindAccount(identification);
 
@@ -119,7 +120,7 @@ namespace Server.Controls
             return accounts.GetFollowedUsers(account.AccountID);
 		}
 
-        public List<ThinListUser> GetBlockedUsers(string identification)
+        public List<ThinnerUser> GetBlockedUsers(Guid userID)
 		{
 			ThinAccount account = accounts.FindAccount(identification);
 
@@ -129,7 +130,7 @@ namespace Server.Controls
 			return accounts.GetBlockedUsers(account.AccountID);
 		}
 
-        public void FollowUser(string identification, string targetIdentification)
+        public void FollowUser(Guid userID, Guid targetID)
         {
             ThinAccount userAccount = accounts.FindAccount(identification);
             ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
@@ -140,7 +141,7 @@ namespace Server.Controls
             accounts.FollowUser(identification, targetIdentification);
 		}
 
-		public void UnfollowUser(string identification, string targetIdentification)
+		public void UnfollowUser(Guid userID, Guid targetID)
 		{
 			ThinAccount userAccount = accounts.FindAccount(identification);
 			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
@@ -151,7 +152,7 @@ namespace Server.Controls
 			accounts.UnfollowUser(identification, targetIdentification);
 		}
 
-		public void BlockUser(string identification, string targetIdentification)
+		public void BlockUser(Guid userID, Guid targetID)
 		{
 			ThinAccount userAccount = accounts.FindAccount(identification);
 			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
@@ -162,7 +163,7 @@ namespace Server.Controls
 			accounts.BlockUser(identification, targetIdentification);
 		}
 
-		public void UnblockUser(string identification, string targetIdentification)
+		public void UnblockUser(Guid userID, Guid targetID)
 		{
 			ThinAccount userAccount = accounts.FindAccount(identification);
 			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
