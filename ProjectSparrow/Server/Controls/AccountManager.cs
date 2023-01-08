@@ -24,7 +24,7 @@ namespace Server.Controls
             ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
 
             if (targetAccount == null)
-            { return; } // TODO Error
+            { return null; ; } // TODO Error
 
             ThinUser targetUser = accounts.GetUser(targetAccount.AccountID);
 
@@ -34,6 +34,7 @@ namespace Server.Controls
         public string TryLogin(string identification, string passkey)
         {
             // TODO Add security manager
+            throw new NotImplementedException();
         }
 
         public void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth, string profilePhoto)
@@ -113,7 +114,7 @@ namespace Server.Controls
 			ThinAccount account = accounts.FindAccount(identification);
 
 			if (account == null)
-			{ return; } // TODO Error
+			{ return null; } // TODO Error
 
             return accounts.GetFollowedUsers(account.AccountID);
 		}
@@ -123,7 +124,7 @@ namespace Server.Controls
 			ThinAccount account = accounts.FindAccount(identification);
 
 			if (account == null)
-			{ return; } // TODO Error
+			{ return null; } // TODO Error
 
 			return accounts.GetBlockedUsers(account.AccountID);
 		}
