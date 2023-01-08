@@ -11,7 +11,7 @@ namespace Server.Boundaries
 		ThinEvent FindEvent(Guid Id);
 		List<ThinnerEvent> FindEvents(float latitude, float longitude, float distance);
 
-		bool CreateEvent(Guid hostID, string name, string eventType, DateTime startTime, float latitude, float longitude);
+		Guid CreateEvent(Guid hostID, string name, string eventType, DateTime startTime, float latitude, float longitude);
 		bool AddUserToEvent(Guid userId, Guid eventId);
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);  
 		bool EndEvent(Guid Id);

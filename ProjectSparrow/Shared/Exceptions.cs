@@ -1,0 +1,50 @@
+﻿using System;
+
+
+namespace Shared
+{
+    [Serializable]
+	public class InvalidUserException : Exception
+	{
+		public InvalidUserException()
+            : base() { }
+		public InvalidUserException(string message)
+            : base(message) { }
+        public InvalidUserException(string message, Exception innerException)
+			: base(message, innerException) { }
+    }
+
+    [Serializable]
+    public class InvalidInformationException : Exception
+    {
+        public InvalidInformationException()
+            : base() { }
+        public InvalidInformationException(string message)
+            : base(message) { }
+        public InvalidInformationException(string message, Exception innerException)
+            : base(message, innerException) { }
+    }
+
+    [Serializable]
+    public class InsufficientPermissionsException : Exception
+    {
+        public InsufficientPermissionsException()
+            : base() { }
+        public InsufficientPermissionsException(string message)
+            : base(message) { }
+        public InsufficientPermissionsException(string message, Exception innerException)
+            : base(message, innerException) { }
+    }
+
+
+    [Serializable]
+    public class UnexpectedFailureException : Exception
+    {
+        public UnexpectedFailureException()
+            : base() { }
+        public UnexpectedFailureException(string message)
+            : base(message) { }
+        public UnexpectedFailureException(string message, Exception innerException)
+            : base(message, innerException) { }
+    }
+}

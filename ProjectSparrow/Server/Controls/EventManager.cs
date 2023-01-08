@@ -20,56 +20,72 @@ namespace Server.Controls
 			events = eventDatabase;
 		}
 
-		public ThinEvent GetEventInformation(string identification, string eventID)
-		{
-			var eventInformation = events.GetEvent(eventID);
+		public ThinEvent GetEventInformation(Guid userID, Guid eventID)
+        {
+			// TODO Verify user
+
+			var eventInformation = events.FindEvent(eventID);
 
 			return eventInformation;
 		}
 
-		public List<ThinListEvent> GetEventsInArea(string identification, float latitude, float longitude, float distance)
+		public List<ThinnerEvent> GetEventsInArea(Guid userID, float latitude, float longitude, float distance)
 		{
-			List<ThinListEvent> nearbyEvents = events.GetEvents(latitude, longitude, distance);
-
-			// TODO Distance calculations here
+			// TODO Verify user
+			
+			List<ThinnerEvent> nearbyEvents = events.FindEvents(latitude, longitude, distance);
 
 			return nearbyEvents;
 		}
 
-		public List<ThinListEvent> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance)
+		public List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, float latitude, float longitude, float distance)
 		{
-			List<ThinListEvent> nearbyEvents = GetEventsInArea(identification, latitude, longitude, distance);
+			// TODO Verify user
+
+			List<ThinnerEvent> nearbyEvents = GetEventsInArea(userID, latitude, longitude, distance);
 
 			// TODO User interest weighting here
 
 			return nearbyEvents;
 		}
 
-		public void CreateEvent(string identification, string eventName, string eventType, DateTime startTime, float latitude, float longitude)
+		public void CreateEvent(Guid userID, string eventName, string eventType, DateTime startTime, float latitude, float longitude)
 		{
-			accounts.FindAccount(identification);
+			// TODO Verify user
 
-			events.CreateEvent("hostID", eventName, eventType, startTime, latitude, longitude);
+			// TODO Verify user is not currently at an event
+
+			events.CreateEvent(userID, eventName, eventType, startTime, latitude, longitude);
 		}
 
-		public void JoinEvent(string identification, string eventID)
+		public void JoinEvent(Guid userID, Guid eventID)
 		{
-			events.AddUserToEvent(identification, eventID);
+			// TODO Verify user
+
+			events.AddUserToEvent(userID, eventID);
 		}
 
-		public void LeaveEvent(string identification, string eventID)
+		public void LeaveEvent(Guid userID, Guid eventID)
 		{
-			events.RemoveUserFromEvent(identification, eventID);
+			// TODO Verify user
+
+			events.RemoveUserFromEvent(userID, eventID);
 		}
 
-		public void EndEvent(string identification, string eventID)
+		public void EndEvent(Guid userID, Guid eventID)
 		{
-			events.EndEvent(identification, eventID);
+			// TODO Verify user
+
+			// TODO Verify user is event host
+
+			events.EndEvent(eventID);
 		}
 
-		public List<ThinListUser> GetAttendees(string identification, string eventID)
+		public List<ThinnerUser> GetAttendees(Guid userID, Guid eventID)
 		{
-			return events.GetGuestList(identification, eventID);
+			// TODO Verify user
+
+			return events.GetGuestList(eventID);
 		}
 	}
 }
