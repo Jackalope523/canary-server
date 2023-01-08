@@ -5,11 +5,11 @@ namespace DataAccess
 {
     public class QueryContext : DbContext
     {
-        DbSet<User> Users { get; set; }
-        DbSet<Event> Events { get; set; }  
-        DbSet<Link> Links { get; set; }
-        DbSet<UserLink> UsersLinks { get; set; }
-        DbSet<EventLink> EventLinks { get; set; }  
+        public DbSet<User> Users { get; set; }
+        public DbSet<Event> Events { get; set; }  
+        public DbSet<Link> Links { get; set; }
+        public DbSet<UserLink> UsersLinks { get; set; }
+        public DbSet<EventLink> EventLinks { get; set; }  
 
          protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
          {
