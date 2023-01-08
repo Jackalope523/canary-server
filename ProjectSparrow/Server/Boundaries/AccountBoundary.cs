@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(int AccountID, string Identification, string Name, DateTime DateOfBirth, string ProfilePhoto, int Reputation, int NumberOfFollowers);
-	public record ThinnerUser(string AccountID, string Name, string ProfilePhoto);
-	public record ThinProfile(string AccountID, string Name, string ProfilePhoto, int Reputation, int NumberOfFollowers);
+	public record ThinUser(int AccountId, string Identification, string Name, DateTime DateOfBirth, string ProfilePhoto, int Reputation, int NumberOfFollowers);
+	public record ThinnerUser(string AccountId, string Name, string ProfilePhoto);
+	public record ThinProfile(string AccountId, string Name, string ProfilePhoto, int Reputation, int NumberOfFollowers);
 
 	public interface IAccountDatabase
 	{
 		ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
         bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
-        bool DeleteUser(Guid accountID);
+        bool DeleteUser(Guid accountId);
         bool UpdatePhoneNumber(Guid id, string newNumber);
         bool UpdatePasskey(Guid id, string Passkey);
         bool UpdateName(Guid id, string newName);
@@ -41,8 +41,8 @@ namespace Server.Boundaries
 		void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto); // TODO Add EditAccount to update identification and/or passkey
 		void DeleteUser(string identification);
 
-		List<ThinListUser> GetFollowedUsers(string identification);
-		List<ThinListUser> GetBlockedUsers(string identification);
+		List<ThinnerUser> GetFollowedUsers(string identification);
+		List<ThinnerUser> GetBlockedUsers(string identification);
 
 		void FollowUser(string identification, string targetIdentification);
 		void UnfollowUser(string identification, string targetIdentification);
