@@ -7,33 +7,33 @@ using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	public record ThinEvent(string HostID, float EventName, string EventType, DateTime StartTime, float Latitude, float Longitude);
-	public record ThinListEvent(string HostID, string EventType, float Latitude, float Longitude);
+	public record ThinEvent(Guid Id, ThinnerUser Host, string Name, string EventType, DateTime StartTime, float Latitude, float Longitude);
+	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, float Latitude, float Longitude);
 
 	public interface IEventDatabase
 	{
-		ThinEvent GetEvent(string eventID);
-		List<ThinListEvent> GetEvents(float latitude, float longitude, float distance);
+		ThinEvent FindEvent(Guid Id);
+		List<ThinnerEvent> FindEvents(float latitude, float longitude, float distance);
 
-		void CreateEvent(string hostID, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
-		void AddUserToEvent(string identification, string eventID);
-		void RemoveUserFromEvent(string identification, string eventID);
-		void EndEvent(string identification, string eventID);
+		bool CreateEvent(Guid hostID, string name, string eventType, DateTime startTime, float latitude, float longitude);
+		bool AddUserToEvent(Guid userId, Guid eventId);
+		bool RemoveUserFromEvent(Guid userId, Guid eventId);  
+		bool EndEvent(Guid Id);
 
-		List<ThinListUser> GetGuestList(string identification, string eventID);
+		List<ThinnerUser> GetGuestList(Guid Id);
 	}
 
 	public interface IEventOperations
 	{
 		ThinEvent GetEventInformation(string identification, string eventID);
-		List<ThinListEvent> GetEventsInArea(string identification, float latitude, float longitude, float distance);
-		List<ThinListEvent> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
+		List<ThinnerEvent> GetEventsInArea(string identification, float latitude, float longitude, float distance);
+		List<ThinnerEvent> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
 
 		void CreateEvent(string identification, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
 		void JoinEvent(string identification, string eventID);
 		void LeaveEvent(string identification, string eventID);
 		void EndEvent(string identification, string eventID);
 
-		List<ThinListUser> GetAttendees(string identification, string eventID);
+		List<ThinnerUser> GetAttendees(string identification, string eventID);
 	}
 }
