@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Server.Boundaries;
 using Web.Models;
 using System.Net;
+using Shared;
 
 namespace Web.Controllers
 {
@@ -71,6 +72,10 @@ namespace Web.Controllers
             {
                 accounts.EditUser(details.UserID, details.Name);
             }
+            catch (InvalidInformationException e)
+            {
+                return BadRequest(e.ToString());
+            }
             catch
             {
                 return BadRequest(AccountError.CouldNotModifyUser.ToString());
@@ -91,6 +96,14 @@ namespace Web.Controllers
 			{
 				accounts.CreateUser(details.PhoneNumber, details.Passkey, details.Name, details.DateOfBirth);
 			}
+            catch (InvalidUserException e)
+            {
+                return BadRequest(e.ToString());
+            }
+            catch (InvalidInformationException e)
+            {
+                return BadRequest(e.ToString());
+            }
             catch
             {
                 return BadRequest(AccountError.CouldNotCreateUser.ToString());

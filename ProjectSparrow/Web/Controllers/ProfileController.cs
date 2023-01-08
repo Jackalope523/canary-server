@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Web.Models;
+using Shared;
 
 namespace Web.Controllers
 {
@@ -41,6 +42,10 @@ namespace Web.Controllers
 			try
 			{
 				profile = accounts.GetUserProfile(info.UserID, info.TargetID);
+			}
+			catch (InvalidUserException e)
+			{
+				return BadRequest(e.ToString());
 			}
 			catch
 			{

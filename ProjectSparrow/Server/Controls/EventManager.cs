@@ -89,7 +89,7 @@ namespace Server.Controls
             if (!success)
             { throw new UnexpectedFailureException("Could not end event."); }
         }
-
+		
 		public List<ThinnerUser> GetAttendees(Guid userID, Guid eventID)
 		{
 			// TODO Verify user
