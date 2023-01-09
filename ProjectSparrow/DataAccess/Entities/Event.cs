@@ -2,7 +2,7 @@
 
 namespace DataAccess.Entities
 {
-    public class Event
+    public class Event : Entity
     {
         public Guid Id { get; set; }
 

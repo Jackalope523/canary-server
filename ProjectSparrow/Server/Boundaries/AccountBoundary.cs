@@ -3,28 +3,28 @@ using System.Collections.Generic;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(int AccountId, string Identification, string Name, DateTime DateOfBirth, string ProfilePhoto, int Reputation, int NumberOfFollowers);
-	public record ThinnerUser(string AccountId, string Name, string ProfilePhoto);
-	public record ThinProfile(string AccountId, string Name, string ProfilePhoto, int Reputation, int NumberOfFollowers);
+	public record ThinUser(Guid AccountId, string PhoneNumber, string Name, DateTime DateOfBirth, int Reputation, int NumberOfFollowers);
+	public record ThinnerUser(Guid AccountId, string Name);
+	public record ThinProfile(Guid AccountId, string Name, int Reputation, int NumberOfFollowers);
 
 	public interface IAccountDatabase
 	{
 		ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
         bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
-        bool DeleteUser(Guid accountId);
+        bool DeleteUser(Guid Id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
-        bool UpdatePasskey(Guid id, string Passkey);
+        bool UpdatePasskey(Guid id, string newPasskey);
         bool UpdateName(Guid id, string newName);
         bool UpdateReputation(Guid id, int newReputation);
 		
 		List<ThinnerUser> GetFollowedUsers(Guid id);
 		List<ThinnerUser> GetBlockedUsers(Guid id);
 
-		void FollowUser(Guid selfId, Guid targetId);
-		void UnfollowUser(Guid selfId, Guid targetId);
-		void BlockUser(Guid selfId, Guid targetId);
-		void UnblockUser(Guid selfId, Guid targetId);
+		bool FollowUser(Guid selfId, Guid targetId);
+		bool UnfollowUser(Guid selfId, Guid targetId);
+		bool BlockUser(Guid selfId, Guid targetId);
+		bool UnblockUser(Guid selfId, Guid targetId);
 	}
 
 	public interface IAccountOperations
