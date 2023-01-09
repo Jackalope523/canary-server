@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Shared;
 
 namespace Server.Controls
 {
@@ -19,16 +20,17 @@ namespace Server.Controls
             accounts = accountDatabase;
         }
 
-        public ThinProfile GetUserProfile(string identification, string targetIdentification)
+        public ThinProfile GetUserProfile(Guid userID, Guid targetID)
         {
-            ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
+            // TODO Verify user
 
-            if (targetAccount == null)
-            { return null; ; } // TODO Error
+            ThinUser targetUser = accounts.FindUser(targetID);
 
-            ThinUser targetUser = accounts.GetUser(targetAccount.AccountID);
+            if (targetUser == null)
+            { throw new InvalidUserException("Target user not found."); }
 
-            return new ThinProfile(targetUser.AccountID, targetUser.Name, targetUser.ProfilePhoto, targetUser.Reputation, targetUser.NumberOfFollowers);
+            return new ThinProfile(targetUser.AccountId, targetUser.Name,
+                targetUser.Reputation, targetUser.NumberOfFollowers);
         }
 
         public string TryLogin(string identification, string passkey)
@@ -37,20 +39,19 @@ namespace Server.Controls
             throw new NotImplementedException();
         }
 
-        public void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth, string profilePhoto)
+        public void CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth)
         {
-            // Check identification not in use
+            // Check phone number not in use
 
-            if (accounts.FindAccount(identification) != null)
-            { return; } // TODO Error
+            if (accounts.FindUser(phoneNumber) != null)
+            { throw new InvalidUserException("Phone Number already registered."); }
 
             // Create profile
 
-            User newUser = new(identification, name, "")
+            User newUser = new(phoneNumber, name, passkey)
             {
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTime.Now,
-                ProfilePhoto = profilePhoto,
                 Verified = false
             };
 
@@ -59,33 +60,30 @@ namespace Server.Controls
             bool valid = newUser.ValidateUser();
 
             if (!valid)
-            { return; } // TODO Add error codes, dispose of account
+            { throw new InvalidInformationException("Invalid account details provided."); }
 
             // Store profile
             
-            accounts.CreateUser(newUser.Identification, passkey, newUser.Name, newUser.DateOfBirth, newUser.ProfilePhoto);
-            // TODO Verify created successfully
+            bool success = accounts.CreateUser(newUser.Identification, passkey,
+                newUser.Name, newUser.DateOfBirth);
+
+            if (!success)
+            { throw new UnexpectedFailureException("User creation failed."); }
         }
 
-        public void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto)
+        public void EditUser(Guid userID, string newName)
         {
+            // TODO Verify user
+            
             // Verify updates are valid
 
-            ThinAccount account = accounts.FindAccount(identification);
-
-			if (account == null)
-			{ return; } // TODO Error
-
-			ThinUser user = accounts.GetUser(account.AccountID);
+            ThinUser account = accounts.FindUser(userID);
 
             // TODO Use only what is given
 
-			User userValidation = new(identification, newName, "")
+			User userValidation = new("", newName, "")
 			{
-				DateOfBirth = newDateOfBirth,
-				JoinDate = DateTime.Now,
-				ProfilePhoto = newPhoto,
-				Verified = false
+                AccountID = userID
 			};
 
 			// Validate profile
@@ -93,84 +91,72 @@ namespace Server.Controls
 			bool valid = userValidation.ValidateUser();
 
 			if (!valid)
-			{ return; } // TODO Add error codes
+            { throw new InvalidInformationException("Invalid account details provided."); }
 
-			accounts.UpdateUser(user.AccountID, newName, newDateOfBirth, newPhoto);
+            bool success = accounts.UpdateName(userID, newName);
+
+            if (!success)
+            { throw new UnexpectedFailureException("User update failed."); }
         }
 
-        public void DeleteUser(string identification)
+        public void DeleteUser(Guid userID)
         {
-            ThinAccount account = accounts.FindAccount(identification);
+            // TODO Verify user
+
+            bool success = accounts.DeleteUser(userID);
+
+            if (!success)
+            { throw new UnexpectedFailureException("User deletion failed."); }
+        }
+
+        public List<ThinnerUser> GetFollowedUsers(Guid userID)
+        {
+            // TODO Verify user
+
+            return accounts.GetFollowedUsers(userID);
+		}
+
+        public List<ThinnerUser> GetBlockedUsers(Guid userID)
+		{
+            // TODO Verify user
             
-            if (account == null)
-            { return; } // TODO Error
+			return accounts.GetBlockedUsers(userID);
+		}
 
-            accounts.DeleteAccount(account.AccountID);
-            // TODO Handle possible errors
+        public void FollowUser(Guid userID, Guid targetID)
+        {
+            // TODO Verify user
+
+            // TODO Check target account exists
+
+            accounts.FollowUser(userID, targetID);
+		}
+
+		public void UnfollowUser(Guid userID, Guid targetID)
+        {
+            // TODO Verify user
+
+            // TODO Check target account exists
+
+            accounts.UnfollowUser(userID, targetID);
         }
 
-        public List<ThinListUser> GetFollowedUsers(string identification)
+		public void BlockUser(Guid userID, Guid targetID)
         {
-			ThinAccount account = accounts.FindAccount(identification);
+            // TODO Verify user
 
-			if (account == null)
-			{ return null; } // TODO Error
+            // TODO Check target account exists
 
-            return accounts.GetFollowedUsers(account.AccountID);
-		}
+            accounts.BlockUser(userID, targetID);
+        }
 
-        public List<ThinListUser> GetBlockedUsers(string identification)
-		{
-			ThinAccount account = accounts.FindAccount(identification);
-
-			if (account == null)
-			{ return null; } // TODO Error
-
-			return accounts.GetBlockedUsers(account.AccountID);
-		}
-
-        public void FollowUser(string identification, string targetIdentification)
+		public void UnblockUser(Guid userID, Guid targetID)
         {
-            ThinAccount userAccount = accounts.FindAccount(identification);
-            ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
+            // TODO Verify user
 
-            if (userAccount == null || targetAccount == null)
-            { return; } // TODO Error
+            // TODO Check target account exists
 
-            accounts.FollowUser(identification, targetIdentification);
-		}
-
-		public void UnfollowUser(string identification, string targetIdentification)
-		{
-			ThinAccount userAccount = accounts.FindAccount(identification);
-			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
-
-			if (userAccount == null || targetAccount == null)
-			{ return; } // TODO Error
-
-			accounts.UnfollowUser(identification, targetIdentification);
-		}
-
-		public void BlockUser(string identification, string targetIdentification)
-		{
-			ThinAccount userAccount = accounts.FindAccount(identification);
-			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
-
-			if (userAccount == null || targetAccount == null)
-			{ return; } // TODO Error
-
-			accounts.BlockUser(identification, targetIdentification);
-		}
-
-		public void UnblockUser(string identification, string targetIdentification)
-		{
-			ThinAccount userAccount = accounts.FindAccount(identification);
-			ThinAccount targetAccount = accounts.FindAccount(targetIdentification);
-
-			if (userAccount == null || targetAccount == null)
-			{ return; } // TODO Error
-
-			accounts.UnblockUser(identification, targetIdentification);
-		}
+            accounts.UnblockUser(userID, targetID);
+        }
 	}
 }

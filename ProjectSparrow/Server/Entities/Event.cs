@@ -11,8 +11,8 @@ namespace Server.Entities
     {
         #region Variables
 
-        public string EventID { get; }
-        public string HostID { get; }
+        public Guid EventID { get; }
+        public User Host { get; }
         public GeoLocation Location { get; }
         public EventType EventType { get; init; }
         public DateTime StartTime { get; private init; }
@@ -25,22 +25,22 @@ namespace Server.Entities
 
         #endregion
 
-        public Event(string hostID)
+        public Event(User eventHost)
         {
-            HostID = hostID;
+            Host = eventHost;
 
             participantLog = new();
-            ParticipantJoined(hostID);
+            ParticipantJoined(Host.AccountID);
 
             StartTime = DateTime.UtcNow;
         }
 
-        public void ParticipantJoined(string participantID)
+        public void ParticipantJoined(Guid participantID)
         {
             participantLog.AddParticipant(participantID);
         }
 
-        public void ParticipantLeft(string participantID)
+        public void ParticipantLeft(Guid participantID)
         {
             // TODO Host leaves, too few participants, only host, etc
 

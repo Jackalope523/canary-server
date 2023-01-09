@@ -38,11 +38,11 @@ namespace Web.Controllers
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
-			List<ThinListEvent> eventList;
+			List<ThinnerEvent> eventList;
 
             try
             {
-                eventList = events.GetPersonalisedEventsInArea(userLocation.Identification, userLocation.Latitude, userLocation.Longitude, userLocation.Distance);
+                eventList = events.GetPersonalisedEventsInArea(userLocation.UserID, userLocation.Latitude, userLocation.Longitude, userLocation.Distance);
             }
             catch
             {
@@ -60,11 +60,11 @@ namespace Web.Controllers
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
-			List<ThinListEvent> eventList;
+			List<ThinnerEvent> eventList;
 
 			try
 			{
-				eventList = events.GetEventsInArea(userLocation.Identification, userLocation.Latitude, userLocation.Longitude, userLocation.Distance);
+				eventList = events.GetEventsInArea(userLocation.UserID, userLocation.Latitude, userLocation.Longitude, userLocation.Distance);
 			}
 			catch
 			{
@@ -75,16 +75,16 @@ namespace Web.Controllers
 		}
 
         [HttpGet("{eventID}")]
-        public IActionResult GetEvent(string eventID)
+        public IActionResult GetEvent([FromBody] EventModel info)
         {
-			if (eventID == null || eventID == string.Empty)
+			if (info == null || !ModelState.IsValid)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
             try
             {
-                events.GetEventInformation("", eventID); // TODO Return relevant information
+                events.GetEventInformation(info.UserID, info.EventID); // TODO Return relevant information
             }
             catch
 			{
@@ -104,7 +104,7 @@ namespace Web.Controllers
 
             try
             {
-                events.CreateEvent(eventDetails.Identification,
+                events.CreateEvent(eventDetails.UserID,
 					eventDetails.EventName, eventDetails.EventType, eventDetails.StartTime,
 					eventDetails.Location.Latitude, eventDetails.Location.Longitude);
             }
@@ -146,7 +146,7 @@ namespace Web.Controllers
 
 			try
 			{
-				events.EndEvent(user.Identification, user.EventID);
+				events.EndEvent(user.UserID, user.EventID);
 			}
 			catch
 			{
@@ -166,7 +166,7 @@ namespace Web.Controllers
 
 			try
 			{
-				events.JoinEvent(user.Identification, user.EventID);
+				events.JoinEvent(user.UserID, user.EventID);
 			}
 			catch
 			{
@@ -186,7 +186,7 @@ namespace Web.Controllers
 
 			try
 			{
-				events.LeaveEvent(user.Identification, user.EventID);
+				events.LeaveEvent(user.UserID, user.EventID);
 			}
 			catch
 			{

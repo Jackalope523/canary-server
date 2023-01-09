@@ -11,7 +11,7 @@ namespace Server.Boundaries
 		ThinEvent FindEvent(Guid Id);
 		List<ThinnerEvent> FindEvents(float latitude, float longitude, float distance);
 
-		bool CreateEvent(Guid hostID, string name, string eventType, DateTime startTime, float latitude, float longitude);
+		Guid CreateEvent(Guid hostID, string name, string eventType, DateTime startTime, float latitude, float longitude);
 		bool AddUserToEvent(Guid userId, Guid eventId);
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);  
 		bool EndEvent(Guid Id);
@@ -21,15 +21,15 @@ namespace Server.Boundaries
 
 	public interface IEventOperations
 	{
-		ThinEvent GetEventInformation(string identification, string eventID);
-		List<ThinnerEvent> GetEventsInArea(string identification, float latitude, float longitude, float distance);
-		List<ThinnerEvent> GetPersonalisedEventsInArea(string identification, float latitude, float longitude, float distance);
+		ThinEvent GetEventInformation(Guid userID, Guid eventID);
+		List<ThinnerEvent> GetEventsInArea(Guid userID, float latitude, float longitude, float distance);
+		List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, float latitude, float longitude, float distance);
 
-		void CreateEvent(string identification, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
-		void JoinEvent(string identification, string eventID);
-		void LeaveEvent(string identification, string eventID);
-		void EndEvent(string identification, string eventID);
+		void CreateEvent(Guid userID, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
+		void JoinEvent(Guid userID, Guid eventID);
+		void LeaveEvent(Guid userID, Guid eventID);
+		void EndEvent(Guid userID, Guid eventID);
 
-		List<ThinnerUser> GetAttendees(string identification, string eventID);
+		List<ThinnerUser> GetAttendees(Guid userID, Guid eventID);
 	}
 }
