@@ -7,6 +7,7 @@ namespace DataAccess.Entities
         public Guid Id { get; set; }
 
         internal string Name { get; set; }
+        internal string EventType { get; set; }
         internal DateTime StartTime { get; set; }
         internal int HostId {  get; set; }
         internal User Host { get; set; }

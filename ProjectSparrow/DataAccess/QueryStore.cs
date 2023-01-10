@@ -7,13 +7,15 @@ using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Shared;
 
 namespace DataAccess
 { 
-    internal class QueryStore : IAccountDatabase
+    internal class QueryStore : IAccountDatabase, IEventDatabase
     {
         private static QueryContext _context = new QueryContext();
 
+        // User Queries
         private static bool EntityOperation(Entity target, Func<Entity,EntityEntry> work)
         {
             int numWrites;
@@ -88,5 +90,51 @@ namespace DataAccess
             }
             return new ThinUser(user.Id, user.PhoneNumber, user.Name, user.DateOfBirth, user.Reputation, numFollowers);
         }
+
+        public ThinEvent FindEvent(Guid id)
+        {
+            Event @event;
+            ThinnerUser Host;
+            using (_context = new QueryContext())
+            {
+                @event = _context.Events.Find(id);
+                Host = _context.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Hosting).Include(l => l.Self).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).Single();
+            }
+            return new ThinEvent(@event.Id,  Host, @event.Name, "Null", @event.StartTime, @event.Latitude, @event.Longitude);
+        }
+
+        public List<ThinnerEvent> FindEvents(float latitude, float longitude, float distance)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, float latitude, float longitude)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool AddUserToEvent(Guid userId, Guid eventId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RemoveUserFromEvent(Guid userId, Guid eventId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EndEvent(Guid Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ThinnerUser> GetGuestList(Guid Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        // Event Queries
+
+
     }
 }
