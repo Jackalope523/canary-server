@@ -2,11 +2,12 @@
 
 namespace DataAccess.Entities
 {
-    public class Event
+    public class Event : Entity
     {
         public Guid Id { get; set; }
 
         internal string Name { get; set; }
+        internal string EventType { get; set; }
         internal DateTime StartTime { get; set; }
         internal int HostId {  get; set; }
         internal User Host { get; set; }

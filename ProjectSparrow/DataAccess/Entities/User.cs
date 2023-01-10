@@ -1,7 +1,7 @@
 ﻿
 namespace DataAccess.Entities
 {
-    public class User
+    public class User : Entity
     {
         public Guid Id { get; init; }
         public string PhoneNumber { get; init; }  

@@ -8,7 +8,7 @@ namespace DataAccess
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }  
         public DbSet<Link> Links { get; set; }
-        public DbSet<UserLink> UsersLinks { get; set; }
+        public DbSet<UserLink> UserLinks { get; set; }
         public DbSet<EventLink> EventLinks { get; set; }  
 
          protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 
 namespace Server.Boundaries
 {
@@ -8,10 +9,10 @@ namespace Server.Boundaries
 
 	public interface IEventDatabase
 	{
-		ThinEvent FindEvent(Guid Id);
+		ThinEvent FindEvent(Guid id);
 		List<ThinnerEvent> FindEvents(float latitude, float longitude, float distance);
 
-		Guid CreateEvent(Guid hostID, string name, string eventType, DateTime startTime, float latitude, float longitude);
+		bool CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, float latitude, float longitude);
 		bool AddUserToEvent(Guid userId, Guid eventId);
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);  
 		bool EndEvent(Guid Id);
