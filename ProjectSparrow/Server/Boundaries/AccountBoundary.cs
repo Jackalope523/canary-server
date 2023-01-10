@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(Guid AccountId, string PhoneNumber, string Name, DateTime DateOfBirth, int Reputation, int NumberOfFollowers);
-	public record ThinnerUser(Guid AccountId, string Name);
-	public record ThinProfile(Guid AccountId, string Name, int Reputation, int NumberOfFollowers);
+	public record ThinUser(Guid Id, string PhoneNumber, string Name, DateTime DateOfBirth, int Reputation, int NumberOfFollowers);
+	public record ThinnerUser(Guid Id, string Name);
+	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
 	public interface IAccountDatabase
 	{
