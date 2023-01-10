@@ -10,12 +10,9 @@ namespace Server.Entities
     {
         public string Name { get; private init; }
         public DateTime DateOfBirth { get; init; }
-        public UserInterest Interests { get; set; }
-        public string ProfilePhoto { get; set; } = "none";
 
         public DateTime JoinDate { get; init; }
-        public Reputation GoerReputation { get; private set; }
-        public Reputation HostReputation { get; private set; }
+        public Reputation Reputation { get; private set; }
 
         public HashSet<string> FollowedUserIDs { get; init; }
         public HashSet<string> BlockedUserIDs { get; init; }
@@ -24,11 +21,10 @@ namespace Server.Entities
 
         public bool Verified { get; set; }
 
-        public User(string identification, string name, string passkey) : base(identification, passkey)
+        public User(string phoneNumber, string name, string passkey) : base(phoneNumber, passkey)
         {
             Name = name;
-            GoerReputation = new Reputation();
-            HostReputation = new Reputation();
+            Reputation = new Reputation();
         }
 
         public bool ValidateUser()

@@ -22,15 +22,15 @@ namespace Server.Boundaries
 
 	public interface IEventOperations
 	{
-		ThinEvent GetEventInformation(Guid UserID, string eventId);
-		List<ThinnerEvent> GetEventsInArea(Guid UserID, float latitude, float longitude, float distance);
-		List<ThinnerEvent> GetPersonalisedEventsInArea(Guid UserID, float latitude, float longitude, float distance);
+		ThinEvent GetEventInformation(Guid userID, Guid eventID);
+		List<ThinnerEvent> GetEventsInArea(Guid userID, float latitude, float longitude, float distance);
+		List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, float latitude, float longitude, float distance);
 
-		void CreateEvent(Guid UserID, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
-		void JoinEvent(Guid UserID, string eventId);
-		void LeaveEvent(Guid UserID, string eventId);
-		void EndEvent(Guid UserID, string eventId);
+		void CreateEvent(Guid userID, string eventName, string eventType, DateTime startTime, float latitude, float longitude);
+		void JoinEvent(Guid userID, Guid eventID);
+		void LeaveEvent(Guid userID, Guid eventID);
+		void EndEvent(Guid userID, Guid eventID);
 
-		List<ThinnerUser> GetAttendees(Guid UserID, string eventID);
+		List<ThinnerUser> GetAttendees(Guid userID, Guid eventID);
 	}
 }

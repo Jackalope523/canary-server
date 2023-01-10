@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Server.Boundaries;
 using Web.Models;
 using System.Net;
+using Shared;
 
 namespace Web.Controllers
 {
@@ -42,7 +43,7 @@ namespace Web.Controllers
 
             try
             {
-                token = accounts.TryLogin(credentials.Identification, credentials.Passkey);
+                token = accounts.TryLogin(credentials.PhoneNumber, credentials.Passkey);
             }
             catch
             {
@@ -69,7 +70,11 @@ namespace Web.Controllers
 
             try
             {
-                accounts.EditUser(details.Identification, details.Name, details.DateOfBirth, details.Photo);
+                accounts.EditUser(details.UserID, details.Name);
+            }
+            catch (InvalidInformationException e)
+            {
+                return BadRequest(e.ToString());
             }
             catch
             {
@@ -89,8 +94,16 @@ namespace Web.Controllers
 
             try
 			{
-				accounts.CreateUser(details.Identification, details.Passkey, details.Name, details.DateOfBirth, details.Photo);
+				accounts.CreateUser(details.PhoneNumber, details.Passkey, details.Name, details.DateOfBirth);
 			}
+            catch (InvalidUserException e)
+            {
+                return BadRequest(e.ToString());
+            }
+            catch (InvalidInformationException e)
+            {
+                return BadRequest(e.ToString());
+            }
             catch
             {
                 return BadRequest(AccountError.CouldNotCreateUser.ToString());

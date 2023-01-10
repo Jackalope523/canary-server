@@ -11,7 +11,7 @@ namespace Server.Entities
         public IList<Participant> ActiveParticipants => GetActiveParticipants();
 
 
-        private Dictionary<string, LinkedList<ParticipantAction>> log;
+        private Dictionary<Guid, LinkedList<ParticipantAction>> log;
 
         private IList<Participant> cachedActiveParticipants;
         private bool participantsIsStale = true;
@@ -19,10 +19,10 @@ namespace Server.Entities
 
         public ParticipantLog()
         {
-            log = new Dictionary<string, LinkedList<ParticipantAction>>();
+            log = new Dictionary<Guid, LinkedList<ParticipantAction>>();
         }
 
-        public void AddParticipant(string participantID)
+        public void AddParticipant(Guid participantID)
         {
             participantsIsStale = true;
 
@@ -34,7 +34,7 @@ namespace Server.Entities
             log[participantID].AddLast(new ParticipantAction(PerformedAction.Joined));
         }
 
-        public void RemoveParticipant(string participantID)
+        public void RemoveParticipant(Guid participantID)
         {
             participantsIsStale = true;
 
@@ -55,7 +55,7 @@ namespace Server.Entities
 
             var currentTime = DateTime.Now;
 
-            foreach (string participant in log.Keys)
+            foreach (Guid participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -74,7 +74,7 @@ namespace Server.Entities
 
             var currentTime = DateTime.Now;
 
-            foreach (string participant in log.Keys)
+            foreach (Guid participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -105,7 +105,7 @@ namespace Server.Entities
 
             List<Participant> activeParticipants = new List<Participant>();
 
-            foreach (string participant in log.Keys)
+            foreach (Guid participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -124,16 +124,16 @@ namespace Server.Entities
 
     internal readonly struct Participant : IComparable<Participant>
     {
-        public string ID { get; }
+        public Guid ID { get; }
         public DateTime JoinedTime { get; }
 
-        public Participant(string userID)
+        public Participant(Guid userID)
         {
             ID = userID;
             JoinedTime = DateTime.UtcNow;
         }
 
-        public Participant(string userID, DateTime timeJoined)
+        public Participant(Guid userID, DateTime timeJoined)
         {
             ID = userID;
             JoinedTime = timeJoined;

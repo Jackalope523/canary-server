@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Server.Boundaries
@@ -29,19 +29,19 @@ namespace Server.Boundaries
 
 	public interface IAccountOperations
 	{
-		ThinProfile GetUserProfile(string identification, string targetIdentification);
+		ThinProfile GetUserProfile(Guid userID, Guid targetID);
 
-		string TryLogin(string identification, string passkey);
-		void CreateUser(string identification, string passkey, string name, DateTime dateOfBirth, string profilePhoto);
-		void EditUser(string identification, string newName, DateTime newDateOfBirth, string newPhoto); // TODO Add EditAccount to update identification and/or passkey
-		void DeleteUser(string identification);
+		string TryLogin(string phoneNumber, string passkey);
+		void CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
+		void EditUser(Guid userID, string newName); // TODO Add EditAccount to update identification and/or passkey
+		void DeleteUser(Guid userID);
 
-		List<ThinnerUser> GetFollowedUsers(string identification);
-		List<ThinnerUser> GetBlockedUsers(string identification);
+		List<ThinnerUser> GetFollowedUsers(Guid userID);
+		List<ThinnerUser> GetBlockedUsers(Guid userID);
 
-		void FollowUser(string identification, string targetIdentification);
-		void UnfollowUser(string identification, string targetIdentification);
-		void BlockUser(string identification, string targetIdentification);
-		void UnblockUser(string identification, string targetIdentification);
+		void FollowUser(Guid userID, Guid targetID);
+		void UnfollowUser(Guid userID, Guid targetID);
+		void BlockUser(Guid userID, Guid targetID);
+		void UnblockUser(Guid userID, Guid targetID);
 	}
 }
