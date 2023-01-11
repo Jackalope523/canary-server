@@ -1,18 +1,16 @@
 ﻿using Server.Boundaries;
 using DataAccess.Entities;
-using Microsoft.Identity.Client;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Shared;
+using NetTopologySuite.Geometries;
 
 namespace DataAccess
 { 
-    internal class QueryStore : IAccountDatabase, IEventDatabase
+    public class QueryStore : IAccountDatabase, IEventDatabase
     {
+        public static IAccountDatabase AccountDatabaseAccess => new QueryStore();
+        public static IEventDatabase EventDatabaseAccess => new QueryStore();
+
         private static QueryContext _context = new QueryContext();
 
         // User Queries
@@ -48,21 +46,21 @@ namespace DataAccess
         public bool UpdatePhoneNumber(Guid id, string newNumber) { return EntityOperation(new User { Id = id, PhoneNumber = newNumber }, updateUser); }
         public bool UpdateReputation(Guid id, int newReputation) { return EntityOperation(new User { Id = id, Reputation = newReputation }, updateUser); }
 
-        Func<Entity, EntityEntry> addUserLink = l => _context.UserLinks.Add((UserLink)l);
-        Func<Entity, EntityEntry> removeUserLink = l => _context.UserLinks.Remove((UserLink)l);
-        public bool FollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, addUserLink); }      
-        public bool UnfollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, removeUserLink); } 
-        public bool BlockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, addUserLink); }
-        public bool UnblockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, removeUserLink); }          
+        Func<Entity, EntityEntry> addLink = l => _context.UserLinks.Add((UserLink)l);
+        Func<Entity, EntityEntry> removeLink = l => _context.UserLinks.Remove((UserLink)l);
+        public bool FollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, addLink); }      
+        public bool UnfollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, removeLink); } 
+        public bool BlockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, addLink); }
+        public bool UnblockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, removeLink); }          
 
         private static List<ThinnerUser> GetCollectionOfUsers(Guid id, UserLink.UserLinkType type)
         {
-            List<ThinnerUser> blockedUsers;
+            List<ThinnerUser> users;
             using (_context = new QueryContext())
             {
-                blockedUsers = _context.UserLinks.Where(l => l.SelfId == id && l.Type == type).Include(l => l.Other).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
+                users = _context.UserLinks.Where(l => l.SelfId == id && l.Type == type).Include(l => l.Other).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
             }
-            return blockedUsers;
+            return users;
         }
         public List<ThinnerUser> GetBlockedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Blocked); }
         public List<ThinnerUser> GetFollowedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
@@ -94,47 +92,62 @@ namespace DataAccess
         public ThinEvent FindEvent(Guid id)
         {
             Event @event;
-            ThinnerUser Host;
+            ThinnerUser host;
             using (_context = new QueryContext())
             {
-                @event = _context.Events.Find(id);
-                Host = _context.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Hosting).Include(l => l.Self).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).Single();
+                @event = _context.Events.Where(e => e.Id == id).Include(e => e.Host).Single();
+                host = new ThinnerUser(@event.Host.Id, @event.Host.Name); 
             }
-            return new ThinEvent(@event.Id,  Host, @event.Name, "Null", @event.StartTime, @event.Latitude, @event.Longitude);
+            return new ThinEvent(@event.Id,  host, @event.Name, @event.EventType, @event.StartTime, @event.Location.X, @event.Location.Y);
         }
 
-        public List<ThinnerEvent> FindEvents(float latitude, float longitude, float distance)
+        public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
         {
-            throw new NotImplementedException();
+            List<ThinnerEvent> closestEvents;
+            Point userLocation = new Point(longitude, latitude); 
+            using (_context = new QueryContext())
+            { 
+                closestEvents = _context.Events.Where(e => e.Location.Distance(userLocation) <= distance).
+                                Select(e => new ThinnerEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.EventType, e.Location.Y, e.Location.X)).ToList();
+            }
+            return closestEvents;
         }
 
-        public bool CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, float latitude, float longitude)
+        public bool CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, double latitude, double longitude)
         {
-            throw new NotImplementedException();
+            Event toCreate = new Event {
+                HostId = hostId,
+                Name = name,
+                EventType = eventType,
+                StartTime = startTime,
+                Location = new Point(longitude, latitude), 
+            };
+            return EntityOperation(toCreate, e => _context.Events.Add((Event)e));
         }
+        public bool EndEvent(Guid id) { return EntityOperation(new Event { Id = id }, e => _context.Events.Remove((Event)e)); }
 
-        public bool AddUserToEvent(Guid userId, Guid eventId)
+        public bool AddUserToEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, addLink); }
+
+        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, removeLink); }    
+
+        public List<ThinnerUser> GetGuestList(Guid id)
         {
-            throw new NotImplementedException();
+            List<ThinnerUser> guests;
+            using (_context = new QueryContext())
+            {
+                guests = _context.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attending).Include(l => l.Self).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).ToList();
+            }
+            return guests;
         }
-
-        public bool RemoveUserFromEvent(Guid userId, Guid eventId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EndEvent(Guid Id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<ThinnerUser> GetGuestList(Guid Id)
-        {
-            throw new NotImplementedException();
-        }
-
-        // Event Queries
 
 
     }
 }
+
+
+/*
+    _.+._
+  (^\/^\/^)
+   \D*O*D/
+   {_____}
+           */

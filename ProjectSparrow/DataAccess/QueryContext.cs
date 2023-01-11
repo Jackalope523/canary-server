@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DataAccess.Entities;
+using Microsoft.Extensions.Options;
 
 namespace DataAccess
 {
@@ -13,7 +14,7 @@ namespace DataAccess
 
          protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
          {
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Test");
+            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Test", x => x.UseNetTopologySuite());
          }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

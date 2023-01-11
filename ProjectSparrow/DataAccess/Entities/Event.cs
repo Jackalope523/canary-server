@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using NetTopologySuite.Geometries;
 
 namespace DataAccess.Entities
 {
@@ -9,11 +9,9 @@ namespace DataAccess.Entities
         internal string Name { get; set; }
         internal string EventType { get; set; }
         internal DateTime StartTime { get; set; }
-        internal int HostId {  get; set; }
+        internal Guid HostId {  get; set; }
         internal User Host { get; set; }
-
-        internal float Latitude { get; set; }
-        internal float Longitude { get; set; }  
+        public Point Location { get; set; } // X = Longitude Y = Latitude
          
 
         internal List<EventLink> Links { get; set; }       

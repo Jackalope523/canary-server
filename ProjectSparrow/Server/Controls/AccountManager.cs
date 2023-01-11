@@ -1,4 +1,4 @@
-﻿using Server.Boundaries.;
+﻿using Server.Boundaries;
 using Server.Entities;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace Server.Controls
             if (targetUser == null)
             { throw new InvalidUserException("Target user not found."); }
 
-            return new ThinProfile(targetUser.AccountId, targetUser.Name,
+            return new ThinProfile(targetUser.Id, targetUser.Name,
                 targetUser.Reputation, targetUser.NumberOfFollowers);
         }
 
