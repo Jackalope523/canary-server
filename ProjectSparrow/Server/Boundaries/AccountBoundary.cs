@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Server.Controls;
 
 namespace Server.Boundaries
 {
@@ -30,6 +31,8 @@ namespace Server.Boundaries
 
 	public interface IAccountOperations
 	{
+		static IAccountOperations AccountManager => new AccountManager(null);
+
 		ThinProfile GetUserProfile(Guid userID, Guid targetID);
 
 		string TryLogin(string phoneNumber, string passkey);

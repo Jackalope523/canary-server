@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using Server.Controls;
 
 namespace Server.Boundaries
 {
@@ -23,6 +24,8 @@ namespace Server.Boundaries
 
 	public interface IEventOperations
 	{
+		static IEventOperations EventManager => new EventManager(null, null);
+
 		ThinEvent GetEventInformation(Guid userID, Guid eventID);
 		List<ThinnerEvent> GetEventsInArea(Guid userID, double latitude, double longitude, double distance);
 		List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, double latitude, double longitude, double distance);
