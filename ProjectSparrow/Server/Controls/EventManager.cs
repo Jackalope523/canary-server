@@ -29,7 +29,7 @@ namespace Server.Controls
 			return eventInformation;
 		}
 
-		public List<ThinnerEvent> GetEventsInArea(Guid userID, float latitude, float longitude, float distance)
+		public List<ThinnerEvent> GetEventsInArea(Guid userID, double latitude, double longitude, double distance)
 		{
 			// TODO Verify user
 			
@@ -38,7 +38,7 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, float latitude, float longitude, float distance)
+		public List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, double latitude, double longitude, double distance)
 		{
 			// TODO Verify user
 
@@ -49,7 +49,7 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public void CreateEvent(Guid userID, string eventName, string eventType, DateTime startTime, float latitude, float longitude)
+		public void CreateEvent(Guid userID, string eventName, string eventType, DateTime startTime, double latitude, double longitude)
 		{
 			// TODO Verify user
 

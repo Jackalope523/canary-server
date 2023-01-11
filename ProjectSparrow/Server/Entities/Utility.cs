@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Server.Entities
 {
-    internal readonly struct GeoLocation
+    public readonly struct GeoLocation
     {
         public static Distance DistanceBetween(GeoLocation locationAlpha, GeoLocation locationBeta)
         {
@@ -42,7 +42,7 @@ namespace Server.Entities
     }
 
 
-    internal struct Distance
+    public struct Distance
     {
         public float Kilometres
         { 
