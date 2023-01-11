@@ -30,50 +30,6 @@ namespace Web.Controllers
             events = eventOperations;
         }
 
-        [HttpGet]
-        public IActionResult GetEventsList([FromBody] GeoLocation userLocation)
-        {
-			if (userLocation == null || !ModelState.IsValid)
-			{
-				return BadRequest(EventError.MissingInformation.ToString());
-			}
-
-			List<ThinnerEvent> eventList;
-
-            try
-            {
-                eventList = events.GetPersonalisedEventsInArea(userLocation.UserID, userLocation.Latitude, userLocation.Longitude, userLocation.Distance);
-            }
-            catch
-            {
-				return BadRequest(EventError.CouldNotCompleteRequest.ToString());
-			}
-			
-			return Ok(eventList);
-        }
-
-        [HttpGet("all")]
-        public IActionResult GetAllEvents([FromBody] GeoLocation userLocation)
-		{
-			if (userLocation == null || !ModelState.IsValid)
-			{
-				return BadRequest(EventError.MissingInformation.ToString());
-			}
-
-			List<ThinnerEvent> eventList;
-
-			try
-			{
-				eventList = events.GetEventsInArea(userLocation.UserID, userLocation.Latitude, userLocation.Longitude, userLocation.Distance);
-			}
-			catch
-			{
-				return BadRequest(EventError.CouldNotCompleteRequest.ToString());
-			}
-
-			return Ok(eventList);
-		}
-
         [HttpGet("{eventID}")]
         public IActionResult GetEvent([FromBody] EventModel info)
         {
