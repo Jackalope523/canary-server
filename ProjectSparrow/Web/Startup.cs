@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Server.Boundaries;
 
 namespace Web
 {
@@ -32,6 +33,9 @@ namespace Web
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
+
+            services.AddSingleton(IAccountOperations.AccountManager);
+            services.AddSingleton(IEventOperations.EventManager);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

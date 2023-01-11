@@ -13,15 +13,15 @@ namespace Tests
             /// In the case here, Event does not, and I am testing it to provide an example test.
             /// Once EventTest has more tests, this will be removed.
 
-            string hostID = "111-1111-111";
+            Guid hostID = new Guid();
 
             DateTime beforeConstruction = DateTime.UtcNow;
 
-            Event e = new(hostID);
+            Event e = new(new User("", "", "") { AccountID = hostID});
 
             DateTime afterConstruction = DateTime.UtcNow;
 
-            Assert.True(e.HostID.Equals(hostID));
+            Assert.True(e.Host.AccountID.Equals(hostID));
 
             Assert.Equal(1, e.Participants.Count);
             Assert.True(e.Participants[0].ID.Equals(hostID));

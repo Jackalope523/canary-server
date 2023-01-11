@@ -136,7 +136,7 @@ namespace Web.Controllers
 			return Ok();
 		}
 
-        [HttpDelete("{eventID}")]
+        [HttpDelete()]
         public IActionResult EndEvent([FromBody] EventModel user)
 		{
 			if (user == null || !ModelState.IsValid)
@@ -176,7 +176,7 @@ namespace Web.Controllers
 			return Ok();
 		}
 
-		[HttpPut("{eventID}")]
+		[HttpDelete("{eventID}")]
 		public IActionResult LeaveEvent([FromBody] EventModel user)
 		{
 			if (user == null || !ModelState.IsValid)
