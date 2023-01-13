@@ -34,7 +34,7 @@ namespace Server.Boundaries
 
 	public interface IAccountOperations
 	{
-		static IAccountOperations AccountManager => new AccountManager(null);
+		static IAccountOperations AccountManager => new AccountManager(IAccountDatabase.AccountDatabaseAccess);
 
 		Task<ThinUser> GetUserAsync(Guid userID);
 		Task<ThinUser> GetUserAsync(string phoneNumber);

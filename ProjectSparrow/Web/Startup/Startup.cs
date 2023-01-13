@@ -38,6 +38,9 @@ namespace Web
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
+            IAccountDatabase.AccountDatabaseAccess = DataAccess.QueryStore.AccountDatabaseAccess;
+            IEventDatabase.EventDatabaseAccess = DataAccess.QueryStore.EventDatabaseAccess;
+
             services.AddSingleton(IAccountOperations.AccountManager);
             services.AddSingleton(IEventOperations.EventManager);
 

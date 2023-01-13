@@ -25,7 +25,7 @@ namespace Server.Boundaries
 
 	public interface IEventOperations
 	{
-		static IEventOperations EventManager => new EventManager(null, null);
+		static IEventOperations EventManager => new EventManager(IAccountDatabase.AccountDatabaseAccess, IEventDatabase.EventDatabaseAccess);
 
 		Task<ThinEvent> GetEventInformationAsync(Guid userID, Guid eventID);
 		Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID, double latitude, double longitude, double distance);
