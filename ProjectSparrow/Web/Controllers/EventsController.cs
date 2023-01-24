@@ -9,11 +9,13 @@ using Web.Models;
 using Web.Models.Utilities;
 using System.Net;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+	[Authorize]
     public class EventsController : ControllerBase
     {
         enum EventError

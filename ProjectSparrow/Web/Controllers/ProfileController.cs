@@ -8,11 +8,13 @@ using System.Net;
 using System.Threading.Tasks;
 using Web.Models;
 using Shared;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers
 {
     [Route("accounts/[controller]")]
     [ApiController]
+	[Authorize]
     public class ProfileController : Controller
 	{
 		enum ProfileError

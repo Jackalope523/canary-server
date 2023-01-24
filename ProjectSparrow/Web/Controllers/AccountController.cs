@@ -8,11 +8,13 @@ using Server.Boundaries;
 using Web.Models;
 using System.Net;
 using Shared;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
 		enum AccountError
@@ -84,6 +86,7 @@ namespace Web.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpPost("sign-up")]
         public IActionResult CreateAccount([FromBody] AccountSignUpModel details)
 		{

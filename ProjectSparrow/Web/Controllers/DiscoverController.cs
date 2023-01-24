@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Server.Boundaries;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Web.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class DiscoverController : Controller
     {
         enum DiscoverError
