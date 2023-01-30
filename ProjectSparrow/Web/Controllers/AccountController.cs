@@ -9,6 +9,8 @@ using Web.Models;
 using System.Net;
 using Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Web.Services;
 
 namespace Web.Controllers
 {
@@ -20,74 +22,89 @@ namespace Web.Controllers
 		enum AccountError
 		{
 			MissingInformation,
-			InvalidLoginCombination,
+            IncorrectCode,
 			CouldNotLoginUser,
 			CouldNotCreateUser,
             CouldNotModifyUser
 		}
 
 		private IAccountOperations accounts;
+        private UserManager<ThinUser> userManager;
+        private SignInManager<ThinUser> signInManager;
 
-        public AccountController(IAccountOperations accountOperations)
+        private ISMSService smsService;
+
+        public AccountController(IAccountOperations accountOperations, UserManager<ThinUser> identityUserManager, SignInManager<ThinUser> identitySignInManager, ISMSService externalSMSService)
         {
             accounts = accountOperations;
+            userManager = identityUserManager;
+            signInManager = identitySignInManager;
+
+            smsService = externalSMSService;
         }
 
-        [HttpGet]
-        public IActionResult GetLoginToken([FromBody] AccountCredentialsModel credentials)
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login([FromBody] AccountCredentialsModel credentials)
         {
             if (credentials == null || !ModelState.IsValid)
             {
                 return BadRequest(AccountError.MissingInformation.ToString());
             }
 
-            string token;
-
             try
             {
-                token = accounts.TryLogin(credentials.PhoneNumber, credentials.Passkey);
+                var user = await accounts.GetUserAsync(credentials.PhoneNumber);
+
+                var code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+
+                await smsService.SendSMSAsync(credentials.PhoneNumber, $"Your Sparrow code is {code}");
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("login/verify")]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsModel credentials)
+        {
+			if (credentials == null || !ModelState.IsValid || credentials.Code == null)
+            {
+				return BadRequest(AccountError.MissingInformation.ToString());
+			}
+
+			try
+			{
+				var user = await accounts.GetUserAsync(credentials.PhoneNumber);
+
+				var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
+
+                if (result)
+                {
+                    await signInManager.SignInAsync(user, false);
+                }
+                else
+                {
+                    return BadRequest(AccountError.IncorrectCode.ToString());
+                }
             }
             catch
             {
                 return BadRequest(AccountError.CouldNotLoginUser.ToString());
             }
 
-            if (token == string.Empty)
-            {
-                return BadRequest(AccountError.InvalidLoginCombination.ToString());
-            }
-            else
-            {
-                return Ok(token);
-            }
-        }
-
-        [HttpPut]
-        public IActionResult ModifyAccount([FromBody] AccountDetailsModel details)
-        {
-			if (details == null || !ModelState.IsValid)
-			{
-				return BadRequest(AccountError.MissingInformation.ToString());
-			}
-
-            try
-            {
-                accounts.EditUser(details.UserID, details.Name);
-            }
-            catch (InvalidInformationException e)
-            {
-                return BadRequest(e.ToString());
-            }
-            catch
-            {
-                return BadRequest(AccountError.CouldNotModifyUser.ToString());
-            }
-
             return Ok();
         }
 
+        [HttpPost("signup")]
         [AllowAnonymous]
-        [HttpPost("sign-up")]
+        [ValidateAntiForgeryToken]
         public IActionResult CreateAccount([FromBody] AccountSignUpModel details)
 		{
 			if (details == null || !ModelState.IsValid)
@@ -113,6 +130,41 @@ namespace Web.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpPut]
+        [ValidateAntiForgeryToken]
+        public IActionResult ModifyAccount([FromBody] AccountDetailsModel details)
+        {
+			if (details == null || !ModelState.IsValid)
+			{
+				return BadRequest(AccountError.MissingInformation.ToString());
+			}
+
+            try
+            {
+                accounts.EditUser(details.UserID, details.Name);
+            }
+            catch (InvalidInformationException e)
+            {
+                return BadRequest(e.ToString());
+            }
+            catch
+            {
+                return BadRequest(AccountError.CouldNotModifyUser.ToString());
+            }
+
+            return Ok();
+        }
+
+        private async Task<ThinUser> GetCurrentUserAsync()
+        {
+            return await userManager.GetUserAsync(HttpContext.User);
+        }
+
+        private async Task SendUserSMS()
+        {
+            
         }
     }
 

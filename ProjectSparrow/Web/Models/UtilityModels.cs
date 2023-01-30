@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Web.Models.Utilities
 {
-    public class GeoLocation : IdentifierModel
+    public class GeoLocation
     {
         [Required]
         public float Latitude { get; set; }

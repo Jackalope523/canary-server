@@ -12,6 +12,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Server.Boundaries;
+using Microsoft.AspNetCore.Identity;
+using Web.Controllers;
+using Web.Stores;
+using Web.Services;
 
 namespace Web
 {
@@ -36,6 +40,12 @@ namespace Web
 
             services.AddSingleton(IAccountOperations.AccountManager);
             services.AddSingleton(IEventOperations.EventManager);
+
+            services.AddIdentityCore<UserAccountStore>()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
+
+            services.AddTransient<ISMSService, Twilio>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +62,7 @@ namespace Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

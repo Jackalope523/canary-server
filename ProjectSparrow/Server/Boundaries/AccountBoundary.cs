@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Server.Controls;
+using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(Guid Id, string PhoneNumber, string Name, DateTime DateOfBirth, int Reputation, int NumberOfFollowers);
+	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTime DateOfBirth, int Reputation, int NumberOfFollowers);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
@@ -16,7 +17,6 @@ namespace Server.Boundaries
         bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
         bool DeleteUser(Guid Id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
-        bool UpdatePasskey(Guid id, string newPasskey);
         bool UpdateName(Guid id, string newName);
         bool UpdateReputation(Guid id, int newReputation);
 		
@@ -33,19 +33,20 @@ namespace Server.Boundaries
 	{
 		static IAccountOperations AccountManager => new AccountManager(null);
 
-		ThinProfile GetUserProfile(Guid userID, Guid targetID);
+		Task<ThinUser> GetUserAsync(Guid userID);
+		Task<ThinUser> GetUserAsync(string phoneNumber);
+		Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID);
 
-		string TryLogin(string phoneNumber, string passkey);
-		void CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
-		void EditUser(Guid userID, string newName); // TODO Add EditAccount to update identification and/or passkey
-		void DeleteUser(Guid userID);
+		Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth);
+		Task EditUserAsync(Guid userID, string newName); // TODO Add EditAccount to update identification and/or passkey
+		Task DeleteUserAsync(Guid userID);
 
-		List<ThinnerUser> GetFollowedUsers(Guid userID);
-		List<ThinnerUser> GetBlockedUsers(Guid userID);
+		Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID);
+		Task<List<ThinnerUser>> GetBlockedUsersAsync(Guid userID);
 
-		void FollowUser(Guid userID, Guid targetID);
-		void UnfollowUser(Guid userID, Guid targetID);
-		void BlockUser(Guid userID, Guid targetID);
-		void UnblockUser(Guid userID, Guid targetID);
+		Task FollowUserAsync(Guid userID, Guid targetID);
+		Task UnfollowUserAsync(Guid userID, Guid targetID);
+		Task BlockUserAsync(Guid userID, Guid targetID);
+		Task UnblockUserAsync(Guid userID, Guid targetID);
 	}
 }

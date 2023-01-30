@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace Web.Models
 {
-	public class IdentifierModel
-	{
-		[Required]
-		public Guid UserID { get; set; }
-	}
 
-    public class TargetModel : IdentifierModel
+    public class TargetModel
     {
         [Required]
         public Guid TargetID { get; set; }
@@ -23,8 +18,7 @@ namespace Web.Models
 		[Required]
 		public string PhoneNumber { get; set; }
 
-        [Required]
-        public string Passkey { get; set; }
+		public string Code { get; set; }
     }
 
     public class AccountSignUpModel
@@ -33,7 +27,7 @@ namespace Web.Models
 		public string PhoneNumber { get; set; }
 
 		[Required]
-		public string Passkey { get; set; }
+		public string Email { get; set; }
 
 		[Required]
 		public string Name { get; set; }
@@ -42,7 +36,7 @@ namespace Web.Models
 		public DateTime DateOfBirth { get; set; }
     }
 
-	public class AccountDetailsModel : IdentifierModel
+	public class AccountDetailsModel
 	{
 		public string PhoneNumber { get; set; }
 

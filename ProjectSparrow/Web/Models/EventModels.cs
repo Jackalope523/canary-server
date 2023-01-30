@@ -9,7 +9,7 @@ namespace Web.Models
 {
     using Utilities;
 
-    public class EventModel : IdentifierModel
+    public class EventModel
     {
         [Required]
         public Guid EventID { get; set; }
