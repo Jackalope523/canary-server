@@ -15,7 +15,7 @@ namespace Server.Boundaries
         ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
         bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
-        bool DeleteUser(Guid Id);
+        bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
         bool UpdateName(Guid id, string newName);
         bool UpdateReputation(Guid id, int newReputation);

@@ -46,6 +46,7 @@ namespace Web
                 .AddDefaultTokenProviders();
 
             services.AddTransient<ISMSService, Twilio>();
+            services.AddTransient<IEmailService, SendGrid>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

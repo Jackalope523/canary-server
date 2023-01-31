@@ -30,12 +30,12 @@ namespace Web.Controllers
             CouldNotModifyUser
 		}
 
-		private IAccountOperations accounts;
-        private UserManager<ThinUser> userManager;
-        private SignInManager<ThinUser> signInManager;
+		IAccountOperations accounts;
+        UserManager<ThinUser> userManager;
+        SignInManager<ThinUser> signInManager;
 
-        private ISMSService smsService;
-        private IEmailService emailService;
+        ISMSService smsService;
+        IEmailService emailService;
 
         public AccountController(IAccountOperations accountOperations,
             UserManager<ThinUser> identityUserManager, SignInManager<ThinUser> identitySignInManager,
@@ -132,7 +132,7 @@ namespace Web.Controllers
         [HttpPost("signup")]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAccountAsync([FromBody] AccountSignUpModel details)
+        public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpModel details)
 		{
 			if (details == null || !ModelState.IsValid)
 			{
@@ -179,7 +179,7 @@ namespace Web.Controllers
 
         [HttpPut]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ModifyAccountAsync([FromBody] AccountDetailsModel details)
+        public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsModel details)
         {
 			if (details == null || !ModelState.IsValid)
 			{

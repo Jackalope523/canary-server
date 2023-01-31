@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 using Web.Models;
 using Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Web.Controllers
 {
-    [Route("accounts/[controller]")]
+    [Route("profiles/[controller]")]
     [ApiController]
 	[Authorize]
     public class ProfileController : Controller
@@ -24,17 +25,19 @@ namespace Web.Controllers
 			CouldNotFindUser
 		}
 
-		private IAccountOperations accounts;
+		IAccountOperations accounts;
+		UserManager<ThinUser> userManager;
 
-		public ProfileController(IAccountOperations accountOperations)
+		public ProfileController(IAccountOperations accountOperations, UserManager<ThinUser> identityUserManager)
 		{
 			accounts = accountOperations;
+			userManager = identityUserManager;
 		}
 
 		[HttpGet("{targetIdentification}")]
-        public IActionResult GetUser([FromBody] TargetModel info)
+        public async Task<IActionResult> GetUser(string targetIdentification)
         {
-			if (info == null || !ModelState.IsValid)
+			if (targetIdentification == null)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
@@ -43,7 +46,14 @@ namespace Web.Controllers
 
 			try
 			{
-				profile = accounts.GetUserProfile(info.UserID, info.TargetID);
+				var user = await GetCurrentUserAsync();
+
+				if (!Guid.TryParse(targetIdentification, out Guid targetGuid))
+				{
+					throw new ArgumentException("Not a valid GUID.", nameof(targetIdentification));
+				}
+
+				profile = await accounts.GetUserProfileAsync(user.Id, targetGuid);
 			}
 			catch (InvalidUserException e)
 			{
@@ -58,18 +68,15 @@ namespace Web.Controllers
         }
 
         [HttpGet("following")]
-        public IActionResult GetFollowed([FromBody] IdentifierModel user)
+        public async Task<IActionResult> GetFollowed()
         {
-			if (user == null || !ModelState.IsValid)
-			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
-			}
-
 			List<ThinnerUser> followedUsers; // Change to something more meaningful
 
 			try
 			{
-				followedUsers = accounts.GetFollowedUsers(user.UserID);
+				var user = await GetCurrentUserAsync();
+
+				followedUsers = await accounts.GetFollowedUsersAsync(user.Id);
 			}
 			catch
 			{
@@ -80,7 +87,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPost("following")]
-		public IActionResult FollowUser([FromBody] TargetModel info)
+		public async Task<IActionResult> FollowUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -89,7 +96,9 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.FollowUser(info.UserID, info.TargetID);
+				var user = await GetCurrentUserAsync();
+
+				await accounts.FollowUserAsync(user.Id, info.TargetID);
 			}
 			catch
 			{
@@ -100,7 +109,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPut("following")]
-		public IActionResult UnfollowUser([FromBody] TargetModel info)
+		public async Task<IActionResult> UnfollowUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -109,7 +118,9 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.UnfollowUser(info.UserID, info.TargetID);
+				var user = await GetCurrentUserAsync();
+
+				await accounts.UnfollowUserAsync(user.Id, info.TargetID);
 			}
 			catch
 			{
@@ -120,18 +131,15 @@ namespace Web.Controllers
 		}
 
 		[HttpGet("blocked")]
-		public IActionResult GetBlocked([FromBody] IdentifierModel user)
+		public async Task<IActionResult> GetBlocked()
 		{
-			if (user == null || !ModelState.IsValid)
-			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
-			}
-
 			List<ThinnerUser> blockedUsers; // Change to something more meaningful
 
 			try
 			{
-				blockedUsers = accounts.GetBlockedUsers(user.UserID);
+				var user = await GetCurrentUserAsync();
+
+				blockedUsers = await accounts.GetBlockedUsersAsync(user.Id);
 			}
 			catch
 			{
@@ -142,7 +150,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPost("blocked")]
-		public IActionResult BlockUser([FromBody] TargetModel info)
+		public async Task<IActionResult> BlockUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -151,7 +159,9 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.BlockUser(info.UserID, info.TargetID);
+				var user = await GetCurrentUserAsync();
+
+				await accounts.BlockUserAsync(user.Id, info.TargetID);
 			}
 			catch
 			{
@@ -162,7 +172,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPut("blocked")]
-		public IActionResult UnblockUser([FromBody] TargetModel info)
+		public async Task<IActionResult> UnblockUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -171,7 +181,9 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.UnblockUser(info.UserID, info.TargetID);
+				var user = await GetCurrentUserAsync();
+
+				await accounts.UnblockUserAsync(user.Id, info.TargetID);
 			}
 			catch
 			{
@@ -179,6 +191,11 @@ namespace Web.Controllers
 			}
 
 			return Ok();
+		}
+
+		private async Task<ThinUser> GetCurrentUserAsync()
+		{
+			return await userManager.GetUserAsync(HttpContext.User);
 		}
 	}
 

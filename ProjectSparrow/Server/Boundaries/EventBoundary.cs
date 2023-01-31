@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Threading.Tasks;
 using Server.Controls;
 
 namespace Server.Boundaries
@@ -26,15 +27,15 @@ namespace Server.Boundaries
 	{
 		static IEventOperations EventManager => new EventManager(null, null);
 
-		ThinEvent GetEventInformation(Guid userID, Guid eventID);
-		List<ThinnerEvent> GetEventsInArea(Guid userID, double latitude, double longitude, double distance);
-		List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, double latitude, double longitude, double distance);
+		Task<ThinEvent> GetEventInformationAsync(Guid userID, Guid eventID);
+		Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID, double latitude, double longitude, double distance);
+		Task<List<ThinnerEvent>> GetPersonalisedEventsInAreaAsync(Guid userID, double latitude, double longitude, double distance);
 
-		void CreateEvent(Guid userID, string eventName, string eventType, DateTime startTime, double latitude, double longitude);
-		void JoinEvent(Guid userID, Guid eventID);
-		void LeaveEvent(Guid userID, Guid eventID);
-		void EndEvent(Guid userID, Guid eventID);
+		Task<ThinEvent> CreateEventAsync(Guid userID, string eventName, string eventType, DateTime startTime, double latitude, double longitude);
+		Task JoinEventAsync(Guid userID, Guid eventID);
+		Task LeaveEventAsync(Guid userID, Guid eventID);
+		Task EndEventAsync(Guid userID, Guid eventID);
 
-		List<ThinnerUser> GetAttendees(Guid userID, Guid eventID);
+		Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID);
 	}
 }

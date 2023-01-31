@@ -6,10 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Server.Boundaries;
 using Web.Models;
-using Web.Models.Utilities;
 using System.Net;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using DataAccess.Entities;
 
 namespace Web.Controllers
 {
@@ -26,43 +28,55 @@ namespace Web.Controllers
 		}
 
 		IEventOperations events;
+		UserManager<ThinUser> userManager;
 
-        public EventsController(IEventOperations eventOperations)
+		public EventsController(IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
         {
             events = eventOperations;
+			userManager = identityUserManager;
         }
 
         [HttpGet("{eventID}")]
-        public IActionResult GetEvent([FromBody] EventModel info)
+        public async Task<IActionResult> GetEvent(string eventID)
         {
-			if (info == null || !ModelState.IsValid)
+			if (eventID == null)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
+			ThinEvent targetEvent;
+
             try
             {
-                events.GetEventInformation(info.UserID, info.EventID); // TODO Return relevant information
+				var user = await GetCurrentUserAsync();
+
+				Guid eventGUID = GetGUID(eventID);
+
+                targetEvent = await events.GetEventInformationAsync(user.Id, eventGUID); // TODO Return relevant information
             }
             catch
 			{
 				return BadRequest(EventError.CouldNotFindEvent.ToString());
 			}
 
-			return Ok();
+			return Ok(targetEvent);
         }
 
         [HttpPost]
-        public IActionResult CreateEvent([FromBody] EventDetailsModel eventDetails)
+        public async Task<IActionResult> CreateEvent([FromBody] EventDetailsModel eventDetails)
         {
             if (eventDetails == null || !ModelState.IsValid)
             {
                 return BadRequest(EventError.MissingInformation.ToString());
             }
 
+			ThinEvent newEvent;
+
             try
             {
-                events.CreateEvent(eventDetails.UserID,
+				var user = await GetCurrentUserAsync();
+
+                newEvent = await events.CreateEventAsync(user.Id,
 					eventDetails.EventName, eventDetails.EventType, eventDetails.StartTime,
 					eventDetails.Location.Latitude, eventDetails.Location.Longitude);
             }
@@ -71,13 +85,13 @@ namespace Web.Controllers
                 return BadRequest(EventError.CouldNotCompleteRequest.ToString());
             }
 
-            return Ok();
+            return Ok(newEvent);
         }
 
-        [HttpPut("{eventID}")]
-        public IActionResult EditEvent([FromBody] EventDetailsModel eventDetails)
+        [HttpPost("{eventID}/edit")]
+        public async Task<IActionResult> EditEvent(string eventID, [FromBody] EventDetailsModel eventDetails)
 		{
-			if (eventDetails == null || !ModelState.IsValid)
+			if (eventID == null || eventDetails == null || !ModelState.IsValid)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -94,17 +108,21 @@ namespace Web.Controllers
 			return Ok();
 		}
 
-        [HttpDelete()]
-        public IActionResult EndEvent([FromBody] EventModel user)
+        [HttpDelete("{eventID}/edit")]
+        public async Task<IActionResult> EndEvent(string eventID)
 		{
-			if (user == null || !ModelState.IsValid)
+			if (eventID == null)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
 			try
 			{
-				events.EndEvent(user.UserID, user.EventID);
+				var user = await GetCurrentUserAsync();
+
+				Guid eventGUID = GetGUID(eventID);
+
+				await events.EndEventAsync(user.Id, eventGUID);
 			}
 			catch
 			{
@@ -115,16 +133,20 @@ namespace Web.Controllers
         }
 
 		[HttpPost("{eventID}")]
-        public IActionResult JoinEvent([FromBody] EventModel user)
+        public async Task<IActionResult> JoinEvent(string eventID)
 		{
-			if (user == null || !ModelState.IsValid)
+			if (eventID == null)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
 			try
 			{
-				events.JoinEvent(user.UserID, user.EventID);
+				var user = await GetCurrentUserAsync();
+
+				Guid eventGUID = GetGUID(eventID);
+
+				await events.JoinEventAsync(user.Id, eventGUID);
 			}
 			catch
 			{
@@ -134,17 +156,21 @@ namespace Web.Controllers
 			return Ok();
 		}
 
-		[HttpDelete("{eventID}")]
-		public IActionResult LeaveEvent([FromBody] EventModel user)
+		[HttpPut("{eventID}")]
+		public async Task<IActionResult> LeaveEvent(string eventID)
 		{
-			if (user == null || !ModelState.IsValid)
+			if (eventID == null)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
 			try
 			{
-				events.LeaveEvent(user.UserID, user.EventID);
+				var user = await GetCurrentUserAsync();
+
+				Guid eventGUID = GetGUID(eventID);
+
+				await events.LeaveEventAsync(user.Id, eventGUID);
 			}
 			catch
 			{
@@ -154,6 +180,20 @@ namespace Web.Controllers
 			return Ok();
 		}
 
+		private async Task<ThinUser> GetCurrentUserAsync()
+		{
+			return await userManager.GetUserAsync(HttpContext.User);
+		}
+
+		private Guid GetGUID(string id)
+		{
+			if (!Guid.TryParse(id, out Guid guid))
+			{
+				throw new ArgumentException("Not a valid GUID.", nameof(id));
+			}
+
+			return guid;
+		}
 	}
 
 }
