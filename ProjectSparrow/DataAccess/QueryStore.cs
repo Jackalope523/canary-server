@@ -74,7 +74,8 @@ namespace DataAccess
                 user = _context.Users.Find(id);
                 numFollowers = _context.UserLinks.Where(l => l.SelfId == user.Id && l.Type.Equals(UserLink.UserLinkType.Following)).Count();
             }
-            return new ThinUser(user.Id, user.PhoneNumber, user.Name, user.DateOfBirth, user.Reputation, numFollowers);
+            return new ThinUser(user.Id, user.PhoneNumber, "", user.Name, user.DateOfBirth,
+                true, true, "", null, 0, DateTimeOffset.Now, user.Reputation, numFollowers);
         }
 
         public ThinUser FindUser(string phoneNumber)
@@ -86,7 +87,8 @@ namespace DataAccess
                 user = _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).Single();
                 numFollowers = _context.UserLinks.Where(l => l.SelfId == user.Id && l.Type.Equals(UserLink.UserLinkType.Following)).Count();
             }
-            return new ThinUser(user.Id, user.PhoneNumber, user.Name, user.DateOfBirth, user.Reputation, numFollowers);
+            return new ThinUser(user.Id, user.PhoneNumber, "", user.Name, user.DateOfBirth,
+				true, true, "", null, 0, DateTimeOffset.Now, user.Reputation, numFollowers);
         }
 
         public ThinEvent FindEvent(Guid id)
