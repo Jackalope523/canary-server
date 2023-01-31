@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTime DateOfBirth, int Reputation, int NumberOfFollowers);
+	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTime DateOfBirth,
+		bool IsPhoneConfirmed, bool IsEmailConfirmed,
+		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries,
+		int Reputation, int NumberOfFollowers);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
@@ -38,7 +41,10 @@ namespace Server.Boundaries
 		Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth);
-		Task EditUserAsync(Guid userID, string newName); // TODO Add EditAccount to update identification and/or passkey
+		Task EditUserAsync(Guid userID,
+			string phoneNumber = "", string email = "", string name = "",
+			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
+			string securityStamp = "", DateTimeOffset? lockoutDate = null, int? accessTries = null);
 		Task DeleteUserAsync(Guid userID);
 
 		Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID);
