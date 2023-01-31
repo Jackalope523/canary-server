@@ -11,6 +11,8 @@ using Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Web.Services;
+using DataAccess.Entities;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace Web.Controllers
 {
@@ -33,14 +35,18 @@ namespace Web.Controllers
         private SignInManager<ThinUser> signInManager;
 
         private ISMSService smsService;
+        private IEmailService emailService;
 
-        public AccountController(IAccountOperations accountOperations, UserManager<ThinUser> identityUserManager, SignInManager<ThinUser> identitySignInManager, ISMSService externalSMSService)
+        public AccountController(IAccountOperations accountOperations,
+            UserManager<ThinUser> identityUserManager, SignInManager<ThinUser> identitySignInManager,
+            ISMSService externalSMSService, IEmailService externalEmailService)
         {
             accounts = accountOperations;
             userManager = identityUserManager;
             signInManager = identitySignInManager;
 
             smsService = externalSMSService;
+            emailService = externalEmailService;
         }
 
         [HttpPost]
@@ -82,17 +88,38 @@ namespace Web.Controllers
 			try
 			{
 				var user = await accounts.GetUserAsync(credentials.PhoneNumber);
-
-				var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
-
-                if (result)
+                
+                if (await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
-                    await signInManager.SignInAsync(user, false);
+				    var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
+
+                    if (result)
+                    {
+                        await signInManager.SignInAsync(user, false);
+                    }
+                    else
+                    {
+                        return BadRequest(AccountError.IncorrectCode.ToString());
+                    }
                 }
                 else
-                {
-                    return BadRequest(AccountError.IncorrectCode.ToString());
-                }
+				{
+					var result = await userManager.ChangePhoneNumberAsync(user, credentials.PhoneNumber, credentials.Code);
+
+					if (result.Succeeded)
+					{
+						await signInManager.SignInAsync(user, false);
+
+						if (user.Email != null)
+						{
+							await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", "Verify your Sparrow email.");
+						}
+					}
+					else
+					{
+						return BadRequest(AccountError.IncorrectCode.ToString());
+					}
+				}
             }
             catch
             {
@@ -105,7 +132,7 @@ namespace Web.Controllers
         [HttpPost("signup")]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateAccount([FromBody] AccountSignUpModel details)
+        public async Task<IActionResult> CreateAccountAsync([FromBody] AccountSignUpModel details)
 		{
 			if (details == null || !ModelState.IsValid)
 			{
@@ -114,10 +141,28 @@ namespace Web.Controllers
 
             try
 			{
-				accounts.CreateUser(details.PhoneNumber, details.Passkey, details.Name, details.DateOfBirth);
+                await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
+                    details.Name, details.DateOfBirth);
+
+                var user = await accounts.GetUserAsync(details.PhoneNumber);
+
+                await userManager.UpdateSecurityStampAsync(user);
+
+				var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, details.PhoneNumber);
+
+				await smsService.SendSMSAsync(details.PhoneNumber, $"Your Sparrow code is {code}");
 			}
             catch (InvalidUserException e)
-            {
+			{
+				var user = await accounts.GetUserAsync(details.PhoneNumber);
+
+				if (!await userManager.IsPhoneNumberConfirmedAsync(user))
+                {
+					var code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+
+					await smsService.SendSMSAsync(details.PhoneNumber, $"Your Sparrow code is {code}");
+				}
+
                 return BadRequest(e.ToString());
             }
             catch (InvalidInformationException e)
@@ -134,7 +179,7 @@ namespace Web.Controllers
 
         [HttpPut]
         [ValidateAntiForgeryToken]
-        public IActionResult ModifyAccount([FromBody] AccountDetailsModel details)
+        public async Task<IActionResult> ModifyAccountAsync([FromBody] AccountDetailsModel details)
         {
 			if (details == null || !ModelState.IsValid)
 			{
@@ -143,7 +188,9 @@ namespace Web.Controllers
 
             try
             {
-                accounts.EditUser(details.UserID, details.Name);
+                var user = await GetCurrentUserAsync();
+
+                await accounts.EditUserAsync(user.Id, details.Name);
             }
             catch (InvalidInformationException e)
             {
@@ -160,11 +207,6 @@ namespace Web.Controllers
         private async Task<ThinUser> GetCurrentUserAsync()
         {
             return await userManager.GetUserAsync(HttpContext.User);
-        }
-
-        private async Task SendUserSMS()
-        {
-            
         }
     }
 

@@ -26,7 +26,6 @@ namespace Web.Models
 		[Required]
 		public string PhoneNumber { get; set; }
 
-		[Required]
 		public string Email { get; set; }
 
 		[Required]
@@ -39,6 +38,8 @@ namespace Web.Models
 	public class AccountDetailsModel
 	{
 		public string PhoneNumber { get; set; }
+
+		public string Email { get; set; }
 
 		public string Name { get; set; }
 	}
