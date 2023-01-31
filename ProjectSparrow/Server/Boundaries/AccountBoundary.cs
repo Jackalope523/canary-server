@@ -8,7 +8,7 @@ namespace Server.Boundaries
 	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTime DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries,
-		int Reputation, int NumberOfFollowers);
+		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
@@ -17,7 +17,7 @@ namespace Server.Boundaries
         public static IAccountDatabase AccountDatabaseAccess;
         ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
-        bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
+        bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
         bool UpdateName(Guid id, string newName);

@@ -28,10 +28,14 @@ namespace Server.Boundaries
 		static IEventOperations EventManager => new EventManager(IAccountDatabase.AccountDatabaseAccess, IEventDatabase.EventDatabaseAccess);
 
 		Task<ThinEvent> GetEventInformationAsync(Guid userID, Guid eventID);
-		Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID, double latitude, double longitude, double distance);
-		Task<List<ThinnerEvent>> GetPersonalisedEventsInAreaAsync(Guid userID, double latitude, double longitude, double distance);
+		Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID,
+			double latitude, double longitude, double distance);
+		Task<List<ThinnerEvent>> GetPersonalisedEventsInAreaAsync(Guid userID,
+			double latitude, double longitude, double distance);
 
-		Task<ThinEvent> CreateEventAsync(Guid userID, string eventName, string eventType, DateTime startTime, double latitude, double longitude);
+		Task<ThinEvent> CreateEventAsync(Guid userID,
+			string eventName, string eventType, DateTime startTime,
+			double latitude, double longitude);
 		Task JoinEventAsync(Guid userID, Guid eventID);
 		Task LeaveEventAsync(Guid userID, Guid eventID);
 		Task EndEventAsync(Guid userID, Guid eventID);

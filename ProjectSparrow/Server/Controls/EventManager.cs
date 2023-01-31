@@ -20,7 +20,7 @@ namespace Server.Controls
 			events = eventDatabase;
 		}
 
-		public ThinEvent GetEventInformation(Guid userID, Guid eventID)
+		public async Task<ThinEvent> GetEventInformationAsync(Guid userID, Guid eventID)
         {
 			// TODO Verify user
 
@@ -29,7 +29,8 @@ namespace Server.Controls
 			return eventInformation;
 		}
 
-		public List<ThinnerEvent> GetEventsInArea(Guid userID, double latitude, double longitude, double distance)
+		public async Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID,
+			double latitude, double longitude, double distance)
 		{
 			// TODO Verify user
 			
@@ -38,27 +39,32 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public List<ThinnerEvent> GetPersonalisedEventsInArea(Guid userID, double latitude, double longitude, double distance)
+		public async Task<List<ThinnerEvent>> GetPersonalisedEventsInAreaAsync(Guid userID,
+			double latitude, double longitude, double distance)
 		{
 			// TODO Verify user
 
-			List<ThinnerEvent> nearbyEvents = GetEventsInArea(userID, latitude, longitude, distance);
+			List<ThinnerEvent> nearbyEvents = await GetEventsInAreaAsync(userID, latitude, longitude, distance);
 
 			// TODO User interest weighting here
 
 			return nearbyEvents;
 		}
 
-		public void CreateEvent(Guid userID, string eventName, string eventType, DateTime startTime, double latitude, double longitude)
+		public async Task<ThinEvent> CreateEventAsync(Guid userID,
+			string eventName, string eventType, DateTime startTime,
+			double latitude, double longitude)
 		{
 			// TODO Verify user
 
 			// TODO Verify user is not currently at an event
 
 			events.CreateEvent(userID, eventName, eventType, startTime, latitude, longitude);
+
+			return null;
 		}
 
-		public void JoinEvent(Guid userID, Guid eventID)
+		public async Task JoinEventAsync(Guid userID, Guid eventID)
 		{
 			// TODO Verify user
 
@@ -68,7 +74,7 @@ namespace Server.Controls
 			{ throw new UnexpectedFailureException("Could not join event."); }
 		}
 
-		public void LeaveEvent(Guid userID, Guid eventID)
+		public async Task LeaveEventAsync(Guid userID, Guid eventID)
 		{
 			// TODO Verify user
 
@@ -78,7 +84,7 @@ namespace Server.Controls
             { throw new UnexpectedFailureException("Could not leave event."); }
         }
 
-		public void EndEvent(Guid userID, Guid eventID)
+		public async Task EndEventAsync(Guid userID, Guid eventID)
 		{
 			// TODO Verify user
 
@@ -90,7 +96,7 @@ namespace Server.Controls
             { throw new UnexpectedFailureException("Could not end event."); }
         }
 		
-		public List<ThinnerUser> GetAttendees(Guid userID, Guid eventID)
+		public async Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID)
 		{
 			// TODO Verify user
 

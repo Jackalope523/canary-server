@@ -21,7 +21,7 @@ namespace Server.Entities
 
         public bool Verified { get; set; }
 
-        public User(string phoneNumber, string name, string passkey) : base(phoneNumber, passkey)
+        public User(string phoneNumber, string name) : base(phoneNumber)
         {
             Name = name;
             Reputation = new Reputation();
