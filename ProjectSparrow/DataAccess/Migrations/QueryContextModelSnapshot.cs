@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
@@ -17,7 +18,7 @@ namespace DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -27,6 +28,10 @@ namespace DataAccess.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<Point>("Location")
+                        .IsRequired()
+                        .HasColumnType("geography");
 
                     b.HasKey("Id");
 
@@ -92,6 +97,38 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            JoinDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Signy of Sváfnir",
+                            Passkey = "",
+                            PhoneNumber = "0",
+                            Reputation = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("5829377a-c9d6-4470-83ba-1390f976d958"),
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            JoinDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Huginn",
+                            Passkey = "",
+                            PhoneNumber = "1",
+                            Reputation = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("fdaa5756-462a-4e0f-a7e8-774d1ee64ddb"),
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            JoinDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Muninn",
+                            Passkey = "",
+                            PhoneNumber = "2",
+                            Reputation = 0
+                        });
                 });
 
             modelBuilder.Entity("DataAccess.Entities.EventLink", b =>
@@ -113,7 +150,41 @@ namespace DataAccess.Migrations
                     b.Property<Guid>("OtherId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int")
+                        .HasColumnName("Type");
+
                     b.HasDiscriminator().HasValue("user");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("3ffd8b59-c392-434e-8f63-0d8f1141ec62"),
+                            SelfId = new Guid("5829377a-c9d6-4470-83ba-1390f976d958"),
+                            OtherId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("bf5653ff-6fa6-417a-90ec-5191b32b0a28"),
+                            SelfId = new Guid("fdaa5756-462a-4e0f-a7e8-774d1ee64ddb"),
+                            OtherId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("bc3f40b5-9377-42fb-a76f-fa35bb52883f"),
+                            SelfId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            OtherId = new Guid("5829377a-c9d6-4470-83ba-1390f976d958"),
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("0374a719-0e07-4952-9d42-f97cf3b908f4"),
+                            SelfId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            OtherId = new Guid("fdaa5756-462a-4e0f-a7e8-774d1ee64ddb"),
+                            Type = 1
+                        });
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Link", b =>

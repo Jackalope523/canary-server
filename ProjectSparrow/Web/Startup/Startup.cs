@@ -44,14 +44,16 @@ namespace Web
             services.AddSingleton(IAccountOperations.AccountManager);
             services.AddSingleton(IEventOperations.EventManager);
 
-            services.AddAuthentication();
+            services.AddTransient<ISMSService, TwilioService>();
+            services.AddTransient<IEmailService, SendGridService>();
+            TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+
+            services.AddAuthentication()
+                .AddIdentityCookies();
             services.AddIdentityCore<ThinUser>()
                 .AddUserStore<UserAccountStore>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
-
-            services.AddTransient<ISMSService, Twilio>();
-            services.AddTransient<IEmailService, SendGrid>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

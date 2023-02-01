@@ -1,12 +1,30 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using SendGrid;
 
 namespace Web.Services
 {
-	public class SendGrid : IEmailService
+	public class SendGridService : IEmailService
 	{
+		private static bool isInitialised = false;
+
+		public SendGridService()
+		{
+			if (!isInitialised)
+			{
+				Initialise();
+			}
+		}
+
+		public static void Initialise()
+		{
+			isInitialised = true;
+			//SendGridClient.Init(Environment.GetEnvironmentVariable("TWILIO_ACCOUNT_SID"), Environment.GetEnvironmentVariable("TWILIO_ACCOUNT_TOKEN"));
+		}
+
 		public Task SendEmailAsync(string email, string subject, string body)
 		{
-			throw new System.NotImplementedException();
+			return Task.FromResult(0);
 		}
 	}
 }
