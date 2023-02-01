@@ -46,17 +46,14 @@ namespace Web.Controllers
 
 			try
 			{
+				// Parse target identification and retrieve profile
+				var target = GetGUID(targetIdentification);
 				var user = await GetCurrentUserAsync();
-
-				if (!Guid.TryParse(targetIdentification, out Guid targetGuid))
-				{
-					throw new ArgumentException("Not a valid GUID.", nameof(targetIdentification));
-				}
-
-				profile = await accounts.GetUserProfileAsync(user.Id, targetGuid);
+				profile = await accounts.GetUserProfileAsync(user.Id, target);
 			}
 			catch (InvalidUserException e)
 			{
+				// User does not exist
 				return BadRequest(e.ToString());
 			}
 			catch (Exception e)
@@ -70,12 +67,12 @@ namespace Web.Controllers
         [HttpGet("following")]
         public async Task<IActionResult> GetFollowed()
         {
-			List<ThinnerUser> followedUsers; // Change to something more meaningful
+			List<ThinnerUser> followedUsers;
 
 			try
 			{
+				// Retrieve all users that the current user is following
 				var user = await GetCurrentUserAsync();
-
 				followedUsers = await accounts.GetFollowedUsersAsync(user.Id);
 			}
 			catch (Exception e)
@@ -96,8 +93,8 @@ namespace Web.Controllers
 
 			try
 			{
+				// Follow other user
 				var user = await GetCurrentUserAsync();
-
 				await accounts.FollowUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
@@ -118,8 +115,8 @@ namespace Web.Controllers
 
 			try
 			{
+				// Unfollow other user
 				var user = await GetCurrentUserAsync();
-
 				await accounts.UnfollowUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
@@ -137,8 +134,8 @@ namespace Web.Controllers
 
 			try
 			{
+				// Retrieve all users that the current user is blocking
 				var user = await GetCurrentUserAsync();
-
 				blockedUsers = await accounts.GetBlockedUsersAsync(user.Id);
 			}
 			catch (Exception e)
@@ -159,8 +156,8 @@ namespace Web.Controllers
 
 			try
 			{
+				// Block other user
 				var user = await GetCurrentUserAsync();
-
 				await accounts.BlockUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
@@ -181,8 +178,8 @@ namespace Web.Controllers
 
 			try
 			{
+				// Unblock other user
 				var user = await GetCurrentUserAsync();
-
 				await accounts.UnblockUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
@@ -196,6 +193,16 @@ namespace Web.Controllers
 		private async Task<ThinUser> GetCurrentUserAsync()
 		{
 			return await userManager.GetUserAsync(HttpContext.User);
+		}
+
+		private Guid GetGUID(string id)
+		{
+			if (!Guid.TryParse(id, out Guid guid))
+			{
+				throw new ArgumentException("Not a valid GUID.", nameof(id));
+			}
+
+			return guid;
 		}
 	}
 

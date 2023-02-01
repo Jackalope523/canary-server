@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Shared;
+using Microsoft.Extensions.Logging;
 
 namespace Server.Controls
 {
@@ -22,38 +23,42 @@ namespace Server.Controls
 
         public async Task<ThinUser> GetUserAsync(Guid userID)
         {
-            ThinUser targetUser = accounts.FindUser(userID);
-
+            var targetUser = accounts.FindUser(userID);
             if (targetUser == null)
-            { throw new InvalidUserException("Target user not found."); }
+            { throw new InvalidUserException("User not found."); }
 
             return targetUser;
         }
 
         public async Task<ThinUser> GetUserAsync(string phoneNumber)
 		{
-			ThinUser targetUser = accounts.FindUser(phoneNumber);
-
+			var targetUser = accounts.FindUser(phoneNumber);
 			if (targetUser == null)
-			{ throw new InvalidUserException("Target user not found."); }
+			{ throw new InvalidUserException("User not found."); }
 
 			return targetUser;
 		}
 
         public async Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID)
         {
-            throw new NotImplementedException();
+            // Check that user is not blocked
+            if (await UserIsBlocked(userID, targetID))
+            {
+                throw new InvalidUserException("User is unable to view target.");
+            }
+
+            var targetUser = accounts.FindUser(targetID);
+            return new ThinProfile(targetID, targetUser.Name, targetUser.Reputation, targetUser.NumberOfFollowers);
         }
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth)
         {
             // Check phone number not in use
-
             if (accounts.FindUser(phoneNumber) != null)
             { throw new InvalidUserException("Phone Number already registered."); }
 
+            // TODO Normalise data
             // Create profile
-
             User newUser = new(phoneNumber, name)
             {
                 DateOfBirth = dateOfBirth,
@@ -62,17 +67,13 @@ namespace Server.Controls
             };
 
             // Validate profile
-
             bool valid = newUser.ValidateUser();
-
             if (!valid)
             { throw new InvalidInformationException("Invalid account details provided."); }
 
             // Store profile
-            
             bool success = accounts.CreateUser(newUser.Identification, email,
                 newUser.Name, newUser.DateOfBirth);
-
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
         }
@@ -81,14 +82,13 @@ namespace Server.Controls
             string phoneNumber = "", string email = "", string name = "",
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = "", DateTimeOffset? lockoutDate = null, int? accessTries = null)
-        {            
+        {
+			if (accounts.FindUser(userID) == null)
+			{ throw new InvalidUserException("User not found."); }
+
             // TODO Verify updates are valid
-
-            ThinUser account = accounts.FindUser(userID);
-
-			if (account == null)
-			{ throw new InvalidUserException("Target user not found."); }
-
+            // TODO Normalise data
+            // Update individual attributes
 			if (phoneNumber != "")
             {
                 accounts.UpdatePhoneNumber(userID, phoneNumber);
@@ -126,7 +126,6 @@ namespace Server.Controls
         public async Task DeleteUserAsync(Guid userID)
         {
             bool success = accounts.DeleteUser(userID);
-
             if (!success)
             { throw new UnexpectedFailureException("User deletion failed."); }
         }
@@ -143,30 +142,35 @@ namespace Server.Controls
 
         public async Task FollowUserAsync(Guid userID, Guid targetID)
         {
-            // TODO Check target account exists
-
             accounts.FollowUser(userID, targetID);
 		}
 
 		public async Task UnfollowUserAsync(Guid userID, Guid targetID)
         {
-            // TODO Check target account exists
-
             accounts.UnfollowUser(userID, targetID);
         }
 
 		public async Task BlockUserAsync(Guid userID, Guid targetID)
         {
-            // TODO Check target account exists
-
             accounts.BlockUser(userID, targetID);
         }
 
 		public async Task UnblockUserAsync(Guid userID, Guid targetID)
         {
-            // TODO Check target account exists
-
             accounts.UnblockUser(userID, targetID);
-        }
+		}
+
+		private async Task<bool> UserIsBlocked(Guid userID, Guid targetID)
+        {
+			var targetBlockedList = accounts.GetBlockedUsers(targetID);
+
+			// Check if user is blocked by target
+			if (targetBlockedList.Find(x => x.Id == userID) != null)
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 }

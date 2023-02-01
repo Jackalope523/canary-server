@@ -37,8 +37,8 @@ namespace Web.Controllers
 
             try
             {
+                // Retrieve events personalised for the current user
                 var user = await GetCurrentUserAsync();
-
                 eventList = await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
 			}
 			catch (Exception e)
@@ -56,8 +56,8 @@ namespace Web.Controllers
 
             try
 			{
+                // Retrieve all events available to the current user
 				var user = await GetCurrentUserAsync();
-
 				eventList = await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
 			}
 			catch (Exception e)

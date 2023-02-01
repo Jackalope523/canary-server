@@ -11,8 +11,6 @@ using Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Web.Services;
-using DataAccess.Entities;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace Web.Controllers
 {
@@ -60,10 +58,9 @@ namespace Web.Controllers
 
             try
             {
+                // Send an SMS to the current user with a generated 2FA token
                 var user = await accounts.GetUserAsync(credentials.PhoneNumber);
-
                 var code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
-
                 await smsService.SendSMSAsync(credentials.PhoneNumber, $"Your Sparrow code is {code}");
 			}
 			catch (Exception e)
@@ -74,7 +71,7 @@ namespace Web.Controllers
 			return Ok();
         }
 
-        [HttpPost("login/verify")]
+        [HttpPost("verify")]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsModel credentials)
         {
@@ -87,10 +84,11 @@ namespace Web.Controllers
 			{
 				var user = await accounts.GetUserAsync(credentials.PhoneNumber);
                 
+                // Check if the account is activated
                 if (await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
+                    // Account is activated, check 2FA token validity
 				    var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
-
                     if (result)
                     {
                         await signInManager.SignInAsync(user, false);
@@ -102,14 +100,17 @@ namespace Web.Controllers
                 }
                 else
 				{
+                    // Account is not activated, check change number token validity
 					var result = await userManager.ChangePhoneNumberAsync(user, credentials.PhoneNumber, credentials.Code);
-
 					if (result.Succeeded)
 					{
+                        // Token is valid, sign user in
 						await signInManager.SignInAsync(user, false);
 
 						if (user.Email != null)
 						{
+                            // Send verification email if an email is added
+                            // TODO
 							await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", "Verify your Sparrow email.");
 						}
 					}
@@ -138,25 +139,28 @@ namespace Web.Controllers
 
             try
 			{
+                // Persist a new user
                 await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
                     details.Name, details.DateOfBirth);
 
+                // Generate security stamp for new user
                 var user = await accounts.GetUserAsync(details.PhoneNumber);
-
                 await userManager.UpdateSecurityStampAsync(user);
-
+                
+                // Send an SMS to new user with a generated change number token
 				var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, details.PhoneNumber);
-
 				await smsService.SendSMSAsync(details.PhoneNumber, $"Your Sparrow code is {code}");
 			}
             catch (InvalidUserException e)
 			{
+                // Account already exists
 				var user = await accounts.GetUserAsync(details.PhoneNumber);
 
+                // Check if account is activated
 				if (!await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
-					var code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
-
+                    // Account is not activated, send an sms with a generated change number token
+					var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
 					await smsService.SendSMSAsync(details.PhoneNumber, $"Your Sparrow code is {code}");
 				}
 
@@ -184,9 +188,9 @@ namespace Web.Controllers
 
             try
             {
+                // Send updates to account manager
                 var user = await GetCurrentUserAsync();
-
-                await accounts.EditUserAsync(user.Id, details.Name);
+                await accounts.EditUserAsync(user.Id, name: details.Name);
             }
             catch (InvalidInformationException e)
             {

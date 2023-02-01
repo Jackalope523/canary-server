@@ -48,10 +48,9 @@ namespace Web.Controllers
 
             try
             {
+				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-
 				Guid eventGUID = GetGUID(eventID);
-
                 targetEvent = await events.GetEventInformationAsync(user.Id, eventGUID); // TODO Return relevant information
 			}
 			catch (Exception e)
@@ -74,8 +73,8 @@ namespace Web.Controllers
 
             try
             {
+				// Create a new event as the current user
 				var user = await GetCurrentUserAsync();
-
                 newEvent = await events.CreateEventAsync(user.Id,
 					eventDetails.EventName, eventDetails.EventType, eventDetails.StartTime,
 					eventDetails.Latitude, eventDetails.Longitude);
@@ -118,10 +117,9 @@ namespace Web.Controllers
 
 			try
 			{
+				// End an event as the current user
 				var user = await GetCurrentUserAsync();
-
 				Guid eventGUID = GetGUID(eventID);
-
 				await events.EndEventAsync(user.Id, eventGUID);
 			}
 			catch (Exception e)
@@ -142,10 +140,9 @@ namespace Web.Controllers
 
 			try
 			{
+				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
-
 				Guid eventGUID = GetGUID(eventID);
-
 				await events.JoinEventAsync(user.Id, eventGUID);
 			}
 			catch (Exception e)
@@ -166,10 +163,9 @@ namespace Web.Controllers
 
 			try
 			{
+				// Leave an event as the current user
 				var user = await GetCurrentUserAsync();
-
 				Guid eventGUID = GetGUID(eventID);
-
 				await events.LeaveEventAsync(user.Id, eventGUID);
 			}
 			catch (Exception e)

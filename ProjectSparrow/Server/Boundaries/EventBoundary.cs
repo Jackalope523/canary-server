@@ -14,8 +14,9 @@ namespace Server.Boundaries
         public static IEventDatabase EventDatabaseAccess;
         ThinEvent FindEvent(Guid id);
 		List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance);
+		ThinEvent FindAttendingEvent(Guid id);
 
-		bool CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, double latitude, double longitude);
+		ThinEvent CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, double latitude, double longitude);
 		bool AddUserToEvent(Guid userId, Guid eventId);
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);  
 		bool EndEvent(Guid id);
