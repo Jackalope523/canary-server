@@ -44,7 +44,9 @@ namespace Web
             services.AddSingleton(IAccountOperations.AccountManager);
             services.AddSingleton(IEventOperations.EventManager);
 
-            services.AddIdentityCore<UserAccountStore>()
+            services.AddAuthentication();
+            services.AddIdentityCore<ThinUser>()
+                .AddUserStore<UserAccountStore>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
 

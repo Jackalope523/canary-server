@@ -7,8 +7,6 @@ using Server.Boundaries;
 
 namespace Web.Models
 {
-    using Utilities;
-
     public class EventModel
     {
         [Required]
@@ -24,7 +22,10 @@ namespace Web.Models
         public string EventType { get; set; }
 
         [Required]
-        public GeoLocation Location { get; set; }
+        public float Latitude { get; set; }
+
+        [Required]
+        public float Longitude { get; set; }
 
         [Required]
         public DateTime StartTime { get; set; }

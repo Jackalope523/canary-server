@@ -40,13 +40,13 @@ namespace Web.Controllers
                 var user = await GetCurrentUserAsync();
 
                 eventList = await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
-            }
-            catch
-            {
-                return BadRequest(DiscoverError.CouldNotCompleteRequest.ToString());
-            }
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
 
-            return Ok(eventList);
+			return Ok(eventList);
         }
 
         [HttpGet("all/{latitude}-{longitude}-{distance}")]
@@ -59,13 +59,13 @@ namespace Web.Controllers
 				var user = await GetCurrentUserAsync();
 
 				eventList = await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
-            }
-            catch
-            {
-                return BadRequest(DiscoverError.CouldNotCompleteRequest.ToString());
-            }
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
 
-            return Ok(eventList);
+			return Ok(eventList);
         }
 
 		private async Task<ThinUser> GetCurrentUserAsync()

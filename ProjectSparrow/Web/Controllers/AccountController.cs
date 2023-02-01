@@ -51,7 +51,6 @@ namespace Web.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody] AccountCredentialsModel credentials)
         {
             if (credentials == null || !ModelState.IsValid)
@@ -66,18 +65,17 @@ namespace Web.Controllers
                 var code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
 
                 await smsService.SendSMSAsync(credentials.PhoneNumber, $"Your Sparrow code is {code}");
-            }
-            catch
-            {
-                return BadRequest();
-            }
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
 
-            return Ok();
+			return Ok();
         }
 
         [HttpPost("login/verify")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsModel credentials)
         {
 			if (credentials == null || !ModelState.IsValid || credentials.Code == null)
@@ -120,18 +118,17 @@ namespace Web.Controllers
 						return BadRequest(AccountError.IncorrectCode.ToString());
 					}
 				}
-            }
-            catch
-            {
-                return BadRequest(AccountError.CouldNotLoginUser.ToString());
-            }
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
 
-            return Ok();
+			return Ok();
         }
 
         [HttpPost("signup")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpModel details)
 		{
 			if (details == null || !ModelState.IsValid)
@@ -169,16 +166,15 @@ namespace Web.Controllers
             {
                 return BadRequest(e.ToString());
             }
-            catch
+            catch (Exception e)
             {
-                return BadRequest(AccountError.CouldNotCreateUser.ToString());
+                return BadRequest(e.ToString());
             }
 
             return Ok();
         }
 
         [HttpPut]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsModel details)
         {
 			if (details == null || !ModelState.IsValid)
@@ -195,13 +191,13 @@ namespace Web.Controllers
             catch (InvalidInformationException e)
             {
                 return BadRequest(e.ToString());
-            }
-            catch
-            {
-                return BadRequest(AccountError.CouldNotModifyUser.ToString());
-            }
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
 
-            return Ok();
+			return Ok();
         }
 
         private async Task<ThinUser> GetCurrentUserAsync()

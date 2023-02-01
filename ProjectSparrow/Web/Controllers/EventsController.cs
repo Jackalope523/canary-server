@@ -53,10 +53,10 @@ namespace Web.Controllers
 				Guid eventGUID = GetGUID(eventID);
 
                 targetEvent = await events.GetEventInformationAsync(user.Id, eventGUID); // TODO Return relevant information
-            }
-            catch
+			}
+			catch (Exception e)
 			{
-				return BadRequest(EventError.CouldNotFindEvent.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok(targetEvent);
@@ -78,12 +78,12 @@ namespace Web.Controllers
 
                 newEvent = await events.CreateEventAsync(user.Id,
 					eventDetails.EventName, eventDetails.EventType, eventDetails.StartTime,
-					eventDetails.Location.Latitude, eventDetails.Location.Longitude);
+					eventDetails.Latitude, eventDetails.Longitude);
             }
-            catch
-            {
-                return BadRequest(EventError.CouldNotCompleteRequest.ToString());
-            }
+            catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
 
             return Ok(newEvent);
         }
@@ -100,9 +100,9 @@ namespace Web.Controllers
 			{
 				// events.EditEvent(eventDetails.Identification); // TODO Do we even need this?
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(EventError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
@@ -124,9 +124,9 @@ namespace Web.Controllers
 
 				await events.EndEventAsync(user.Id, eventGUID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(EventError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
@@ -148,9 +148,9 @@ namespace Web.Controllers
 
 				await events.JoinEventAsync(user.Id, eventGUID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(EventError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
@@ -172,9 +172,9 @@ namespace Web.Controllers
 
 				await events.LeaveEventAsync(user.Id, eventGUID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(EventError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();

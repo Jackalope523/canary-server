@@ -59,12 +59,12 @@ namespace Web.Controllers
 			{
 				return BadRequest(e.ToString());
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
-            return Ok(profile);
+			return Ok(profile);
         }
 
         [HttpGet("following")]
@@ -78,9 +78,9 @@ namespace Web.Controllers
 
 				followedUsers = await accounts.GetFollowedUsersAsync(user.Id);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok(followedUsers);
@@ -100,9 +100,9 @@ namespace Web.Controllers
 
 				await accounts.FollowUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
@@ -122,9 +122,9 @@ namespace Web.Controllers
 
 				await accounts.UnfollowUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
@@ -141,9 +141,9 @@ namespace Web.Controllers
 
 				blockedUsers = await accounts.GetBlockedUsersAsync(user.Id);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok(blockedUsers);
@@ -163,9 +163,9 @@ namespace Web.Controllers
 
 				await accounts.BlockUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
@@ -185,9 +185,9 @@ namespace Web.Controllers
 
 				await accounts.UnblockUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
