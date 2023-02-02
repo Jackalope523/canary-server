@@ -60,22 +60,25 @@ namespace DataAccess
                 {
                     Id = Guid.NewGuid(),
                     PhoneNumber = "0",
-                    Passkey = "",
+                    Email = "",
                     Name = "Signy of Sváfnir",
+                    SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new User
                 {
                     Id = Guid.NewGuid(),
                     PhoneNumber = "1",
-                    Passkey = "",
+                    Email = "",
                     Name = "Huginn",
+                    SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new User
                 {
                     Id = Guid.NewGuid(),
                     PhoneNumber = "2",
-                    Passkey = "",
+                    Email = "",
                     Name = "Muninn",
+                    SecurityStamp = Guid.NewGuid().ToString()
                 }
             };
 

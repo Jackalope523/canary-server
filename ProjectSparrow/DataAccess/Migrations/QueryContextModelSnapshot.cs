@@ -18,10 +18,10 @@ namespace DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "6.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("DataAccess.Entities.Event", b =>
                 {
@@ -63,8 +63,6 @@ namespace DataAccess.Migrations
                     b.ToTable("Links");
 
                     b.HasDiscriminator<string>("link_type").HasValue("Link");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("DataAccess.Entities.User", b =>
@@ -73,17 +71,29 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("AccessTries")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPhoneConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTimeOffset?>("LockoutDate")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Passkey")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -94,6 +104,10 @@ namespace DataAccess.Migrations
                     b.Property<int>("Reputation")
                         .HasColumnType("int");
 
+                    b.Property<string>("SecurityStamp")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -101,33 +115,45 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            Id = new Guid("d047c5e7-8f32-474f-a466-66989c934b05"),
+                            AccessTries = 0,
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "",
+                            IsEmailConfirmed = false,
+                            IsPhoneConfirmed = false,
                             JoinDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Signy of Sváfnir",
-                            Passkey = "",
                             PhoneNumber = "0",
-                            Reputation = 0
+                            Reputation = 0,
+                            SecurityStamp = "b77d02dd-352f-4539-885c-2ddff6b9b462"
                         },
                         new
                         {
-                            Id = new Guid("5829377a-c9d6-4470-83ba-1390f976d958"),
+                            Id = new Guid("5d4f8ae3-3414-445d-8a82-aeb632bfba91"),
+                            AccessTries = 0,
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "",
+                            IsEmailConfirmed = false,
+                            IsPhoneConfirmed = false,
                             JoinDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Huginn",
-                            Passkey = "",
                             PhoneNumber = "1",
-                            Reputation = 0
+                            Reputation = 0,
+                            SecurityStamp = "01d89e9b-d1b1-460c-92c1-a61420692faf"
                         },
                         new
                         {
-                            Id = new Guid("fdaa5756-462a-4e0f-a7e8-774d1ee64ddb"),
+                            Id = new Guid("d9e5aed6-e9bc-4986-8f46-9c5aaf32f162"),
+                            AccessTries = 0,
                             DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "",
+                            IsEmailConfirmed = false,
+                            IsPhoneConfirmed = false,
                             JoinDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "Muninn",
-                            Passkey = "",
                             PhoneNumber = "2",
-                            Reputation = 0
+                            Reputation = 0,
+                            SecurityStamp = "266a3179-8a1a-4324-8235-11f54f3bb42c"
                         });
                 });
 
@@ -159,30 +185,30 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("3ffd8b59-c392-434e-8f63-0d8f1141ec62"),
-                            SelfId = new Guid("5829377a-c9d6-4470-83ba-1390f976d958"),
-                            OtherId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            Id = new Guid("d2b05d8a-e3f2-43f6-a283-681deec2b607"),
+                            SelfId = new Guid("5d4f8ae3-3414-445d-8a82-aeb632bfba91"),
+                            OtherId = new Guid("d047c5e7-8f32-474f-a466-66989c934b05"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("bf5653ff-6fa6-417a-90ec-5191b32b0a28"),
-                            SelfId = new Guid("fdaa5756-462a-4e0f-a7e8-774d1ee64ddb"),
-                            OtherId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
+                            Id = new Guid("07255625-ec32-45f3-b43d-7e0e06acf2e3"),
+                            SelfId = new Guid("d9e5aed6-e9bc-4986-8f46-9c5aaf32f162"),
+                            OtherId = new Guid("d047c5e7-8f32-474f-a466-66989c934b05"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("bc3f40b5-9377-42fb-a76f-fa35bb52883f"),
-                            SelfId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
-                            OtherId = new Guid("5829377a-c9d6-4470-83ba-1390f976d958"),
+                            Id = new Guid("c84ed896-d491-4fde-ad20-46856a88d7aa"),
+                            SelfId = new Guid("d047c5e7-8f32-474f-a466-66989c934b05"),
+                            OtherId = new Guid("5d4f8ae3-3414-445d-8a82-aeb632bfba91"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("0374a719-0e07-4952-9d42-f97cf3b908f4"),
-                            SelfId = new Guid("33951325-d0da-4fd5-9dfd-f7e6abee8390"),
-                            OtherId = new Guid("fdaa5756-462a-4e0f-a7e8-774d1ee64ddb"),
+                            Id = new Guid("db9de99d-4c54-4a6e-a573-830ed264ff13"),
+                            SelfId = new Guid("d047c5e7-8f32-474f-a466-66989c934b05"),
+                            OtherId = new Guid("d9e5aed6-e9bc-4986-8f46-9c5aaf32f162"),
                             Type = 1
                         });
                 });

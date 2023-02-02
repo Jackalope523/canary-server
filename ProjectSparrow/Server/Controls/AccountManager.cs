@@ -95,7 +95,7 @@ namespace Server.Controls
 			}
 			if (email != "")
 			{
-                // NO-OP
+                accounts.UpdateEmail(userID, email);
 			}
 			if (name != "")
 			{
@@ -103,23 +103,23 @@ namespace Server.Controls
 			}
 			if (isPhoneNumberConfirmed.HasValue)
 			{
-				// NO-OP
+				accounts.UpdatePhoneConfirmation(userID, isPhoneNumberConfirmed.Value);
 			}
 			if (isEmailConfirmed.HasValue)
 			{
-				// NO-OP
+				accounts.UpdateEmailConfirmation(userID, isEmailConfirmed.Value);
 			}
 			if (securityStamp != "")
 			{
-				// NO-OP
+				accounts.UpdateSecurityStamp(userID, securityStamp);
 			}
 			if (lockoutDate.HasValue)
 			{
-				// NO-OP
+				accounts.UpdateLockoutDate(userID, lockoutDate.Value);
 			}
 			if (accessTries.HasValue)
 			{
-				// NO-OP
+				accounts.UpdateAccessTries(userID, accessTries.Value);
 			}
 		}
 

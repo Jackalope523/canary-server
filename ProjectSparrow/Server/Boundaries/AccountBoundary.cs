@@ -20,7 +20,13 @@ namespace Server.Boundaries
         bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
+		bool UpdateEmail(Guid id, string newEmail);
         bool UpdateName(Guid id, string newName);
+		bool UpdatePhoneConfirmation(Guid id, bool isConfirmed);
+		bool UpdateEmailConfirmation(Guid id, bool isConfirmed);
+		bool UpdateSecurityStamp(Guid id, string newSecurityStamp);
+		bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate);
+		bool UpdateAccessTries(Guid id, int newAccessTries);
         bool UpdateReputation(Guid id, int newReputation);
 		
 		List<ThinnerUser> GetFollowedUsers(Guid id);

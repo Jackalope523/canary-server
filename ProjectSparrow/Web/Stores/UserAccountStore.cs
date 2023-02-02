@@ -53,11 +53,11 @@ namespace Web.Stores
 			return await accounts.GetUserAsync(normalizedUserName);
 		}
 
-		public Task<string> GetNormalizedUserNameAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<string> GetNormalizedUserNameAsync(ThinUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return Task.FromResult("");
+			return await GetPhoneNumberAsync(user, cancellationToken);
 		}
 
 		public Task<string> GetUserIdAsync(ThinUser user, CancellationToken cancellationToken)
@@ -67,11 +67,11 @@ namespace Web.Stores
 			return Task.FromResult(user.Id.ToString());
 		}
 
-		public Task<string> GetUserNameAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<string> GetUserNameAsync(ThinUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return Task.FromResult("");
+			return await GetPhoneNumberAsync(user, cancellationToken);
 		}
 
 		public Task SetNormalizedUserNameAsync(ThinUser user, string normalizedName, CancellationToken cancellationToken)
@@ -154,7 +154,9 @@ namespace Web.Stores
 
 		public async Task<ThinUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			cancellationToken.ThrowIfCancellationRequested();
+
+			return await accounts.GetUserAsync(normalizedEmail);
 		}
 
 		public Task<string> GetNormalizedEmailAsync(ThinUser user, CancellationToken cancellationToken)
