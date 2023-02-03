@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Web.Controllers;
 using Web.Stores;
 using Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Web
 {
@@ -48,7 +49,12 @@ namespace Web
             services.AddTransient<IEmailService, SendGridService>();
             TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
-            services.AddAuthentication()
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            })
                 .AddIdentityCookies();
             services.AddIdentityCore<ThinUser>()
                 .AddUserStore<UserAccountStore>()
@@ -71,6 +77,7 @@ namespace Web
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseCookiePolicy();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
