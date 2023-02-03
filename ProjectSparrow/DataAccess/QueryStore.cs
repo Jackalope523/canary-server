@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NetTopologySuite.Geometries;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shared;
 
 namespace DataAccess
 { 
@@ -26,16 +27,17 @@ namespace DataAccess
             }
             return numWrites > 0;       
         }      
-        public bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth) 
+        public bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth) 
         { 
             User toCreate = new User
             {
                 PhoneNumber = phoneNumber,
-                Email = passkey,
+                Email = email,
                 Name = name,
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTime.Now,
-                Reputation = 100
+                Reputation = 100,
+                SecurityStamp = Guid.NewGuid().ToString(),
             };
 
             return EntityOperation(toCreate, u => _context.Users.Add((User)u)); 
@@ -85,6 +87,8 @@ namespace DataAccess
 			{
 				user = _context.Users.Find(id);
 			}
+            if (user == null)
+            { throw new InvalidUserException("User not found."); }
             return user;
 		}
         private User GetUser(string phoneNumber)
@@ -92,7 +96,14 @@ namespace DataAccess
 			User user;
 			using (_context = new QueryContext())
 			{
-                user = _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).Single();
+                try
+                {
+                    user = _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).Single();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidUserException("User not found.", ex);
+                }
 			}
             return user;
 		}

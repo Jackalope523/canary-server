@@ -24,18 +24,12 @@ namespace Server.Controls
         public async Task<ThinUser> GetUserAsync(Guid userID)
         {
             var targetUser = accounts.FindUser(userID);
-            if (targetUser == null)
-            { throw new InvalidUserException("User not found."); }
-
             return targetUser;
         }
 
         public async Task<ThinUser> GetUserAsync(string phoneNumber)
 		{
 			var targetUser = accounts.FindUser(phoneNumber);
-			if (targetUser == null)
-			{ throw new InvalidUserException("User not found."); }
-
 			return targetUser;
 		}
 
@@ -54,8 +48,14 @@ namespace Server.Controls
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth)
         {
             // Check phone number not in use
-            if (accounts.FindUser(phoneNumber) != null)
-            { throw new InvalidUserException("Phone Number already registered."); }
+            try
+            {
+                // FindUser throws an exception if there are no entries
+                // Thus, if this catches an exception, no account exists under this phone number
+                accounts.FindUser(phoneNumber);
+                throw new InvalidUserException("Phone Number already registered.");
+            }
+            catch { }
 
             // TODO Normalise data
             // Create profile
@@ -72,8 +72,8 @@ namespace Server.Controls
             { throw new InvalidInformationException("Invalid account details provided."); }
 
             // Store profile
-            bool success = accounts.CreateUser(newUser.Identification, email,
-                newUser.Name, newUser.DateOfBirth);
+            bool success = accounts.CreateUser(phoneNumber, email,
+                name, dateOfBirth);
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
         }
@@ -83,8 +83,8 @@ namespace Server.Controls
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = "", DateTimeOffset? lockoutDate = null, int? accessTries = null)
         {
-			if (accounts.FindUser(userID) == null)
-			{ throw new InvalidUserException("User not found."); }
+            // Throws if user not found
+            accounts.FindUser(userID);
 
             // TODO Verify updates are valid
             // TODO Normalise data
