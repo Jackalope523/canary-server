@@ -23,6 +23,7 @@ namespace Web.Controllers
 		{
 			MissingInformation,
             IncorrectCode,
+            UserLockedOut,
 			CouldNotLoginUser,
 			CouldNotCreateUser,
             CouldNotModifyUser
@@ -131,6 +132,11 @@ namespace Web.Controllers
 			{
 				var user = await accounts.GetUserAsync(credentials.PhoneNumber);
                 
+                if (await userManager.IsLockedOutAsync(user))
+                {
+                    return BadRequest(AccountError.UserLockedOut.ToString());
+                }
+
                 // Check if the account is activated
                 if (await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
@@ -138,10 +144,13 @@ namespace Web.Controllers
 				    var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
                     if (result)
                     {
+                        // Token matched, reset access tries and sign user in
+                        await userManager.ResetAccessFailedCountAsync(user);
                         await signInManager.SignInAsync(user, false);
                     }
                     else
                     {
+                        await userManager.AccessFailedAsync(user);
                         return BadRequest(AccountError.IncorrectCode.ToString());
                     }
                 }
@@ -151,7 +160,8 @@ namespace Web.Controllers
 					var result = await userManager.ChangePhoneNumberAsync(user, credentials.PhoneNumber, credentials.Code);
 					if (result.Succeeded)
 					{
-                        // Token is valid, sign user in
+                        // Token matched, reset access tries and sign user in
+                        await userManager.ResetAccessFailedCountAsync(user);
 						await signInManager.SignInAsync(user, false);
 
 						if (user.Email != null)
@@ -163,6 +173,7 @@ namespace Web.Controllers
 					}
 					else
 					{
+                        await userManager.AccessFailedAsync(user);
 						return BadRequest(AccountError.IncorrectCode.ToString());
 					}
 				}

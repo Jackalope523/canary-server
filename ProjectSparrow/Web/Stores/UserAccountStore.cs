@@ -92,7 +92,10 @@ namespace Web.Stores
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			await accounts.EditUserAsync(user.Id);
+			// No-Op'ing here because all operations that would update the user here
+			// write to the database immediately instead of just locally.
+			// This is based on our current database implementation but is subject to
+			// change with a distributed architecture or different framework.
 			return IdentityResult.Success;
 		}
 
