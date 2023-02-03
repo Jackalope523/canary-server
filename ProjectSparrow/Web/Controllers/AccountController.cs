@@ -14,7 +14,7 @@ using Web.Services;
 
 namespace Web.Controllers
 {
-    [Route("[controller]")]
+    [Route("account")]
     [ApiController]
     [Authorize]
     public class AccountController : ControllerBase
@@ -47,7 +47,26 @@ namespace Web.Controllers
             emailService = externalEmailService;
         }
 
-        [HttpPost]
+        [HttpGet]
+        public async Task<IActionResult> GetAccount()
+        {
+            ThinUser user;
+
+            try
+            {
+                // Get current user
+                // TODO Strip away internal data
+                user = await GetCurrentUserAsync();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok(user);
+        }
+
+        [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] AccountCredentialsModel credentials)
         {
@@ -58,9 +77,22 @@ namespace Web.Controllers
 
             try
             {
-                // Send an SMS to the current user with a generated 2FA token
                 var user = await accounts.GetUserAsync(credentials.PhoneNumber);
-                var code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+                string code;
+
+                // Verify that the account is activated
+                if (await userManager.IsPhoneNumberConfirmedAsync(user))
+                {
+                    // Account is activated, generate regular 2FA token
+                    code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+                }
+                else
+				{
+					// Account is not activated, generate change number token
+					code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+				}
+                
+                // Send user an SMS with code
                 await smsService.SendSMSAsync(credentials.PhoneNumber, $"Your Sparrow code is {code}");
 			}
 			catch (Exception e)
@@ -69,6 +101,21 @@ namespace Web.Controllers
 			}
 
 			return Ok();
+        }
+
+        [HttpGet("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await signInManager.SignOutAsync();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok();
         }
 
         [HttpPost("verify")]
@@ -156,7 +203,7 @@ namespace Web.Controllers
                 // Check if account is activated
 				if (!await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
-                    // Account is not activated, send an sms with a generated change number token
+                    // Account is not activated, send an SMS with a generated change number token
 					var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
 					await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
 				}

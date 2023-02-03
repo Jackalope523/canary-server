@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Web.Controllers
 {
-    [Route("[controller]")]
+    [Route("discover")]
     [ApiController]
     [Authorize]
     public class DiscoverController : Controller

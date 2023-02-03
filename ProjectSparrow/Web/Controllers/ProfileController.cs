@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Web.Controllers
 {
-    [Route("profiles/[controller]")]
+    [Route("profile")]
     [ApiController]
 	[Authorize]
     public class ProfileController : Controller

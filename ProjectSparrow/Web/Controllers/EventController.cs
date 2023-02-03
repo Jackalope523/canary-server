@@ -15,10 +15,10 @@ using DataAccess.Entities;
 
 namespace Web.Controllers
 {
-    [Route("[controller]")]
+    [Route("event")]
     [ApiController]
 	[Authorize]
-    public class EventsController : ControllerBase
+    public class EventController : ControllerBase
     {
         enum EventError
 		{
@@ -30,7 +30,7 @@ namespace Web.Controllers
 		IEventOperations events;
 		UserManager<ThinUser> userManager;
 
-		public EventsController(IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
+		public EventController(IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
         {
             events = eventOperations;
 			userManager = identityUserManager;
