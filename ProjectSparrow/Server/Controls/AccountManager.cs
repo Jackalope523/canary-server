@@ -48,14 +48,17 @@ namespace Server.Controls
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth)
         {
             // Check phone number not in use
+            bool numberInUse = false;
             try
             {
                 // FindUser throws an exception if there are no entries
-                // Thus, if this catches an exception, no account exists under this phone number
                 accounts.FindUser(phoneNumber);
-                throw new InvalidUserException("Phone Number already registered.");
+                numberInUse = true;
             }
             catch { }
+
+            if (numberInUse)
+            { throw new InvalidUserException("Phone Number already registered."); }
 
             // TODO Normalise data
             // Create profile

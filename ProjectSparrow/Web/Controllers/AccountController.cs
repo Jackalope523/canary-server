@@ -100,7 +100,7 @@ namespace Web.Controllers
                 }
                 else
 				{
-                    // Account is not activated, check change number token validity
+					// Account is not activated, check change number token validity
 					var result = await userManager.ChangePhoneNumberAsync(user, credentials.PhoneNumber, credentials.Code);
 					if (result.Succeeded)
 					{
@@ -142,14 +142,11 @@ namespace Web.Controllers
                 // Persist a new user
                 await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
                     details.Name, details.DateOfBirth);
-
-                // Generate security stamp for new user
-                var user = await accounts.GetUserAsync(details.PhoneNumber);
-                await userManager.UpdateSecurityStampAsync(user);
-                
+                                
                 // Send an SMS to new user with a generated change number token
-				var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, details.PhoneNumber);
-				await smsService.SendSMSAsync(details.PhoneNumber, $"Your Sparrow code is {code}");
+                var user = await accounts.GetUserAsync(details.PhoneNumber);
+				var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+				await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
 			}
             catch (InvalidUserException e)
 			{
@@ -161,7 +158,7 @@ namespace Web.Controllers
                 {
                     // Account is not activated, send an sms with a generated change number token
 					var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-					await smsService.SendSMSAsync(details.PhoneNumber, $"Your Sparrow code is {code}");
+					await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
 				}
 
                 return BadRequest(e.ToString());
