@@ -12,6 +12,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Server.Boundaries;
+using Microsoft.AspNetCore.Identity;
+using Web.Controllers;
+using Web.Stores;
+using Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Web
 {
@@ -34,8 +39,27 @@ namespace Web
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
+            IAccountDatabase.AccountDatabaseAccess = DataAccess.QueryStore.AccountDatabaseAccess;
+            IEventDatabase.EventDatabaseAccess = DataAccess.QueryStore.EventDatabaseAccess;
+
             services.AddSingleton(IAccountOperations.AccountManager);
             services.AddSingleton(IEventOperations.EventManager);
+
+            services.AddTransient<ISMSService, TwilioService>();
+            services.AddTransient<IEmailService, SendGridService>();
+            TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            })
+                .AddIdentityCookies();
+            services.AddIdentityCore<ThinUser>()
+                .AddUserStore<UserAccountStore>()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +76,8 @@ namespace Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseCookiePolicy();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

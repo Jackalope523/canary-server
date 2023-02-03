@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Server.Controls;
+using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(Guid Id, string PhoneNumber, string Name, DateTime DateOfBirth, int Reputation, int NumberOfFollowers);
+	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTime DateOfBirth,
+		bool IsPhoneConfirmed, bool IsEmailConfirmed,
+		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries,
+		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
@@ -13,11 +17,16 @@ namespace Server.Boundaries
         public static IAccountDatabase AccountDatabaseAccess;
         ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
-        bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
-        bool DeleteUser(Guid Id);
+        bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth);
+        bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
-        bool UpdatePasskey(Guid id, string newPasskey);
+		bool UpdateEmail(Guid id, string newEmail);
         bool UpdateName(Guid id, string newName);
+		bool UpdatePhoneConfirmation(Guid id, bool isConfirmed);
+		bool UpdateEmailConfirmation(Guid id, bool isConfirmed);
+		bool UpdateSecurityStamp(Guid id, string newSecurityStamp);
+		bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate);
+		bool UpdateAccessTries(Guid id, int newAccessTries);
         bool UpdateReputation(Guid id, int newReputation);
 		
 		List<ThinnerUser> GetFollowedUsers(Guid id);
@@ -31,21 +40,25 @@ namespace Server.Boundaries
 
 	public interface IAccountOperations
 	{
-		static IAccountOperations AccountManager => new AccountManager(null);
+		static IAccountOperations AccountManager => new AccountManager(IAccountDatabase.AccountDatabaseAccess);
 
-		ThinProfile GetUserProfile(Guid userID, Guid targetID);
+		Task<ThinUser> GetUserAsync(Guid userID);
+		Task<ThinUser> GetUserAsync(string phoneNumber);
+		Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID);
 
-		string TryLogin(string phoneNumber, string passkey);
-		void CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth);
-		void EditUser(Guid userID, string newName); // TODO Add EditAccount to update identification and/or passkey
-		void DeleteUser(Guid userID);
+		Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth);
+		Task EditUserAsync(Guid userID,
+			string phoneNumber = "", string email = "", string name = "",
+			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
+			string securityStamp = "", DateTimeOffset? lockoutDate = null, int? accessTries = null);
+		Task DeleteUserAsync(Guid userID);
 
-		List<ThinnerUser> GetFollowedUsers(Guid userID);
-		List<ThinnerUser> GetBlockedUsers(Guid userID);
+		Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID);
+		Task<List<ThinnerUser>> GetBlockedUsersAsync(Guid userID);
 
-		void FollowUser(Guid userID, Guid targetID);
-		void UnfollowUser(Guid userID, Guid targetID);
-		void BlockUser(Guid userID, Guid targetID);
-		void UnblockUser(Guid userID, Guid targetID);
+		Task FollowUserAsync(Guid userID, Guid targetID);
+		Task UnfollowUserAsync(Guid userID, Guid targetID);
+		Task BlockUserAsync(Guid userID, Guid targetID);
+		Task UnblockUserAsync(Guid userID, Guid targetID);
 	}
 }

@@ -3,6 +3,9 @@ using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NetTopologySuite.Geometries;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Shared;
 
 namespace DataAccess
 { 
@@ -24,34 +27,46 @@ namespace DataAccess
             }
             return numWrites > 0;       
         }      
-        public bool CreateUser(string phoneNumber, string passkey, string name, DateTime dateOfBirth) 
+        public bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth) 
         { 
             User toCreate = new User
             {
                 PhoneNumber = phoneNumber,
-                Passkey = passkey,
+                Email = email,
                 Name = name,
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTime.Now,
-                Reputation = 100
+                Reputation = 100,
+                SecurityStamp = Guid.NewGuid().ToString(),
             };
 
             return EntityOperation(toCreate, u => _context.Users.Add((User)u)); 
         }
         public bool DeleteUser(Guid Id) { return EntityOperation(new User { Id = Id }, u => _context.Users.Remove((User)u)); }
 
+        private TEntity ApplyEntityEdit<TEntity>(TEntity entity, Func<TEntity,object> edit)
+        {
+            edit(entity);
+            return entity;
+        }
+        
         Func<Entity, EntityEntry> updateUser = u => _context.Users.Update((User)u);
-        public bool UpdateName(Guid id, string newName) { return EntityOperation(new User { Id = id, Name = newName }, updateUser); }
-        public bool UpdatePasskey(Guid id, string newPasskey) { return EntityOperation(new User { Id = id, Passkey = newPasskey }, updateUser); }
-        public bool UpdatePhoneNumber(Guid id, string newNumber) { return EntityOperation(new User { Id = id, PhoneNumber = newNumber }, updateUser); }
-        public bool UpdateReputation(Guid id, int newReputation) { return EntityOperation(new User { Id = id, Reputation = newReputation }, updateUser); }
+        public bool UpdatePhoneNumber(Guid id, string newNumber) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.PhoneNumber = newNumber), updateUser); }
+        public bool UpdateEmail(Guid id, string newEmail) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Email = newEmail), updateUser); }
+        public bool UpdateName(Guid id, string newName) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Name = newName), updateUser); }
+        public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsPhoneConfirmed = isConfirmed), updateUser); }
+        public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsEmailConfirmed = isConfirmed), updateUser); }
+        public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.SecurityStamp = newSecurityStamp), updateUser); }
+        public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.LockoutDate = newLockoutDate), updateUser); }
+        public bool UpdateAccessTries(Guid id, int newAccessTries) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.AccessTries = newAccessTries), updateUser); }
+        public bool UpdateReputation(Guid id, int newReputation) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Reputation = newReputation), updateUser); }
 
-        Func<Entity, EntityEntry> addLink = l => _context.UserLinks.Add((UserLink)l);
-        Func<Entity, EntityEntry> removeLink = l => _context.UserLinks.Remove((UserLink)l);
-        public bool FollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, addLink); }      
-        public bool UnfollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, removeLink); } 
-        public bool BlockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, addLink); }
-        public bool UnblockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, removeLink); }          
+        Func<Entity, EntityEntry> addUserLink = l => _context.UserLinks.Add((UserLink)l);
+        Func<Entity, EntityEntry> removeUserLink = l => _context.UserLinks.Remove((UserLink)l);
+        public bool FollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, addUserLink); }      
+        public bool UnfollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, removeUserLink); } 
+        public bool BlockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, addUserLink); }
+        public bool UnblockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, removeUserLink); }          
 
         private static List<ThinnerUser> GetCollectionOfUsers(Guid id, UserLink.UserLinkType type)
         {
@@ -65,28 +80,62 @@ namespace DataAccess
         public List<ThinnerUser> GetBlockedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Blocked); }
         public List<ThinnerUser> GetFollowedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
 
-        public ThinUser FindUser(Guid id)
+        private User GetUser(Guid id)
         {
-            User user;
-            int numFollowers;
+			User user;
+			using (_context = new QueryContext())
+			{
+				user = _context.Users.Find(id);
+			}
+            if (user == null)
+            { throw new InvalidUserException("User not found."); }
+            return user;
+		}
+        private User GetUser(string phoneNumber)
+        {
+			User user;
+			using (_context = new QueryContext())
+			{
+                try
+                {
+                    user = _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).Single();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidUserException("User not found.", ex);
+                }
+			}
+            return user;
+		}
+
+        private int GetUserFollowerCount(Guid id)
+        {
+			int numFollowers;
             using (_context = new QueryContext())
             {
-                user = _context.Users.Find(id);
-                numFollowers = _context.UserLinks.Where(l => l.SelfId == user.Id && l.Type.Equals(UserLink.UserLinkType.Following)).Count();
+				numFollowers = _context.UserLinks.Where(l => l.SelfId == id && l.Type.Equals(UserLink.UserLinkType.Following)).Count();
             }
-            return new ThinUser(user.Id, user.PhoneNumber, user.Name, user.DateOfBirth, user.Reputation, numFollowers);
+            return numFollowers;
+        }
+
+        public ThinUser FindUser(Guid id)
+        {
+            User user = GetUser(id);
+            int numFollowers = GetUserFollowerCount(id);
+            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
+                user.IsPhoneConfirmed, user.IsEmailConfirmed,
+                user.SecurityStamp, user.LockoutDate, user.AccessTries,
+                user.JoinDate, user.Reputation, numFollowers);
         }
 
         public ThinUser FindUser(string phoneNumber)
         {
-            User user;
-            int numFollowers;
-            using (_context = new QueryContext())
-            {
-                user = _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).Single();
-                numFollowers = _context.UserLinks.Where(l => l.SelfId == user.Id && l.Type.Equals(UserLink.UserLinkType.Following)).Count();
-            }
-            return new ThinUser(user.Id, user.PhoneNumber, user.Name, user.DateOfBirth, user.Reputation, numFollowers);
+            User user = GetUser(phoneNumber);
+            int numFollowers = GetUserFollowerCount(user.Id);
+            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
+                user.IsPhoneConfirmed, user.IsEmailConfirmed,
+                user.SecurityStamp, user.LockoutDate, user.AccessTries,
+                user.JoinDate, user.Reputation, numFollowers);
         }
 
         public ThinEvent FindEvent(Guid id)
@@ -98,7 +147,8 @@ namespace DataAccess
                 @event = _context.Events.Where(e => e.Id == id).Include(e => e.Host).Single();
                 host = new ThinnerUser(@event.Host.Id, @event.Host.Name); 
             }
-            return new ThinEvent(@event.Id,  host, @event.Name, @event.EventType, @event.StartTime, @event.Location.X, @event.Location.Y);
+            return new ThinEvent(@event.Id, host, @event.Name, @event.EventType,
+                @event.StartTime, @event.Location.X, @event.Location.Y);
         }
 
         public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
@@ -113,7 +163,19 @@ namespace DataAccess
             return closestEvents;
         }
 
-        public bool CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, double latitude, double longitude)
+        public ThinEvent FindAttendingEvent(Guid id)
+		{
+			Event @event;
+			ThinnerUser host;
+			using (_context = new QueryContext())
+			{
+				@event = _context.EventLinks.Where(e => e.SelfId == id).Include(e => e.Event.Host).Single().Event;
+				host = new ThinnerUser(@event.Host.Id, @event.Host.Name);
+			}
+			return new ThinEvent(@event.Id, host, @event.Name, @event.EventType, @event.StartTime, @event.Location.X, @event.Location.Y);
+		}
+
+        public ThinEvent CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, double latitude, double longitude)
         {
             Event toCreate = new Event {
                 HostId = hostId,
@@ -122,13 +184,20 @@ namespace DataAccess
                 StartTime = startTime,
                 Location = new Point(longitude, latitude), 
             };
-            return EntityOperation(toCreate, e => _context.Events.Add((Event)e));
+            EntityOperation(toCreate, e => _context.Events.Add((Event)e));
+            AddUserToEvent(hostId, toCreate.Id);
+
+            ThinUser host = FindUser(hostId);
+            ThinnerUser thinHost = new(host.Id, host.Name);
+			return new ThinEvent(toCreate.Id, thinHost, toCreate.Name, toCreate.EventType, toCreate.StartTime, toCreate.Location.X, toCreate.Location.Y);
         }
         public bool EndEvent(Guid id) { return EntityOperation(new Event { Id = id }, e => _context.Events.Remove((Event)e)); }
 
-        public bool AddUserToEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, addLink); }
+		Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
+		Func<Entity, EntityEntry> removeEventLink = l => _context.EventLinks.Remove((EventLink)l);
 
-        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, removeLink); }    
+		public bool AddUserToEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, addEventLink); }
+        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, removeEventLink); }    
 
         public List<ThinnerUser> GetGuestList(Guid id)
         {

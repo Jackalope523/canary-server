@@ -32,6 +32,10 @@ namespace DataAccess
                 .Property(l => l.SelfId)
                 .HasColumnName("SelfId");
 
+            modelBuilder.Entity<UserLink>()
+                .Property(l => l.Type)
+                .HasColumnName("Type");
+
 
             modelBuilder.Entity<EventLink>()
                 .Property(l => l.SelfId)
@@ -44,6 +48,75 @@ namespace DataAccess
             modelBuilder.Entity<EventLink>()
                 .HasOne(a => a.Event)
                 .WithMany(b => b.Links);
+
+            SeedData(modelBuilder);
+        }
+
+        private void SeedData(ModelBuilder modelBuilder)
+        {
+            List<User> users = new()
+            {
+                new User
+                {
+                    Id = Guid.NewGuid(),
+                    PhoneNumber = "0",
+                    Email = "",
+                    Name = "Signy of Sváfnir",
+                    SecurityStamp = Guid.NewGuid().ToString()
+                },
+                new User
+                {
+                    Id = Guid.NewGuid(),
+                    PhoneNumber = "1",
+                    Email = "",
+                    Name = "Huginn",
+                    SecurityStamp = Guid.NewGuid().ToString()
+                },
+                new User
+                {
+                    Id = Guid.NewGuid(),
+                    PhoneNumber = "2",
+                    Email = "",
+                    Name = "Muninn",
+                    SecurityStamp = Guid.NewGuid().ToString()
+                }
+            };
+
+            modelBuilder.Entity<User>().HasData(users);
+
+            List<UserLink> links = new()
+            {
+                new UserLink
+                {
+                    Id = Guid.NewGuid(),
+                    SelfId = users[1].Id,
+                    OtherId = users[0].Id,
+                    Type = UserLink.UserLinkType.Following
+                },
+                new UserLink
+                {
+                    Id = Guid.NewGuid(),
+                    SelfId = users[2].Id,
+                    OtherId = users[0].Id,
+                    Type = UserLink.UserLinkType.Following
+                },
+                new UserLink
+                {
+                    Id = Guid.NewGuid(),
+                    SelfId = users[0].Id,
+                    OtherId = users[1].Id,
+                    Type = UserLink.UserLinkType.Following
+                },
+                new UserLink
+                {
+                    Id = Guid.NewGuid(),
+                    SelfId = users[0].Id,
+                    OtherId = users[2].Id,
+                    Type = UserLink.UserLinkType.Blocked
+                }
+            };
+
+            modelBuilder.Entity<UserLink>().HasData(links);
         }
     }
 }

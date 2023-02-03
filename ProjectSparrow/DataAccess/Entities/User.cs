@@ -4,12 +4,18 @@ namespace DataAccess.Entities
     public class User : Entity
     {
         public Guid Id { get; init; }
-        public string PhoneNumber { get; init; }  
-        public string Passkey { get; init; }
-        public string Name { get; init; }
+        public string PhoneNumber { get; set; }  
+        public string Email { get; set; }
+        public string Name { get; set; }
         public DateTime DateOfBirth { get; init; }
         public DateTime JoinDate { get; init; }  
         public int Reputation { get; set; }
+
+        public bool IsPhoneConfirmed { get; set; }
+        public bool IsEmailConfirmed { get; set; }
+        public string SecurityStamp { get; set; }
+        public DateTimeOffset? LockoutDate { get; set; }
+        public int AccessTries { get; set; }
 
         internal List<Link> Links { get; set; }
 

@@ -8,11 +8,14 @@ using System.Net;
 using System.Threading.Tasks;
 using Web.Models;
 using Shared;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Web.Controllers
 {
-    [Route("accounts/[controller]")]
+    [Route("profile")]
     [ApiController]
+	[Authorize]
     public class ProfileController : Controller
 	{
 		enum ProfileError
@@ -22,17 +25,19 @@ namespace Web.Controllers
 			CouldNotFindUser
 		}
 
-		private IAccountOperations accounts;
+		IAccountOperations accounts;
+		UserManager<ThinUser> userManager;
 
-		public ProfileController(IAccountOperations accountOperations)
+		public ProfileController(IAccountOperations accountOperations, UserManager<ThinUser> identityUserManager)
 		{
 			accounts = accountOperations;
+			userManager = identityUserManager;
 		}
 
 		[HttpGet("{targetIdentification}")]
-        public IActionResult GetUser([FromBody] TargetModel info)
+        public async Task<IActionResult> GetUser(string targetIdentification)
         {
-			if (info == null || !ModelState.IsValid)
+			if (targetIdentification == null)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
@@ -41,44 +46,45 @@ namespace Web.Controllers
 
 			try
 			{
-				profile = accounts.GetUserProfile(info.UserID, info.TargetID);
+				// Parse target identification and retrieve profile
+				var target = GetGUID(targetIdentification);
+				var user = await GetCurrentUserAsync();
+				profile = await accounts.GetUserProfileAsync(user.Id, target);
 			}
 			catch (InvalidUserException e)
 			{
+				// User does not exist
 				return BadRequest(e.ToString());
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
-            return Ok(profile);
+			return Ok(profile);
         }
 
         [HttpGet("following")]
-        public IActionResult GetFollowed([FromBody] IdentifierModel user)
+        public async Task<IActionResult> GetFollowed()
         {
-			if (user == null || !ModelState.IsValid)
-			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
-			}
-
-			List<ThinnerUser> followedUsers; // Change to something more meaningful
+			List<ThinnerUser> followedUsers;
 
 			try
 			{
-				followedUsers = accounts.GetFollowedUsers(user.UserID);
+				// Retrieve all users that the current user is following
+				var user = await GetCurrentUserAsync();
+				followedUsers = await accounts.GetFollowedUsersAsync(user.Id);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok(followedUsers);
 		}
 
 		[HttpPost("following")]
-		public IActionResult FollowUser([FromBody] TargetModel info)
+		public async Task<IActionResult> FollowUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -87,18 +93,20 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.FollowUser(info.UserID, info.TargetID);
+				// Follow other user
+				var user = await GetCurrentUserAsync();
+				await accounts.FollowUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
 		}
 
 		[HttpPut("following")]
-		public IActionResult UnfollowUser([FromBody] TargetModel info)
+		public async Task<IActionResult> UnfollowUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -107,40 +115,39 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.UnfollowUser(info.UserID, info.TargetID);
+				// Unfollow other user
+				var user = await GetCurrentUserAsync();
+				await accounts.UnfollowUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
 		}
 
 		[HttpGet("blocked")]
-		public IActionResult GetBlocked([FromBody] IdentifierModel user)
+		public async Task<IActionResult> GetBlocked()
 		{
-			if (user == null || !ModelState.IsValid)
-			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
-			}
-
 			List<ThinnerUser> blockedUsers; // Change to something more meaningful
 
 			try
 			{
-				blockedUsers = accounts.GetBlockedUsers(user.UserID);
+				// Retrieve all users that the current user is blocking
+				var user = await GetCurrentUserAsync();
+				blockedUsers = await accounts.GetBlockedUsersAsync(user.Id);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok(blockedUsers);
 		}
 
 		[HttpPost("blocked")]
-		public IActionResult BlockUser([FromBody] TargetModel info)
+		public async Task<IActionResult> BlockUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -149,18 +156,20 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.BlockUser(info.UserID, info.TargetID);
+				// Block other user
+				var user = await GetCurrentUserAsync();
+				await accounts.BlockUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
 		}
 
 		[HttpPut("blocked")]
-		public IActionResult UnblockUser([FromBody] TargetModel info)
+		public async Task<IActionResult> UnblockUser([FromBody] TargetModel info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -169,14 +178,31 @@ namespace Web.Controllers
 
 			try
 			{
-				accounts.UnblockUser(info.UserID, info.TargetID);
+				// Unblock other user
+				var user = await GetCurrentUserAsync();
+				await accounts.UnblockUserAsync(user.Id, info.TargetID);
 			}
-			catch
+			catch (Exception e)
 			{
-				return BadRequest(ProfileError.CouldNotCompleteRequest.ToString());
+				return BadRequest(e.ToString());
 			}
 
 			return Ok();
+		}
+
+		private async Task<ThinUser> GetCurrentUserAsync()
+		{
+			return await userManager.GetUserAsync(HttpContext.User);
+		}
+
+		private Guid GetGUID(string id)
+		{
+			if (!Guid.TryParse(id, out Guid guid))
+			{
+				throw new ArgumentException("Not a valid GUID.", nameof(id));
+			}
+
+			return guid;
 		}
 	}
 

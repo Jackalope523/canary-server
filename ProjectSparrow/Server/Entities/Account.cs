@@ -11,14 +11,11 @@ namespace Server.Entities
         public Guid AccountID { get; init; }
         public string Identification { get; init; }
 
-        private readonly string accountPasskey; // TODO Passkey may change. Create new instance? Change from readonly?
 
-        protected Account(string identification, string passkeyHash)
-        {
-            accountPasskey = passkeyHash;
-        }
+        protected Account(string identification)
+        { }
 
-        public bool VerifyPasskey(string otherPasskey)
+        /*public bool VerifyPasskey(string otherPasskey)
         {
             bool isValid = otherPasskey.Length == accountPasskey.Length;
 
@@ -31,7 +28,7 @@ namespace Server.Entities
             }
 
             return isValid;
-        }
+        }*/
 
         public bool ValidateAccount()
         {
