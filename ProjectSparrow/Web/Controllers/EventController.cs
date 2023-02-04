@@ -76,8 +76,9 @@ namespace Web.Controllers
 				// Create a new event as the current user
 				var user = await GetCurrentUserAsync();
                 newEvent = await events.CreateEventAsync(user.Id,
-					eventDetails.EventName, eventDetails.EventType, eventDetails.StartTime,
-					eventDetails.Latitude, eventDetails.Longitude);
+					eventDetails.EventName, eventDetails.EventDescription, eventDetails.EventType,
+					eventDetails.StartTime,	eventDetails.Latitude, eventDetails.Longitude,
+					eventDetails.GroupMinimum, eventDetails.GroupMaximum);
             }
             catch (Exception e)
 			{
@@ -88,7 +89,7 @@ namespace Web.Controllers
         }
 
         [HttpPost("{eventID}/edit")]
-        public async Task<IActionResult> EditEvent(string eventID, [FromBody] EventDetailsModel eventDetails)
+        public async Task<IActionResult> EditEvent(string eventID, [FromBody] EventEditModel eventDetails)
 		{
 			if (eventID == null || eventDetails == null || !ModelState.IsValid)
 			{
@@ -97,7 +98,8 @@ namespace Web.Controllers
 
 			try
 			{
-				// events.EditEvent(eventDetails.Identification); // TODO Do we even need this?
+				var user = await GetCurrentUserAsync();
+				await events.EditEventAsync(user.Id, GetGUID(eventID), isOpen: eventDetails.EventIsOpen);
 			}
 			catch (Exception e)
 			{

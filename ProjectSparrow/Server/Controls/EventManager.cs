@@ -3,6 +3,7 @@ using Server.Entities;
 using Shared;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
@@ -24,9 +25,7 @@ namespace Server.Controls
         {
 			// Check if user is allowed to view event
 			if (!await UserCanSeeEvent(userID, eventID))
-			{
-				throw new InvalidEventException("User is unable to view event.");
-			}
+			{ throw new InvalidEventException("User is unable to view event."); }
 
 			var eventInformation = events.FindEvent(eventID);
 			return eventInformation;
@@ -60,8 +59,9 @@ namespace Server.Controls
 		}
 
 		public async Task<ThinEvent> CreateEventAsync(Guid userID,
-			string eventName, string eventType, DateTime startTime,
-			double latitude, double longitude)
+			string eventName, string eventDescription, string eventType,
+			DateTimeOffset startTime, double latitude, double longitude,
+			int? groupMinimum, int? groupMaximum)
 		{
 			try
 			{
@@ -72,20 +72,38 @@ namespace Server.Controls
 			{
 				// TODO Validate event
 				// Try to create an event
-				var newEvent = events.CreateEvent(userID, eventName, eventType, startTime, latitude, longitude);
+				var newEvent = events.CreateEvent(userID, eventName, eventDescription, eventType,
+					startTime, latitude, longitude,
+					groupMinimum ?? 0, groupMaximum ?? 0);
 				return newEvent;
 			}
 
 			throw new InvalidUserException("User cannot create a new event whilst attending one.");
 		}
 
+		public async Task EditEventAsync(Guid userID, Guid eventID, bool? isOpen = null)
+		{
+			// Verify that user is event host
+			if (!await UserIsEventHost(userID, eventID))
+			{ throw new InvalidEventException("User is unable to edit event.");	}
+
+			// TODO Verify updates are valid
+			// Update individual attributes
+			if (isOpen.HasValue)
+			{
+				events.UpdateStatus(eventID, isOpen.Value);
+			}
+		}
+
 		public async Task JoinEventAsync(Guid userID, Guid eventID)
 		{
 			// Check if user is allowed to view event
 			if (!await UserCanSeeEvent(userID, eventID))
-			{
-				throw new InvalidEventException("User is unable to view event.");
-			}
+			{ throw new InvalidEventException("User is unable to view event."); }
+
+			// Check if event is open
+			if (!events.FindEvent(eventID).IsOpen)
+			{ throw new InvalidEventException("Event is closed."); }
 
 			// Try to add user to the event
 			bool success = events.AddUserToEvent(userID, eventID);
@@ -105,9 +123,7 @@ namespace Server.Controls
 		{
 			// Check if the user is able to end the event
 			if (await UserIsEventHost(userID, eventID))
-			{
-				throw new InvalidUserException("User does not have permissions to end event.");
-			}
+			{ throw new InvalidUserException("User does not have permissions to end event."); }
 
 			// Try to end to event
 			bool success = events.EndEvent(eventID);
@@ -121,9 +137,7 @@ namespace Server.Controls
 
 			// Check if user is on the guest list
 			if (guestList.Find(x => x.Id == userID) == null)
-			{
-				throw new InvalidUserException("User did not attend event.");
-			}
+			{ throw new InvalidUserException("User did not attend event."); }
 
 			return guestList;
 		}
