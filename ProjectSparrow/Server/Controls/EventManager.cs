@@ -85,7 +85,12 @@ namespace Server.Controls
 		{
 			// Verify that user is event host
 			if (!await UserIsEventHost(userID, eventID))
-			{ throw new InvalidEventException("User is unable to edit event.");	}
+			{ throw new InvalidEventException("User is unable to edit event."); }
+
+			// Verify that event is still active
+			var @event = events.FindEvent(eventID);
+			if (@event.TimeEnded.HasValue)
+			{ throw new InvalidEventException("Unable to edit event, event has ended."); }
 
 			// TODO Verify updates are valid
 			// Update individual attributes

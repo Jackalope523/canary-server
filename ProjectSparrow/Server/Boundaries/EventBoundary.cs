@@ -7,7 +7,7 @@ using Server.Controls;
 namespace Server.Boundaries
 {
 	public record ThinEvent(Guid Id, ThinnerUser Host, string Name, string Description, string EventType,
-		DateTimeOffset StartTime, double Latitude, double Longitude,
+		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
 
@@ -17,6 +17,8 @@ namespace Server.Boundaries
         ThinEvent FindEvent(Guid id);
 		List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance);
 		ThinEvent FindAttendingEvent(Guid id);
+		List<ThinEvent> FindUpcomingEvents(Guid id);
+		List<ThinEvent> FindPastEvents(Guid id);
 
 		ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType,
 			DateTimeOffset startTime, double latitude, double longitude,

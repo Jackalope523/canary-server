@@ -15,10 +15,12 @@ namespace Server.Controls
     internal class AccountManager : IAccountOperations
     {
         private IAccountDatabase accounts { get; init; }
+        private IEventDatabase events { get; init; }
 
-        public AccountManager(IAccountDatabase accountDatabase)
+        public AccountManager(IAccountDatabase accountDatabase, IEventDatabase eventDatabase)
         {
             accounts = accountDatabase;
+            events = eventDatabase;
         }
 
         public async Task<ThinUser> GetUserAsync(Guid userID)
@@ -35,14 +37,35 @@ namespace Server.Controls
 
         public async Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID)
         {
-            // Check that user is not blocked
+            // Check if user is blocked
             if (await UserIsBlocked(userID, targetID))
-            {
-                throw new InvalidUserException("User is unable to view target.");
-            }
+            { throw new InvalidUserException("User is unable to view target."); }
 
             var targetUser = accounts.FindUser(targetID);
             return new ThinProfile(targetID, targetUser.Name, targetUser.Reputation, targetUser.NumberOfFollowers);
+        }
+
+        public async Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID)
+        {
+            // Check if user is blocked
+            if (await UserIsBlocked(userID, targetID))
+            { throw new InvalidUserException("User is unable to view target."); }
+
+            // Gather all user event data
+            var pastActivity = events.FindPastEvents(targetID);
+            var upcomingActivity = events.FindUpcomingEvents(targetID);
+            upcomingActivity.Add(events.FindAttendingEvent(targetID));
+
+            // Remove active and upcoming events if the user cannot view them
+            foreach (var @event in upcomingActivity)
+            {
+                if (await UserIsBlocked(userID, @event.Host.Id))
+                {
+                    upcomingActivity.Remove(@event);
+                }
+            }
+
+            return pastActivity.Concat(upcomingActivity).ToList();
         }
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth)
@@ -169,9 +192,7 @@ namespace Server.Controls
 
 			// Check if user is blocked by target
 			if (targetBlockedList.Find(x => x.Id == userID) != null)
-			{
-				return false;
-			}
+			{ return false; }
 
 			return true;
 		}

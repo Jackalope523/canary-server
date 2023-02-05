@@ -17,7 +17,7 @@ namespace DataAccess.Entities
         public bool IsEventOpen { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
-        
+        public DateTimeOffset? EndTime { get; set; }
          
 
         internal List<EventLink> Links { get; set; }       
