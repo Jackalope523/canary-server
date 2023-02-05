@@ -99,7 +99,9 @@ namespace Web.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				await events.EditEventAsync(user.Id, GetGUID(eventID), isOpen: eventDetails.EventIsOpen);
+				await events.EditEventAsync(user.Id, GetGUID(eventID),
+					eventDescription: eventDetails.EventDescription ?? "", eventType: eventDetails.EventType ?? "",
+					isOpen: eventDetails.EventIsOpen);
 			}
 			catch (Exception e)
 			{

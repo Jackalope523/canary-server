@@ -37,6 +37,8 @@ namespace Web.Models
 
     public class EventEditModel
     {
+        public string EventDescription { get; set; }
+        public string EventType { get; set; }
         public bool? EventIsOpen { get; set; }
     }
 

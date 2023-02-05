@@ -237,6 +237,8 @@ namespace DataAccess
 		}
 
 		Func<Entity, EntityEntry> updateEvent = e => _context.Events.Update((Event)e);
+		public bool UpdateDescription(Guid id, string description) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.Description = description), updateEvent); }
+		public bool UpdateType(Guid id, string type) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.EventType = type), updateEvent); }
 		public bool UpdateStatus(Guid id, bool isOpen) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.IsEventOpen = isOpen), updateEvent); }
         public bool EndEvent(Guid id) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.EndTime = DateTimeOffset.UtcNow), updateEvent); }
 

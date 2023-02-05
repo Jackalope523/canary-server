@@ -81,7 +81,9 @@ namespace Server.Controls
 			throw new InvalidUserException("User cannot create a new event whilst attending one.");
 		}
 
-		public async Task EditEventAsync(Guid userID, Guid eventID, bool? isOpen = null)
+		public async Task EditEventAsync(Guid userID, Guid eventID,
+			string eventDescription = "", string eventType = "",
+			bool? isOpen = null)
 		{
 			// Verify that user is event host
 			if (!await UserIsEventHost(userID, eventID))
@@ -94,6 +96,14 @@ namespace Server.Controls
 
 			// TODO Verify updates are valid
 			// Update individual attributes
+			if (eventDescription != "")
+			{
+				events.UpdateDescription(eventID, eventDescription);
+			}
+			if (eventType != "")
+			{
+				events.UpdateType(eventID, eventType);
+			}
 			if (isOpen.HasValue)
 			{
 				events.UpdateStatus(eventID, isOpen.Value);

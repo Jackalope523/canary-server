@@ -23,6 +23,8 @@ namespace Server.Boundaries
 		ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum);
+		bool UpdateDescription(Guid id, string description);
+		bool UpdateType(Guid id, string type);
 		bool UpdateStatus(Guid id, bool isOpen);
 		bool EndEvent(Guid id);
 
@@ -46,7 +48,9 @@ namespace Server.Boundaries
 			string eventName, string eventDescription, string eventType,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum);
-		Task EditEventAsync(Guid userID, Guid eventID, bool? isOpen = null);
+		Task EditEventAsync(Guid userID, Guid eventID,
+			string eventDescription = "", string eventType = "",
+			bool? isOpen = null);
 		Task JoinEventAsync(Guid userID, Guid eventID);
 		Task LeaveEventAsync(Guid userID, Guid eventID);
 		Task EndEventAsync(Guid userID, Guid eventID);
