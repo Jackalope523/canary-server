@@ -6,6 +6,8 @@ using NetTopologySuite.Geometries;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared;
+using System.Security.Cryptography;
+using Server.Entities;
 
 namespace DataAccess
 { 
@@ -26,7 +28,14 @@ namespace DataAccess
                 numWrites = _context.SaveChanges();
             }
             return numWrites > 0;       
-        }      
+        }
+
+        private TEntity ApplyEntityEdit<TEntity>(TEntity entity, Func<TEntity,object> edit)
+        {
+            edit(entity);
+            return entity;
+        }
+
         public bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth) 
         { 
             User toCreate = new User
@@ -44,11 +53,6 @@ namespace DataAccess
         }
         public bool DeleteUser(Guid Id) { return EntityOperation(new User { Id = Id }, u => _context.Users.Remove((User)u)); }
 
-        private TEntity ApplyEntityEdit<TEntity>(TEntity entity, Func<TEntity,object> edit)
-        {
-            edit(entity);
-            return entity;
-        }
         
         Func<Entity, EntityEntry> updateUser = u => _context.Users.Update((User)u);
         public bool UpdatePhoneNumber(Guid id, string newNumber) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.PhoneNumber = newNumber), updateUser); }
@@ -107,7 +111,6 @@ namespace DataAccess
 			}
             return user;
 		}
-
         private int GetUserFollowerCount(Guid id)
         {
 			int numFollowers;
@@ -138,17 +141,25 @@ namespace DataAccess
                 user.JoinDate, user.Reputation, numFollowers);
         }
 
-        public ThinEvent FindEvent(Guid id)
+
+		private Event GetEvent(Guid id)
+		{
+			Event @event;
+			using (_context = new QueryContext())
+			{
+				@event = _context.Events.Find(id);
+			}
+			if (@event == null)
+			{ throw new InvalidEventException("Event not found."); }
+			return @event;
+		}
+		public ThinEvent FindEvent(Guid id)
         {
-            Event @event;
-            ThinnerUser host;
-            using (_context = new QueryContext())
-            {
-                @event = _context.Events.Where(e => e.Id == id).Include(e => e.Host).Single();
-                host = new ThinnerUser(@event.Host.Id, @event.Host.Name); 
-            }
-            return new ThinEvent(@event.Id, host, @event.Name, @event.EventType,
-                @event.StartTime, @event.Location.X, @event.Location.Y);
+            Event @event = GetEvent(id);
+            ThinnerUser host = new ThinnerUser(@event.Host.Id, @event.Host.Name); 
+            return new ThinEvent(@event.Id, host, @event.Name, @event.Description, @event.EventType,
+                @event.StartTime, @event.Location.X, @event.Location.Y, @event.EndTime,
+                @event.IsEventOpen, @event.GroupMinimum, @event.GroupMaximum);
         }
 
         public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
@@ -157,7 +168,7 @@ namespace DataAccess
             Point userLocation = new Point(longitude, latitude); 
             using (_context = new QueryContext())
             { 
-                closestEvents = _context.Events.Where(e => e.Location.Distance(userLocation) <= distance).
+                closestEvents = _context.Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
                                 Select(e => new ThinnerEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.EventType, e.Location.Y, e.Location.X)).ToList();
             }
             return closestEvents;
@@ -172,26 +183,64 @@ namespace DataAccess
 				@event = _context.EventLinks.Where(e => e.SelfId == id).Include(e => e.Event.Host).Single().Event;
 				host = new ThinnerUser(@event.Host.Id, @event.Host.Name);
 			}
-			return new ThinEvent(@event.Id, host, @event.Name, @event.EventType, @event.StartTime, @event.Location.X, @event.Location.Y);
+            return new ThinEvent(@event.Id, host, @event.Name, @event.Description, @event.EventType,
+                @event.StartTime, @event.Location.X, @event.Location.Y, @event.EndTime,
+				@event.IsEventOpen, @event.GroupMinimum, @event.GroupMaximum);
 		}
 
-        public ThinEvent CreateEvent(Guid hostId, string name, string eventType, DateTime startTime, double latitude, double longitude)
+        public List<ThinEvent> FindUpcomingEvents(Guid id)
+        {
+            List<ThinEvent> upcomingEvents;
+            using (_context = new QueryContext())
+            { 
+                upcomingEvents = _context.Events.Where(e => e.StartTime > DateTimeOffset.UtcNow).
+								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.EventType,
+                                e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
+            }
+            return upcomingEvents;
+        }
+
+        public List<ThinEvent> FindPastEvents(Guid id)
+		{
+            List<ThinEvent> pastEvents;
+            using (_context = new QueryContext())
+            { 
+                pastEvents = _context.Events.Where(e => e.EndTime.HasValue && e.EndTime < DateTimeOffset.UtcNow).
+								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.EventType,
+                                e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
+            }
+            return pastEvents;
+		}
+
+        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType,
+            DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
         {
             Event toCreate = new Event {
                 HostId = hostId,
                 Name = name,
                 EventType = eventType,
                 StartTime = startTime,
-                Location = new Point(longitude, latitude), 
+                Location = new Point(longitude, latitude),
+
+                IsEventOpen = true,
+                GroupMinimum = groupMinimum,
+                GroupMaximum = groupMaximum
             };
             EntityOperation(toCreate, e => _context.Events.Add((Event)e));
             AddUserToEvent(hostId, toCreate.Id);
 
             ThinUser host = FindUser(hostId);
             ThinnerUser thinHost = new(host.Id, host.Name);
-			return new ThinEvent(toCreate.Id, thinHost, toCreate.Name, toCreate.EventType, toCreate.StartTime, toCreate.Location.X, toCreate.Location.Y);
-        }
-        public bool EndEvent(Guid id) { return EntityOperation(new Event { Id = id }, e => _context.Events.Remove((Event)e)); }
+			return new ThinEvent(toCreate.Id, thinHost, toCreate.Name, toCreate.Description, toCreate.EventType,
+                toCreate.StartTime, toCreate.Location.X, toCreate.Location.Y, toCreate.EndTime,
+				toCreate.IsEventOpen, toCreate.GroupMinimum, toCreate.GroupMaximum);
+		}
+
+		Func<Entity, EntityEntry> updateEvent = e => _context.Events.Update((Event)e);
+		public bool UpdateDescription(Guid id, string description) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.Description = description), updateEvent); }
+		public bool UpdateType(Guid id, string type) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.EventType = type), updateEvent); }
+		public bool UpdateStatus(Guid id, bool isOpen) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.IsEventOpen = isOpen), updateEvent); }
+        public bool EndEvent(Guid id) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.EndTime = DateTimeOffset.UtcNow), updateEvent); }
 
 		Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
 		Func<Entity, EntityEntry> removeEventLink = l => _context.EventLinks.Remove((EventLink)l);

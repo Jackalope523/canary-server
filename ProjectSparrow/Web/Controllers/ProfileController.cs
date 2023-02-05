@@ -62,9 +62,39 @@ namespace Web.Controllers
 			}
 
 			return Ok(profile);
-        }
+		}
 
-        [HttpGet("following")]
+		[HttpGet("{targetIdentification}/activity")]
+		public async Task<IActionResult> GetUserActivity(string targetIdentification)
+		{
+			if (targetIdentification == null)
+			{
+				return BadRequest(ProfileError.MissingInformation.ToString());
+			}
+
+			List<ThinEvent> activity;
+
+			try
+			{
+				// Parse target identification and retrieve activity
+				var target = GetGUID(targetIdentification);
+				var user = await GetCurrentUserAsync();
+				activity = await accounts.GetUserActivityAsync(user.Id, target);
+			}
+			catch (InvalidUserException e)
+			{
+				// User does not exist
+				return BadRequest(e.ToString());
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok(activity);
+		}
+
+		[HttpGet("following")]
         public async Task<IActionResult> GetFollowed()
         {
 			List<ThinnerUser> followedUsers;

@@ -40,11 +40,13 @@ namespace Server.Boundaries
 
 	public interface IAccountOperations
 	{
-		static IAccountOperations AccountManager => new AccountManager(IAccountDatabase.AccountDatabaseAccess);
+		static IAccountOperations AccountManager => new AccountManager(IAccountDatabase.AccountDatabaseAccess, IEventDatabase.EventDatabaseAccess);
 
 		Task<ThinUser> GetUserAsync(Guid userID);
 		Task<ThinUser> GetUserAsync(string phoneNumber);
 		Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID);
+
+		Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth);
 		Task EditUserAsync(Guid userID,

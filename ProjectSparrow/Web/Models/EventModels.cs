@@ -7,16 +7,13 @@ using Server.Boundaries;
 
 namespace Web.Models
 {
-    public class EventModel
-    {
-        [Required]
-        public Guid EventID { get; set; }
-    }
-
-    public class EventDetailsModel : EventModel
+    public class EventDetailsModel
     {
         [Required]
         public string EventName { get; set; }
+
+        [Required]
+        public string EventDescription { get; set; }
 
         [Required]
         public string EventType { get; set; }
@@ -28,11 +25,21 @@ namespace Web.Models
         public float Longitude { get; set; }
 
         [Required]
-        public DateTime StartTime { get; set; }
+        public DateTimeOffset StartTime { get; set; }
+
+        public int? GroupMinimum { get; set; }
+        public int? GroupMaximum { get; set; }
 
         public ThinnerUser Host { get; set; }
 
         public uint NumberOfParticipants { get; set; }
+    }
+
+    public class EventEditModel
+    {
+        public string EventDescription { get; set; }
+        public string EventType { get; set; }
+        public bool? EventIsOpen { get; set; }
     }
 
 }
