@@ -68,7 +68,7 @@ namespace Server.Controls
             return pastActivity.Concat(upcomingActivity).ToList();
         }
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth)
+        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
             // Check phone number not in use
             bool numberInUse = false;

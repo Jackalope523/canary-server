@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTime DateOfBirth,
+	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
@@ -17,7 +17,7 @@ namespace Server.Boundaries
         public static IAccountDatabase AccountDatabaseAccess;
         ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
-        bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth);
+        bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
 		bool UpdateEmail(Guid id, string newEmail);
@@ -48,7 +48,7 @@ namespace Server.Boundaries
 
 		Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID);
 
-		Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth);
+		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
 		Task EditUserAsync(Guid userID,
 			string phoneNumber = "", string email = "", string name = "",
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,

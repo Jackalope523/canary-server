@@ -36,7 +36,7 @@ namespace DataAccess
             return entity;
         }
 
-        public bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth) 
+        public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth) 
         { 
             User toCreate = new User
             {
@@ -44,7 +44,7 @@ namespace DataAccess
                 Email = email,
                 Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTime.Now,
+                JoinDate = DateTimeOffset.UtcNow,
                 Reputation = 100,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };

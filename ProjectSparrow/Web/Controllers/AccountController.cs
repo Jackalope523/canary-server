@@ -199,7 +199,7 @@ namespace Web.Controllers
 			{
                 // Persist a new user
                 await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
-                    details.Name, details.DateOfBirth);
+                    details.Name, details.DateOfBirth.ToUniversalTime());
                                 
                 // Send an SMS to new user with a generated change number token
                 var user = await accounts.GetUserAsync(details.PhoneNumber);

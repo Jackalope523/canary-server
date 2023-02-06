@@ -9,9 +9,9 @@ namespace Server.Entities
     internal class User : Account
     {
         public string Name { get; private init; }
-        public DateTime DateOfBirth { get; init; }
+        public DateTimeOffset DateOfBirth { get; init; }
 
-        public DateTime JoinDate { get; init; }
+        public DateTimeOffset JoinDate { get; init; }
         public Reputation Reputation { get; private set; }
 
         public HashSet<string> FollowedUserIDs { get; init; }
