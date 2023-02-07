@@ -14,11 +14,15 @@ namespace Server.Controls
 {
     internal class AccountManager : IAccountOperations
     {
+        internal static AccountManager Manager { get; private set; }
+
         private IAccountDatabase accounts { get; init; }
         private IEventDatabase events { get; init; }
 
         public AccountManager(IAccountDatabase accountDatabase, IEventDatabase eventDatabase)
         {
+            Manager = this;
+
             accounts = accountDatabase;
             events = eventDatabase;
         }

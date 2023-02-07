@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Server.Boundaries;
+using Server.Controls;
 using Shared;
 
 namespace Server.Entities
@@ -109,7 +110,7 @@ namespace Server.Entities
         public async Task<bool> IsFollowing(Guid userID)
         {
             // Set if null
-            Following ??= await IAccountOperations.AccountManager.GetFollowedUsersAsync(userID);
+            Following ??= await AccountManager.Manager.GetFollowedUsersAsync(userID);
 
 			// Check if user is following target
 			if (Following.Find(x => x.Id == userID) != null)
@@ -121,7 +122,7 @@ namespace Server.Entities
         public async Task<bool> IsBlocking(Guid userID)
         {
             // Set if null
-            Blocking ??= await IAccountOperations.AccountManager.GetBlockedUsersAsync(userID);
+            Blocking ??= await AccountManager.Manager.GetBlockedUsersAsync(userID);
 
 			// Check if user is following target
 			if (Blocking.Find(x => x.Id == userID) != null)
