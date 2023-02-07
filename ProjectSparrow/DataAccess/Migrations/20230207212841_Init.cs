@@ -42,6 +42,7 @@ namespace DataAccess.Migrations
                     DateOfBirth = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     JoinDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Reputation = table.Column<int>(type: "int", nullable: false),
+                    NormalisedEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPhoneConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     IsEmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -59,11 +60,10 @@ namespace DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SelfId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     link_type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    OtherId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Type = table.Column<int>(type: "int", nullable: true)
+                    Type = table.Column<int>(type: "int", nullable: true),
+                    OtherId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -87,45 +87,45 @@ namespace DataAccess.Migrations
                 columns: new[] { "Id", "Description", "EndTime", "EventType", "GroupMaximum", "GroupMinimum", "HostId", "IsEventOpen", "Location", "Name", "StartTime" },
                 values: new object[,]
                 {
-                    { new Guid("2f07003e-a3ca-4688-b1e8-1e4373afe615"), "something interesting", null, "chill,drinks", 0, 0, new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), false, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (23.4413325 -76.0092066)"), "Masquerade", new DateTimeOffset(new DateTime(2025, 6, 25, 17, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
-                    { new Guid("89d9f649-cb8e-4f97-9014-da3576c4d0d8"), "still nothing interesting", new DateTimeOffset(new DateTime(800, 11, 4, 11, 3, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "skiing,drinks,rager", 0, 0, new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), false, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (0 0)"), "Then There Were Two", new DateTimeOffset(new DateTime(800, 11, 2, 13, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
-                    { new Guid("8b004d57-ec57-4293-be01-3760a1be26c8"), "nothing interesting", new DateTimeOffset(new DateTime(800, 4, 3, 1, 37, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "campfire,stories", 0, 0, new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), false, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (0 0)"), "The First Few", new DateTimeOffset(new DateTime(800, 4, 2, 18, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
+                    { new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"), "nothing interesting", new DateTimeOffset(new DateTime(800, 4, 3, 1, 37, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "campfire,stories", 0, 0, new Guid("2fe22508-b1c7-4243-9070-926172684da2"), false, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (0 0)"), "The First Few", new DateTimeOffset(new DateTime(800, 4, 2, 18, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"), "something interesting", null, "chill,drinks", 0, 0, new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), false, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (23.4413325 -76.0092066)"), "Masquerade", new DateTimeOffset(new DateTime(2025, 6, 25, 17, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { new Guid("903aea86-698d-4f18-ba24-be6ee3d16566"), "still nothing interesting", new DateTimeOffset(new DateTime(800, 11, 4, 11, 3, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "skiing,drinks,rager", 0, 0, new Guid("2fe22508-b1c7-4243-9070-926172684da2"), false, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (0 0)"), "Then There Were Two", new DateTimeOffset(new DateTime(800, 11, 2, 13, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessTries", "DateOfBirth", "Email", "IsEmailConfirmed", "IsPhoneConfirmed", "JoinDate", "LockoutDate", "Name", "PhoneNumber", "Reputation", "SecurityStamp" },
+                columns: new[] { "Id", "AccessTries", "DateOfBirth", "Email", "IsEmailConfirmed", "IsPhoneConfirmed", "JoinDate", "LockoutDate", "Name", "NormalisedEmail", "PhoneNumber", "Reputation", "SecurityStamp" },
                 values: new object[,]
                 {
-                    { new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Huginn", "1", 0, "604a41c9-1d3f-4e31-8576-184807b7835a" },
-                    { new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Signy of Sváfnir", "0", 0, "99669718-9f64-4a64-9067-45cfc0ee19ef" },
-                    { new Guid("ecb85ed0-1628-4ae2-81bb-0e9bb3bdb6b8"), 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Muninn", "2", 0, "f3442a23-3b33-4cf7-95d2-e0bd3ac379cb" }
+                    { new Guid("2fe22508-b1c7-4243-9070-926172684da2"), 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Huginn", "", "1", 0, "260e2456-8712-4c3f-b68c-7b5d483961e6" },
+                    { new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Signy of Sváfnir", "", "0", 0, "25370e4b-384f-41be-80f6-97e4abcdff52" },
+                    { new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"), 0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Muninn", "", "2", 0, "16c5a432-2da9-4380-82f4-4f30131fd200" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Links",
-                columns: new[] { "Id", "Discriminator", "EventId", "SelfId", "link_type" },
+                columns: new[] { "Id", "EventId", "SelfId", "Type", "link_type" },
                 values: new object[,]
                 {
-                    { new Guid("13b3ccb5-bd9e-422d-9cfe-72c82a973c9c"), null, new Guid("8b004d57-ec57-4293-be01-3760a1be26c8"), new Guid("ecb85ed0-1628-4ae2-81bb-0e9bb3bdb6b8"), "event" },
-                    { new Guid("3f5c5b71-b28a-4379-b1a7-6ac808e4d190"), null, new Guid("2f07003e-a3ca-4688-b1e8-1e4373afe615"), new Guid("ecb85ed0-1628-4ae2-81bb-0e9bb3bdb6b8"), "event" },
-                    { new Guid("748b5d38-286e-4917-83a7-50d73f63058a"), null, new Guid("8b004d57-ec57-4293-be01-3760a1be26c8"), new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), "event" },
-                    { new Guid("99861b00-fdd1-4f4b-881a-b00fa227a5a8"), null, new Guid("2f07003e-a3ca-4688-b1e8-1e4373afe615"), new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), "event" },
-                    { new Guid("c44be1cb-b8ce-4349-a9f2-dc16d13c6063"), null, new Guid("2f07003e-a3ca-4688-b1e8-1e4373afe615"), new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), "event" },
-                    { new Guid("c931bfbb-136f-4bf6-b8ea-a37c913c12ca"), null, new Guid("8b004d57-ec57-4293-be01-3760a1be26c8"), new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), "event" },
-                    { new Guid("e20dbc09-aa27-4cf4-84a3-abb5a8d941dd"), null, new Guid("89d9f649-cb8e-4f97-9014-da3576c4d0d8"), new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), "event" },
-                    { new Guid("f2180438-d129-4877-af66-07626068ef8b"), null, new Guid("89d9f649-cb8e-4f97-9014-da3576c4d0d8"), new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), "event" }
+                    { new Guid("03b1d5fa-6d91-4fbd-b88d-5e4700030f0c"), new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"), new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), 0, "event" },
+                    { new Guid("19c141ab-3f37-427c-ba5b-e8fbc87e9cd2"), new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"), new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"), 0, "event" },
+                    { new Guid("56c3dad2-8a5b-4c2c-9472-86427844dad9"), new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"), new Guid("2fe22508-b1c7-4243-9070-926172684da2"), 0, "event" },
+                    { new Guid("6ba2518b-0352-4769-a453-5cec43bdaeb9"), new Guid("903aea86-698d-4f18-ba24-be6ee3d16566"), new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), 0, "event" },
+                    { new Guid("6bb343da-74dc-4584-9ff9-e732cc457854"), new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"), new Guid("2fe22508-b1c7-4243-9070-926172684da2"), 1, "event" },
+                    { new Guid("7fbf2eb9-3e9e-4782-b1d8-101b315c9d19"), new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"), new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), 1, "event" },
+                    { new Guid("b2862eb0-1407-4b2e-8410-d6f3854134b2"), new Guid("903aea86-698d-4f18-ba24-be6ee3d16566"), new Guid("2fe22508-b1c7-4243-9070-926172684da2"), 0, "event" },
+                    { new Guid("bdd00760-019b-42ca-b27b-4325fc001560"), new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"), new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"), 1, "event" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Links",
-                columns: new[] { "Id", "Discriminator", "OtherId", "SelfId", "Type", "link_type" },
+                columns: new[] { "Id", "OtherId", "SelfId", "Type", "link_type" },
                 values: new object[,]
                 {
-                    { new Guid("135661a5-7b71-44cc-ad0b-f83e16a3c36a"), null, new Guid("ecb85ed0-1628-4ae2-81bb-0e9bb3bdb6b8"), new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), 1, "user" },
-                    { new Guid("2d99ec49-5ff1-40bf-ac22-8115cbb6d76e"), null, new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), new Guid("ecb85ed0-1628-4ae2-81bb-0e9bb3bdb6b8"), 0, "user" },
-                    { new Guid("e7a57830-7600-42ad-a138-728f638d84dd"), null, new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), 0, "user" },
-                    { new Guid("f4841190-57aa-440a-8d4f-a8f124629fbd"), null, new Guid("73acf8c3-a2fd-41d3-af27-43215fd0637f"), new Guid("564bb3d4-c2cf-4278-9a0c-68da3eb782b3"), 0, "user" }
+                    { new Guid("26863755-e02b-4d84-8678-89b3b86d2310"), new Guid("2fe22508-b1c7-4243-9070-926172684da2"), new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), 0, "user" },
+                    { new Guid("298a9a8d-b2f2-4df6-a043-26a8c7f848d2"), new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"), 0, "user" },
+                    { new Guid("5d1ed340-a6e7-41c3-9d61-1da12bb60ad2"), new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), new Guid("2fe22508-b1c7-4243-9070-926172684da2"), 0, "user" },
+                    { new Guid("bad9512b-5f0a-4165-88bf-893c2ddc3118"), new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"), new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"), 1, "user" }
                 });
 
             migrationBuilder.CreateIndex(

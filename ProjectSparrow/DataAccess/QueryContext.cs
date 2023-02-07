@@ -25,9 +25,6 @@ namespace DataAccess
                 .HasValue<UserLink>("user")
                 .HasValue<EventLink>("event");
 
-            modelBuilder.Entity<Link>()
-                .Property<string>("Discriminator")
-                .HasMaxLength(50);
 
             modelBuilder.Entity<UserLink>()
                 .Property(l => l.SelfId)
@@ -41,6 +38,11 @@ namespace DataAccess
             modelBuilder.Entity<EventLink>()
                 .Property(l => l.SelfId)
                 .HasColumnName("SelfId");
+
+            modelBuilder.Entity<EventLink>()
+                .Property(l => l.Type)
+                .HasColumnName("Type");
+
 
             modelBuilder.Entity<Link>()
                 .HasOne(a => a.Self)
@@ -62,6 +64,7 @@ namespace DataAccess
                     Id = Guid.NewGuid(),
                     PhoneNumber = "0",
                     Email = "",
+                    NormalisedEmail = "",
                     Name = "Signy of Sváfnir",
                     SecurityStamp = Guid.NewGuid().ToString()
                 },
@@ -70,6 +73,7 @@ namespace DataAccess
                     Id = Guid.NewGuid(),
                     PhoneNumber = "1",
                     Email = "",
+                    NormalisedEmail = "",
                     Name = "Huginn",
                     SecurityStamp = Guid.NewGuid().ToString()
                 },
@@ -78,6 +82,7 @@ namespace DataAccess
                     Id = Guid.NewGuid(),
                     PhoneNumber = "2",
                     Email = "",
+                    NormalisedEmail = "",
                     Name = "Muninn",
                     SecurityStamp = Guid.NewGuid().ToString()
                 }
