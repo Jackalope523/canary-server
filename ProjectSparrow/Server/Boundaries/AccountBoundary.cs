@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Server.Controls;
 using System.Threading.Tasks;
+using Server.Entities;
 
 namespace Server.Boundaries
 {
@@ -17,6 +18,7 @@ namespace Server.Boundaries
         public static IAccountDatabase AccountDatabaseAccess;
         ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
+		ThinUser FindUserByEmail(string email);
         bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
@@ -50,9 +52,9 @@ namespace Server.Boundaries
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
 		Task EditUserAsync(Guid userID,
-			string phoneNumber = "", string email = "", string name = "",
+			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
-			string securityStamp = "", DateTimeOffset? lockoutDate = null, int? accessTries = null);
+			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null);
 		Task DeleteUserAsync(Guid userID);
 
 		Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID);

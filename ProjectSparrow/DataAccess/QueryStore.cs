@@ -111,6 +111,22 @@ namespace DataAccess
 			}
             return user;
 		}
+        private User GetUserByEmail(string email)
+        {
+			User user;
+			using (_context = new QueryContext())
+			{
+                try
+                {
+                    user = _context.Users.Where(u => u.Email.Equals(email)).Single();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidUserException("User not found.", ex);
+                }
+			}
+            return user;
+		}
         private int GetUserFollowerCount(Guid id)
         {
 			int numFollowers;
@@ -134,6 +150,16 @@ namespace DataAccess
         public ThinUser FindUser(string phoneNumber)
         {
             User user = GetUser(phoneNumber);
+            int numFollowers = GetUserFollowerCount(user.Id);
+            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
+                user.IsPhoneConfirmed, user.IsEmailConfirmed,
+                user.SecurityStamp, user.LockoutDate, user.AccessTries,
+                user.JoinDate, user.Reputation, numFollowers);
+        }
+
+        public ThinUser FindUserByEmail(string email)
+        {
+            User user = GetUserByEmail(email);
             int numFollowers = GetUserFollowerCount(user.Id);
             return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
                 user.IsPhoneConfirmed, user.IsEmailConfirmed,

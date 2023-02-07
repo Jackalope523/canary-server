@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -12,6 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="libphonenumber-csharp" Version="8.13.5" />
 	  <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
 	  <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.13" />
 	</ItemGroup>

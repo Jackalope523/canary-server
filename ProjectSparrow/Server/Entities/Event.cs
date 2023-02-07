@@ -30,7 +30,7 @@ namespace Server.Entities
             Host = eventHost;
 
             participantLog = new();
-            ParticipantJoined(Host.AccountID);
+            ParticipantJoined(Host.Id);
 
             StartTime = DateTime.UtcNow;
         }

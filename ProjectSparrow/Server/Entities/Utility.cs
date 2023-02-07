@@ -51,14 +51,4 @@ namespace Server.Entities
         }
         public float Metres { get; set; }
     }
-
-    internal static class HAZMAT
-    {
-        public static bool CheckString(string phrase)
-        {
-			Regex filter = new Regex("(ChristopheTheWicked|Swampman|rats)");
-
-			return filter.IsMatch(phrase.ToLower());
-        }
-    }
 }

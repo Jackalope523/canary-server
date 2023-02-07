@@ -25,30 +25,31 @@ namespace Server.Controls
 
         public async Task<ThinUser> GetUserAsync(Guid userID)
         {
-            var targetUser = accounts.FindUser(userID);
-            return targetUser;
+            return (await GetUser(userID)).ToThinUser();
         }
 
         public async Task<ThinUser> GetUserAsync(string phoneNumber)
 		{
-			var targetUser = accounts.FindUser(phoneNumber);
-			return targetUser;
+            return (await GetUser(phoneNumber)).ToThinUser();
 		}
 
         public async Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID)
         {
+            var targetUser = await GetUser(targetID);
+
             // Check if user is blocked
-            if (await UserIsBlocked(userID, targetID))
+            if (await targetUser.IsBlocking(userID))
             { throw new InvalidUserException("User is unable to view target."); }
 
-            var targetUser = accounts.FindUser(targetID);
-            return new ThinProfile(targetID, targetUser.Name, targetUser.Reputation, targetUser.NumberOfFollowers);
+            return targetUser.ToThinProfile();
         }
 
         public async Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID)
         {
+            var targetUser = await GetUser(targetID);
+
             // Check if user is blocked
-            if (await UserIsBlocked(userID, targetID))
+            if (await targetUser.IsBlocking(userID))
             { throw new InvalidUserException("User is unable to view target."); }
 
             // Gather all user event data
@@ -59,10 +60,10 @@ namespace Server.Controls
             // Remove active and upcoming events if the user cannot view them
             foreach (var @event in upcomingActivity)
             {
-                if (await UserIsBlocked(userID, @event.Host.Id))
-                {
-                    upcomingActivity.Remove(@event);
-                }
+                User eventHost = new(@event.Host);
+
+                if (await eventHost.IsBlocking(userID))
+                { upcomingActivity.Remove(@event); }
             }
 
             return pastActivity.Concat(upcomingActivity).ToList();
@@ -70,63 +71,68 @@ namespace Server.Controls
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
-            // Check phone number not in use
-            bool numberInUse = false;
-            try
+            // Create user
+            User newUser = new()
             {
-                // FindUser throws an exception if there are no entries
-                accounts.FindUser(phoneNumber);
-                numberInUse = true;
-            }
-            catch { }
-
-            if (numberInUse)
-            { throw new InvalidUserException("Phone Number already registered."); }
-
-            // TODO Normalise data
-            // Create profile
-            User newUser = new(phoneNumber, name)
-            {
+                PhoneNumber = phoneNumber,
+                Email = email,
+                Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTime.Now,
-                Verified = false
+                JoinDate = DateTimeOffset.UtcNow
             };
 
-            // Validate profile
-            bool valid = newUser.ValidateUser();
+            // Validate and normalise user
+            bool valid = newUser.ValidateAndNormalise();
             if (!valid)
             { throw new InvalidInformationException("Invalid account details provided."); }
 
+            // Check if phone number is in use
+            await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
+
+            // Check if email is in use
+            if (!string.IsNullOrEmpty(email))
+            { await ThrowIfEmailTaken(newUser.Email); }
+
             // Store profile
-            bool success = accounts.CreateUser(phoneNumber, email,
-                name, dateOfBirth);
+            bool success = accounts.CreateUser(newUser.PhoneNumber, newUser.Email,
+                newUser.Name, newUser.DateOfBirth);
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
         }
 
         public async Task EditUserAsync(Guid userID,
-            string phoneNumber = "", string email = "", string name = "",
+            string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
-			string securityStamp = "", DateTimeOffset? lockoutDate = null, int? accessTries = null)
+			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
         {
             // Throws if user not found
-            accounts.FindUser(userID);
+            User editUser = await GetUser(userID);
+            
+            editUser.PhoneNumber = phoneNumber;
+            editUser.Email = email;
+            editUser.Name = name;
 
-            // TODO Verify updates are valid
-            // TODO Normalise data
+            // Validate and Normalise
+            if (!editUser.ValidateAndNormalise())
+            { throw new InvalidInformationException("Invalid details provided."); }
+
             // Update individual attributes
-			if (phoneNumber != "")
+			if (!string.IsNullOrEmpty(phoneNumber))
             {
-                accounts.UpdatePhoneNumber(userID, phoneNumber);
+                await ThrowIfPhoneNumberTaken(editUser.PhoneNumber);
+                accounts.UpdatePhoneNumber(userID, editUser.PhoneNumber);
 			}
-			if (email != "")
+			if (!string.IsNullOrEmpty(email))
 			{
-                accounts.UpdateEmail(userID, email);
+                await ThrowIfEmailTaken(editUser.Email);
+                accounts.UpdateEmail(userID, editUser.Email);
 			}
-			if (name != "")
+			if (!string.IsNullOrEmpty(name))
 			{
-                accounts.UpdateName(userID, name);
+                accounts.UpdateName(userID, editUser.Name);
 			}
+
+            // Internal attributes
 			if (isPhoneNumberConfirmed.HasValue)
 			{
 				accounts.UpdatePhoneConfirmation(userID, isPhoneNumberConfirmed.Value);
@@ -135,7 +141,7 @@ namespace Server.Controls
 			{
 				accounts.UpdateEmailConfirmation(userID, isEmailConfirmed.Value);
 			}
-			if (securityStamp != "")
+			if (!string.IsNullOrEmpty(securityStamp))
 			{
 				accounts.UpdateSecurityStamp(userID, securityStamp);
 			}
@@ -186,15 +192,48 @@ namespace Server.Controls
             accounts.UnblockUser(userID, targetID);
 		}
 
-		private async Task<bool> UserIsBlocked(Guid userID, Guid targetID)
+
+
+        internal async Task<User> GetUser(Guid userID)
         {
-			var targetBlockedList = accounts.GetBlockedUsers(targetID);
+            return new(accounts.FindUser(userID));
+        }
 
-			// Check if user is blocked by target
-			if (targetBlockedList.Find(x => x.Id == userID) != null)
-			{ return false; }
+        internal async Task<User> GetUser(string phoneNumber)
+        {
+            return new(accounts.FindUser(phoneNumber));
+        }
 
-			return true;
+
+
+        private async Task ThrowIfPhoneNumberTaken(string phoneNumber)
+        {
+			bool numberTaken = false;
+			try
+			{
+				// Throws an exception if there is no user
+				await GetUser(phoneNumber);
+				numberTaken = true;
+			}
+			catch { }
+
+			if (numberTaken)
+			{ throw new InvalidUserException("Phone Number already registered."); }
 		}
+
+        private async Task ThrowIfEmailTaken(string email)
+        {
+			bool emailTaken = false;
+			try
+			{
+                // Throws an exception if there is no user
+                accounts.FindUserByEmail(email);
+				emailTaken = true;
+			}
+			catch { }
+
+			if (emailTaken)
+			{ throw new InvalidUserException("Email already registered."); }
+        }
 	}
 }
