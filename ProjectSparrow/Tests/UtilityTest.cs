@@ -43,7 +43,7 @@ namespace Tests
         [MemberData(nameof(CityDistances))]
         internal void Distance_TwoPoints_ReturnsDistance(GeoLocation pointA, GeoLocation pointB, Distance expectedDistance)
         {
-            Assert.Equal(expectedDistance.Kilometres, MathF.Round(GeoLocation.DistanceBetween(pointA, pointB).Kilometres));
+            Assert.Equal(expectedDistance.Kilometres, Math.Round(GeoLocation.DistanceBetween(pointA, pointB).Kilometres));
         }
 
         [Theory]

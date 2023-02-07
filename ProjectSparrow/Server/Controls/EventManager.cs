@@ -12,23 +12,28 @@ namespace Server.Controls
 {
 	public class EventManager : IEventOperations
 	{
+		internal static EventManager Manager { get; private set; }
+
 		private IAccountDatabase accounts;
 		private IEventDatabase events;
 
 		public EventManager(IAccountDatabase accountDatabase, IEventDatabase eventDatabase)
 		{
+			Manager = this;
+
 			accounts = accountDatabase;
 			events = eventDatabase;
 		}
 
 		public async Task<ThinEvent> GetEventInformationAsync(Guid userID, Guid eventID)
         {
+			var targetEvent = await GetEvent(eventID);
+
 			// Check if user is allowed to view event
-			if (!await UserCanSeeEvent(userID, eventID))
+			if (!await targetEvent.IsVisibleTo(userID))
 			{ throw new InvalidEventException("User is unable to view event."); }
 
-			var eventInformation = events.FindEvent(eventID);
-			return eventInformation;
+			return targetEvent.ToThinEvent();
 		}
 
 		public async Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID,
@@ -39,10 +44,10 @@ namespace Server.Controls
 			// Remove events from list that the user cannot access
 			foreach (ThinnerEvent e in nearbyEvents)
 			{
-				if (!await UserCanSeeEvent(userID, e.Id))
-				{
-					nearbyEvents.Remove(e);
-				}
+				Event targetEvent = new(e);
+
+				if (!await targetEvent.IsVisibleTo(userID))
+				{ nearbyEvents.Remove(e); }
 			}
 
 			return nearbyEvents;
@@ -63,35 +68,28 @@ namespace Server.Controls
 			DateTimeOffset startTime, double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum)
 		{
-			try
-			{
-				// Will throw if the user is not attending an event
-				events.FindAttendingEvent(userID);
-			}
-			catch
-			{
-				// TODO Validate event
-				// Try to create an event
-				var newEvent = events.CreateEvent(userID, eventName, eventDescription, eventType,
-					startTime, latitude, longitude,
-					groupMinimum ?? 0, groupMaximum ?? 0);
-				return newEvent;
-			}
+			await ThrowIfUserAtEvent(userID);
 
-			throw new InvalidUserException("User cannot create a new event whilst attending one.");
+			// TODO Validate event
+			// Try to create an event
+			var newEvent = events.CreateEvent(userID, eventName, eventDescription, eventType,
+				startTime, latitude, longitude,
+				groupMinimum ?? 0, groupMaximum ?? 0);
+			return newEvent;
 		}
 
 		public async Task EditEventAsync(Guid userID, Guid eventID,
 			string eventDescription = "", string eventType = "",
 			bool? isOpen = null)
 		{
+			var targetEvent = await GetEvent(eventID);
+
 			// Verify that user is event host
-			if (!await UserIsEventHost(userID, eventID))
+			if (!await targetEvent.ModifiableBy(userID))
 			{ throw new InvalidEventException("User is unable to edit event."); }
 
 			// Verify that event is still active
-			var @event = events.FindEvent(eventID);
-			if (@event.TimeEnded.HasValue)
+			if (targetEvent.EndTime.HasValue)
 			{ throw new InvalidEventException("Unable to edit event, event has ended."); }
 
 			// TODO Verify updates are valid
@@ -112,12 +110,16 @@ namespace Server.Controls
 
 		public async Task JoinEventAsync(Guid userID, Guid eventID)
 		{
+			await ThrowIfUserAtEvent(userID);
+
+			var targetEvent = await GetEvent(eventID);
+
 			// Check if user is allowed to view event
-			if (!await UserCanSeeEvent(userID, eventID))
+			if (!await targetEvent.IsVisibleTo(userID))
 			{ throw new InvalidEventException("User is unable to view event."); }
 
 			// Check if event is open
-			if (!events.FindEvent(eventID).IsOpen)
+			if (!targetEvent.IsOpen)
 			{ throw new InvalidEventException("Event is closed."); }
 
 			// Try to add user to the event
@@ -128,6 +130,8 @@ namespace Server.Controls
 
 		public async Task LeaveEventAsync(Guid userID, Guid eventID)
 		{
+			// TODO Is Host logic
+
 			// Try to remove user from event
 			bool success = events.RemoveUserFromEvent(userID, eventID);
             if (!success)
@@ -136,8 +140,10 @@ namespace Server.Controls
 
 		public async Task EndEventAsync(Guid userID, Guid eventID)
 		{
+			var targetEvent = await GetEvent(eventID);
+
 			// Check if the user is able to end the event
-			if (await UserIsEventHost(userID, eventID))
+			if (!await targetEvent.ModifiableBy(userID))
 			{ throw new InvalidUserException("User does not have permissions to end event."); }
 
 			// Try to end to event
@@ -145,36 +151,44 @@ namespace Server.Controls
             if (!success)
             { throw new UnexpectedFailureException("Could not end event."); }
         }
-		
+
 		public async Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID)
 		{
-			var guestList = events.GetGuestList(eventID);
+			Event targetEvent = new(eventID);
 
-			// Check if user is on the guest list
-			if (guestList.Find(x => x.Id == userID) == null)
+			if (!await targetEvent.AttendedBy(userID))
 			{ throw new InvalidUserException("User did not attend event."); }
 
-			return guestList;
+			return targetEvent.Attendees;
 		}
 
-		private async Task<bool> UserCanSeeEvent(Guid userID, Guid eventID)
-		{
-			var host = events.FindEvent(eventID);
-			var hostBlockedList = accounts.GetBlockedUsers(userID);
 
-			// Check if user is blocked by event host
-			if (hostBlockedList.Find(x => x.Id == userID) != null)
+
+		internal async Task<Event> GetEvent(Guid eventID)
+		{
+			return new(events.FindEvent(eventID));
+		}
+
+		internal async Task<List<ThinnerUser>> GetAttendeesInternalAsync(Guid eventID)
+		{
+			return events.GetGuestList(eventID);
+		}
+
+
+
+		private async Task ThrowIfUserAtEvent(Guid userID)
+		{
+			bool attendingEvent = false;
+			try
 			{
-				return false;
+				// Throws an exception if there is no event
+				events.FindAttendingEvent(userID);
+				attendingEvent = true;
 			}
+			catch { }
 
-			return true;
-		}
-
-		private async Task<bool> UserIsEventHost(Guid userID, Guid eventID)
-		{
-			var @event = events.FindEvent(eventID);
-			return @event.Host.Id == userID;
+			if (attendingEvent)
+			{ throw new InvalidUserException("User is currently attending an event."); }
 		}
 	}
 }

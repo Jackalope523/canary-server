@@ -12,10 +12,10 @@ namespace Server.Entities
         public static Distance DistanceBetween(GeoLocation locationAlpha, GeoLocation locationBeta)
         {
 
-            float sdlat = MathF.Sin((locationBeta.LatitudeInRadians - locationAlpha.LatitudeInRadians) / 2);
-            float sdlon = MathF.Sin((locationBeta.LongitudeInRadians - locationAlpha.LongitudeInRadians) / 2);
-            float q = sdlat * sdlat + MathF.Cos(locationAlpha.LatitudeInRadians) * MathF.Cos(locationBeta.LatitudeInRadians) * sdlon * sdlon;
-            float d = 2 * EarthRadius.Kilometres * MathF.Asin(MathF.Sqrt(q));
+            double sdlat = Math.Sin((locationBeta.LatitudeInRadians - locationAlpha.LatitudeInRadians) / 2);
+            double sdlon = Math.Sin((locationBeta.LongitudeInRadians - locationAlpha.LongitudeInRadians) / 2);
+            double q = sdlat * sdlat + Math.Cos(locationAlpha.LatitudeInRadians) * Math.Cos(locationBeta.LatitudeInRadians) * sdlon * sdlon;
+            double d = 2 * EarthRadius.Kilometres * Math.Asin(Math.Sqrt(q));
 
             Distance distance = new() { Kilometres = d };
 
@@ -32,33 +32,21 @@ namespace Server.Entities
         public static Distance EarthRadius => new() { Kilometres = 6371 };
 
 
-        public float Latitude { get; init; }
-        public float Longitude { get; init; }
+        public double Latitude { get; init; }
+        public double Longitude { get; init; }
 
-        public float LatitudeInRadians => (MathF.PI / 180) * Latitude;
-        public float LongitudeInRadians => (MathF.PI / 180) * Longitude;
-
-        // Figure out location initialisation
+        public double LatitudeInRadians => (Math.PI / 180) * Latitude;
+        public double LongitudeInRadians => (Math.PI / 180) * Longitude;
     }
 
 
     public struct Distance
     {
-        public float Kilometres
+        public double Kilometres
         { 
-            get => Metres / 1000f;
-            set => Metres = value * 1000f;
+            get => Metres / 1000d;
+            set => Metres = value * 1000d;
         }
-        public float Metres { get; set; }
-    }
-
-    internal static class HAZMAT
-    {
-        public static bool CheckString(string phrase)
-        {
-			Regex filter = new Regex("(ChristopheTheWicked|Swampman|rats)");
-
-			return filter.IsMatch(phrase.ToLower());
-        }
+        public double Metres { get; set; }
     }
 }

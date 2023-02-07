@@ -7,10 +7,11 @@ namespace DataAccess.Entities
         public string PhoneNumber { get; set; }  
         public string Email { get; set; }
         public string Name { get; set; }
-        public DateTime DateOfBirth { get; init; }
-        public DateTime JoinDate { get; init; }  
+        public DateTimeOffset DateOfBirth { get; init; }
+        public DateTimeOffset JoinDate { get; init; }  
         public int Reputation { get; set; }
 
+        public string NormalisedEmail { get; set; }
         public bool IsPhoneConfirmed { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public string SecurityStamp { get; set; }

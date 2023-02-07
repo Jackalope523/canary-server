@@ -7,7 +7,7 @@
         public Guid EventId { get; init; }
         internal Event Event { get; init; }
         internal EventLinkType Type { get; set; }
-        internal DateTime Time { get; init; }
+        internal DateTimeOffset Time { get; init; }
 
         
       

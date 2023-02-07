@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Server.Controls;
 using System.Threading.Tasks;
+using Server.Entities;
 
 namespace Server.Boundaries
 {
-	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTime DateOfBirth,
+	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
@@ -17,10 +18,12 @@ namespace Server.Boundaries
         public static IAccountDatabase AccountDatabaseAccess;
         ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
-        bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth);
+		ThinUser FindUserByEmail(string normalisedEmail);
+        bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
 		bool UpdateEmail(Guid id, string newEmail);
+		bool UpdateNormalisedEmail(Guid id, string normalisedEmail);
         bool UpdateName(Guid id, string newName);
 		bool UpdatePhoneConfirmation(Guid id, bool isConfirmed);
 		bool UpdateEmailConfirmation(Guid id, bool isConfirmed);
@@ -48,11 +51,11 @@ namespace Server.Boundaries
 
 		Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID);
 
-		Task CreateUserAsync(string phoneNumber, string email, string name, DateTime dateOfBirth);
+		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
 		Task EditUserAsync(Guid userID,
-			string phoneNumber = "", string email = "", string name = "",
+			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
-			string securityStamp = "", DateTimeOffset? lockoutDate = null, int? accessTries = null);
+			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null);
 		Task DeleteUserAsync(Guid userID);
 
 		Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID);

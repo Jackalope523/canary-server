@@ -1,82 +1,135 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Server.Boundaries;
+using Server.Controls;
 using Shared;
 
 namespace Server.Entities
 {
-    internal class User : Account
+    internal class User
     {
-        public string Name { get; private init; }
-        public DateTime DateOfBirth { get; init; }
+		public Guid Id { get; init; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public string Name { get; set; }
+        public DateTimeOffset DateOfBirth { get; init; }
 
-        public DateTime JoinDate { get; init; }
-        public Reputation Reputation { get; private set; }
+        public DateTimeOffset JoinDate { get; init; }
+        public int Reputation { get; set; }
+        public int NumberOfFollowers { get; set; }
 
-        public HashSet<string> FollowedUserIDs { get; init; }
-        public HashSet<string> BlockedUserIDs { get; init; }
+        public bool IsPhoneConfirmed { get; set; }
+        public bool IsEmailConfirmed { get; set; }
 
-        public string CurrentEventID { get; private set; }
+        public string SecurityStamp { get; set; }
+        public DateTimeOffset? LockoutDate { get; set; }
+        public int AccessTries { get; set; }
 
-        public bool Verified { get; set; }
+        public string CurrentEventID { get; set; }
 
-        public User(string phoneNumber, string name) : base(phoneNumber)
+        public List<ThinnerUser> Following { get; set; }
+        public List<ThinnerUser> Blocking { get; set; }
+
+        public User() { }
+
+        public User(ThinUser fromUser)
         {
-            Name = name;
-            Reputation = new Reputation();
+            Id = fromUser.Id;
+            PhoneNumber = fromUser.PhoneNumber;
+            Email = fromUser.Email;
+            Name = fromUser.Name;
+            DateOfBirth = fromUser.DateOfBirth;
+            JoinDate = fromUser.JoinDate;
+            Reputation = fromUser.Reputation;
+            NumberOfFollowers = fromUser.NumberOfFollowers;
+            IsPhoneConfirmed = fromUser.IsPhoneConfirmed;
+            IsEmailConfirmed = fromUser.IsEmailConfirmed;
+            SecurityStamp = fromUser.SecurityStamp;
+            LockoutDate = fromUser.LockoutDate;
+            AccessTries = fromUser.AccessTries;
         }
 
-        public bool ValidateUser()
+        public User(ThinnerUser fromUser)
         {
-            if (!ValidateAccount()) { return false; }
+            Id = fromUser.Id;
+            Name = fromUser.Name;
+        }
 
-            // Check Name is suitable
+        public User(ThinProfile fromUser)
+        {
+            Id = fromUser.Id;
+            Name = fromUser.Name;
+            Reputation = fromUser.Reputation;
+            NumberOfFollowers = fromUser.NumberOfFollowers;
+        }
 
-            // Verify DateOfBirth
+        public ThinUser ToThinUser()
+        {
+            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+                IsPhoneConfirmed, IsEmailConfirmed,
+                SecurityStamp, LockoutDate, AccessTries,
+                JoinDate, Reputation, NumberOfFollowers);
+        }
+
+        public ThinnerUser ToThinnerUser()
+        {
+            return new(Id, Name);
+        }
+
+        public ThinProfile ToThinProfile()
+        {
+            return new(Id, Name, Reputation, NumberOfFollowers);
+        }
+
+        public bool ValidateAndNormalise()
+        {
+            // Verify Phone Number
+            if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
+
+            // Verify Email
+            if (!ContentValidation.IsEmailValid(Email)) { return false; }
+
+            // Verify User age
+            if (DateOfBirth + TimeSpan.FromDays(365 * 18) > DateTimeOffset.UtcNow) { return false; }
+
+            // Normalise
+            Email = Email.ToLower();
+            PhoneNumber = normalisedPhoneNumber;
 
             return true;
         }
-    }
 
-
-    internal struct Reputation
-    {
-        public const ushort DefaultReputation = 300;
-
-        public ushort ReputationScore { get; set; }
-        public ReputationTier ReputationTier 
+        public void GenerateSecurityStamp()
         {
-            get
-            {
-                var tiers = Enum.GetValues<ReputationTier>().Reverse();
-
-                foreach (ReputationTier tier in tiers)
-                {
-                    if (ReputationScore >= (ushort)tier)
-                    {
-                        return tier;
-                    }
-                }
-
-                return ReputationTier.Poor;
-            }
+            SecurityStamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(20));
         }
 
-        public Reputation() { ReputationScore = DefaultReputation; }
+        public async Task<bool> IsFollowing(Guid userID)
+        {
+            // Set if null
+            Following ??= await AccountManager.Manager.GetFollowedUsersAsync(userID);
 
+			// Check if user is following target
+			if (Following.Find(x => x.Id == userID) != null)
+			{ return false; }
+
+            return true;
+		}
+
+        public async Task<bool> IsBlocking(Guid userID)
+        {
+            // Set if null
+            Blocking ??= await AccountManager.Manager.GetBlockedUsersAsync(userID);
+
+			// Check if user is following target
+			if (Blocking.Find(x => x.Id == userID) != null)
+			{ return false; }
+
+            return true;
+
+        }
     }
-
-
-    internal enum ReputationTier : ushort
-    {
-        Poor = 0,
-        Mediocre = 200,
-        Normal = 400,
-		Good = 600,
-        Great = 800,
-        Excellent = 900
-    }
-
-
 }

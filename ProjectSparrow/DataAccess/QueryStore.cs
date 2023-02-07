@@ -36,7 +36,7 @@ namespace DataAccess
             return entity;
         }
 
-        public bool CreateUser(string phoneNumber, string email, string name, DateTime dateOfBirth) 
+        public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth) 
         { 
             User toCreate = new User
             {
@@ -44,8 +44,9 @@ namespace DataAccess
                 Email = email,
                 Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTime.Now,
+                JoinDate = DateTimeOffset.UtcNow,
                 Reputation = 100,
+                NormalisedEmail = email,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
 
@@ -57,6 +58,7 @@ namespace DataAccess
         Func<Entity, EntityEntry> updateUser = u => _context.Users.Update((User)u);
         public bool UpdatePhoneNumber(Guid id, string newNumber) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.PhoneNumber = newNumber), updateUser); }
         public bool UpdateEmail(Guid id, string newEmail) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Email = newEmail), updateUser); }
+        public bool UpdateNormalisedEmail(Guid id, string normalisedEmail) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.NormalisedEmail = normalisedEmail), updateUser); }
         public bool UpdateName(Guid id, string newName) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Name = newName), updateUser); }
         public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsPhoneConfirmed = isConfirmed), updateUser); }
         public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsEmailConfirmed = isConfirmed), updateUser); }
@@ -111,6 +113,22 @@ namespace DataAccess
 			}
             return user;
 		}
+        private User GetUserByEmail(string email)
+        {
+			User user;
+			using (_context = new QueryContext())
+			{
+                try
+                {
+                    user = _context.Users.Where(u => u.NormalisedEmail.Equals(email)).Single();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidUserException("User not found.", ex);
+                }
+			}
+            return user;
+		}
         private int GetUserFollowerCount(Guid id)
         {
 			int numFollowers;
@@ -134,6 +152,16 @@ namespace DataAccess
         public ThinUser FindUser(string phoneNumber)
         {
             User user = GetUser(phoneNumber);
+            int numFollowers = GetUserFollowerCount(user.Id);
+            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
+                user.IsPhoneConfirmed, user.IsEmailConfirmed,
+                user.SecurityStamp, user.LockoutDate, user.AccessTries,
+                user.JoinDate, user.Reputation, numFollowers);
+        }
+
+        public ThinUser FindUserByEmail(string email)
+        {
+            User user = GetUserByEmail(email);
             int numFollowers = GetUserFollowerCount(user.Id);
             return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
                 user.IsPhoneConfirmed, user.IsEmailConfirmed,
