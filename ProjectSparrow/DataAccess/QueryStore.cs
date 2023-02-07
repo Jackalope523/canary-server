@@ -46,6 +46,7 @@ namespace DataAccess
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTimeOffset.UtcNow,
                 Reputation = 100,
+                NormalisedEmail = email,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
 
@@ -57,6 +58,7 @@ namespace DataAccess
         Func<Entity, EntityEntry> updateUser = u => _context.Users.Update((User)u);
         public bool UpdatePhoneNumber(Guid id, string newNumber) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.PhoneNumber = newNumber), updateUser); }
         public bool UpdateEmail(Guid id, string newEmail) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Email = newEmail), updateUser); }
+        public bool UpdateNormalisedEmail(Guid id, string normalisedEmail) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.NormalisedEmail = normalisedEmail), updateUser); }
         public bool UpdateName(Guid id, string newName) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Name = newName), updateUser); }
         public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsPhoneConfirmed = isConfirmed), updateUser); }
         public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsEmailConfirmed = isConfirmed), updateUser); }
@@ -118,7 +120,7 @@ namespace DataAccess
 			{
                 try
                 {
-                    user = _context.Users.Where(u => u.Email.Equals(email)).Single();
+                    user = _context.Users.Where(u => u.NormalisedEmail.Equals(email)).Single();
                 }
                 catch (Exception ex)
                 {

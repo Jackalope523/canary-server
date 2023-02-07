@@ -18,11 +18,12 @@ namespace Server.Boundaries
         public static IAccountDatabase AccountDatabaseAccess;
         ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
-		ThinUser FindUserByEmail(string email);
+		ThinUser FindUserByEmail(string normalisedEmail);
         bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
 		bool UpdateEmail(Guid id, string newEmail);
+		bool UpdateNormalisedEmail(Guid id, string normalisedEmail);
         bool UpdateName(Guid id, string newName);
 		bool UpdatePhoneConfirmation(Guid id, bool isConfirmed);
 		bool UpdateEmailConfirmation(Guid id, bool isConfirmed);

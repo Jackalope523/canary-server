@@ -11,6 +11,7 @@ namespace DataAccess.Entities
         public DateTimeOffset JoinDate { get; init; }  
         public int Reputation { get; set; }
 
+        public string NormalisedEmail { get; set; }
         public bool IsPhoneConfirmed { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public string SecurityStamp { get; set; }

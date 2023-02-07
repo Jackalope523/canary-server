@@ -94,10 +94,12 @@ namespace Server.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            bool success = accounts.CreateUser(newUser.PhoneNumber, newUser.Email,
+            bool success = accounts.CreateUser(newUser.PhoneNumber, email,
                 newUser.Name, newUser.DateOfBirth);
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
+
+            accounts.UpdateNormalisedEmail(newUser.Id, newUser.Email);
         }
 
         public async Task EditUserAsync(Guid userID,
@@ -125,7 +127,8 @@ namespace Server.Controls
 			if (!string.IsNullOrEmpty(email))
 			{
                 await ThrowIfEmailTaken(editUser.Email);
-                accounts.UpdateEmail(userID, editUser.Email);
+                accounts.UpdateEmail(userID, email);
+                accounts.UpdateNormalisedEmail(userID, editUser.Email);
 			}
 			if (!string.IsNullOrEmpty(name))
 			{
@@ -221,13 +224,13 @@ namespace Server.Controls
 			{ throw new InvalidUserException("Phone Number already registered."); }
 		}
 
-        private async Task ThrowIfEmailTaken(string email)
+        private async Task ThrowIfEmailTaken(string normalisedEmail)
         {
 			bool emailTaken = false;
 			try
 			{
                 // Throws an exception if there is no user
-                accounts.FindUserByEmail(email);
+                accounts.FindUserByEmail(normalisedEmail);
 				emailTaken = true;
 			}
 			catch { }
