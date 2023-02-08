@@ -27,10 +27,6 @@ namespace Server.Entities
 
         public List<ThinnerUser> Attendees { get; set; }
 
-        public IList<Participant> Participants => ImmutableList.CreateRange(participantLog.ActiveParticipants.ToList());
-
-        private readonly ParticipantLog participantLog;
-
         #endregion
 
         public Event() { }
@@ -78,29 +74,38 @@ namespace Server.Entities
         }
 
         public async Task<bool> IsVisibleTo(Guid userID)
+            => await IsVisibleTo(new User(userID));
+
+        public async Task<bool> IsVisibleTo(User user)
         {
 			// Check if user is blocked by event host
-			if (await Host.IsBlocking(userID))
+			if (await Host.IsBlocking(user))
 			{ return false; }
 
 			return true;
 		}
 
-        public async Task<bool> ModifiableBy(Guid userID)
+        public async Task<bool> IsModifiableBy(Guid userID)
+            => await IsModifiableBy(new User(userID));
+
+        public async Task<bool> IsModifiableBy(User user)
         {
 			// Check if user is event host
-			if (Host.Id == userID)
+			if (Host.Id == user.Id)
 			{ return true; }
 
 			return false;
         }
 
-        public async Task<bool> AttendedBy(Guid userID)
+        public async Task<bool> IsAttendedBy(Guid userID)
+            => await IsAttendedBy(new User(userID));
+
+        public async Task<bool> IsAttendedBy(User user)
         {
             Attendees ??= await EventManager.Manager.GetAttendeesInternalAsync(Id);
 
             // Check if user is on the guest list
-            return Attendees.Find(x => x.Id == userID) != null;
+            return Attendees.Find(x => x.Id == user.Id) != null;
 		}
     }
 }

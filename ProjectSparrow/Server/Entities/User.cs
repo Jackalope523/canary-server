@@ -89,9 +89,9 @@ namespace Server.Entities
             return new(Id, Name, Reputation, NumberOfFollowers);
         }
 
-        public void Sync()
+        public async Task Sync()
         {
-            CurrentEvent = new(EventManager.Manager.GetCurrentEventAsync(Id).Result);
+            CurrentEvent = new(await EventManager.Manager.GetCurrentEventAsync(Id));
         }
 
         public bool ValidateAndNormalise()
