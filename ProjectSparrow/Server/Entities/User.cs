@@ -28,7 +28,7 @@ namespace Server.Entities
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
 
-        public string CurrentEventID { get; set; }
+        public Event CurrentEvent { get; set; }        
 
         public List<ThinnerUser> Following { get; set; }
         public List<ThinnerUser> Blocking { get; set; }
@@ -87,6 +87,11 @@ namespace Server.Entities
         public ThinProfile ToThinProfile()
         {
             return new(Id, Name, Reputation, NumberOfFollowers);
+        }
+
+        public void Sync()
+        {
+            CurrentEvent = new(EventManager.Manager.GetCurrentEventAsync(Id).Result);
         }
 
         public bool ValidateAndNormalise()

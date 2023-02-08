@@ -79,7 +79,7 @@ namespace Server.Controls
 			var targetEvent = await GetEvent(eventID);
 
 			// Verify that user is event host
-			if (!await targetEvent.ModifiableBy(userID))
+			if (!await targetEvent.IsModifiableBy(userID))
 			{ throw new InvalidEventException("User is unable to edit event."); }
 
 			// Verify that event is still active
@@ -137,7 +137,7 @@ namespace Server.Controls
 			var targetEvent = await GetEvent(eventID);
 
 			// Check if the user is able to end the event
-			if (!await targetEvent.ModifiableBy(userID))
+			if (!await targetEvent.IsModifiableBy(userID))
 			{ throw new InvalidUserException("User does not have permissions to end event."); }
 
 			// Try to end to event
@@ -150,8 +150,28 @@ namespace Server.Controls
 		{
 			Event targetEvent = new(eventID);
 
-			if (!await targetEvent.AttendedBy(userID))
-			{ throw new InvalidUserException("User did not attend event."); }
+			// Check if user attended
+			if (!await targetEvent.IsAttendedBy(userID))
+			{
+				// Retrieve user's friends
+				var friends = accounts.GetFriends(userID);
+				List<ThinnerUser> friendAttendees = new();
+
+				// Check if any friends are attending
+				foreach (var friend in friends)
+				{
+					if (await targetEvent.IsAttendedBy(friend.Id))
+					{
+						friendAttendees.Add(friend);
+					}
+				}
+
+				// Check if user had friends that attended
+				if (friendAttendees.Count == 0)
+				{ throw new InvalidUserException("User did not attend event."); }
+
+				return friendAttendees;
+			}
 
 			return targetEvent.Attendees;
 		}
@@ -194,6 +214,11 @@ namespace Server.Controls
 			return events;
 		}
 
+		internal async Task<ThinEvent> GetCurrentEventAsync(Guid userID)
+		{
+			return events.FindAttendingEvent(userID);
+		}
+
 
 		private async Task ThrowIfUserAtEvent(Guid userID)
 		{
@@ -201,7 +226,7 @@ namespace Server.Controls
 			try
 			{
 				// Throws an exception if there is no event
-				events.FindAttendingEvent(userID);
+				await GetCurrentEventAsync(userID);
 				attendingEvent = true;
 			}
 			catch { }
