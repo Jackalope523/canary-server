@@ -52,25 +52,34 @@ namespace Server.Controls
         {
             var targetUser = await GetUser(targetID);
 
-            // Check if user is blocked
-            if (await targetUser.IsBlocking(userID))
+            // Check if users are friends
+            if (!await targetUser.IsFriendsWith(userID)) 
             { throw new InvalidUserException("User is unable to view target."); }
 
-            // Gather all user event data
-            var pastActivity = events.FindPastEvents(targetID);
-            var upcomingActivity = events.FindUpcomingEvents(targetID);
-            upcomingActivity.Add(events.FindAttendingEvent(targetID));
+            // Gather active and upcoming events
+            var upcomingActivity = await GetUserActivityInternalAsync(targetID);
 
             // Remove active and upcoming events if the user cannot view them
-            foreach (var @event in upcomingActivity)
-            {
-                User eventHost = new(@event.Host);
+            await EventManager.Manager.RemoveInaccessibleEventsAsync(userID, upcomingActivity);
 
-                if (await eventHost.IsBlocking(userID))
-                { upcomingActivity.Remove(@event); }
+            return upcomingActivity.ToList();
+        }
+
+        public async Task<Dictionary<ThinnerUser, List<ThinEvent>>> GetFriendActivityAsync(Guid userID)
+        {
+            var friends = accounts.GetFriends(userID);
+
+            Dictionary<ThinnerUser, List<ThinEvent>> friendEvents = new();
+
+            // Gather visible activity of each friend
+			foreach (var friend in friends)
+            {
+                var friendActivity = await GetUserActivityInternalAsync(friend.Id);
+                await EventManager.Manager.RemoveInaccessibleEventsAsync(userID, friendActivity);
+                friendEvents.Add(friend, friendActivity);
             }
 
-            return pastActivity.Concat(upcomingActivity).ToList();
+            return friendEvents;
         }
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
@@ -241,6 +250,15 @@ namespace Server.Controls
 
 			if (emailTaken)
 			{ throw new InvalidUserException("Email already registered."); }
+        }
+
+        private async Task<List<ThinEvent>> GetUserActivityInternalAsync(Guid userID)
+        {
+            // Gather all user event data
+            var upcomingActivity = events.FindUpcomingEvents(userID);
+            upcomingActivity.Add(events.FindAttendingEvent(userID));
+
+            return upcomingActivity.ToList();
         }
 	}
 }

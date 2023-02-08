@@ -31,7 +31,8 @@ namespace Server.Boundaries
 		bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate);
 		bool UpdateAccessTries(Guid id, int newAccessTries);
         bool UpdateReputation(Guid id, int newReputation);
-		
+
+		List<ThinnerUser> GetFriends(Guid id);
 		List<ThinnerUser> GetFollowedUsers(Guid id);
 		List<ThinnerUser> GetBlockedUsers(Guid id);
 
@@ -50,6 +51,7 @@ namespace Server.Boundaries
 		Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID);
 
 		Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID);
+		Task<Dictionary<ThinnerUser, List<ThinEvent>>> GetFriendActivityAsync(Guid userID);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
 		Task EditUserAsync(Guid userID,

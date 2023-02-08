@@ -35,6 +35,11 @@ namespace Server.Entities
 
         public User() { }
 
+        public User(Guid userID)
+        {
+            Id = userID;
+        }
+
         public User(ThinUser fromUser)
         {
             Id = fromUser.Id;
@@ -107,29 +112,46 @@ namespace Server.Entities
             SecurityStamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(20));
         }
 
+        public async Task<bool> IsFriendsWith(Guid userID)
+            => await IsFriendsWith(new User(userID));
+
+        public async Task<bool> IsFriendsWith(User otherUser)
+        {
+            // Check if both users are following eachother
+            if (await IsFollowing(otherUser) && await otherUser.IsFollowing(this))
+            { return true; }
+
+            return false;
+        }
+
         public async Task<bool> IsFollowing(Guid userID)
+            => await IsFollowing(new User(userID));
+		
+        public async Task<bool> IsFollowing(User otherUser)
         {
             // Set if null
-            Following ??= await AccountManager.Manager.GetFollowedUsersAsync(userID);
+            Following ??= await AccountManager.Manager.GetFollowedUsersAsync(otherUser.Id);
 
 			// Check if user is following target
-			if (Following.Find(x => x.Id == userID) != null)
+			if (Following.Find(x => x.Id == otherUser.Id) != null)
 			{ return false; }
 
             return true;
-		}
+        }
 
         public async Task<bool> IsBlocking(Guid userID)
+            => await IsBlocking(new User(userID));
+
+        public async Task<bool> IsBlocking(User otherUser)
         {
             // Set if null
-            Blocking ??= await AccountManager.Manager.GetBlockedUsersAsync(userID);
+            Blocking ??= await AccountManager.Manager.GetBlockedUsersAsync(otherUser.Id);
 
 			// Check if user is following target
-			if (Blocking.Find(x => x.Id == userID) != null)
+			if (Blocking.Find(x => x.Id == otherUser.Id) != null)
 			{ return false; }
 
             return true;
-
         }
     }
 }

@@ -83,6 +83,7 @@ namespace DataAccess
             }
             return users;
         }
+        public List<ThinnerUser> GetFriends(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
         public List<ThinnerUser> GetBlockedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Blocked); }
         public List<ThinnerUser> GetFollowedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
 

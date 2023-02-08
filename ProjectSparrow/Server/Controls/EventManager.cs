@@ -42,13 +42,7 @@ namespace Server.Controls
 			var nearbyEvents = events.FindEvents(latitude, longitude, distance);
 
 			// Remove events from list that the user cannot access
-			foreach (ThinnerEvent e in nearbyEvents)
-			{
-				Event targetEvent = new(e);
-
-				if (!await targetEvent.IsVisibleTo(userID))
-				{ nearbyEvents.Remove(e); }
-			}
+			await RemoveInaccessibleEventsAsync(userID, nearbyEvents);
 
 			return nearbyEvents;
 		}
@@ -174,6 +168,31 @@ namespace Server.Controls
 			return events.GetGuestList(eventID);
 		}
 
+		internal async Task<List<ThinEvent>> RemoveInaccessibleEventsAsync(Guid userID, List<ThinEvent> events)
+		{
+			foreach (ThinEvent e in events)
+			{
+				Event targetEvent = new(e);
+
+				if (!await targetEvent.IsVisibleTo(userID))
+				{ events.Remove(e); }
+			}
+
+			return events;
+		}
+
+		internal async Task<List<ThinnerEvent>> RemoveInaccessibleEventsAsync(Guid userID, List<ThinnerEvent> events)
+		{
+			foreach (ThinnerEvent e in events)
+			{
+				Event targetEvent = new(e);
+
+				if (!await targetEvent.IsVisibleTo(userID))
+				{ events.Remove(e); }
+			}
+
+			return events;
+		}
 
 
 		private async Task ThrowIfUserAtEvent(Guid userID)
