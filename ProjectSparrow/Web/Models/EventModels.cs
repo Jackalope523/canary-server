@@ -46,7 +46,7 @@ namespace Web.Models
     public class EventReportModel
     {
         [Required]
-        public EventReport ReportType { get; set; }
+        public EventReportType ReportType { get; set; }
 
         public string ReportDetails { get; set; }
     }

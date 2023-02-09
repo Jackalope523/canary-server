@@ -44,7 +44,7 @@ namespace Web.Models
 	public class AccountReportModel
 	{
 		[Required]
-		public UserReport ReportType { get; set; }
+		public UserReportType ReportType { get; set; }
 
 		public string ReportDetails { get; set; }
 	}

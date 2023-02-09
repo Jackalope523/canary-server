@@ -14,6 +14,8 @@ namespace Server.Boundaries
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
+	public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime, UserReportType ReportType, string ReportDetails);
+
 	public interface IAccountDatabase
 	{
         public static IAccountDatabase AccountDatabaseAccess;
@@ -42,7 +44,9 @@ namespace Server.Boundaries
 		bool BlockUser(Guid selfId, Guid targetId);
 		bool UnblockUser(Guid selfId, Guid targetId);
 
-		bool ReportUser(Guid selfId, Guid targetId, UserReport reportType, string reportDetails);
+		(List<UserReport>, List<EventReport>) GetReports(Guid id);
+		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
+		bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails);
 	}
 
 	public interface IAccountOperations
@@ -71,6 +75,6 @@ namespace Server.Boundaries
 		Task BlockUserAsync(Guid userID, Guid targetID);
 		Task UnblockUserAsync(Guid userID, Guid targetID);
 
-		Task ReportUserAsync(Guid userID, Guid targetID, UserReport reportType, string reportDetails);
+		Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails);
 	}
 }
