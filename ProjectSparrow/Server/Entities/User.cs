@@ -28,10 +28,22 @@ namespace Server.Entities
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
 
-        public Event CurrentEvent { get; set; }        
+        public UserAccountStatus AccountStatus { get; set; }
+        public bool CanAttend => AccountStatus == UserAccountStatus.active ||
+            AccountStatus == UserAccountStatus.active_no_host;
+        public bool CanAttendFriends => CanAttend ||
+            AccountStatus == UserAccountStatus.active_limited;
+		public bool CanHost => AccountStatus == UserAccountStatus.active;
+        public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
+
+        public Event CurrentEvent { get; set; }
+        public bool IsAtEvent => CurrentEvent != null;
 
         public List<ThinnerUser> Following { get; set; }
         public List<ThinnerUser> Blocking { get; set; }
+
+        public List<UserReport> Reports { get; set; }
+        public List<EventReport> EventReports { get; set; }
 
         public User() { }
 
@@ -75,7 +87,7 @@ namespace Server.Entities
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
-                SecurityStamp, LockoutDate, AccessTries,
+                SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation, NumberOfFollowers);
         }
 
@@ -89,9 +101,20 @@ namespace Server.Entities
             return new(Id, Name, Reputation, NumberOfFollowers);
         }
 
-        public async Task Sync()
+        public async Task SyncCurrentEvent()
         {
-            CurrentEvent = new(await EventManager.Manager.GetCurrentEventAsync(Id));
+            try
+            {
+                CurrentEvent = new(await EventManager.Manager.GetCurrentEventAsync(Id));
+            }
+            catch { }
+        }
+
+        public async Task SyncReports()
+        {
+            var reports = await AccountManager.Manager.GetAllReportsAsync(Id);
+            Reports = reports.UserReports;
+            EventReports = reports.EventReports;
         }
 
         public bool ValidateAndNormalise()
@@ -157,6 +180,36 @@ namespace Server.Entities
 			{ return false; }
 
             return true;
+        }
+
+        public async Task<UserAccountStatus> EventReported()
+        {
+            await SyncReports();
+
+			// Check if there are enough reports
+			if (EventReports.Count < 4)
+			{ return AccountStatus; }
+
+			return UserAccountStatus.active_no_host;
+        }
+
+        public async Task<UserAccountStatus> Reported()
+        {
+            await SyncReports();
+
+			// Check if there are enough reports
+			if (Reports.Count < 4)
+			{ return AccountStatus; }
+
+			// Check if there are enough reports
+			if (Reports.Count < 6)
+			{ return UserAccountStatus.active_limited; }
+            
+			// Check if there are enough reports
+			if (Reports.Count < 10)
+			{ return UserAccountStatus.inactive_under_review; }
+
+            return UserAccountStatus.blacklisted;
         }
     }
 }

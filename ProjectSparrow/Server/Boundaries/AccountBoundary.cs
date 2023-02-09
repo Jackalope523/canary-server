@@ -3,20 +3,27 @@ using System.Collections.Generic;
 using Server.Controls;
 using System.Threading.Tasks;
 using Server.Entities;
+using Shared;
 
 namespace Server.Boundaries
 {
+	public enum UserAccountStatus
+	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }
+
 	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
-		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries,
+		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
+	public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime,
+		UserReportType ReportType, string ReportDetails);
+
 	public interface IAccountDatabase
 	{
         public static IAccountDatabase AccountDatabaseAccess;
-        ThinUser FindUser(Guid id);
+		ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
 		ThinUser FindUserByEmail(string normalisedEmail);
         bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
@@ -30,7 +37,8 @@ namespace Server.Boundaries
 		bool UpdateSecurityStamp(Guid id, string newSecurityStamp);
 		bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate);
 		bool UpdateAccessTries(Guid id, int newAccessTries);
-        bool UpdateReputation(Guid id, int newReputation);
+		bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus);
+		bool UpdateReputation(Guid id, int newReputation);
 
 		List<ThinnerUser> GetFriends(Guid id);
 		List<ThinnerUser> GetFollowedUsers(Guid id);
@@ -40,6 +48,10 @@ namespace Server.Boundaries
 		bool UnfollowUser(Guid selfId, Guid targetId);
 		bool BlockUser(Guid selfId, Guid targetId);
 		bool UnblockUser(Guid selfId, Guid targetId);
+
+		(List<UserReport>, List<EventReport>) GetReports(Guid id);
+		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
+		bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails);
 	}
 
 	public interface IAccountOperations
@@ -67,5 +79,7 @@ namespace Server.Boundaries
 		Task UnfollowUserAsync(Guid userID, Guid targetID);
 		Task BlockUserAsync(Guid userID, Guid targetID);
 		Task UnblockUserAsync(Guid userID, Guid targetID);
+
+		Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails);
 	}
 }

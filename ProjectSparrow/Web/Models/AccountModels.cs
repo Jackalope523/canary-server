@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -40,4 +41,11 @@ namespace Web.Models
 		public string Name { get; set; }
 	}
 
+	public class AccountReportModel
+	{
+		[Required]
+		public UserReportType ReportType { get; set; }
+
+		public string ReportDetails { get; set; }
+	}
 }

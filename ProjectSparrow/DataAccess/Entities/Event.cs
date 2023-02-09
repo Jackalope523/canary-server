@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
+using Server.Boundaries;
 
 namespace DataAccess.Entities
 {
@@ -18,8 +19,18 @@ namespace DataAccess.Entities
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public DateTimeOffset? EndTime { get; set; }
-         
 
-        internal List<EventLink> Links { get; set; }       
+        internal List<EventLink> Links { get; set; }
+
+        public ThinEvent ToThinEvent()
+		{
+			return new(Id, Host.ToThinnerUser(), Name, Description, EventType,
+				StartTime, Location.Y, Location.X, EndTime,
+				IsEventOpen, GroupMinimum, GroupMaximum);
+		}
+        public ThinnerEvent ToThinnerEvent()
+		{
+			return new(Id, Host.ToThinnerUser(), EventType,Location.Y, Location.X);
+		}
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Threading.Tasks;
 using Server.Controls;
+using Shared;
 
 namespace Server.Boundaries
 {
@@ -10,6 +11,9 @@ namespace Server.Boundaries
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
+
+	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
+		EventReportType ReportType, string ReportDetails);
 
 	public interface IEventDatabase
 	{
@@ -32,6 +36,9 @@ namespace Server.Boundaries
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);
 
 		List<ThinnerUser> GetGuestList(Guid id);
+
+		List<EventReport> GetEventReports(Guid id);
+		bool ReportEvent(Guid userId, Guid eventId, EventReportType reportType, string reportDetails);
 	}
 
 	public interface IEventOperations
@@ -56,5 +63,7 @@ namespace Server.Boundaries
 		Task EndEventAsync(Guid userID, Guid eventID);
 
 		Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID);
+
+		Task ReportEventAsync(Guid userID, Guid eventID, EventReportType reportType, string reportDetails);
 	}
 }

@@ -37,7 +37,7 @@ namespace DataAccess
         }
 
         public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth) 
-        { 
+        {
             User toCreate = new User
             {
                 PhoneNumber = phoneNumber,
@@ -48,6 +48,7 @@ namespace DataAccess
                 Reputation = 100,
                 NormalisedEmail = email,
                 SecurityStamp = Guid.NewGuid().ToString(),
+                AccountStatus = UserAccountStatus.active,
             };
 
             return EntityOperation(toCreate, u => _context.Users.Add((User)u)); 
@@ -65,6 +66,7 @@ namespace DataAccess
         public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.SecurityStamp = newSecurityStamp), updateUser); }
         public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.LockoutDate = newLockoutDate), updateUser); }
         public bool UpdateAccessTries(Guid id, int newAccessTries) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.AccessTries = newAccessTries), updateUser); }
+        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.AccountStatus = accountStatus), updateUser); }
         public bool UpdateReputation(Guid id, int newReputation) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Reputation = newReputation), updateUser); }
 
         Func<Entity, EntityEntry> addUserLink = l => _context.UserLinks.Add((UserLink)l);
@@ -86,6 +88,10 @@ namespace DataAccess
         public List<ThinnerUser> GetFriends(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
         public List<ThinnerUser> GetBlockedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Blocked); }
         public List<ThinnerUser> GetFollowedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
+
+		public (List<UserReport>, List<EventReport>) GetReports(Guid id) { throw new NotImplementedException(); }
+		public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id) { throw new NotImplementedException(); }
+		public bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails) { throw new NotImplementedException(); }
 
         private User GetUser(Guid id)
         {
@@ -144,30 +150,21 @@ namespace DataAccess
         {
             User user = GetUser(id);
             int numFollowers = GetUserFollowerCount(id);
-            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
-                user.IsPhoneConfirmed, user.IsEmailConfirmed,
-                user.SecurityStamp, user.LockoutDate, user.AccessTries,
-                user.JoinDate, user.Reputation, numFollowers);
+            return user.ToThinUser() with { NumberOfFollowers = numFollowers };
         }
 
         public ThinUser FindUser(string phoneNumber)
         {
             User user = GetUser(phoneNumber);
             int numFollowers = GetUserFollowerCount(user.Id);
-            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
-                user.IsPhoneConfirmed, user.IsEmailConfirmed,
-                user.SecurityStamp, user.LockoutDate, user.AccessTries,
-                user.JoinDate, user.Reputation, numFollowers);
+			return user.ToThinUser() with { NumberOfFollowers = numFollowers };
         }
 
         public ThinUser FindUserByEmail(string email)
         {
             User user = GetUserByEmail(email);
             int numFollowers = GetUserFollowerCount(user.Id);
-            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
-                user.IsPhoneConfirmed, user.IsEmailConfirmed,
-                user.SecurityStamp, user.LockoutDate, user.AccessTries,
-                user.JoinDate, user.Reputation, numFollowers);
+			return user.ToThinUser() with { NumberOfFollowers = numFollowers };
         }
 
 
@@ -185,10 +182,7 @@ namespace DataAccess
 		public ThinEvent FindEvent(Guid id)
         {
             Event @event = GetEvent(id);
-            ThinnerUser host = new ThinnerUser(@event.Host.Id, @event.Host.Name); 
-            return new ThinEvent(@event.Id, host, @event.Name, @event.Description, @event.EventType,
-                @event.StartTime, @event.Location.X, @event.Location.Y, @event.EndTime,
-                @event.IsEventOpen, @event.GroupMinimum, @event.GroupMaximum);
+            return @event.ToThinEvent();
         }
 
         public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
@@ -258,11 +252,7 @@ namespace DataAccess
             EntityOperation(toCreate, e => _context.Events.Add((Event)e));
             AddUserToEvent(hostId, toCreate.Id);
 
-            ThinUser host = FindUser(hostId);
-            ThinnerUser thinHost = new(host.Id, host.Name);
-			return new ThinEvent(toCreate.Id, thinHost, toCreate.Name, toCreate.Description, toCreate.EventType,
-                toCreate.StartTime, toCreate.Location.X, toCreate.Location.Y, toCreate.EndTime,
-				toCreate.IsEventOpen, toCreate.GroupMinimum, toCreate.GroupMaximum);
+			return toCreate.ToThinEvent();
 		}
 
 		Func<Entity, EntityEntry> updateEvent = e => _context.Events.Update((Event)e);
@@ -287,8 +277,10 @@ namespace DataAccess
             return guests;
         }
 
+		public List<EventReport> GetEventReports(Guid id) { throw new NotImplementedException(); }
+		public bool ReportEvent(Guid selfId, Guid targetId, EventReportType reportType, string reportDetails) { throw new NotImplementedException(); }
 
-    }
+	}
 }
 
 

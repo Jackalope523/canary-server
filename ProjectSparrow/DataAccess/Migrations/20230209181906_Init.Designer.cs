@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(QueryContext))]
-    [Migration("20230207212841_Init")]
+    [Migration("20230209181906_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,13 +72,13 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"),
+                            Id = new Guid("b98dc4a7-66fd-41be-9ac1-70ef12875472"),
                             Description = "nothing interesting",
                             EndTime = new DateTimeOffset(new DateTime(800, 4, 3, 1, 37, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             EventType = "campfire,stories",
                             GroupMaximum = 0,
                             GroupMinimum = 0,
-                            HostId = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
+                            HostId = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
                             IsEventOpen = false,
                             Location = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (0 0)"),
                             Name = "The First Few",
@@ -86,13 +86,13 @@ namespace DataAccess.Migrations
                         },
                         new
                         {
-                            Id = new Guid("903aea86-698d-4f18-ba24-be6ee3d16566"),
+                            Id = new Guid("43a9001a-c220-42c0-8db2-78e448340ef7"),
                             Description = "still nothing interesting",
                             EndTime = new DateTimeOffset(new DateTime(800, 11, 4, 11, 3, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             EventType = "skiing,drinks,rager",
                             GroupMaximum = 0,
                             GroupMinimum = 0,
-                            HostId = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
+                            HostId = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
                             IsEventOpen = false,
                             Location = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (0 0)"),
                             Name = "Then There Were Two",
@@ -100,12 +100,12 @@ namespace DataAccess.Migrations
                         },
                         new
                         {
-                            Id = new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"),
+                            Id = new Guid("72b1c2e9-88ca-477a-869e-71eeb555d813"),
                             Description = "something interesting",
                             EventType = "chill,drinks",
                             GroupMaximum = 0,
                             GroupMinimum = 0,
-                            HostId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
+                            HostId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
                             IsEventOpen = false,
                             Location = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4237;POINT (23.4413325 -76.0092066)"),
                             Name = "Masquerade",
@@ -144,6 +144,10 @@ namespace DataAccess.Migrations
 
                     b.Property<int>("AccessTries")
                         .HasColumnType("int");
+
+                    b.Property<int>("AccountStatus")
+                        .HasColumnType("int")
+                        .HasColumnName("AccountStatus");
 
                     b.Property<DateTimeOffset>("DateOfBirth")
                         .HasColumnType("datetimeoffset");
@@ -190,8 +194,9 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
+                            Id = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
                             AccessTries = 0,
+                            AccountStatus = 0,
                             DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "",
                             IsEmailConfirmed = false,
@@ -201,12 +206,13 @@ namespace DataAccess.Migrations
                             NormalisedEmail = "",
                             PhoneNumber = "0",
                             Reputation = 0,
-                            SecurityStamp = "25370e4b-384f-41be-80f6-97e4abcdff52"
+                            SecurityStamp = "b6462001-08c7-43ef-bff8-824ef5819d95"
                         },
                         new
                         {
-                            Id = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
+                            Id = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
                             AccessTries = 0,
+                            AccountStatus = 0,
                             DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "",
                             IsEmailConfirmed = false,
@@ -216,12 +222,13 @@ namespace DataAccess.Migrations
                             NormalisedEmail = "",
                             PhoneNumber = "1",
                             Reputation = 0,
-                            SecurityStamp = "260e2456-8712-4c3f-b68c-7b5d483961e6"
+                            SecurityStamp = "675a78f2-5038-4c51-b9a9-f639e194d2de"
                         },
                         new
                         {
-                            Id = new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"),
+                            Id = new Guid("b4940b9e-bb9b-49dc-a9ee-458a3feb76f5"),
                             AccessTries = 0,
+                            AccountStatus = 0,
                             DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "",
                             IsEmailConfirmed = false,
@@ -231,7 +238,7 @@ namespace DataAccess.Migrations
                             NormalisedEmail = "",
                             PhoneNumber = "2",
                             Reputation = 0,
-                            SecurityStamp = "16c5a432-2da9-4380-82f4-4f30131fd200"
+                            SecurityStamp = "dc97fd04-ec68-41d0-80ad-20df7c858ea9"
                         });
                 });
 
@@ -254,58 +261,58 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("03b1d5fa-6d91-4fbd-b88d-5e4700030f0c"),
-                            SelfId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
-                            EventId = new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"),
+                            Id = new Guid("9989ae13-874e-42ca-b73a-493e9f624f21"),
+                            SelfId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
+                            EventId = new Guid("b98dc4a7-66fd-41be-9ac1-70ef12875472"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("56c3dad2-8a5b-4c2c-9472-86427844dad9"),
-                            SelfId = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
-                            EventId = new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"),
+                            Id = new Guid("a9d20a93-b0b1-4cca-9b73-9cca7c5c10a3"),
+                            SelfId = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
+                            EventId = new Guid("b98dc4a7-66fd-41be-9ac1-70ef12875472"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("19c141ab-3f37-427c-ba5b-e8fbc87e9cd2"),
-                            SelfId = new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"),
-                            EventId = new Guid("22ea9e48-6528-4e8e-94b5-6a340431a140"),
+                            Id = new Guid("7ac4cb6f-1d4a-4bea-aa4f-8e129bead1b5"),
+                            SelfId = new Guid("b4940b9e-bb9b-49dc-a9ee-458a3feb76f5"),
+                            EventId = new Guid("b98dc4a7-66fd-41be-9ac1-70ef12875472"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("6ba2518b-0352-4769-a453-5cec43bdaeb9"),
-                            SelfId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
-                            EventId = new Guid("903aea86-698d-4f18-ba24-be6ee3d16566"),
+                            Id = new Guid("bf256884-4360-4d3a-a669-7f964eaeadfb"),
+                            SelfId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
+                            EventId = new Guid("43a9001a-c220-42c0-8db2-78e448340ef7"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("b2862eb0-1407-4b2e-8410-d6f3854134b2"),
-                            SelfId = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
-                            EventId = new Guid("903aea86-698d-4f18-ba24-be6ee3d16566"),
+                            Id = new Guid("34621ad4-75cc-49bb-a046-4d93a8d42492"),
+                            SelfId = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
+                            EventId = new Guid("43a9001a-c220-42c0-8db2-78e448340ef7"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("7fbf2eb9-3e9e-4782-b1d8-101b315c9d19"),
-                            SelfId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
-                            EventId = new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"),
+                            Id = new Guid("e96c1719-6121-4877-9793-20ec046d8d28"),
+                            SelfId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
+                            EventId = new Guid("72b1c2e9-88ca-477a-869e-71eeb555d813"),
                             Type = 1
                         },
                         new
                         {
-                            Id = new Guid("6bb343da-74dc-4584-9ff9-e732cc457854"),
-                            SelfId = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
-                            EventId = new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"),
+                            Id = new Guid("c16f67ad-e638-40a7-9e60-3851276dddfd"),
+                            SelfId = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
+                            EventId = new Guid("72b1c2e9-88ca-477a-869e-71eeb555d813"),
                             Type = 1
                         },
                         new
                         {
-                            Id = new Guid("bdd00760-019b-42ca-b27b-4325fc001560"),
-                            SelfId = new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"),
-                            EventId = new Guid("540ec6e6-5342-4350-92ec-a94e684b5df3"),
+                            Id = new Guid("699ba422-0ad7-4439-96ff-db6f67d44ce1"),
+                            SelfId = new Guid("b4940b9e-bb9b-49dc-a9ee-458a3feb76f5"),
+                            EventId = new Guid("72b1c2e9-88ca-477a-869e-71eeb555d813"),
                             Type = 1
                         });
                 });
@@ -327,30 +334,30 @@ namespace DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5d1ed340-a6e7-41c3-9d61-1da12bb60ad2"),
-                            SelfId = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
-                            OtherId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
+                            Id = new Guid("b3c3f836-7640-4f59-803c-0ebaf212ba90"),
+                            SelfId = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
+                            OtherId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("298a9a8d-b2f2-4df6-a043-26a8c7f848d2"),
-                            SelfId = new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"),
-                            OtherId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
+                            Id = new Guid("8942bda0-aab2-4219-8e4f-dd0c5d3f8374"),
+                            SelfId = new Guid("b4940b9e-bb9b-49dc-a9ee-458a3feb76f5"),
+                            OtherId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("26863755-e02b-4d84-8678-89b3b86d2310"),
-                            SelfId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
-                            OtherId = new Guid("2fe22508-b1c7-4243-9070-926172684da2"),
+                            Id = new Guid("96e2a779-fd82-4018-9565-a3c2612be074"),
+                            SelfId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
+                            OtherId = new Guid("5df33e44-2e1a-4cb7-8296-bd098f6e32b9"),
                             Type = 0
                         },
                         new
                         {
-                            Id = new Guid("bad9512b-5f0a-4165-88bf-893c2ddc3118"),
-                            SelfId = new Guid("8b043af7-c35b-463e-a2eb-b9cb36d38426"),
-                            OtherId = new Guid("d6430eeb-a7cc-4ef9-a851-6cde9376b9bf"),
+                            Id = new Guid("a24b5b3e-0c7a-4d66-a839-ba66cdb0cbdf"),
+                            SelfId = new Guid("53c8a2cf-46dd-435c-a5dd-6130c2c3d408"),
+                            OtherId = new Guid("b4940b9e-bb9b-49dc-a9ee-458a3feb76f5"),
                             Type = 1
                         });
                 });

@@ -180,6 +180,28 @@ namespace Web.Controllers
 			return Ok();
 		}
 
+		[HttpPost("{eventID}/report")]
+		public async Task<IActionResult> ReportEvent(string eventID, [FromBody] EventReportModel report)
+		{
+			if (string.IsNullOrEmpty(eventID) || report == null || !ModelState.IsValid)
+			{
+				return BadRequest(EventError.MissingInformation.ToString());
+			}
+
+			try
+			{
+				var user = await GetCurrentUserAsync();
+				Guid eventGUID = GetGUID(eventID);
+				await events.ReportEventAsync(user.Id, eventGUID, report.ReportType, report.ReportDetails);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
 		private async Task<ThinUser> GetCurrentUserAsync()
 		{
 			return await userManager.GetUserAsync(HttpContext.User);

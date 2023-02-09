@@ -20,6 +20,11 @@ namespace DataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>()
+                .Property(u => u.AccountStatus)
+                .HasColumnName("AccountStatus");
+
+
             modelBuilder.Entity<Link>()
                 .HasDiscriminator<string>("link_type")
                 .HasValue<UserLink>("user")
@@ -51,6 +56,7 @@ namespace DataAccess
             modelBuilder.Entity<EventLink>()
                 .HasOne(a => a.Event)
                 .WithMany(b => b.Links);
+
 
             SeedData(modelBuilder);
         }
