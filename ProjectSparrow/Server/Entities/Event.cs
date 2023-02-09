@@ -27,9 +27,11 @@ namespace Server.Entities
 
         public List<ThinnerUser> Attendees { get; set; }
 
-        #endregion
+		public List<EventReport> EventReports { get; set; }
 
-        public Event() { }
+		#endregion
+
+		public Event() { }
 
         public Event(Guid eventID)
         {
@@ -73,7 +75,12 @@ namespace Server.Entities
             return new(Id, Host.ToThinnerUser(), EventType, Location.Latitude, Location.Longitude);
         }
 
-        public async Task<bool> IsVisibleTo(User user)
+		public async Task SyncReports()
+		{
+			EventReports = await EventManager.Manager.GetEventReportsAsync(Id);
+		}
+
+		public async Task<bool> IsVisibleTo(User user)
         {
             // Check if user account is locked
             if (user.IsLocked)
@@ -117,5 +124,16 @@ namespace Server.Entities
             // Check if user is on the guest list
             return Attendees.Find(x => x.Id == user.Id) != null;
 		}
+
+        public async Task<bool> Reported()
+        {
+            await SyncReports();
+
+            // Check if there are enough reports
+            if (EventReports.Count < 3)
+            { return false; }
+
+            return true;
+        }
     }
 }

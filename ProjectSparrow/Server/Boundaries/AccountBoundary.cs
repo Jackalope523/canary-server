@@ -8,7 +8,7 @@ using Shared;
 namespace Server.Boundaries
 {
 	public enum UserAccountStatus
-	{ active, active_no_host, active_limited, active_under_review, inactive_under_review, blacklisted }
+	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }
 
 	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
@@ -37,7 +37,8 @@ namespace Server.Boundaries
 		bool UpdateSecurityStamp(Guid id, string newSecurityStamp);
 		bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate);
 		bool UpdateAccessTries(Guid id, int newAccessTries);
-        bool UpdateReputation(Guid id, int newReputation);
+		bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus);
+		bool UpdateReputation(Guid id, int newReputation);
 
 		List<ThinnerUser> GetFriends(Guid id);
 		List<ThinnerUser> GetFollowedUsers(Guid id);

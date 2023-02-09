@@ -187,7 +187,25 @@ namespace Server.Controls
 
 		public async Task ReportEventAsync(Guid userID, Guid eventID, EventReportType reportType, string reportDetails)
 		{
+			var targetEvent = await GetEvent(eventID);
 			events.ReportEvent(userID, eventID, reportType, reportDetails);
+
+			// Check if action is to be taken
+			if (await targetEvent.Reported())
+			{
+				// Threshold hit, end event
+				await EndEventAsync(targetEvent.Host.Id, eventID);
+
+				// Compute host's standing
+				var user = await AccountManager.Manager.GetUser(targetEvent.Host.Id);
+				var status = await user.EventReported();
+
+				// Check if host should be punished
+				if (user.AccountStatus != status)
+				{
+					accounts.UpdateAccountStatus(user.Id, status);
+				}
+			}
 		}
 
 
@@ -231,6 +249,11 @@ namespace Server.Controls
 		internal async Task<ThinEvent> GetCurrentEventAsync(Guid userID)
 		{
 			return events.FindAttendingEvent(userID);
+		}
+
+		internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
+		{
+			return events.GetEventReports(eventID);
 		}
 
 

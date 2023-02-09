@@ -37,7 +37,7 @@ namespace DataAccess
         }
 
         public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth) 
-        { 
+        {
             User toCreate = new User
             {
                 PhoneNumber = phoneNumber,
@@ -48,6 +48,7 @@ namespace DataAccess
                 Reputation = 100,
                 NormalisedEmail = email,
                 SecurityStamp = Guid.NewGuid().ToString(),
+                AccountStatus = UserAccountStatus.active,
             };
 
             return EntityOperation(toCreate, u => _context.Users.Add((User)u)); 
@@ -65,6 +66,7 @@ namespace DataAccess
         public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.SecurityStamp = newSecurityStamp), updateUser); }
         public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.LockoutDate = newLockoutDate), updateUser); }
         public bool UpdateAccessTries(Guid id, int newAccessTries) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.AccessTries = newAccessTries), updateUser); }
+        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.AccountStatus = accountStatus), updateUser); }
         public bool UpdateReputation(Guid id, int newReputation) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Reputation = newReputation), updateUser); }
 
         Func<Entity, EntityEntry> addUserLink = l => _context.UserLinks.Add((UserLink)l);

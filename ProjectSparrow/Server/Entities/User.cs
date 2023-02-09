@@ -30,12 +30,10 @@ namespace Server.Entities
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.active ||
-            AccountStatus == UserAccountStatus.active_no_host ||
-            AccountStatus == UserAccountStatus.active_under_review;
+            AccountStatus == UserAccountStatus.active_no_host;
         public bool CanAttendFriends => CanAttend ||
             AccountStatus == UserAccountStatus.active_limited;
-		public bool CanHost => AccountStatus == UserAccountStatus.active ||
-            AccountStatus == UserAccountStatus.active_under_review;
+		public bool CanHost => AccountStatus == UserAccountStatus.active;
         public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
 
         public Event CurrentEvent { get; set; }
@@ -182,6 +180,36 @@ namespace Server.Entities
 			{ return false; }
 
             return true;
+        }
+
+        public async Task<UserAccountStatus> EventReported()
+        {
+            await SyncReports();
+
+			// Check if there are enough reports
+			if (EventReports.Count < 4)
+			{ return AccountStatus; }
+
+			return UserAccountStatus.active_no_host;
+        }
+
+        public async Task<UserAccountStatus> Reported()
+        {
+            await SyncReports();
+
+			// Check if there are enough reports
+			if (Reports.Count < 4)
+			{ return AccountStatus; }
+
+			// Check if there are enough reports
+			if (Reports.Count < 6)
+			{ return UserAccountStatus.active_limited; }
+            
+			// Check if there are enough reports
+			if (Reports.Count < 10)
+			{ return UserAccountStatus.inactive_under_review; }
+
+            return UserAccountStatus.blacklisted;
         }
     }
 }

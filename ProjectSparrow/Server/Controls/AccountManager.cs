@@ -215,7 +215,17 @@ namespace Server.Controls
         public async Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails)
         {
             accounts.ReportUser(userID, targetID, reportType, reportDetails);
-        }
+
+			// Compute user's standing
+			var user = await GetUser(targetID);
+			var status = await user.Reported();
+
+			// Check if host should be punished
+			if (user.AccountStatus != status)
+			{
+				accounts.UpdateAccountStatus(user.Id, status);
+			}
+		}
 
 
 
