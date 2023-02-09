@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Threading.Tasks;
 using Server.Controls;
+using Shared;
 
 namespace Server.Boundaries
 {
@@ -32,6 +33,8 @@ namespace Server.Boundaries
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);
 
 		List<ThinnerUser> GetGuestList(Guid id);
+
+		bool ReportEvent(Guid userId, Guid eventId, EventReport reportType, string reportDetails);
 	}
 
 	public interface IEventOperations
@@ -56,5 +59,7 @@ namespace Server.Boundaries
 		Task EndEventAsync(Guid userID, Guid eventID);
 
 		Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID);
+
+		Task ReportEventAsync(Guid userID, Guid eventID, EventReport reportType, string reportDetails);
 	}
 }

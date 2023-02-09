@@ -208,6 +208,11 @@ namespace Server.Controls
             accounts.UnblockUser(userID, targetID);
 		}
 
+        public async Task ReportUserAsync(Guid userID, Guid targetID, UserReport reportType, string reportDetails)
+        {
+            accounts.ReportUser(userID, targetID, reportType, reportDetails);
+        }
+
 
 
         internal async Task<User> GetUser(Guid userID)

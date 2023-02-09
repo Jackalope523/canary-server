@@ -176,6 +176,11 @@ namespace Server.Controls
 			return targetEvent.Attendees;
 		}
 
+		public async Task ReportEventAsync(Guid userID, Guid eventID, EventReport reportType, string reportDetails)
+		{
+			events.ReportEvent(userID, eventID, reportType, reportDetails);
+		}
+
 
 
 		internal async Task<Event> GetEvent(Guid eventID)

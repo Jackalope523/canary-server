@@ -239,6 +239,28 @@ namespace Web.Controllers
 			return Ok();
 		}
 
+		[HttpPost("{targetIdentification}/report")]
+		public async Task<IActionResult> ReportUser(string targetID, [FromBody] AccountReportModel report)
+		{
+			if (string.IsNullOrEmpty(targetID) || report == null || !ModelState.IsValid)
+			{
+				return BadRequest(ProfileError.MissingInformation.ToString());
+			}
+
+			try
+			{
+				var user = await GetCurrentUserAsync();
+				Guid targetGUID = GetGUID(targetID);
+				await accounts.ReportUserAsync(user.Id, targetGUID, report.ReportType, report.ReportDetails);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
 		private async Task<ThinUser> GetCurrentUserAsync()
 		{
 			return await userManager.GetUserAsync(HttpContext.User);

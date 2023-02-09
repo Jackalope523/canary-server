@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Server.Boundaries;
+using Shared;
 
 namespace Web.Models
 {
@@ -42,4 +43,11 @@ namespace Web.Models
         public bool? EventIsOpen { get; set; }
     }
 
+    public class EventReportModel
+    {
+        [Required]
+        public EventReport ReportType { get; set; }
+
+        public string ReportDetails { get; set; }
+    }
 }

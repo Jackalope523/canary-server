@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Server.Controls;
 using System.Threading.Tasks;
 using Server.Entities;
+using Shared;
 
 namespace Server.Boundaries
 {
@@ -40,6 +41,8 @@ namespace Server.Boundaries
 		bool UnfollowUser(Guid selfId, Guid targetId);
 		bool BlockUser(Guid selfId, Guid targetId);
 		bool UnblockUser(Guid selfId, Guid targetId);
+
+		bool ReportUser(Guid selfId, Guid targetId, UserReport reportType, string reportDetails);
 	}
 
 	public interface IAccountOperations
@@ -67,5 +70,7 @@ namespace Server.Boundaries
 		Task UnfollowUserAsync(Guid userID, Guid targetID);
 		Task BlockUserAsync(Guid userID, Guid targetID);
 		Task UnblockUserAsync(Guid userID, Guid targetID);
+
+		Task ReportUserAsync(Guid userID, Guid targetID, UserReport reportType, string reportDetails);
 	}
 }

@@ -87,6 +87,8 @@ namespace DataAccess
         public List<ThinnerUser> GetBlockedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Blocked); }
         public List<ThinnerUser> GetFollowedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
 
+        public bool ReportUser(Guid selfId, Guid targetId, UserReport reportType, string reportDetails) { throw new NotImplementedException(); }
+
         private User GetUser(Guid id)
         {
 			User user;
@@ -287,8 +289,9 @@ namespace DataAccess
             return guests;
         }
 
+		public bool ReportEvent(Guid selfId, Guid targetId, EventReport reportType, string reportDetails) { throw new NotImplementedException(); }
 
-    }
+	}
 }
 
 
