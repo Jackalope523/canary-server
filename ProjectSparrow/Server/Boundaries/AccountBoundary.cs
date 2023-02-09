@@ -8,7 +8,7 @@ using Shared;
 namespace Server.Boundaries
 {
 	public enum UserAccountStatus
-	{ active, active_no_host, active_under_review, inactive_under_review, blacklisted }
+	{ active, active_no_host, active_limited, active_under_review, inactive_under_review, blacklisted }
 
 	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,

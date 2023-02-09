@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Shared;
 using Microsoft.Extensions.Logging;
+using PhoneNumbers;
 
 namespace Server.Controls
 {
@@ -39,10 +40,11 @@ namespace Server.Controls
 
         public async Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID)
         {
+            var user = await GetUser(userID);
             var targetUser = await GetUser(targetID);
 
             // Check if user is blocked
-            if (await targetUser.IsBlocking(userID))
+            if (await targetUser.IsBlocking(user))
             { throw new InvalidUserException("User is unable to view target."); }
 
             return targetUser.ToThinProfile();
@@ -50,23 +52,25 @@ namespace Server.Controls
 
         public async Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID)
         {
+            var user = await GetUser(userID);
             var targetUser = await GetUser(targetID);
 
             // Check if users are friends
-            if (!await targetUser.IsFriendsWith(userID)) 
+            if (!await targetUser.IsFriendsWith(user)) 
             { throw new InvalidUserException("User is unable to view target."); }
 
             // Gather active and upcoming events
             var upcomingActivity = await GetUserActivityInternalAsync(targetID);
 
             // Remove active and upcoming events if the user cannot view them
-            await EventManager.Manager.RemoveInaccessibleEventsAsync(userID, upcomingActivity);
+            await EventManager.Manager.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
             return upcomingActivity.ToList();
         }
 
         public async Task<Dictionary<ThinnerUser, List<ThinEvent>>> GetFriendActivityAsync(Guid userID)
         {
+            var user = await GetUser(userID);
             var friends = accounts.GetFriends(userID);
 
             Dictionary<ThinnerUser, List<ThinEvent>> friendEvents = new();
@@ -75,7 +79,7 @@ namespace Server.Controls
 			foreach (var friend in friends)
             {
                 var friendActivity = await GetUserActivityInternalAsync(friend.Id);
-                await EventManager.Manager.RemoveInaccessibleEventsAsync(userID, friendActivity);
+                await EventManager.Manager.RemoveInaccessibleEventsAsync(user, friendActivity);
                 friendEvents.Add(friend, friendActivity);
             }
 
@@ -120,7 +124,7 @@ namespace Server.Controls
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
         {
-            // Throws if user not found
+            // Throws if user not found or locked
             User editUser = await GetUser(userID);
             
             editUser.PhoneNumber = phoneNumber;
@@ -217,12 +221,24 @@ namespace Server.Controls
 
         internal async Task<User> GetUser(Guid userID)
         {
-            return new(accounts.FindUser(userID));
-        }
+			User user = new(accounts.FindUser(userID));
+
+			// Check if user account is locked
+			if (user.IsLocked)
+			{ throw new InvalidUserException("User account is locked."); }
+
+			return user;
+		}
 
         internal async Task<User> GetUser(string phoneNumber)
         {
-            return new(accounts.FindUser(phoneNumber));
+            User user = new(accounts.FindUser(phoneNumber));
+
+            // Check if user account is locked
+            if (user.IsLocked)
+            { throw new InvalidUserException("User account is locked."); }
+
+            return user;
         }
 
         internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)> GetAllReportsAsync(Guid userID)

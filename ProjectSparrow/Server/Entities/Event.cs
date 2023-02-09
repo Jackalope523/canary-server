@@ -73,11 +73,21 @@ namespace Server.Entities
             return new(Id, Host.ToThinnerUser(), EventType, Location.Latitude, Location.Longitude);
         }
 
-        public async Task<bool> IsVisibleTo(Guid userID)
-            => await IsVisibleTo(new User(userID));
-
         public async Task<bool> IsVisibleTo(User user)
         {
+            // Check if user account is locked
+            if (user.IsLocked)
+            { return false; }
+
+			// Check if user's account is limited
+			if (!user.CanAttend)
+			{
+				// User cannot join normal events
+                // Check if user can join friend events and Host is friends with the user
+				if (!user.CanAttendFriends || !await Host.IsFriendsWith(user))
+				{ return false; }
+			}
+
 			// Check if user is blocked by event host
 			if (await Host.IsBlocking(user))
 			{ return false; }

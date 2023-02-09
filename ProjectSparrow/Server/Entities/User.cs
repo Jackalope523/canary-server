@@ -32,11 +32,14 @@ namespace Server.Entities
         public bool CanAttend => AccountStatus == UserAccountStatus.active ||
             AccountStatus == UserAccountStatus.active_no_host ||
             AccountStatus == UserAccountStatus.active_under_review;
+        public bool CanAttendFriends => CanAttend ||
+            AccountStatus == UserAccountStatus.active_limited;
 		public bool CanHost => AccountStatus == UserAccountStatus.active ||
             AccountStatus == UserAccountStatus.active_under_review;
         public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
 
-        public Event CurrentEvent { get; set; }        
+        public Event CurrentEvent { get; set; }
+        public bool IsAtEvent => CurrentEvent != null;
 
         public List<ThinnerUser> Following { get; set; }
         public List<ThinnerUser> Blocking { get; set; }
@@ -102,7 +105,11 @@ namespace Server.Entities
 
         public async Task SyncCurrentEvent()
         {
-            CurrentEvent = new(await EventManager.Manager.GetCurrentEventAsync(Id));
+            try
+            {
+                CurrentEvent = new(await EventManager.Manager.GetCurrentEventAsync(Id));
+            }
+            catch { }
         }
 
         public async Task SyncReports()

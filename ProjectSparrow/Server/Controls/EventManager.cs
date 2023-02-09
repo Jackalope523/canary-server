@@ -27,10 +27,11 @@ namespace Server.Controls
 
 		public async Task<ThinEvent> GetEventInformationAsync(Guid userID, Guid eventID)
         {
+			var user = await AccountManager.Manager.GetUser(userID);
 			var targetEvent = await GetEvent(eventID);
 
 			// Check if user is allowed to view event
-			if (!await targetEvent.IsVisibleTo(userID))
+			if (!await targetEvent.IsVisibleTo(user))
 			{ throw new InvalidEventException("User is unable to view event."); }
 
 			return targetEvent.ToThinEvent();
@@ -39,10 +40,11 @@ namespace Server.Controls
 		public async Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance)
 		{
+			var user = await AccountManager.Manager.GetUser(userID);
 			var nearbyEvents = events.FindEvents(latitude, longitude, distance);
 
 			// Remove events from list that the user cannot access
-			await RemoveInaccessibleEventsAsync(userID, nearbyEvents);
+			await RemoveInaccessibleEventsAsync(user, nearbyEvents);
 
 			return nearbyEvents;
 		}
@@ -62,7 +64,13 @@ namespace Server.Controls
 			DateTimeOffset startTime, double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum)
 		{
+			// Check if user is already at an event
 			await ThrowIfUserAtEvent(userID);
+			var user = await AccountManager.Manager.GetUser(userID);
+			
+			// Check if user can host
+			if (!user.CanHost)
+			{ throw new InvalidUserException("User cannot host."); }
 
 			// TODO Validate event
 			// Try to create an event
@@ -104,12 +112,13 @@ namespace Server.Controls
 
 		public async Task JoinEventAsync(Guid userID, Guid eventID)
 		{
+			var user = await AccountManager.Manager.GetUser(userID);
 			await ThrowIfUserAtEvent(userID);
 
 			var targetEvent = await GetEvent(eventID);
 
 			// Check if user is allowed to view event
-			if (!await targetEvent.IsVisibleTo(userID))
+			if (!await targetEvent.IsVisibleTo(user))
 			{ throw new InvalidEventException("User is unable to view event."); }
 
 			// Check if event is open
@@ -193,26 +202,26 @@ namespace Server.Controls
 			return events.GetGuestList(eventID);
 		}
 
-		internal async Task<List<ThinEvent>> RemoveInaccessibleEventsAsync(Guid userID, List<ThinEvent> events)
+		internal async Task<List<ThinEvent>> RemoveInaccessibleEventsAsync(User user, List<ThinEvent> events)
 		{
 			foreach (ThinEvent e in events)
 			{
 				Event targetEvent = new(e);
 
-				if (!await targetEvent.IsVisibleTo(userID))
+				if (!await targetEvent.IsVisibleTo(user))
 				{ events.Remove(e); }
 			}
 
 			return events;
 		}
 
-		internal async Task<List<ThinnerEvent>> RemoveInaccessibleEventsAsync(Guid userID, List<ThinnerEvent> events)
+		internal async Task<List<ThinnerEvent>> RemoveInaccessibleEventsAsync(User user, List<ThinnerEvent> events)
 		{
 			foreach (ThinnerEvent e in events)
 			{
 				Event targetEvent = new(e);
 
-				if (!await targetEvent.IsVisibleTo(userID))
+				if (!await targetEvent.IsVisibleTo(user))
 				{ events.Remove(e); }
 			}
 
@@ -227,16 +236,10 @@ namespace Server.Controls
 
 		private async Task ThrowIfUserAtEvent(Guid userID)
 		{
-			bool attendingEvent = false;
-			try
-			{
-				// Throws an exception if there is no event
-				await GetCurrentEventAsync(userID);
-				attendingEvent = true;
-			}
-			catch { }
+			User user = new(userID);
+			await user.SyncCurrentEvent();
 
-			if (attendingEvent)
+			if (user.IsAtEvent)
 			{ throw new InvalidUserException("User is currently attending an event."); }
 		}
 	}
