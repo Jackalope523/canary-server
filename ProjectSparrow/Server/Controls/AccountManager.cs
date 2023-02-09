@@ -225,6 +225,11 @@ namespace Server.Controls
             return new(accounts.FindUser(phoneNumber));
         }
 
+        internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)> GetAllReportsAsync(Guid userID)
+        {
+            return accounts.GetReports(userID);
+        }
+
 
 
         private async Task ThrowIfPhoneNumberTaken(string phoneNumber)

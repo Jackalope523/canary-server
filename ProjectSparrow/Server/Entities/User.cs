@@ -28,10 +28,21 @@ namespace Server.Entities
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
 
+        public UserAccountStatus AccountStatus { get; set; }
+        public bool CanAttend => AccountStatus == UserAccountStatus.active ||
+            AccountStatus == UserAccountStatus.active_no_host ||
+            AccountStatus == UserAccountStatus.active_under_review;
+		public bool CanHost => AccountStatus == UserAccountStatus.active ||
+            AccountStatus == UserAccountStatus.active_under_review;
+        public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
+
         public Event CurrentEvent { get; set; }        
 
         public List<ThinnerUser> Following { get; set; }
         public List<ThinnerUser> Blocking { get; set; }
+
+        public List<UserReport> Reports { get; set; }
+        public List<EventReport> EventReports { get; set; }
 
         public User() { }
 
@@ -75,7 +86,7 @@ namespace Server.Entities
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
-                SecurityStamp, LockoutDate, AccessTries,
+                SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation, NumberOfFollowers);
         }
 
@@ -89,9 +100,16 @@ namespace Server.Entities
             return new(Id, Name, Reputation, NumberOfFollowers);
         }
 
-        public async Task Sync()
+        public async Task SyncCurrentEvent()
         {
             CurrentEvent = new(await EventManager.Manager.GetCurrentEventAsync(Id));
+        }
+
+        public async Task SyncReports()
+        {
+            var reports = await AccountManager.Manager.GetAllReportsAsync(Id);
+            Reports = reports.UserReports;
+            EventReports = reports.EventReports;
         }
 
         public bool ValidateAndNormalise()

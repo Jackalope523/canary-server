@@ -148,30 +148,21 @@ namespace DataAccess
         {
             User user = GetUser(id);
             int numFollowers = GetUserFollowerCount(id);
-            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
-                user.IsPhoneConfirmed, user.IsEmailConfirmed,
-                user.SecurityStamp, user.LockoutDate, user.AccessTries,
-                user.JoinDate, user.Reputation, numFollowers);
+            return user.ToThinUser() with { NumberOfFollowers = numFollowers };
         }
 
         public ThinUser FindUser(string phoneNumber)
         {
             User user = GetUser(phoneNumber);
             int numFollowers = GetUserFollowerCount(user.Id);
-            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
-                user.IsPhoneConfirmed, user.IsEmailConfirmed,
-                user.SecurityStamp, user.LockoutDate, user.AccessTries,
-                user.JoinDate, user.Reputation, numFollowers);
+			return user.ToThinUser() with { NumberOfFollowers = numFollowers };
         }
 
         public ThinUser FindUserByEmail(string email)
         {
             User user = GetUserByEmail(email);
             int numFollowers = GetUserFollowerCount(user.Id);
-            return new ThinUser(user.Id, user.PhoneNumber, user.Email, user.Name, user.DateOfBirth,
-                user.IsPhoneConfirmed, user.IsEmailConfirmed,
-                user.SecurityStamp, user.LockoutDate, user.AccessTries,
-                user.JoinDate, user.Reputation, numFollowers);
+			return user.ToThinUser() with { NumberOfFollowers = numFollowers };
         }
 
 
@@ -189,10 +180,7 @@ namespace DataAccess
 		public ThinEvent FindEvent(Guid id)
         {
             Event @event = GetEvent(id);
-            ThinnerUser host = new ThinnerUser(@event.Host.Id, @event.Host.Name); 
-            return new ThinEvent(@event.Id, host, @event.Name, @event.Description, @event.EventType,
-                @event.StartTime, @event.Location.X, @event.Location.Y, @event.EndTime,
-                @event.IsEventOpen, @event.GroupMinimum, @event.GroupMaximum);
+            return @event.ToThinEvent();
         }
 
         public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
@@ -262,11 +250,7 @@ namespace DataAccess
             EntityOperation(toCreate, e => _context.Events.Add((Event)e));
             AddUserToEvent(hostId, toCreate.Id);
 
-            ThinUser host = FindUser(hostId);
-            ThinnerUser thinHost = new(host.Id, host.Name);
-			return new ThinEvent(toCreate.Id, thinHost, toCreate.Name, toCreate.Description, toCreate.EventType,
-                toCreate.StartTime, toCreate.Location.X, toCreate.Location.Y, toCreate.EndTime,
-				toCreate.IsEventOpen, toCreate.GroupMinimum, toCreate.GroupMaximum);
+			return toCreate.ToThinEvent();
 		}
 
 		Func<Entity, EntityEntry> updateEvent = e => _context.Events.Update((Event)e);

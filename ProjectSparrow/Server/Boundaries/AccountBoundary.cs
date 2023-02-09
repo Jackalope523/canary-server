@@ -7,19 +7,23 @@ using Shared;
 
 namespace Server.Boundaries
 {
+	public enum UserAccountStatus
+	{ active, active_no_host, active_under_review, inactive_under_review, blacklisted }
+
 	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
-		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries,
+		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
-	public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime, UserReportType ReportType, string ReportDetails);
+	public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime,
+		UserReportType ReportType, string ReportDetails);
 
 	public interface IAccountDatabase
 	{
         public static IAccountDatabase AccountDatabaseAccess;
-        ThinUser FindUser(Guid id);
+		ThinUser FindUser(Guid id);
         ThinUser FindUser(string phoneNumber);
 		ThinUser FindUserByEmail(string normalisedEmail);
         bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);

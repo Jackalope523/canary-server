@@ -12,7 +12,8 @@ namespace Server.Boundaries
 		bool IsOpen, int GroupMinimum, int GroupMaximum);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
 
-	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, DateTimeOffset ReportTime, EventReportType ReportType, string ReportDetails);
+	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
+		EventReportType ReportType, string ReportDetails);
 
 	public interface IEventDatabase
 	{
