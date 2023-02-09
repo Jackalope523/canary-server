@@ -94,6 +94,25 @@ namespace Web.Controllers
 			return Ok(activity);
 		}
 
+		[HttpGet("activity")]
+		public async Task<IActionResult> GetFriendActivity()
+		{
+			Dictionary<ThinnerUser, List<ThinEvent>> activity;
+
+			try
+			{
+				// Retrieve activity
+				var user = await GetCurrentUserAsync();
+				activity = await accounts.GetFriendActivityAsync(user.Id);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok(activity);
+		}
+
 		[HttpGet("following")]
         public async Task<IActionResult> GetFollowed()
         {
