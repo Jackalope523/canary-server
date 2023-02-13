@@ -15,4 +15,9 @@ namespace Shared
         Everything = 0xFFFF
     }
 
+    public enum UserRating
+    {
+        Positive, Negative
+    }
+
 }
