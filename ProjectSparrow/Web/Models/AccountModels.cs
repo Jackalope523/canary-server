@@ -51,6 +51,7 @@ namespace Web.Models
 
 	public class AccountRatingModel
 	{
+		[Required]
 		public UserRating Rating { get; set; }
 	}
 }
