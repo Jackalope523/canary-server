@@ -25,7 +25,7 @@ export default function VerifyScreen({navigation}: VerifyProps): JSX.Element {
         keyboardType='number-pad'
         maxLength={6}
         style={style.inputField}/>
-      <Button title={"Verify"} onPress={() => navigation.navigate('Register')} />
+      <Button title={"Verify"} onPress={() => navigation.replace('Landing')} />
       <View style={style.footer} />
     </SafeAreaView>
   );
