@@ -9,7 +9,7 @@ namespace DataAccess.Entities
 
         public string Name { get; set; }
         public string Description { get; set; }
-        public string EventType { get; set; }
+        public string Type { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public Guid HostId {  get; set; }
         internal User Host { get; set; }
@@ -24,13 +24,13 @@ namespace DataAccess.Entities
 
         public ThinEvent ToThinEvent()
 		{
-			return new(Id, Host.ToThinnerUser(), Name, Description, EventType,
+			return new(Id, Host.ToThinnerUser(), Name, Description, Type,
 				StartTime, Location.Y, Location.X, EndTime,
 				IsEventOpen, GroupMinimum, GroupMaximum);
 		}
         public ThinnerEvent ToThinnerEvent()
 		{
-			return new(Id, Host.ToThinnerUser(), EventType,Location.Y, Location.X);
+			return new(Id, Host.ToThinnerUser(), Type,Location.Y, Location.X);
 		}
     }
 }

@@ -1,18 +1,12 @@
-﻿using Server.Boundaries;
-using DataAccess.Entities;
+﻿using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NetTopologySuite.Geometries;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Server.Boundaries;
 using Shared;
-using System.Security.Cryptography;
-using Server.Entities;
-using PhoneNumbers;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DataAccess
-{ 
+{
     public class QueryStore : IAccountDatabase, IEventDatabase
     {
         public static IAccountDatabase AccountDatabaseAccess => new QueryStore();
@@ -57,43 +51,43 @@ namespace DataAccess
         }
         public bool DeleteUser(Guid Id) { return DatabaseOperation(new User { Id = Id }, u => _context.Users.Remove((User)u)); }
 
-        private static bool UpdateUserProperty(Guid id, string propertyName, Object newProperty)
+        private static bool updateUserProperty(Guid id, string propertyName, Object newProperty)
         {
             User u = new User { Id = id };
 
             switch (propertyName)
             {
-                case "PhoneNumber":
+                case nameof(u.PhoneNumber):
                     u.PhoneNumber = (string)newProperty;
                     break;
-                case "Email":
+                case nameof(u.Email):
                     u.Email = (string)newProperty;
                     break;
-                case "NormalisedEmail":
+                case nameof(u.NormalisedEmail):
                     u.NormalisedEmail = (string)newProperty;
                     break;
-                case "Name":
+                case nameof(u.Name):
                     u.Name = (string)newProperty;
                     break;
-                case "IsPhoneConfirmed":
+                case nameof(u.IsPhoneConfirmed):
                     u.IsPhoneConfirmed = (bool)newProperty;
                     break;
-                case "IsEmailConfirmed":
+                case nameof(u.IsEmailConfirmed):
                     u.IsEmailConfirmed = (bool)newProperty;
                     break;
-                case "SecurityStamp":
+                case nameof(u.SecurityStamp):
                     u.SecurityStamp = (string)newProperty;
                     break;
-                case "LockoutDate":
+                case nameof(u.LockoutDate):
                     u.LockoutDate = (DateTimeOffset?)newProperty;
                     break;
-                case "AccessTries":
+                case nameof(u.AccessTries):
                     u.AccessTries = (int)newProperty;
                     break;
-                case "AccountStatus":
+                case nameof(u.AccountStatus):
                     u.AccountStatus = (UserAccountStatus)newProperty;
                     break;
-                case "Reputation":
+                case nameof(u.Reputation):
                     u.Reputation = (int)newProperty;
                     break;
                 default:
@@ -108,17 +102,17 @@ namespace DataAccess
             return true;
         }
 
-        public bool UpdatePhoneNumber(Guid id, string newNumber) { return UpdateUserProperty(id, "PhoneNumber", newNumber); }
-        public bool UpdateEmail(Guid id, string newEmail) { return UpdateUserProperty(id, "Email", newEmail); }
-        public bool UpdateNormalisedEmail(Guid id, string newNormalisedEmail) { return UpdateUserProperty(id, "NormalisedEmail", newNormalisedEmail); }
-        public bool UpdateName(Guid id, string newName) { return UpdateUserProperty(id, "Name", newName); }
-        public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return UpdateUserProperty(id, "IsPhoneConfirmed", isConfirmed); }
-        public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return UpdateUserProperty(id, "IsEmailConfirmed", isConfirmed); }
-        public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return UpdateUserProperty(id, "SecurityStamp", newSecurityStamp); }
-        public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return UpdateUserProperty(id, "LockoutDate", newLockoutDate); }
-        public bool UpdateAccessTries(Guid id, int newAccessTries) { return UpdateUserProperty(id, "AccessTries", newAccessTries); }
-        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return UpdateUserProperty(id, "AccountStatus", accountStatus); }
-        public bool UpdateReputation(Guid id, int newReputation) { return UpdateUserProperty(id, "Reputation", newReputation); }
+        public bool UpdatePhoneNumber(Guid id, string newNumber) { return updateUserProperty(id, nameof(User.PhoneNumber), newNumber); }
+        public bool UpdateEmail(Guid id, string newEmail) { return updateUserProperty(id, nameof(User.Email), newEmail); }
+        public bool UpdateNormalisedEmail(Guid id, string newNormalisedEmail) { return updateUserProperty(id, nameof(User.NormalisedEmail), newNormalisedEmail); }
+        public bool UpdateName(Guid id, string newName) { return updateUserProperty(id, nameof(User.Name), newName); }
+        public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return updateUserProperty(id, nameof(User.IsPhoneConfirmed), isConfirmed); }
+        public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return updateUserProperty(id, nameof(User.IsEmailConfirmed), isConfirmed); }
+        public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return updateUserProperty(id, nameof(User.SecurityStamp), newSecurityStamp); }
+        public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return updateUserProperty(id, nameof(User.LockoutDate), newLockoutDate); }
+        public bool UpdateAccessTries(Guid id, int newAccessTries) { return updateUserProperty(id, nameof(User.AccessTries), newAccessTries); }
+        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return updateUserProperty(id, nameof(User.AccountStatus), accountStatus); }
+        public bool UpdateReputation(Guid id, int newReputation) { return updateUserProperty(id, nameof(User.Reputation), newReputation); }
 
         Func<Entity, EntityEntry> addUserLink = l => _context.UserLinks.Add((UserLink)l);
         Func<Entity, EntityEntry> removeUserLink = l => _context.UserLinks.Remove((UserLink)l);
@@ -243,7 +237,7 @@ namespace DataAccess
             using (_context = new QueryContext())
             { 
                 closestEvents = _context.Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
-                                Select(e => new ThinnerEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.EventType, e.Location.Y, e.Location.X)).ToList();
+                                Select(e => new ThinnerEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Type, e.Location.Y, e.Location.X)).ToList();
             }
             return closestEvents;
         }
@@ -257,7 +251,7 @@ namespace DataAccess
 				@event = _context.EventLinks.Where(e => e.SelfId == id).Include(e => e.Event.Host).Single().Event;
 				host = new ThinnerUser(@event.Host.Id, @event.Host.Name);
 			}
-            return new ThinEvent(@event.Id, host, @event.Name, @event.Description, @event.EventType,
+            return new ThinEvent(@event.Id, host, @event.Name, @event.Description, @event.Type,
                 @event.StartTime, @event.Location.X, @event.Location.Y, @event.EndTime,
 				@event.IsEventOpen, @event.GroupMinimum, @event.GroupMaximum);
 		}
@@ -268,7 +262,7 @@ namespace DataAccess
             using (_context = new QueryContext())
             { 
                 upcomingEvents = _context.Events.Where(e => e.StartTime > DateTimeOffset.UtcNow).
-								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.EventType,
+								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.Type,
                                 e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
             }
             return upcomingEvents;
@@ -280,7 +274,7 @@ namespace DataAccess
             using (_context = new QueryContext())
             { 
                 pastEvents = _context.Events.Where(e => e.EndTime.HasValue && e.EndTime < DateTimeOffset.UtcNow).
-								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.EventType,
+								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.Type,
                                 e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
             }
             return pastEvents;
@@ -292,7 +286,7 @@ namespace DataAccess
             Event toCreate = new Event {
                 HostId = hostId,
                 Name = name,
-                EventType = eventType,
+                Type = eventType,
                 StartTime = startTime,
                 Location = new Point(longitude, latitude),
 
@@ -307,9 +301,39 @@ namespace DataAccess
 		}
 
 		Func<Entity, EntityEntry> updateEvent = e => _context.Events.Update((Event)e);
-		public bool UpdateDescription(Guid id, string description) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.Description = description), updateEvent); }
-		public bool UpdateType(Guid id, string type) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.EventType = type), updateEvent); }
-		public bool UpdateStatus(Guid id, bool isOpen) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.IsEventOpen = isOpen), updateEvent); }
+
+        private static bool UpdateEventProperty (Guid id, string propertyName, Object newProperty)
+        {
+            Event u = new Event { Id = id };
+
+            switch (propertyName)
+            {
+                case "Description":
+                    u.Description = (string)newProperty;
+                    break;
+                case "Type":
+                    u.Type = (string)newProperty;
+                    break;
+                case "IsEventOpen":
+                    u.IsEventOpen = (bool)newProperty;
+                    break;
+                case "EndTime":
+                    u.EndTime = (DateTimeOffset?)newProperty;
+                    break;
+                default:
+                    throw new Exception("No propertyName match found");
+            }
+            using (_context = new QueryContext())
+            {
+                _context.Users.Attach(u);
+                _context.Entry(u).Property<string>(propertyName).IsModified = true;
+                _context.SaveChanges();
+            }
+            return true;
+        }
+		public bool UpdateDescription(Guid id, string newDescription) { return UpdateEventProperty(id, nameof(Event.Description), newDescription); }
+		public bool UpdateType(Guid id, string newType) { return UpdateEventProperty(id, "Type", newType); }
+        public bool UpdateStatus(Guid id, bool isOpen) { return UpdateEventProperty(id, "IsEventOpen", isOpen); }
         public bool EndEvent(Guid id) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.EndTime = DateTimeOffset.UtcNow), updateEvent); }
 
 		Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
