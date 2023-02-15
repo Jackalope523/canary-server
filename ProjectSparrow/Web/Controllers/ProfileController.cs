@@ -64,6 +64,33 @@ namespace Web.Controllers
 			return Ok(profile);
 		}
 
+		[HttpPost("{targetIdentification}")]
+		public async Task<IActionResult> RateUser(string targetIdentification, [FromBody] AccountRatingModel details)
+        {
+            if (targetIdentification == null && details != null && !ModelState.IsValid)
+            {
+                return BadRequest(ProfileError.MissingInformation.ToString());
+            }
+
+			try
+			{
+				var target = GetGUID(targetIdentification);
+				var user = await GetCurrentUserAsync();
+				await accounts.RateUser(user.Id, target, details.Rating);
+            }
+            catch (InvalidUserException e)
+            {
+                // User does not exist
+                return BadRequest(e.ToString());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok();
+		}
+
 		[HttpGet("{targetIdentification}/activity")]
 		public async Task<IActionResult> GetUserActivity(string targetIdentification)
 		{
