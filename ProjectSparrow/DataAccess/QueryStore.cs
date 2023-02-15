@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Shared;
 using System.Security.Cryptography;
 using Server.Entities;
+using PhoneNumbers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DataAccess
 { 
@@ -19,7 +21,7 @@ namespace DataAccess
         private static QueryContext _context = new QueryContext();
 
         // User Queries
-        private static bool EntityOperation(Entity target, Func<Entity,EntityEntry> work)
+        private static bool DatabaseOperation(Entity target, Func<Entity,EntityEntry> work)
         {
             int numWrites;
             using (_context = new QueryContext())
@@ -51,30 +53,79 @@ namespace DataAccess
                 AccountStatus = UserAccountStatus.active,
             };
 
-            return EntityOperation(toCreate, u => _context.Users.Add((User)u)); 
+            return DatabaseOperation(toCreate, u => _context.Users.Add((User)u)); 
         }
-        public bool DeleteUser(Guid Id) { return EntityOperation(new User { Id = Id }, u => _context.Users.Remove((User)u)); }
+        public bool DeleteUser(Guid Id) { return DatabaseOperation(new User { Id = Id }, u => _context.Users.Remove((User)u)); }
 
-        
-        Func<Entity, EntityEntry> updateUser = u => _context.Users.Update((User)u);
-        public bool UpdatePhoneNumber(Guid id, string newNumber) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.PhoneNumber = newNumber), updateUser); }
-        public bool UpdateEmail(Guid id, string newEmail) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Email = newEmail), updateUser); }
-        public bool UpdateNormalisedEmail(Guid id, string normalisedEmail) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.NormalisedEmail = normalisedEmail), updateUser); }
-        public bool UpdateName(Guid id, string newName) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Name = newName), updateUser); }
-        public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsPhoneConfirmed = isConfirmed), updateUser); }
-        public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.IsEmailConfirmed = isConfirmed), updateUser); }
-        public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.SecurityStamp = newSecurityStamp), updateUser); }
-        public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.LockoutDate = newLockoutDate), updateUser); }
-        public bool UpdateAccessTries(Guid id, int newAccessTries) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.AccessTries = newAccessTries), updateUser); }
-        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.AccountStatus = accountStatus), updateUser); }
-        public bool UpdateReputation(Guid id, int newReputation) { return EntityOperation(ApplyEntityEdit(GetUser(id), u => u.Reputation = newReputation), updateUser); }
+        private static bool UpdateUserProperty(Guid id, string propertyName, Object newProperty)
+        {
+            User u = new User { Id = id };
+
+            switch (propertyName)
+            {
+                case "PhoneNumber":
+                    u.PhoneNumber = (string)newProperty;
+                    break;
+                case "Email":
+                    u.Email = (string)newProperty;
+                    break;
+                case "NormalisedEmail":
+                    u.NormalisedEmail = (string)newProperty;
+                    break;
+                case "Name":
+                    u.Name = (string)newProperty;
+                    break;
+                case "IsPhoneConfirmed":
+                    u.IsPhoneConfirmed = (bool)newProperty;
+                    break;
+                case "IsEmailConfirmed":
+                    u.IsEmailConfirmed = (bool)newProperty;
+                    break;
+                case "SecurityStamp":
+                    u.SecurityStamp = (string)newProperty;
+                    break;
+                case "LockoutDate":
+                    u.LockoutDate = (DateTimeOffset?)newProperty;
+                    break;
+                case "AccessTries":
+                    u.AccessTries = (int)newProperty;
+                    break;
+                case "AccountStatus":
+                    u.AccountStatus = (UserAccountStatus)newProperty;
+                    break;
+                case "Reputation":
+                    u.Reputation = (int)newProperty;
+                    break;
+                default:
+                    throw new Exception("No propertyName match found");
+            }
+            using (_context = new QueryContext())
+            {
+                _context.Users.Attach(u);
+                _context.Entry(u).Property<string>(propertyName).IsModified = true;
+                _context.SaveChanges();
+            }
+            return true;
+        }
+
+        public bool UpdatePhoneNumber(Guid id, string newNumber) { return UpdateUserProperty(id, "PhoneNumber", newNumber); }
+        public bool UpdateEmail(Guid id, string newEmail) { return UpdateUserProperty(id, "Email", newEmail); }
+        public bool UpdateNormalisedEmail(Guid id, string newNormalisedEmail) { return UpdateUserProperty(id, "NormalisedEmail", newNormalisedEmail); }
+        public bool UpdateName(Guid id, string newName) { return UpdateUserProperty(id, "Name", newName); }
+        public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return UpdateUserProperty(id, "IsPhoneConfirmed", isConfirmed); }
+        public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return UpdateUserProperty(id, "IsEmailConfirmed", isConfirmed); }
+        public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return UpdateUserProperty(id, "SecurityStamp", newSecurityStamp); }
+        public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return UpdateUserProperty(id, "LockoutDate", newLockoutDate); }
+        public bool UpdateAccessTries(Guid id, int newAccessTries) { return UpdateUserProperty(id, "AccessTries", newAccessTries); }
+        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return UpdateUserProperty(id, "AccountStatus", accountStatus); }
+        public bool UpdateReputation(Guid id, int newReputation) { return UpdateUserProperty(id, "Reputation", newReputation); }
 
         Func<Entity, EntityEntry> addUserLink = l => _context.UserLinks.Add((UserLink)l);
         Func<Entity, EntityEntry> removeUserLink = l => _context.UserLinks.Remove((UserLink)l);
-        public bool FollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, addUserLink); }      
-        public bool UnfollowUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Following }, removeUserLink); } 
-        public bool BlockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, addUserLink); }
-        public bool UnblockUser(Guid selfId, Guid targetId) { return EntityOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Blocked }, removeUserLink); }          
+        public bool FollowUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }, addUserLink); }      
+        public bool UnfollowUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }, removeUserLink); } 
+        public bool BlockUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, addUserLink); }
+        public bool UnblockUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, removeUserLink); }          
 
         private static List<ThinnerUser> GetCollectionOfUsers(Guid id, UserLink.UserLinkType type)
         {
@@ -85,9 +136,9 @@ namespace DataAccess
             }
             return users;
         }
-        public List<ThinnerUser> GetFriends(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
-        public List<ThinnerUser> GetBlockedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Blocked); }
-        public List<ThinnerUser> GetFollowedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Following); }
+        public List<ThinnerUser> GetFriends(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Follow); }
+        public List<ThinnerUser> GetBlockedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Block); }
+        public List<ThinnerUser> GetFollowedUsers(Guid id) { return GetCollectionOfUsers(id, UserLink.UserLinkType.Follow); }
 
 		public (List<UserReport>, List<EventReport>) GetReports(Guid id) { throw new NotImplementedException(); }
 		public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id) { throw new NotImplementedException(); }
@@ -141,7 +192,7 @@ namespace DataAccess
 			int numFollowers;
             using (_context = new QueryContext())
             {
-				numFollowers = _context.UserLinks.Where(l => l.SelfId == id && l.Type.Equals(UserLink.UserLinkType.Following)).Count();
+				numFollowers = _context.UserLinks.Where(l => l.SelfId == id && l.Type.Equals(UserLink.UserLinkType.Follow)).Count();
             }
             return numFollowers;
         }
@@ -249,36 +300,42 @@ namespace DataAccess
                 GroupMinimum = groupMinimum,
                 GroupMaximum = groupMaximum
             };
-            EntityOperation(toCreate, e => _context.Events.Add((Event)e));
+            DatabaseOperation(toCreate, e => _context.Events.Add((Event)e));
             AddUserToEvent(hostId, toCreate.Id);
 
 			return toCreate.ToThinEvent();
 		}
 
 		Func<Entity, EntityEntry> updateEvent = e => _context.Events.Update((Event)e);
-		public bool UpdateDescription(Guid id, string description) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.Description = description), updateEvent); }
-		public bool UpdateType(Guid id, string type) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.EventType = type), updateEvent); }
-		public bool UpdateStatus(Guid id, bool isOpen) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.IsEventOpen = isOpen), updateEvent); }
-        public bool EndEvent(Guid id) { return EntityOperation(ApplyEntityEdit(GetEvent(id), e => e.EndTime = DateTimeOffset.UtcNow), updateEvent); }
+		public bool UpdateDescription(Guid id, string description) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.Description = description), updateEvent); }
+		public bool UpdateType(Guid id, string type) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.EventType = type), updateEvent); }
+		public bool UpdateStatus(Guid id, bool isOpen) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.IsEventOpen = isOpen), updateEvent); }
+        public bool EndEvent(Guid id) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.EndTime = DateTimeOffset.UtcNow), updateEvent); }
 
 		Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
 		Func<Entity, EntityEntry> removeEventLink = l => _context.EventLinks.Remove((EventLink)l);
 
-		public bool AddUserToEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, addEventLink); }
-        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return EntityOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attending }, removeEventLink); }    
+		public bool AddUserToEvent(Guid userId, Guid eventId) { return DatabaseOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, addEventLink); }
+        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return DatabaseOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, removeEventLink); }    
 
         public List<ThinnerUser> GetGuestList(Guid id)
         {
             List<ThinnerUser> guests;
             using (_context = new QueryContext())
             {
-                guests = _context.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attending).Include(l => l.Self).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).ToList();
+                guests = _context.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attend).Include(l => l.Self).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).ToList();
             }
             return guests;
         }
 
-		public List<EventReport> GetEventReports(Guid id) { throw new NotImplementedException(); }
-		public bool ReportEvent(Guid selfId, Guid targetId, EventReportType reportType, string reportDetails) { throw new NotImplementedException(); }
+		public List<EventReport> GetEventReports(Guid id) 
+        { 
+            throw new NotImplementedException(); 
+        }
+		public bool ReportEvent(Guid selfId, Guid targetId, EventReportType reportType, string reportDetails) 
+        { 
+            throw new NotImplementedException(); 
+        }
 
 	}
 }

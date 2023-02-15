@@ -102,13 +102,13 @@ namespace DataAccess
                 //    X
                 // Muninn
                 new UserLink // Huginn follows Signy
-                { Id = Guid.NewGuid(), SelfId = users[1].Id, OtherId = users[0].Id, Type = UserLink.UserLinkType.Following },
+                { Id = Guid.NewGuid(), SelfId = users[1].Id, OtherId = users[0].Id, Type = UserLink.UserLinkType.Follow },
                 new UserLink // Muninn follows Signy
-                { Id = Guid.NewGuid(), SelfId = users[2].Id, OtherId = users[0].Id, Type = UserLink.UserLinkType.Following  },
+                { Id = Guid.NewGuid(), SelfId = users[2].Id, OtherId = users[0].Id, Type = UserLink.UserLinkType.Follow },
                 new UserLink // Signy follows Huginn
-                { Id = Guid.NewGuid(), SelfId = users[0].Id, OtherId = users[1].Id, Type = UserLink.UserLinkType.Following },
+                { Id = Guid.NewGuid(), SelfId = users[0].Id, OtherId = users[1].Id, Type = UserLink.UserLinkType.Follow },
                 new UserLink // Signy blocks Muninn
-                { Id = Guid.NewGuid(), SelfId = users[0].Id, OtherId = users[2].Id, Type = UserLink.UserLinkType.Blocked }
+                { Id = Guid.NewGuid(), SelfId = users[0].Id, OtherId = users[2].Id, Type = UserLink.UserLinkType.Block }
             };
 
             List<Event> events = new()
@@ -165,11 +165,11 @@ namespace DataAccess
 
                 // Masquerade Attendees
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[0].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watching },
+                { Id = Guid.NewGuid(), SelfId = users[0].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watch },
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[1].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watching },
+                { Id = Guid.NewGuid(), SelfId = users[1].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watch },
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[2].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watching },
+                { Id = Guid.NewGuid(), SelfId = users[2].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watch },
             };
 
 

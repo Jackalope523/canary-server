@@ -10,7 +10,7 @@ namespace DataAccess.Entities
         public string Email { get; set; }
         public string Name { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
-        public DateTimeOffset JoinDate { get; init; }  
+        public DateTimeOffset JoinDate { get; init; }
         public int Reputation { get; set; }
 
         public string NormalisedEmail { get; set; }

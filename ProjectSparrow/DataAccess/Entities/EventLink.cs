@@ -2,7 +2,7 @@
 {
     public class EventLink : Link
     {
-        internal enum EventLinkType { Attending, Watching, Left}
+        internal enum EventLinkType { Attend, Watch, Left, Inappropriate, Spam, Misleading, Promotion }
 
         public Guid EventId { get; init; }
         internal Event Event { get; init; }
