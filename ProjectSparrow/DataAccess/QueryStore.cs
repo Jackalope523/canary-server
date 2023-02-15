@@ -300,43 +300,41 @@ namespace DataAccess
 			return toCreate.ToThinEvent();
 		}
 
-		Func<Entity, EntityEntry> updateEvent = e => _context.Events.Update((Event)e);
-
-        private static bool UpdateEventProperty (Guid id, string propertyName, Object newProperty)
+        private static bool updateEventProperty (Guid id, string propertyName, Object newProperty)
         {
-            Event u = new Event { Id = id };
+            Event e = new Event { Id = id };
 
             switch (propertyName)
             {
-                case "Description":
-                    u.Description = (string)newProperty;
+                case nameof(e.Description):
+                    e.Description = (string)newProperty;
                     break;
-                case "Type":
-                    u.Type = (string)newProperty;
+                case nameof(e.Type):
+                    e.Type = (string)newProperty;
                     break;
-                case "IsEventOpen":
-                    u.IsEventOpen = (bool)newProperty;
+                case nameof(e.IsEventOpen):
+                    e.IsEventOpen = (bool)newProperty;
                     break;
-                case "EndTime":
-                    u.EndTime = (DateTimeOffset?)newProperty;
+                case nameof(e.EndTime):
+                    e.EndTime = (DateTimeOffset?)newProperty;
                     break;
                 default:
                     throw new Exception("No propertyName match found");
             }
             using (_context = new QueryContext())
             {
-                _context.Users.Attach(u);
-                _context.Entry(u).Property<string>(propertyName).IsModified = true;
+                _context.Events.Attach(e);
+                _context.Entry(e).Property<string>(propertyName).IsModified = true;
                 _context.SaveChanges();
             }
             return true;
         }
-		public bool UpdateDescription(Guid id, string newDescription) { return UpdateEventProperty(id, nameof(Event.Description), newDescription); }
-		public bool UpdateType(Guid id, string newType) { return UpdateEventProperty(id, "Type", newType); }
-        public bool UpdateStatus(Guid id, bool isOpen) { return UpdateEventProperty(id, "IsEventOpen", isOpen); }
-        public bool EndEvent(Guid id) { return DatabaseOperation(ApplyEntityEdit(GetEvent(id), e => e.EndTime = DateTimeOffset.UtcNow), updateEvent); }
+		public bool UpdateDescription(Guid id, string newDescription) { return updateEventProperty(id, nameof(Event.Description), newDescription); }
+		public bool UpdateType(Guid id, string newType) { return updateEventProperty(id, nameof(Event.Type), newType); }
+        public bool UpdateStatus(Guid id, bool isOpen) { return updateEventProperty(id, nameof(Event.IsEventOpen), isOpen); }
+        public bool EndEvent(Guid id) { return updateEventProperty(id, nameof(Event.EndTime), DateTimeOffset.UtcNow); }
 
-		Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
+        Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
 		Func<Entity, EntityEntry> removeEventLink = l => _context.EventLinks.Remove((EventLink)l);
 
 		public bool AddUserToEvent(Guid userId, Guid eventId) { return DatabaseOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, addEventLink); }
