@@ -12,6 +12,8 @@ import RegisterScreen from './src/features/portal/screens/RegisterScreen';
 import FeedScreen from './src/features/events/screens/FeedScreen';
 import DiscoverScreen from './src/features/events/screens/DiscoverScreen';
 import ProfileScreen from './src/features/events/screens/ProfileScreen';
+import { Provider } from 'react-redux';
+import store from './src/lib/store';
 
 /*
 import type {PropsWithChildren} from 'react';
@@ -50,7 +52,7 @@ export type RootStackParamList = {
   Portal: undefined;
   Authentication: undefined;
   Login: undefined;
-  Verify: undefined;
+  Verify: { phoneNumber: string};
   Register: undefined;
   Landing: undefined;
 };
@@ -118,14 +120,11 @@ const Authentication = () => {
 
 const Landing = () => {
   return (
-    <Tabs.Navigator initialRouteName='Discover'>      
-      <Tabs.Screen name='Feed'
-      component={FeedScreen}
-      />
-      <Tabs.Screen name='Discover' component={DiscoverScreen}
-      />
-      <Tabs.Screen name='Profile' component={ProfileScreen}
-      />
+    <Tabs.Navigator initialRouteName='Discover'
+    screenOptions={{ headerShown: false }}>      
+      <Tabs.Screen name='Feed' component={FeedScreen} />
+      <Tabs.Screen name='Discover' component={DiscoverScreen} />
+      <Tabs.Screen name='Profile' component={ProfileScreen} />
   </Tabs.Navigator>
   );
 };
