@@ -164,7 +164,7 @@ namespace Web.Controllers
                         await userManager.ResetAccessFailedCountAsync(user);
 						await signInManager.SignInAsync(user, false);
 
-						if (user.Email != null)
+						if (!string.IsNullOrEmpty(user.Email))
 						{
                             // Send verification email if an email is added
                             // TODO
