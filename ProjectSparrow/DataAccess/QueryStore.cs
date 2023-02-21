@@ -2,8 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NetTopologySuite.Geometries;
+using PhoneNumbers;
 using Server.Boundaries;
 using Shared;
+using System.Net.Security;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DataAccess
 {
@@ -51,76 +54,19 @@ namespace DataAccess
         }
         public bool DeleteUser(Guid Id) { return DatabaseOperation(new User { Id = Id }, u => _context.Users.Remove((User)u)); }
 
-        private static bool updateUserProperty(Guid id, string propertyName, Object newProperty)
-        {
-            User u = new User { Id = id };
-
-            switch (propertyName)
-            {
-                case nameof(u.PhoneNumber):
-                    u.PhoneNumber = (string)newProperty;
-                    break;
-                case nameof(u.Email):
-                    u.Email = (string)newProperty;
-                    break;
-                case nameof(u.NormalisedEmail):
-                    u.NormalisedEmail = (string)newProperty;
-                    break;
-                case nameof(u.Name):
-                    u.Name = (string)newProperty;
-                    break;
-                case nameof(u.IsPhoneConfirmed):
-                    u.IsPhoneConfirmed = (bool)newProperty;
-                    break;
-                case nameof(u.IsEmailConfirmed):
-                    u.IsEmailConfirmed = (bool)newProperty;
-                    break;
-                case nameof(u.SecurityStamp):
-                    u.SecurityStamp = (string)newProperty;
-                    break;
-                case nameof(u.LockoutDate):
-                    u.LockoutDate = (DateTimeOffset?)newProperty;
-                    break;
-                case nameof(u.AccessTries):
-                    u.AccessTries = (int)newProperty;
-                    break;
-                case nameof(u.AccountStatus):
-                    u.AccountStatus = (UserAccountStatus)newProperty;
-                    break;
-                case nameof(u.Reputation):
-                    u.Reputation = (int)newProperty;
-                    break;
-                default:
-                    throw new Exception("No propertyName match found");
-            }
-            using (_context = new QueryContext())
-            {
-                _context.Users.Attach(u);
-                _context.Entry(u).Property<string>(propertyName).IsModified = true;
-                _context.SaveChanges();
-            }
-            return true;
-        }
-
-        public bool UpdatePhoneNumber(Guid id, string newNumber) { return updateUserProperty(id, nameof(User.PhoneNumber), newNumber); }
-        public bool UpdateEmail(Guid id, string newEmail) { return updateUserProperty(id, nameof(User.Email), newEmail); }
-        public bool UpdateNormalisedEmail(Guid id, string newNormalisedEmail) { return updateUserProperty(id, nameof(User.NormalisedEmail), newNormalisedEmail); }
-        public bool UpdateName(Guid id, string newName) { return updateUserProperty(id, nameof(User.Name), newName); }
-        public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return updateUserProperty(id, nameof(User.IsPhoneConfirmed), isConfirmed); }
-        public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return updateUserProperty(id, nameof(User.IsEmailConfirmed), isConfirmed); }
-        public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return updateUserProperty(id, nameof(User.SecurityStamp), newSecurityStamp); }
-        public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return updateUserProperty(id, nameof(User.LockoutDate), newLockoutDate); }
-        public bool UpdateAccessTries(Guid id, int newAccessTries) { return updateUserProperty(id, nameof(User.AccessTries), newAccessTries); }
-        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return updateUserProperty(id, nameof(User.AccountStatus), accountStatus); }
-        public bool UpdateReputation(Guid id, int newReputation) { return updateUserProperty(id, nameof(User.Reputation), newReputation); }
 
         Func<Entity, EntityEntry> addUserLink = l => _context.UserLinks.Add((UserLink)l);
         Func<Entity, EntityEntry> removeUserLink = l => _context.UserLinks.Remove((UserLink)l);
         public bool FollowUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }, addUserLink); }      
         public bool UnfollowUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }, removeUserLink); } 
         public bool BlockUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, addUserLink); }
-        public bool UnblockUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, removeUserLink); }          
+        public bool UnblockUser(Guid selfId, Guid targetId) { return DatabaseOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, removeUserLink); }
 
+        Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
+        Func<Entity, EntityEntry> removeEventLink = l => _context.EventLinks.Remove((EventLink)l);
+
+        public bool AddUserToEvent(Guid userId, Guid eventId) { return DatabaseOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, addEventLink); }
+        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return DatabaseOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, removeEventLink); }
         private static List<ThinnerUser> GetCollectionOfUsers(Guid id, UserLink.UserLinkType type)
         {
             List<ThinnerUser> users;
@@ -138,79 +84,40 @@ namespace DataAccess
 		public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id) { throw new NotImplementedException(); }
 		public bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails) { throw new NotImplementedException(); }
 
-        private User GetUser(Guid id)
+        private ThinUser FindUserBy(Func<User,bool> predicate)
         {
-			User user;
-			using (_context = new QueryContext())
-			{
-				user = _context.Users.Find(id);
-			}
-            if (user == null)
-            { throw new InvalidUserException("User not found."); }
-            return user;
-		}
-        private User GetUser(string phoneNumber)
-        {
-			User user;
-			using (_context = new QueryContext())
-			{
-                try
-                {
-                    user = _context.Users.Where(u => u.PhoneNumber.Equals(phoneNumber)).Single();
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidUserException("User not found.", ex);
-                }
-			}
-            return user;
-		}
-        private User GetUserByEmail(string email)
-        {
-			User user;
-			using (_context = new QueryContext())
-			{
-                try
-                {
-                    user = _context.Users.Where(u => u.NormalisedEmail.Equals(email)).Single();
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidUserException("User not found.", ex);
-                }
-			}
-            return user;
-		}
-        private int GetUserFollowerCount(Guid id)
-        {
-			int numFollowers;
+            ThinUser user;
+            int numFollowers;
             using (_context = new QueryContext())
             {
-				numFollowers = _context.UserLinks.Where(l => l.SelfId == id && l.Type.Equals(UserLink.UserLinkType.Follow)).Count();
+                user = _context.Users.Where(predicate).Select(u => new ThinUser
+                (
+                    u.Id,
+                    u.PhoneNumber,
+                    u.Email,
+                    u.Name,
+                    u.DateOfBirth,
+                    u.IsPhoneConfirmed,
+                    u.IsEmailConfirmed,
+                    u.SecurityStamp,
+                    u.LockoutDate,
+                    u.AccessTries,
+                    u.AccountStatus,
+                    u.JoinDate,
+                    u.Reputation,
+                    -1
+                )).Single();
+
+                numFollowers = _context.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).Count();
+
             }
-            return numFollowers;
+            return user with { NumberOfFollowers = numFollowers};
         }
 
-        public ThinUser FindUser(Guid id)
-        {
-            User user = GetUser(id);
-            int numFollowers = GetUserFollowerCount(id);
-            return user.ToThinUser() with { NumberOfFollowers = numFollowers };
-        }
+        public ThinUser FindUserById(Guid id) { return FindUserBy(u => u.Id == id); }
+        public ThinUser FindUserByPhoneNumber(string phoneNumber) { return FindUserBy(u => u.PhoneNumber == phoneNumber); }
+        public ThinUser FindUserByEmail(string email) { return FindUserBy(u => u.NormalisedEmail == email); }
 
-        public ThinUser FindUser(string phoneNumber)
-        {
-            User user = GetUser(phoneNumber);
-            int numFollowers = GetUserFollowerCount(user.Id);
-			return user.ToThinUser() with { NumberOfFollowers = numFollowers };
-        }
-
-        public ThinUser FindUserByEmail(string email)
-        {
-            User user = GetUserByEmail(email);
-            int numFollowers = GetUserFollowerCount(user.Id);
-			return user.ToThinUser() with { NumberOfFollowers = numFollowers };
-        }
 
 
 		private Event GetEvent(Guid id)
@@ -300,6 +207,68 @@ namespace DataAccess
 			return toCreate.ToThinEvent();
 		}
 
+        private static bool updateUserProperty(Guid id, string propertyName, Object newProperty)
+        {
+            User u = new User { Id = id };
+
+            switch (propertyName)
+            {
+                case nameof(u.PhoneNumber):
+                    u.PhoneNumber = (string)newProperty;
+                    break;
+                case nameof(u.Email):
+                    u.Email = (string)newProperty;
+                    break;
+                case nameof(u.NormalisedEmail):
+                    u.NormalisedEmail = (string)newProperty;
+                    break;
+                case nameof(u.Name):
+                    u.Name = (string)newProperty;
+                    break;
+                case nameof(u.IsPhoneConfirmed):
+                    u.IsPhoneConfirmed = (bool)newProperty;
+                    break;
+                case nameof(u.IsEmailConfirmed):
+                    u.IsEmailConfirmed = (bool)newProperty;
+                    break;
+                case nameof(u.SecurityStamp):
+                    u.SecurityStamp = (string)newProperty;
+                    break;
+                case nameof(u.LockoutDate):
+                    u.LockoutDate = (DateTimeOffset?)newProperty;
+                    break;
+                case nameof(u.AccessTries):
+                    u.AccessTries = (int)newProperty;
+                    break;
+                case nameof(u.AccountStatus):
+                    u.AccountStatus = (UserAccountStatus)newProperty;
+                    break;
+                case nameof(u.Reputation):
+                    u.Reputation = (int)newProperty;
+                    break;
+                default:
+                    throw new Exception("No propertyName match found");
+            }
+            using (_context = new QueryContext())
+            {
+                _context.Users.Attach(u);
+                _context.Entry(u).Property<string>(propertyName).IsModified = true;
+                _context.SaveChanges();
+            }
+            return true;
+        }
+        public bool UpdatePhoneNumber(Guid id, string newNumber) { return updateUserProperty(id, nameof(User.PhoneNumber), newNumber); }
+        public bool UpdateEmail(Guid id, string newEmail) { return updateUserProperty(id, nameof(User.Email), newEmail); }
+        public bool UpdateNormalisedEmail(Guid id, string newNormalisedEmail) { return updateUserProperty(id, nameof(User.NormalisedEmail), newNormalisedEmail); }
+        public bool UpdateName(Guid id, string newName) { return updateUserProperty(id, nameof(User.Name), newName); }
+        public bool UpdatePhoneConfirmation(Guid id, bool isConfirmed) { return updateUserProperty(id, nameof(User.IsPhoneConfirmed), isConfirmed); }
+        public bool UpdateEmailConfirmation(Guid id, bool isConfirmed) { return updateUserProperty(id, nameof(User.IsEmailConfirmed), isConfirmed); }
+        public bool UpdateSecurityStamp(Guid id, string newSecurityStamp) { return updateUserProperty(id, nameof(User.SecurityStamp), newSecurityStamp); }
+        public bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate) { return updateUserProperty(id, nameof(User.LockoutDate), newLockoutDate); }
+        public bool UpdateAccessTries(Guid id, int newAccessTries) { return updateUserProperty(id, nameof(User.AccessTries), newAccessTries); }
+        public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return updateUserProperty(id, nameof(User.AccountStatus), accountStatus); }
+        public bool UpdateReputation(Guid id, int newReputation) { return updateUserProperty(id, nameof(User.Reputation), newReputation); }
+
         private static bool updateEventProperty (Guid id, string propertyName, Object newProperty)
         {
             Event e = new Event { Id = id };
@@ -333,12 +302,6 @@ namespace DataAccess
 		public bool UpdateType(Guid id, string newType) { return updateEventProperty(id, nameof(Event.Type), newType); }
         public bool UpdateStatus(Guid id, bool isOpen) { return updateEventProperty(id, nameof(Event.IsEventOpen), isOpen); }
         public bool EndEvent(Guid id) { return updateEventProperty(id, nameof(Event.EndTime), DateTimeOffset.UtcNow); }
-
-        Func<Entity, EntityEntry> addEventLink = l => _context.EventLinks.Add((EventLink)l);
-		Func<Entity, EntityEntry> removeEventLink = l => _context.EventLinks.Remove((EventLink)l);
-
-		public bool AddUserToEvent(Guid userId, Guid eventId) { return DatabaseOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, addEventLink); }
-        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return DatabaseOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, removeEventLink); }    
 
         public List<ThinnerUser> GetGuestList(Guid id)
         {

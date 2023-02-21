@@ -23,8 +23,8 @@ namespace Server.Boundaries
 	public interface IAccountDatabase
 	{
         public static IAccountDatabase AccountDatabaseAccess;
-		ThinUser FindUser(Guid id);
-        ThinUser FindUser(string phoneNumber);
+		ThinUser FindUserById(Guid id);
+        ThinUser FindUserByPhoneNumber(string phoneNumber);
 		ThinUser FindUserByEmail(string normalisedEmail);
         bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
         bool DeleteUser(Guid id);

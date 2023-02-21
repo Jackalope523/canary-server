@@ -237,7 +237,7 @@ namespace Server.Controls
 
         internal async Task<User> GetUser(Guid userID)
         {
-			User user = new(accounts.FindUser(userID));
+			User user = new(accounts.FindUserById(userID));
 
 			// Check if user account is locked
 			if (user.IsLocked)
@@ -248,7 +248,7 @@ namespace Server.Controls
 
         internal async Task<User> GetUser(string phoneNumber)
         {
-            User user = new(accounts.FindUser(phoneNumber));
+            User user = new(accounts.FindUserByPhoneNumber(phoneNumber));
 
             // Check if user account is locked
             if (user.IsLocked)
