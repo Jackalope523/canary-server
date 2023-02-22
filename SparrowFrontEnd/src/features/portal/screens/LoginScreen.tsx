@@ -42,6 +42,11 @@ export default function LoginScreen({navigation}: LoginProps): JSX.Element {
       title={"Login"}
       disabled={!buttonEnabled}
       onPress={handleLogin} />
+      <View style={{marginVertical: 10}} />
+      <Button
+      title={"Register"}
+      disabled={!buttonEnabled}
+      onPress={() => navigation.navigate('Register', { phoneNumber: phoneNumber})} />
     </View>
     <View style={style.footer} />
   </SafeAreaView>

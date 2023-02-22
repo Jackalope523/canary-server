@@ -22,6 +22,28 @@ export async function login(phoneNumber: string) {
     });
 }
 
+export async function signup(phoneNumber: string, email: string, name: string, dateOfBirth: Date) {
+  await axios.post('/account/signup',
+    { 'phoneNumber': phoneNumber, 'email': email, 'name': name, 'dateOfBirth': dateOfBirth.toISOString() })
+  .then((response) => {
+      console.log(response.data);
+      console.log(response.status);
+      console.log(response.headers);
+  })
+  .catch((error) => {
+      console.log(error.toJSON());
+      if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+    } else {
+          console.log('Axios call failed, error', error.message);
+    }
+  });
+}
+      
 export async function verify(phoneNumber: string, code: string) {
     await axios.post('/account/verify', { 'phoneNumber': phoneNumber, 'code': code })
     .then((response) => {

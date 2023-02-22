@@ -53,7 +53,7 @@ export type RootStackParamList = {
   Authentication: undefined;
   Login: undefined;
   Verify: { phoneNumber: string};
-  Register: undefined;
+  Register: { phoneNumber: string};
   Landing: undefined;
 };
 
