@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { initialiseAxiosSession } from '../../../lib/axios';
 
 export async function login(phoneNumber: string) {
     await axios.post('/account/login', { 'phoneNumber': phoneNumber })
@@ -6,10 +7,6 @@ export async function login(phoneNumber: string) {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
-        if (response.status === 200) {
-            return true;
-        }
-        return false;
     })
     .catch((error) => {
         console.log(error.toJSON());
@@ -25,13 +22,11 @@ export async function login(phoneNumber: string) {
     });
 }
 
-export async function verifyLogin(phoneNumber: string, code: string) {
-    await axios.post('/account/verify', { 'phoneNumber':phoneNumber, 'code': code })
+export async function verify(phoneNumber: string, code: string) {
+    await axios.post('/account/verify', { 'phoneNumber': phoneNumber, 'code': code })
     .then((response) => {
-        if (response.status === 200) {
-            return true;
-        }
-        return false;
+        // Store cookie
+        // initialiseAxiosSession();
     })
     .catch((error) => {
         console.log(error.toJSON());
@@ -44,5 +39,7 @@ export async function verifyLogin(phoneNumber: string, code: string) {
       } else {
         console.log('Axios call failed, error', error.message);
       }
+      
+      return Promise.reject();
     });
 }

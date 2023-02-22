@@ -20,10 +20,13 @@ type LoginProps = StackScreenProps<RootStackParamList, 'Login'>;
 
 export default function LoginScreen({navigation}: LoginProps): JSX.Element {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [buttonEnabled, setButtonEnabled] = useState(true);
   
   function handleLogin() {
+    setButtonEnabled(false);
     Promise.resolve(login(phoneNumber))
-    .then(() => navigation.navigate('Verify', { phoneNumber: phoneNumber}));
+    .then(() => navigation.navigate('Verify', { phoneNumber: phoneNumber}))
+    .finally(() => setButtonEnabled(true));
   }
 
   return (
@@ -37,6 +40,7 @@ export default function LoginScreen({navigation}: LoginProps): JSX.Element {
       style={style.inputField}/>
       <Button
       title={"Login"}
+      disabled={!buttonEnabled}
       onPress={handleLogin} />
     </View>
     <View style={style.footer} />

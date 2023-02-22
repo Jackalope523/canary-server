@@ -21,6 +21,9 @@ export default StyleSheet.create({
       marginVertical: 20,
       backgroundColor: '#bbb',
     },
+    errorText: {
+      color: 'red',
+    },
     footer: {
       height: 100,
     },
