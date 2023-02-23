@@ -11,42 +11,8 @@ import RegisterScreen from './src/features/portal/screens/RegisterScreen';
 
 import FeedScreen from './src/features/events/screens/FeedScreen';
 import DiscoverScreen from './src/features/events/screens/DiscoverScreen';
-import ProfileScreen from './src/features/events/screens/ProfileScreen';
+import ProfileScreen from './src/features/profile/screens/ProfileScreen';
 import { Provider } from 'react-redux';
-import store from './src/lib/store';
-
-/*
-import type {PropsWithChildren} from 'react';
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element
-{
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}*/
 
 export type RootStackParamList = {
   Portal: undefined;

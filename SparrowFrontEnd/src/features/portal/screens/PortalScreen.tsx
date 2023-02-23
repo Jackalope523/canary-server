@@ -31,7 +31,6 @@ export default function PortalScreen({navigation}: PortalProps): JSX.Element {
     setButtonEnabled(false);
     AsyncStorage.getItem('token')
     .then((token) => {
-      console.log('token is ' + token);
       if (token != null) {
         initialiseAxiosSession(token);
         Promise.resolve(getUserProfile())

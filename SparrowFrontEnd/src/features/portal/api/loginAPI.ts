@@ -71,6 +71,7 @@ export async function verify(phoneNumber: string, code: string) {
       return Promise.reject();
     });
 }
+
 export async function logout() {
   await axios.post('/account/logout')
   .then((response) => {

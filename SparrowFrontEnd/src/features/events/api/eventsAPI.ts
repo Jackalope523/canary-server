@@ -1,24 +1,28 @@
 import { userSession } from '../../../lib/axios';
-import { UserProfile } from '../screens/ProfileScreen';
+import { EventModel } from '../../../components/EventSegment';
 
-export async function getUserProfile() {
+export async function getNearbyEvents() {
     
-    let user: UserProfile = {
-        name: '',
-        numberOfFollowers: 0,
-        reputation: 0
-    };
+    let eventList: EventModel[] = [];
 
-    await userSession.get('/account')
+    await userSession.get('/discover/0-0-0')
     .then((response) => {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
 
-        user = {
-            name: response.data['name'],
-            numberOfFollowers: response.data['numberOfFollowers'],
-            reputation: response.data['reputation']
+        for (const event of response.data[''])
+        {
+            eventList.push({
+                id: '',
+                host: { id: '', name: '' },
+                name: response.data['name'],
+                description: '',
+                type: '',
+                startTime: new Date(),
+                position: { latitude: 0, longitude: 0 },
+                numberAttendees: 0
+            });
         }
     })
     .catch((error) => {
@@ -36,5 +40,5 @@ export async function getUserProfile() {
       return Promise.reject();
     });
     
-    return Promise.resolve(user);
+    return Promise.resolve(eventList);
 }

@@ -27,4 +27,15 @@ export default StyleSheet.create({
     footer: {
       height: 100,
     },
+    eventSegment: {
+      flex: 1,
+      height: 80,
+      backgroundColor: '#ddd',
+      marginBottom: 10,
+      marginRight: 10,
+      shadowColor: '#111',
+      shadowRadius: 3,
+      elevation: 3,
+      zIndex: 999
+    },
   });
