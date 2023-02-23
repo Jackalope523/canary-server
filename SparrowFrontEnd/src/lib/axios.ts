@@ -11,7 +11,7 @@ export function initialiseAxios() {
 
 export var userSession: AxiosInstance;
 
-export function initialiseAxiosSession() {
+export function initialiseAxiosSession(token: string) {
     userSession = axios.create({
         baseURL: API_URL,
         headers: {'Content-Type': 'application/json'},

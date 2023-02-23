@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { initialiseAxiosSession } from '../../../lib/axios';
 
@@ -48,7 +49,12 @@ export async function verify(phoneNumber: string, code: string) {
     await axios.post('/account/verify', { 'phoneNumber': phoneNumber, 'code': code })
     .then((response) => {
         // Store cookie
-        // initialiseAxiosSession();
+        let tokenCookie = response.headers['set-cookie']?.[0];
+        if (typeof  tokenCookie === 'string') {
+          tokenCookie = tokenCookie.split(';', 2)[0];
+          AsyncStorage.setItem('token', tokenCookie);
+          initialiseAxiosSession(tokenCookie);
+        }
     })
     .catch((error) => {
         console.log(error.toJSON());
@@ -64,4 +70,24 @@ export async function verify(phoneNumber: string, code: string) {
       
       return Promise.reject();
     });
+}
+export async function logout() {
+  await axios.post('/account/logout')
+  .then((response) => {
+    console.log(response.data);
+    console.log(response.status);
+    console.log(response.headers);
+  })
+  .catch((error) => {
+      console.log(error.toJSON());
+      if (error.response) {
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      console.log(error.request);
+    } else {
+      console.log('Axios call failed, error', error.message);
+    }
+  });
 }

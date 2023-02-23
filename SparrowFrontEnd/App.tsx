@@ -121,10 +121,10 @@ const Authentication = () => {
 const Landing = () => {
   return (
     <Tabs.Navigator initialRouteName='Discover'
-    screenOptions={{ headerShown: false }}>      
-      <Tabs.Screen name='Feed' component={FeedScreen} />
-      <Tabs.Screen name='Discover' component={DiscoverScreen} />
-      <Tabs.Screen name='Profile' component={ProfileScreen} />
-  </Tabs.Navigator>
+      screenOptions={{ headerShown: false }}>      
+        <Tabs.Screen name='Feed' component={FeedScreen} />
+        <Tabs.Screen name='Discover' component={DiscoverScreen} />
+        <Tabs.Screen name='Profile' component={ProfileScreen} />
+    </Tabs.Navigator>
   );
 };
