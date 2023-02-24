@@ -35,7 +35,9 @@ namespace Server.Controls
 
         public async Task<ThinUser> GetUserAsync(string phoneNumber)
 		{
-            return (await GetUser(phoneNumber)).ToThinUser();
+            if (!ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber))
+            { throw new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."); }
+            return (await GetUser(normalisedPhoneNumber)).ToThinUser();
 		}
 
         public async Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID)

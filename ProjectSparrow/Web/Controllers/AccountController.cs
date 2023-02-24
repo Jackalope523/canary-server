@@ -94,7 +94,7 @@ namespace Web.Controllers
 				}
                 
                 // Send user an SMS with code
-                await smsService.SendSMSAsync(credentials.PhoneNumber, $"Your Sparrow code is {code}");
+                await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
 			}
 			catch (Exception e)
 			{
@@ -157,7 +157,7 @@ namespace Web.Controllers
                 else
 				{
 					// Account is not activated, check change number token validity
-					var result = await userManager.ChangePhoneNumberAsync(user, credentials.PhoneNumber, credentials.Code);
+					var result = await userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, credentials.Code);
 					if (result.Succeeded)
 					{
                         // Token matched, reset access tries and sign user in
@@ -200,7 +200,7 @@ namespace Web.Controllers
                 // Persist a new user
                 await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
                     details.Name, details.DateOfBirth.ToUniversalTime());
-                                
+                
                 // Send an SMS to new user with a generated change number token
                 var user = await accounts.GetUserAsync(details.PhoneNumber);
 				var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
