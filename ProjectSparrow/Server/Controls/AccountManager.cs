@@ -35,7 +35,9 @@ namespace Server.Controls
 
         public async Task<ThinUser> GetUserAsync(string phoneNumber)
 		{
-            return (await GetUser(phoneNumber)).ToThinUser();
+            if (!ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber))
+            { throw new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."); }
+            return (await GetUser(normalisedPhoneNumber)).ToThinUser();
 		}
 
         public async Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID)
@@ -127,21 +129,26 @@ namespace Server.Controls
             // Throws if user not found or locked
             User editUser = await GetUser(userID);
             
-            editUser.PhoneNumber = phoneNumber;
-            editUser.Email = email;
-            editUser.Name = name;
+            // Check unique details changed to avoid errors
+            bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && editUser.PhoneNumber != phoneNumber;
+            bool emailChanged = !string.IsNullOrEmpty(email) && editUser.Email != email;
+
+            // Modify user for validation
+            editUser.PhoneNumber = string.IsNullOrEmpty(phoneNumber) ? editUser.PhoneNumber : phoneNumber;
+            editUser.Email = string.IsNullOrEmpty(email) ? editUser.Email : email;
+            editUser.Name = string.IsNullOrEmpty(name) ? editUser.Name : name;
 
             // Validate and Normalise
-            if (!editUser.ValidateAndNormalise())
+            if ((phoneNumberChanged || emailChanged) && !editUser.ValidateAndNormalise())
             { throw new InvalidInformationException("Invalid details provided."); }
 
             // Update individual attributes
-			if (!string.IsNullOrEmpty(phoneNumber))
+			if (phoneNumberChanged)
             {
                 await ThrowIfPhoneNumberTaken(editUser.PhoneNumber);
                 accounts.UpdatePhoneNumber(userID, editUser.PhoneNumber);
 			}
-			if (!string.IsNullOrEmpty(email))
+			if (emailChanged)
 			{
                 await ThrowIfEmailTaken(editUser.Email);
                 accounts.UpdateEmail(userID, email);

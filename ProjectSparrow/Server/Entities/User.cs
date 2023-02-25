@@ -122,14 +122,15 @@ namespace Server.Entities
             // Verify Phone Number
             if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
 
-            // Verify Email
-            if (!ContentValidation.IsEmailValid(Email)) { return false; }
+            // Verify Email if it exists
+            if (!string.IsNullOrEmpty(Email) &&
+                !ContentValidation.IsEmailValid(Email)) { return false; }
 
             // Verify User age
             if (DateOfBirth + TimeSpan.FromDays(365 * 18) > DateTimeOffset.UtcNow) { return false; }
 
             // Normalise
-            Email = Email.ToLower();
+            Email = string.IsNullOrEmpty(Email) ? Email : Email.ToLower();
             PhoneNumber = normalisedPhoneNumber;
 
             return true;
