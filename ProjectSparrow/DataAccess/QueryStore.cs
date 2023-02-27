@@ -84,7 +84,10 @@ namespace DataAccess
 		public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id) { throw new NotImplementedException(); }
 		public bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails) { throw new NotImplementedException(); }
 
-        private ThinUser FindUserBy(Func<User,bool> predicate)
+		public bool RateUser(Guid selfId, Guid targetId, UserRating rating) { throw new NotImplementedException(); }
+		public (int Positive, int Negative) GetUserRatings(Guid id) { throw new NotImplementedException(); }
+
+		private ThinUser FindUserBy(Func<User,bool> predicate)
         {
             ThinUser user;
             int numFollowers;
