@@ -216,6 +216,11 @@ namespace Server.Controls
         {
             await GetUser(userID);
             accounts.RateUser(userID, targetID, rating);
+
+            User targetUser = new(targetID);
+            await targetUser.SyncReputation();
+            targetUser.CalculateReputation();
+            accounts.UpdateReputation(targetID, targetUser.Reputation);
         }
 
         public async Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails)
@@ -255,6 +260,11 @@ namespace Server.Controls
             { throw new InvalidUserException("User account is locked."); }
 
             return user;
+        }
+
+        internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(Guid userID)
+        {
+            return accounts.GetUserRatings(userID);
         }
 
         internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)> GetAllReportsAsync(Guid userID)

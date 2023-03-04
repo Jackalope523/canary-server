@@ -17,9 +17,14 @@ namespace Server.Entities
         public string Name { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
-        public DateTimeOffset JoinDate { get; init; }
-        public int Reputation { get; set; }
         public int NumberOfFollowers { get; set; }
+        public DateTimeOffset JoinDate { get; init; }
+
+        public int Reputation { get; set; }
+        public (int Postitive, int Negative) Ratings { get; set; }
+        public const int MaximumReputation = 100;
+        public const int ReputationPopulation = 20;
+        public const float ReputationIntensity = 2.2f;
 
         public bool IsPhoneConfirmed { get; set; }
         public bool IsEmailConfirmed { get; set; }
@@ -110,6 +115,11 @@ namespace Server.Entities
             catch { }
         }
 
+        public async Task SyncReputation()
+        {
+            Ratings = await AccountManager.Manager.GetAllRatingsAsync(Id);
+        }
+
         public async Task SyncReports()
         {
             var reports = await AccountManager.Manager.GetAllReportsAsync(Id);
@@ -180,6 +190,16 @@ namespace Server.Entities
 			{ return false; }
 
             return true;
+        }
+
+        public void CalculateReputation()
+        {
+            int ratingDiff = Ratings.Postitive - Ratings.Negative;
+            int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
+
+            float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
+
+            Reputation = (int) (MathF.Atan(reputationRaw * normal) * (MaximumReputation / ReputationIntensity) + (MaximumReputation / 2));
         }
 
         public async Task<UserAccountStatus> EventReported()
