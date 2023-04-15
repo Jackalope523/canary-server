@@ -70,7 +70,7 @@ namespace DataAccess
                     Id = Guid.NewGuid(),
                     PhoneNumber = "0",
                     Email = "",
-                    NormalisedEmail = "",
+                    NormalizedEmail = "",
                     Name = "Signy of Sváfnir",
                     SecurityStamp = Guid.NewGuid().ToString()
                 },
@@ -79,7 +79,7 @@ namespace DataAccess
                     Id = Guid.NewGuid(),
                     PhoneNumber = "1",
                     Email = "",
-                    NormalisedEmail = "",
+                    NormalizedEmail = "",
                     Name = "Huginn",
                     SecurityStamp = Guid.NewGuid().ToString()
                 },
@@ -88,7 +88,7 @@ namespace DataAccess
                     Id = Guid.NewGuid(),
                     PhoneNumber = "2",
                     Email = "",
-                    NormalisedEmail = "",
+                    NormalizedEmail = "",
                     Name = "Muninn",
                     SecurityStamp = Guid.NewGuid().ToString()
                 }
