@@ -1,9 +1,9 @@
 ﻿using NetTopologySuite.Geometries;
 using Server.Boundaries;
 
-namespace DataAccess.Entities
+namespace Repository.Entities
 {
-    public class Event : Entity
+    public class Event
     {
         public Guid Id { get; set; }
 

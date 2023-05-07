@@ -1,22 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DataAccess.Entities;
+using Repository.Entities;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
+using System.ComponentModel;
 
-namespace DataAccess
+namespace Repository.Contexts
 {
-    public class QueryContext : DbContext
+    public abstract class QueryContext : DbContext
     {
         public DbSet<User> Users { get; set; }
-        public DbSet<Event> Events { get; set; }  
+        public DbSet<Event> Events { get; set; }
         public DbSet<Link> Links { get; set; }
         public DbSet<UserLink> UserLinks { get; set; }
-        public DbSet<EventLink> EventLinks { get; set; }  
-
-         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-         {
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Test", x => x.UseNetTopologySuite());
-         }
+        public DbSet<EventLink> EventLinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,7 +54,7 @@ namespace DataAccess
                 .WithMany(b => b.Links);
 
 
-            SeedData(modelBuilder);
+            //SeedData(modelBuilder);
         }
 
         private void SeedData(ModelBuilder modelBuilder)

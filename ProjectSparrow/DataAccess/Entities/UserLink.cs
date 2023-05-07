@@ -1,4 +1,4 @@
-﻿namespace DataAccess.Entities
+﻿namespace Repository.Entities
 {
     public class UserLink : Link
     {

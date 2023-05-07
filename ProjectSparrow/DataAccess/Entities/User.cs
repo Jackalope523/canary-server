@@ -1,9 +1,9 @@
 ﻿
 using Server.Boundaries;
 
-namespace DataAccess.Entities
+namespace Repository.Entities
 {
-    public class User : Entity
+    public class User
     {
         public Guid Id { get; init; }
         public string PhoneNumber { get; set; }  

@@ -1,26 +1,49 @@
-﻿using DataAccess.Entities;
+﻿using Repository.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
-using PhoneNumbers;
 using Server.Boundaries;
 using Shared;
-using System.Collections.Generic;
-using System.Xml.Linq;
+using Repository.Contexts;
 
-namespace DataAccess
+namespace Repository
 {
     public class QueryStore : IAccountDatabase, IEventDatabase
     {
-        public static IAccountDatabase AccountDatabaseAccess => new QueryStore();
-        public static IEventDatabase EventDatabaseAccess => new QueryStore();
+        public enum StoreMode { Production, Test }
 
-        private static QueryContext _context = new QueryContext();
+        private StoreMode storeMode;
+        private int flushRate;
+        private int callsMade;
 
+        public static IAccountDatabase AccountDatabaseAccess => new QueryStore(StoreMode.Production, 1);
+        public static IEventDatabase EventDatabaseAccess => new QueryStore(StoreMode.Production, 1);
 
+        private static QueryContext _context;
 
+        public QueryStore(StoreMode mode, int rate)
+        {
+            storeMode = mode;
+            flushRate = rate;
+
+            if (storeMode == StoreMode.Test) { _context = new TestContext(); }
+            else { _context = new TestContext(); }
+        }
+
+        private void callMade()
+        {
+            callsMade++;
+
+            if (callsMade == flushRate)
+            {
+                callsMade = 0;
+
+                _context.SaveChanges();
+                _context.Dispose();
+                
+                if (storeMode == StoreMode.Test) { _context = new TestContext(); }
+                else { _context = new TestContext(); }
+            }
+        }
 
         // Workout Mutual follow search
         public List<ThinnerUser> GetFriends(Guid id) { return getLinkedUsers(id, UserLink.UserLinkType.Follow); }
@@ -29,13 +52,14 @@ namespace DataAccess
         // WTF DOES THIS DO???
         public ThinEvent FindAttendingEvent(Guid id)
 		{
+            callMade();
+
 			Event @event;
 			ThinnerUser host;
-			using (_context = new QueryContext())
-			{
-				@event = _context.EventLinks.Where(e => e.SelfId == id).Include(e => e.Event.Host).Single().Event;
-				host = new ThinnerUser(@event.Host.Id, @event.Host.Name);
-			}
+			
+            @event = _context.EventLinks.Where(e => e.SelfId == id).Include(e => e.Event.Host).Single().Event;
+            host = new ThinnerUser(@event.Host.Id, @event.Host.Name);
+
             return new ThinEvent(@event.Id, host, @event.Name, @event.Description, @event.Type,
                 @event.StartTime, @event.Location.X, @event.Location.Y, @event.EndTime,
 				@event.IsEventOpen, @event.GroupMinimum, @event.GroupMaximum);
@@ -44,32 +68,36 @@ namespace DataAccess
         // Why need ID here?
         public List<ThinEvent> FindUpcomingEvents(Guid id)
         {
+            callMade();
+
             List<ThinEvent> upcomingEvents;
-            using (_context = new QueryContext())
-            { 
-                upcomingEvents = _context.Events.Where(e => e.HostId == id &e.StartTime > DateTimeOffset.UtcNow).
-								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.Type,
-                                e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
-            }
+          
+            upcomingEvents = _context.Events.Where(e => e.HostId == id & e.StartTime > DateTimeOffset.UtcNow).
+                               Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.Type,
+                               e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
+
             return upcomingEvents;
         }
 
         // Why need ID here?
         public List<ThinEvent> FindPastEvents(Guid id)
 		{
+            callMade();
+
             List<ThinEvent> pastEvents;
-            using (_context = new QueryContext())
-            { 
-                pastEvents = _context.Events.Where(e => e.EndTime.HasValue && e.EndTime < DateTimeOffset.UtcNow).
-								Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.Type,
-                                e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
-            }
+            
+            pastEvents = _context.Events.Where(e => e.EndTime.HasValue && e.EndTime < DateTimeOffset.UtcNow).
+                               Select(e => new ThinEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Name, e.Description, e.Type,
+                               e.StartTime, e.Location.Y, e.Location.X, e.EndTime, e.IsEventOpen, e.GroupMinimum, e.GroupMaximum)).ToList();
+
             return pastEvents;
 		}
 
         // Do you really need thin event returned?
         public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
         {
+            callMade();
+
             Event toCreate = new Event
             {
                 HostId = hostId,
@@ -82,13 +110,9 @@ namespace DataAccess
                 GroupMaximum = groupMaximum
             };
 
-            using (_context = new QueryContext())
-            {
-                _context.Events.Add(toCreate);
-                _context.SaveChanges();
+            _context.Events.Add(toCreate);
 
-                AddUserToEvent(hostId, toCreate.Id);
-            }
+            AddUserToEvent(hostId, toCreate.Id);
 
             return toCreate.ToThinEvent();
         }
@@ -98,6 +122,8 @@ namespace DataAccess
         //************************************************
         public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
+            callMade();
+
             User toCreate = new User
             {
                 PhoneNumber = phoneNumber,
@@ -111,21 +137,15 @@ namespace DataAccess
                 AccountStatus = UserAccountStatus.active,
             };
 
-            using (_context = new QueryContext())
-            {
-                _context.Users.Add(toCreate);
-                _context.SaveChanges();
-            }
-
+            _context.Users.Add(toCreate);
+            
             return true;
         }
         public bool DeleteUser(Guid id)
         {
-            using (_context = new QueryContext())
-            {
-                _context.Users.Remove(new User { Id = id });
-                _context.SaveChanges();
-            }
+            callMade();
+
+            _context.Users.Remove(new User { Id = id });
 
             return true;
         }
@@ -134,77 +154,77 @@ namespace DataAccess
 
         public ThinEvent FindEvent(Guid id)
         {
-            ThinEvent @event;
-            using (_context = new QueryContext())
-            {
-                @event = _context.Events.Where(e => e.Id == id).Select(e => new ThinEvent
-                (
-                    e.Id, 
-                    new ThinnerUser(e.Host.Id, e.Host.Name), 
-                    e.Name, 
-                    e.Description, 
-                    e.Type,
-                    e.StartTime, 
-                    e.Location.Y, 
-                    e.Location.X, 
-                    e.EndTime,
-                    e.IsEventOpen, 
-                    e.GroupMinimum, 
-                    e.GroupMaximum
-                )).Single();
-            }
+            callMade();
+
+            ThinEvent @event;          
+            @event = _context.Events.Where(e => e.Id == id).Select(e => new ThinEvent
+               (
+                   e.Id,
+                   new ThinnerUser(e.Host.Id, e.Host.Name),
+                   e.Name,
+                   e.Description,
+                   e.Type,
+                   e.StartTime,
+                   e.Location.Y,
+                   e.Location.X,
+                   e.EndTime,
+                   e.IsEventOpen,
+                   e.GroupMinimum,
+                   e.GroupMaximum
+               )).Single();
 
             return @event;
         }
         public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
         {
+            callMade();
+
             List<ThinnerEvent> closestEvents;
             Point userLocation = new Point(longitude, latitude);
-            using (_context = new QueryContext())
-            {
-                closestEvents = _context.Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
+           
+            closestEvents = _context.Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
                                 Select(e => new ThinnerEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Type, e.Location.Y, e.Location.X)).ToList();
-            }
+
             return closestEvents;
         }
 
         public List<ThinnerUser> GetGuestList(Guid id)
         {
+            callMade();
+
             List<ThinnerUser> guests;
-            using (_context = new QueryContext())
-            {
-                guests = _context.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).ToList();
-            }
+            
+            guests = _context.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).ToList();
+
             return guests;
         }
 
         private ThinUser FindUserBy(Func<User, bool> predicate)
         {
+            callMade();
+
             ThinUser user;
             int numFollowers;
-            using (_context = new QueryContext())
-            {
-                user = _context.Users.Where(predicate).Select(u => new ThinUser
-                (
-                    u.Id,
-                    u.PhoneNumber,
-                    u.Email,
-                    u.Name,
-                    u.DateOfBirth,
-                    u.IsPhoneConfirmed,
-                    u.IsEmailConfirmed,
-                    u.SecurityStamp,
-                    u.LockoutDate,
-                    u.AccessTries,
-                    u.AccountStatus,
-                    u.JoinDate,
-                    u.Reputation,
-                    -1
-                )).Single();
 
-                numFollowers = _context.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).Count();
+            user = _context.Users.Where(predicate).Select(u => new ThinUser
+               (
+                   u.Id,
+                   u.PhoneNumber,
+                   u.Email,
+                   u.Name,
+                   u.DateOfBirth,
+                   u.IsPhoneConfirmed,
+                   u.IsEmailConfirmed,
+                   u.SecurityStamp,
+                   u.LockoutDate,
+                   u.AccessTries,
+                   u.AccountStatus,
+                   u.JoinDate,
+                   u.Reputation,
+                   -1
+               )).Single();
 
-            }
+            numFollowers = _context.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).Count();
             return user with { NumberOfFollowers = numFollowers };
         }
         public ThinUser FindUserById(Guid id) { return FindUserBy(u => u.Id == id); }
@@ -212,14 +232,13 @@ namespace DataAccess
         public ThinUser FindUserByEmail(string email) { return FindUserBy(u => u.NormalizedEmail == email); }
 
         // Come back here once exclusivity decided. 
-        private static bool linkOperation(Link link, bool addOperation)
+        private bool linkOperation(Link link, bool addOperation)
         {
-            using (_context = new QueryContext())
-            {
-                if (addOperation) _context.Links.Add(link);
-                else _context.Links.Remove(link);
-                _context.SaveChanges();
-            }
+            callMade();
+
+            if (addOperation) _context.Links.Add(link);
+            else _context.Links.Remove(link);
+
             return true;
         }
         public bool FollowUser(Guid selfId, Guid targetId) { return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }, true); }
@@ -228,6 +247,8 @@ namespace DataAccess
         public bool UnblockUser(Guid selfId, Guid targetId) { return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, false); }
         public bool RateUser(Guid selfId, Guid targetId, UserRating rating) 
         {
+            callMade();
+
             if (rating == UserRating.Positive) return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateUp }, true);
             else return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateDown }, true);
         }
@@ -235,8 +256,10 @@ namespace DataAccess
         public bool AddUserToEvent(Guid userId, Guid eventId) { return linkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, true); }
         public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return linkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, false); }
 
-        private static bool updateUserProperty(Guid id, string propertyName, Object newProperty)
+        private bool updateUserProperty(Guid id, string propertyName, Object newProperty)
         {
+            callMade();
+
             User u = new User { Id = id };
 
             switch (propertyName)
@@ -277,12 +300,10 @@ namespace DataAccess
                 default:
                     throw new Exception("No propertyName match found");
             }
-            using (_context = new QueryContext())
-            {
-                _context.Users.Attach(u);
-                _context.Entry(u).Property<string>(propertyName).IsModified = true;
-                _context.SaveChanges();
-            }
+
+            _context.Users.Attach(u);
+            _context.Entry(u).Property<string>(propertyName).IsModified = true;
+
             return true;
         }
         public bool UpdatePhoneNumber(Guid id, string newNumber) { return updateUserProperty(id, nameof(User.PhoneNumber), newNumber); }
@@ -297,8 +318,10 @@ namespace DataAccess
         public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return updateUserProperty(id, nameof(User.AccountStatus), accountStatus); }
         public bool UpdateReputation(Guid id, int newReputation) { return updateUserProperty(id, nameof(User.Reputation), newReputation); }
 
-        private static bool updateEventProperty (Guid id, string propertyName, Object newProperty)
+        private bool updateEventProperty (Guid id, string propertyName, Object newProperty)
         {
+            callMade();
+
             Event e = new Event { Id = id };
 
             switch (propertyName)
@@ -318,12 +341,10 @@ namespace DataAccess
                 default:
                     throw new Exception("No propertyName match found");
             }
-            using (_context = new QueryContext())
-            {
-                _context.Events.Attach(e);
-                _context.Entry(e).Property<string>(propertyName).IsModified = true;
-                _context.SaveChanges();
-            }
+
+            _context.Events.Attach(e);
+            _context.Entry(e).Property<string>(propertyName).IsModified = true;
+
             return true;
         }
 		public bool UpdateDescription(Guid id, string newDescription) { return updateEventProperty(id, nameof(Event.Description), newDescription); }
@@ -331,13 +352,14 @@ namespace DataAccess
         public bool UpdateStatus(Guid id, bool isOpen) { return updateEventProperty(id, nameof(Event.IsEventOpen), isOpen); }
         public bool EndEvent(Guid id) { return updateEventProperty(id, nameof(Event.EndTime), DateTimeOffset.UtcNow); }
 
-        private static List<ThinnerUser> getLinkedUsers(Guid id, UserLink.UserLinkType type)
+        private List<ThinnerUser> getLinkedUsers(Guid id, UserLink.UserLinkType type)
         {
+            callMade();
+
             List<ThinnerUser> users;
-            using (_context = new QueryContext())
-            {
-                users = _context.UserLinks.Where(l => l.SelfId == id && l.Type == type).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
-            }
+          
+            users = _context.UserLinks.Where(l => l.SelfId == id && l.Type == type).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
+
             return users;
         }  
         public List<ThinnerUser> GetFollowedUsers(Guid id) { return getLinkedUsers(id, UserLink.UserLinkType.Follow); }
@@ -345,11 +367,10 @@ namespace DataAccess
      
         public (int Positive, int Negative) GetUserRatings(Guid id)
         {
+            callMade();
+
             List<UserLink.UserLinkType> ratings;
-            using (_context = new QueryContext())
-            {
-                ratings = _context.UserLinks.Where(l => l.OtherId == id && (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).Select(l => l.Type).ToList();
-            }
+            ratings = _context.UserLinks.Where(l => l.OtherId == id && (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).Select(l => l.Type).ToList();
 
             int up = 0;
             int down = 0;
