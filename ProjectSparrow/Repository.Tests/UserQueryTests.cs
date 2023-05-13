@@ -1,5 +1,7 @@
-﻿using Repository.Contexts;
+﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using Repository.Contexts;
 using Repository.Entities;
+using Xunit.Abstractions;
 
 namespace Repository.Tests
 {
@@ -8,6 +10,14 @@ namespace Repository.Tests
         private static TestContext _context = new TestContext();
         private static QueryStore store = new QueryStore(QueryStore.StoreMode.Test, 1);
 
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public UserQueryTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
+
         [Fact]
         public void CreateUser_Success()
         {
@@ -15,11 +25,10 @@ namespace Repository.Tests
             store.CreateUser("000-000-0000", "email_0@test.com", "user0", new DateTimeOffset(new DateTime(0)));
 
             // Act
-            User created = _context.Users.Where(u => u.PhoneNumber == "000-000-0000").Single();
+            User created = _context.Users.Where(u => u.PhoneNumber.Equals("000-000-0000")).Single();
 
             // Assert
             Assert.NotNull(created);
-
         }
     }
 }
