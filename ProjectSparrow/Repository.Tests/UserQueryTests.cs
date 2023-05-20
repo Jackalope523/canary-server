@@ -42,7 +42,6 @@ namespace Repository.Tests
             };
         }
 
-
         [Fact]
         public void CreateUser_SUCCESS()
         {
@@ -128,34 +127,7 @@ namespace Repository.Tests
             Assert.Equal(subjectEmail, found.Email);
             Assert.Equal(subjectName, found.Name);
             Assert.Equal(subjectDateOfBirth, found.DateOfBirth);
-        }
-
-        [Fact]
-        public void FollowUser_SUCCESS()
-        {
-
-        }
-        [Fact]
-        public void UnfollowUser_SUCCESS()
-        {
-
-        }
-        [Fact]
-        public void BlockUser_SUCCESS()
-        {
-
-        }
-        [Fact]
-        public void UnblockUser_SUCCESS()
-        {
-
-        }
-        [Fact]
-        public void RateUser_SUCCESS()
-        {
-
-        }
-
+        } 
         [Fact]
         public void UpdatePhoneNumber_SUCCESS() 
         {

@@ -179,8 +179,6 @@ namespace Repository
         }
         public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
         {
-            
-
             List<ThinnerEvent> closestEvents;
             Point userLocation = new Point(longitude, latitude);
            
@@ -204,8 +202,6 @@ namespace Repository
 
         private ThinUser FindUserBy(Func<User, bool> predicate)
         {
-           
-
             ThinUser user;
             int numFollowers;
 
@@ -236,31 +232,41 @@ namespace Repository
         public ThinUser FindUserByPhoneNumber(string phoneNumber) { return FindUserBy(u => u.PhoneNumber == phoneNumber); }
         public ThinUser FindUserByEmail(string email) { return FindUserBy(u => u.NormalizedEmail == email); }
 
-        // Come back here once exclusivity decided. 
-        private bool linkOperation(Link link, bool addOperation)
+        private bool addLinkOperation(Link link)
         {
-            
-
-            if (addOperation) _context.Links.Add(link);
-            else _context.Links.Remove(link);
-
+            _context.Links.Add(link);
             queueChange();
             return true;
+
         }
-        public bool FollowUser(Guid selfId, Guid targetId) { return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }, true); }
-        public bool UnfollowUser(Guid selfId, Guid targetId) { return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }, false); }
-        public bool BlockUser(Guid selfId, Guid targetId) { return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, true); }
-        public bool UnblockUser(Guid selfId, Guid targetId) { return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }, false); }
+        private bool removeLinkOperation(UserLink link)
+        {
+            _context.UserLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete();
+
+            //queueChange();
+            return true;
+        }
+        private bool removeLinkOperation(EventLink link)
+        {
+            _context.EventLinks.Where(l => l.SelfId == link.SelfId && l.EventId == link.EventId && l.Type == link.Type).ExecuteDelete();
+            //queueChange();
+            return true;
+        }
+
+        public bool FollowUser(Guid selfId, Guid targetId) { return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); }
+        public bool UnfollowUser(Guid selfId, Guid targetId) { return removeLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); }
+        public bool BlockUser(Guid selfId, Guid targetId) { return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); }
+        public bool UnblockUser(Guid selfId, Guid targetId) { return removeLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); }
         public bool RateUser(Guid selfId, Guid targetId, UserRating rating) 
         {
             
 
-            if (rating == UserRating.Positive) return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateUp }, true);
-            else return linkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateDown }, true);
+            if (rating == UserRating.Positive) return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateUp });
+            else return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateDown });
         }
 
-        public bool AddUserToEvent(Guid userId, Guid eventId) { return linkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, true); }
-        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return linkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }, false); }
+        public bool AddUserToEvent(Guid userId, Guid eventId) { return addLinkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }); }
+        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return removeLinkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }); }
 
         private bool updateUserProperty(Guid id, string propertyName, Object newProperty)
         {
@@ -306,7 +312,7 @@ namespace Repository
             }
 
             _context.Users.Attach(u);
-            _context.Entry(u).Property<string>(propertyName).IsModified = true;
+            _context.Entry(u).Property(propertyName).IsModified = true;
 
             queueChange();
             return true;

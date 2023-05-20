@@ -2,11 +2,11 @@
 {
     public class UserLink : Link
     {
-        internal enum UserLinkType { Follow, Block, RateUp, RateDown, Rude, HateSpeech, Harassment, ViolentBehaviour, PhysicalAssault, SexualAssault}
+        public enum UserLinkType { Follow, Block, RateUp, RateDown, Rude, HateSpeech, Harassment, ViolentBehaviour, PhysicalAssault, SexualAssault}
 
         public Guid OtherId { get; init; }
         internal User Other { get; init; }
-        internal UserLinkType Type { get; set; }
+        public UserLinkType Type { get; set; }
        
     }
 }
