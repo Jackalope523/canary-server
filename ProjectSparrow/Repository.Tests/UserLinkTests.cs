@@ -8,7 +8,7 @@ using static PhoneNumbers.PhoneNumber;
 
 namespace Repository.Tests
 {
-    public class UserLinkQueryTests : IDisposable
+    public class UserLinkTests : IDisposable
     {
         private static TestSentry sentry = TestSentry.GetTestSentry();
         private static QueryStore store = new QueryStore(sentry);
@@ -32,7 +32,7 @@ namespace Repository.Tests
         private DateTimeOffset subject2DateOfBirth = new DateTimeOffset(new DateTime(10));
 
 
-        public UserLinkQueryTests(ITestOutputHelper testOutputHelper)
+        public UserLinkTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
@@ -152,18 +152,23 @@ namespace Repository.Tests
         }
         [Fact]
         public void GetFollowedUsers_SUCCESS() 
-        { 
-            
+        {
+            throw new NotImplementedException();
         }
         [Fact]
         public void GetBlockedUsers_SUCCESS() 
-        { 
-            
+        {
+            throw new NotImplementedException();
         }
         [Fact]
         public void GetUserRatings_SUCCESS()
         {
-            
+            throw new NotImplementedException();
+        }
+        [Fact]
+        public void GetFriends_SUCCESS()
+        {
+            throw new NotImplementedException();
         }
     }
 }

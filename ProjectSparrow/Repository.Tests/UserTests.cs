@@ -13,7 +13,7 @@ using static PhoneNumbers.PhoneNumber;
 
 namespace Repository.Tests
 {
-    public class UserQueryTests
+    public class UserTests
     {
         private static TestSentry sentry = TestSentry.GetTestSentry();
         private static QueryStore store = new QueryStore(sentry);
@@ -28,7 +28,7 @@ namespace Repository.Tests
         private DateTimeOffset subjectDateOfBirth = new DateTimeOffset(new DateTime(0));
         private User subject;
 
-        public UserQueryTests(ITestOutputHelper testOutputHelper)
+        public UserTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 

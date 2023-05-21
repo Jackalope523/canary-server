@@ -8,22 +8,22 @@ using System.Threading.Tasks;
 
 namespace Repository.Tests
 {
-    public class EventLinkQueryTests
+    public class EventLinkTests
     {
         [Fact]
         public void GetGuestList_SUCCESS()
         {
-            
+            throw new NotImplementedException();
         }
         [Fact]
         public void AddUserToEvent_SUCCESS() 
-        { 
-            
+        {
+            throw new NotImplementedException();
         }
         [Fact]
         public void RemoveUserFromEvent_SUCCESS() 
-        { 
-            
+        {
+            throw new NotImplementedException();
         }
     }
 }
