@@ -44,8 +44,6 @@ namespace Repository
             return true;
         }
 
-
-
         public ThinEvent FindEvent(Guid id)
         {
             ThinEvent @event;
