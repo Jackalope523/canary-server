@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Repository.Contexts;
 using Repository.Entities;
+using Repository.Sentries;
 using Server.Boundaries;
 using Shared;
 using System;
@@ -14,8 +15,8 @@ namespace Repository.Tests
 {
     public class UserQueryTests
     {
-        private static TestContext _context = new TestContext();
-        private static QueryStore store = new QueryStore(QueryStore.StoreMode.Test, 1);
+        private static TestSentry sentry = TestSentry.GetTestSentry();
+        private static QueryStore store = new QueryStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -47,10 +48,10 @@ namespace Repository.Tests
         {
             store.CreateUser(subjectPhoneNumber, subjectEmail, subjectName, subjectDateOfBirth);
 
-            User created = _context.Users.First();
+            User created = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(created);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(created);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(created);
             Assert.Equal(subjectPhoneNumber, created.PhoneNumber);
@@ -62,15 +63,15 @@ namespace Repository.Tests
 
         [Fact]
         public void DeleteUser_SUCCESS()
-        {         
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+        {
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
 
             store.DeleteUser(id);
 
-            int numRecords = _context.Users.Count();
+            int numRecords = sentry.GetContext().Users.Count();
 
             Assert.Equal(0, numRecords);
         }
@@ -78,14 +79,14 @@ namespace Repository.Tests
         [Fact]
         public void FindUserById_SUCCESS()
         {
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             ThinUser found = store.FindUserById(id);
 
-            _context.Users.Remove(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(subject);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(found);
             Assert.Equal(id, found.Id);    
@@ -97,13 +98,13 @@ namespace Repository.Tests
         [Fact]
         public void FindUserByPhoneNumber_SUCCESS()
         {
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
             ThinUser found = store.FindUserByPhoneNumber(subjectPhoneNumber);
 
-            _context.Users.Remove(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(subject);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(found);
             Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
@@ -114,13 +115,13 @@ namespace Repository.Tests
         [Fact]
         public void FindUserByEmail_SUCCESS()
         {
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
             ThinUser found = store.FindUserByEmail(subjectEmail);
 
-            _context.Users.Remove(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(subject);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(found);
             Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
@@ -133,19 +134,18 @@ namespace Repository.Tests
         {
             string newPhoneNumber = "111-111-1111";
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdatePhoneNumber(id, newPhoneNumber);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -162,19 +162,18 @@ namespace Repository.Tests
         {
             string newEmail = "email_1@test.com";
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateEmail(id, newEmail);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -191,19 +190,18 @@ namespace Repository.Tests
         {
             string newNormalizedEmail = "email_1@test.com";
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateNormalisedEmail(id, newNormalizedEmail);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -220,19 +218,18 @@ namespace Repository.Tests
         {
             string newName = "USER";
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateName(id, newName);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -247,19 +244,18 @@ namespace Repository.Tests
         [Fact]
         public void UpdatePhoneConfirmation_SUCCESS() 
         {
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdatePhoneConfirmation(id, true);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -274,19 +270,18 @@ namespace Repository.Tests
         [Fact]
         public void UpdateEmailConfirmation_SUCCESS() 
         {
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateEmailConfirmation(id, true);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -303,19 +298,18 @@ namespace Repository.Tests
         {
             string newSecurityStamp = "STAMP";
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateSecurityStamp(id, newSecurityStamp);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -332,19 +326,18 @@ namespace Repository.Tests
         {
             DateTimeOffset newLockoutDate = new DateTimeOffset(new DateTime(1));
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateLockoutDate(id, newLockoutDate);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -361,19 +354,18 @@ namespace Repository.Tests
         {
             int newAccessTries = 10;
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateAccessTries(id, newAccessTries);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -390,19 +382,18 @@ namespace Repository.Tests
         {
             UserAccountStatus newAccountStatus = UserAccountStatus.blacklisted;
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateAccountStatus(id, newAccountStatus);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -419,19 +410,18 @@ namespace Repository.Tests
         {
             int newReputation = 10;
 
-            _context.Users.Add(subject);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject);
+            sentry.GetContext().SaveChanges();
 
-            Guid id = _context.Users.First().Id;
+            Guid id = sentry.GetContext().Users.First().Id;
             store.UpdateReputation(id, newReputation);
 
-            _context.Dispose();
-            _context = new TestContext();
+            sentry.GetContext();
 
-            User updated = _context.Users.First();
+            User updated = sentry.GetContext().Users.First();
 
-            _context.Users.Remove(updated);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(updated);
+            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);

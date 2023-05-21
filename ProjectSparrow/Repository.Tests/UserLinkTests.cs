@@ -1,5 +1,6 @@
 ﻿using Repository.Contexts;
 using Repository.Entities;
+using Repository.Sentries;
 using Server.Boundaries;
 using Xunit.Abstractions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -9,8 +10,8 @@ namespace Repository.Tests
 {
     public class UserLinkTests : IDisposable
     {
-        private static TestContext _context = new TestContext();
-        private static QueryStore store = new QueryStore(QueryStore.StoreMode.Test, 1);
+        private static TestSentry sentry = TestSentry.GetTestSentry();
+        private static QueryStore store = new QueryStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -55,26 +56,25 @@ namespace Repository.Tests
                 DateOfBirth = subject2DateOfBirth
             };
 
-            _context.Users.Add(subject1);
-            _context.Users.Add(subject2);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Add(subject1);
+            sentry.GetContext().Users.Add(subject2);
         }
         public void Dispose()
         {
-            _context.Users.Remove(subject1);
-            _context.Users.Remove(subject2);
-            _context.SaveChanges();
+            sentry.GetContext().Users.Remove(subject1);
+            sentry.GetContext().Users.Remove(subject2);
+            sentry.GetContext().SaveChanges();
         }
 
         [Fact]
         public void FollowUser_SUCCESS()
         {
-            Guid id1 = _context.Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
-            Guid id2 = _context.Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
+            Guid id1 = sentry.GetContext().Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
+            Guid id2 = sentry.GetContext().Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
 
             store.FollowUser(id1, id2);
 
-            UserLink link = _context.UserLinks.Where(l => l.SelfId== id1 && l.OtherId== id2).Single();
+            UserLink link = sentry.GetContext().UserLinks.Where(l => l.SelfId== id1 && l.OtherId== id2).Single();
 
             Assert.NotNull(link);
             Assert.Equal(UserLink.UserLinkType.Follow, link.Type);
@@ -82,27 +82,27 @@ namespace Repository.Tests
         [Fact]
         public void UnfollowUser_SUCCESS()
         {
-            Guid id1 = _context.Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
-            Guid id2 = _context.Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
+            Guid id1 = sentry.GetContext().Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
+            Guid id2 = sentry.GetContext().Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
 
-            _context.UserLinks.Add(new UserLink { SelfId = id1, OtherId = id2, Type = UserLink.UserLinkType.Follow });
-            _context.SaveChanges();
+            sentry.GetContext().UserLinks.Add(new UserLink { SelfId = id1, OtherId = id2, Type = UserLink.UserLinkType.Follow });
+            sentry.GetContext().SaveChanges();
 
             store.UnfollowUser(id1, id2);
 
-            int numLinks = _context.UserLinks.Count();
+            int numLinks = sentry.GetContext().UserLinks.Count();
 
             Assert.Equal(0, numLinks);
         }
         [Fact]
         public void BlockUser_SUCCESS()
         {
-            Guid id1 = _context.Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
-            Guid id2 = _context.Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
+            Guid id1 = sentry.GetContext().Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
+            Guid id2 = sentry.GetContext().Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
 
             store.BlockUser(id1, id2);
 
-            UserLink link = _context.UserLinks.Where(l => l.SelfId == id1 && l.OtherId == id2).Single();
+            UserLink link = sentry.GetContext().UserLinks.Where(l => l.SelfId == id1 && l.OtherId == id2).Single();
 
             Assert.NotNull(link);
             Assert.Equal(UserLink.UserLinkType.Block, link.Type);
@@ -110,22 +110,45 @@ namespace Repository.Tests
         [Fact]
         public void UnblockUser_SUCCESS()
         {
-            Guid id1 = _context.Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
-            Guid id2 = _context.Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
+            Guid id1 = sentry.GetContext().Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
+            Guid id2 = sentry.GetContext().Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
 
-            _context.UserLinks.Add(new UserLink { SelfId = id1, OtherId = id2, Type = UserLink.UserLinkType.Block });
-            _context.SaveChanges();
+            sentry.GetContext().UserLinks.Add(new UserLink { SelfId = id1, OtherId = id2, Type = UserLink.UserLinkType.Block });
+            sentry.GetContext().SaveChanges();
 
             store.UnblockUser(id1, id2);
 
-            int numLinks = _context.UserLinks.Count();
+            int numLinks = sentry.GetContext().UserLinks.Count();
 
             Assert.Equal(0, numLinks);
         }
         [Fact]
-        public void RateUser_SUCCESS()
+        public void RateUser_UP()
         {
+            Guid id1 = sentry.GetContext().Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
+            Guid id2 = sentry.GetContext().Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
 
+            store.RateUser(id1, id2, Shared.UserRating.Positive);
+
+            UserLink link = sentry.GetContext().UserLinks.Single();
+
+            Assert.Equal(id1, link.SelfId);
+            Assert.Equal(id2, link.OtherId);
+            Assert.Equal(UserLink.UserLinkType.RateUp, link.Type);
+        }
+        [Fact]
+        public void RateUser_Down()
+        {
+            Guid id1 = sentry.GetContext().Users.Where(u => u.Name == subject1Name).Select(u => u.Id).Single();
+            Guid id2 = sentry.GetContext().Users.Where(u => u.Name == subject2Name).Select(u => u.Id).Single();
+
+            store.RateUser(id1, id2, Shared.UserRating.Negative);
+
+            UserLink link = sentry.GetContext().UserLinks.Single();
+
+            Assert.Equal(id1, link.SelfId);
+            Assert.Equal(id2, link.OtherId);
+            Assert.Equal(UserLink.UserLinkType.RateDown, link.Type);
         }
     }
 }

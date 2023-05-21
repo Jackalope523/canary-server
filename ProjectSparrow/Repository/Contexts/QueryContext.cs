@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Repository.Entities;
-using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
-using System.ComponentModel;
+using Repository.Entities;
 
 namespace Repository.Contexts
 {

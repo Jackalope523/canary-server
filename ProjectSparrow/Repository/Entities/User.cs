@@ -6,7 +6,7 @@ namespace Repository.Entities
     public class User
     {
         public Guid Id { get; init; }
-        public string PhoneNumber { get; set; }  
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
@@ -25,18 +25,18 @@ namespace Repository.Entities
 
         public ThinUser ToThinUser()
         {
-			return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-				IsPhoneConfirmed, IsEmailConfirmed,
-				SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-				JoinDate, Reputation, -1);
-		}
+            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+                IsPhoneConfirmed, IsEmailConfirmed,
+                SecurityStamp, LockoutDate, AccessTries, AccountStatus,
+                JoinDate, Reputation, -1);
+        }
         public ThinnerUser ToThinnerUser()
         {
-			return new(Id, Name);
-		}
+            return new(Id, Name);
+        }
         public ThinProfile ToThinProfile()
         {
-			return new(Id, Name, Reputation, 0);
-		}
+            return new(Id, Name, Reputation, 0);
+        }
     }
 }
