@@ -35,5 +35,11 @@ namespace Repository.Tests
         {
             throw new NotImplementedException();
         }
+
+
+        public ThinEvent FindAttendingEvent(Guid id) { throw new NotImplementedException(); }
+        public List<ThinEvent> FindUpcomingEvents(Guid id) { throw new NotImplementedException(); }
+        public List<ThinEvent> FindPastEvents(Guid id) { throw new NotImplementedException(); }
+       
     }
 }
