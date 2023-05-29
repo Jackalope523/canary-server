@@ -44,6 +44,29 @@ namespace Repository
             return true;
         }
 
+        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
+        {
+            /*
+            Event toCreate = new Event 
+            { 
+                HostId = hostId, 
+                Name = name, 
+                Description = description, 
+                Type = eventType, 
+                StartTime = startTime, 
+                Location = new Point(longitude, latitude), 
+                GroupMinimum = groupMinimum, 
+                GroupMaximum = groupMaximum 
+            };
+
+            storeSentry.GetContext().Events.Add(toCreate);
+
+
+            return true;
+            */
+            throw new NotImplementedException();
+        }
+
         public ThinEvent FindEvent(Guid id)
         {
             ThinEvent @event;
@@ -232,7 +255,7 @@ namespace Repository
             }
 
             storeSentry.GetContext().Events.Attach(e);
-            storeSentry.GetContext().Entry(e).Property<string>(propertyName).IsModified = true;
+            storeSentry.GetContext().Entry(e).Property(propertyName).IsModified = true;
           
             return true;
         }
@@ -305,11 +328,6 @@ namespace Repository
         }
 
         public List<ThinEvent> FindPastEvents(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
         {
             throw new NotImplementedException();
         }
