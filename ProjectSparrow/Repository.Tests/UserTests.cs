@@ -13,7 +13,7 @@ using static PhoneNumbers.PhoneNumber;
 
 namespace Repository.Tests
 {
-    public class UserTests
+    public class UserTests : IDisposable
     {
         private static TestSentry sentry = TestSentry.GetTestSentry();
         private static QueryStore store = new QueryStore(sentry);
@@ -42,6 +42,10 @@ namespace Repository.Tests
                 DateOfBirth = subjectDateOfBirth          
             };
         }
+        public void Dispose()
+        {
+            sentry.GetContext().Users.ExecuteDelete();
+        }
 
         [Fact]
         public void CreateUser_SUCCESS()
@@ -49,9 +53,6 @@ namespace Repository.Tests
             store.CreateUser(subjectPhoneNumber, subjectEmail, subjectName, subjectDateOfBirth);
 
             User created = sentry.GetContext().Users.First();
-
-            sentry.GetContext().Users.Remove(created);
-            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(created);
             Assert.Equal(subjectPhoneNumber, created.PhoneNumber);
@@ -83,10 +84,7 @@ namespace Repository.Tests
             sentry.GetContext().SaveChanges();
 
             Guid id = sentry.GetContext().Users.First().Id;
-            ThinUser found = store.FindUserById(id);
-
-            sentry.GetContext().Users.Remove(subject);
-            sentry.GetContext().SaveChanges();
+            ThinUser found = store.FindUserById(id);        
 
             Assert.NotNull(found);
             Assert.Equal(id, found.Id);    
@@ -101,10 +99,7 @@ namespace Repository.Tests
             sentry.GetContext().Users.Add(subject);
             sentry.GetContext().SaveChanges();
 
-            ThinUser found = store.FindUserByPhoneNumber(subjectPhoneNumber);
-
-            sentry.GetContext().Users.Remove(subject);
-            sentry.GetContext().SaveChanges();
+            ThinUser found = store.FindUserByPhoneNumber(subjectPhoneNumber);       
 
             Assert.NotNull(found);
             Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
@@ -118,10 +113,7 @@ namespace Repository.Tests
             sentry.GetContext().Users.Add(subject);
             sentry.GetContext().SaveChanges();
 
-            ThinUser found = store.FindUserByEmail(subjectEmail);
-
-            sentry.GetContext().Users.Remove(subject);
-            sentry.GetContext().SaveChanges();
+            ThinUser found = store.FindUserByEmail(subjectEmail);         
 
             Assert.NotNull(found);
             Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
@@ -143,9 +135,6 @@ namespace Repository.Tests
             sentry.GetContext();
 
             User updated = sentry.GetContext().Users.First();
-
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -172,9 +161,6 @@ namespace Repository.Tests
 
             User updated = sentry.GetContext().Users.First();
 
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
-
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
             Assert.NotEqual(subjectEmail, updated.Email);
@@ -199,9 +185,6 @@ namespace Repository.Tests
             sentry.GetContext();
 
             User updated = sentry.GetContext().Users.First();
-
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -228,9 +211,6 @@ namespace Repository.Tests
 
             User updated = sentry.GetContext().Users.First();
 
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
-
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
             Assert.Equal(subjectEmail, updated.Email);
@@ -254,9 +234,6 @@ namespace Repository.Tests
 
             User updated = sentry.GetContext().Users.First();
 
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
-
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
             Assert.Equal(subjectEmail, updated.Email);
@@ -279,9 +256,6 @@ namespace Repository.Tests
             sentry.GetContext();
 
             User updated = sentry.GetContext().Users.First();
-
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -308,9 +282,6 @@ namespace Repository.Tests
 
             User updated = sentry.GetContext().Users.First();
 
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
-
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
             Assert.Equal(subjectEmail, updated.Email);
@@ -335,9 +306,6 @@ namespace Repository.Tests
             sentry.GetContext();
 
             User updated = sentry.GetContext().Users.First();
-
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
@@ -364,9 +332,6 @@ namespace Repository.Tests
 
             User updated = sentry.GetContext().Users.First();
 
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
-
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
             Assert.Equal(subjectEmail, updated.Email);
@@ -392,9 +357,6 @@ namespace Repository.Tests
 
             User updated = sentry.GetContext().Users.First();
 
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
-
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
             Assert.Equal(subjectEmail, updated.Email);
@@ -419,9 +381,6 @@ namespace Repository.Tests
             sentry.GetContext();
 
             User updated = sentry.GetContext().Users.First();
-
-            sentry.GetContext().Users.Remove(updated);
-            sentry.GetContext().SaveChanges();
 
             Assert.NotNull(updated);
             Assert.Equal(id, updated.Id);
