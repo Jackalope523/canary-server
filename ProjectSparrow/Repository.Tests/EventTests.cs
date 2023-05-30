@@ -31,6 +31,7 @@ namespace Repository.Tests
         private double testEventLongitude = 100;
         private int testEventGroupMinimum = 0;
         private int testEventGroupMaximum = 1;
+        private bool testIsEventOpen = false;     
         private Event testEvent;
 
         public EventTests(ITestOutputHelper testOutputHelper)
@@ -50,18 +51,19 @@ namespace Repository.Tests
             sentry.GetContext().Users.Add(testUser);
             sentry.GetContext().SaveChanges();
 
-            testHostId = sentry.GetContext().Users.First().Id;           
+            testHostId = sentry.GetContext().Users.First().Id;
 
             testEvent = new Event
             {
                 HostId = testHostId,
                 Name = testEventName,
                 Description = testEventDescription,
-                Type= testEventEventType,
+                Type = testEventEventType,
                 StartTime = testEventStartTime,
                 Location = new Point(testEventLongitude, testEventLatitude),
                 GroupMinimum = testEventGroupMinimum,
                 GroupMaximum = testEventGroupMaximum,
+                IsEventOpen= testIsEventOpen
             };
         }
         public void Dispose()
@@ -87,6 +89,7 @@ namespace Repository.Tests
             Assert.Equal(testEventLongitude, created.Location.X);
             Assert.Equal(testEventGroupMinimum, created.GroupMinimum);
             Assert.Equal(testEventGroupMaximum, created.GroupMaximum);
+            Assert.Equal(testIsEventOpen, created.IsEventOpen);
         }
         [Fact]
         public void FindEvent_SUCCESS()
@@ -225,23 +228,6 @@ namespace Repository.Tests
             Assert.Equal(testEventGroupMinimum, ended.GroupMinimum);
             Assert.Equal(testEventGroupMaximum, ended.GroupMaximum);
             Assert.NotNull(ended.EndTime);
-        }
-        [Fact]
-        public void FindUpcomingEvents_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
-        [Fact]
-        public void FindPastEvents_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
-        [Fact]
-        public void FindCurrentEvent_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
-
-        
+        }      
     }
 }

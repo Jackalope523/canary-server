@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Repository.Contexts;
 using Repository.Entities;
 using Repository.Sentries;
 using Server.Boundaries;
@@ -317,7 +316,7 @@ namespace Repository
             throw new NotImplementedException();
         }
 
-        public ThinEvent FindAttendingEvent(Guid id)
+        public ThinEvent FindCurrentEvent(Guid id)
         {
             throw new NotImplementedException();
         }

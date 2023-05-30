@@ -1,4 +1,5 @@
-﻿using Repository.Contexts;
+﻿using Microsoft.EntityFrameworkCore;
+using Repository.Contexts;
 using Repository.Entities;
 using Repository.Sentries;
 using Server.Boundaries;
@@ -61,9 +62,8 @@ namespace Repository.Tests
         }
         public void Dispose()
         {
-            sentry.GetContext().Users.Remove(subject1);
-            sentry.GetContext().Users.Remove(subject2);
-            sentry.GetContext().SaveChanges();
+            sentry.GetContext().Users.ExecuteDelete();
+            sentry.GetContext().UserLinks.ExecuteDelete();
         }
 
         [Fact]

@@ -308,7 +308,7 @@ namespace Server.Controls
         {
             // Gather all user event data
             var upcomingActivity = events.FindUpcomingEvents(userID);
-            upcomingActivity.Add(events.FindAttendingEvent(userID));
+            upcomingActivity.Add(events.FindCurrentEvent(userID));
 
             return upcomingActivity.ToList();
         }

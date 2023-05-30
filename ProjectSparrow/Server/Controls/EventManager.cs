@@ -248,7 +248,7 @@ namespace Server.Controls
 
 		internal async Task<ThinEvent> GetCurrentEventAsync(Guid userID)
 		{
-			return events.FindAttendingEvent(userID);
+			return events.FindCurrentEvent(userID);
 		}
 
 		internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
