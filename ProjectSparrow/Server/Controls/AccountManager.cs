@@ -219,6 +219,17 @@ namespace Server.Controls
             accounts.UnblockUser(userID, targetID);
 		}
 
+        public async Task RateUser(Guid userID, Guid targetID, UserRating rating)
+        {
+            await GetUser(userID);
+            accounts.RateUser(userID, targetID, rating);
+
+            User targetUser = new(targetID);
+            await targetUser.SyncReputation();
+            targetUser.CalculateReputation();
+            accounts.UpdateReputation(targetID, targetUser.Reputation);
+        }
+
         public async Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails)
         {
             accounts.ReportUser(userID, targetID, reportType, reportDetails);
@@ -238,7 +249,7 @@ namespace Server.Controls
 
         internal async Task<User> GetUser(Guid userID)
         {
-			User user = new(accounts.FindUser(userID));
+			User user = new(accounts.FindUserById(userID));
 
 			// Check if user account is locked
 			if (user.IsLocked)
@@ -249,13 +260,18 @@ namespace Server.Controls
 
         internal async Task<User> GetUser(string phoneNumber)
         {
-            User user = new(accounts.FindUser(phoneNumber));
+            User user = new(accounts.FindUserByPhoneNumber(phoneNumber));
 
             // Check if user account is locked
             if (user.IsLocked)
             { throw new InvalidUserException("User account is locked."); }
 
             return user;
+        }
+
+        internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(Guid userID)
+        {
+            return accounts.GetUserRatings(userID);
         }
 
         internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)> GetAllReportsAsync(Guid userID)
@@ -299,7 +315,7 @@ namespace Server.Controls
         {
             // Gather all user event data
             var upcomingActivity = events.FindUpcomingEvents(userID);
-            upcomingActivity.Add(events.FindAttendingEvent(userID));
+            upcomingActivity.Add(events.FindCurrentEvent(userID));
 
             return upcomingActivity.ToList();
         }

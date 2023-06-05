@@ -48,4 +48,10 @@ namespace Web.Models
 
 		public string ReportDetails { get; set; }
 	}
+
+	public class AccountRatingModel
+	{
+		[Required]
+		public UserRating Rating { get; set; }
+	}
 }

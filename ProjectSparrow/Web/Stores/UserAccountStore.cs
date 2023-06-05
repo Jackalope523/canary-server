@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess.Entities;
+using Repository.Entities;
 using Microsoft.AspNetCore.Identity;
 using Server.Boundaries;
 

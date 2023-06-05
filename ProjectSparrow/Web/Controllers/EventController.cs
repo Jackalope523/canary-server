@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using DataAccess.Entities;
+using Repository.Entities;
 
 namespace Web.Controllers
 {

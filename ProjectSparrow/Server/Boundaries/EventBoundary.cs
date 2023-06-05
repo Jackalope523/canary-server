@@ -20,7 +20,7 @@ namespace Server.Boundaries
         public static IEventDatabase EventDatabaseAccess;
         ThinEvent FindEvent(Guid id);
 		List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance);
-		ThinEvent FindAttendingEvent(Guid id);
+		ThinEvent FindCurrentEvent(Guid id);
 		List<ThinEvent> FindUpcomingEvents(Guid id);
 		List<ThinEvent> FindPastEvents(Guid id);
 

@@ -23,8 +23,8 @@ namespace Server.Boundaries
 	public interface IAccountDatabase
 	{
         public static IAccountDatabase AccountDatabaseAccess;
-		ThinUser FindUser(Guid id);
-        ThinUser FindUser(string phoneNumber);
+		ThinUser FindUserById(Guid id);
+        ThinUser FindUserByPhoneNumber(string phoneNumber);
 		ThinUser FindUserByEmail(string normalisedEmail);
         bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
         bool DeleteUser(Guid id);
@@ -48,6 +48,9 @@ namespace Server.Boundaries
 		bool UnfollowUser(Guid selfId, Guid targetId);
 		bool BlockUser(Guid selfId, Guid targetId);
 		bool UnblockUser(Guid selfId, Guid targetId);
+
+		bool RateUser(Guid selfId, Guid targetId, UserRating rating);
+		(int Positive, int Negative) GetUserRatings(Guid id);
 
 		(List<UserReport>, List<EventReport>) GetReports(Guid id);
 		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
@@ -79,6 +82,8 @@ namespace Server.Boundaries
 		Task UnfollowUserAsync(Guid userID, Guid targetID);
 		Task BlockUserAsync(Guid userID, Guid targetID);
 		Task UnblockUserAsync(Guid userID, Guid targetID);
+
+		Task RateUser(Guid userID, Guid targetID, UserRating rating);
 
 		Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails);
 	}
