@@ -51,6 +51,22 @@ namespace Repository.Contexts
                 .HasOne(a => a.Event)
                 .WithMany(b => b.Links);
 
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Self)
+                .WithMany(u => u.ReporterList);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Other)
+                .WithMany(u => u.ReporteeList);
+
+
+            modelBuilder.Entity<Report>()
+               .HasOne(r => r.Event)
+               .WithMany(e => e.Reports);
+
+
+
+
 
             //SeedData(modelBuilder);
         }

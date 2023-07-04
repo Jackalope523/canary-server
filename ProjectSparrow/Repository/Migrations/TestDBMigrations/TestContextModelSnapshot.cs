@@ -88,6 +88,39 @@ namespace Repository.Migrations.TestDBMigrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Repository.Entities.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OtherId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SelfId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("OtherId");
+
+                    b.HasIndex("SelfId");
+
+                    b.ToTable("Report");
+                });
+
             modelBuilder.Entity("Repository.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -187,6 +220,33 @@ namespace Repository.Migrations.TestDBMigrations
                     b.Navigation("Self");
                 });
 
+            modelBuilder.Entity("Repository.Entities.Report", b =>
+                {
+                    b.HasOne("Repository.Entities.Event", "Event")
+                        .WithMany("Reports")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.Entities.User", "Other")
+                        .WithMany("ReporteeList")
+                        .HasForeignKey("OtherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.Entities.User", "Self")
+                        .WithMany("ReporterList")
+                        .HasForeignKey("SelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Other");
+
+                    b.Navigation("Self");
+                });
+
             modelBuilder.Entity("Repository.Entities.EventLink", b =>
                 {
                     b.HasOne("Repository.Entities.Event", "Event")
@@ -201,11 +261,17 @@ namespace Repository.Migrations.TestDBMigrations
             modelBuilder.Entity("Repository.Entities.Event", b =>
                 {
                     b.Navigation("Links");
+
+                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("Repository.Entities.User", b =>
                 {
                     b.Navigation("Links");
+
+                    b.Navigation("ReporteeList");
+
+                    b.Navigation("ReporterList");
                 });
 #pragma warning restore 612, 618
         }
