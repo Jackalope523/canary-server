@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repository.Entities
 {
-    internal class Report
+    public class Report
     {
         public enum ReportType { Inappropriate, Spam, Misleading, Promotion, Rude, HateSpeech, Harassment, ViolentBehaviour, PhysicalAssault, SexualAssault }
 
@@ -24,6 +25,16 @@ namespace Repository.Entities
         public ReportType Type { get; init; }
         public string Notes { get; init; }
 
-        
+        public static ReportType ToReportType(UserReportType type)
+        {
+
+        }
+
+        public static ReportType ToReportType(EventReportType type)
+        {
+
+        }
+
+
     }
 }

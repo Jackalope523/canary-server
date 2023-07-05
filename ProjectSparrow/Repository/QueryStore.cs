@@ -1,9 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using PhoneNumbers;
 using Repository.Entities;
 using Repository.Sentries;
 using Server.Boundaries;
 using Shared;
+using SQLitePCL;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Repository
 {
@@ -43,28 +48,7 @@ namespace Repository
             return true;
         }
 
-        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
-        {
-            /*
-            Event toCreate = new Event 
-            { 
-                HostId = hostId, 
-                Name = name, 
-                Description = description, 
-                Type = eventType, 
-                StartTime = startTime, 
-                Location = new Point(longitude, latitude), 
-                GroupMinimum = groupMinimum, 
-                GroupMaximum = groupMaximum 
-            };
-
-            storeSentry.GetContext().Events.Add(toCreate);
-
-
-            return true;
-            */
-            throw new NotImplementedException();
-        }
+      
 
         public ThinEvent FindEvent(Guid id)
         {
@@ -290,7 +274,7 @@ namespace Repository
             
             return (up, down);
         }
-
+        //_________________________________________________________________________________________________________________________
         public (List<UserReport>, List<EventReport>) GetReports(Guid id)
         {
             throw new NotImplementedException();
@@ -299,40 +283,99 @@ namespace Repository
         public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id)
         {
             throw new NotImplementedException();
-        }
-
-        public bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails)
-        {
-            throw new NotImplementedException();
-        }
+        } 
 
         public List<EventReport> GetEventReports(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public bool ReportEvent(Guid userId, Guid eventId, EventReportType reportType, string reportDetails)
+        public bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails)
         {
-            throw new NotImplementedException();
+            Report toCreate = new Report
+            {
+                SelfId = selfId,
+                OtherId = targetId,
+                EventId = eventId,
+                Type = Report.ToReportType(reportType),
+                Notes = reportDetails
+            };
+
+            storeSentry.GetContext().Reports.Add(toCreate);
+            return true;
         }
 
-        public ThinEvent FindCurrentEvent(Guid id)
+        public bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails)
         {
-            throw new NotImplementedException();
+            Report toCreate = new Report
+            {
+                SelfId = userId,
+                OtherId = HostId,
+                EventId = eventId,
+                Type = Report.ToReportType(reportType),
+                Notes = reportDetails
+            };
+
+            storeSentry.GetContext().Reports.Add(toCreate);
+            return true;
         }
 
-        public List<ThinEvent> FindUpcomingEvents(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+        //_________________________________________________________________________________________________________________________
 
-        public List<ThinEvent> FindPastEvents(Guid id)
-        {
-            throw new NotImplementedException();
+        private List<ThinEvent> FindEventsBy(Func<EventLink, bool> predicate )
+        {     
+            List<Guid> guids= new List<Guid>();
+            guids = storeSentry.GetContext().EventLinks.Where(predicate).Select(l => l.EventId).ToList();
+
+            List<ThinEvent> events;
+            events = storeSentry.GetContext().Events.Where(e => guids.Contains(e.Id)).Select(e => new ThinEvent
+               (
+                   e.Id,
+                   new ThinnerUser(e.HostId, e.Host.Name),
+                   e.Name,
+                   e.Description,
+                   e.Type,
+                   e.StartTime,
+                   e.Location.Y,
+                   e.Location.X,
+                   e.EndTime,
+                   e.IsEventOpen,
+                   e.GroupMinimum,
+                   e.GroupMaximum
+               )).ToList();
+
+            return events;
         }
+        public ThinEvent FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
+        public List<ThinEvent> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
+        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
+        
 
         public List<ThinnerUser> GetFriends(Guid id)
         {
+            throw new NotImplementedException();
+        }
+
+        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
+        {
+            /*
+            Event toCreate = new Event 
+            { 
+                HostId = hostId, 
+                Name = name, 
+                Description = description, 
+                Type = eventType, 
+                StartTime = startTime, 
+                Location = new Point(longitude, latitude), 
+                GroupMinimum = groupMinimum, 
+                GroupMaximum = groupMaximum 
+            };
+
+            storeSentry.GetContext().Events.Add(toCreate);
+
+
+            return true;
+            */
             throw new NotImplementedException();
         }
     }
