@@ -291,11 +291,13 @@ namespace Repository
             return (up, down);
         }
 
+        // Reports concerning this person.
         public (List<UserReport>, List<EventReport>) GetReports(Guid id)
         {
             throw new NotImplementedException();
         }
 
+        // Reports by this person.
         public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id)
         {
             throw new NotImplementedException();
@@ -306,6 +308,7 @@ namespace Repository
             throw new NotImplementedException();
         }
 
+        // Reports that happened at this event.
         public List<EventReport> GetEventReports(Guid id)
         {
             throw new NotImplementedException();
