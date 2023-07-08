@@ -275,18 +275,22 @@ namespace Repository
         public bool UpdateType(Guid id, string newType) { return updateEventProperty(id, nameof(Event.Type), newType); }
         public bool UpdateStatus(Guid id, bool isOpen) { return updateEventProperty(id, nameof(Event.IsEventOpen), isOpen); }
         public bool EndEvent(Guid id) { return updateEventProperty(id, nameof(Event.EndTime), DateTimeOffset.UtcNow); }
-
-        private List<ThinnerUser> getLinkedUsers(Guid id, UserLink.UserLinkType type)
+       
+        private List<ThinnerUser> getUsersBy(Func<UserLink,bool> predicate)
         {
             List<ThinnerUser> users;
 
-            users = storeSentry.GetContext().UserLinks.Where(l => l.SelfId == id && l.Type == type).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
-
-           
+            users = storeSentry.GetContext().UserLinks.Where(predicate).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
             return users;
         }
-        public List<ThinnerUser> GetFollowedUsers(Guid id) { return getLinkedUsers(id, UserLink.UserLinkType.Follow); }
-        public List<ThinnerUser> GetBlockedUsers(Guid id) { return getLinkedUsers(id, UserLink.UserLinkType.Block); }
+        public List<ThinnerUser> GetFollowedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow); }
+        public List<ThinnerUser> GetBlockedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block); }
+        public List<ThinnerUser> GetFriends(Guid id)
+        {
+            List<ThinnerUser> following = getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow);
+            List<ThinnerUser> followingMe = getUsersBy(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow);     
+            return following.Intersect(followingMe).ToList();
+        }
 
         public (int Positive, int Negative) GetUserRatings(Guid id)
         {
@@ -411,13 +415,7 @@ namespace Repository
         }
         public ThinEvent FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
         public List<ThinEvent> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
-        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
-        
-
-        public List<ThinnerUser> GetFriends(Guid id)
-        {
-            throw new NotImplementedException();
-        }    
+        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }     
     }
 }
 

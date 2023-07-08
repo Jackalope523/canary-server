@@ -7,6 +7,5 @@
         public Guid OtherId { get; init; }
         internal User Other { get; init; }
         public UserLinkType Type { get; set; }
-
     }
 }
