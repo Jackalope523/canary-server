@@ -253,7 +253,7 @@ namespace Server.Controls
 
 		internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
 		{
-			return events.GetEventReports(eventID);
+			return events.GetReportsAboutEvent(eventID);
 		}
 
 

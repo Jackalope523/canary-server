@@ -9,6 +9,8 @@ using Shared;
 using SQLitePCL;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
+using static Repository.Entities.Report;
 
 namespace Repository
 {
@@ -274,56 +276,90 @@ namespace Repository
             
             return (up, down);
         }
-        //_________________________________________________________________________________________________________________________
-        public (List<UserReport>, List<EventReport>) GetReports(Guid id)
-        {
-            throw new NotImplementedException();
-        }
 
+        private List<Report> getReports(Func<Report,bool> predicate)
+        {
+            return storeSentry.GetContext().Reports.Where(r => predicate(r)).ToList();
+        }
+        public List<EventReport> GetReportsAboutEvent(Guid id)
+        {
+            List<Report> reports = getReports(r => r.EventId == id);
+            List<EventReport> toReturn = new List<EventReport>();
+
+            foreach (Report report in reports)
+            {
+                toReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
+            }
+
+            return toReturn;
+        }
+        public (List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id)
+        {
+            List<Report> userReports = getReports(r => r.OtherId == id);
+            List<Report> eventReports = getReports(r => r.OtherId == id && r.OtherId == r.Event.HostId);
+            List<UserReport> userReportsToReturn = new List<UserReport>();
+            List<EventReport> eventReportsToReturn = new List<EventReport>();
+
+            foreach (Report report in userReports)
+            {
+                userReportsToReturn.Add(new UserReport(report.Id, report.SelfId, report.OtherId, report.FilingDate, Report.ToUserReportType(report.Type), report.Notes));
+            }
+            foreach (Report report in eventReports)
+            {
+                eventReportsToReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
+
+            }
+
+            return (userReportsToReturn, eventReportsToReturn);
+        }
         public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id)
         {
-            throw new NotImplementedException();
-        } 
+            List<Report> reports = getReports(r => r.SelfId == id);
+            List<UserReport> userReportsToReturn = new List<UserReport>();
+            List<EventReport> eventReportsToReturn = new List<EventReport>();
 
-        public List<EventReport> GetEventReports(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails)
-        {
-            Report toCreate = new Report
+            foreach (Report report in reports)
             {
-                SelfId = selfId,
-                OtherId = targetId,
-                EventId = eventId,
-                Type = Report.ToReportType(reportType),
-                Notes = reportDetails
-            };
-
-            storeSentry.GetContext().Reports.Add(toCreate);
-            return true;
-        }
-
-        public bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails)
+                if (report.OtherId != report.Event.HostId)
+                {
+                    userReportsToReturn.Add(new UserReport(report.Id, report.SelfId, report.OtherId, report.FilingDate, Report.ToUserReportType(report.Type), report.Notes));
+                }
+                else
+                {
+                    eventReportsToReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
+                }
+                
+            }       
+            return (userReportsToReturn, eventReportsToReturn);
+        } 
+       
+        private bool CreateReport(Guid userId, Guid eventId, Guid HostId, ReportType reportType,  DateTimeOffset filingDate, string reportDetails)
         {
             Report toCreate = new Report
             {
                 SelfId = userId,
                 OtherId = HostId,
                 EventId = eventId,
-                Type = Report.ToReportType(reportType),
+                Type = reportType,
+                FilingDate = filingDate,
                 Notes = reportDetails
             };
 
             storeSentry.GetContext().Reports.Add(toCreate);
             return true;
         }
-
-        //_________________________________________________________________________________________________________________________
+        public bool ReportUser(Guid selfId, Guid eventId, Guid targetId, UserReportType reportType, string reportDetails) 
+        {
+            return CreateReport(selfId, eventId, targetId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
+        }
+        public bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails)
+        {
+            
+            return CreateReport(userId, eventId, HostId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
+        }
 
         private List<ThinEvent> FindEventsBy(Func<EventLink, bool> predicate )
-        {     
+        {
             List<Guid> guids= new List<Guid>();
             guids = storeSentry.GetContext().EventLinks.Where(predicate).Select(l => l.EventId).ToList();
 

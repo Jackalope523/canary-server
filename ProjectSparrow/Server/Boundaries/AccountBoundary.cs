@@ -52,7 +52,7 @@ namespace Server.Boundaries
 		bool RateUser(Guid selfId, Guid targetId, UserRating rating);
 		(int Positive, int Negative) GetUserRatings(Guid id);
 
-		(List<UserReport>, List<EventReport>) GetReports(Guid id);
+		(List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id);
 		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
 		bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails);
 	}
