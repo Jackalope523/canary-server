@@ -54,7 +54,7 @@ namespace Server.Boundaries
 
 		(List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id);
 		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
-		bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails);
+		bool ReportUser(Guid selfId, Guid eventId, Guid targetId, UserReportType reportType, string reportDetails);
 	}
 
 	public interface IAccountOperations

@@ -38,7 +38,7 @@ namespace Server.Boundaries
 		List<ThinnerUser> GetGuestList(Guid id);
 
 		List<EventReport> GetReportsAboutEvent(Guid id);
-		bool ReportEvent(Guid userId, Guid eventId, EventReportType reportType, string reportDetails);
+		bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails);
 	}
 
 	public interface IEventOperations

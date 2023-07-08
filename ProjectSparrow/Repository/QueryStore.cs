@@ -1,15 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
-using PhoneNumbers;
 using Repository.Entities;
 using Repository.Sentries;
 using Server.Boundaries;
 using Shared;
-using SQLitePCL;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using static Repository.Entities.Report;
 
 namespace Repository
@@ -50,7 +44,40 @@ namespace Repository
             return true;
         }
 
-      
+        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
+        {
+            Event toCreate = new Event
+            {
+                HostId = hostId,
+                Name = name,
+                Description = description,
+                Type = eventType,
+                StartTime = startTime,
+                Location = new Point(longitude, latitude),
+                GroupMinimum = groupMinimum,
+                GroupMaximum = groupMaximum
+            };
+
+            storeSentry.GetContext().Events.Add(toCreate);
+
+
+            return storeSentry.GetContext().Events.Where(e => e.HostId == hostId && e.Name == name && e.Description == description && e.Type == eventType && e.StartTime == startTime).Select(e => new ThinEvent
+                (
+                   e.Id,
+                   new ThinnerUser(e.Host.Id, e.Host.Name),
+                   e.Name,
+                   e.Description,
+                   e.Type,
+                   e.StartTime,
+                   e.Location.Y,
+                   e.Location.X,
+                   e.EndTime,
+                   e.IsEventOpen,
+                   e.GroupMinimum,
+                   e.GroupMaximum
+                )).Single();
+        }
+
 
         public ThinEvent FindEvent(Guid id)
         {
@@ -390,30 +417,7 @@ namespace Repository
         public List<ThinnerUser> GetFriends(Guid id)
         {
             throw new NotImplementedException();
-        }
-
-        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
-        {
-            /*
-            Event toCreate = new Event 
-            { 
-                HostId = hostId, 
-                Name = name, 
-                Description = description, 
-                Type = eventType, 
-                StartTime = startTime, 
-                Location = new Point(longitude, latitude), 
-                GroupMinimum = groupMinimum, 
-                GroupMaximum = groupMaximum 
-            };
-
-            storeSentry.GetContext().Events.Add(toCreate);
-
-
-            return true;
-            */
-            throw new NotImplementedException();
-        }
+        }    
     }
 }
 
