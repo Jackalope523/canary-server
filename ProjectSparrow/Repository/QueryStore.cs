@@ -4,6 +4,7 @@ using Repository.Entities;
 using Repository.Sentries;
 using Server.Boundaries;
 using Shared;
+using static Repository.Entities.Report;
 
 namespace Repository
 {
@@ -45,26 +46,38 @@ namespace Repository
 
         public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
         {
-            /*
-            Event toCreate = new Event 
-            { 
-                HostId = hostId, 
-                Name = name, 
-                Description = description, 
-                Type = eventType, 
-                StartTime = startTime, 
-                Location = new Point(longitude, latitude), 
-                GroupMinimum = groupMinimum, 
-                GroupMaximum = groupMaximum 
+            Event toCreate = new Event
+            {
+                HostId = hostId,
+                Name = name,
+                Description = description,
+                Type = eventType,
+                StartTime = startTime,
+                Location = new Point(longitude, latitude),
+                GroupMinimum = groupMinimum,
+                GroupMaximum = groupMaximum
             };
 
             storeSentry.GetContext().Events.Add(toCreate);
 
 
-            return true;
-            */
-            throw new NotImplementedException();
+            return storeSentry.GetContext().Events.Where(e => e.HostId == hostId && e.Name == name && e.Description == description && e.Type == eventType && e.StartTime == startTime).Select(e => new ThinEvent
+                (
+                   e.Id,
+                   new ThinnerUser(e.Host.Id, e.Host.Name),
+                   e.Name,
+                   e.Description,
+                   e.Type,
+                   e.StartTime,
+                   e.Location.Y,
+                   e.Location.X,
+                   e.EndTime,
+                   e.IsEventOpen,
+                   e.GroupMinimum,
+                   e.GroupMaximum
+                )).Single();
         }
+
 
         public ThinEvent FindEvent(Guid id)
         {
@@ -262,18 +275,22 @@ namespace Repository
         public bool UpdateType(Guid id, string newType) { return updateEventProperty(id, nameof(Event.Type), newType); }
         public bool UpdateStatus(Guid id, bool isOpen) { return updateEventProperty(id, nameof(Event.IsEventOpen), isOpen); }
         public bool EndEvent(Guid id) { return updateEventProperty(id, nameof(Event.EndTime), DateTimeOffset.UtcNow); }
-
-        private List<ThinnerUser> getLinkedUsers(Guid id, UserLink.UserLinkType type)
+       
+        private List<ThinnerUser> getUsersBy(Func<UserLink,bool> predicate)
         {
             List<ThinnerUser> users;
 
-            users = storeSentry.GetContext().UserLinks.Where(l => l.SelfId == id && l.Type == type).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
-
-           
+            users = storeSentry.GetContext().UserLinks.Where(predicate).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
             return users;
         }
-        public List<ThinnerUser> GetFollowedUsers(Guid id) { return getLinkedUsers(id, UserLink.UserLinkType.Follow); }
-        public List<ThinnerUser> GetBlockedUsers(Guid id) { return getLinkedUsers(id, UserLink.UserLinkType.Block); }
+        public List<ThinnerUser> GetFollowedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow); }
+        public List<ThinnerUser> GetBlockedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block); }
+        public List<ThinnerUser> GetFriends(Guid id)
+        {
+            List<ThinnerUser> following = getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow);
+            List<ThinnerUser> followingMe = getUsersBy(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow);     
+            return following.Intersect(followingMe).ToList();
+        }
 
         public (int Positive, int Negative) GetUserRatings(Guid id)
         {
@@ -291,53 +308,114 @@ namespace Repository
             return (up, down);
         }
 
-        // Reports concerning this person.
-        public (List<UserReport>, List<EventReport>) GetReports(Guid id)
+        private List<Report> getReports(Func<Report,bool> predicate)
         {
-            throw new NotImplementedException();
+            return storeSentry.GetContext().Reports.Where(r => predicate(r)).ToList();
         }
+        public List<EventReport> GetReportsAboutEvent(Guid id)
+        {
+            List<Report> reports = getReports(r => r.EventId == id);
+            List<EventReport> toReturn = new List<EventReport>();
 
-        // Reports by this person.
+            foreach (Report report in reports)
+            {
+                toReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
+            }
+
+            return toReturn;
+        }
+        public (List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id)
+        {
+            List<Report> userReports = getReports(r => r.OtherId == id);
+            List<Report> eventReports = getReports(r => r.OtherId == id && r.OtherId == r.Event.HostId);
+            List<UserReport> userReportsToReturn = new List<UserReport>();
+            List<EventReport> eventReportsToReturn = new List<EventReport>();
+
+            foreach (Report report in userReports)
+            {
+                userReportsToReturn.Add(new UserReport(report.Id, report.SelfId, report.OtherId, report.FilingDate, Report.ToUserReportType(report.Type), report.Notes));
+            }
+            foreach (Report report in eventReports)
+            {
+                eventReportsToReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
+
+            }
+
+            return (userReportsToReturn, eventReportsToReturn);
+        }
         public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id)
         {
-            throw new NotImplementedException();
+            List<Report> reports = getReports(r => r.SelfId == id);
+            List<UserReport> userReportsToReturn = new List<UserReport>();
+            List<EventReport> eventReportsToReturn = new List<EventReport>();
+
+            foreach (Report report in reports)
+            {
+                if (report.OtherId != report.Event.HostId)
+                {
+                    userReportsToReturn.Add(new UserReport(report.Id, report.SelfId, report.OtherId, report.FilingDate, Report.ToUserReportType(report.Type), report.Notes));
+                }
+                else
+                {
+                    eventReportsToReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
+                }
+                
+            }       
+            return (userReportsToReturn, eventReportsToReturn);
+        } 
+       
+        private bool CreateReport(Guid userId, Guid eventId, Guid HostId, ReportType reportType,  DateTimeOffset filingDate, string reportDetails)
+        {
+            Report toCreate = new Report
+            {
+                SelfId = userId,
+                OtherId = HostId,
+                EventId = eventId,
+                Type = reportType,
+                FilingDate = filingDate,
+                Notes = reportDetails
+            };
+
+            storeSentry.GetContext().Reports.Add(toCreate);
+            return true;
+        }
+        public bool ReportUser(Guid selfId, Guid eventId, Guid targetId, UserReportType reportType, string reportDetails) 
+        {
+            return CreateReport(selfId, eventId, targetId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
+        }
+        public bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails)
+        {
+            
+            return CreateReport(userId, eventId, HostId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
         }
 
-        public bool ReportUser(Guid selfId, Guid targetId, UserReportType reportType, string reportDetails)
+        private List<ThinEvent> FindEventsBy(Func<EventLink, bool> predicate )
         {
-            throw new NotImplementedException();
-        }
+            List<Guid> guids= new List<Guid>();
+            guids = storeSentry.GetContext().EventLinks.Where(predicate).Select(l => l.EventId).ToList();
 
-        // Reports that happened at this event.
-        public List<EventReport> GetEventReports(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+            List<ThinEvent> events;
+            events = storeSentry.GetContext().Events.Where(e => guids.Contains(e.Id)).Select(e => new ThinEvent
+               (
+                   e.Id,
+                   new ThinnerUser(e.HostId, e.Host.Name),
+                   e.Name,
+                   e.Description,
+                   e.Type,
+                   e.StartTime,
+                   e.Location.Y,
+                   e.Location.X,
+                   e.EndTime,
+                   e.IsEventOpen,
+                   e.GroupMinimum,
+                   e.GroupMaximum
+               )).ToList();
 
-        public bool ReportEvent(Guid userId, Guid eventId, EventReportType reportType, string reportDetails)
-        {
-            throw new NotImplementedException();
+            return events;
         }
-
-        public ThinEvent FindCurrentEvent(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<ThinEvent> FindUpcomingEvents(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<ThinEvent> FindPastEvents(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<ThinnerUser> GetFriends(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+        public ThinEvent FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
+        public List<ThinEvent> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
+        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }     
     }
 }
 

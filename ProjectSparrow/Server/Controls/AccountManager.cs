@@ -276,7 +276,7 @@ namespace Server.Controls
 
         internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)> GetAllReportsAsync(Guid userID)
         {
-            return accounts.GetReports(userID);
+            return accounts.GetReportsAboutUser(userID);
         }
 
 

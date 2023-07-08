@@ -37,8 +37,8 @@ namespace Server.Boundaries
 
 		List<ThinnerUser> GetGuestList(Guid id);
 
-		List<EventReport> GetEventReports(Guid id);
-		bool ReportEvent(Guid userId, Guid eventId, EventReportType reportType, string reportDetails);
+		List<EventReport> GetReportsAboutEvent(Guid id);
+		bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails);
 	}
 
 	public interface IEventOperations
@@ -64,6 +64,6 @@ namespace Server.Boundaries
 
 		Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID);
 
-		Task ReportEventAsync(Guid userID, Guid eventID, EventReportType reportType, string reportDetails);
+		Task ReportEventAsync(Guid userID, Guid eventID, Guid HostId, EventReportType reportType, string reportDetails);
 	}
 }

@@ -11,6 +11,7 @@ namespace Repository.Contexts
         public DbSet<Link> Links { get; set; }
         public DbSet<UserLink> UserLinks { get; set; }
         public DbSet<EventLink> EventLinks { get; set; }
+        public DbSet<Report> Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +51,22 @@ namespace Repository.Contexts
             modelBuilder.Entity<EventLink>()
                 .HasOne(a => a.Event)
                 .WithMany(b => b.Links);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Self)
+                .WithMany(u => u.ReporterList);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Other)
+                .WithMany(u => u.ReporteeList);
+
+
+            modelBuilder.Entity<Report>()
+               .HasOne(r => r.Event)
+               .WithMany(e => e.Reports);
+
+
+
 
 
             //SeedData(modelBuilder);
