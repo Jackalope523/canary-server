@@ -64,6 +64,6 @@ namespace Server.Boundaries
 
 		Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID);
 
-		Task ReportEventAsync(Guid userID, Guid eventID, Guid HostId, EventReportType reportType, string reportDetails);
+		Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId, EventReportType reportType, string reportDetails);
 	}
 }

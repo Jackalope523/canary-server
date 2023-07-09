@@ -185,7 +185,7 @@ namespace Server.Controls
 			return targetEvent.Attendees;
 		}
 
-		public async Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId, EventReportType reportType, string reportDetails)
+        public async Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId, EventReportType reportType, string reportDetails)
 		{
 			var targetEvent = await GetEvent(eventID);
 			events.ReportEvent(userID, eventID, hostId, reportType, reportDetails);
@@ -265,5 +265,7 @@ namespace Server.Controls
 			if (user.IsAtEvent)
 			{ throw new InvalidUserException("User is currently attending an event."); }
 		}
+
+       
     }
 }

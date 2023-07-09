@@ -181,7 +181,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPost("{eventID}/report")]
-		public async Task<IActionResult> ReportEvent(string eventID, [FromBody] EventReportModel report)
+		public async Task<IActionResult> ReportEvent(string eventID, string hostID, [FromBody] EventReportModel report)
 		{
 			if (string.IsNullOrEmpty(eventID) || report == null || !ModelState.IsValid)
 			{
@@ -192,7 +192,8 @@ namespace Web.Controllers
 			{
 				var user = await GetCurrentUserAsync();
 				Guid eventGUID = GetGUID(eventID);
-				await events.ReportEventAsync(user.Id, eventGUID, report.ReportType, report.ReportDetails);
+                Guid hostGUID = GetGUID(hostID);
+                await events.ReportEventAsync(user.Id, eventGUID, hostGUID, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{
