@@ -230,9 +230,9 @@ namespace Server.Controls
             accounts.UpdateReputation(targetID, targetUser.Reputation);
         }
 
-        public async Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(Guid userID, Guid eventId, Guid targetID, UserReportType reportType, string reportDetails)
         {
-            accounts.ReportUser(userID, targetID, reportType, reportDetails);
+            accounts.ReportUser(userID, eventId, targetID, reportType, reportDetails);
 
 			// Compute user's standing
 			var user = await GetUser(targetID);
@@ -319,5 +319,10 @@ namespace Server.Controls
 
             return upcomingActivity.ToList();
         }
-	}
+
+        public Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
