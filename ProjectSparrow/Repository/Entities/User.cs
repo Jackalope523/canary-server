@@ -21,7 +21,10 @@ namespace Repository.Entities
         public int AccessTries { get; set; }
         public UserAccountStatus AccountStatus { get; set; }
 
+        // Navigation Properties
         internal List<Link> Links { get; set; }
+        internal List<Report> ReporterList { get; set; }
+        internal List<Report> ReporteeList { get; set; }
 
         public ThinUser ToThinUser()
         {

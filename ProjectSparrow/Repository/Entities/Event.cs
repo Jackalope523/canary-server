@@ -20,7 +20,9 @@ namespace Repository.Entities
         public int GroupMaximum { get; set; }
         public DateTimeOffset? EndTime { get; set; }
 
+        // Navigation Properties
         internal List<EventLink> Links { get; set; }
+        internal List<Report> Reports { get; set; }
 
         public ThinEvent ToThinEvent()
         {

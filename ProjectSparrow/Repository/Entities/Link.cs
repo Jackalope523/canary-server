@@ -6,7 +6,5 @@
         public Guid SelfId { get; init; }
         internal User Self { get; init; }
 
-
-
     }
 }

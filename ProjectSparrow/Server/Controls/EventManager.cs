@@ -185,10 +185,10 @@ namespace Server.Controls
 			return targetEvent.Attendees;
 		}
 
-		public async Task ReportEventAsync(Guid userID, Guid eventID, EventReportType reportType, string reportDetails)
+        public async Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId, EventReportType reportType, string reportDetails)
 		{
 			var targetEvent = await GetEvent(eventID);
-			events.ReportEvent(userID, eventID, reportType, reportDetails);
+			events.ReportEvent(userID, eventID, hostId, reportType, reportDetails);
 
 			// Check if action is to be taken
 			if (await targetEvent.Reported())
@@ -253,7 +253,7 @@ namespace Server.Controls
 
 		internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
 		{
-			return events.GetEventReports(eventID);
+			return events.GetReportsAboutEvent(eventID);
 		}
 
 
@@ -265,5 +265,7 @@ namespace Server.Controls
 			if (user.IsAtEvent)
 			{ throw new InvalidUserException("User is currently attending an event."); }
 		}
-	}
+
+       
+    }
 }
