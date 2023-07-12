@@ -97,6 +97,9 @@ namespace Repository.Migrations.TestDBMigrations
                     b.Property<Guid>("EventId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTimeOffset>("FilingDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -118,7 +121,7 @@ namespace Repository.Migrations.TestDBMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("Report");
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("Repository.Entities.User", b =>
