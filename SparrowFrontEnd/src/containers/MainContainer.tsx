@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+// Colors
+import Colors from '../styles/Colors';
+
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
@@ -48,8 +51,9 @@ export default function MainContainer(){
 
                     },
 
-                    tabBarActiveTintColor: 'blue',
-                    tabBarInactiveTintColor: 'red',
+                    tabBarActiveTintColor: Colors.orange400,
+                    tabBarInactiveTintColor: Colors.sparrowBrown,
+                    tabBarShowLabel: false,
                 })}>
                 
                 <Tab.Screen name={activityName} component={ActivityScreen}/>
