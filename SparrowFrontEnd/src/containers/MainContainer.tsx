@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // Colors
-import Colors from '../styles/Colors';
+import { Colors } from '../styles/Colors';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';

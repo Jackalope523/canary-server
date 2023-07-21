@@ -1,4 +1,4 @@
-export default {
+export const Colors = {
     // Colors
     // Sparrow Primary
     sparrowSand: "#F5F4F1",
