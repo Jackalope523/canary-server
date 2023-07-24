@@ -7,6 +7,12 @@ export const Colors = {
     sparrowDarkBrown: "#362D2D",
     sparrowDark: "#221B1B",
 
+    // Sands
+    sand100: "#FBF4EA",
+    sand200: "#E8DCCF",
+    sand300: "#DFD2C4",
+    sand400: "#BDAF9F",
+
     // Yellow
     yellow50: "#FEFEF9",
     yellow100: "#F9F4CB",

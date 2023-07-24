@@ -53,6 +53,7 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
+		<string>sparrow-icons.ttf</string>
 		<string>UncutSans-Bold.otf</string>
 		<string>UncutSans-BoldItalic.otf</string>
 		<string>UncutSans-Book.otf</string>
@@ -65,7 +66,6 @@
 		<string>UncutSans-RegularItalic.otf</string>
 		<string>UncutSans-Semibold.otf</string>
 		<string>UncutSans-SemiboldItalic.otf</string>
-		<string>sparrow-icons.ttf</string>
 	</array>
 </dict>
 </plist>

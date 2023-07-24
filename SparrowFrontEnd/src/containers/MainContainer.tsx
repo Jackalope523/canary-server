@@ -17,7 +17,6 @@ import ActivityScreen from '../screens/Activity';
 import DiscoveryScreen from '../screens/Discovery';
 import FeedScreen from '../screens/Feed';
 import AccountScreen from '../screens/Account';
-import { StyleSheet } from 'react-native';
 
 // Screen names
 const activityName = 'Activity';
@@ -65,13 +64,3 @@ export default function MainContainer(){
         </NavigationContainer>
     );
 }
-
-// Icon styling
-const styles = StyleSheet.create({
-    icon: {
-        color: 'black',
-    },
-    iconFocused: {
-        color: 'red',
-    }
-})
