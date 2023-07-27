@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const SearchFilter = () => {
+type Props = {}
+
+const SearchFilter = (props: Props) => {
   return (
     <View>
       <Text>SearchFilter</Text>
