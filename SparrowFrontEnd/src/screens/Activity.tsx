@@ -4,22 +4,14 @@ import { globalStyles } from '../styles/Global';
 
 import { StyleSheet } from 'react-native';
 
+interface ActivityScreenProps {
+    navigation: string;
+}
+
 export default function ActivityScreen({ navigation }) {
     return (
         <View style={globalStyles.baseContainer}>
             <Text onPress={() => alert('This is the "Activity/Home" screen.')}>Activity/Home Screen</Text>
-
-            <View style={styles.containerTest}>
-
-            <TouchableOpacity style={[globalStyles.textButtonLarge, globalStyles.textButtonPrimary]}>
-                <Text style={globalStyles.textButtonLargeText}>Test Button</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={globalStyles.textButtonLarge}>
-                <Text>Test Button two</Text>
-            </TouchableOpacity>
-
-            </View>
 
         </View>
     );
