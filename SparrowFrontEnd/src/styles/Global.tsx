@@ -9,6 +9,32 @@ export const globalStyles = StyleSheet.create({
         backgroundColor: Colors.sparrowSand,
     },
 
+    // Spacing
+    // Extra small
+    xsGap: {
+        gap: 4,
+    },
+
+    // Small
+    smGap: {
+        gap: 8,
+    },
+
+    // Medium
+    mdGap: {
+        gap: 16,
+    },
+
+    // Large
+    lgGap: {
+        gap: 24,
+    },
+
+    // Extra Large
+    xlGap: {
+        gap: 32,
+    },
+
     // Typography
     // Base text
     baseText: {
@@ -18,84 +44,84 @@ export const globalStyles = StyleSheet.create({
     // Display text
     displayTextOne: {
         fontSize: 72,
-        lineHeight: 80,
-        letterSpacing: -1.8,
+        // lineHeight: 80,
+        // letterSpacing: -1.8,
     },
 
     displayTextTwo: {
         fontSize: 44,
-        lineHeight: 52,
-        letterSpacing: -1,
+        // lineHeight: 52,
+        // letterSpacing: -1,
     },
 
     // Heading text
     headingTextOne: {
         fontSize: 36,
-        lineHeight: 44,
-        letterSpacing: -0.8,
+        // lineHeight: 44,
+        // letterSpacing: -0.8,
     },
     
     headingTextTwo: {
         fontSize: 28,
-        lineHeight: 36,
-        letterSpacing: -0.4,
+        // lineHeight: 36,
+        // letterSpacing: -0.4,
     },
 
     headingTextThree: {
         fontSize: 22,
-        lineHeight: 30,
-        letterSpacing: -0.25,
+        // lineHeight: 30,
+        // letterSpacing: -0.25,
     },
 
     headingTextFour: {
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: -0.25,
+        // lineHeight: 26,
+        // letterSpacing: -0.25,
     },
 
     headingTextFive: {
         fontSize: 16,
-        lineHeight: 24,
-        letterSpacing: 0,
+        // lineHeight: 24,
+        // letterSpacing: 0,
     },
 
     // Body text
     bodyTextOne: {
         fontSize: 16,
-        lineHeight: 24,
-        letterSpacing: 0,
+        // lineHeight: 24,
+        // letterSpacing: 0,
     },
 
     bodyTextTwo: {
         fontSize: 14,
-        lineHeight: 22,
-        letterSpacing: 0,
+        // lineHeight: 22,
+        // letterSpacing: 0,
     },
 
     // Small text
     smallText: {
         fontSize: 16,
-        lineHeight: 24,
-        letterSpacing: 2.4,
+        // lineHeight: 24,
+        // letterSpacing: 2.4,
     },
 
     // Button text
     buttonTextOne: {
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: 0.25,
+        // lineHeight: 26,
+        // letterSpacing: 0.25,
     },
 
     buttonTextTwo: {
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: 2.4,
+        // lineHeight: 26,
+        // letterSpacing: 2.4,
     },
 
     buttonTextThree: {
         fontSize: 16,
-        lineHeight: 24,
-        letterSpacing: 2.2,
+        // lineHeight: 24,
+        // letterSpacing: 2.2,
     },
 
     // Buttons
@@ -137,8 +163,8 @@ export const globalStyles = StyleSheet.create({
         fontFamily: 'UncutSans-Medium',
         color: Colors.sparrowDark,
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: 0.25,
+        // lineHeight: 26,
+        // letterSpacing: 0.25,
     },
 
     // Medium
@@ -156,8 +182,8 @@ export const globalStyles = StyleSheet.create({
         fontFamily: 'UncutSans-Medium',
         color: Colors.sparrowDark,
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: 0.25,
+        // lineHeight: 26,
+        // letterSpacing: 0.25,
     },
 
     // Small
@@ -174,8 +200,9 @@ export const globalStyles = StyleSheet.create({
         fontFamily: 'UncutSans-Bold',
         color: Colors.sparrowDark,
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: 0.24,
+        textTransform: 'uppercase',
+        // lineHeight: 26,
+        // letterSpacing: 0.24,
     },
 
     // Extra small
@@ -187,15 +214,15 @@ export const globalStyles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 8,
         borderColor: Colors.sparrowDarkBrown,
-        backgroundColor: Colors.green400,
     },
 
     textButtonExtraSmallText: {
         fontFamily: 'UncutSans-Bold',
         color: Colors.sparrowDark,
         fontSize: 16,
-        lineHeight: 24,
-        letterSpacing: 2.2,
+        textTransform: 'uppercase',
+        // lineHeight: 24,
+        // letterSpacing: 2.2,
     },
 
     // Sort buttons
@@ -232,8 +259,8 @@ export const globalStyles = StyleSheet.create({
         fontFamily: 'UncutSans-Bold',
         color: Colors.sparrowSand,
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: 2.4,
+        // lineHeight: 26,
+        // letterSpacing: 2.4,
     },
 
     // Filter buttons
@@ -270,7 +297,7 @@ export const globalStyles = StyleSheet.create({
         fontFamily: 'UncutSans-Bold',
         color: Colors.sparrowSand,
         fontSize: 18,
-        lineHeight: 26,
-        letterSpacing: 2.4,
+        // lineHeight: 26,
+        // letterSpacing: 2.4,
     },
 });
