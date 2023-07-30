@@ -1,21 +1,38 @@
-import { View, TextInput, StyleSheet } from 'react-native'
+import { View, TextInput, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
+import { NavigationState, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StackParamList } from '../atoms/types';
+import { StackNavigationProp } from '@react-navigation/stack';
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
-type Props = {}
+const SearchBar = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
-const SearchBar = (props: Props) => {
   return (
-      <View style={styles.tempTextInput}>
-        <Icon name="search-outline" />
-        <TextInput placeholder='Search' />
+    // <View>
+    //   <Pressable onPress={() => navigation.navigate('DiscoverySearch')}>
+    //     <View pointerEvents='none'>
+    //       <TextInput />
+    //     </View>
+    //   </Pressable>
+    // </View>
+      <View>
+        <TextInput
+          placeholder='Search'
+          style={styles.tempTextInput}
+          onPressIn={() => navigation.navigate('DiscoverySearch')}
+        >
+          <Icon name="search-outline"/>
+        </TextInput>
       </View>
-  )
-}
+  );
+};
 
 export default SearchBar
 

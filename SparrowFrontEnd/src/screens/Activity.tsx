@@ -4,18 +4,28 @@ import { globalStyles } from '../styles/Global';
 
 import { StyleSheet } from 'react-native';
 
-interface ActivityScreenProps {
-    navigation: string;
-}
+// interface ActivityScreenProps {
+//     navigation: string;
+// }
 
-export default function ActivityScreen({ navigation }) {
+// export default function ActivityScreen({ navigation }) {
+//     return (
+//         <View style={globalStyles.baseContainer}>
+//             <Text onPress={() => alert('This is the "Activity/Home" screen.')}>Activity/Home Screen</Text>
+
+//         </View>
+//     );
+// };
+
+const ActivityScreen = () => {
     return (
-        <View style={globalStyles.baseContainer}>
-            <Text onPress={() => alert('This is the "Activity/Home" screen.')}>Activity/Home Screen</Text>
-
+        <View>
+            <Text>Activity</Text>
         </View>
     );
 };
+
+export default ActivityScreen
 
 const styles = StyleSheet.create({
     containerTest: {
