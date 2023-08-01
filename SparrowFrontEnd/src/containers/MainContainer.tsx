@@ -23,20 +23,20 @@ import { BottomTabParamList, StackParamList } from '../components/atoms/types';
 
 // NEW VERSION
 const Tab = createBottomTabNavigator<BottomTabParamList>();
-const Stack = createNativeStackNavigator<StackParamList>();
+// const Stack = createNativeStackNavigator<StackParamList>();
 
-const DiscoverySearchContainer = () => {
-    return (
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen
-                    name='DiscoverySearch'
-                    component={DiscoverySearchScreen}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
-    );
-};
+// const DiscoverySearchContainer = () => {
+//     return (
+//         <NavigationContainer>
+//             <Stack.Navigator>
+//                 <Stack.Screen
+//                     name='DiscoverySearch'
+//                     component={DiscoverySearchScreen}
+//                 />
+//             </Stack.Navigator>
+//         </NavigationContainer>
+//     );
+// };
 
 const MainContainer = () => {
     return (
