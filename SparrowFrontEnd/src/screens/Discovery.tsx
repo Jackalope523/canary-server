@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Pressable } from 'react-native';
 
 import SearchBar from '../components/molecules/SearchBar';
 import { cardStyles } from '../styles/Cards';
@@ -26,6 +26,7 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 
 const DiscoveryScreen = () => {
     const [searchContainerVisible, setSearchContainerVisible] = React.useState(false);
+    const [searchCloseVisible, setSearchCloseVisible] = React.useState(false);
 
     return (
         <View>
@@ -33,31 +34,37 @@ const DiscoveryScreen = () => {
 
 
             <View style={styles.searchBarContainer}>
-                <View>
-                    <TextInput onPressIn={() => setSearchContainerVisible(!searchContainerVisible)} placeholder='Search' style={styles.tempTextInput}>
+                <View style={searchContainerVisible ? styles.searchBarInnerContainerVisible : null}>
+                    <TextInput onPressIn={() => [setSearchContainerVisible(!searchContainerVisible), setSearchCloseVisible(!searchCloseVisible)]} placeholder='Search' style={searchContainerVisible ? styles.searchBarStylesVisible : null}>
                     <Icon name="search-outline"/>
                     </TextInput>
+
+                    {searchCloseVisible ? (
+                    <Pressable style={searchContainerVisible ? styles.searchCloseStylesVisible : null}>
+                        <Icon name="close-outline" />
+                    </Pressable>
+                    ) : null }
                 </View>
 
                 {searchContainerVisible ? (
 
                 <View style={styles.searchContainer}>
-                    <TouchableOpacity style={[globalStyles.filterButton, globalStyles.filterButtonRest]}>
+                    <Pressable style={[globalStyles.filterButton, globalStyles.filterButtonRest]}>
                         <Text style={globalStyles.filterButtonText}>Filter</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[globalStyles.sortButton, globalStyles.sortButtonRest]}>
+                    </Pressable>
+                    <Pressable style={[globalStyles.sortButton, globalStyles.sortButtonRest]}>
                         <Text style={globalStyles.sortButtonText}>Sort</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                     <View style={cardStyles.eventCardMedium}>
                         <Text style={globalStyles.bodyTextOne}>This Tuesday</Text>
-                        <Text style={globalStyles.bodyTextOne}>At 16:30</Text>
+                        <Text style={globalStyles.bodyTextOne}>At 1630</Text>
                         <Text style={globalStyles.bodyTextOne}>12 people attending</Text>
                         <Text style={globalStyles.headingTextTwo}>Dog Walk and Play Meetup at Central Park</Text>
                         <Text style={globalStyles.bodyTextOne}>Central Park, Manhattan, New York City</Text>
                     </View>
                 </View>
 
-                ) : null}
+                ) : null }
             </View>
 
 
@@ -86,5 +93,23 @@ const styles = StyleSheet.create ({
         marginHorizontal: 22,
         marginVertical: 16,
         paddingHorizontal: 16,
+    },
+
+    searchBarStylesVisible: {
+        backgroundColor: 'red',
+        flex: 3,
+
+        height: 50,
+    },
+
+    searchCloseStylesVisible: {
+        backgroundColor: 'blue',
+        flex: 1,
+
+        height: 50,
+    },
+
+    searchBarInnerContainerVisible: {
+        flexDirection: 'row',
     },
 })
