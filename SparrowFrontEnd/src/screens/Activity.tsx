@@ -1,26 +1,17 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { globalStyles } from '../styles/Global';
 
+import EventCardMedium from '../components/organisms/EventCardMedium';
+import NotificationIndicator from '../components/molecules/NotificationIndicator';
+
 import { StyleSheet } from 'react-native';
-
-// interface ActivityScreenProps {
-//     navigation: string;
-// }
-
-// export default function ActivityScreen({ navigation }) {
-//     return (
-//         <View style={globalStyles.baseContainer}>
-//             <Text onPress={() => alert('This is the "Activity/Home" screen.')}>Activity/Home Screen</Text>
-
-//         </View>
-//     );
-// };
 
 const ActivityScreen = () => {
     return (
         <View>
-            <Text>Activity</Text>
+            <NotificationIndicator />
+            <EventCardMedium />
         </View>
     );
 };

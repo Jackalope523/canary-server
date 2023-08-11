@@ -18,12 +18,14 @@ export const globalStyles = StyleSheet.create({
     // Display text
     displayTextOne: {
         fontSize: 72,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 80,
         // letterSpacing: -1.8,
     },
 
     displayTextTwo: {
         fontSize: 44,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 52,
         // letterSpacing: -1,
     },
@@ -31,30 +33,35 @@ export const globalStyles = StyleSheet.create({
     // Heading text
     headingTextOne: {
         fontSize: 36,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 44,
         // letterSpacing: -0.8,
     },
     
     headingTextTwo: {
         fontSize: 28,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 36,
         // letterSpacing: -0.4,
     },
 
     headingTextThree: {
         fontSize: 22,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 30,
         // letterSpacing: -0.25,
     },
 
     headingTextFour: {
         fontSize: 18,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 26,
         // letterSpacing: -0.25,
     },
 
     headingTextFive: {
         fontSize: 16,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 24,
         // letterSpacing: 0,
     },
@@ -62,12 +69,14 @@ export const globalStyles = StyleSheet.create({
     // Body text
     bodyTextOne: {
         fontSize: 16,
+        fontFamily: 'UncutSans-Regular',
         // lineHeight: 24,
         // letterSpacing: 0,
     },
 
     bodyTextTwo: {
         fontSize: 14,
+        fontFamily: 'UncutSans-Regular',
         // lineHeight: 22,
         // letterSpacing: 0,
     },
@@ -75,6 +84,7 @@ export const globalStyles = StyleSheet.create({
     // Small text
     smallText: {
         fontSize: 16,
+        fontFamily: 'UncutSans-Regular',
         // lineHeight: 24,
         // letterSpacing: 2.4,
     },
@@ -82,20 +92,46 @@ export const globalStyles = StyleSheet.create({
     // Button text
     buttonTextOne: {
         fontSize: 18,
+        fontFamily: 'UncutSans-Medium',
         // lineHeight: 26,
         // letterSpacing: 0.25,
     },
 
     buttonTextTwo: {
         fontSize: 18,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 26,
         // letterSpacing: 2.4,
     },
 
     buttonTextThree: {
         fontSize: 16,
+        fontFamily: 'UncutSans-Bold',
         // lineHeight: 24,
         // letterSpacing: 2.2,
+    },
+
+    // Label text
+    labelTextAsTyped: {
+        fontSize: 16,
+        fontFamily: 'UncutSans-Bold',
+    },
+
+    labelTextUppercase: {
+        fontSize: 16,
+        textTransform: 'uppercase',
+        fontFamily: 'UncutSans-Bold',
+    },
+
+    labelTextTitleCase: {
+        fontSize: 16,
+        textTransform: 'capitalize',
+        fontFamily: 'UncutSans-Bold',
+    },
+
+    // Text color variants
+    textDark: {
+        color: Colors.sparrowDark,
     },
 
     // Buttons

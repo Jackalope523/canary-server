@@ -1,36 +1,55 @@
-import { Text, View } from 'react-native'
-import React, { Component } from 'react'
+import { ImageBackground, Text, View } from 'react-native'
+import React from 'react'
 import { cardStyles } from '../../styles/Cards'
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
+import { globalStyles } from '../../styles/Global';
+import { Colors } from '../../styles/Colors';
 const Icon = createIconSetFromFontello(fontelloConfig);
 
-// Types
-type Props = {}
+// TEMP. example imports
+const bgImage = {uri: 'https://images.unsplash.com/photo-1562519819-016930ada31b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80'};
 
-const EventCardMedium = (props: Props) => {
+const EventCardMedium = () => {
   return (
       <View>
         <View style={cardStyles.eventCardMedium}>
-            <View>
-                <Icon name="date-outline"/>
-                <Text>This Friday</Text>
-                <Icon name="time-outline"/>
-                <Text>15:00</Text>
-            </View>
-            {/* Replace account-fill with account-outline later - need to create an updated font file */}
-            <View>
-                <Icon name="account-fill"/>
-                <Text>6</Text>
-            </View>
-            <View>
-                <Text>Two-on-two basketball at Venice Beach</Text>
-                <Icon name="location-outline" />
-                <Text>Venice Beach, Venice</Text>
-            </View>
+            <ImageBackground source={bgImage} resizeMode="cover" style={cardStyles.eventCardMedium.bgImage} imageStyle={cardStyles.eventCardMedium.bgImage2}>
+                <View style={cardStyles.eventCardMedium.content}>
+                    <View style={cardStyles.eventCardMedium.content.topWrapper}>
+                        <View style={cardStyles.eventCardMedium.content.container}>
+                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
+                                <Icon name="date-outline" style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
+                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>This Friday</Text>
+                            </View>
+                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
+                                <Icon name="time-outline" style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
+                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>15:00</Text>
+                            </View>
+                        </View>
+                        {/* TODO create an updated font file and replace account-fill with account-outline */}
+                        {/* TODO make the attendees container not resize to match the time and date container */}
+                        <View style={cardStyles.eventCardMedium.content.container}>
+                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
+                                <Icon name="account-fill" style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
+                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>6</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={cardStyles.eventCardMedium.content.container}>
+                        <Text style={[globalStyles.headingTextThree, globalStyles.textDark, cardStyles.eventCardMedium.content.container.title]}>Two-on-two basketball at Venice Beach</Text>
+                        <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
+                            <Icon name="location-outline" style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
+                            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>Venice Beach, Venice</Text>
+                        </View>
+                    </View>
+                </View>
+            </ImageBackground>
         </View>
       </View>
   )
 }
+
+export default EventCardMedium

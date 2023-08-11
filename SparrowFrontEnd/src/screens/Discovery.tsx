@@ -12,18 +12,6 @@ import fontelloConfig from '../config.json';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
-// export default function DiscoveryScreen({ navigation }) {
-//     return (
-//         <View>
-//             <Text onPress={() => navigation.navigate('Activity')}>Discovery Screen</Text>
-//             <SearchBar />
-//             <TouchableOpacity style={[globalStyles.textButtonExtraSmall, globalStyles.textButtonPrimary]}>
-//                 <Text style={globalStyles.textButtonExtraSmallText}>Create Event</Text>
-//             </TouchableOpacity>
-//         </View>
-//     );
-// };
-
 const DiscoveryScreen = () => {
     const [searchContainerVisible, setSearchContainerVisible] = React.useState(false);
     const [searchCloseVisible, setSearchCloseVisible] = React.useState(false);
@@ -68,7 +56,7 @@ const DiscoveryScreen = () => {
             </View>
 
 
-            <TouchableOpacity style={[globalStyles.textButtonExtraSmall, globalStyles.textButtonPrimary]}>
+            <TouchableOpacity style={[globalStyles.textButtonExtraSmall, globalStyles.textButtonSuccess]}>
                 <Text style={globalStyles.textButtonExtraSmallText}>Create Event</Text>
             </TouchableOpacity>
         </View>

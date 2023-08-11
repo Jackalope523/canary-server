@@ -14,7 +14,6 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-SparrowFrontEnd-SparrowFrontEndTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-SparrowFrontEnd-SparrowFrontEndTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		F921CEECAF5F4B539F89D2C5 /* sparrow-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8EEE4E4FD89C4ECBA189DE85 /* sparrow-icons.ttf */; };
 		2DA296B7E69043DF966B14C0 /* UncutSans-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E9662928453645F6B17530F4 /* UncutSans-Bold.otf */; };
 		B135063A76F34B408EA4718C /* UncutSans-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 482B988835A444619E7878D9 /* UncutSans-BoldItalic.otf */; };
 		DFE158C3CA06403A95CE351F /* UncutSans-Book.otf in Resources */ = {isa = PBXBuildFile; fileRef = 86A87AE6D5694F458BB5EF29 /* UncutSans-Book.otf */; };
@@ -27,6 +26,7 @@
 		D7FB203DD6F94F8FB12CE39F /* UncutSans-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8D6CED67461346BCA4AB8030 /* UncutSans-RegularItalic.otf */; };
 		C6F6A6C4C8B84D9EA6781F24 /* UncutSans-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 588006B1B4714C9A8965ECBF /* UncutSans-Semibold.otf */; };
 		9B9A2F7C83C74D4C85EC8ED2 /* UncutSans-SemiboldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 67CF85052CD24C46BC3DAE8C /* UncutSans-SemiboldItalic.otf */; };
+		2947FC5A26DC4CA7B34824D5 /* sparrow-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7DD0EBEC90EC4146832D499C /* sparrow-icons.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +57,6 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SparrowFrontEnd/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-SparrowFrontEnd-SparrowFrontEndTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SparrowFrontEnd-SparrowFrontEndTests.release.xcconfig"; path = "Target Support Files/Pods-SparrowFrontEnd-SparrowFrontEndTests/Pods-SparrowFrontEnd-SparrowFrontEndTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		8EEE4E4FD89C4ECBA189DE85 /* sparrow-icons.ttf */ = {isa = PBXFileReference; name = "sparrow-icons.ttf"; path = "../src/assets/fonts/sparrow-icons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		E9662928453645F6B17530F4 /* UncutSans-Bold.otf */ = {isa = PBXFileReference; name = "UncutSans-Bold.otf"; path = "../src/assets/fonts/UncutSans-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		482B988835A444619E7878D9 /* UncutSans-BoldItalic.otf */ = {isa = PBXFileReference; name = "UncutSans-BoldItalic.otf"; path = "../src/assets/fonts/UncutSans-BoldItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		86A87AE6D5694F458BB5EF29 /* UncutSans-Book.otf */ = {isa = PBXFileReference; name = "UncutSans-Book.otf"; path = "../src/assets/fonts/UncutSans-Book.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
@@ -70,6 +69,7 @@
 		8D6CED67461346BCA4AB8030 /* UncutSans-RegularItalic.otf */ = {isa = PBXFileReference; name = "UncutSans-RegularItalic.otf"; path = "../src/assets/fonts/UncutSans-RegularItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		588006B1B4714C9A8965ECBF /* UncutSans-Semibold.otf */ = {isa = PBXFileReference; name = "UncutSans-Semibold.otf"; path = "../src/assets/fonts/UncutSans-Semibold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		67CF85052CD24C46BC3DAE8C /* UncutSans-SemiboldItalic.otf */ = {isa = PBXFileReference; name = "UncutSans-SemiboldItalic.otf"; path = "../src/assets/fonts/UncutSans-SemiboldItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7DD0EBEC90EC4146832D499C /* sparrow-icons.ttf */ = {isa = PBXFileReference; name = "sparrow-icons.ttf"; path = "../src/assets/fonts/sparrow-icons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,7 +178,6 @@
 		4D2CDDD90AD349A28CCE9F30 /* Resources */ = {
 			isa = "PBXGroup";
 			children = (
-				8EEE4E4FD89C4ECBA189DE85 /* sparrow-icons.ttf */,
 				E9662928453645F6B17530F4 /* UncutSans-Bold.otf */,
 				482B988835A444619E7878D9 /* UncutSans-BoldItalic.otf */,
 				86A87AE6D5694F458BB5EF29 /* UncutSans-Book.otf */,
@@ -191,6 +190,7 @@
 				8D6CED67461346BCA4AB8030 /* UncutSans-RegularItalic.otf */,
 				588006B1B4714C9A8965ECBF /* UncutSans-Semibold.otf */,
 				67CF85052CD24C46BC3DAE8C /* UncutSans-SemiboldItalic.otf */,
+				7DD0EBEC90EC4146832D499C /* sparrow-icons.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -292,7 +292,6 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F921CEECAF5F4B539F89D2C5 /* sparrow-icons.ttf in Resources */,
 				2DA296B7E69043DF966B14C0 /* UncutSans-Bold.otf in Resources */,
 				B135063A76F34B408EA4718C /* UncutSans-BoldItalic.otf in Resources */,
 				DFE158C3CA06403A95CE351F /* UncutSans-Book.otf in Resources */,
@@ -305,6 +304,7 @@
 				D7FB203DD6F94F8FB12CE39F /* UncutSans-RegularItalic.otf in Resources */,
 				C6F6A6C4C8B84D9EA6781F24 /* UncutSans-Semibold.otf in Resources */,
 				9B9A2F7C83C74D4C85EC8ED2 /* UncutSans-SemiboldItalic.otf in Resources */,
+				2947FC5A26DC4CA7B34824D5 /* sparrow-icons.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
