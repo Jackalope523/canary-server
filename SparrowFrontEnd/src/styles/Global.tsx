@@ -9,32 +9,6 @@ export const globalStyles = StyleSheet.create({
         backgroundColor: Colors.sparrowSand,
     },
 
-    // Spacing
-    // Extra small
-    xsGap: {
-        gap: 4,
-    },
-
-    // Small
-    smGap: {
-        gap: 8,
-    },
-
-    // Medium
-    mdGap: {
-        gap: 16,
-    },
-
-    // Large
-    lgGap: {
-        gap: 24,
-    },
-
-    // Extra Large
-    xlGap: {
-        gap: 32,
-    },
-
     // Typography
     // Base text
     baseText: {
@@ -129,22 +103,32 @@ export const globalStyles = StyleSheet.create({
     // Color variants
     // Primary
     textButtonPrimary: {
-        backgroundColor: Colors.green400,
+        backgroundColor: Colors.sparrowDarkBrown,
     },
 
     // Secondary
     textButtonSecondary: {
+        backgroundColor: Colors.sparrowSand,
+    },
+
+    // Success
+    textButtonSuccess: {
+        backgroundColor: Colors.green400,
+    },
+
+    // Warning
+    textButtonWarning: {
         backgroundColor: Colors.orange400,
     },
 
-    // Tertiary
-    textButtonTertiary: {
-        backgroundColor: Colors.turqoise300,
+    // Error
+    textButtonError: {
+        backgroundColor: Colors.red400,
     },
 
-    // Outline
-    textButtonOutline: {
-        backgroundColor: Colors.sparrowSand,
+    // Function
+    textButtonFunction: {
+        backgroundColor: Colors.turqoise300,
     },
 
     // Sizes
