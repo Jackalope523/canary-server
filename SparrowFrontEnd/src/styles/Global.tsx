@@ -5,8 +5,9 @@ export const globalStyles = StyleSheet.create({
     // Layout
     // Containers
     baseContainer: {
-        flex: 1,
-        backgroundColor: Colors.sparrowSand,
+        // flex: 1,
+        // backgroundColor: Colors.sparrowSand,
+        margin: 24,
     },
 
     // Typography

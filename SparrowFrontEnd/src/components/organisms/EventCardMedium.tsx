@@ -29,11 +29,9 @@ const EventCardMedium = () => {
                                 <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>15:00</Text>
                             </View>
                         </View>
-                        {/* TODO create an updated font file and replace account-fill with account-outline */}
-                        {/* TODO make the attendees container not resize to match the time and date container */}
                         <View style={cardStyles.eventCardMedium.content.container}>
                             <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-                                <Icon name="account-fill" style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
+                                <Icon name="account-outline" style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
                                 <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>6</Text>
                             </View>
                         </View>

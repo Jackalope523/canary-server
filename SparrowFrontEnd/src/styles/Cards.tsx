@@ -7,7 +7,7 @@ export const cardStyles = StyleSheet.create({
     // Medium size card
     eventCardMedium: {
         // TEMP. MARGIN
-        margin: 24,
+        // margin: 24,
 
         // Background image
         bgImage: {
@@ -56,6 +56,7 @@ export const cardStyles = StyleSheet.create({
             topWrapper: {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
+                alignItems: 'flex-start',
             },
         },
     },
