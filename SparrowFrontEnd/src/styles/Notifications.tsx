@@ -1,0 +1,20 @@
+import { StyleSheet } from "react-native";
+import { Colors } from "./Colors";
+import { Spacing } from "./Spacing";
+
+// Notifications, messages, popups
+
+export const notificationStyles = StyleSheet.create ({
+    // Notifications
+    // Notification indicator
+    notificationIndicator: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: Spacing.sm,
+
+        icon: {
+            color: Colors.sparrowDarkBrown,
+            fontSize: 16,
+        },
+    },
+});

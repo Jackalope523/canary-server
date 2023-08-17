@@ -10,10 +10,9 @@ export const cardStyles = StyleSheet.create({
         // margin: 24,
 
         // Background image
-        bgImage: {
-            // flex: 1,
-            justifyContent: 'center',
-        },
+        // bgImage: {
+        //     justifyContent: 'center',
+        // },
 
         bgImage2: {
             borderWidth: 2,
@@ -23,7 +22,7 @@ export const cardStyles = StyleSheet.create({
 
         content: {
             height: 254,
-            margin: 8,
+            margin: Spacing.sm,
             justifyContent: 'space-between',
 
             // Event detail containers

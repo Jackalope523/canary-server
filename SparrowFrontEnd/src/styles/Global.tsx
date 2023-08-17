@@ -4,9 +4,14 @@ import { Colors } from "./Colors";
 export const globalStyles = StyleSheet.create({
     // Layout
     // Containers
+    // Used for navigation container, tab navigator
+    mainContainer: {
+        backgroundColor: Colors.sparrowSand,
+    },
+
+    // Used for screens
     baseContainer: {
         // flex: 1,
-        // backgroundColor: Colors.sparrowSand,
         margin: 24,
     },
 

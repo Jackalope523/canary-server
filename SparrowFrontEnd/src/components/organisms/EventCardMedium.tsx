@@ -14,9 +14,8 @@ const bgImage = {uri: 'https://images.unsplash.com/photo-1562519819-016930ada31b
 
 const EventCardMedium = () => {
   return (
-      <View>
         <View style={cardStyles.eventCardMedium}>
-            <ImageBackground source={bgImage} resizeMode="cover" style={cardStyles.eventCardMedium.bgImage} imageStyle={cardStyles.eventCardMedium.bgImage2}>
+            <ImageBackground source={bgImage} resizeMode="cover" imageStyle={cardStyles.eventCardMedium.bgImage2}>
                 <View style={cardStyles.eventCardMedium.content}>
                     <View style={cardStyles.eventCardMedium.content.topWrapper}>
                         <View style={cardStyles.eventCardMedium.content.container}>
@@ -46,7 +45,6 @@ const EventCardMedium = () => {
                 </View>
             </ImageBackground>
         </View>
-      </View>
   )
 }
 
