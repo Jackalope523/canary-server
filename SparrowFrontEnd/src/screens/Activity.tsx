@@ -19,7 +19,7 @@ const ActivityScreen = () => {
 
             {/* TODO make event card heading such as "upcoming events" like it is in the prototype - another heading on scroll */}
             {/* stickyHeaderIndices is NOT SUPPORTED with horizontal scrolling */}
-            <View style={styles.sectionWrapper}>
+            <View style={{marginBottom: Spacing.md}}>
                 <Text style={[globalStyles.headingTextOne, {color: Colors.sparrowDark, marginBottom: Spacing.md, marginLeft: Spacing.lg}]}>Upcoming events</Text>
                 <ScrollView horizontal={true} overScrollMode="never">
                     <View style={styles.eventCardContainer}>
@@ -30,7 +30,7 @@ const ActivityScreen = () => {
                 </ScrollView>
             </View>
 
-            <View style={styles.sectionWrapper}>
+            <View style={{marginBottom: Spacing.lg}}>
                 <Text style={[globalStyles.headingTextOne, {color: Colors.sparrowDark, marginBottom: Spacing.md, marginLeft: Spacing.lg}]}>Recommended</Text>
                 <ScrollView horizontal={true} overScrollMode="never">
                     <View style={styles.eventCardContainer}>
@@ -51,10 +51,6 @@ const styles = StyleSheet.create ({
         paddingBottom: Spacing.lg,
     },
 
-    sectionWrapper: {
-        marginBottom: Spacing.lg,   
-    },
-
     topWrapper: {
         marginHorizontal: Spacing.lg,
         marginTop: Spacing.lg,
@@ -65,8 +61,7 @@ const styles = StyleSheet.create ({
     },
 
     eventCardContainer: {
-        // flex: 1,
-        marginLeft: Spacing.lg,
+        marginHorizontal: Spacing.lg,
         flexDirection: 'row',
         columnGap: Spacing.md,
     },

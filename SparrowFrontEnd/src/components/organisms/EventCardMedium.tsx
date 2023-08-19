@@ -7,6 +7,7 @@ import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
 import { globalStyles } from '../../styles/Global';
 import { Colors } from '../../styles/Colors';
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // TEMP. example imports

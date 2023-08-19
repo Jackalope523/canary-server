@@ -20,25 +20,58 @@ import DiscoveryScreen from '../screens/Discovery';
 import FeedScreen from '../screens/Feed';
 import AccountScreen from '../screens/Account';
 import DiscoverySearchScreen from '../screens/DiscoverySearch';
+import NotificationsScreen from '../screens/Notifications';
+
+// More imports
 import { BottomTabParamList, StackParamList } from '../components/atoms/types';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// NEW VERSION
-const Tab = createBottomTabNavigator<BottomTabParamList>();
-// const Stack = createNativeStackNavigator<StackParamList>();
+// v1.0.1
 
-// const DiscoverySearchContainer = () => {
+const ActivityStack = createNativeStackNavigator();
+
+// TODO if you navigate from Activity to Notifications, then to another screen such as Feed, when navigating back to Activity, you will be directed to Notifiations. You should be directed back to Activity instead of last opened navigation screen.
+
+function ActivityStackScreen () {
+    return (
+        <ActivityStack.Navigator
+            screenOptions={() => ({
+                headerShown: false,
+            })}>
+            <ActivityStack.Screen name="Activity" component={ActivityScreen} />
+            <ActivityStack.Screen name="Notifications" component={NotificationsScreen} />
+        </ActivityStack.Navigator>
+    );
+}
+
+// DELETE WHAT'S BELOW LATER BUT KEEP FOR NOW
+
+// const NotificationsStack = createNativeStackNavigator();
+
+// function NotificationsStackScreen() {
+//     return (
+//         <NotificationsStack.Navigator>
+//             <NotificationsStack.Screen name="Notifications" component={NotificationsScreen} />
+//         </NotificationsStack.Navigator>
+//     );
+// }
+
+// Details is Notifications
+// Home is Activity
+// const Tab = createBottomTabNavigator();
+
+// export default function MainContainer() {
 //     return (
 //         <NavigationContainer>
-//             <Stack.Navigator>
-//                 <Stack.Screen
-//                     name='DiscoverySearch'
-//                     component={DiscoverySearchScreen}
-//                 />
-//             </Stack.Navigator>
+//             <Tab.Navigator>
+//                 <Tab.Screen name="Activity" component={ActivityStackScreen} />
+//                 <Tab.Screen name="Notifications" component={NotificationsStackScreen} />
+//             </Tab.Navigator>
 //         </NavigationContainer>
 //     );
-// };
+// }
+
+const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 // TODO If possible, set the tab navigator horizontal margin to 24, probably with tabBarStyle
 
@@ -68,7 +101,7 @@ const MainContainer = () => {
 
                         },
 
-                        tabBarActiveTintColor: Colors.turqoise400,
+                        tabBarActiveTintColor: Colors.sparrowRed,
                         tabBarInactiveTintColor: Colors.sparrowBrown,
                         tabBarShowLabel: false,
                         
@@ -83,7 +116,7 @@ const MainContainer = () => {
                         headerShown: false,
                     })}>
                     
-                    <Tab.Screen name='Activity' component={ActivityScreen}/>
+                    <Tab.Screen name='Activity' component={ActivityStackScreen}/>
                     <Tab.Screen name='Discovery' component={DiscoveryScreen}/>
                     <Tab.Screen name='Feed' component={FeedScreen}/>
                     <Tab.Screen name='Account' component={AccountScreen}/>
@@ -96,65 +129,64 @@ const MainContainer = () => {
 
 export default MainContainer
 
-// OLD VERSION
+// ------- END ------------
 
-// Screen names
-// const activityName = 'Activity';
-// const discoveryName = 'Discovery';
-// const feedName = 'Feed';
-// const accountName = 'Account';
-// const DiscoverySearchName = 'DiscoverySearch';
+// v1.0.0
 
-// const Tab = createBottomTabNavigator();
-// const Stack = createNativeStackNavigator();
+// const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-// function MainContainer(){
+// // TODO If possible, set the tab navigator horizontal margin to 24, probably with tabBarStyle
+
+// const MainContainer = () => {
 //     return (
-//         <NavigationContainer>
-//             <Tab.Navigator
-//                 initialRouteName={activityName}
-//                 screenOptions={({route}) => ({
-//                     tabBarIcon: ({focused, color, size}) => {
-//                         let iconName;
-//                         let rn = route.name;
+//         <SafeAreaProvider>
+//             <NavigationContainer>
+//                 <Tab.Navigator
+//                     sceneContainerStyle={globalStyles.mainContainer}
+//                     screenOptions={({route}) => ({
 
-//                         if (rn === activityName) {
-//                             iconName = focused ? 'activity-fill' : 'activity-fill'
-//                         } else if (rn === discoveryName) {
-//                             iconName = focused ? 'discovery-fill' : 'discovery-fill'
-//                         } else if (rn === feedName) {
-//                             iconName = focused ? 'feed-fill' : 'feed-fill'
-//                         } else if (rn === accountName) {
-//                             iconName = focused ? 'account-fill' : 'account-fill'
-//                         }
+//                         tabBarIcon: ({focused, color, size}) => {
+//                             let iconName;
+//                             let rn = route.name;
 
-//                         return <Icon name={iconName} size={size} color={color}/>
+//                             if (rn === 'Activity') {
+//                                 iconName = focused ? 'activity-fill' : 'activity-fill'
+//                             } else if (rn === 'Discovery') {
+//                                 iconName = focused ? 'discovery-fill' : 'discovery-fill'
+//                             } else if (rn === 'Feed') {
+//                                 iconName = focused ? 'feed-fill' : 'feed-fill'
+//                             } else if (rn === 'Account') {
+//                                 iconName = focused ? 'account-fill' : 'account-fill'
+//                             }
 
-//                     },
+//                             return <Icon name={iconName} size={size} color={color}/>
 
-//                     tabBarActiveTintColor: Colors.orange400,
-//                     tabBarInactiveTintColor: Colors.sparrowBrown,
-//                     tabBarShowLabel: false,
-//                 })}>
-                
-//                 <Tab.Screen name={activityName} component={ActivityScreen}/>
-//                 <Tab.Screen name={discoveryName} component={DiscoveryScreen}/>
-//                 <Tab.Screen name={feedName} component={FeedScreen}/>
-//                 <Tab.Screen name={accountName} component={AccountScreen}/>
+//                         },
 
-//             </Tab.Navigator>
-//         </NavigationContainer>
+//                         tabBarActiveTintColor: Colors.turqoise400,
+//                         tabBarInactiveTintColor: Colors.sparrowBrown,
+//                         tabBarShowLabel: false,
+                        
+//                         tabBarStyle: {
+//                             height: 50,
+//                             backgroundColor: Colors.sparrowSand,
+//                             borderTopWidth: 2,
+//                             borderTopColor: Colors.sparrowDarkBrown,
+//                             paddingHorizontal: 0,
+//                         },
+
+//                         headerShown: false,
+//                     })}>
+                    
+//                     <Tab.Screen name='Activity' component={ActivityScreen}/>
+//                     <Tab.Screen name='Discovery' component={DiscoveryScreen}/>
+//                     <Tab.Screen name='Feed' component={FeedScreen}/>
+//                     <Tab.Screen name='Account' component={AccountScreen}/>
+
+//                 </Tab.Navigator>
+//             </NavigationContainer>
+//         </SafeAreaProvider>
 //     );
-// }
-
-// function DiscoverySearchContainer(){
-//     return (
-//         <NavigationContainer>
-//             <Stack.Navigator screenOptions={{headerShown: false}}>
-//                 <Stack.Screen name={DiscoverySearchName} component={DiscoverySearchScreen} />
-//             </Stack.Navigator>
-//         </NavigationContainer>
-//     );
-// }
+// };
 
 // export default MainContainer
