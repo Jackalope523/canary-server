@@ -1,18 +1,16 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 import { Colors } from "./Colors";
 import { Spacing } from "./Spacing";
+
+// Screen dimensions
+const screenWidth = Dimensions.get('screen').width;
 
 export const cardStyles = StyleSheet.create({
     // Event cards
     // Medium size card
     eventCardMedium: {
-        // TEMP. MARGIN
-        // margin: 24,
-
-        // Background image
-        // bgImage: {
-        //     justifyContent: 'center',
-        // },
+        // Width is 100% of screen width - 24 (margin) x 2 (LR)
+        width: screenWidth - Spacing.lg * 2,
 
         bgImage2: {
             borderWidth: 2,
