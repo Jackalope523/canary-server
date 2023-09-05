@@ -19,6 +19,11 @@ export const navigationStyles = StyleSheet.create({
             color: Colors.sparrowDarkBrown,
             fontSize: 16,
         },
+
+        // Use as gap for icon on the left (usually the back arrow)
+        gapLeft: {
+            marginRight: Spacing.md,
+        },
         
         // Types
         // Default with title

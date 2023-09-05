@@ -12,7 +12,7 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 // Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 // Screens
 import ActivityScreen from '../screens/Activity';
@@ -26,9 +26,12 @@ import NotificationsScreen from '../screens/Notifications';
 import { BottomTabParamList, StackParamList } from '../components/atoms/types';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// TEMP. testing
+import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
+
 // v1.0.1
 
-const ActivityStack = createNativeStackNavigator();
+const ActivityStack = createStackNavigator();
 
 // TODO if you navigate from Activity to Notifications, then to another screen such as Feed, when navigating back to Activity, you will be directed to Notifiations. You should be directed back to Activity instead of last opened navigation screen.
 
@@ -36,40 +39,45 @@ function ActivityStackScreen () {
     return (
         <ActivityStack.Navigator
             screenOptions={() => ({
-                headerShown: false,
+                // headerShown: false,
+
+                headerTitleStyle: {
+                    fontSize: 16,
+                    color: Colors.sparrowDark,
+                },
+
+                // TODO set margin to 24
+                headerTitleContainerStyle: {
+                    marginHorizontal: 24,
+                },
+
+                headerLeftContainerStyle: {
+                    marginLeft: 0,
+                },
+
+                headerStyle: {
+                    height: 50,
+                    backgroundColor: Colors.sparrowSand,
+                    borderBottomColor: Colors.sparrowDarkBrown,
+                    borderBottomWidth: 2,
+                },
+
+                // headerLeftContainerStyle: {
+                //     marginLeft: 24,
+                // },
+
+                // headerLeftContainerStyle: {
+                //     backgroundColor: Colors.red400,
+                //     // marginHorizontal: 16, // between btn and title
+                //     // left: 24, // moves ONLY btn from left, absolute
+                // },
+
             })}>
             <ActivityStack.Screen name="Activity" component={ActivityScreen} />
             <ActivityStack.Screen name="Notifications" component={NotificationsScreen} />
         </ActivityStack.Navigator>
     );
 }
-
-// DELETE WHAT'S BELOW LATER BUT KEEP FOR NOW
-
-// const NotificationsStack = createNativeStackNavigator();
-
-// function NotificationsStackScreen() {
-//     return (
-//         <NotificationsStack.Navigator>
-//             <NotificationsStack.Screen name="Notifications" component={NotificationsScreen} />
-//         </NotificationsStack.Navigator>
-//     );
-// }
-
-// Details is Notifications
-// Home is Activity
-// const Tab = createBottomTabNavigator();
-
-// export default function MainContainer() {
-//     return (
-//         <NavigationContainer>
-//             <Tab.Navigator>
-//                 <Tab.Screen name="Activity" component={ActivityStackScreen} />
-//                 <Tab.Screen name="Notifications" component={NotificationsStackScreen} />
-//             </Tab.Navigator>
-//         </NavigationContainer>
-//     );
-// }
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -113,10 +121,12 @@ const MainContainer = () => {
                             paddingHorizontal: 0,
                         },
 
-                        headerShown: false,
+                        // headerShown: false,
                     })}>
                     
-                    <Tab.Screen name='Activity' component={ActivityStackScreen}/>
+                    <Tab.Screen
+                        name='Activity'
+                        component={ActivityStackScreen}/>
                     <Tab.Screen name='Discovery' component={DiscoveryScreen}/>
                     <Tab.Screen name='Feed' component={FeedScreen}/>
                     <Tab.Screen name='Account' component={AccountScreen}/>

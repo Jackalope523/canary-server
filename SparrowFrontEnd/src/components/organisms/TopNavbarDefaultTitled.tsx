@@ -10,6 +10,8 @@ import { navigationStyles } from '../../styles/Navigation';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
+// TODO possibly delete all these topNavbar components, if you're going to code them differently
+
 const TopNavbarDefaultTitled = () => {
   return (
     <View style={[navigationStyles.topNavbar, navigationStyles.topNavbar.defaultTitled]}>

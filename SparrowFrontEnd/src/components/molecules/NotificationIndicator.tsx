@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, Platform } from 'react-native'
 import React from 'react'
 import { globalStyles } from '../../styles/Global';
 import { Colors } from '../../styles/Colors';
