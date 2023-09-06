@@ -105,7 +105,7 @@ const MainContainer = () => {
                                 iconName = focused ? 'account-fill' : 'account-fill'
                             }
 
-                            return <Icon name={iconName} size={size} color={color}/>
+                            return <Icon name={iconName} size={40} height={40} width={40} color={color}/>
 
                         },
 

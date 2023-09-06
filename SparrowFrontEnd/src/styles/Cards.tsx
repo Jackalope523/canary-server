@@ -44,7 +44,10 @@ export const cardStyles = StyleSheet.create({
 
                     icon: {
                         color: Colors.sparrowDarkBrown,
-                        fontSize: 16,
+
+                        // TODO change fontSize back to 16 - 24 if necessary and other icon sizes have been changed to 24
+                        // fontSize is 42 purely for inspection purposes
+                        // fontSize: 42,
                     },
                 },
             },

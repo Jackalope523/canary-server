@@ -19,7 +19,7 @@ const NotificationIndicator = () => {
   return (
     <Pressable onPress={() => navigation.navigate('Notifications')}>
       <View style={notificationStyles.notificationIndicator}>
-        <Icon name="notification-outline-alt" style={notificationStyles.notificationIndicator.icon}/>
+        <Icon name="notification-outline-alt" size={24} height={24} width={24} style={notificationStyles.notificationIndicator.icon}/>
         <View style={[labelStyles.numberLabel, labelStyles.numberLabel.dark]}>
           <Text style={[globalStyles.labelTextUppercase, {color: Colors.sparrowSand}]}>12</Text>
         </View>

@@ -17,7 +17,6 @@ export const navigationStyles = StyleSheet.create({
 
         icons: {
             color: Colors.sparrowDarkBrown,
-            fontSize: 16,
         },
 
         // Use as gap for icon on the left (usually the back arrow)

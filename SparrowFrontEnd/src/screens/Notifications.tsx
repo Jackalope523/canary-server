@@ -15,7 +15,7 @@ const NotificationsScreen = ({navigation}) => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
 
-      headerLeft: () => <Icon style={navigationStyles.topNavbar.icons} name="arrow-back-outline" onPress={() => navigation.goBack()} />,
+      headerLeft: () => <Icon size={24} height={24} width={24} style={navigationStyles.topNavbar.icons} name="arrow-back-outline" onPress={() => navigation.goBack()} />,
 
       // headerLeftContainerStyle: {
       //   marginLeft: 24,

@@ -14,7 +14,6 @@ export const notificationStyles = StyleSheet.create ({
 
         icon: {
             color: Colors.sparrowDarkBrown,
-            fontSize: 16,
         },
     },
 });
