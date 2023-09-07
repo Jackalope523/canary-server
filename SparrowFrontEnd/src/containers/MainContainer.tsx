@@ -46,7 +46,6 @@ function ActivityStackScreen () {
                     color: Colors.sparrowDark,
                 },
 
-                // TODO set margin to 24
                 headerTitleContainerStyle: {
                     marginHorizontal: 24,
                 },
