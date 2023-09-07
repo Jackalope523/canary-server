@@ -8,11 +8,12 @@ import TopNavbarEditSelected from '../components/organisms/TopNavbarEditSelected
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import TopNavbarOptions from '../components/organisms/TopNavbarOptions';
 import Notification from '../components/organisms/Notification';
+import NoNotifications from '../components/organisms/NoNotifications';
 
 const FeedScreen = () => {
     return (
         <View>
-            <Text>Feed</Text>
+            {/* <Text>Feed</Text>
             <Text>Used as temporary styling testing screen</Text>
             <TopNavbarDefaultTitled />
             <TopNavbarFavorite />
@@ -20,7 +21,8 @@ const FeedScreen = () => {
             <TopNavbarEdit />
             <TopNavbarEditSelected />
             <Text>Notification</Text>
-            <Notification />
+            <Notification /> */}
+            <NoNotifications />
         </View>
     );
 };

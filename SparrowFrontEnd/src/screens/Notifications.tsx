@@ -26,6 +26,7 @@ const NotificationsScreen = ({navigation}) => {
     })
   })
 
+  // TODO if no notifications show NoNotifications component
   // TODO use a flatlist when connecting it up to the backend
 
     return (
