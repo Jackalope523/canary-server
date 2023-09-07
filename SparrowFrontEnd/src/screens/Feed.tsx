@@ -7,6 +7,7 @@ import TopNavbarEdit from '../components/organisms/TopNavbarEdit';
 import TopNavbarEditSelected from '../components/organisms/TopNavbarEditSelected';
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import TopNavbarOptions from '../components/organisms/TopNavbarOptions';
+import Notification from '../components/organisms/Notification';
 
 const FeedScreen = () => {
     return (
@@ -18,6 +19,8 @@ const FeedScreen = () => {
             <TopNavbarOptions />
             <TopNavbarEdit />
             <TopNavbarEditSelected />
+            <Text>Notification</Text>
+            <Notification />
         </View>
     );
 };

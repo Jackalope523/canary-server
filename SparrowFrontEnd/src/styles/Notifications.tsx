@@ -16,4 +16,16 @@ export const notificationStyles = StyleSheet.create ({
             color: Colors.sparrowDarkBrown,
         },
     },
+
+    // Notification
+    notification: {
+        flexDirection: 'row',
+        columnGap: Spacing.md,
+        marginBottom: Spacing.sm,
+
+        textWrapper: {
+            flexDirection: 'column',
+            rowGap: Spacing.sm,
+        },
+    },
 });
