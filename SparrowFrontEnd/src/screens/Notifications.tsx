@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { avatarStyles } from '../styles/Avatars';
 import { notificationStyles } from '../styles/Notifications';
+import NoNotifications from '../components/organisms/NoNotifications';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -81,6 +82,7 @@ const NotificationsScreen = ({navigation}) => {
         <SafeAreaView>
           <FlatList
             style={[globalStyles.baseContainer, styles.listWrapper]}
+            ListEmptyComponent={NoNotifications}
             keyExtractor={(item) => item.id}
             data={sampleNotifications}
             renderItem={({ item }) => (

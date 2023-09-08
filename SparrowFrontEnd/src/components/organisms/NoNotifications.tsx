@@ -12,13 +12,11 @@ type Props = {}
 
 const NoNotifications = (props: Props) => {
   return (
-    <View style={globalStyles.baseContainer}>
-        <View style={styles.container}>
-            <Image source={image} height={300} width={300} />
-            <View style={styles.textWrapper}>
-                <Text style={[globalStyles.headingTextThree, globalStyles.textDark, styles.textAlign]}>You don't have any notifications yet.</Text>
-                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark, styles.textAlign]}>We'll notify you when you get invited to events and during other occurances.</Text>
-            </View>
+    <View style={styles.container}>
+        <Image source={image} height={300} width={300} />
+        <View style={styles.textWrapper}>
+            <Text style={[globalStyles.headingTextThree, globalStyles.textDark, styles.textAlign]}>You don't have any notifications yet.</Text>
+            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark, styles.textAlign]}>We'll notify you when you get invited to events and during other occurances.</Text>
         </View>
     </View>
   )
