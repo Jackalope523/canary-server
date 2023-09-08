@@ -7,6 +7,8 @@ import { Spacing } from '../styles/Spacing';
 import EventCardMedium from '../components/organisms/EventCardMedium';
 import NotificationIndicator from '../components/molecules/NotificationIndicator';
 
+// TODO might need to use SectionList or FlatList instead of ScrollView
+
 const ActivityScreen = () => {
     return (
         <ScrollView style={styles.mainWrapper} overScrollMode="never">

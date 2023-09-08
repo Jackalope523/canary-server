@@ -21,7 +21,7 @@ export const notificationStyles = StyleSheet.create ({
     notification: {
         flexDirection: 'row',
         columnGap: Spacing.md,
-        marginBottom: Spacing.sm,
+        marginBottom: Spacing.md,
 
         textWrapper: {
             flexDirection: 'column',
