@@ -327,4 +327,17 @@ export const globalStyles = StyleSheet.create({
         // lineHeight: 26,
         // letterSpacing: 2.4,
     },
+
+    // Illustrations
+    illustration: {
+        resizeMode: 'center',
+
+        large: {
+            height: 280,
+        },
+
+        medium: {
+            height: 200,
+        },
+    },
 });
