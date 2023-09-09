@@ -17,6 +17,9 @@ namespace Server.Boundaries
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
+	public record Characteristics(int Extraversion, int Athleticism, int Openness,
+		int Chaoticness, int Competitiveness, int Industriousness, int NightOwl);
+
 	public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime,
 		UserReportType ReportType, string ReportDetails);
 
@@ -51,6 +54,10 @@ namespace Server.Boundaries
 
 		bool RateUser(Guid selfId, Guid targetId, UserRating rating);
 		(int Positive, int Negative) GetUserRatings(Guid id);
+
+		Characteristics GetUserCharacteristics(Guid id);
+		bool UpdateUserCharacteristics(Guid id, int extraversion, int athleticism, int openness,
+		int chaoticness, int competitiveness, int industriousness, int nightOwl);
 
 		(List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id);
 		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
