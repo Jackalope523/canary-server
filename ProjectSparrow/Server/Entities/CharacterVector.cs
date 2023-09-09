@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Server.Entities
 {
-	internal class CharacterVector
+	internal struct CharacterVector
 	{
 		public static float AngleBetween(CharacterVector firstVector, CharacterVector secondVector)
 		{
@@ -25,21 +25,63 @@ namespace Server.Entities
 			return angle;
 		}
 
-		public void MoveTowards(CharacterVector otherVector)
-		{
-
-		}
-
-		public int Extraversion { get; }
-		public int Athleticism { get; }
-		public int Openness { get; }
-		public int Chaoticness { get; }
-		public int Competitiveness { get; }
-		public int Industriousness { get; }
-		public int NightOwl { get; }
+		public int Extraversion { get; init; }
+		public int Athleticism { get; init; }
+		public int Openness { get; init; }
+		public int Chaoticness { get; init; }
+		public int Competitiveness { get; init; }
+		public int Industriousness { get; init; }
+		public int NightOwl { get; init; }
 
 		public float Magnitude => MathF.Sqrt(Extraversion * Extraversion + Athleticism * Athleticism +
 			Openness * Openness + Chaoticness * Chaoticness + Competitiveness * Competitiveness +
 			NightOwl * NightOwl);
+
+		public CharacterVector MoveTowards(CharacterVector otherVector, float modifier = 1f)
+		{
+			return this + ((otherVector - this) * modifier);
+		}
+
+		public static CharacterVector operator +(CharacterVector a, CharacterVector b)
+		{
+			return new()
+			{
+				Extraversion = a.Extraversion + b.Extraversion,
+				Athleticism = a.Athleticism + b.Athleticism,
+				Openness = a.Openness + b.Openness,
+				Chaoticness = a.Chaoticness + b.Chaoticness,
+				Competitiveness = a.Competitiveness + b.Competitiveness,
+				Industriousness = a.Industriousness + b.Industriousness,
+				NightOwl = a.NightOwl + b.NightOwl
+			};
+		}
+
+		public static CharacterVector operator -(CharacterVector a, CharacterVector b)
+		{
+			return new()
+			{
+				Extraversion = a.Extraversion - b.Extraversion,
+				Athleticism = a.Athleticism - b.Athleticism,
+				Openness = a.Openness - b.Openness,
+				Chaoticness = a.Chaoticness - b.Chaoticness,
+				Competitiveness = a.Competitiveness - b.Competitiveness,
+				Industriousness = a.Industriousness - b.Industriousness,
+				NightOwl = a.NightOwl - b.NightOwl
+			};
+		}
+
+		public static CharacterVector operator *(CharacterVector a, float f)
+		{
+			return new()
+			{
+				Extraversion = (int) (a.Extraversion * f),
+				Athleticism = (int) (a.Athleticism * f),
+				Openness = (int) (a.Openness * f),
+				Chaoticness = (int) (a.Chaoticness * f),
+				Competitiveness = (int) (a.Competitiveness * f),
+				Industriousness = (int) (a.Industriousness * f),
+				NightOwl = (int) (a.NightOwl * f)
+			};
+		}
 	}
 }
