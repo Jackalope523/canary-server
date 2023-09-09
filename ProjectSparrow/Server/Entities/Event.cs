@@ -27,6 +27,8 @@ namespace Server.Entities
 
         public List<ThinnerUser> Attendees { get; set; }
 
+        public CharacterVector Character { get; set; }
+
 		public List<EventReport> EventReports { get; set; }
 
 		#endregion

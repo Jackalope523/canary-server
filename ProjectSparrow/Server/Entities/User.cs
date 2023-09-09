@@ -47,6 +47,8 @@ namespace Server.Entities
         public List<ThinnerUser> Following { get; set; }
         public List<ThinnerUser> Blocking { get; set; }
 
+        public CharacterVector Character { get; set; }
+
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
 
