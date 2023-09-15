@@ -24,12 +24,13 @@ namespace Server.Entities
         public bool IsOpen { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
+        public CharacterVector Character { get; set; }
 
         public List<ThinnerUser> Attendees { get; set; }
 
-        public CharacterVector Character { get; set; }
-
 		public List<EventReport> EventReports { get; set; }
+
+        public List<EventPost> EventPosts { get; set; }
 
 		#endregion
 
@@ -82,6 +83,11 @@ namespace Server.Entities
 		{
 			EventReports = await EventManager.Manager.GetEventReportsAsync(Id);
 		}
+
+        public async Task SyncPosts()
+        {
+            // EventPosts = await EventManager.Manager.GetEventPostsAsync(Id);
+        }
 
 		public async Task<bool> IsVisibleTo(User user)
         {
