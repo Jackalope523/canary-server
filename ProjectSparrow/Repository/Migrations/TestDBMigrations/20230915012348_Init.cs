@@ -43,8 +43,11 @@ namespace Repository.Migrations.TestDBMigrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     OwnerId = table.Column<Guid>(type: "TEXT", nullable: false),
                     EventId = table.Column<Guid>(type: "TEXT", nullable: false),
+<<<<<<<< HEAD:ProjectSparrow/Repository/Migrations/TestDBMigrations/20230915012348_Init.cs
                     PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
+========
+>>>>>>>> 7ea3e0e88e26b331d157a078749fc037bb717138:ProjectSparrow/Repository/Migrations/TestDBMigrations/20230915011740_Init.cs
                     Photo = table.Column<byte[]>(type: "BLOB", nullable: false)
                 },
                 constraints: table =>

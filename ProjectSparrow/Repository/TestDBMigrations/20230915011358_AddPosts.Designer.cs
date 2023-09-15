@@ -12,8 +12,13 @@ using Repository.Contexts;
 namespace Repository.TestDBMigrations
 {
     [DbContext(typeof(TestContext))]
+<<<<<<<< HEAD:ProjectSparrow/Repository/TestDBMigrations/20230915011358_AddPosts.Designer.cs
     [Migration("20230915011358_AddPosts")]
     partial class AddPosts
+========
+    [Migration("20230915011740_Init")]
+    partial class Init
+>>>>>>>> 7ea3e0e88e26b331d157a078749fc037bb717138:ProjectSparrow/Repository/Migrations/TestDBMigrations/20230915011740_Init.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
