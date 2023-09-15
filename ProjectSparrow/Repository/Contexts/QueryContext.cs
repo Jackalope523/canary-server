@@ -12,6 +12,7 @@ namespace Repository.Contexts
         public DbSet<UserLink> UserLinks { get; set; }
         public DbSet<EventLink> EventLinks { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<Post> Posts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

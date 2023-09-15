@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using NetTopologySuite.Geometries;
 
 #nullable disable
@@ -33,6 +34,22 @@ namespace Repository.Migrations.TestDBMigrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Events", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Posts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    EventId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Photo = table.Column<byte[]>(type: "BLOB", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,6 +104,41 @@ namespace Repository.Migrations.TestDBMigrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Reports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SelfId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    OtherId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    EventId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    Notes = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reports_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reports_Users_OtherId",
+                        column: x => x.OtherId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reports_Users_SelfId",
+                        column: x => x.SelfId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Links_EventId",
                 table: "Links",
@@ -96,6 +148,21 @@ namespace Repository.Migrations.TestDBMigrations
                 name: "IX_Links_SelfId",
                 table: "Links",
                 column: "SelfId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_EventId",
+                table: "Reports",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_OtherId",
+                table: "Reports",
+                column: "OtherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_SelfId",
+                table: "Reports",
+                column: "SelfId");
         }
 
         /// <inheritdoc />
@@ -103,6 +170,12 @@ namespace Repository.Migrations.TestDBMigrations
         {
             migrationBuilder.DropTable(
                 name: "Links");
+
+            migrationBuilder.DropTable(
+                name: "Posts");
+
+            migrationBuilder.DropTable(
+                name: "Reports");
 
             migrationBuilder.DropTable(
                 name: "Events");
