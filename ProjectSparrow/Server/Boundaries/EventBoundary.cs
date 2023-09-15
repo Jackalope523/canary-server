@@ -9,7 +9,7 @@ namespace Server.Boundaries
 {
 	public record ThinEvent(Guid Id, ThinnerUser Host, string Name, string Description, string EventType,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-		bool IsOpen, int GroupMinimum, int GroupMaximum);
+		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
 
 	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
@@ -36,8 +36,6 @@ namespace Server.Boundaries
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);
 
 		List<ThinnerUser> GetGuestList(Guid id);
-
-		Character GetEventCharacter(Guid id);
 
 		List<EventReport> GetReportsAboutEvent(Guid id);
 		bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails);

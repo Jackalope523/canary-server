@@ -13,12 +13,12 @@ namespace Server.Boundaries
 	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
+		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
 
-	public record Character(int Extraversion, int Athleticism, int Openness,
-		int Chaoticness, int Competitiveness, int Industriousness, int NightOwl);
+	public record Character(int Extraversion, int Athleticism, int Chaoticness,
+		int Competitiveness, int Industriousness, int NightOwl, int Openness);
 
 	public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime,
 		UserReportType ReportType, string ReportDetails);
@@ -42,6 +42,8 @@ namespace Server.Boundaries
 		bool UpdateAccessTries(Guid id, int newAccessTries);
 		bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus);
 		bool UpdateReputation(Guid id, int newReputation);
+		bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int chaoticness,
+			int competitiveness, int industriousness, int nightOwl, int openness);
 
 		List<ThinnerUser> GetFriends(Guid id);
 		List<ThinnerUser> GetFollowedUsers(Guid id);
@@ -54,10 +56,6 @@ namespace Server.Boundaries
 
 		bool RateUser(Guid selfId, Guid targetId, UserRating rating);
 		(int Positive, int Negative) GetUserRatings(Guid id);
-
-		Character GetUserCharacter(Guid id);
-		bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int openness,
-		int chaoticness, int competitiveness, int industriousness, int nightOwl);
 
 		(List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id);
 		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);

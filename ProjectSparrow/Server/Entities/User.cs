@@ -74,6 +74,7 @@ namespace Server.Entities
             SecurityStamp = fromUser.SecurityStamp;
             LockoutDate = fromUser.LockoutDate;
             AccessTries = fromUser.AccessTries;
+            Character = new(fromUser.Character);
         }
 
         public User(ThinnerUser fromUser)
@@ -95,7 +96,7 @@ namespace Server.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, NumberOfFollowers);
+                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }
 
         public ThinnerUser ToThinnerUser()
