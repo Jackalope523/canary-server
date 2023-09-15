@@ -78,7 +78,7 @@ namespace Server.Controls
 			// Try to create an event
 			var newEvent = events.CreateEvent(userID, eventName, eventDescription, eventType,
 				startTime, latitude, longitude,
-				groupMinimum ?? 0, groupMaximum ?? 0);
+				groupMinimum ?? 0, groupMaximum ?? 0, CharacterVector.Default.ToCharacter());
 			return newEvent;
 		}
 

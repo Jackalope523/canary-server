@@ -29,7 +29,7 @@ namespace Server.Boundaries
 		ThinUser FindUserById(Guid id);
         ThinUser FindUserByPhoneNumber(string phoneNumber);
 		ThinUser FindUserByEmail(string normalisedEmail);
-        bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
+        bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, Character character);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
 		bool UpdateEmail(Guid id, string newEmail);

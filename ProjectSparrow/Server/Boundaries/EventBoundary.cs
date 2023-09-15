@@ -26,7 +26,7 @@ namespace Server.Boundaries
 
 		ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int groupMinimum, int groupMaximum);
+			int groupMinimum, int groupMaximum, Character character);
 		bool UpdateDescription(Guid id, string description);
 		bool UpdateType(Guid id, string type);
 		bool UpdateStatus(Guid id, bool isOpen);

@@ -34,6 +34,10 @@ namespace Server.Entities
 			return angle;
 		}
 
+		public static CharacterVector Default => new() { Extraversion = 50, Athleticism = 50,
+			Chaoticness = 50, Competitiveness = 50, Industriousness = 50, NightOwl = 50,
+			Openness = 50 };
+
 		public CharacterVector(Character fromCharacter)
 		{
 			Extraversion = fromCharacter.Extraversion;
