@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Repository.Entities
+{
+    public class Post
+    {
+        public Guid Id { get; set; }
+
+        public Guid OwnerId { get; set; }
+        internal User Owner { get; set; }
+        public Guid EventId { get; set; }
+        internal Event Event { get; set; }
+        internal DateTimeOffset PostedAt { get; init; }
+        internal string Description { get; set; }
+        public byte[] Photo { get; set; }
+
+
+
+    }
+}

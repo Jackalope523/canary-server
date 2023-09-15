@@ -25,6 +25,7 @@ namespace Repository.Entities
         internal List<Link> Links { get; set; }
         internal List<Report> ReporterList { get; set; }
         internal List<Report> ReporteeList { get; set; }
+        internal List<Post> Posts { get; set; }
 
         public ThinUser ToThinUser()
         {

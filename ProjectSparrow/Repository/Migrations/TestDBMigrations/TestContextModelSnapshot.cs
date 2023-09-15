@@ -88,6 +88,27 @@ namespace Repository.Migrations.TestDBMigrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Repository.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Photo")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Posts");
+                });
+
             modelBuilder.Entity("Repository.Entities.Report", b =>
                 {
                     b.Property<Guid>("Id")

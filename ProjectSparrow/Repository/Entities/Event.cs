@@ -23,6 +23,9 @@ namespace Repository.Entities
         // Navigation Properties
         internal List<EventLink> Links { get; set; }
         internal List<Report> Reports { get; set; }
+        internal List<Post> Posts { get; set; }
+
+
 
         public ThinEvent ToThinEvent()
         {

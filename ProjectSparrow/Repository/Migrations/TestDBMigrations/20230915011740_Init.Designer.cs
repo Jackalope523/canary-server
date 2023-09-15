@@ -12,8 +12,8 @@ using Repository.Contexts;
 namespace Repository.Migrations.TestDBMigrations
 {
     [DbContext(typeof(TestContext))]
-    [Migration("20230709003600_AddReports")]
-    partial class AddReports
+    [Migration("20230915011740_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +89,27 @@ namespace Repository.Migrations.TestDBMigrations
                     b.HasDiscriminator<string>("link_type").HasValue("Link");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Repository.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Photo")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Repository.Entities.Report", b =>
