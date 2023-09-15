@@ -1,18 +1,22 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 import { globalStyles } from '../../styles/Global';
 import { Spacing } from '../../styles/Spacing';
 
 // TODO rename this file later when you come up with a better name
 
+// Screen dimensions
+const screenHeight = Dimensions.get('screen').height;
+
+// Navigation dimensions
+const navHeight = 50;
+
 type Props = {}
 
 const NoNotifications = (props: Props) => {
   return (
-    <View style={styles.container}>
-        <View style={{}}>
+    <View style={[styles.container, globalStyles.baseContainer]}>
         <Image source={require('../../assets/illustrations/temp/not-found.png')} style={[globalStyles.illustration, globalStyles.illustration.large]} />
-        </View>
         <View style={styles.textWrapper}>
             <Text style={[globalStyles.headingTextThree, globalStyles.textDark, styles.textAlign]}>You don't have any notifications yet.</Text>
             <Text style={[globalStyles.bodyTextOne, globalStyles.textDark, styles.textAlign]}>We'll notify you when you get invited to events and during other occurances.</Text>
@@ -25,6 +29,7 @@ export default NoNotifications
 
 const styles = StyleSheet.create ({
     container: {
+        height: screenHeight - navHeight,
         alignItems: 'center',
         justifyContent: 'center',
     },

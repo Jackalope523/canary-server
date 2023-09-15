@@ -120,7 +120,7 @@ const MainContainer = () => {
                             paddingHorizontal: 0,
                         },
 
-                        // headerShown: false,
+                        headerShown: false,
                     })}>
                     
                     <Tab.Screen
