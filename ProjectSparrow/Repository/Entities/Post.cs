@@ -15,8 +15,9 @@ namespace Repository.Entities
         public Guid EventId { get; set; }
         internal Event Event { get; set; }
         public DateTimeOffset PostedAt { get; init; }
-        public string Description { get; set; }
-        public byte[] Photo { get; set; }
+        public string PhotoURL { get; set; }
+        public int Ups { get; set; }
+        public int Downs { get; set; }
 
 
 
