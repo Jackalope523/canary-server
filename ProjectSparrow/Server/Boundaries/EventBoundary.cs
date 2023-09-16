@@ -9,11 +9,13 @@ namespace Server.Boundaries
 {
 	public record ThinEvent(Guid Id, ThinnerUser Host, string Name, string Description, string EventType,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-		bool IsOpen, int GroupMinimum, int GroupMaximum);
+		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
 
 	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
 		EventReportType ReportType, string ReportDetails);
+
+	public record EventPost(Guid Id, Guid EventId, Guid UserId, DateTimeOffset TimePosted, string ImageURL, (int Positive, int Negative) Ratings);
 
 	public interface IEventDatabase
 	{
@@ -26,7 +28,7 @@ namespace Server.Boundaries
 
 		ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int groupMinimum, int groupMaximum);
+			int groupMinimum, int groupMaximum, Character character);
 		bool UpdateDescription(Guid id, string description);
 		bool UpdateType(Guid id, string type);
 		bool UpdateStatus(Guid id, bool isOpen);
@@ -39,6 +41,11 @@ namespace Server.Boundaries
 
 		List<EventReport> GetReportsAboutEvent(Guid id);
 		bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails);
+
+		List<EventPost> GetPostsForEvent(Guid id);
+		bool AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL);
+		bool RemovePost(Guid postId);
+		bool RatePost(Guid postId, Guid voterId, UserRating rating);
 	}
 
 	public interface IEventOperations

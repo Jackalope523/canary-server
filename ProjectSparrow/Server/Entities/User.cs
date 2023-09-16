@@ -47,6 +47,8 @@ namespace Server.Entities
         public List<ThinnerUser> Following { get; set; }
         public List<ThinnerUser> Blocking { get; set; }
 
+        public CharacterVector Character { get; set; }
+
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
 
@@ -72,6 +74,7 @@ namespace Server.Entities
             SecurityStamp = fromUser.SecurityStamp;
             LockoutDate = fromUser.LockoutDate;
             AccessTries = fromUser.AccessTries;
+            Character = new(fromUser.Character);
         }
 
         public User(ThinnerUser fromUser)
@@ -93,7 +96,7 @@ namespace Server.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, NumberOfFollowers);
+                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }
 
         public ThinnerUser ToThinnerUser()
