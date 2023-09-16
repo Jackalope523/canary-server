@@ -114,7 +114,7 @@ namespace Server.Controls
 
             // Store profile
             bool success = accounts.CreateUser(newUser.PhoneNumber, email,
-                newUser.Name, newUser.DateOfBirth);
+                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
 

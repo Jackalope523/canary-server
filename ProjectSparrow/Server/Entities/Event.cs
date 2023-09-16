@@ -27,6 +27,8 @@ namespace Server.Entities
 
         public List<ThinnerUser> Attendees { get; set; }
 
+        public CharacterVector Character { get; set; }
+
 		public List<EventReport> EventReports { get; set; }
 
 		#endregion
@@ -52,6 +54,7 @@ namespace Server.Entities
             IsOpen = fromEvent.IsOpen;
             GroupMinimum = fromEvent.GroupMinimum;
             GroupMaximum = fromEvent.GroupMaximum;
+            Character = new(fromEvent.Character);
         }
 
         public Event(ThinnerEvent fromEvent)
@@ -67,7 +70,7 @@ namespace Server.Entities
         {
             return new(Id, Host.ToThinnerUser(), Name, Description, EventType,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
-                IsOpen, GroupMinimum, GroupMaximum);
+                IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter());
         }
 
         public ThinnerEvent ToThinnerEvent()

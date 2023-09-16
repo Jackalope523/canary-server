@@ -13,9 +13,12 @@ namespace Server.Boundaries
 	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers);
+		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
 	public record ThinnerUser(Guid Id, string Name);
 	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
+
+	public record Character(int Extraversion, int Athleticism, int Chaoticness,
+		int Competitiveness, int Industriousness, int NightOwl, int Openness);
 
 	public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime,
 		UserReportType ReportType, string ReportDetails);
@@ -26,7 +29,7 @@ namespace Server.Boundaries
 		ThinUser FindUserById(Guid id);
         ThinUser FindUserByPhoneNumber(string phoneNumber);
 		ThinUser FindUserByEmail(string normalisedEmail);
-        bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
+        bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, Character character);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
 		bool UpdateEmail(Guid id, string newEmail);
@@ -39,6 +42,8 @@ namespace Server.Boundaries
 		bool UpdateAccessTries(Guid id, int newAccessTries);
 		bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus);
 		bool UpdateReputation(Guid id, int newReputation);
+		bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int chaoticness,
+			int competitiveness, int industriousness, int nightOwl, int openness);
 
 		List<ThinnerUser> GetFriends(Guid id);
 		List<ThinnerUser> GetFollowedUsers(Guid id);

@@ -9,7 +9,7 @@ namespace Server.Boundaries
 {
 	public record ThinEvent(Guid Id, ThinnerUser Host, string Name, string Description, string EventType,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-		bool IsOpen, int GroupMinimum, int GroupMaximum);
+		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
 
 	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
@@ -26,7 +26,7 @@ namespace Server.Boundaries
 
 		ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int groupMinimum, int groupMaximum);
+			int groupMinimum, int groupMaximum, Character character);
 		bool UpdateDescription(Guid id, string description);
 		bool UpdateType(Guid id, string type);
 		bool UpdateStatus(Guid id, bool isOpen);

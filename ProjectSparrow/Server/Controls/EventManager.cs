@@ -52,9 +52,11 @@ namespace Server.Controls
 		public async Task<List<ThinnerEvent>> GetPersonalisedEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance)
 		{
-			var nearbyEvents = await GetEventsInAreaAsync(userID, latitude, longitude, distance);
+			var user = await AccountManager.Manager.GetUser(userID);
+			var nearbyEvents = events.FindEvents(latitude, longitude, distance);
 
-			// TODO User interest weighting here
+			// Remove inaccessible events and events with a large difference between event and user interest
+			await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
 
 			return nearbyEvents;
 		}
@@ -76,7 +78,7 @@ namespace Server.Controls
 			// Try to create an event
 			var newEvent = events.CreateEvent(userID, eventName, eventDescription, eventType,
 				startTime, latitude, longitude,
-				groupMinimum ?? 0, groupMaximum ?? 0);
+				groupMinimum ?? 0, groupMaximum ?? 0, CharacterVector.Default.ToCharacter());
 			return newEvent;
 		}
 
@@ -240,6 +242,22 @@ namespace Server.Controls
 				Event targetEvent = new(e);
 
 				if (!await targetEvent.IsVisibleTo(user))
+				{ events.Remove(e); }
+			}
+
+			return events;
+		}
+
+		internal async Task<List<ThinnerEvent>> RemoveUnattractiveEventsAsync(User user, List<ThinnerEvent> events, float maximumAngle)
+		{
+			foreach (ThinnerEvent e in events)
+			{
+				Event targetEvent = new(e);
+
+				if (!await targetEvent.IsVisibleTo(user))
+				{ events.Remove(e); continue; }
+
+				if (CharacterVector.AngleBetweenAffected(user.Character, targetEvent.Character) > maximumAngle)
 				{ events.Remove(e); }
 			}
 
