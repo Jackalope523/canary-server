@@ -95,6 +95,7 @@ const NotificationsScreen = ({navigation}) => {
         <SafeAreaView>
           <FlatList
             style={[globalStyles.baseContainer, styles.listWrapper]}
+            ItemSeparatorComponent={() => <View style={{height: Spacing.md}} />}
             ListEmptyComponent={NoNotifications}
             keyExtractor={(item) => item.id}
             data={sampleNotifications}
