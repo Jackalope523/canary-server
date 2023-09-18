@@ -8,6 +8,8 @@ import fontelloConfig from '../../config.json';
 import { globalStyles } from '../../styles/Global';
 import { Colors } from '../../styles/Colors';
 
+// !! THIS COMPONENT IS CURRENTLY NOT IN USE !!
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // TEMP. example imports
