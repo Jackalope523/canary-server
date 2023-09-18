@@ -39,20 +39,20 @@ function ActivityStackScreen () {
     return (
         <ActivityStack.Navigator
             screenOptions={() => ({
-                // headerShown: false,
+                headerShown: false,
 
                 headerTitleStyle: {
                     fontSize: 16,
                     color: Colors.sparrowDark,
                 },
 
-                headerTitleContainerStyle: {
-                    marginHorizontal: 24,
-                },
+                // headerTitleContainerStyle: {
+                //     marginHorizontal: 24,
+                // },
 
-                headerLeftContainerStyle: {
-                    marginLeft: 0,
-                },
+                // headerLeftContainerStyle: {
+                //     marginLeft: 0,
+                // },
 
                 headerStyle: {
                     height: 50,
