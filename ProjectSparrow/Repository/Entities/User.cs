@@ -21,6 +21,15 @@ namespace Repository.Entities
         public int AccessTries { get; set; }
         public UserAccountStatus AccountStatus { get; set; }
 
+        // Vector
+        public int Extroversion { get; init; }
+        public int Athleticisme { get; init; }
+        public int Openness { get; init; }
+        public int Chaos { get; init; }
+        public int Competitiveness { get; init; }
+        public int Industriousness { get; init; }
+        public int NightOwl { get; init; }
+
         // Navigation Properties
         internal List<Link> Links { get; set; }
         internal List<Report> ReporterList { get; set; }
