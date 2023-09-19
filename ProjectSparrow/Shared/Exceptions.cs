@@ -3,6 +3,43 @@
 
 namespace Shared
 {
+    #region Repository
+    [Serializable]
+    public class InsuifficientRadiusException : Exception
+    {
+        public InsuifficientRadiusException()
+        {
+        }
+
+        public InsuifficientRadiusException(string message)
+            : base(message)
+        {
+        }
+
+        public InsuifficientRadiusException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+
+    public class ExcessiveRadiusException : Exception
+    {
+        public ExcessiveRadiusException()
+        {
+        }
+
+        public ExcessiveRadiusException(string message)
+            : base(message)
+        {
+        }
+
+        public ExcessiveRadiusException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    #endregion
+
     #region Accounts
 
     [Serializable]

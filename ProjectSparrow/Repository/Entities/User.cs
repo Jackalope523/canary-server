@@ -1,4 +1,4 @@
-﻿
+﻿using NetTopologySuite.Geometries;
 using Server.Boundaries;
 
 namespace Repository.Entities
@@ -29,6 +29,13 @@ namespace Repository.Entities
         public int Competitiveness { get; init; }
         public int Industriousness { get; init; }
         public int NightOwl { get; init; }
+
+        //Geolocation: X = Longitude Y = Latitude
+        public Point Haunt { get; set; }
+        public double HauntRadius { get; set; }
+        public Point CurrentLocation { get; set; }
+        public double CurrentRadius { get; set; }
+
 
         // Navigation Properties
         internal List<Link> Links { get; set; }
