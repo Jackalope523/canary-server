@@ -72,13 +72,13 @@ const SAMPLEEVENTDATA = [
         time: '12:30',
         attendees: 5,
         title: 'ROLLINGDOWN Downhill longboarding competition 2023',
-        location: 'Tiny and chill hill, Newstreet 203F, Sigulda',
+        location: 'Tiny and chill hill with gnomes and majestic flying butterflies, Newstreet 203F, Sigulda',
         uri: img5,
     },
 ];
 
 const ActivityScreen = () => {
-    // TODO FIX THIS, IT DOESN'T WORK - if textWrapper text exceeds 2 lines, align items to flex-start
+    // If textWrapper text exceeds 2 lines, align items to flex-start
     const [isTextOverflowing, setIsTextOverflowing] = useState(false);
 
     const handleTextLayout = (event) => {

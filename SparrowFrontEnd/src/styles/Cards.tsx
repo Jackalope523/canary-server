@@ -53,7 +53,7 @@ export const cardStyles = StyleSheet.create({
                     },
                 },
 
-                // TODO FIX THIS - if textWrapper text exceeds 2 lines, align items to flex-start
+                // If textWrapper text exceeds 2 lines, align items to flex-start
                 textWrapperCenter: {
                     alignItems: 'center',
                 },
