@@ -55,6 +55,7 @@ namespace Server.Boundaries
 		bool UnblockUser(Guid selfId, Guid targetId);
 
 		bool RateUser(Guid selfId, Guid targetId, UserRating rating);
+		bool RemoveUserRating(Guid selfId, Guid targetId);
 		(int Positive, int Negative) GetUserRatings(Guid id);
 
 		(List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id);

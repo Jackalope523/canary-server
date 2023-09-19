@@ -46,6 +46,7 @@ namespace Server.Boundaries
 		bool AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL);
 		bool RemovePost(Guid postId);
 		bool RatePost(Guid postId, Guid voterId, UserRating rating);
+		bool RemovePostRating(Guid postId, Guid voterId);
 	}
 
 	public interface IEventOperations
