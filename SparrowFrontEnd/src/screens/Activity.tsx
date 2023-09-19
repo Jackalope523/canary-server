@@ -79,7 +79,7 @@ const SAMPLEEVENTDATA = [
 
 const ActivityScreen = () => {
     // TODO FIX THIS, IT DOESN'T WORK - if textWrapper text exceeds 2 lines, align items to flex-start
-    const [isTextOverflowing, setIsTextOverflowing] = useState({});
+    const [isTextOverflowing, setIsTextOverflowing] = useState(false);
 
     const handleTextLayout = (event) => {
         const { lines } = event.nativeEvent;
@@ -98,6 +98,7 @@ const ActivityScreen = () => {
             <View style={{marginBottom: Spacing.md}}>
                 <Text style={[globalStyles.headingTextOne, styles.headingText]}>Upcoming events</Text>
                 <FlatList
+                    showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{paddingHorizontal: Spacing.lg}}
                     ItemSeparatorComponent={() => <View style={{width: Spacing.md}} />}
                     overScrollMode='never'
@@ -142,6 +143,7 @@ const ActivityScreen = () => {
             <View style={{marginBottom: Spacing.lg}}>
                 <Text style={[globalStyles.headingTextOne, styles.headingText]}>Recommended</Text>
                 <FlatList
+                    showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{paddingHorizontal: Spacing.lg}}
                     ItemSeparatorComponent={() => <View style={{width: Spacing.md}} />}
                     overScrollMode='never'
