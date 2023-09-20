@@ -9,11 +9,16 @@ using Repository.Contexts;
 
 #nullable disable
 
-namespace Repository.Migrations.TestDBMigrations
+namespace Repository.TestDBMigrations
 {
     [DbContext(typeof(TestContext))]
-    [Migration("20230709003600_AddReports")]
-    partial class AddReports
+<<<<<<<< HEAD:ProjectSparrow/Repository/Migrations/TestDBMigrations/20230915012348_Init.Designer.cs
+    [Migration("20230915012348_Init")]
+    partial class Init
+========
+    [Migration("20230915011358_AddPosts")]
+    partial class AddPosts
+>>>>>>>> 7ea3e0e88e26b331d157a078749fc037bb717138:ProjectSparrow/Repository/TestDBMigrations/20230915011358_AddPosts.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +94,40 @@ namespace Repository.Migrations.TestDBMigrations
                     b.HasDiscriminator<string>("link_type").HasValue("Link");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Repository.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+<<<<<<<< HEAD:ProjectSparrow/Repository/Migrations/TestDBMigrations/20230915012348_Init.Designer.cs
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+========
+>>>>>>>> 7ea3e0e88e26b331d157a078749fc037bb717138:ProjectSparrow/Repository/TestDBMigrations/20230915011358_AddPosts.Designer.cs
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Photo")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+<<<<<<<< HEAD:ProjectSparrow/Repository/Migrations/TestDBMigrations/20230915012348_Init.Designer.cs
+                    b.Property<DateTimeOffset>("PostedAt")
+                        .HasColumnType("TEXT");
+
+========
+>>>>>>>> 7ea3e0e88e26b331d157a078749fc037bb717138:ProjectSparrow/Repository/TestDBMigrations/20230915011358_AddPosts.Designer.cs
+                    b.HasKey("Id");
+
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Repository.Entities.Report", b =>

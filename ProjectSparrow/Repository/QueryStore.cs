@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite.Geometries;
 using Repository.Entities;
 using Repository.Sentries;
@@ -457,7 +458,46 @@ namespace Repository
         }
         public ThinEvent FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
         public List<ThinEvent> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
-        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
+        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
+
+        public List<EventPost> GetPostsForEvent(Guid id)
+        {
+            return storeSentry.GetContext().Posts.
+                Where(p => p.EventId == id).
+                Select(p => new EventPost (
+                    p.Id, 
+                    p.EventId, 
+                    p.OwnerId, 
+                    p.PostedAt, 
+                    p.PhotoURL, 
+                    new (p.Ups, p.Downs)
+                    )).ToList();
+        }
+
+        public bool AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
+        {
+            Post toAdd = new Post { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
+            storeSentry.GetContext().Posts.Add(toAdd);
+            return true;
+        }
+
+        public bool RemovePost(Guid postId)
+        {
+            storeSentry.GetContext().Posts.Remove(new Post { Id = postId });
+            return true;
+        }
+
+        public bool RatePost(Guid postId, Guid voterId, UserRating rating)
+        {
+            PostLink.PostLinkType type;
+
+            if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
+            else type = PostLink.PostLinkType.RateDown;
+
+            PostLink toAdd = new PostLink { SelfId = voterId, PostId = postId, Type = type }; 
+            storeSentry.GetContext().PostLinks.Add(toAdd);
+            return true;
+        }
 
         public bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int chaoticness, int competitiveness, int industriousness, int nightOwl, int openness)
         {

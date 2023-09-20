@@ -274,6 +274,11 @@ namespace Server.Controls
 			return events.GetReportsAboutEvent(eventID);
 		}
 
+		internal async Task<List<EventPost>> GetEventPostsAsync(Guid eventID)
+		{
+			return events.GetPostsForEvent(eventID);
+		}
+
 
 		private async Task ThrowIfUserAtEvent(Guid userID)
 		{

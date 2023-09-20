@@ -15,6 +15,8 @@ namespace Server.Boundaries
 	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
 		EventReportType ReportType, string ReportDetails);
 
+	public record EventPost(Guid Id, Guid EventId, Guid UserId, DateTimeOffset TimePosted, string ImageURL, (int Positive, int Negative) Ratings);
+
 	public interface IEventDatabase
 	{
         public static IEventDatabase EventDatabaseAccess;
@@ -39,6 +41,11 @@ namespace Server.Boundaries
 
 		List<EventReport> GetReportsAboutEvent(Guid id);
 		bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails);
+
+		List<EventPost> GetPostsForEvent(Guid id);
+		bool AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL);
+		bool RemovePost(Guid postId);
+		bool RatePost(Guid postId, Guid voterId, UserRating rating);
 	}
 
 	public interface IEventOperations

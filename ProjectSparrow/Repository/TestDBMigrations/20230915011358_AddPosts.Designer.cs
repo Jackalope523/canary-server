@@ -9,11 +9,16 @@ using Repository.Contexts;
 
 #nullable disable
 
-namespace Repository.Migrations.TestDBMigrations
+namespace Repository.TestDBMigrations
 {
     [DbContext(typeof(TestContext))]
-    [Migration("20230513150810_Init")]
+<<<<<<<< HEAD:ProjectSparrow/Repository/TestDBMigrations/20230915011358_AddPosts.Designer.cs
+    [Migration("20230915011358_AddPosts")]
+    partial class AddPosts
+========
+    [Migration("20230915011740_Init")]
     partial class Init
+>>>>>>>> 7ea3e0e88e26b331d157a078749fc037bb717138:ProjectSparrow/Repository/Migrations/TestDBMigrations/20230915011740_Init.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +94,63 @@ namespace Repository.Migrations.TestDBMigrations
                     b.HasDiscriminator<string>("link_type").HasValue("Link");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Repository.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Photo")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Repository.Entities.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("FilingDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OtherId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SelfId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("OtherId");
+
+                    b.HasIndex("SelfId");
+
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("Repository.Entities.User", b =>
@@ -190,6 +252,33 @@ namespace Repository.Migrations.TestDBMigrations
                     b.Navigation("Self");
                 });
 
+            modelBuilder.Entity("Repository.Entities.Report", b =>
+                {
+                    b.HasOne("Repository.Entities.Event", "Event")
+                        .WithMany("Reports")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.Entities.User", "Other")
+                        .WithMany("ReporteeList")
+                        .HasForeignKey("OtherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.Entities.User", "Self")
+                        .WithMany("ReporterList")
+                        .HasForeignKey("SelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Other");
+
+                    b.Navigation("Self");
+                });
+
             modelBuilder.Entity("Repository.Entities.EventLink", b =>
                 {
                     b.HasOne("Repository.Entities.Event", "Event")
@@ -204,11 +293,17 @@ namespace Repository.Migrations.TestDBMigrations
             modelBuilder.Entity("Repository.Entities.Event", b =>
                 {
                     b.Navigation("Links");
+
+                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("Repository.Entities.User", b =>
                 {
                     b.Navigation("Links");
+
+                    b.Navigation("ReporteeList");
+
+                    b.Navigation("ReporterList");
                 });
 #pragma warning restore 612, 618
         }
