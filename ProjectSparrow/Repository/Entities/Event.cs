@@ -20,6 +20,15 @@ namespace Repository.Entities
         public int GroupMaximum { get; set; }
         public DateTimeOffset? EndTime { get; set; }
 
+        // Vector
+        public int Extroversion { get; init; }
+        public int Athleticisme { get; init; }
+        public int Openness { get; init; }
+        public int Chaos { get; init; }
+        public int Competitiveness { get; init; }
+        public int Industriousness { get; init; }
+        public int NightOwl { get; init; }
+
         // Navigation Properties
         internal List<EventLink> Links { get; set; }
         internal List<Report> Reports { get; set; }

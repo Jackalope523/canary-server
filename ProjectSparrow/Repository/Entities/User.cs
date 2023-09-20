@@ -1,4 +1,4 @@
-﻿
+﻿using NetTopologySuite.Geometries;
 using Server.Boundaries;
 
 namespace Repository.Entities
@@ -20,6 +20,22 @@ namespace Repository.Entities
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
         public UserAccountStatus AccountStatus { get; set; }
+
+        // Vector
+        public int Extroversion { get; init; }
+        public int Athleticisme { get; init; }
+        public int Openness { get; init; }
+        public int Chaos { get; init; }
+        public int Competitiveness { get; init; }
+        public int Industriousness { get; init; }
+        public int NightOwl { get; init; }
+
+        //Geolocation: X = Longitude Y = Latitude
+        public Point Haunt { get; set; }
+        public double HauntRadius { get; set; }
+        public Point CurrentLocation { get; set; }
+        public double CurrentRadius { get; set; }
+
 
         // Navigation Properties
         internal List<Link> Links { get; set; }
