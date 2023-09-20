@@ -22,7 +22,7 @@ namespace Repository
             storeSentry = sentry;
         }
 
-        public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
+        public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, Character character)
         {
             User toCreate = new User
             {
@@ -35,6 +35,13 @@ namespace Repository
                 NormalizedEmail = email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccountStatus = UserAccountStatus.active,
+                Extroversion = character.Extraversion,
+                Athleticisme = character.Athleticism,
+                Openness = character.Openness,
+                Chaos = character.Chaoticness,
+                Competitiveness = character.Competitiveness,
+                Industriousness = character.Industriousness,
+                NightOwl = character.NightOwl,
             };
 
             storeSentry.GetContext().Users.Add(toCreate);
@@ -46,7 +53,7 @@ namespace Repository
             return true;
         }
 
-        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum)
+        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
         {
             Event toCreate = new Event
             {
@@ -57,13 +64,23 @@ namespace Repository
                 StartTime = startTime,
                 Location = new Point(longitude, latitude),
                 GroupMinimum = groupMinimum,
-                GroupMaximum = groupMaximum
+                GroupMaximum = groupMaximum,
+                Extroversion = character.Extraversion,
+                Athleticisme = character.Athleticism,
+                Openness = character.Openness,
+                Chaos = character.Chaoticness,
+                Competitiveness = character.Competitiveness,
+                Industriousness = character.Industriousness,
+                NightOwl = character.NightOwl,
+
             };
 
             storeSentry.GetContext().Events.Add(toCreate);
 
 
-            return storeSentry.GetContext().Events.Where(e => e.HostId == hostId && e.Name == name && e.Description == description && e.Type == eventType && e.StartTime == startTime).Select(e => new ThinEvent
+            return storeSentry.GetContext().Events.
+                Where(e => e.HostId == hostId && e.Name == name && e.Description == description && e.Type == eventType && e.StartTime == startTime).
+                Select(e => new ThinEvent
                 (
                    e.Id,
                    new ThinnerUser(e.Host.Id, e.Host.Name),
@@ -76,7 +93,15 @@ namespace Repository
                    e.EndTime,
                    e.IsEventOpen,
                    e.GroupMinimum,
-                   e.GroupMaximum
+                   e.GroupMaximum,
+                   new Character(
+                   e.Extroversion,
+                   e.Athleticisme,
+                   e.Chaos,
+                   e.Competitiveness,
+                   e.Industriousness,
+                   e.NightOwl,
+                   e.Openness)
                 )).Single();
         }
 
@@ -97,7 +122,15 @@ namespace Repository
                    e.EndTime,
                    e.IsEventOpen,
                    e.GroupMinimum,
-                   e.GroupMaximum
+                   e.GroupMaximum,
+                   new Character(
+                   e.Extroversion,
+                   e.Athleticisme,
+                   e.Chaos,
+                   e.Competitiveness,
+                   e.Industriousness,
+                   e.NightOwl,
+                   e.Openness)
                )).Single();
 
             return @event;
@@ -142,7 +175,15 @@ namespace Repository
                    u.AccountStatus,
                    u.JoinDate,
                    u.Reputation,
-                   -1
+                   -1,
+                   new Character(
+                   u.Extroversion,
+                   u.Athleticisme,
+                   u.Chaos,
+                   u.Competitiveness,
+                   u.Industriousness,
+                   u.NightOwl,
+                   u.Openness)
                )).Single();
 
             numFollowers = storeSentry.GetContext().UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).Count();
@@ -417,9 +458,7 @@ namespace Repository
         }
         public ThinEvent FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
         public List<ThinEvent> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
-        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
-
-      
+        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
 
         public List<EventPost> GetPostsForEvent(Guid id)
         {
@@ -462,23 +501,24 @@ namespace Repository
 
         public bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int chaoticness, int competitiveness, int industriousness, int nightOwl, int openness)
         {
-            throw new NotImplementedException();
-        }
+            User toUpdate = new User
+            {
+                Id = id,
+                Extroversion = extraversion,
+                Athleticisme = athleticism,
+                Openness = openness,
+                Chaos = chaoticness,
+                Competitiveness = competitiveness,
+                Industriousness = industriousness,
+                NightOwl = nightOwl
+            };
+            storeSentry.GetContext().Users.Update(toUpdate);
 
-        public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, Character character)
-        {
-            throw new NotImplementedException();
-            //ERROR
+            return true;
         }
-
-        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
-        {
-            throw new NotImplementedException();
-            //ERROR
-        }
-
-      
     }
+
+
 }
 
 
