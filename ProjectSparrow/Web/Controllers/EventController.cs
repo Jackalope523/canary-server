@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Repository.Entities;
+using Twilio.TwiML.Voice;
+using Microsoft.Extensions.Hosting;
+using Shared;
 
 namespace Web.Controllers
 {
@@ -194,6 +197,100 @@ namespace Web.Controllers
 				Guid eventGUID = GetGUID(eventID);
                 Guid hostGUID = GetGUID(hostID);
                 await events.ReportEventAsync(user.Id, eventGUID, hostGUID, report.ReportType, report.ReportDetails);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+		[HttpGet("{eventID}/posts")]
+		public async Task<IActionResult> GetEventPosts(string eventID)
+		{
+			if (string.IsNullOrEmpty(eventID))
+			{
+				return BadRequest(EventError.MissingInformation.ToString());
+			}
+
+			List<EventPost> eventPosts;
+
+			try
+			{
+				// Retrieve event information as current user
+				var user = await GetCurrentUserAsync();
+				Guid eventGUID = GetGUID(eventID);
+
+				eventPosts = await events.GetEventPostsAsync(user.Id, eventGUID);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok(eventPosts);
+		}
+
+		[HttpPost("{eventID}/posts")]
+		public async Task<IActionResult> PostToEvent(string eventID, [FromBody] EventPostModel post)
+		{
+			if (string.IsNullOrEmpty(eventID) || post == null || !ModelState.IsValid)
+			{
+				return BadRequest(EventError.MissingInformation.ToString());
+			}
+
+			EventPost newPost;
+
+			try
+			{
+				var user = await GetCurrentUserAsync();
+				Guid eventGUID = GetGUID(eventID);
+				newPost = await events.AddPostAsync(user.Id, eventGUID, post.ImageURL);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok(newPost);
+		}
+
+		[HttpPut("{eventID}/posts")]
+		public async Task<IActionResult> RemovePost(string eventID, string postID)
+		{
+			if (string.IsNullOrEmpty(eventID) || string.IsNullOrEmpty(postID))
+			{
+				return BadRequest(EventError.MissingInformation.ToString());
+			}
+
+			try
+			{
+				var user = await GetCurrentUserAsync();
+				Guid postGUID = GetGUID(postID);
+				await events.RemovePostAsync(user.Id, postGUID);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+		[HttpPost("{eventID}/posts/{postID}")]
+		public async Task<IActionResult> RatePost(string eventID, string postID, [FromBody] AccountRatingModel details)
+		{
+			if (string.IsNullOrEmpty(eventID) || details == null || !ModelState.IsValid)
+			{
+				return BadRequest(EventError.MissingInformation.ToString());
+			}
+
+			try
+			{
+				var user = await GetCurrentUserAsync();
+				var postGUID = GetGUID(postID);
+				await events.RatePostAsync(user.Id, postGUID, details.Rating);
 			}
 			catch (Exception e)
 			{

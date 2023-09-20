@@ -219,10 +219,16 @@ namespace Server.Controls
             accounts.UnblockUser(userID, targetID);
 		}
 
-        public async Task RateUser(Guid userID, Guid targetID, UserRating rating)
+        public async Task RateUserAsync(Guid userID, Guid targetID, UserRating rating)
         {
-            await GetUser(userID);
-            accounts.RateUser(userID, targetID, rating);
+            if (rating != UserRating.Remove)
+            {
+                accounts.RateUser(userID, targetID, rating);
+            }
+            else
+            {
+                accounts.RemoveUserRating(userID, targetID);
+            }
 
             User targetUser = new(targetID);
             await targetUser.SyncReputation();

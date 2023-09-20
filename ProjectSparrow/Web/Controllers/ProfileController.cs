@@ -76,7 +76,7 @@ namespace Web.Controllers
 			{
 				var target = GetGUID(targetIdentification);
 				var user = await GetCurrentUserAsync();
-				await accounts.RateUser(user.Id, target, details.Rating);
+				await accounts.RateUserAsync(user.Id, target, details.Rating);
             }
             catch (InvalidUserException e)
             {

@@ -17,7 +17,7 @@ namespace Shared
 
     public enum UserRating
     {
-        Positive, Negative
+        Positive, Negative, Remove
     }
 
 }

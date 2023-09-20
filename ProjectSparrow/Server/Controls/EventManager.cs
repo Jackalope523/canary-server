@@ -210,6 +210,69 @@ namespace Server.Controls
 			}
 		}
 
+		public async Task<List<EventPost>> GetEventPostsAsync(Guid userID, Guid eventID)
+		{
+			var user = await AccountManager.Manager.GetUser(userID);
+			Event targetEvent = new(eventID);
+
+			// Ensure user can see the event
+			if (!await targetEvent.IsAttendedBy(user))
+			{ throw new InvalidEventException("User did not attend or is not attending event."); }
+
+			var eventPosts = events.GetPostsForEvent(eventID);
+
+			return eventPosts;
+		}
+
+		public async Task<EventPost> AddPostAsync(Guid userID, Guid eventID, string imageURL)
+		{
+			User user = new(userID);
+			var targetEvent = await GetEvent(eventID);
+
+			// Ensure the user can post to the event
+			if (!await targetEvent.IsAttendedBy(user))
+			{ throw new InvalidEventException("User is not attending event."); }
+
+			// Ensure event is still running
+			if (targetEvent.EndTime.HasValue)
+			{ throw new InvalidEventException("Event has already ended."); }
+			
+			// Try to post
+			var userPost = events.AddPost(eventID, userID, DateTimeOffset.UtcNow, imageURL);
+
+			return userPost;
+		}
+
+		public async Task RemovePostAsync(Guid userID, Guid postID)
+		{
+			var eventPost = events.GetPost(postID);
+			
+			// Check if user can delete post
+			if (!eventPost.UserId.Equals(userID))
+			{ throw new InvalidUserException("User cannot remove post."); }
+
+			events.RemovePost(postID);
+		}
+
+		public async Task RatePostAsync(Guid userID, Guid postID, UserRating rating)
+		{
+			User user = new(userID);
+			var eventOfPost = await GetEvent(events.GetPost(postID).EventId);
+			
+			// Check if user can interact with post
+			if (!await eventOfPost.IsAttendedBy(user))
+			{ throw new InvalidUserException("User cannot interact with post."); }
+
+			if (rating != UserRating.Remove)
+			{
+				events.RatePost(userID, postID, rating);
+			}
+			else
+			{
+				events.RemovePostRating(postID, userID);
+			}
+		}
+
 
 
 		internal async Task<Event> GetEvent(Guid eventID)

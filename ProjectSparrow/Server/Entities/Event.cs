@@ -86,7 +86,7 @@ namespace Server.Entities
 
         public async Task SyncPosts()
         {
-            // EventPosts = await EventManager.Manager.GetEventPostsAsync(Id);
+            EventPosts = await EventManager.Manager.GetEventPostsAsync(Id);
         }
 
 		public async Task<bool> IsVisibleTo(User user)

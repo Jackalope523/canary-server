@@ -89,7 +89,7 @@ namespace Server.Boundaries
 		Task BlockUserAsync(Guid userID, Guid targetID);
 		Task UnblockUserAsync(Guid userID, Guid targetID);
 
-		Task RateUser(Guid userID, Guid targetID, UserRating rating);
+		Task RateUserAsync(Guid userID, Guid targetID, UserRating rating);
 
 		Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails);
 	}
