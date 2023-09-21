@@ -15,8 +15,6 @@ import fontelloConfig from '../config.json';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
-// TODO might need to use SectionList or FlatList instead of ScrollView
-
 // Sample event image dataset
 const img1 = {uri: 'https://images.unsplash.com/photo-1562519819-016930ada31b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80'}
 const img2 = {uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'}
@@ -106,37 +104,15 @@ const ActivityScreen = () => {
                     keyExtractor={(item) => item.id}
                     data={SAMPLEEVENTDATA}
                     renderItem={({ item }) => (
-                        <View style={cardStyles.eventCardMedium}>
-                            <ImageBackground source={item.uri} resizeMode="cover" imageStyle={cardStyles.eventCardMedium.bgImage2}>
-                                <View style={cardStyles.eventCardMedium.content}>
-                                    <View style={cardStyles.eventCardMedium.content.topWrapper}>
-                                        <View style={cardStyles.eventCardMedium.content.container}>
-                                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-                                                <Icon name="date-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.date}</Text>
-                                            </View>
-                                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-                                                <Icon name="time-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.time}</Text>
-                                            </View>
-                                        </View>
-                                        <View style={cardStyles.eventCardMedium.content.container}>
-                                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-                                                <Icon name="account-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.attendees}</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <View style={cardStyles.eventCardMedium.content.container}>
-                                        <Text style={[globalStyles.headingTextThree, globalStyles.textDark, cardStyles.eventCardMedium.content.container.title]}>{item.title}</Text>
-                                        <View style={[cardStyles.eventCardMedium.content.container.textWrapper, isTextOverflowing ? cardStyles.eventCardMedium.content.container.textWrapperOverflow : cardStyles.eventCardMedium.content.container.textWrapperCenter]}>
-                                            <Icon name="location-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon} />
-                                            <Text onTextLayout={handleTextLayout} style={[globalStyles.bodyTextOne, globalStyles.textDark, cardStyles.eventCardMedium.content.container.textWrapper.innerText]}>{item.location}</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </ImageBackground>
-                        </View>
+                        <EventCardMedium
+                            onPress={null}
+                            eventHeroImage={item.uri}
+                            eventDate={item.date}
+                            eventTime={item.time}
+                            eventAttendees={item.attendees}
+                            eventLocation={item.location}
+                            eventTitle={item.title}
+                        />
                     )}
                 />
             </View>
@@ -151,37 +127,15 @@ const ActivityScreen = () => {
                     keyExtractor={(item) => item.id}
                     data={SAMPLEEVENTDATA}
                     renderItem={({ item }) => (
-                        <View style={cardStyles.eventCardMedium}>
-                            <ImageBackground source={item.uri} resizeMode="cover" imageStyle={cardStyles.eventCardMedium.bgImage2}>
-                                <View style={cardStyles.eventCardMedium.content}>
-                                    <View style={cardStyles.eventCardMedium.content.topWrapper}>
-                                        <View style={cardStyles.eventCardMedium.content.container}>
-                                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-                                                <Icon name="date-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.date}</Text>
-                                            </View>
-                                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-                                                <Icon name="time-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.time}</Text>
-                                            </View>
-                                        </View>
-                                        <View style={cardStyles.eventCardMedium.content.container}>
-                                            <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-                                                <Icon name="account-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                                                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.attendees}</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <View style={cardStyles.eventCardMedium.content.container}>
-                                        <Text style={[globalStyles.headingTextThree, globalStyles.textDark, cardStyles.eventCardMedium.content.container.title]}>{item.title}</Text>
-                                        <View style={[cardStyles.eventCardMedium.content.container.textWrapper, isTextOverflowing ? cardStyles.eventCardMedium.content.container.textWrapperOverflow : cardStyles.eventCardMedium.content.container.textWrapperCenter]}>
-                                            <Icon name="location-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon} />
-                                            <Text onTextLayout={handleTextLayout} style={[globalStyles.bodyTextOne, globalStyles.textDark, cardStyles.eventCardMedium.content.container.textWrapper.innerText]}>{item.location}</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </ImageBackground>
-                        </View>
+                        <EventCardMedium
+                            onPress={null}
+                            eventHeroImage={item.uri}
+                            eventDate={item.date}
+                            eventTime={item.time}
+                            eventAttendees={item.attendees}
+                            eventLocation={item.location}
+                            eventTitle={item.title}
+                        />
                     )}
                 />
             </View>

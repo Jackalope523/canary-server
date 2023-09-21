@@ -24,7 +24,7 @@ const DiscoveryScreen = () => {
             <ImageBackground source={tempMapImage} resizeMode='cover' style={styles.mapImage}>
                 <View style={styles.searchBarContainer}>
                     <View style={searchContainerVisible ? styles.searchBarInnerContainerVisible : null}>
-                        <TextInput onPressIn={() => [setSearchContainerVisible(!searchContainerVisible), setSearchCloseVisible(!searchCloseVisible)]} placeholder='Search' style={searchContainerVisible ? styles.searchBarStylesVisible : null}>
+                        <TextInput onPressIn={() => [setSearchContainerVisible(!searchContainerVisible), setSearchCloseVisible(!searchCloseVisible)]} placeholder='Search for events' style={searchContainerVisible ? styles.searchBarStylesVisible : null}>
                         <Icon name="search-outline"/>
                         </TextInput>
 
@@ -44,22 +44,15 @@ const DiscoveryScreen = () => {
                         <Pressable style={[globalStyles.sortButton, globalStyles.sortButtonRest]}>
                             <Text style={globalStyles.sortButtonText}>Sort</Text>
                         </Pressable>
-                        <View style={cardStyles.eventCardMedium}>
-                            <Text style={globalStyles.bodyTextOne}>This Tuesday</Text>
-                            <Text style={globalStyles.bodyTextOne}>At 1630</Text>
-                            <Text style={globalStyles.bodyTextOne}>12 people attending</Text>
-                            <Text style={globalStyles.headingTextTwo}>Dog Walk and Play Meetup at Central Park</Text>
-                            <Text style={globalStyles.bodyTextOne}>Central Park, Manhattan, New York City</Text>
-                        </View>
                     </View>
 
                     ) : null }
                 </View>
 
 
-                <TouchableOpacity style={[globalStyles.textButtonExtraSmall, globalStyles.textButtonSuccess]}>
+                <Pressable style={[globalStyles.textButtonExtraSmall, globalStyles.textButtonSuccess]}>
                     <Text style={globalStyles.textButtonExtraSmallText}>Create Event</Text>
-                </TouchableOpacity>
+                </Pressable>
             </ImageBackground>
         </View>
     );

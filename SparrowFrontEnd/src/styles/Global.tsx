@@ -136,9 +136,16 @@ export const globalStyles = StyleSheet.create({
         fontFamily: 'UncutSans-Bold',
     },
 
-    // Text color variants
+    // Text
+    // Color variants
+    // Dark
     textDark: {
         color: Colors.sparrowDark,
+    },
+
+    // Light
+    textLight: {
+        color: Colors.sparrowSand,
     },
 
     // Buttons
@@ -188,7 +195,7 @@ export const globalStyles = StyleSheet.create({
 
     textButtonLargeText: {
         fontFamily: 'UncutSans-Medium',
-        color: Colors.sparrowDark,
+        // color: Colors.sparrowDark,
         fontSize: 18,
         // lineHeight: 26,
         // letterSpacing: 0.25,
@@ -207,7 +214,7 @@ export const globalStyles = StyleSheet.create({
 
     textButtonMediumText: {
         fontFamily: 'UncutSans-Medium',
-        color: Colors.sparrowDark,
+        // color: Colors.sparrowDark,
         fontSize: 18,
         // lineHeight: 26,
         // letterSpacing: 0.25,
@@ -225,7 +232,7 @@ export const globalStyles = StyleSheet.create({
 
     textButtonSmallText :{
         fontFamily: 'UncutSans-Bold',
-        color: Colors.sparrowDark,
+        // color: Colors.sparrowDark,
         fontSize: 18,
         textTransform: 'uppercase',
         // lineHeight: 26,
@@ -245,7 +252,7 @@ export const globalStyles = StyleSheet.create({
 
     textButtonExtraSmallText: {
         fontFamily: 'UncutSans-Bold',
-        color: Colors.sparrowDark,
+        // color: Colors.sparrowDark,
         fontSize: 16,
         textTransform: 'uppercase',
         // lineHeight: 24,
@@ -284,7 +291,7 @@ export const globalStyles = StyleSheet.create({
 
     sortButtonText: {
         fontFamily: 'UncutSans-Bold',
-        color: Colors.sparrowSand,
+        // color: Colors.sparrowSand,
         fontSize: 18,
         // lineHeight: 26,
         // letterSpacing: 2.4,
@@ -322,7 +329,7 @@ export const globalStyles = StyleSheet.create({
 
     filterButtonText: {
         fontFamily: 'UncutSans-Bold',
-        color: Colors.sparrowSand,
+        // color: Colors.sparrowSand,
         fontSize: 18,
         // lineHeight: 26,
         // letterSpacing: 2.4,
