@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, SectionList, FlatList, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { globalStyles } from '../styles/Global';
 import { Colors } from '../styles/Colors';
 import { Spacing } from '../styles/Spacing';
 
 import EventCardMedium from '../components/organisms/EventCardMedium';
 import NotificationIndicator from '../components/molecules/NotificationIndicator';
-
-import { cardStyles } from '../styles/Cards';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
@@ -29,7 +27,7 @@ const ActivityScreen = () => {
     };
     
     return (
-        <ScrollView style={styles.mainWrapper} overScrollMode="never">
+        <ScrollView style={styles.mainWrapper} overScrollMode="never" showsVerticalScrollIndicator={false}>
             <View style={styles.topWrapper}>
                 <View style={styles.notificationWrapper}>
                     <NotificationIndicator />
