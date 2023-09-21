@@ -1,6 +1,8 @@
 import { StyleSheet, Text, Pressable } from 'react-native'
 import React from 'react'
 
+// TODO type check
+
 const Button = ({onPress, btnText, btnStyle, btnTextStyle}) => {
   return (
     <Pressable onPress={onPress} style={btnStyle}>
