@@ -50,4 +50,10 @@ namespace Web.Models
 
         public string ReportDetails { get; set; }
     }
+
+    public class EventPostModel
+    {
+        [Required]
+        public string ImageURL { get; set; }
+    }
 }

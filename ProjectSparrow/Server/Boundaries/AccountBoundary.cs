@@ -55,6 +55,7 @@ namespace Server.Boundaries
 		bool UnblockUser(Guid selfId, Guid targetId);
 
 		bool RateUser(Guid selfId, Guid targetId, UserRating rating);
+		bool RemoveUserRating(Guid selfId, Guid targetId);
 		(int Positive, int Negative) GetUserRatings(Guid id);
 
 		(List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id);
@@ -88,7 +89,7 @@ namespace Server.Boundaries
 		Task BlockUserAsync(Guid userID, Guid targetID);
 		Task UnblockUserAsync(Guid userID, Guid targetID);
 
-		Task RateUser(Guid userID, Guid targetID, UserRating rating);
+		Task RateUserAsync(Guid userID, Guid targetID, UserRating rating);
 
 		Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails);
 	}
