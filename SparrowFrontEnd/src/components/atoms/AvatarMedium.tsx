@@ -3,6 +3,8 @@ import React from 'react'
 import { avatarStyles } from '../../styles/Avatars';
 
 // !! THIS COMPONENT IS CURRENTLY NOT IN USE !!
+// TODO make this component
+// TODO integrate in eventCardMedium component with a style={avatarStyle} as the medium sized avatar style
 
 type Props = {}
 
