@@ -61,6 +61,12 @@ namespace Server.Boundaries
 		(List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id);
 		(List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
 		bool ReportUser(Guid selfId, Guid eventId, Guid targetId, UserReportType reportType, string reportDetails);
+
+		(double Latitude, double Longitude, double Radius, int Weight) GetUserHaunt(Guid id);
+		bool UpdateHaunt(Guid id, double latitude, double longitude, double radius, int weight);
+
+		(double Latitude, double Longitude, double Radius) GetRecentUserLocation(Guid id);
+		bool UpdateRecentLocation(Guid id, double latitude, double longitude, double radius);
 	}
 
 	public interface IAccountOperations
