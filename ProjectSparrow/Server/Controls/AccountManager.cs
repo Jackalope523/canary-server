@@ -189,6 +189,19 @@ namespace Server.Controls
             { throw new UnexpectedFailureException("User deletion failed."); }
         }
 
+        public async Task UpdateUserLocationAsync(Guid userID, double latitude, double longitude)
+		{
+			var user = await GetUser(userID);
+            await user.SyncLocation();
+
+            user.LastKnownLocation = new() { Latitude = latitude, Longitude = longitude };
+
+            await user.HandleHaunt();
+
+            accounts.UpdateRecentLocation(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
+            accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
+        }
+
         public async Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID)
         {
             return accounts.GetFollowedUsers(userID);
@@ -273,6 +286,16 @@ namespace Server.Controls
             { throw new InvalidUserException("User account is locked."); }
 
             return user;
+        }
+
+        internal async Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(Guid userID)
+        {
+            return accounts.GetUserHaunt(userID);
+        }
+
+        internal async Task<(double Latitude, double Longitude, double Radius)> GetLastKnownUserLocationAsync(Guid userID)
+        {
+            return accounts.GetRecentUserLocation(userID);
         }
 
         internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(Guid userID)

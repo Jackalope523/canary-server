@@ -41,6 +41,12 @@ namespace Server.Entities
 		public bool CanHost => AccountStatus == UserAccountStatus.active;
         public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
 
+        public GeoLocation LastKnownLocation { get; set; }
+        public Distance LastKnownRadius { get; set; }
+        public GeoLocation Haunt { get; set; }
+        public Distance HauntRadius { get; set; }
+        public int HauntStability { get; set; }
+
         public Event CurrentEvent { get; set; }
         public bool IsAtEvent => CurrentEvent != null;
 
@@ -109,6 +115,30 @@ namespace Server.Entities
             return new(Id, Name, Reputation, NumberOfFollowers);
         }
 
+        public async Task SyncLocation()
+        {
+            try
+            {
+                var userLocation = await AccountManager.Manager.GetLastKnownUserLocationAsync(Id);
+                LastKnownLocation = new() { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude };
+                LastKnownRadius = new() { Metres = userLocation.Radius };
+            }
+            catch { }
+        }
+
+        public async Task SyncHaunt()
+        {
+            try
+            {
+                var userHaunt = await AccountManager.Manager.GetUserHauntAsync(Id);
+                Haunt = new() { Latitude = userHaunt.Latitude, Longitude = userHaunt.Longitude };
+                HauntRadius = new() { Metres = userHaunt.Radius };
+                HauntStability = userHaunt.Stability;
+            }
+            catch { }
+
+        }
+
         public async Task SyncCurrentEvent()
         {
             try
@@ -152,6 +182,28 @@ namespace Server.Entities
         public void GenerateSecurityStamp()
         {
             SecurityStamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(20));
+        }
+
+        public async Task HandleHaunt()
+        {
+            await SyncHaunt();
+
+            // Check if recent location is within haunt area
+            if (GeoLocation.DistanceBetween(Haunt, LastKnownLocation) < HauntRadius)
+            {
+                HauntStability += 1;
+            }
+            else
+            {
+                HauntStability -= 1;
+
+                // If our haunt is unstable, move it
+                if (HauntStability < 0)
+                {
+                    HauntStability = 0;
+                    Haunt = LastKnownLocation;
+                }
+            }
         }
 
         public async Task<bool> IsFriendsWith(Guid userID)
