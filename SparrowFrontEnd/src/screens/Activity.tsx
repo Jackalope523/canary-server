@@ -18,6 +18,8 @@ import { SAMPLEEVENTDATA } from '../data/sampleEventData';
 
 const ActivityScreen = () => {
     // If textWrapper text exceeds 2 lines, align items to flex-start
+    // Doesn't work with some text, not the ideal solution - fix later
+        // Not ideal but I can just assign a % of space for the icon and the rest for the text
     const [isTextOverflowing, setIsTextOverflowing] = useState(false);
 
     const handleTextLayout = (event) => {
