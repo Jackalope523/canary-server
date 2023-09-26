@@ -11,6 +11,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
+// THIS FILE IS CURRENTLY NOT IN USE
+
 const SearchBar = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
