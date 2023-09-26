@@ -5,7 +5,7 @@ import { Spacing } from "./Spacing";
 
 export const navigationStyles = StyleSheet.create({
     // Navigation
-    // Top navbar
+    // Top navbar (header)
     topNavbar: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -48,6 +48,21 @@ export const navigationStyles = StyleSheet.create({
                 flexDirection: 'row',
                 columnGap: Spacing.md,
             },
+        },
+    },
+
+    // Search
+    search: {
+        // backgroundColor: Colors.azure700,
+    },
+
+    // OLD
+    searchBar: {
+        backgroundColor: Colors.azure400,
+
+        container: {
+            backgroundColor: Colors.azure400,
+            paddingHorizontal: 16,
         },
     },
 });
