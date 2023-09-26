@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "./Colors";
+import { Spacing } from "./Spacing";
 
 export const globalStyles = StyleSheet.create({
     // Layout
@@ -181,6 +182,12 @@ export const globalStyles = StyleSheet.create({
         backgroundColor: Colors.turqoise300,
     },
 
+    // Layout
+    // Makes the button width the size of the contents
+    buttonContained: {
+        alignSelf: 'flex-start'
+    },
+
     // Sizes
     // Large
     textButtonLarge: {
@@ -248,6 +255,7 @@ export const globalStyles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 8,
         borderColor: Colors.sparrowDarkBrown,
+        columnGap: Spacing.sm,
     },
 
     textButtonExtraSmallText: {
@@ -333,6 +341,12 @@ export const globalStyles = StyleSheet.create({
         fontSize: 18,
         // lineHeight: 26,
         // letterSpacing: 2.4,
+    },
+
+    // Button icons
+    buttonIconSmall: {
+        fontSize: 24,
+        color: Colors.sparrowSand,
     },
 
     // Illustrations
