@@ -36,12 +36,6 @@ namespace Repository.Entities
 
 
 
-        public ThinEvent ToThinEvent()
-        {
-            return new(Id, Host.ToThinnerUser(), Name, Description, Type,
-                StartTime, Location.Y, Location.X, EndTime,
-                IsEventOpen, GroupMinimum, GroupMaximum);
-        }
         public ThinnerEvent ToThinnerEvent()
         {
             return new(Id, Host.ToThinnerUser(), Type, Location.Y, Location.X);

@@ -24,12 +24,24 @@ namespace Repository.Migrations.TestDBMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Athleticisme")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Chaos")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Competitiveness")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("EndTime")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Extroversion")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("GroupMaximum")
                         .HasColumnType("INTEGER");
@@ -39,6 +51,9 @@ namespace Repository.Migrations.TestDBMigrations
 
                     b.Property<Guid>("HostId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Industriousness")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsEventOpen")
                         .HasColumnType("INTEGER");
@@ -50,6 +65,12 @@ namespace Repository.Migrations.TestDBMigrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("NightOwl")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Openness")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("TEXT");
@@ -94,19 +115,15 @@ namespace Repository.Migrations.TestDBMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("EventId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Photo")
+                    b.Property<string>("PhotoURL")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("PostedAt")
                         .HasColumnType("TEXT");
@@ -165,12 +182,44 @@ namespace Repository.Migrations.TestDBMigrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("AccountStatus");
 
+                    b.Property<int>("Athleticisme")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Chaos")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Competitiveness")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Point>("CurrentLocation")
+                        .IsRequired()
+                        .HasColumnType("POINT");
+
+                    b.Property<double>("CurrentRadius")
+                        .HasColumnType("REAL");
+
                     b.Property<DateTimeOffset>("DateOfBirth")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Extroversion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Point>("Haunt")
+                        .IsRequired()
+                        .HasColumnType("POINT");
+
+                    b.Property<double>("HauntRadius")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("HauntWheight")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Industriousness")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsEmailConfirmed")
                         .HasColumnType("INTEGER");
@@ -188,9 +237,15 @@ namespace Repository.Migrations.TestDBMigrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("NightOwl")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("NormalizedEmail")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Openness")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
@@ -223,6 +278,25 @@ namespace Repository.Migrations.TestDBMigrations
                     b.HasIndex("EventId");
 
                     b.HasDiscriminator().HasValue("event");
+                });
+
+            modelBuilder.Entity("Repository.Entities.PostLink", b =>
+                {
+                    b.HasBaseType("Repository.Entities.Link");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.ToTable("Links", t =>
+                        {
+                            t.Property("Type")
+                                .HasColumnName("PostLink_Type");
+                        });
+
+                    b.HasDiscriminator().HasValue("PostLink");
                 });
 
             modelBuilder.Entity("Repository.Entities.UserLink", b =>

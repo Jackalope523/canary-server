@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\TestDBMigrations\" />
+    <Folder Include="TestDBMigrations\" />
   </ItemGroup>
 
 </Project>
