@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Utilities;
 using Repository.Entities;
 using Repository.Sentries;
 using Server.Boundaries;
 using Shared;
+using System;
 using System.Numerics;
 using static Repository.Entities.Report;
 
@@ -78,31 +80,28 @@ namespace Repository
             storeSentry.GetContext().Events.Add(toCreate);
 
 
-            return storeSentry.GetContext().Events.
-                Where(e => e.HostId == hostId && e.Name == name && e.Description == description && e.Type == eventType && e.StartTime == startTime).
-                Select(e => new ThinEvent
+            return new ThinEvent
                 (
-                   e.Id,
-                   new ThinnerUser(e.Host.Id, e.Host.Name),
-                   e.Name,
-                   e.Description,
-                   e.Type,
-                   e.StartTime,
-                   e.Location.Y,
-                   e.Location.X,
-                   e.EndTime,
-                   e.IsEventOpen,
-                   e.GroupMinimum,
-                   e.GroupMaximum,
+                   toCreate.Id,
+                   new ThinnerUser(toCreate.Host.Id, toCreate.Host.Name),
+                   toCreate.Name,
+                   toCreate.Description,
+                   toCreate.Type,
+                   toCreate.StartTime,
+                   toCreate.Location.Y,
+                   toCreate.Location.X,
+                   toCreate.EndTime,
+                   toCreate.IsEventOpen,
+                   toCreate.GroupMinimum,
+                   toCreate.GroupMaximum,
                    new Character(
-                   e.Extroversion,
-                   e.Athleticisme,
-                   e.Chaos,
-                   e.Competitiveness,
-                   e.Industriousness,
-                   e.NightOwl,
-                   e.Openness)
-                )).Single();
+                   toCreate.Extroversion,
+                   toCreate.Athleticisme,
+                   toCreate.Chaos,
+                   toCreate.Competitiveness,
+                   toCreate.Industriousness,
+                   toCreate.NightOwl,
+                   toCreate.Openness));
         }
 
 
@@ -213,6 +212,12 @@ namespace Repository
             //queueChange();
             return true;
         }
+        private bool removeLinkOperation(PostLink link)
+        {
+            storeSentry.GetContext().PostLinks.Where(l => l.SelfId == link.SelfId && l.PostId == link.PostId).ExecuteDelete();
+            //queueChange();
+            return true;
+        }
 
         public bool FollowUser(Guid selfId, Guid targetId) { return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); }
         public bool UnfollowUser(Guid selfId, Guid targetId) { return removeLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); }
@@ -220,10 +225,29 @@ namespace Repository
         public bool UnblockUser(Guid selfId, Guid targetId) { return removeLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); }
         public bool RateUser(Guid selfId, Guid targetId, UserRating rating)
         {
-            if (rating == UserRating.Positive) return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateUp });
-            else return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.RateDown });
-        }
+            UserLink.UserLinkType type;
+            if (rating.Equals(UserRating.Positive)) type = UserLink.UserLinkType.RateUp;
+            else type = UserLink.UserLinkType.RateDown;
 
+            return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = type });
+        }
+        public bool RatePost(Guid postId, Guid voterId, UserRating rating)
+        {
+            PostLink.PostLinkType type;
+            if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
+            else type = PostLink.PostLinkType.RateDown;
+
+            return addLinkOperation(new PostLink { SelfId = voterId, PostId = postId, Type = type });
+        }
+        public bool RemoveUserRating(Guid selfId, Guid targetId)
+        {
+            return removeLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId });
+        }
+        public bool RemovePostRating(Guid postId, Guid voterId)
+        {
+            return removeLinkOperation(new PostLink { SelfId = voterId, PostId = postId });
+        }
+       
         public bool AddUserToEvent(Guid userId, Guid eventId) { return addLinkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }); }
         public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return removeLinkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }); }
 
@@ -286,6 +310,15 @@ namespace Repository
         public bool UpdateAccessTries(Guid id, int newAccessTries) { return updateUserProperty(id, nameof(User.AccessTries), newAccessTries); }
         public bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus) { return updateUserProperty(id, nameof(User.AccountStatus), accountStatus); }
         public bool UpdateReputation(Guid id, int newReputation) { return updateUserProperty(id, nameof(User.Reputation), newReputation); }
+        public bool UpdateHaunt(Guid id, double latitude, double longitude, double radius, int weight)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateRecentLocation(Guid id, double latitude, double longitude, double radius)
+        {
+            throw new NotImplementedException();
+        }
 
         private bool updateEventProperty(Guid id, string propertyName, Object newProperty)
         {
@@ -451,7 +484,15 @@ namespace Repository
                    e.EndTime,
                    e.IsEventOpen,
                    e.GroupMinimum,
-                   e.GroupMaximum
+                   e.GroupMaximum,
+                   new Character(
+                   e.Extroversion,
+                   e.Athleticisme,
+                   e.Chaos,
+                   e.Competitiveness,
+                   e.Industriousness,
+                   e.NightOwl,
+                   e.Openness)
                )).ToList();
 
             return events;
@@ -460,25 +501,11 @@ namespace Repository
         public List<ThinEvent> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
         public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
 
-        public List<EventPost> GetPostsForEvent(Guid id)
-        {
-            return storeSentry.GetContext().Posts.
-                Where(p => p.EventId == id).
-                Select(p => new EventPost (
-                    p.Id, 
-                    p.EventId, 
-                    p.OwnerId, 
-                    p.PostedAt, 
-                    p.PhotoURL, 
-                    new (p.Ups, p.Downs)
-                    )).ToList();
-        }
-
-        public bool AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
+        EventPost IEventDatabase.AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
         {
             Post toAdd = new Post { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
             storeSentry.GetContext().Posts.Add(toAdd);
-            return true;
+            return new EventPost(toAdd.Id, toAdd.EventId, toAdd.OwnerId, toAdd.PostedAt, toAdd.PhotoURL, new (0, 0));
         }
 
         public bool RemovePost(Guid postId)
@@ -487,16 +514,24 @@ namespace Repository
             return true;
         }
 
-        public bool RatePost(Guid postId, Guid voterId, UserRating rating)
+        private int countRatings(Guid id, PostLink.PostLinkType type)
         {
-            PostLink.PostLinkType type;
+            return storeSentry.GetContext().PostLinks.Where(l => l.PostId == id && l.Type == type).Count();
+        }
+        public EventPost GetPost(Guid id)
+        {
+            int Ups = countRatings(id, PostLink.PostLinkType.RateUp);
+            int Downs = countRatings(id, PostLink.PostLinkType.RateDown);
 
-            if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
-            else type = PostLink.PostLinkType.RateDown;
+            return storeSentry.GetContext().
+                Posts.
+                Where(p => p.Id == id).
+                Select(p => new EventPost(p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, new (Ups, Downs))).Single();
+        }
 
-            PostLink toAdd = new PostLink { SelfId = voterId, PostId = postId, Type = type }; 
-            storeSentry.GetContext().PostLinks.Add(toAdd);
-            return true;
+        public List<EventPost> GetPostsForEvent(Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int chaoticness, int competitiveness, int industriousness, int nightOwl, int openness)
@@ -515,6 +550,21 @@ namespace Repository
             storeSentry.GetContext().Users.Update(toUpdate);
 
             return true;
+        }
+
+       
+        public (double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(Guid id)
+        {
+            var result = storeSentry.GetContext().Users.Where(u => u.Id == id).Select(u => new { u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight }).Single();
+            return (result.Y, result.X, result.HauntRadius, result.HauntWheight);
+        }
+
+      
+
+        public (double Latitude, double Longitude, double Radius) GetRecentUserLocation(Guid id)
+        {
+            var result = storeSentry.GetContext().Users.Where(u => u.Id == id).Select(u => new { u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius }).Single();
+            return (result.Y, result.X, result.CurrentRadius);
         }
     }
 

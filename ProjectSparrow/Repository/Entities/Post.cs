@@ -16,10 +16,5 @@ namespace Repository.Entities
         internal Event Event { get; set; }
         public DateTimeOffset PostedAt { get; init; }
         public string PhotoURL { get; set; }
-        public int Ups { get; set; }
-        public int Downs { get; set; }
-
-
-
     }
 }

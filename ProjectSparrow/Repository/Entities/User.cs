@@ -33,6 +33,7 @@ namespace Repository.Entities
         //Geolocation: X = Longitude Y = Latitude
         public Point Haunt { get; set; }
         public double HauntRadius { get; set; }
+        public int HauntWheight { get; set; }
         public Point CurrentLocation { get; set; }
         public double CurrentRadius { get; set; }
 
