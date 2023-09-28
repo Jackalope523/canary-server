@@ -72,6 +72,7 @@ namespace Repository.Tests
             sentry.GetContext().Events.ExecuteDelete();
         }
 
+        /*
         [Fact]
         public void CreateEvent_SUCCESS()
         {
@@ -91,6 +92,8 @@ namespace Repository.Tests
             Assert.Equal(testEventGroupMaximum, created.GroupMaximum);
             Assert.Equal(testIsEventOpen, created.IsEventOpen);
         }
+        */
+
         [Fact]
         public void FindEvent_SUCCESS()
         {

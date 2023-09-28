@@ -21,11 +21,13 @@ namespace Web.Controllers
             CouldNotCompleteRequest
         }
 
+        IAccountOperations accounts;
         IEventOperations events;
 		UserManager<ThinUser> userManager;
 
-		public DiscoverController(IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
+		public DiscoverController(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
         {
+            accounts = accountOperations;
             events = eventOperations;
             userManager = identityUserManager;
         }
@@ -66,6 +68,22 @@ namespace Web.Controllers
 			}
 
 			return Ok(eventList);
+        }
+
+        [HttpPost("user/{latitude}-{longitude}")]
+        public async Task<IActionResult> UpdateCurrentPosition(float latitude, float longitude)
+        {
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                await accounts.UpdateUserLocationAsync(user.Id, latitude, longitude);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok();
         }
 
 		private async Task<ThinUser> GetCurrentUserAsync()

@@ -48,5 +48,17 @@ namespace Server.Entities
             set => Metres = value * 1000d;
         }
         public double Metres { get; set; }
-    }
+
+        public static bool operator ==(Distance a, Distance b)
+            => a.Metres == b.Metres;
+
+        public static bool operator !=(Distance a, Distance b)
+            => a.Metres != b.Metres;
+
+        public static bool operator <(Distance a, Distance b)
+            => a.Metres < b.Metres;
+
+        public static bool operator >(Distance a, Distance b)
+            => a.Metres > b.Metres;
+	}
 }

@@ -33,6 +33,7 @@ namespace Repository.Entities
         //Geolocation: X = Longitude Y = Latitude
         public Point Haunt { get; set; }
         public double HauntRadius { get; set; }
+        public int HauntWheight { get; set; }
         public Point CurrentLocation { get; set; }
         public double CurrentRadius { get; set; }
 
@@ -43,13 +44,6 @@ namespace Repository.Entities
         internal List<Report> ReporteeList { get; set; }
         internal List<Post> Posts { get; set; }
 
-        public ThinUser ToThinUser()
-        {
-            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-                IsPhoneConfirmed, IsEmailConfirmed,
-                SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, -1);
-        }
         public ThinnerUser ToThinnerUser()
         {
             return new(Id, Name);

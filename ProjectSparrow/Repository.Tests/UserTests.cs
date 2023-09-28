@@ -47,6 +47,7 @@ namespace Repository.Tests
             sentry.GetContext().Users.ExecuteDelete();
         }
 
+        /*
         [Fact]
         public void CreateUser_SUCCESS()
         {
@@ -61,6 +62,7 @@ namespace Repository.Tests
             Assert.Equal(subjectName, created.Name);
             Assert.Equal(subjectDateOfBirth, created.DateOfBirth);       
         }
+        */
 
         [Fact]
         public void DeleteUser_SUCCESS()

@@ -45,6 +45,12 @@ namespace Server.Boundaries
 		bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int chaoticness,
 			int competitiveness, int industriousness, int nightOwl, int openness);
 
+		(double Latitude, double Longitude, double Radius) GetRecentUserLocation(Guid id);
+		bool UpdateRecentLocation(Guid id, double latitude, double longitude, double radius);
+
+		(double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(Guid id);
+		bool UpdateHaunt(Guid id, double latitude, double longitude, double radius, int stability);
+
 		List<ThinnerUser> GetFriends(Guid id);
 		List<ThinnerUser> GetFollowedUsers(Guid id);
 		List<ThinnerUser> GetBlockedUsers(Guid id);
@@ -80,6 +86,8 @@ namespace Server.Boundaries
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null);
 		Task DeleteUserAsync(Guid userID);
+
+		Task UpdateUserLocationAsync(Guid userID, double latitude, double longitude);
 
 		Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID);
 		Task<List<ThinnerUser>> GetBlockedUsersAsync(Guid userID);
