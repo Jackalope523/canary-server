@@ -20,6 +20,9 @@ const ActivityScreen = () => {
     // If textWrapper text exceeds 2 lines, align items to flex-start
     // Doesn't work with some text, not the ideal solution - fix later
         // Not ideal but I can just assign a % of space for the icon and the rest for the text
+
+    // TODO Ideally this would not be needed if the location text would only take up 1 line. If it takes up more it starts looking worse.
+        // Maybe make it end with ... if it exceeds 1 line
     const [isTextOverflowing, setIsTextOverflowing] = useState(false);
 
     const handleTextLayout = (event) => {

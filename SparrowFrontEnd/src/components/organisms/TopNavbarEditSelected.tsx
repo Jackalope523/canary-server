@@ -14,7 +14,7 @@ const TopNavbarEditSelected = () => {
   return (
     <View style={[navigationStyles.topNavbar, navigationStyles.topNavbar.edit]}>
         <Icon style={navigationStyles.topNavbar.icons} name="arrow-back-outline" />
-        <Text style={[globalStyles.buttonTextThree, globalStyles.textButtonExtraSmallText]}>Save</Text>
+        <Text style={[globalStyles.buttonTextThree, globalStyles.textButtonExtraSmall.text]}>Save</Text>
     </View>
   )
 }

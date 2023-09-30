@@ -191,6 +191,15 @@ export const globalStyles = StyleSheet.create({
         flex: 1,
     },
 
+    // Icon buttons - buttons with icons
+    // These styles currently work in conjuction
+    iconButtonSmall: {
+        flexDirection: 'row',
+
+        // TODO going to use spacing.sm instead of md for now cause I think it looks better, update Figma later if this is the final setting
+        columnGap: Spacing.sm,
+    },
+
     // Text buttons
     // Color variants
     // Primary

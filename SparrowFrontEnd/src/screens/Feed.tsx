@@ -137,8 +137,8 @@ const FeedScreen = () => {
             <Text>Testing custom button components</Text>
             <Button
                     btnText={'I am a neat button'}
-                    btnStyle={[globalStyles.textButtonMedium, globalStyles.textButtonPrimary]}
-                    btnTextStyle={[globalStyles.textButtonMediumText, globalStyles.textLight]}
+                    btnStyle={[globalStyles.textButtonMedium, globalStyles.textPrimary]}
+                    btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textLight]}
                 />
         </View>
     );
