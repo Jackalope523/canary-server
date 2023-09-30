@@ -149,44 +149,79 @@ export const globalStyles = StyleSheet.create({
         color: Colors.sparrowSand,
     },
 
-    // Buttons
-    // Text buttons
-    // Color variants
     // Primary
-    textButtonPrimary: {
+    textPrimary: {
         backgroundColor: Colors.sparrowDarkBrown,
     },
 
     // Secondary
-    textButtonSecondary: {
+    textSecondary: {
         backgroundColor: Colors.sparrowSand,
     },
 
     // Success
-    textButtonSuccess: {
+    textSuccess: {
         backgroundColor: Colors.green400,
     },
 
     // Warning
-    textButtonWarning: {
+    textWarning: {
         backgroundColor: Colors.orange400,
     },
 
     // Error
-    textButtonError: {
+    textError: {
         backgroundColor: Colors.red400,
     },
 
     // Function
-    textButtonFunction: {
+    textFunction: {
         backgroundColor: Colors.turqoise300,
     },
 
+    // Buttons
     // Layout
     // Makes the button width the size of the contents
     buttonContained: {
-        alignSelf: 'flex-start'
+        alignSelf: 'flex-start',
     },
+
+    // Makes the button full-width
+    buttonFull: {
+        flex: 1,
+    },
+
+    // Text buttons
+    // Color variants
+    // Primary
+    // textButtonPrimary: {
+    //     backgroundColor: Colors.sparrowDarkBrown,
+    // },
+
+    // // Secondary
+    // textButtonSecondary: {
+    //     backgroundColor: Colors.sparrowSand,
+    // },
+
+    // // Success
+    // textButtonSuccess: {
+    //     backgroundColor: Colors.green400,
+    // },
+
+    // // Warning
+    // textButtonWarning: {
+    //     backgroundColor: Colors.orange400,
+    // },
+
+    // // Error
+    // textButtonError: {
+    //     backgroundColor: Colors.red400,
+    // },
+
+    // // Function
+    // textButtonFunction: {
+    //     backgroundColor: Colors.turqoise300,
+    // },
 
     // Sizes
     // Large
@@ -198,15 +233,20 @@ export const globalStyles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 8,
         borderColor: Colors.sparrowDarkBrown,
+
+        text: {
+            fontFamily: 'UncutSans-Medium',
+            fontSize: 18,
+        },
     },
 
-    textButtonLargeText: {
-        fontFamily: 'UncutSans-Medium',
-        // color: Colors.sparrowDark,
-        fontSize: 18,
-        // lineHeight: 26,
-        // letterSpacing: 0.25,
-    },
+    // textButtonLargeText: {
+    //     fontFamily: 'UncutSans-Medium',
+    //     // color: Colors.sparrowDark,
+    //     fontSize: 18,
+    //     // lineHeight: 26,
+    //     // letterSpacing: 0.25,
+    // },
 
     // Medium
     textButtonMedium: {
@@ -217,15 +257,20 @@ export const globalStyles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 8,
         borderColor: Colors.sparrowDarkBrown,
+
+        text: {
+            fontFamily: 'UncutSans-Medium',
+            fontSize: 18,
+        },
     },
 
-    textButtonMediumText: {
-        fontFamily: 'UncutSans-Medium',
-        // color: Colors.sparrowDark,
-        fontSize: 18,
-        // lineHeight: 26,
-        // letterSpacing: 0.25,
-    },
+    // textButtonMediumText: {
+    //     fontFamily: 'UncutSans-Medium',
+    //     // color: Colors.sparrowDark,
+    //     fontSize: 18,
+    //     // lineHeight: 26,
+    //     // letterSpacing: 0.25,
+    // },
 
     // Small
     textButtonSmall :{
@@ -235,16 +280,21 @@ export const globalStyles = StyleSheet.create({
         paddingHorizontal: 16,
         borderWidth: 2,
         borderRadius: 8,
+
+        text: {
+            fontFamily: 'UncutSans-Bold',
+            fontSize: 18,
+        },
     },
 
-    textButtonSmallText :{
-        fontFamily: 'UncutSans-Bold',
-        // color: Colors.sparrowDark,
-        fontSize: 18,
-        textTransform: 'uppercase',
-        // lineHeight: 26,
-        // letterSpacing: 0.24,
-    },
+    // textButtonSmallText :{
+    //     fontFamily: 'UncutSans-Bold',
+    //     // color: Colors.sparrowDark,
+    //     fontSize: 18,
+    //     // textTransform: 'uppercase',
+    //     // lineHeight: 26,
+    //     // letterSpacing: 0.24,
+    // },
 
     // Extra small
     textButtonExtraSmall: {
@@ -256,97 +306,126 @@ export const globalStyles = StyleSheet.create({
         borderRadius: 8,
         borderColor: Colors.sparrowDarkBrown,
         columnGap: Spacing.sm,
+
+        text: {
+            fontFamily: 'UncutSans-Bold',
+            fontSize: 16,
+            textTransform: 'uppercase',
+        },
     },
 
-    textButtonExtraSmallText: {
-        fontFamily: 'UncutSans-Bold',
-        // color: Colors.sparrowDark,
-        fontSize: 16,
-        textTransform: 'uppercase',
-        // lineHeight: 24,
-        // letterSpacing: 2.2,
-    },
+    // TODO delete
+    // textButtonExtraSmallText: {
+    //     fontFamily: 'UncutSans-Bold',
+    //     // color: Colors.sparrowDark,
+    //     fontSize: 16,
+    //     textTransform: 'uppercase',
+    //     // lineHeight: 24,
+    //     // letterSpacing: 2.2,
+    // },
 
-    // Sort buttons
-    // Color variants
-    // Rest
-    sortButtonRest: {
-        backgroundColor: Colors.sparrowBrown,
-        borderColor: Colors.sparrowDark,
-    },
+    // TODO delete later
+    // // Sort buttons
+    // // Color variants
+    // // Rest
+    // sortButtonRest: {
+    //     backgroundColor: Colors.sparrowBrown,
+    //     borderColor: Colors.sparrowDark,
+    // },
 
-    // Selected
-    sortButtonSelected: {
-        backgroundColor: Colors.sparrowRed,
-        borderColor: Colors.sparrowDark,
-    },
+    // // Selected
+    // sortButtonSelected: {
+    //     backgroundColor: Colors.sparrowRed,
+    //     borderColor: Colors.sparrowDark,
+    // },
 
-    // Disabled
-    sortButtonDisabled: {
-        backgroundColor: Colors.sand200,
-        borderColor: Colors.sand300,
-    },
+    // // Disabled
+    // sortButtonDisabled: {
+    //     backgroundColor: Colors.sand200,
+    //     borderColor: Colors.sand300,
+    // },
 
-    // Sizes
-    sortButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderWidth: 2,
-        borderRadius: 8,
-    },
+    // // Sizes
+    // sortButton: {
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     paddingVertical: 8,
+    //     paddingHorizontal: 16,
+    //     borderWidth: 2,
+    //     borderRadius: 8,
+    // },
 
-    sortButtonText: {
-        fontFamily: 'UncutSans-Bold',
-        // color: Colors.sparrowSand,
-        fontSize: 18,
-        // lineHeight: 26,
-        // letterSpacing: 2.4,
-    },
+    // sortButtonText: {
+    //     fontFamily: 'UncutSans-Bold',
+    //     // color: Colors.sparrowSand,
+    //     fontSize: 18,
+    //     // lineHeight: 26,
+    //     // letterSpacing: 2.4,
+    // },
 
-    // Filter buttons
-    // Color variants
-    // Rest
-    filterButtonRest: {
-        backgroundColor: Colors.sparrowBrown,
-        borderColor: Colors.sparrowDark,
-    },
+    // // Filter buttons
+    // // Color variants
+    // // Rest
+    // filterButtonRest: {
+    //     backgroundColor: Colors.sparrowBrown,
+    //     borderColor: Colors.sparrowDark,
+    // },
 
-    // Selected
-    filterButtonSelected: {
-        backgroundColor: Colors.sparrowRed,
-        borderColor: Colors.sparrowDark,
-    },
+    // // Selected
+    // filterButtonSelected: {
+    //     backgroundColor: Colors.sparrowRed,
+    //     borderColor: Colors.sparrowDark,
+    // },
 
-    // Disabled
-    filterButtonDisabled: {
-        backgroundColor: Colors.sand200,
-        borderColor: Colors.sand300,
-    },
+    // // Disabled
+    // filterButtonDisabled: {
+    //     backgroundColor: Colors.sand200,
+    //     borderColor: Colors.sand300,
+    // },
 
-    // Sizes
-    filterButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderWidth: 2,
-        borderRadius: 8,
-    },
+    // // Sizes
+    // filterButton: {
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     paddingVertical: 8,
+    //     paddingHorizontal: 16,
+    //     borderWidth: 2,
+    //     borderRadius: 8,
+    // },
 
-    filterButtonText: {
-        fontFamily: 'UncutSans-Bold',
-        // color: Colors.sparrowSand,
-        fontSize: 18,
-        // lineHeight: 26,
-        // letterSpacing: 2.4,
-    },
+    // filterButtonText: {
+    //     fontFamily: 'UncutSans-Bold',
+    //     // color: Colors.sparrowSand,
+    //     fontSize: 18,
+    //     // lineHeight: 26,
+    //     // letterSpacing: 2.4,
+    // },
 
     // Button icons
+    // Small
     buttonIconSmall: {
         fontSize: 24,
-        color: Colors.sparrowSand,
+
+        light: {
+            color: Colors.sparrowSand,
+        },
+
+        dark: {
+            color: Colors.sparrowDarkBrown,
+        },
+    },
+
+    // Medium
+    buttonIconMedium: {
+        fontSize: 32,
+
+        light: {
+            color: Colors.sparrowSand,
+        },
+
+        dark: {
+            color: Colors.sparrowDarkBrown,
+        },
     },
 
     // Illustrations
