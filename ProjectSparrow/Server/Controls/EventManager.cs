@@ -273,6 +273,13 @@ namespace Server.Controls
 			}
 		}
 
+		public async Task<(int Depth, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0)
+		{
+			User user = new(userID);
+
+			return (depth, null);
+		}
+
 
 
 		internal async Task<Event> GetEvent(Guid eventID)

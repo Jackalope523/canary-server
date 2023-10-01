@@ -79,5 +79,8 @@ namespace Server.Boundaries
 		Task<EventPost> AddPostAsync(Guid userID, Guid eventID, string imageURL);
 		Task RemovePostAsync(Guid userID, Guid postID);
 		Task RatePostAsync(Guid userID, Guid postID, UserRating rating);
+
+
+		Task<(int Depth, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0);
 	}
 }
