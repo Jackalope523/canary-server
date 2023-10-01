@@ -415,6 +415,9 @@ export const globalStyles = StyleSheet.create({
     buttonIconSmall: {
         fontSize: 24,
 
+        // Fix for icon being cut off
+        height: 24,
+
         light: {
             color: Colors.sparrowSand,
         },
@@ -427,6 +430,9 @@ export const globalStyles = StyleSheet.create({
     // Medium
     buttonIconMedium: {
         fontSize: 32,
+
+        // Fix for icon being cut off
+        height: 32,
 
         light: {
             color: Colors.sparrowSand,

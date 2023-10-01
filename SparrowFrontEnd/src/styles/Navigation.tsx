@@ -117,58 +117,58 @@ export const navigationStyles = StyleSheet.create({
     },
 
     // OLD 2
-    mapContainer: {
-        flex: 1,
-    },
+    // mapContainer: {
+    //     flex: 1,
+    // },
 
-    mapImage: {
-        flex: 1,
-    },
+    // mapImage: {
+    //     flex: 1,
+    // },
 
-    tempTextInput: {
-        backgroundColor: 'lightgrey',
-        borderWidth: 2,
-        marginHorizontal: 22,
-        marginVertical: 16,
-        paddingHorizontal: 16,
-    },
+    // tempTextInput: {
+    //     backgroundColor: 'lightgrey',
+    //     borderWidth: 2,
+    //     marginHorizontal: 22,
+    //     marginVertical: 16,
+    //     paddingHorizontal: 16,
+    // },
 
-    // Search bar
+    // // Search bar
 
-    searchBarContainer: {
-        backgroundColor: Colors.orange200,
-    },
+    // searchBarContainer: {
+    //     backgroundColor: Colors.orange200,
+    // },
 
-    searchContainer: {
-        // temp. background color for testing purposes - replace with sparrow sand later
-        backgroundColor: Colors.azure200,
-    },
+    // searchContainer: {
+    //     // temp. background color for testing purposes - replace with sparrow sand later
+    //     backgroundColor: Colors.azure200,
+    // },
 
-    searchBarStylesVisible: {
-        backgroundColor: 'red',
-        flex: 3,
+    // searchBarStylesVisible: {
+    //     backgroundColor: 'red',
+    //     flex: 3,
 
-        height: 50,
-    },
+    //     height: 50,
+    // },
 
-    searchCloseStylesVisible: {
-        backgroundColor: 'blue',
-        flex: 1,
+    // searchCloseStylesVisible: {
+    //     backgroundColor: 'blue',
+    //     flex: 1,
 
-        height: 50,
-    },
+    //     height: 50,
+    // },
 
-    searchBarInnerContainerVisible: {
-        flexDirection: 'row',
-    },
+    // searchBarInnerContainerVisible: {
+    //     flexDirection: 'row',
+    // },
 
-    // OLD
-    searchBar: {
-        backgroundColor: Colors.azure400,
+    // // OLD
+    // searchBar: {
+    //     backgroundColor: Colors.azure400,
 
-        container: {
-            backgroundColor: Colors.azure400,
-            paddingHorizontal: 16,
-        },
-    },
+    //     container: {
+    //         backgroundColor: Colors.azure400,
+    //         paddingHorizontal: 16,
+    //     },
+    // },
 });

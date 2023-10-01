@@ -33,6 +33,8 @@ const DiscoveryScreen = () => {
         setSearchText('');
     };
 
+    // Clear search input text
+
     return (
         <View style={styles.mapWrapper}>
             <ImageBackground source={tempMapImage} resizeMode='cover' style={styles.mapImage}>
@@ -52,11 +54,12 @@ const DiscoveryScreen = () => {
                                     style={navigationStyles.search.searchBarWrapper.searchBar.textInput}
                                     onPressIn={toggleSearch}
                                     placeholder='Search for events'
-                                    // style={searchContentVisible ? navigationStyles.search.searchBarWrapper.searchBar : navigationStyles.search.searchBarWrapper.searchBar}
-                                    // style={navigationStyles.search.searchBarWrapper.searchBar}
-                                >
-                                    {/* <Icon name="search-outline" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.dark]} /> */}
-                                </TextInput>
+                                    value={searchText}
+                                    onChangeText={(text) => setSearchText(text)}
+                                    />
+                                <Pressable onPress={() => setSearchText('')}>
+                                    <Icon name="close-fill" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.dark]} />
+                                </Pressable>
                             </View>
 
                             {searchContentVisible ? (
