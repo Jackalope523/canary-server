@@ -93,7 +93,7 @@ export const navigationStyles = StyleSheet.create({
                 
                 // OG padding in prototype is 16 but that doesn't work well here so I'm using 10
                 // To make it more similar to OG padding, make paddingHorizontal: 16, paddingVertical: 10
-                padding: 10,
+                padding: 8,
             },
         },
 

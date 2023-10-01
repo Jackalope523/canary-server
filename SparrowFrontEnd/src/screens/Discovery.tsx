@@ -10,6 +10,8 @@ import { Spacing } from '../styles/Spacing';
 import Button from '../components/atoms/Button';
 import EventCardMedium from '../components/organisms/EventCardMedium';
 import { SAMPLEEVENTDATA } from '../data/sampleEventData';
+import SearchFilter from '../components/organisms/SearchFilter';
+
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
@@ -38,7 +40,6 @@ const DiscoveryScreen = () => {
     return (
         <View style={styles.mapWrapper}>
             <ImageBackground source={tempMapImage} resizeMode='cover' style={styles.mapImage}>
-
                 <View style={[globalStyles.baseContainer, styles.container]}>
 
                     {/* Search */}
@@ -92,7 +93,10 @@ const DiscoveryScreen = () => {
                             {/* TODO fix last 2 events not visible */}
                             {/* Potential not-ideal fix = screen height - (searchBarWrapper height + filterSort height) */}
                             {/* TODO maybe add an opacity 0 to opacity 100 gradient at the top */}
-                            <FlatList
+
+                            <SearchFilter />
+
+                            {/* <FlatList
                             showsVerticalScrollIndicator={false}
                             contentContainerStyle={{paddingVertical: Spacing.lg, paddingBottom: 800}}
                             ItemSeparatorComponent={() => <View style={{height: Spacing.md}} />}
@@ -110,7 +114,7 @@ const DiscoveryScreen = () => {
                                     eventTitle={item.title}
                                     />
                                 )}
-                            />
+                            /> */}
 
                         </View>
 
@@ -118,6 +122,7 @@ const DiscoveryScreen = () => {
 
                     </View>
 
+                    {!searchContentVisible && (
                     <View style={styles.buttonWrapper}>
                         {/* TODO replace onPress={null} with go to CREATE EVENT screen */}
                         <Button
@@ -129,6 +134,7 @@ const DiscoveryScreen = () => {
                             onPress={null}
                         />
                     </View>
+                    )}
 
                 </View>
 
@@ -186,9 +192,14 @@ const DiscoveryScreen = () => {
 export default DiscoveryScreen
 
 const styles = StyleSheet.create ({
-    // Wraps all screen elements
+    // Wraps all search elements
+    searchWrapper: {
+        // TODO enable bgC when the screen is finished
+        // backgroundColor: Colors.sparrowSand,
+    },
+
     container: {
-        gap: 20,
+        rowGap: 16,
     },
 
     // Map
