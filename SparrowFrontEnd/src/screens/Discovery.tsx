@@ -35,8 +35,6 @@ const DiscoveryScreen = () => {
         setSearchText('');
     };
 
-    // Clear search input text
-
     return (
         <View style={styles.mapWrapper}>
             <ImageBackground source={tempMapImage} resizeMode='cover' style={styles.mapImage}>
@@ -57,6 +55,8 @@ const DiscoveryScreen = () => {
                                     placeholder='Search for events'
                                     value={searchText}
                                     onChangeText={(text) => setSearchText(text)}
+                                    autoCorrect={false}
+                                    autoCapitalize='none'
                                     />
                                 <Pressable onPress={() => setSearchText('')}>
                                     <Icon name="close-fill" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.dark]} />
@@ -94,6 +94,9 @@ const DiscoveryScreen = () => {
                             {/* Potential not-ideal fix = screen height - (searchBarWrapper height + filterSort height) */}
                             {/* TODO maybe add an opacity 0 to opacity 100 gradient at the top */}
 
+                            {/* NEW CODE */}
+
+                            {/* PREVIOUS CODE */}
                             <SearchFilter />
 
                             {/* <FlatList
@@ -115,6 +118,7 @@ const DiscoveryScreen = () => {
                                     />
                                 )}
                             /> */}
+                            {/* PREVIOUS CODE ENDS HERE */}
 
                         </View>
 
