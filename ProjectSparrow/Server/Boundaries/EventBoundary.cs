@@ -11,6 +11,7 @@ namespace Server.Boundaries
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
+	public record EventHeader(Guid Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
 
 	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
 		EventReportType ReportType, string ReportDetails);
@@ -43,6 +44,7 @@ namespace Server.Boundaries
 		bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails);
 
 		List<EventPost> GetPostsForEvent(Guid id);
+		List<EventPost> GetPostsForUser(Guid id);
 		EventPost GetPost(Guid id);
 		EventPost AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL);
 		bool RemovePost(Guid postId);
@@ -80,7 +82,6 @@ namespace Server.Boundaries
 		Task RemovePostAsync(Guid userID, Guid postID);
 		Task RatePostAsync(Guid userID, Guid postID, UserRating rating);
 
-
-		Task<(int Depth, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0);
+		Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0);
 	}
 }

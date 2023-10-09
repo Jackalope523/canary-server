@@ -40,7 +40,7 @@ namespace Web.Controllers
                 return BadRequest(FeedError.MissingInformation.ToString());
             }
 
-            (int Depth, List<EventPost>) userFeed;
+            (int Depth, List<EventHeader>, List<EventPost>) userFeed;
 
             try
             {
