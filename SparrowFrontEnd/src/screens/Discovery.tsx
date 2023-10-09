@@ -29,9 +29,19 @@ const DiscoveryScreen = () => {
     const [searchText, setSearchText] = React.useState('');
 
     // Toggle search container
+    // Search bar
     const toggleSearch = () => {
+        if(!searchContentVisible) {
+            setsearchContentVisible(!searchContentVisible);
+            setSearchText('');
+        } else {
+            false
+        }
+    };
+
+    // Close button
+    const toggleClose = () => {
         setsearchContentVisible(!searchContentVisible);
-        // setSearchCloseVisible(!searchCloseVisible);
         setSearchText('');
     };
 
@@ -64,7 +74,7 @@ const DiscoveryScreen = () => {
                             </View>
 
                             {searchContentVisible ? (
-                            <Pressable onPress={toggleSearch} style={searchContentVisible ? navigationStyles.search.searchBarWrapper.closeButtonWrapper : null}>
+                            <Pressable onPress={toggleClose} style={searchContentVisible ? navigationStyles.search.searchBarWrapper.closeButtonWrapper : null}>
                                 {/* TODO this icon isn't perfectly vertically aligned - fix that */}
                                 <Icon name="close-outline" style={[globalStyles.buttonIconMedium, globalStyles.buttonIconMedium.dark]} />
                             </Pressable>
