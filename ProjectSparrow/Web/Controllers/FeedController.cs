@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Repository.Entities;
 using Server.Boundaries;
+using Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,9 +36,9 @@ namespace Web.Controllers
         }
 
         [HttpGet("{feedDepth}")]
-        public async Task<IActionResult> GetFeed(int feedDepth)
+        public async Task<IActionResult> GetFeed([FromBody] FeedModel feedOptions)
         {
-            if (feedDepth < 0)
+            if (feedOptions == null || !ModelState.IsValid)
             {
                 return BadRequest(FeedError.MissingInformation.ToString());
             }
@@ -46,7 +49,7 @@ namespace Web.Controllers
             {
                 // Retrieve current user
                 var user = await GetCurrentUserAsync();
-                userFeed = await events.GetUserFeedAsync(user.Id, feedDepth);
+                userFeed = await events.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
 			}
 			catch (Exception e)
 			{

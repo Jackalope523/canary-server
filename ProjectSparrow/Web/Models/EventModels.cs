@@ -56,4 +56,13 @@ namespace Web.Models
         [Required]
         public string ImageURL { get; set; }
     }
+
+    public class FeedModel
+    {
+        [Required]
+        public int Depth { get; set; }
+
+        [Required]
+        public Guid[] ExclusionList { get; set; }
+    }
 }

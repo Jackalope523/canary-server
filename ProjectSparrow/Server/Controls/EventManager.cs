@@ -274,19 +274,15 @@ namespace Server.Controls
 			}
 		}
 
-		public async Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0)
+		public async Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0, List<Guid> exclusionList = null)
 		{
 			User user = new(userID);
-			List<EventPost> friendPosts = new();
+			exclusionList ??= new();
 			Dictionary<Guid, EventHeader> eventHeaders = new();
 
-			var friends = accounts.GetFriends(user.Id);
-
-			// Gather all posts that can be seen by the user
-			foreach (ThinnerUser friend in friends)
-			{
-				friendPosts.AddRange(events.GetPostsForUser(friend.Id));
-			}
+			// Retrieve friend-populated event posts after a specified time excluding previously viewed events
+			DateTimeOffset depthCharge = DateTimeOffset.UtcNow - TimeSpan.FromDays(1 + depth);
+			var friendPosts = events.GenerateFeedForUser(user.Id, depthCharge, exclusionList);
 
 			// Get the respective event headers for the posts
 			foreach (EventPost post in friendPosts)
