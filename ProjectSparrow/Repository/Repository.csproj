@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestDBMigrations\**" />
+    <EmbeddedResource Remove="TestDBMigrations\**" />
+    <None Remove="TestDBMigrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
       <PrivateAssets>all</PrivateAssets>
@@ -28,7 +34,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\TestDBMigrations\" />
-    <Folder Include="TestDBMigrations\" />
   </ItemGroup>
 
 </Project>
