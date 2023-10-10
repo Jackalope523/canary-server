@@ -25,25 +25,25 @@ const tempMapImage = require('../assets/images/temp/temp-map.png');
 
 const DiscoveryScreen = () => {
     const [searchContentVisible, setsearchContentVisible] = React.useState(false);
-    // const [searchCloseVisible, setSearchCloseVisible] = React.useState(false);
     const [searchText, setSearchText] = React.useState('');
 
-    // Toggle search container
-    // Search bar
+    // Search bar text input
+    const [isTextInputFocused, setIsTextInputFocused] = React.useState(false);
+
+    // Toggle search bar
     const toggleSearch = () => {
-        if(!searchContentVisible) {
-            setsearchContentVisible(!searchContentVisible);
-            setSearchText('');
-        } else {
-            false
+        if (!searchContentVisible) {
+            setsearchContentVisible(true);
+            // setSearchText('');
         }
     };
 
-    // Close button
+    // Toggle search close button
     const toggleClose = () => {
-        setsearchContentVisible(!searchContentVisible);
+        setsearchContentVisible(false);
         setSearchText('');
     };
+
 
     return (
         <View style={styles.mapWrapper}>
@@ -67,10 +67,14 @@ const DiscoveryScreen = () => {
                                     onChangeText={(text) => setSearchText(text)}
                                     autoCorrect={false}
                                     autoCapitalize='none'
+                                    onFocus={() => setIsTextInputFocused(true)}
+                                    onBlur={() => setIsTextInputFocused(false)}
                                     />
+                                {isTextInputFocused && searchText ? (
                                 <Pressable onPress={() => setSearchText('')}>
                                     <Icon name="close-fill" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.dark]} />
                                 </Pressable>
+                                ) : null }
                             </View>
 
                             {searchContentVisible ? (

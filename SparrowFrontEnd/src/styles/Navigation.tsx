@@ -52,9 +52,7 @@ export const navigationStyles = StyleSheet.create({
     },
 
     // Search
-    search: {
-        backgroundColor: Colors.yellow400,
-        
+    search: {        
         searchBarWrapper: {
             flexDirection: 'row',
             // columnGap: Spacing.sm,
@@ -89,6 +87,7 @@ export const navigationStyles = StyleSheet.create({
             },
     
             closeButtonWrapper: {
+                // TODO remove bgc later
                 backgroundColor: Colors.red400,
                 
                 // OG padding in prototype is 16 but that doesn't work well here so I'm using 10
@@ -103,6 +102,7 @@ export const navigationStyles = StyleSheet.create({
                 columnGap: Spacing.md,
                 paddingTop: Spacing.md,
 
+                // TODO remove bgc later
                 backgroundColor: Colors.fuchsia500,
             },
         },
