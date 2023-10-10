@@ -350,4 +350,4 @@ MigrationBackup/
 .ionide/
 
 #EF Core Garbage
-ProjectSparrow\Repository\Migrations
+ProjectSparrow/Repository/Migrations/
