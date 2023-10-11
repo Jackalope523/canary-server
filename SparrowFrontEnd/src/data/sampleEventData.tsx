@@ -118,7 +118,7 @@ export const SAMPLEEVENTDATA = [
         attendees: 34,
         title: "Summer Soiree",
         description: "Get ready to kick off the summer season in style and join us at the picturesque Sandy Beachfront for an unforgettable day of sun, sea, and celebration. This beach party is all about good vibes, great company, and the perfect mix of relaxation and fun. We'll have a variety of beach games, from beach volleyball to sandcastle competitions, so bring your A-game.",
-        location: "Sandy Beachfront,",
+        location: "Sandy Beachfront",
         uri: img10,
     },
 ];
