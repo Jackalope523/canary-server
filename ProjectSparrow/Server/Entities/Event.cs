@@ -13,6 +13,9 @@ namespace Server.Entities
     {
         #region Variables
 
+        public const int MaximumNameLength = 50;
+        public const int MaximumDescLength = 400;
+
         public Guid Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
@@ -92,10 +95,10 @@ namespace Server.Entities
         }
 
         public bool ValidateAndNormalise()
-        {
+        { 
             // Sanitise User content
-            Name = ContentValidation.NormaliseText(Name);
-            Description = ContentValidation.NormaliseText(Description);
+            Name = ContentValidation.NormaliseText(Name[..MaximumNameLength]);
+            Description = ContentValidation.NormaliseText(Description[..MaximumDescLength]);
 
             // Verify Event is within a reasonable time
             if (StartTime > DateTimeOffset.UtcNow + TimeSpan.FromDays(7)) { return false; }
