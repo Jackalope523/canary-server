@@ -6,6 +6,9 @@ import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
 
 import { Spacing } from '../../styles/Spacing';
 
+//  TODO make search filter, search for events based on TEXT input from Discovery -> searchBar -> TextInput component.
+// TODO make FILTER and SORT buttons functional
+
 const SearchFilter = () => {
 
   return (

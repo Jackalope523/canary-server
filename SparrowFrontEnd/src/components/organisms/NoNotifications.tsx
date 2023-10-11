@@ -18,8 +18,8 @@ const NoNotifications = (props: Props) => {
     <View style={[styles.container, globalStyles.baseContainer]}>
         <Image source={require('../../assets/illustrations/temp/not-found.png')} style={[globalStyles.illustration, globalStyles.illustration.large]} />
         <View style={styles.textWrapper}>
-            <Text style={[globalStyles.headingTextThree, globalStyles.textDark, styles.textAlign]}>You don't have any notifications yet.</Text>
-            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark, styles.textAlign]}>We'll notify you when you get invited to events and during other occurances.</Text>
+            <Text style={[globalStyles.headingTextThree, globalStyles.buttonDark, styles.textAlign]}>You don't have any notifications yet.</Text>
+            <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark, styles.textAlign]}>We'll notify you when you get invited to events and during other occurances.</Text>
         </View>
     </View>
   )

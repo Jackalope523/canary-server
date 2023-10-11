@@ -17,6 +17,8 @@ import { globalStyles } from '../styles/Global';
 import { cardStyles } from '../styles/Cards';
 import Button from '../components/atoms/Button';
 
+import RangeSelector from '../components/atoms/RangeSelector';
+import SingleValueSelector from '../components/atoms/SingleValueSelector';
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
@@ -108,7 +110,7 @@ const FeedScreen = () => {
             <Notification />
             <NoNotifications /> */}
 
-            <Text>Currently testing event card component</Text>
+            {/* <Text>Currently testing event card component</Text>
             
             <View style={{marginBottom: Spacing.md}}>
                 <Text style={[globalStyles.headingTextOne, styles.headingText]}>Upcoming events</Text>
@@ -137,9 +139,23 @@ const FeedScreen = () => {
             <Text>Testing custom button components</Text>
             <Button
                     btnText={'I am a neat button'}
-                    btnStyle={[globalStyles.textButtonMedium, globalStyles.textPrimary]}
-                    btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textLight]}
+                    btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonPrimary]}
+                    btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.buttonLight]}
+                /> */}
+
+            <Text>Testing sort and filter components</Text>
+            <View>
+                <Text>Range selector here</Text>
+                <RangeSelector
+                    min={1}
+                    max={4}
+                    steps={1}
+                    onValueChange={(range) => console.log(range)}
                 />
+
+                <Text>SingleValueSelector here</Text>
+                <SingleValueSelector />
+            </View>
         </View>
     );
 };

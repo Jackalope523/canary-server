@@ -140,46 +140,90 @@ export const globalStyles = StyleSheet.create({
     // Text
     // Color variants
     // Dark
-    textDark: {
+    // textDark: {
+    //     color: Colors.sparrowDark,
+    // },
+
+    // // Light
+    // textLight: {
+    //     color: Colors.sparrowSand,
+    // },
+
+    // // Primary
+    // textPrimary: {
+    //     backgroundColor: Colors.sparrowDarkBrown,
+    // },
+
+    // // Secondary
+    // textSecondary: {
+    //     backgroundColor: Colors.sparrowSand,
+    // },
+
+    // // Success
+    // textSuccess: {
+    //     backgroundColor: Colors.green400,
+    // },
+
+    // // Warning
+    // textWarning: {
+    //     backgroundColor: Colors.orange400,
+    // },
+
+    // // Error
+    // textError: {
+    //     backgroundColor: Colors.red400,
+    // },
+
+    // // Function
+    // textFunction: {
+    //     backgroundColor: Colors.turqoise300,
+    // },
+
+    // Buttons
+    buttonDark: {
         color: Colors.sparrowDark,
     },
 
     // Light
-    textLight: {
+    buttonLight: {
         color: Colors.sparrowSand,
     },
 
     // Primary
-    textPrimary: {
+    buttonPrimary: {
         backgroundColor: Colors.sparrowDarkBrown,
     },
 
+    // Primary Light
+    buttonPrimaryLight: {
+        backgroundColor: Colors.sparrowBrown,
+    },
+
     // Secondary
-    textSecondary: {
+    buttonSecondary: {
         backgroundColor: Colors.sparrowSand,
     },
 
     // Success
-    textSuccess: {
+    buttonSuccess: {
         backgroundColor: Colors.green400,
     },
 
     // Warning
-    textWarning: {
+    buttonWarning: {
         backgroundColor: Colors.orange400,
     },
 
     // Error
-    textError: {
+    buttonError: {
         backgroundColor: Colors.red400,
     },
 
     // Function
-    textFunction: {
+    buttonFunction: {
         backgroundColor: Colors.turqoise300,
     },
 
-    // Buttons
     // Layout
     // Makes the button width the size of the contents
     buttonContained: {
@@ -239,9 +283,9 @@ export const globalStyles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 24,
         paddingHorizontal: 32,
-        borderWidth: 2,
         borderRadius: 8,
-        borderColor: Colors.sparrowDarkBrown,
+        // borderWidth: 2,
+        // borderColor: Colors.sparrowDarkBrown,
 
         text: {
             fontFamily: 'UncutSans-Medium',
@@ -263,9 +307,9 @@ export const globalStyles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 16,
         paddingHorizontal: 24,
-        borderWidth: 2,
         borderRadius: 8,
-        borderColor: Colors.sparrowDarkBrown,
+        // borderWidth: 2,
+        // borderColor: Colors.sparrowDarkBrown,
 
         text: {
             fontFamily: 'UncutSans-Medium',
@@ -287,7 +331,8 @@ export const globalStyles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 8,
         paddingHorizontal: 16,
-        borderWidth: 2,
+        // borderWidth: 2,
+        // borderColor: Colors.sparrowDarkBrown,
         borderRadius: 8,
 
         text: {
@@ -311,9 +356,9 @@ export const globalStyles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 8,
         paddingHorizontal: 16,
-        borderWidth: 2,
         borderRadius: 8,
-        borderColor: Colors.sparrowDarkBrown,
+        // borderWidth: 2,
+        // borderColor: Colors.sparrowDarkBrown,
         columnGap: Spacing.sm,
 
         text: {

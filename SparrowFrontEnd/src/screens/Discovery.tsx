@@ -126,16 +126,16 @@ const DiscoveryScreen = () => {
                                     btnText={'Filter'}
                                     btnIcon={'filter-fill'}
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonFull]}
-                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimary, activeComponent === 'filter' ? globalStyles.buttonPrimaryLight : null]}
+                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.buttonLight]}
                                     onPress={toggleFilter}
                                 />
                                 <Button
                                     btnText={'Sort'}
                                     btnIcon={'sort-outline'}
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonFull]}
-                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonFull, activeComponent === 'sort' ? globalStyles.buttonPrimaryLight : null]}
+                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.buttonLight]}
                                     onPress={toggleSort}
                                 />
                             </View>
@@ -165,6 +165,8 @@ const DiscoveryScreen = () => {
                     ) : null }
 
 
+
+                    {/* TODO probably have to enable it and disable filter or sort if there's text input in the textInput component */}
                     {!activeComponent && searchContentVisible ? (
                     <View style={navigationStyles.search.searchContent}>
                         <SearchFilter />
@@ -178,8 +180,8 @@ const DiscoveryScreen = () => {
                             btnText={'Create Event'}
                             btnIcon={'add-outline'}
                             btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonContained]}
-                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textButtonExtraSmall.text.uppercase, globalStyles.textLight]}
+                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonContained]}
+                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textButtonExtraSmall.text.uppercase, globalStyles.buttonLight]}
                             onPress={null}
                         />
                     </View>

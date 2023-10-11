@@ -1,16 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-type Props = {}
-
-const slider = (props: Props) => {
+const SingleValueSelector = () => {
   return (
     <View>
-      <Text>slider</Text>
+      <Text>SingleValueSelector</Text>
     </View>
   )
 }
 
-export default slider
+export default SingleValueSelector
 
 const styles = StyleSheet.create({})

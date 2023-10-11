@@ -22,13 +22,15 @@ const bgImage = {uri: 'https://images.unsplash.com/photo-1562519819-016930ada31b
 const EventCardMedium = ({  eventDate, eventTime, eventAttendees, eventTitle, eventLocation, eventHeroImage, onPress }) => {
     // Activity component testing
     // If textWrapper text exceeds 2 lines, align items to flex-start
-    const [isTextOverflowing, setIsTextOverflowing] = useState(false);
+    // const [isTextOverflowing, setIsTextOverflowing] = useState(false);
 
-    const handleTextLayout = (event) => {
-        const { lines } = event.nativeEvent;
+    // const handleTextLayout = (event) => {
+    //     const { lines } = event.nativeEvent;
 
-        setIsTextOverflowing(lines.length > 2);
-    };
+    //     setIsTextOverflowing(lines.length > 2);
+    // };
+
+    // TODO if LOCATION text exceeds 1 line, add ... and hide overflowing text
 
   return (
     <Pressable onPress={onPress}>
@@ -39,65 +41,31 @@ const EventCardMedium = ({  eventDate, eventTime, eventAttendees, eventTitle, ev
                     <View style={cardStyles.eventCardMedium.content.container}>
                         <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
                             <Icon name="date-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{eventDate}</Text>
+                            <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{eventDate}</Text>
                         </View>
                         <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
                             <Icon name="time-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{eventTime}</Text>
+                            <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{eventTime}</Text>
                         </View>
                     </View>
                     <View style={cardStyles.eventCardMedium.content.container}>
                         <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
                             <Icon name="account-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{eventAttendees}</Text>
+                            <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{eventAttendees}</Text>
                         </View>
                     </View>
                 </View>
                 <View style={cardStyles.eventCardMedium.content.container}>
-                    <Text style={[globalStyles.headingTextThree, globalStyles.textDark, cardStyles.eventCardMedium.content.container.title]}>{eventTitle}</Text>
-                    <View style={[cardStyles.eventCardMedium.content.container.textWrapper, isTextOverflowing ? cardStyles.eventCardMedium.content.container.textWrapperOverflow : cardStyles.eventCardMedium.content.container.textWrapperCenter]}>
+                    <Text numberOfLines={2} style={[globalStyles.headingTextThree, globalStyles.buttonDark, cardStyles.eventCardMedium.content.container.title]}>{eventTitle}</Text>
+                    <View style={[cardStyles.eventCardMedium.content.container.textWrapper, cardStyles.eventCardMedium.content.container.textWrapperCenter]}>
                         <Icon name="location-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon} />
-                        <Text onTextLayout={handleTextLayout} style={[globalStyles.bodyTextOne, globalStyles.textDark, cardStyles.eventCardMedium.content.container.textWrapper.innerText]}>{eventLocation}</Text>
+                        <Text numberOfLines={1} style={[globalStyles.bodyTextOne, globalStyles.buttonDark, cardStyles.eventCardMedium.content.container.textWrapper.innerText]}>{eventLocation}</Text>
                     </View>
                 </View>
             </View>
         </ImageBackground>
     </View>
     </Pressable>
-
-        // <View style={cardStyles.eventCardMedium}>
-        //     <ImageBackground source={bgImage} resizeMode="cover" imageStyle={cardStyles.eventCardMedium.bgImage2}>
-        //         <View style={cardStyles.eventCardMedium.content}>
-        //             <View style={cardStyles.eventCardMedium.content.topWrapper}>
-        //                 <View style={cardStyles.eventCardMedium.content.container}>
-        //                     <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-        //                         <Icon name="date-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-        //                         <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>This Friday</Text>
-        //                     </View>
-        //                     <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-        //                         <Icon name="time-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-        //                         <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>15:00</Text>
-        //                     </View>
-        //                 </View>
-        //                 <View style={cardStyles.eventCardMedium.content.container}>
-        //                     <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-        //                         <Icon name="account-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-        //                         <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>6</Text>
-        //                     </View>
-        //                 </View>
-        //             </View>
-        //             <View style={cardStyles.eventCardMedium.content.container}>
-        //                 <Text style={[globalStyles.headingTextThree, globalStyles.textDark, cardStyles.eventCardMedium.content.container.title]}>Two-on-two basketball at Venice Beach</Text>
-        //                 <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
-        //                     <View>
-        //                         <Icon name="location-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon} />
-        //                     </View>
-        //                     <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>Venice Beach, Venice</Text>
-        //                 </View>
-        //             </View>
-        //         </View>
-        //     </ImageBackground>
-        // </View>
   )
 }
 
