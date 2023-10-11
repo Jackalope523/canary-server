@@ -110,15 +110,19 @@ namespace Server.Controls
 			if (targetEvent.EndTime.HasValue)
 			{ throw new InvalidEventException("Unable to edit event, event has ended."); }
 
-			// TODO Verify updates are valid
+			targetEvent.Description = eventDescription;
+			targetEvent.IsOpen = isOpen ?? targetEvent.IsOpen;
+
+			targetEvent.ValidateAndNormalise();
+
 			// Update individual attributes
 			if (eventDescription != "")
 			{
-				events.UpdateDescription(eventID, eventDescription);
+				events.UpdateDescription(eventID, targetEvent.Description);
 			}
 			if (isOpen.HasValue)
 			{
-				events.UpdateStatus(eventID, isOpen.Value);
+				events.UpdateStatus(eventID, targetEvent.IsOpen);
 			}
 		}
 
@@ -145,7 +149,11 @@ namespace Server.Controls
 
 		public async Task LeaveEventAsync(Guid userID, Guid eventID)
 		{
-			// TODO Is Host logic
+			var targetEvent = await GetEvent(eventID);
+
+			// Check if user is the host
+			if (targetEvent.Host.Id.Equals(userID))
+			{ throw new InvalidUserException("Host cannot leave the event."); }
 
 			// Try to remove user from event
 			bool success = events.RemoveUserFromEvent(userID, eventID);
