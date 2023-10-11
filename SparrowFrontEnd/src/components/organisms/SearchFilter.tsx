@@ -10,7 +10,6 @@ const SearchFilter = () => {
 
   return (
     <View>
-        <Text>SearchFilter</Text>
         <FlatList
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{paddingVertical: Spacing.lg, paddingBottom: 800}}

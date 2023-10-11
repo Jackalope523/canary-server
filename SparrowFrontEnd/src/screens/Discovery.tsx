@@ -48,10 +48,14 @@ const DiscoveryScreen = () => {
     return (
         <View style={styles.mapWrapper}>
             <ImageBackground source={tempMapImage} resizeMode='cover' style={styles.mapImage}>
-                <View style={[globalStyles.baseContainer, styles.container]}>
-
+                <View>
                     {/* Search */}
+                    {/* Search header */}
                     <View style={navigationStyles.search}>
+
+                        {/* NEW CODE HERE ----------------------------->>>>>>> */}
+                        <View style={searchContentVisible ? navigationStyles.search.headerWrapper : null}>
+                            <View style={navigationStyles.search.headerWrapper.header}>
 
                         {/* Search bar */}
                         {/* style={searchContentVisible ? navigationStyles.search.searchBarWrapper : navigationStyles.search.searchBarWrapper}> */}
@@ -61,8 +65,10 @@ const DiscoveryScreen = () => {
                                 <Icon name="search-outline" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.dark]} />
                                 <TextInput
                                     style={navigationStyles.search.searchBarWrapper.searchBar.textInput}
+                                    color={Colors.sparrowDark}
                                     onPressIn={toggleSearch}
                                     placeholder='Search for events'
+                                    placeholderTextColor={Colors.sparrowDark}
                                     value={searchText}
                                     onChangeText={(text) => setSearchText(text)}
                                     autoCorrect={false}
@@ -85,22 +91,30 @@ const DiscoveryScreen = () => {
                             ) : null }
                         </View>
 
-                        {/* Search content */}
+                        {/* Search options */}
 
                         {searchContentVisible ? (
 
-                        <View style={navigationStyles.search.searchContent}>
+                        <View style={navigationStyles.search.searchOptionsWrapper}>
 
                             {/* TODO make FILTER and SORT buttons functional */}
-                            <View style={navigationStyles.search.searchContent.searchOptions}>
-                                <Pressable style={[globalStyles.textButtonSmall, globalStyles.textPrimary, globalStyles.buttonFull, globalStyles.iconButtonSmall]}>
-                                    <Icon name="filter-fill" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]} />
-                                    <Text style={[globalStyles.textButtonSmall.text, globalStyles.textLight]}>Filter</Text>
-                                </Pressable>
-                                <Pressable style={[globalStyles.textButtonSmall, globalStyles.textPrimary, globalStyles.buttonFull, globalStyles.iconButtonSmall]}>
-                                    <Icon name="sort-outline" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]} />
-                                    <Text style={[globalStyles.textButtonSmall.text, globalStyles.textLight]}>Sort</Text>
-                                </Pressable>
+                            <View style={navigationStyles.search.searchOptionsWrapper.searchOptions}>
+                                <Button
+                                    btnText={'Filter'}
+                                    btnIcon={'filter-fill'}
+                                    btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
+                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonFull]}
+                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    onPress={null}
+                                />
+                                <Button
+                                    btnText={'Sort'}
+                                    btnIcon={'sort-outline'}
+                                    btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
+                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonFull]}
+                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    onPress={null}
+                                />
                             </View>
 
 
@@ -111,34 +125,20 @@ const DiscoveryScreen = () => {
                             {/* NEW CODE */}
 
                             {/* PREVIOUS CODE */}
-                            <SearchFilter />
-
-                            {/* <FlatList
-                            showsVerticalScrollIndicator={false}
-                            contentContainerStyle={{paddingVertical: Spacing.lg, paddingBottom: 800}}
-                            ItemSeparatorComponent={() => <View style={{height: Spacing.md}} />}
-                            overScrollMode='never'
-                            keyExtractor={(item) => item.id}
-                            data={SAMPLEEVENTDATA}
-                            renderItem={({ item }) => (
-                                <EventCardMedium
-                                    onPress={null}
-                                    eventHeroImage={item.uri}
-                                    eventDate={item.date}
-                                    eventTime={item.time}
-                                    eventAttendees={item.attendees}
-                                    eventLocation={item.location}
-                                    eventTitle={item.title}
-                                    />
-                                )}
-                            /> */}
-                            {/* PREVIOUS CODE ENDS HERE */}
+                            {/* <SearchFilter /> */}
 
                         </View>
 
                         ) : null }
-
+                        </View>
+                        </View>
                     </View>
+
+                    {searchContentVisible ? (
+                    <View style={navigationStyles.search.searchContent}>
+                        <SearchFilter />
+                    </View>
+                    ) : null}
 
                     {!searchContentVisible && (
                     <View style={styles.buttonWrapper}>
@@ -148,7 +148,7 @@ const DiscoveryScreen = () => {
                             btnIcon={'add-outline'}
                             btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonContained]}
-                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textButtonExtraSmall.text.uppercase, globalStyles.textLight]}
                             onPress={null}
                         />
                     </View>
@@ -158,52 +158,6 @@ const DiscoveryScreen = () => {
 
             </ImageBackground>
         </View>
-
-        // <View style={styles.mapContainer}>
-        //     <ImageBackground source={tempMapImage} resizeMode='cover' style={styles.mapImage}>
-        //         <View style={navigationStyles.searchBar.container}>
-        //             <View style={searchContentVisible ? styles.searchBarInnerContainerVisible : null}>
-        //                 <TextInput
-        //                     onPressIn={() => [setsearchContentVisible(!searchContentVisible), setSearchCloseVisible(!searchCloseVisible)]}
-        //                     placeholder='Search for events'
-        //                     style={searchContentVisible ? styles.searchBarStylesVisible : null}
-        //                 >
-        //                 <Icon name="search-outline"/>
-        //                 </TextInput>
-
-        //                 {searchCloseVisible ? (
-        //                 <Pressable style={searchContentVisible ? styles.searchCloseStylesVisible : null}>
-        //                     <Icon name="close-outline" />
-        //                 </Pressable>
-        //                 ) : null }
-        //             </View>
-
-        //             {searchContentVisible ? (
-
-        //             <View style={styles.searchContent}>
-        //                 <Pressable style={[globalStyles.filterButton, globalStyles.filterButtonRest]}>
-        //                     <Text style={globalStyles.filterButtonText}>Filter</Text>
-        //                 </Pressable>
-        //                 <Pressable style={[globalStyles.sortButton, globalStyles.sortButtonRest]}>
-        //                     <Text style={globalStyles.sortButtonText}>Sort</Text>
-        //                 </Pressable>
-        //             </View>
-
-        //             ) : null }
-        //         </View>
-
-        //         {/* TODO replace onPress={null} with go to CREATE EVENT screen */}
-        //         <Button
-        //             btnText={'Create Event'}
-        //             btnIcon={'add-outline'}
-        //             btnIconStyle={[globalStyles.buttonIconSmall]}
-        //             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonContained]}
-        //             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-        //             onPress={null}
-        //         />
-
-        //     </ImageBackground>
-        // </View>
     );
 };
 
@@ -232,6 +186,7 @@ const styles = StyleSheet.create ({
     // Create event button wrapper
     buttonWrapper: {
         alignSelf: 'flex-end',
+        marginHorizontal: 24,
     },
 
     // TODO delete styles below

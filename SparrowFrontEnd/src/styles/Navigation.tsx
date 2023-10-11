@@ -52,7 +52,17 @@ export const navigationStyles = StyleSheet.create({
     },
 
     // Search
-    search: {        
+    search: {
+        headerWrapper: {
+            backgroundColor: Colors.azure400,
+            borderBottomWidth: 2,
+            borderColor: Colors.sparrowDarkBrown,
+
+            header: {
+                margin: 24,
+            },
+        },
+        
         searchBarWrapper: {
             flexDirection: 'row',
             // columnGap: Spacing.sm,
@@ -96,7 +106,7 @@ export const navigationStyles = StyleSheet.create({
             },
         },
 
-        searchContent: {
+        searchOptionsWrapper: {
             searchOptions: {
                 flexDirection: 'row',
                 columnGap: Spacing.md,
@@ -105,6 +115,10 @@ export const navigationStyles = StyleSheet.create({
                 // TODO remove bgc later
                 backgroundColor: Colors.fuchsia500,
             },
+        },
+
+        searchContent: {
+            marginHorizontal: 24,
         },
     },
 

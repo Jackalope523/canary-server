@@ -319,7 +319,10 @@ export const globalStyles = StyleSheet.create({
         text: {
             fontFamily: 'UncutSans-Bold',
             fontSize: 16,
-            textTransform: 'uppercase',
+            
+            uppercase: {
+                textTransform: 'uppercase',
+            },
         },
     },
 
