@@ -91,6 +91,23 @@ namespace Server.Entities
             EventPosts = await EventManager.Manager.GetEventPostsAsync(Id);
         }
 
+        public bool ValidateAndNormalise()
+        {
+            // Sanitise User content
+            Name = ContentValidation.NormaliseText(Name);
+            Description = ContentValidation.NormaliseText(Description);
+
+            // Verify Event is within a reasonable time
+            if (StartTime > DateTimeOffset.UtcNow + TimeSpan.FromDays(7)) { return false; }
+
+            // Verify group bounds
+            if (GroupMaximum != 0 &&
+                (GroupMaximum <= GroupMinimum ||
+                GroupMaximum < 4)) { return false; }
+
+            return true;
+        }
+
 		public async Task<bool> IsVisibleTo(User user)
         {
             // Check if user account is locked

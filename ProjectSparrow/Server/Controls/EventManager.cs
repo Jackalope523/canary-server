@@ -61,8 +61,9 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public async Task<ThinEvent> CreateEventAsync(Guid userID, string eventName, string eventDescription,
-			DateTimeOffset startTime, double latitude, double longitude,
+		public async Task<ThinEvent> CreateEventAsync(Guid userID,
+			string eventName, string eventDescription, DateTimeOffset startTime,
+			double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum)
 		{
 			// Check if user is already at an event
@@ -73,11 +74,26 @@ namespace Server.Controls
 			if (!user.CanHost)
 			{ throw new InvalidUserException("User cannot host."); }
 
-			// TODO Validate event
-			// Try to create an event
-			var newEvent = events.CreateEvent(userID, eventName, eventDescription,
-				startTime, latitude, longitude,
-				groupMinimum ?? 0, groupMaximum ?? 0, user.Character.ToCharacter());
+			// Create event
+			Event eventStub = new()
+			{
+				Name = eventName,
+				Description = eventDescription,
+				StartTime = startTime,
+				Location = new() { Latitude = latitude, Longitude = longitude },
+				GroupMinimum = groupMinimum ?? 0,
+				GroupMaximum = groupMaximum ?? 0
+			};
+
+			// Validate event
+			bool valid = eventStub.ValidateAndNormalise();
+            if (!valid)
+            { throw new InvalidInformationException("Invalid event details provided."); }
+
+            // Try to create an event
+            var newEvent = events.CreateEvent(userID, eventStub.Name, eventStub.Description,
+				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
+				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter());
 			return newEvent;
 		}
 
@@ -194,7 +210,8 @@ namespace Server.Controls
 			return targetEvent.Attendees;
 		}
 
-        public async Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId, EventReportType reportType, string reportDetails)
+        public async Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId,
+			EventReportType reportType, string reportDetails)
 		{
 			var targetEvent = await GetEvent(eventID);
 			events.ReportEvent(userID, eventID, hostId, reportType, reportDetails);
@@ -281,7 +298,8 @@ namespace Server.Controls
 			}
 		}
 
-		public async Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0, List<Guid> exclusionList = null)
+		public async Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)>
+			GetUserFeedAsync(Guid userID, int depth = 0, List<Guid> exclusionList = null)
 		{
 			User user = new(userID);
 			exclusionList ??= new();
@@ -326,7 +344,8 @@ namespace Server.Controls
 			return events.GetGuestList(eventID);
 		}
 
-		internal async Task<List<ThinEvent>> RemoveInaccessibleEventsAsync(User user, List<ThinEvent> events)
+		internal async Task<List<ThinEvent>>
+			RemoveInaccessibleEventsAsync(User user, List<ThinEvent> events)
 		{
 			foreach (ThinEvent e in events)
 			{
@@ -339,7 +358,8 @@ namespace Server.Controls
 			return events;
 		}
 
-		internal async Task<List<ThinnerEvent>> RemoveInaccessibleEventsAsync(User user, List<ThinnerEvent> events)
+		internal async Task<List<ThinnerEvent>>
+			RemoveInaccessibleEventsAsync(User user, List<ThinnerEvent> events)
 		{
 			foreach (ThinnerEvent e in events)
 			{
@@ -352,7 +372,8 @@ namespace Server.Controls
 			return events;
 		}
 
-		internal async Task<List<ThinnerEvent>> RemoveUnattractiveEventsAsync(User user, List<ThinnerEvent> events, float maximumAngle)
+		internal async Task<List<ThinnerEvent>>
+			RemoveUnattractiveEventsAsync(User user, List<ThinnerEvent> events, float maximumAngle)
 		{
 			foreach (ThinnerEvent e in events)
 			{

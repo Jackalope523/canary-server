@@ -13,7 +13,9 @@ namespace Server.Entities
 	{
 		private static ProfanityFilter filter;
 		private static List<string> DisallowedPhrases = new()
+		#region Disallowed Phrases List
 		{ "crack", "cocaine" };
+		#endregion
 
 		static ContentValidation()
 		{
