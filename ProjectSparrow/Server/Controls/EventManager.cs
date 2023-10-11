@@ -171,7 +171,7 @@ namespace Server.Controls
 			{
 				User guest = new(guestDetails.User);
 
-				guest.CalculateCharacter(targetEvent, guestDetails.Left - guestDetails.Joined);
+				guest.CalculateCharacter(targetEvent, guestDetails.Left.Value - guestDetails.Joined);
 
 				accounts.UpdateUserCharacter(guest.Id, guest.Character.Extraversion,
 					guest.Character.Athleticism, guest.Character.Chaoticness,
