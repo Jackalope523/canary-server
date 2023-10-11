@@ -7,10 +7,10 @@ using Shared;
 
 namespace Server.Boundaries
 {
-	public record ThinEvent(Guid Id, ThinnerUser Host, string Name, string Description, string EventType,
+	public record ThinEvent(Guid Id, ThinnerUser Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
-	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
+	public record ThinnerEvent(Guid Id, ThinnerUser Host, double Latitude, double Longitude);
 	public record EventHeader(Guid Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
 
 	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
@@ -28,11 +28,10 @@ namespace Server.Boundaries
 		List<ThinEvent> FindUpcomingEvents(Guid id);
 		List<ThinEvent> FindPastEvents(Guid id);
 
-		ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType,
+		ThinEvent CreateEvent(Guid hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character);
 		bool UpdateDescription(Guid id, string description);
-		bool UpdateType(Guid id, string type);
 		bool UpdateStatus(Guid id, bool isOpen);
 		bool EndEvent(Guid id);
 
@@ -68,13 +67,11 @@ namespace Server.Boundaries
 		Task<List<ThinnerEvent>> GetPersonalisedEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance);
 
-		Task<ThinEvent> CreateEventAsync(Guid userID,
-			string eventName, string eventDescription, string eventType,
+		Task<ThinEvent> CreateEventAsync(Guid userID, string eventName, string eventDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum);
 		Task EditEventAsync(Guid userID, Guid eventID,
-			string eventDescription = "", string eventType = "",
-			bool? isOpen = null);
+			string eventDescription = "", bool? isOpen = null);
 		Task JoinEventAsync(Guid userID, Guid eventID);
 		Task LeaveEventAsync(Guid userID, Guid eventID);
 		Task EndEventAsync(Guid userID, Guid eventID);

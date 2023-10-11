@@ -61,8 +61,7 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public async Task<ThinEvent> CreateEventAsync(Guid userID,
-			string eventName, string eventDescription, string eventType,
+		public async Task<ThinEvent> CreateEventAsync(Guid userID, string eventName, string eventDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum)
 		{
@@ -76,15 +75,14 @@ namespace Server.Controls
 
 			// TODO Validate event
 			// Try to create an event
-			var newEvent = events.CreateEvent(userID, eventName, eventDescription, eventType,
+			var newEvent = events.CreateEvent(userID, eventName, eventDescription,
 				startTime, latitude, longitude,
 				groupMinimum ?? 0, groupMaximum ?? 0, user.Character.ToCharacter());
 			return newEvent;
 		}
 
 		public async Task EditEventAsync(Guid userID, Guid eventID,
-			string eventDescription = "", string eventType = "",
-			bool? isOpen = null)
+			string eventDescription = "", bool? isOpen = null)
 		{
 			var targetEvent = await GetEvent(eventID);
 
@@ -101,10 +99,6 @@ namespace Server.Controls
 			if (eventDescription != "")
 			{
 				events.UpdateDescription(eventID, eventDescription);
-			}
-			if (eventType != "")
-			{
-				events.UpdateType(eventID, eventType);
 			}
 			if (isOpen.HasValue)
 			{

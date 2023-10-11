@@ -17,9 +17,6 @@ namespace Web.Models
         public string EventDescription { get; set; }
 
         [Required]
-        public string EventType { get; set; }
-
-        [Required]
         public float Latitude { get; set; }
 
         [Required]
@@ -39,7 +36,6 @@ namespace Web.Models
     public class EventEditModel
     {
         public string EventDescription { get; set; }
-        public string EventType { get; set; }
         public bool? EventIsOpen { get; set; }
     }
 
