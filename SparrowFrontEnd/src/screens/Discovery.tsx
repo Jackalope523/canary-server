@@ -24,7 +24,7 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 const tempMapImage = require('../assets/images/temp/temp-map.png');
 
 const DiscoveryScreen = () => {
-    const [searchContentVisible, setsearchContentVisible] = React.useState(false);
+    const [searchContentVisible, setSearchContentVisible] = React.useState(false);
     const [searchText, setSearchText] = React.useState('');
 
     // Search bar text input
@@ -33,17 +33,44 @@ const DiscoveryScreen = () => {
     // Toggle search bar
     const toggleSearch = () => {
         if (!searchContentVisible) {
-            setsearchContentVisible(true);
+            setSearchContentVisible(true);
             // setSearchText('');
         }
     };
 
     // Toggle search close button
     const toggleClose = () => {
-        setsearchContentVisible(false);
+        setSearchContentVisible(false);
         setSearchText('');
     };
 
+    // Search options
+    const [activeComponent, setActiveComponent] = React.useState(null);
+
+    // Toggle filter
+    const [filterVisible, setFilterVisible] = React.useState(false);
+
+    const toggleFilter = () => {
+        // setFilterVisible(!filterVisible);
+
+        if (activeComponent === 'filter') {
+            setActiveComponent(null);
+        } else {
+            setActiveComponent('filter');
+        }
+    };
+
+    // Toggle sort
+    const [sortVisible, setSortVisible] = React.useState(false);
+
+    const toggleSort = () => {
+        // setSortVisible(!sortVisible);
+        if (activeComponent === 'sort') {
+            setActiveComponent(null);
+        } else {
+            setActiveComponent('sort');
+        }
+    };
 
     return (
         <View style={styles.mapWrapper}>
@@ -52,15 +79,11 @@ const DiscoveryScreen = () => {
                     {/* Search */}
                     {/* Search header */}
                     <View style={navigationStyles.search}>
-
-                        {/* NEW CODE HERE ----------------------------->>>>>>> */}
                         <View style={searchContentVisible ? navigationStyles.search.headerWrapper : null}>
                             <View style={navigationStyles.search.headerWrapper.header}>
 
                         {/* Search bar */}
-                        {/* style={searchContentVisible ? navigationStyles.search.searchBarWrapper : navigationStyles.search.searchBarWrapper}> */}
                         <View style={navigationStyles.search.searchBarWrapper}>
-                            {/* TODO add CANCEL SEARCH (round x) button */}
                             <View style={navigationStyles.search.searchBarWrapper.searchBar}>
                                 <Icon name="search-outline" style={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.dark]} />
                                 <TextInput
@@ -105,7 +128,7 @@ const DiscoveryScreen = () => {
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonFull]}
                                     btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                    onPress={null}
+                                    onPress={toggleFilter}
                                 />
                                 <Button
                                     btnText={'Sort'}
@@ -113,20 +136,12 @@ const DiscoveryScreen = () => {
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.textPrimary, globalStyles.buttonFull]}
                                     btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                    onPress={null}
+                                    onPress={toggleSort}
                                 />
                             </View>
-
-
                             {/* TODO fix last 2 events not visible */}
                             {/* Potential not-ideal fix = screen height - (searchBarWrapper height + filterSort height) */}
                             {/* TODO maybe add an opacity 0 to opacity 100 gradient at the top */}
-
-                            {/* NEW CODE */}
-
-                            {/* PREVIOUS CODE */}
-                            {/* <SearchFilter /> */}
-
                         </View>
 
                         ) : null }
@@ -134,11 +149,27 @@ const DiscoveryScreen = () => {
                         </View>
                     </View>
 
-                    {searchContentVisible ? (
+                    {/* TODO insert sort and filter views here */}
+                    {/* TODO if sort and filter doesn't overlay SearchFilter - hide SearchFilter when sort or filter is active/visible */}
+                    {/* TODO make only one open - sort or filter - both cant be open at once */}
+                    {activeComponent === 'filter' ? (
+                        <View>
+                            <Text style={globalStyles.headingTextOne}>FILTER VIEW</Text>
+                        </View>
+                    ) : null }
+
+                    {activeComponent === 'sort' ? (
+                        <View>
+                            <Text style={globalStyles.headingTextTwo}>SORT VIEW</Text>
+                        </View>
+                    ) : null }
+
+
+                    {!activeComponent && searchContentVisible ? (
                     <View style={navigationStyles.search.searchContent}>
                         <SearchFilter />
                     </View>
-                    ) : null}
+                    ) : null }
 
                     {!searchContentVisible && (
                     <View style={styles.buttonWrapper}>
@@ -155,7 +186,6 @@ const DiscoveryScreen = () => {
                     )}
 
                 </View>
-
             </ImageBackground>
         </View>
     );
@@ -164,14 +194,8 @@ const DiscoveryScreen = () => {
 export default DiscoveryScreen
 
 const styles = StyleSheet.create ({
-    // Wraps all search elements
-    searchWrapper: {
-        // TODO enable bgC when the screen is finished
-        // backgroundColor: Colors.sparrowSand,
-    },
-
     container: {
-        rowGap: 16,
+        rowGap: Spacing.md,
     },
 
     // Map
@@ -188,34 +212,4 @@ const styles = StyleSheet.create ({
         alignSelf: 'flex-end',
         marginHorizontal: 24,
     },
-
-    // TODO delete styles below
-
-    // TEMP. Search bar
-    // searchBarContainer: {
-    //     backgroundColor: Colors.orange200,
-    // },
-
-    // searchContent: {
-    //     // temp. background color for testing purposes - replace with sparrow sand later
-    //     backgroundColor: Colors.azure200,
-    // },
-
-    // searchBarStylesVisible: {
-    //     backgroundColor: 'red',
-    //     flex: 3,
-
-    //     height: 50,
-    // },
-
-    // searchCloseStylesVisible: {
-    //     backgroundColor: 'blue',
-    //     flex: 1,
-
-    //     height: 50,
-    // },
-
-    // searchBarInnerContainerVisible: {
-    //     flexDirection: 'row',
-    // },
 })

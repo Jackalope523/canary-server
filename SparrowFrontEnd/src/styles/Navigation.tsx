@@ -54,12 +54,13 @@ export const navigationStyles = StyleSheet.create({
     // Search
     search: {
         headerWrapper: {
+            // TODO replace azure400 with Sparrow Sand
             backgroundColor: Colors.azure400,
             borderBottomWidth: 2,
             borderColor: Colors.sparrowDarkBrown,
 
             header: {
-                margin: 24,
+                padding: 24,
             },
         },
         
