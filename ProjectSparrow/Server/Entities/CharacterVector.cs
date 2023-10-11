@@ -8,7 +8,7 @@ using Server.Boundaries;
 
 namespace Server.Entities
 {
-	internal struct CharacterVector
+	internal readonly struct CharacterVector
 	{
 		public static float AngleBetween(CharacterVector firstVector, CharacterVector secondVector)
 		{
@@ -67,7 +67,7 @@ namespace Server.Entities
 		public float Magnitude => MathF.Sqrt(Extraversion * Extraversion + Athleticism * Athleticism +
 			Chaoticness * Chaoticness + Competitiveness * Competitiveness + NightOwl * NightOwl);
 
-		public CharacterVector MoveTowards(CharacterVector otherVector, float modifier = 1f)
+		public CharacterVector MoveTowards(CharacterVector otherVector, float modifier = 0.1f)
 		{
 			return this + ((otherVector - this) * modifier);
 		}

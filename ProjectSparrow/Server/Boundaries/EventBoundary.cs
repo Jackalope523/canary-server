@@ -40,6 +40,7 @@ namespace Server.Boundaries
 		bool RemoveUserFromEvent(Guid userId, Guid eventId);
 
 		List<ThinnerUser> GetGuestList(Guid id);
+		List<(DateTimeOffset Joined, DateTimeOffset Left, ThinnerUser User)> GetGuestHistory(Guid id);
 
 		List<EventReport> GetReportsAboutEvent(Guid id);
 		bool ReportEvent(Guid userId, Guid eventId, Guid HostId,

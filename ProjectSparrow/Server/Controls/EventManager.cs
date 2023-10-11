@@ -155,6 +155,19 @@ namespace Server.Controls
 			bool success = events.EndEvent(eventID);
             if (!success)
             { throw new UnexpectedFailureException("Could not end event."); }
+
+			// Update all participants' vectors
+			foreach (var guestDetails in events.GetGuestHistory(targetEvent.Id))
+			{
+				User guest = new(guestDetails.User);
+
+				guest.CalculateCharacter(targetEvent, guestDetails.Left - guestDetails.Joined);
+
+				accounts.UpdateUserCharacter(guest.Id, guest.Character.Extraversion,
+					guest.Character.Athleticism, guest.Character.Chaoticness,
+					guest.Character.Competitiveness, guest.Character.Industriousness,
+					guest.Character.NightOwl, guest.Character.Openness);
+			}
         }
 
 		public async Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID)
