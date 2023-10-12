@@ -566,9 +566,74 @@ namespace Repository
             var result = storeSentry.GetContext().Users.Where(u => u.Id == id).Select(u => new { u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius }).Single();
             return (result.Y, result.X, result.CurrentRadius);
         }
+
+        public List<EventPost> GetPostsByUser(Guid id)
+        {
+
+            return storeSentry.GetContext().Posts.Where(p => p.OwnerId == id).
+                Join(
+                storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
+                p => p.Id,
+                l => l.PostId,
+                (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, l.RateUps }
+                ).
+                Join(
+                storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
+                p => p.Id,
+                l => l.PostId,
+                (a, b) => new EventPost(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
+                )).ToList();
+        }
+
+        public List<EventPost> GenerateFeedForUser(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList)
+        {           
+            // Get List of Friends.
+            List<Guid> following = storeSentry.GetContext().UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.OtherId).ToList();
+            List<Guid> followingMe = storeSentry.GetContext().UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.SelfId).ToList();
+            List<Guid> friends =  following.Intersect(followingMe).ToList();
+
+            // Get unseen posts by friends from certain depth.
+            List<EventPost> friendPosts = storeSentry.GetContext().Posts.Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && p.PostedAt > depthCharge && p.PostedAt < DateTimeOffset.UtcNow).
+               Join(
+               storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
+               p => p.Id,
+               l => l.PostId,
+               (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, l.RateUps }
+               ).
+               Join(
+               storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
+               p => p.Id,
+               l => l.PostId,
+               (a, b) => new EventPost(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
+               )).ToList();
+
+            // Compile unique list if events spanned by friend posts and a list of already loaded posts. 
+            List<Guid> sitesToBeExplored = new List<Guid>();
+            List<Guid> previouslyExtractedPosts = new List<Guid>();
+            foreach (EventPost p in friendPosts)
+            {
+                if (!sitesToBeExplored.Contains(p.EventId)) sitesToBeExplored.Add(p.EventId);
+                previouslyExtractedPosts.Add(p.Id);
+            }
+
+            // Get remaining friend posts from same events as others even if outside time range. 
+            List<EventPost> nettedPosts = storeSentry.GetContext().Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
+               Join(
+               storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
+               p => p.Id,
+               l => l.PostId,
+               (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, l.RateUps }
+               ).
+               Join(
+               storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
+               p => p.Id,
+               l => l.PostId,
+               (a, b) => new EventPost(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
+               )).ToList();
+
+            return friendPosts.Concat(nettedPosts).ToList();
+        }
     }
-
-
 }
 
 

@@ -11,6 +11,7 @@ namespace Server.Boundaries
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
 	public record ThinnerEvent(Guid Id, ThinnerUser Host, string EventType, double Latitude, double Longitude);
+	public record EventHeader(Guid Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
 
 	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId, Guid ReportedEventHostId, DateTimeOffset ReportTime,
 		EventReportType ReportType, string ReportDetails);
@@ -20,6 +21,7 @@ namespace Server.Boundaries
 	public interface IEventDatabase
 	{
         public static IEventDatabase EventDatabaseAccess;
+
         ThinEvent FindEvent(Guid id);
 		List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance);
 		ThinEvent FindCurrentEvent(Guid id);
@@ -40,14 +42,19 @@ namespace Server.Boundaries
 		List<ThinnerUser> GetGuestList(Guid id);
 
 		List<EventReport> GetReportsAboutEvent(Guid id);
-		bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails);
+		bool ReportEvent(Guid userId, Guid eventId, Guid HostId,
+			EventReportType reportType, string reportDetails);
 
 		List<EventPost> GetPostsForEvent(Guid id);
+		List<EventPost> GetPostsByUser(Guid id);
 		EventPost GetPost(Guid id);
-		EventPost AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL);
+		EventPost AddPost(Guid eventId, Guid posterId,
+			DateTimeOffset timePosted, string imageURL);
 		bool RemovePost(Guid postId);
 		bool RatePost(Guid postId, Guid voterId, UserRating rating);
 		bool RemovePostRating(Guid postId, Guid voterId);
+
+		List<EventPost> GenerateFeedForUser(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList);
 	}
 
 	public interface IEventOperations
@@ -73,11 +80,15 @@ namespace Server.Boundaries
 
 		Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID);
 
-		Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId, EventReportType reportType, string reportDetails);
+		Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId,
+			EventReportType reportType, string reportDetails);
 
 		Task<List<EventPost>> GetEventPostsAsync(Guid userID, Guid eventID);
 		Task<EventPost> AddPostAsync(Guid userID, Guid eventID, string imageURL);
 		Task RemovePostAsync(Guid userID, Guid postID);
 		Task RatePostAsync(Guid userID, Guid postID, UserRating rating);
+
+		Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)> GetUserFeedAsync(Guid userID,
+			int depth, List<Guid> exclusionList = null);
 	}
 }

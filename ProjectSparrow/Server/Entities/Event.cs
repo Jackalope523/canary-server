@@ -79,6 +79,11 @@ namespace Server.Entities
             return new(Id, Host.ToThinnerUser(), EventType, Location.Latitude, Location.Longitude);
         }
 
+        public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
+        {
+            return new(Id, Name, EndTime.HasValue, lastActiveTime);
+        }
+
 		public async Task SyncReports()
 		{
 			EventReports = await EventManager.Manager.GetEventReportsAsync(Id);

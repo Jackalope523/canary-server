@@ -263,6 +263,7 @@ namespace Server.Controls
 			if (!await eventOfPost.IsAttendedBy(user))
 			{ throw new InvalidUserException("User cannot interact with post."); }
 
+			// Check if removing a rating
 			if (rating != UserRating.Remove)
 			{
 				events.RatePost(userID, postID, rating);
@@ -271,6 +272,39 @@ namespace Server.Controls
 			{
 				events.RemovePostRating(postID, userID);
 			}
+		}
+
+		public async Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)> GetUserFeedAsync(Guid userID, int depth = 0, List<Guid> exclusionList = null)
+		{
+			User user = new(userID);
+			exclusionList ??= new();
+			Dictionary<Guid, EventHeader> eventHeaders = new();
+
+			// Retrieve friend-populated event posts after a specified time excluding previously viewed events
+			DateTimeOffset depthCharge = DateTimeOffset.UtcNow - TimeSpan.FromDays(1 + depth);
+			var friendPosts = events.GenerateFeedForUser(user.Id, depthCharge, exclusionList);
+
+			// Get the respective event headers for the posts
+			foreach (EventPost post in friendPosts)
+			{
+				// Add event header if it does not yet exist
+				if (!eventHeaders.ContainsKey(post.EventId))
+				{
+					Event postEvent = new(events.FindEvent(post.EventId));
+
+					eventHeaders.Add(post.EventId, postEvent.ToEventHeader(post.TimePosted));
+				}
+				// Update event header active time if post is more recent
+				else if (eventHeaders[post.EventId].LastActiveTime < post.TimePosted)
+				{
+					eventHeaders[post.EventId] = new(post.EventId,
+						eventHeaders[post.EventId].Name,
+						eventHeaders[post.EventId].IsActive,
+						post.TimePosted);
+				}
+			}
+
+			return (depth, eventHeaders.Values.ToList(), friendPosts);
 		}
 
 
