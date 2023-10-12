@@ -258,6 +258,14 @@ namespace Server.Entities
             Reputation = (int) (MathF.Atan(reputationRaw * normal) * (MaximumReputation / ReputationIntensity) + (MaximumReputation / 2));
         }
 
+        public void CalculateCharacter(Event eventAttended, TimeSpan timeAttended)
+        {
+            // Modified by time spent
+            float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
+
+            Character.MoveTowards(eventAttended.Character, modifier);
+        }
+
         public async Task<UserAccountStatus> EventReported()
         {
             await SyncReports();

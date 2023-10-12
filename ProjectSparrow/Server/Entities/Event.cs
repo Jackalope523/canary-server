@@ -13,18 +13,20 @@ namespace Server.Entities
     {
         #region Variables
 
+        public const int MaximumNameLength = 50;
+        public const int MaximumDescLength = 400;
+
         public Guid Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string EventType { get; set; }
+        public CharacterVector Character { get; set; }
         public DateTimeOffset StartTime { get; init; }
         public GeoLocation Location { get; set; }
         public DateTimeOffset? EndTime { get; init; }
         public bool IsOpen { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
-        public CharacterVector Character { get; set; }
 
         public List<ThinnerUser> Attendees { get; set; }
 
@@ -47,7 +49,6 @@ namespace Server.Entities
             Host = new(fromEvent.Host);
             Name = fromEvent.Name;
             Description = fromEvent.Description;
-            EventType = fromEvent.EventType;
             StartTime = fromEvent.StartTime;
             Location = new()
                 { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
@@ -62,21 +63,20 @@ namespace Server.Entities
         {
             Id = fromEvent.Id;
             Host = new(fromEvent.Host);
-            EventType = fromEvent.EventType;
             Location = new()
                 { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
         }
 
         public ThinEvent ToThinEvent()
         {
-            return new(Id, Host.ToThinnerUser(), Name, Description, EventType,
+            return new(Id, Host.ToThinnerUser(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter());
         }
 
         public ThinnerEvent ToThinnerEvent()
         {
-            return new(Id, Host.ToThinnerUser(), EventType, Location.Latitude, Location.Longitude);
+            return new(Id, Host.ToThinnerUser(), Location.Latitude, Location.Longitude);
         }
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
@@ -92,6 +92,23 @@ namespace Server.Entities
         public async Task SyncPosts()
         {
             EventPosts = await EventManager.Manager.GetEventPostsAsync(Id);
+        }
+
+        public bool ValidateAndNormalise()
+        { 
+            // Sanitise User content
+            Name = ContentValidation.NormaliseText(Name[..MaximumNameLength]);
+            Description = ContentValidation.NormaliseText(Description[..MaximumDescLength]);
+
+            // Verify Event is within a reasonable time
+            if (StartTime > DateTimeOffset.UtcNow + TimeSpan.FromDays(7)) { return false; }
+
+            // Verify group bounds
+            if (GroupMaximum != 0 &&
+                (GroupMaximum <= GroupMinimum ||
+                GroupMaximum < 4)) { return false; }
+
+            return true;
         }
 
 		public async Task<bool> IsVisibleTo(User user)

@@ -79,7 +79,7 @@ namespace Web.Controllers
 				// Create a new event as the current user
 				var user = await GetCurrentUserAsync();
                 newEvent = await events.CreateEventAsync(user.Id,
-					eventDetails.EventName, eventDetails.EventDescription, eventDetails.EventType,
+					eventDetails.EventName, eventDetails.EventDescription,
 					eventDetails.StartTime,	eventDetails.Latitude, eventDetails.Longitude,
 					eventDetails.GroupMinimum, eventDetails.GroupMaximum);
             }
@@ -103,7 +103,7 @@ namespace Web.Controllers
 			{
 				var user = await GetCurrentUserAsync();
 				await events.EditEventAsync(user.Id, GetGUID(eventID),
-					eventDescription: eventDetails.EventDescription ?? "", eventType: eventDetails.EventType ?? "",
+					eventDescription: eventDetails.EventDescription ?? "",
 					isOpen: eventDetails.EventIsOpen);
 			}
 			catch (Exception e)

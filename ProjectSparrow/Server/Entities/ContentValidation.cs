@@ -11,13 +11,15 @@ namespace Server.Entities
 {
 	internal static class ContentValidation
 	{
-		private static ProfanityFilter filter;
+		private static TextFilter filter;
 		private static List<string> DisallowedPhrases = new()
+		#region Disallowed Phrases List
 		{ "crack", "cocaine" };
+		#endregion
 
 		static ContentValidation()
 		{
-			filter = new ProfanityFilter(DisallowedPhrases);
+			filter = new TextFilter(DisallowedPhrases);
 		}
 
 		public static bool IsEmailValid(string email)
@@ -30,9 +32,12 @@ namespace Server.Entities
 		public static string NormaliseText(string content)
 		{
 			// Check if text contains inappropriate phrases
-			string finalText = filter.CensorText(content);
+			content = filter.CensorText(content);
 
-			return finalText;
+			// Check if text contains links, phone numbers, or emails
+			content = filter.HideInformation(content);
+
+			return content;
 		}
 
 		public static bool TryNormalisePhoneNumber(string phoneNumber, out string normalisedPhoneNumber)
@@ -49,12 +54,12 @@ namespace Server.Entities
 		}
 	}
 
-	internal class ProfanityFilter
+	internal class TextFilter
 	{
 		public IList<string> CensoredWords { get; private set; }
 
 
-		public ProfanityFilter(IEnumerable<string> censoredWords)
+		public TextFilter(IEnumerable<string> censoredWords)
 		{
 			CensoredWords = new List<string>(censoredWords);
 		}
@@ -77,6 +82,24 @@ namespace Server.Entities
 
 			return censoredText;
 		}
+
+		public string HideInformation(string text)
+		{
+            // Regular expression to find links
+            string linkPattern = @"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
+
+            // Regular expression to find phone numbers (10 digit)
+            string phonePattern = @"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b";
+			
+            // Regular expression to find emails
+            string emailPattern = @"[\w\.-]+@[\w\.-]+";
+
+            text = Regex.Replace(text, linkPattern, "[hidden]");
+            text = Regex.Replace(text, phonePattern, "[hidden]");
+            text = Regex.Replace(text, emailPattern, "[hidden]");
+
+			return text;
+        }
 
 		private static string StarCensoredMatch(Match m)
 		{
