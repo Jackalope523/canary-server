@@ -22,6 +22,7 @@ import SingleValueSelector from '../components/atoms/SingleValueSelector';
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
+import RangeSelector2 from '../components/atoms/RangeSelector2';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -98,64 +99,22 @@ const FeedScreen = () => {
     };
 
     return (
+        // <View>
+        //     <Text>Testing sort and filter components</Text>
+        //     {/* <Text>Range selector here</Text> */}
+        //     <RangeSelector
+        //         min={1}
+        //         max={4}
+        //         steps={1}
+        //         onValueChange={(range) => console.log(range)}
+        //         style={{ flex: 1 }}
+        //     />
+
+        //     {/* <Text>SingleValueSelector here</Text> */}
+        //     {/* <SingleValueSelector /> */}
+        // </View>
         <View>
-            {/* <Text>Feed</Text>
-            <Text>Used as temporary styling testing screen</Text>
-            <TopNavbarDefaultTitled />
-            <TopNavbarFavorite />
-            <TopNavbarOptions />
-            <TopNavbarEdit />
-            <TopNavbarEditSelected />
-            <Text>Notification</Text>
-            <Notification />
-            <NoNotifications /> */}
-
-            {/* <Text>Currently testing event card component</Text>
-            
-            <View style={{marginBottom: Spacing.md}}>
-                <Text style={[globalStyles.headingTextOne, styles.headingText]}>Upcoming events</Text>
-                <FlatList
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{paddingHorizontal: Spacing.lg}}
-                    ItemSeparatorComponent={() => <View style={{width: Spacing.md}} />}
-                    overScrollMode='never'
-                    horizontal={true}
-                    keyExtractor={(item) => item.id}
-                    data={SAMPLEEVENTDATA}
-                    renderItem={({ item }) => (
-                        <EventCardMedium
-                            onPress={null}
-                            eventHeroImage={item.uri}
-                            eventDate={item.date}
-                            eventTime={item.time}
-                            eventAttendees={item.attendees}
-                            eventLocation={item.location}
-                            eventTitle={item.title}
-                        />
-                    )}
-                />
-            </View>
-
-            <Text>Testing custom button components</Text>
-            <Button
-                    btnText={'I am a neat button'}
-                    btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonPrimary]}
-                    btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.buttonLight]}
-                /> */}
-
-            <Text>Testing sort and filter components</Text>
-            <View>
-                <Text>Range selector here</Text>
-                <RangeSelector
-                    min={1}
-                    max={4}
-                    steps={1}
-                    onValueChange={(range) => console.log(range)}
-                />
-
-                <Text>SingleValueSelector here</Text>
-                <SingleValueSelector />
-            </View>
+            <RangeSelector2 />
         </View>
     );
 };
