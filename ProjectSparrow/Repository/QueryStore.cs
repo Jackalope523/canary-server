@@ -567,7 +567,7 @@ namespace Repository
             return (result.Y, result.X, result.CurrentRadius);
         }
 
-        public List<EventPost> GetPostsForUser(Guid id)
+        public List<EventPost> GetPostsByUser(Guid id)
         {
 
             return storeSentry.GetContext().Posts.Where(p => p.OwnerId == id).

@@ -46,7 +46,7 @@ namespace Server.Boundaries
 			EventReportType reportType, string reportDetails);
 
 		List<EventPost> GetPostsForEvent(Guid id);
-		List<EventPost> GetPostsForUser(Guid id);
+		List<EventPost> GetPostsByUser(Guid id);
 		EventPost GetPost(Guid id);
 		EventPost AddPost(Guid eventId, Guid posterId,
 			DateTimeOffset timePosted, string imageURL);
