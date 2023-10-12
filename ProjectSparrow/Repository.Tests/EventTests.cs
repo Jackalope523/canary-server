@@ -101,7 +101,7 @@ namespace Repository.Tests
             sentry.GetContext().SaveChanges();
 
             Guid id = sentry.GetContext().Events.First().Id;
-            ThinEvent found = store.FindEvent(id);
+            EventShard found = store.FindEvent(id);
 
             Assert.NotNull(found);
             Assert.Equal(id, found.Id);
@@ -123,7 +123,7 @@ namespace Repository.Tests
             sentry.GetContext().SaveChanges();
 
             Guid id = sentry.GetContext().Events.First().Id;
-            List<ThinnerEvent> found = store.FindEvents(100, 100, 10);        
+            List<EventThinSlice> found = store.FindEvents(100, 100, 10);        
 
             Assert.Single(found);
             Assert.Equal(id, found.First().Id);

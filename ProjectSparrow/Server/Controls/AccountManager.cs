@@ -28,19 +28,19 @@ namespace Server.Controls
             events = eventDatabase;
         }
 
-        public async Task<ThinUser> GetUserAsync(Guid userID)
+        public async Task<UserShard> GetUserAsync(Guid userID)
         {
             return (await GetUser(userID)).ToThinUser();
         }
 
-        public async Task<ThinUser> GetUserAsync(string phoneNumber)
+        public async Task<UserShard> GetUserAsync(string phoneNumber)
 		{
             if (!ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber))
             { throw new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."); }
             return (await GetUser(normalisedPhoneNumber)).ToThinUser();
 		}
 
-        public async Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID)
+        public async Task<UserProfile> GetUserProfileAsync(Guid userID, Guid targetID)
         {
             var user = await GetUser(userID);
             var targetUser = await GetUser(targetID);
@@ -52,7 +52,7 @@ namespace Server.Controls
             return targetUser.ToThinProfile();
         }
 
-        public async Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID)
+        public async Task<List<EventShard>> GetUserActivityAsync(Guid userID, Guid targetID)
         {
             var user = await GetUser(userID);
             var targetUser = await GetUser(targetID);
@@ -70,12 +70,12 @@ namespace Server.Controls
             return upcomingActivity.ToList();
         }
 
-        public async Task<Dictionary<ThinnerUser, List<ThinEvent>>> GetFriendActivityAsync(Guid userID)
+        public async Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(Guid userID)
         {
             var user = await GetUser(userID);
             var friends = accounts.GetFriends(userID);
 
-            Dictionary<ThinnerUser, List<ThinEvent>> friendEvents = new();
+            Dictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
             // Gather visible activity of each friend
 			foreach (var friend in friends)
@@ -202,12 +202,12 @@ namespace Server.Controls
             accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
         }
 
-        public async Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID)
+        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid userID)
         {
             return accounts.GetFollowedUsers(userID);
 		}
 
-        public async Task<List<ThinnerUser>> GetBlockedUsersAsync(Guid userID)
+        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid userID)
 		{
 			return accounts.GetBlockedUsers(userID);
 		}
@@ -340,7 +340,7 @@ namespace Server.Controls
 			{ throw new InvalidUserException("Email already registered."); }
         }
 
-        private async Task<List<ThinEvent>> GetUserActivityInternalAsync(Guid userID)
+        private async Task<List<EventShard>> GetUserActivityInternalAsync(Guid userID)
         {
             // Gather all user event data
             var upcomingActivity = events.FindUpcomingEvents(userID);

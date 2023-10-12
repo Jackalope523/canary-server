@@ -10,11 +10,11 @@ using Server.Boundaries;
 
 namespace Web.Stores
 {
-	public class UserAccountStore : IUserStore<ThinUser>,
-		IUserPhoneNumberStore<ThinUser>,
-		IUserEmailStore<ThinUser>,
-		IUserSecurityStampStore<ThinUser>,
-		IUserLockoutStore<ThinUser>
+	public class UserAccountStore : IUserStore<UserShard>,
+		IUserPhoneNumberStore<UserShard>,
+		IUserEmailStore<UserShard>,
+		IUserSecurityStampStore<UserShard>,
+		IUserLockoutStore<UserShard>
 	{
 		private IAccountOperations accounts { get; init; }
 
@@ -23,7 +23,7 @@ namespace Web.Stores
 			accounts = accountOperations;
 		}
 
-		public async Task<IdentityResult> CreateAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> CreateAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -31,7 +31,7 @@ namespace Web.Stores
 			return IdentityResult.Success;
 		}
 
-		public async Task<IdentityResult> DeleteAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> DeleteAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -39,56 +39,56 @@ namespace Web.Stores
 			return IdentityResult.Success;
 		}
 
-		public async Task<ThinUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+		public async Task<UserShard> FindByIdAsync(string userId, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await accounts.GetUserAsync(GetGUID(userId));
 		}
 
-		public async Task<ThinUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+		public async Task<UserShard> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await accounts.GetUserAsync(normalizedUserName);
 		}
 
-		public async Task<string> GetNormalizedUserNameAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<string> GetNormalizedUserNameAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await GetPhoneNumberAsync(user, cancellationToken);
 		}
 
-		public Task<string> GetUserIdAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<string> GetUserIdAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.Id.ToString());
 		}
 
-		public async Task<string> GetUserNameAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<string> GetUserNameAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await GetPhoneNumberAsync(user, cancellationToken);
 		}
 
-		public Task SetNormalizedUserNameAsync(ThinUser user, string normalizedName, CancellationToken cancellationToken)
+		public Task SetNormalizedUserNameAsync(UserShard user, string normalizedName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(0);
 		}
 
-		public Task SetUserNameAsync(ThinUser user, string userName, CancellationToken cancellationToken)
+		public Task SetUserNameAsync(UserShard user, string userName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(0);
 		}
 
-		public async Task<IdentityResult> UpdateAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> UpdateAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -99,105 +99,105 @@ namespace Web.Stores
 			return IdentityResult.Success;
 		}
 
-		public async Task SetPhoneNumberAsync(ThinUser user, string phoneNumber, CancellationToken cancellationToken)
+		public async Task SetPhoneNumberAsync(UserShard user, string phoneNumber, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, phoneNumber: phoneNumber);
 		}
 
-		public Task<string> GetPhoneNumberAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<string> GetPhoneNumberAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.PhoneNumber);
 		}
 
-		public Task<bool> GetPhoneNumberConfirmedAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<bool> GetPhoneNumberConfirmedAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.IsPhoneConfirmed);
 		}
 
-		public async Task SetPhoneNumberConfirmedAsync(ThinUser user, bool confirmed, CancellationToken cancellationToken)
+		public async Task SetPhoneNumberConfirmedAsync(UserShard user, bool confirmed, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, isPhoneNumberConfirmed: confirmed);
 		}
 
-		public async Task SetEmailAsync(ThinUser user, string email, CancellationToken cancellationToken)
+		public async Task SetEmailAsync(UserShard user, string email, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, email: email);
 		}
 
-		public Task<string> GetEmailAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<string> GetEmailAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.Email);
 		}
 
-		public Task<bool> GetEmailConfirmedAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<bool> GetEmailConfirmedAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.IsEmailConfirmed);
 		}
 
-		public async Task SetEmailConfirmedAsync(ThinUser user, bool confirmed, CancellationToken cancellationToken)
+		public async Task SetEmailConfirmedAsync(UserShard user, bool confirmed, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, isEmailConfirmed: confirmed);
 		}
 
-		public async Task<ThinUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+		public async Task<UserShard> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await accounts.GetUserAsync(normalizedEmail);
 		}
 
-		public Task<string> GetNormalizedEmailAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<string> GetNormalizedEmailAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.Email);
 		}
 
-		public Task SetNormalizedEmailAsync(ThinUser user, string normalizedEmail, CancellationToken cancellationToken)
+		public Task SetNormalizedEmailAsync(UserShard user, string normalizedEmail, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(0);
 		}
 
-		public async Task SetSecurityStampAsync(ThinUser user, string stamp, CancellationToken cancellationToken)
+		public async Task SetSecurityStampAsync(UserShard user, string stamp, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, securityStamp: stamp);
 		}
 
-		public Task<string> GetSecurityStampAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<string> GetSecurityStampAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.SecurityStamp);
 		}
 
-		public Task<DateTimeOffset?> GetLockoutEndDateAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<DateTimeOffset?> GetLockoutEndDateAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.LockoutDate);
 		}
 
-		public async Task SetLockoutEndDateAsync(ThinUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
+		public async Task SetLockoutEndDateAsync(UserShard user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -208,7 +208,7 @@ namespace Web.Stores
 			await accounts.EditUserAsync(user.Id, lockoutDate: lockoutEnd.Value);
 		}
 
-		public async Task<int> IncrementAccessFailedCountAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task<int> IncrementAccessFailedCountAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -217,28 +217,28 @@ namespace Web.Stores
 			return currentTries + 1;
 		}
 
-		public async Task ResetAccessFailedCountAsync(ThinUser user, CancellationToken cancellationToken)
+		public async Task ResetAccessFailedCountAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, accessTries: 0);
 		}
 
-		public Task<int> GetAccessFailedCountAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<int> GetAccessFailedCountAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.AccessTries);
 		}
 
-		public Task<bool> GetLockoutEnabledAsync(ThinUser user, CancellationToken cancellationToken)
+		public Task<bool> GetLockoutEnabledAsync(UserShard user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(true);
 		}
 
-		public Task SetLockoutEnabledAsync(ThinUser user, bool enabled, CancellationToken cancellationToken)
+		public Task SetLockoutEnabledAsync(UserShard user, bool enabled, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 

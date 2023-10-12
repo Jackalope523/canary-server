@@ -30,14 +30,14 @@ namespace Web.Controllers
 		}
 
 		IAccountOperations accounts;
-        UserManager<ThinUser> userManager;
-        SignInManager<ThinUser> signInManager;
+        UserManager<UserShard> userManager;
+        SignInManager<UserShard> signInManager;
 
         ISMSService smsService;
         IEmailService emailService;
 
         public AccountController(IAccountOperations accountOperations,
-            UserManager<ThinUser> identityUserManager, SignInManager<ThinUser> identitySignInManager,
+            UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
             ISMSService externalSMSService, IEmailService externalEmailService)
         {
             accounts = accountOperations;
@@ -51,7 +51,7 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAccount()
         {
-            ThinUser user;
+            UserShard user;
 
             try
             {
@@ -259,7 +259,7 @@ namespace Web.Controllers
 			return Ok();
         }
 
-        private async Task<ThinUser> GetCurrentUserAsync()
+        private async Task<UserShard> GetCurrentUserAsync()
         {
             return await userManager.GetUserAsync(HttpContext.User);
         }

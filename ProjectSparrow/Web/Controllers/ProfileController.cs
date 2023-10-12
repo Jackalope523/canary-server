@@ -26,9 +26,9 @@ namespace Web.Controllers
 		}
 
 		IAccountOperations accounts;
-		UserManager<ThinUser> userManager;
+		UserManager<UserShard> userManager;
 
-		public ProfileController(IAccountOperations accountOperations, UserManager<ThinUser> identityUserManager)
+		public ProfileController(IAccountOperations accountOperations, UserManager<UserShard> identityUserManager)
 		{
 			accounts = accountOperations;
 			userManager = identityUserManager;
@@ -42,7 +42,7 @@ namespace Web.Controllers
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
 
-			ThinProfile profile;
+			UserProfile profile;
 
 			try
 			{
@@ -99,7 +99,7 @@ namespace Web.Controllers
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
 
-			List<ThinEvent> activity;
+			List<EventShard> activity;
 
 			try
 			{
@@ -124,7 +124,7 @@ namespace Web.Controllers
 		[HttpGet("activity")]
 		public async Task<IActionResult> GetFriendActivity()
 		{
-			Dictionary<ThinnerUser, List<ThinEvent>> activity;
+			Dictionary<UserSilhouette, List<EventShard>> activity;
 
 			try
 			{
@@ -143,7 +143,7 @@ namespace Web.Controllers
 		[HttpGet("following")]
         public async Task<IActionResult> GetFollowed()
         {
-			List<ThinnerUser> followedUsers;
+			List<UserSilhouette> followedUsers;
 
 			try
 			{
@@ -206,7 +206,7 @@ namespace Web.Controllers
 		[HttpGet("blocked")]
 		public async Task<IActionResult> GetBlocked()
 		{
-			List<ThinnerUser> blockedUsers; // Change to something more meaningful
+			List<UserSilhouette> blockedUsers; // Change to something more meaningful
 
 			try
 			{
@@ -288,7 +288,7 @@ namespace Web.Controllers
 			return Ok();
 		}
 
-		private async Task<ThinUser> GetCurrentUserAsync()
+		private async Task<UserShard> GetCurrentUserAsync()
 		{
 			return await userManager.GetUserAsync(HttpContext.User);
 		}

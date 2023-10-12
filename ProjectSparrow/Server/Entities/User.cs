@@ -50,8 +50,8 @@ namespace Server.Entities
         public Event CurrentEvent { get; set; }
         public bool IsAtEvent => CurrentEvent != null;
 
-        public List<ThinnerUser> Following { get; set; }
-        public List<ThinnerUser> Blocking { get; set; }
+        public List<UserSilhouette> Following { get; set; }
+        public List<UserSilhouette> Blocking { get; set; }
 
         public CharacterVector Character { get; set; }
 
@@ -65,7 +65,7 @@ namespace Server.Entities
             Id = userID;
         }
 
-        public User(ThinUser fromUser)
+        public User(UserShard fromUser)
         {
             Id = fromUser.Id;
             PhoneNumber = fromUser.PhoneNumber;
@@ -83,13 +83,13 @@ namespace Server.Entities
             Character = new(fromUser.Character);
         }
 
-        public User(ThinnerUser fromUser)
+        public User(UserSilhouette fromUser)
         {
             Id = fromUser.Id;
             Name = fromUser.Name;
         }
 
-        public User(ThinProfile fromUser)
+        public User(UserProfile fromUser)
         {
             Id = fromUser.Id;
             Name = fromUser.Name;
@@ -97,7 +97,7 @@ namespace Server.Entities
             NumberOfFollowers = fromUser.NumberOfFollowers;
         }
 
-        public ThinUser ToThinUser()
+        public UserShard ToThinUser()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
@@ -105,12 +105,12 @@ namespace Server.Entities
                 JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }
 
-        public ThinnerUser ToThinnerUser()
+        public UserSilhouette ToThinnerUser()
         {
             return new(Id, Name);
         }
 
-        public ThinProfile ToThinProfile()
+        public UserProfile ToThinProfile()
         {
             return new(Id, Name, Reputation, NumberOfFollowers);
         }

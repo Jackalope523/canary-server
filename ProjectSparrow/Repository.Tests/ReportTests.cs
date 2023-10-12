@@ -37,9 +37,9 @@ namespace Repository.Tests
         }
 
 
-        public ThinEvent FindAttendingEvent(Guid id) { throw new NotImplementedException(); }
-        public List<ThinEvent> FindUpcomingEvents(Guid id) { throw new NotImplementedException(); }
-        public List<ThinEvent> FindPastEvents(Guid id) { throw new NotImplementedException(); }
+        public EventShard FindAttendingEvent(Guid id) { throw new NotImplementedException(); }
+        public List<EventShard> FindUpcomingEvents(Guid id) { throw new NotImplementedException(); }
+        public List<EventShard> FindPastEvents(Guid id) { throw new NotImplementedException(); }
        
     }
 }

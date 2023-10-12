@@ -10,12 +10,12 @@ namespace Server.Boundaries
 	public enum UserAccountStatus
 	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }
 
-	public record ThinUser(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
+	public record UserShard(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
 		bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
-	public record ThinnerUser(Guid Id, string Name);
-	public record ThinProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
+	public record UserProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
+	public record UserSilhouette(Guid Id, string Name);
 
 	public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
@@ -27,10 +27,11 @@ namespace Server.Boundaries
 	{
         public static IAccountDatabase AccountDatabaseAccess;
 
-		ThinUser FindUserById(Guid id);
-        ThinUser FindUserByPhoneNumber(string phoneNumber);
-		ThinUser FindUserByEmail(string normalisedEmail);
-        bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, Character character);
+		UserShard FindUserById(Guid id);
+        UserShard FindUserByPhoneNumber(string phoneNumber);
+		UserShard FindUserByEmail(string normalisedEmail);
+        bool CreateUser(string phoneNumber, string email, string name,
+			DateTimeOffset dateOfBirth, Character character);
         bool DeleteUser(Guid id);
         bool UpdatePhoneNumber(Guid id, string newNumber);
 		bool UpdateEmail(Guid id, string newEmail);
@@ -52,9 +53,9 @@ namespace Server.Boundaries
 		(double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(Guid id);
 		bool UpdateHaunt(Guid id, double latitude, double longitude, double radius, int stability);
 
-		List<ThinnerUser> GetFriends(Guid id);
-		List<ThinnerUser> GetFollowedUsers(Guid id);
-		List<ThinnerUser> GetBlockedUsers(Guid id);
+		List<UserSilhouette> GetFriends(Guid id);
+		List<UserSilhouette> GetFollowedUsers(Guid id);
+		List<UserSilhouette> GetBlockedUsers(Guid id);
 
 		bool FollowUser(Guid selfId, Guid targetId);
 		bool UnfollowUser(Guid selfId, Guid targetId);
@@ -72,14 +73,15 @@ namespace Server.Boundaries
 
 	public interface IAccountOperations
 	{
-		static IAccountOperations AccountManager => new AccountManager(IAccountDatabase.AccountDatabaseAccess, IEventDatabase.EventDatabaseAccess);
+		static IAccountOperations AccountManager
+			=> new AccountManager(IAccountDatabase.AccountDatabaseAccess, IEventDatabase.EventDatabaseAccess);
 
-		Task<ThinUser> GetUserAsync(Guid userID);
-		Task<ThinUser> GetUserAsync(string phoneNumber);
-		Task<ThinProfile> GetUserProfileAsync(Guid userID, Guid targetID);
+		Task<UserShard> GetUserAsync(Guid userID);
+		Task<UserShard> GetUserAsync(string phoneNumber);
+		Task<UserProfile> GetUserProfileAsync(Guid userID, Guid targetID);
 
-		Task<List<ThinEvent>> GetUserActivityAsync(Guid userID, Guid targetID);
-		Task<Dictionary<ThinnerUser, List<ThinEvent>>> GetFriendActivityAsync(Guid userID);
+		Task<List<EventShard>> GetUserActivityAsync(Guid userID, Guid targetID);
+		Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(Guid userID);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
 		Task EditUserAsync(Guid userID,
@@ -90,8 +92,8 @@ namespace Server.Boundaries
 
 		Task UpdateUserLocationAsync(Guid userID, double latitude, double longitude);
 
-		Task<List<ThinnerUser>> GetFollowedUsersAsync(Guid userID);
-		Task<List<ThinnerUser>> GetBlockedUsersAsync(Guid userID);
+		Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid userID);
+		Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid userID);
 
 		Task FollowUserAsync(Guid userID, Guid targetID);
 		Task UnfollowUserAsync(Guid userID, Guid targetID);

@@ -31,9 +31,9 @@ namespace Web.Controllers
 		}
 
 		IEventOperations events;
-		UserManager<ThinUser> userManager;
+		UserManager<UserShard> userManager;
 
-		public EventController(IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
+		public EventController(IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
         {
             events = eventOperations;
 			userManager = identityUserManager;
@@ -47,7 +47,7 @@ namespace Web.Controllers
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
 
-			ThinEvent targetEvent;
+			EventShard targetEvent;
 
             try
             {
@@ -72,7 +72,7 @@ namespace Web.Controllers
                 return BadRequest(EventError.MissingInformation.ToString());
             }
 
-			ThinEvent newEvent;
+			EventShard newEvent;
 
             try
             {
@@ -300,7 +300,7 @@ namespace Web.Controllers
 			return Ok();
 		}
 
-		private async Task<ThinUser> GetCurrentUserAsync()
+		private async Task<UserShard> GetCurrentUserAsync()
 		{
 			return await userManager.GetUserAsync(HttpContext.User);
 		}

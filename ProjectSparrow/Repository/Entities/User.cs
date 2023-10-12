@@ -44,11 +44,11 @@ namespace Repository.Entities
         internal List<Report> ReporteeList { get; set; }
         internal List<Post> Posts { get; set; }
 
-        public ThinnerUser ToThinnerUser()
+        public UserSilhouette ToThinnerUser()
         {
             return new(Id, Name);
         }
-        public ThinProfile ToThinProfile()
+        public UserProfile ToThinProfile()
         {
             return new(Id, Name, Reputation, 0);
         }

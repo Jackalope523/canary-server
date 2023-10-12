@@ -26,9 +26,9 @@ namespace Web.Controllers
 
         IAccountOperations accounts;
         IEventOperations events;
-		UserManager<ThinUser> userManager;
+		UserManager<UserShard> userManager;
 
-		public FeedController(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
+		public FeedController(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
         {
             accounts = accountOperations;
             events = eventOperations;
@@ -59,7 +59,7 @@ namespace Web.Controllers
 			return Ok(userFeed);
         }
 
-		private async Task<ThinUser> GetCurrentUserAsync()
+		private async Task<UserShard> GetCurrentUserAsync()
         {
 			return await userManager.GetUserAsync(HttpContext.User);
 		}

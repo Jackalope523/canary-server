@@ -25,7 +25,7 @@ namespace Server.Controls
 			events = eventDatabase;
 		}
 
-		public async Task<ThinEvent> GetEventInformationAsync(Guid userID, Guid eventID)
+		public async Task<EventShard> GetEventInformationAsync(Guid userID, Guid eventID)
         {
 			var user = await AccountManager.Manager.GetUser(userID);
 			var targetEvent = await GetEvent(eventID);
@@ -37,7 +37,7 @@ namespace Server.Controls
 			return targetEvent.ToThinEvent();
 		}
 
-		public async Task<List<ThinnerEvent>> GetEventsInAreaAsync(Guid userID,
+		public async Task<List<EventThinSlice>> GetEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance)
 		{
 			var user = await AccountManager.Manager.GetUser(userID);
@@ -49,7 +49,7 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public async Task<List<ThinnerEvent>> GetPersonalisedEventsInAreaAsync(Guid userID,
+		public async Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance)
 		{
 			var user = await AccountManager.Manager.GetUser(userID);
@@ -61,7 +61,7 @@ namespace Server.Controls
 			return nearbyEvents;
 		}
 
-		public async Task<ThinEvent> CreateEventAsync(Guid userID,
+		public async Task<EventShard> CreateEventAsync(Guid userID,
 			string eventName, string eventDescription, DateTimeOffset startTime,
 			double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum)
@@ -188,7 +188,7 @@ namespace Server.Controls
 			}
         }
 
-		public async Task<List<ThinnerUser>> GetAttendeesAsync(Guid userID, Guid eventID)
+		public async Task<List<UserSilhouette>> GetAttendeesAsync(Guid userID, Guid eventID)
 		{
 			Event targetEvent = new(eventID);
 
@@ -197,7 +197,7 @@ namespace Server.Controls
 			{
 				// Retrieve user's friends
 				var friends = accounts.GetFriends(userID);
-				List<ThinnerUser> friendAttendees = new();
+				List<UserSilhouette> friendAttendees = new();
 
 				// Check if any friends are attending
 				foreach (var friend in friends)
@@ -347,15 +347,15 @@ namespace Server.Controls
 			return new(events.FindEvent(eventID));
 		}
 
-		internal async Task<List<ThinnerUser>> GetAttendeesInternalAsync(Guid eventID)
+		internal async Task<List<UserSilhouette>> GetAttendeesInternalAsync(Guid eventID)
 		{
 			return events.GetGuestList(eventID);
 		}
 
-		internal async Task<List<ThinEvent>>
-			RemoveInaccessibleEventsAsync(User user, List<ThinEvent> events)
+		internal async Task<List<EventShard>>
+			RemoveInaccessibleEventsAsync(User user, List<EventShard> events)
 		{
-			foreach (ThinEvent e in events)
+			foreach (EventShard e in events)
 			{
 				Event targetEvent = new(e);
 
@@ -366,10 +366,10 @@ namespace Server.Controls
 			return events;
 		}
 
-		internal async Task<List<ThinnerEvent>>
-			RemoveInaccessibleEventsAsync(User user, List<ThinnerEvent> events)
+		internal async Task<List<EventThinSlice>>
+			RemoveInaccessibleEventsAsync(User user, List<EventThinSlice> events)
 		{
-			foreach (ThinnerEvent e in events)
+			foreach (EventThinSlice e in events)
 			{
 				Event targetEvent = new(e);
 
@@ -380,10 +380,10 @@ namespace Server.Controls
 			return events;
 		}
 
-		internal async Task<List<ThinnerEvent>>
-			RemoveUnattractiveEventsAsync(User user, List<ThinnerEvent> events, float maximumAngle)
+		internal async Task<List<EventThinSlice>>
+			RemoveUnattractiveEventsAsync(User user, List<EventThinSlice> events, float maximumAngle)
 		{
-			foreach (ThinnerEvent e in events)
+			foreach (EventThinSlice e in events)
 			{
 				Event targetEvent = new(e);
 
@@ -397,7 +397,7 @@ namespace Server.Controls
 			return events;
 		}
 
-		internal async Task<ThinEvent> GetCurrentEventAsync(Guid userID)
+		internal async Task<EventShard> GetCurrentEventAsync(Guid userID)
 		{
 			return events.FindCurrentEvent(userID);
 		}

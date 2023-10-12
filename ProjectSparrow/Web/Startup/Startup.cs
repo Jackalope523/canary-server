@@ -56,7 +56,7 @@ namespace Web
                 options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
             })
                 .AddIdentityCookies();
-            services.AddIdentityCore<ThinUser>()
+            services.AddIdentityCore<UserShard>()
                 .AddUserStore<UserAccountStore>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();

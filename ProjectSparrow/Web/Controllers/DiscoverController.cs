@@ -23,9 +23,9 @@ namespace Web.Controllers
 
         IAccountOperations accounts;
         IEventOperations events;
-		UserManager<ThinUser> userManager;
+		UserManager<UserShard> userManager;
 
-		public DiscoverController(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<ThinUser> identityUserManager)
+		public DiscoverController(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
         {
             accounts = accountOperations;
             events = eventOperations;
@@ -35,7 +35,7 @@ namespace Web.Controllers
         [HttpGet("{latitude}-{longitude}-{distance}")]
         public async Task<IActionResult> GetEvents(float latitude, float longitude, float distance)
         {
-            List<ThinnerEvent> eventList;
+            List<EventThinSlice> eventList;
 
             try
             {
@@ -54,7 +54,7 @@ namespace Web.Controllers
         [HttpGet("all/{latitude}-{longitude}-{distance}")]
         public async Task<IActionResult> GetAllEvents(float latitude, float longitude, float distance)
         {
-            List<ThinnerEvent> eventList;
+            List<EventThinSlice> eventList;
 
             try
 			{
@@ -86,7 +86,7 @@ namespace Web.Controllers
             return Ok();
         }
 
-		private async Task<ThinUser> GetCurrentUserAsync()
+		private async Task<UserShard> GetCurrentUserAsync()
         {
 			return await userManager.GetUserAsync(HttpContext.User);
 		}

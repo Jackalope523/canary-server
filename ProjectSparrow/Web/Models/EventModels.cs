@@ -28,7 +28,7 @@ namespace Web.Models
         public int? GroupMinimum { get; set; }
         public int? GroupMaximum { get; set; }
 
-        public ThinnerUser Host { get; set; }
+        public UserSilhouette Host { get; set; }
 
         public uint NumberOfParticipants { get; set; }
     }

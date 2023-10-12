@@ -86,7 +86,7 @@ namespace Repository.Tests
             sentry.GetContext().SaveChanges();
 
             Guid id = sentry.GetContext().Users.First().Id;
-            ThinUser found = store.FindUserById(id);        
+            UserShard found = store.FindUserById(id);        
 
             Assert.NotNull(found);
             Assert.Equal(id, found.Id);    
@@ -101,7 +101,7 @@ namespace Repository.Tests
             sentry.GetContext().Users.Add(subject);
             sentry.GetContext().SaveChanges();
 
-            ThinUser found = store.FindUserByPhoneNumber(subjectPhoneNumber);       
+            UserShard found = store.FindUserByPhoneNumber(subjectPhoneNumber);       
 
             Assert.NotNull(found);
             Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
@@ -115,7 +115,7 @@ namespace Repository.Tests
             sentry.GetContext().Users.Add(subject);
             sentry.GetContext().SaveChanges();
 
-            ThinUser found = store.FindUserByEmail(subjectEmail);         
+            UserShard found = store.FindUserByEmail(subjectEmail);         
 
             Assert.NotNull(found);
             Assert.Equal(subjectPhoneNumber, found.PhoneNumber);

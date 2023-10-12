@@ -36,7 +36,7 @@ namespace Repository.Entities
 
 
 
-        public ThinnerEvent ToThinnerEvent()
+        public EventThinSlice ToThinnerEvent()
         {
             return new(Id, Host.ToThinnerUser(), Type, Location.Y, Location.X);
         }

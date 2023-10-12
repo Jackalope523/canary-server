@@ -28,7 +28,7 @@ namespace Server.Entities
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
 
-        public List<ThinnerUser> Attendees { get; set; }
+        public List<UserSilhouette> Attendees { get; set; }
 
 		public List<EventReport> EventReports { get; set; }
 
@@ -43,7 +43,7 @@ namespace Server.Entities
             Id = eventID;
         }
 
-        public Event(ThinEvent fromEvent)
+        public Event(EventShard fromEvent)
         {
             Id = fromEvent.Id;
             Host = new(fromEvent.Host);
@@ -59,7 +59,7 @@ namespace Server.Entities
             Character = new(fromEvent.Character);
         }
 
-        public Event(ThinnerEvent fromEvent)
+        public Event(EventThinSlice fromEvent)
         {
             Id = fromEvent.Id;
             Host = new(fromEvent.Host);
@@ -67,14 +67,14 @@ namespace Server.Entities
                 { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
         }
 
-        public ThinEvent ToThinEvent()
+        public EventShard ToThinEvent()
         {
             return new(Id, Host.ToThinnerUser(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter());
         }
 
-        public ThinnerEvent ToThinnerEvent()
+        public EventThinSlice ToThinnerEvent()
         {
             return new(Id, Host.ToThinnerUser(), Location.Latitude, Location.Longitude);
         }

@@ -55,7 +55,7 @@ namespace Repository
             return true;
         }
 
-        public ThinEvent CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
+        public EventShard CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
         {
             Event toCreate = new Event
             {
@@ -83,7 +83,7 @@ namespace Repository
             return new ThinEvent
                 (
                    toCreate.Id,
-                   new ThinnerUser(toCreate.Host.Id, toCreate.Host.Name),
+                   new UserSilhouette(toCreate.Host.Id, toCreate.Host.Name),
                    toCreate.Name,
                    toCreate.Description,
                    toCreate.Type,
@@ -105,13 +105,13 @@ namespace Repository
         }
 
 
-        public ThinEvent FindEvent(Guid id)
+        public EventShard FindEvent(Guid id)
         {
-            ThinEvent @event;
+            EventShard @event;
             @event = storeSentry.GetContext().Events.Where(e => e.Id == id).Select(e => new ThinEvent
                (
                    e.Id,
-                   new ThinnerUser(e.Host.Id, e.Host.Name),
+                   new UserSilhouette(e.Host.Id, e.Host.Name),
                    e.Name,
                    e.Description,
                    e.Type,
@@ -134,32 +134,32 @@ namespace Repository
 
             return @event;
         }
-        public List<ThinnerEvent> FindEvents(double latitude, double longitude, double distance)
+        public List<EventThinSlice> FindEvents(double latitude, double longitude, double distance)
         {
-            List<ThinnerEvent> closestEvents;
+            List<EventThinSlice> closestEvents;
             Point userLocation = new Point(longitude, latitude);
 
             closestEvents = storeSentry.GetContext().Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
-                                Select(e => new ThinnerEvent(e.Id, new ThinnerUser(e.Host.Id, e.Host.Name), e.Type, e.Location.Y, e.Location.X)).ToList();
+                                Select(e => new ThinnerEvent(e.Id, new UserSilhouette(e.Host.Id, e.Host.Name), e.Type, e.Location.Y, e.Location.X)).ToList();
 
             return closestEvents;
         }
 
-        public List<ThinnerUser> GetGuestList(Guid id)
+        public List<UserSilhouette> GetGuestList(Guid id)
         {
-            List<ThinnerUser> guests;
+            List<UserSilhouette> guests;
 
-            guests = storeSentry.GetContext().EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new ThinnerUser(l.Self.Id, l.Self.Name)).ToList();
+            guests = storeSentry.GetContext().EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new UserSilhouette(l.Self.Id, l.Self.Name)).ToList();
 
             return guests;
         }
 
-        private ThinUser FindUserBy(Func<User, bool> predicate)
+        private UserShard FindUserBy(Func<User, bool> predicate)
         {
-            ThinUser user;
+            UserShard user;
             int numFollowers;
 
-            user = storeSentry.GetContext().Users.Where(predicate).Select(u => new ThinUser
+            user = storeSentry.GetContext().Users.Where(predicate).Select(u => new UserShard
                (
                    u.Id,
                    u.PhoneNumber,
@@ -189,9 +189,9 @@ namespace Repository
 
             return user with { NumberOfFollowers = numFollowers };
         }
-        public ThinUser FindUserById(Guid id) { return FindUserBy(u => u.Id == id); }
-        public ThinUser FindUserByPhoneNumber(string phoneNumber) { return FindUserBy(u => u.PhoneNumber == phoneNumber); }
-        public ThinUser FindUserByEmail(string email) { return FindUserBy(u => u.NormalizedEmail == email); }
+        public UserShard FindUserById(Guid id) { return FindUserBy(u => u.Id == id); }
+        public UserShard FindUserByPhoneNumber(string phoneNumber) { return FindUserBy(u => u.PhoneNumber == phoneNumber); }
+        public UserShard FindUserByEmail(string email) { return FindUserBy(u => u.NormalizedEmail == email); }
 
         private bool addLinkOperation(Link link)
         {
@@ -352,19 +352,19 @@ namespace Repository
         public bool UpdateStatus(Guid id, bool isOpen) { return updateEventProperty(id, nameof(Event.IsEventOpen), isOpen); }
         public bool EndEvent(Guid id) { return updateEventProperty(id, nameof(Event.EndTime), DateTimeOffset.UtcNow); }
        
-        private List<ThinnerUser> getUsersBy(Func<UserLink,bool> predicate)
+        private List<UserSilhouette> getUsersBy(Func<UserLink,bool> predicate)
         {
-            List<ThinnerUser> users;
+            List<UserSilhouette> users;
 
-            users = storeSentry.GetContext().UserLinks.Where(predicate).Select(l => new ThinnerUser(l.Other.Id, l.Other.Name)).ToList();
+            users = storeSentry.GetContext().UserLinks.Where(predicate).Select(l => new UserSilhouette(l.Other.Id, l.Other.Name)).ToList();
             return users;
         }
-        public List<ThinnerUser> GetFollowedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow); }
-        public List<ThinnerUser> GetBlockedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block); }
-        public List<ThinnerUser> GetFriends(Guid id)
+        public List<UserSilhouette> GetFollowedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow); }
+        public List<UserSilhouette> GetBlockedUsers(Guid id) { return getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block); }
+        public List<UserSilhouette> GetFriends(Guid id)
         {
-            List<ThinnerUser> following = getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow);
-            List<ThinnerUser> followingMe = getUsersBy(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow);     
+            List<UserSilhouette> following = getUsersBy(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow);
+            List<UserSilhouette> followingMe = getUsersBy(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow);     
             return following.Intersect(followingMe).ToList();
         }
 
@@ -465,16 +465,16 @@ namespace Repository
             return CreateReport(userId, eventId, HostId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
         }
 
-        private List<ThinEvent> FindEventsBy(Func<EventLink, bool> predicate )
+        private List<EventShard> FindEventsBy(Func<EventLink, bool> predicate )
         {
             List<Guid> guids= new List<Guid>();
             guids = storeSentry.GetContext().EventLinks.Where(predicate).Select(l => l.EventId).ToList();
 
-            List<ThinEvent> events;
+            List<EventShard> events;
             events = storeSentry.GetContext().Events.Where(e => guids.Contains(e.Id)).Select(e => new ThinEvent
                (
                    e.Id,
-                   new ThinnerUser(e.HostId, e.Host.Name),
+                   new UserSilhouette(e.HostId, e.Host.Name),
                    e.Name,
                    e.Description,
                    e.Type,
@@ -497,9 +497,9 @@ namespace Repository
 
             return events;
         }
-        public ThinEvent FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
-        public List<ThinEvent> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
-        public List<ThinEvent> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
+        public EventShard FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
+        public List<EventShard> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
+        public List<EventShard> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
 
         EventPost IEventDatabase.AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
         {

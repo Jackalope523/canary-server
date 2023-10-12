@@ -90,7 +90,7 @@ namespace Repository.Tests
             sentry.GetContext().EventLinks.Add(new EventLink { SelfId = testUserId, EventId = testEventId, Type = EventLink.EventLinkType.Attend });
             sentry.GetContext().SaveChanges();
 
-            List<ThinnerUser> guestList = store.GetGuestList(testEventId);
+            List<UserSilhouette> guestList = store.GetGuestList(testEventId);
 
             Assert.Single(guestList);
             Assert.Equal(testUserId, guestList.First().Id);
