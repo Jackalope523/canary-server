@@ -388,7 +388,7 @@ namespace Repository
         {
             return storeSentry.GetContext().Reports.Where(r => predicate(r)).ToList();
         }
-        public List<EventReport> GetReportsAboutEvent(Guid id)
+        public List<EventReport> GetReportsForEvent(Guid id)
         {
             List<Report> reports = getReports(r => r.EventId == id);
             List<EventReport> toReturn = new List<EventReport>();
@@ -497,9 +497,9 @@ namespace Repository
 
             return events;
         }
-        public EventShard FindCurrentEvent(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
-        public List<EventShard> FindUpcomingEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
-        public List<EventShard> FindPastEvents(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
+        public EventShard FindCurrentEventForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
+        public List<EventShard> FindUpcomingEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
+        public List<EventShard> FindPastEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
 
         EventPost IEventDatabase.AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
         {

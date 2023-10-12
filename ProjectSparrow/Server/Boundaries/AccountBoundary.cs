@@ -10,8 +10,8 @@ namespace Server.Boundaries
 	public enum UserAccountStatus
 	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }
 
-	public record UserShard(Guid Id, string PhoneNumber, string Email, string Name, DateTimeOffset DateOfBirth,
-		bool IsPhoneConfirmed, bool IsEmailConfirmed,
+	public record UserShard(Guid Id, string PhoneNumber, string Email, string Name,
+		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
 	public record UserProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
@@ -30,22 +30,10 @@ namespace Server.Boundaries
 		UserShard FindUserById(Guid id);
         UserShard FindUserByPhoneNumber(string phoneNumber);
 		UserShard FindUserByEmail(string normalisedEmail);
-        bool CreateUser(string phoneNumber, string email, string name,
-			DateTimeOffset dateOfBirth, Character character);
+        bool CreateUser(string phoneNumber, string email, string normalisedEmail,
+			string name, DateTimeOffset dateOfBirth, Character character);
+		bool UpdateUser(Guid id, List<(string Property, object Value)> edits);
         bool DeleteUser(Guid id);
-        bool UpdatePhoneNumber(Guid id, string newNumber);
-		bool UpdateEmail(Guid id, string newEmail);
-		bool UpdateNormalisedEmail(Guid id, string normalisedEmail);
-        bool UpdateName(Guid id, string newName);
-		bool UpdatePhoneConfirmation(Guid id, bool isConfirmed);
-		bool UpdateEmailConfirmation(Guid id, bool isConfirmed);
-		bool UpdateSecurityStamp(Guid id, string newSecurityStamp);
-		bool UpdateLockoutDate(Guid id, DateTimeOffset? newLockoutDate);
-		bool UpdateAccessTries(Guid id, int newAccessTries);
-		bool UpdateAccountStatus(Guid id, UserAccountStatus accountStatus);
-		bool UpdateReputation(Guid id, int newReputation);
-		bool UpdateUserCharacter(Guid id, int extraversion, int athleticism, int chaoticness,
-			int competitiveness, int industriousness, int nightOwl, int openness);
 
 		(double Latitude, double Longitude, double Radius) GetRecentUserLocation(Guid id);
 		bool UpdateRecentLocation(Guid id, double latitude, double longitude, double radius);

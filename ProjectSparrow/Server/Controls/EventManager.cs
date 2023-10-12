@@ -115,15 +115,20 @@ namespace Server.Controls
 
 			targetEvent.ValidateAndNormalise();
 
-			// Update individual attributes
+			List<(string Property, object Value)> edits = new();
+
+			// Track individual edits
 			if (eventDescription != "")
 			{
-				events.UpdateDescription(eventID, targetEvent.Description);
+				edits.Add(("Description", targetEvent.Description));
 			}
 			if (isOpen.HasValue)
 			{
-				events.UpdateStatus(eventID, targetEvent.IsOpen);
+				edits.Add(("IsOpen", targetEvent.IsOpen));
 			}
+
+			// Push update
+			events.UpdateEvent(targetEvent.Id, edits);
 		}
 
 		public async Task JoinEventAsync(Guid userID, Guid eventID)
@@ -181,10 +186,7 @@ namespace Server.Controls
 
 				guest.CalculateCharacter(targetEvent, guestDetails.Left.Value - guestDetails.Joined);
 
-				accounts.UpdateUserCharacter(guest.Id, guest.Character.Extraversion,
-					guest.Character.Athleticism, guest.Character.Chaoticness,
-					guest.Character.Competitiveness, guest.Character.Industriousness,
-					guest.Character.NightOwl, guest.Character.Openness);
+				accounts.UpdateUser(guest.Id, new() { ("Character", guest.Character) });
 			}
         }
 
@@ -237,7 +239,7 @@ namespace Server.Controls
 				// Check if host should be punished
 				if (user.AccountStatus != status)
 				{
-					accounts.UpdateAccountStatus(user.Id, status);
+					accounts.UpdateUser(user.Id, new() { ("AccountStatus", status) });
 				}
 			}
 		}
@@ -399,12 +401,12 @@ namespace Server.Controls
 
 		internal async Task<EventShard> GetCurrentEventAsync(Guid userID)
 		{
-			return events.FindCurrentEvent(userID);
+			return events.FindCurrentEventForUser(userID);
 		}
 
 		internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
 		{
-			return events.GetReportsAboutEvent(eventID);
+			return events.GetReportsForEvent(eventID);
 		}
 
 		internal async Task<List<EventPost>> GetEventPostsAsync(Guid eventID)

@@ -113,12 +113,10 @@ namespace Server.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            bool success = accounts.CreateUser(newUser.PhoneNumber, email,
+            bool success = accounts.CreateUser(newUser.PhoneNumber, email, newUser.Email,
                 newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
-
-            accounts.UpdateNormalisedEmail(newUser.Id, newUser.Email);
         }
 
         public async Task EditUserAsync(Guid userID,
@@ -142,44 +140,48 @@ namespace Server.Controls
             if ((phoneNumberChanged || emailChanged) && !editUser.ValidateAndNormalise())
             { throw new InvalidInformationException("Invalid details provided."); }
 
-            // Update individual attributes
+            List<(string Property, object Value)> edits = new();
+
+            // Track individual edits
 			if (phoneNumberChanged)
             {
                 await ThrowIfPhoneNumberTaken(editUser.PhoneNumber);
-                accounts.UpdatePhoneNumber(userID, editUser.PhoneNumber);
+                edits.Add(("PhoneNumber", editUser.PhoneNumber));
 			}
 			if (emailChanged)
 			{
                 await ThrowIfEmailTaken(editUser.Email);
-                accounts.UpdateEmail(userID, email);
-                accounts.UpdateNormalisedEmail(userID, editUser.Email);
+                edits.Add(("Email", email));
+                edits.Add(("NormalisedEmail", editUser.Email));
 			}
 			if (!string.IsNullOrEmpty(name))
 			{
-                accounts.UpdateName(userID, editUser.Name);
+                edits.Add(("Name", editUser.Name));
 			}
-
             // Internal attributes
 			if (isPhoneNumberConfirmed.HasValue)
 			{
-				accounts.UpdatePhoneConfirmation(userID, isPhoneNumberConfirmed.Value);
+                edits.Add(("IsPhoneConfirmed", isPhoneNumberConfirmed.Value));
 			}
 			if (isEmailConfirmed.HasValue)
 			{
-				accounts.UpdateEmailConfirmation(userID, isEmailConfirmed.Value);
+                edits.Add(("IsEmailConfirmed", isEmailConfirmed.Value));
 			}
 			if (!string.IsNullOrEmpty(securityStamp))
 			{
-				accounts.UpdateSecurityStamp(userID, securityStamp);
+                edits.Add(("SecurityStamp", securityStamp));
 			}
 			if (lockoutDate.HasValue)
 			{
-				accounts.UpdateLockoutDate(userID, lockoutDate.Value);
+                edits.Add(("LockoutDate", lockoutDate.Value));
 			}
 			if (accessTries.HasValue)
 			{
-				accounts.UpdateAccessTries(userID, accessTries.Value);
+                edits.Add(("AccessTries", accessTries.Value));
 			}
+
+            // Push update
+            accounts.UpdateUser(editUser.Id, edits);
 		}
 
         public async Task DeleteUserAsync(Guid userID)
@@ -246,7 +248,7 @@ namespace Server.Controls
             User targetUser = new(targetID);
             await targetUser.SyncReputation();
             targetUser.CalculateReputation();
-            accounts.UpdateReputation(targetID, targetUser.Reputation);
+            accounts.UpdateUser(targetID, new() { ("Reputation", targetUser.Reputation) });
         }
 
         public async Task ReportUserAsync(Guid userID, Guid eventId, Guid targetID, UserReportType reportType, string reportDetails)
@@ -260,7 +262,7 @@ namespace Server.Controls
 			// Check if host should be punished
 			if (user.AccountStatus != status)
 			{
-				accounts.UpdateAccountStatus(user.Id, status);
+                accounts.UpdateUser(targetID, new() { ("AccountStatus", status) });
 			}
 		}
 
@@ -343,8 +345,8 @@ namespace Server.Controls
         private async Task<List<EventShard>> GetUserActivityInternalAsync(Guid userID)
         {
             // Gather all user event data
-            var upcomingActivity = events.FindUpcomingEvents(userID);
-            upcomingActivity.Add(events.FindCurrentEvent(userID));
+            var upcomingActivity = events.FindUpcomingEventsForUser(userID);
+            upcomingActivity.Add(events.FindCurrentEventForUser(userID));
 
             return upcomingActivity.ToList();
         }

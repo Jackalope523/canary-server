@@ -27,15 +27,14 @@ namespace Server.Boundaries
 
         EventShard FindEvent(Guid id);
 		List<EventThinSlice> FindEvents(double latitude, double longitude, double distance);
-		EventShard FindCurrentEvent(Guid id);
-		List<EventShard> FindUpcomingEvents(Guid id);
-		List<EventShard> FindPastEvents(Guid id);
+		EventShard FindCurrentEventForUser(Guid id);
+		List<EventShard> FindUpcomingEventsForUser(Guid id);
+		List<EventShard> FindPastEventsForUser(Guid id);
 
 		EventShard CreateEvent(Guid hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character);
-		bool UpdateDescription(Guid id, string description);
-		bool UpdateStatus(Guid id, bool isOpen);
+		bool UpdateEvent(Guid id, List<(string Property, object Value)> edits);
 		bool EndEvent(Guid id);
 
 		bool AddUserToEvent(Guid userId, Guid eventId);
@@ -44,7 +43,7 @@ namespace Server.Boundaries
 		List<UserSilhouette> GetGuestList(Guid id);
 		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(Guid id);
 
-		List<EventReport> GetReportsAboutEvent(Guid id);
+		List<EventReport> GetReportsForEvent(Guid id);
 		bool ReportEvent(Guid userId, Guid eventId, Guid HostId,
 			EventReportType reportType, string reportDetails);
 
@@ -54,6 +53,7 @@ namespace Server.Boundaries
 		EventPost AddPost(Guid eventId, Guid posterId,
 			DateTimeOffset timePosted, string imageURL);
 		bool RemovePost(Guid postId);
+
 		bool RatePost(Guid postId, Guid voterId, UserRating rating);
 		bool RemovePostRating(Guid postId, Guid voterId);
 
