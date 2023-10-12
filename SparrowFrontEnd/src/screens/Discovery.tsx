@@ -72,6 +72,8 @@ const DiscoveryScreen = () => {
         }
     };
 
+    // TODO when SEARCH is CLOSED - hide SORT view and/or FILTER view
+
     return (
         <View style={styles.mapWrapper}>
             <ImageBackground source={tempMapImage} resizeMode='cover' style={styles.mapImage}>
@@ -152,13 +154,13 @@ const DiscoveryScreen = () => {
                     {/* TODO insert sort and filter views here */}
                     {/* TODO if sort and filter doesn't overlay SearchFilter - hide SearchFilter when sort or filter is active/visible */}
                     {/* TODO make only one open - sort or filter - both cant be open at once */}
-                    {activeComponent === 'filter' ? (
+                    {activeComponent === 'filter' && searchContentVisible ? (
                         <View>
                             <Text style={globalStyles.headingTextOne}>FILTER VIEW</Text>
                         </View>
                     ) : null }
 
-                    {activeComponent === 'sort' ? (
+                    {activeComponent === 'sort' && searchContentVisible ? (
                         <View>
                             <Text style={globalStyles.headingTextTwo}>SORT VIEW</Text>
                         </View>
