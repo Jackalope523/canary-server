@@ -1,14 +1,26 @@
 import { StyleSheet, Text, View, Dimensions } from 'react-native'
 import React from 'react'
 import { Colors } from '../../styles/Colors'
-import Animated, {useAnimatedStyle} from 'react-native-reanimated';
+import Animated, {useAnimatedGestureHandler, useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
+import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 
 
 // TODO replace -40 with real padding size or make the responsiveness better
 const screenWidth = Dimensions.get('screen').width - 40;
+const knobSize = 20;
 
 const RangeSelector = ({min, max, steps, onValueChange}) => {
   
+  const xKnob1 = useSharedValue(0);
+  
+  const gestureHandler1 = useAnimatedGestureHandler ({
+    onStart: (_, ctx) => {},
+    onActive: (event, ctx) => {
+      xKnob1.value = event.translationX;
+    },
+    onEnd: () => {},
+  });
+
   const styleLine = useAnimatedStyle(() => {
     return {
       backgroundColor: Colors.orange500,
@@ -18,7 +30,17 @@ const RangeSelector = ({min, max, steps, onValueChange}) => {
       width: 100,
       transform: [{ translateX: 0 }],
     }
-  })
+  });
+
+  const styleKnob1 = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: xKnob1.value,
+        }
+      ]
+    }
+  });
 
   return (
     <View>
@@ -29,6 +51,13 @@ const RangeSelector = ({min, max, steps, onValueChange}) => {
         </View>
         <View style={styles.track} />
         <Animated.View style={styleLine} />
+        <View>
+          <GestureHandlerRootView>
+            <PanGestureHandler onGestureEvent={gestureHandler1}>
+              <Animated.View style={[styles.knob, styleKnob1]} />
+            </PanGestureHandler>
+          </GestureHandlerRootView>
+        </View>
       </View>
     </View>
   )
@@ -60,5 +89,17 @@ const styles = StyleSheet.create({
     height: 3,
     backgroundColor: Colors.fuchsia700,
     borderRadius: 3,
+  },
+
+  knob: {
+    position: 'absolute',
+    height: knobSize,
+    width: knobSize,
+    borderColor: Colors.turqoise800,
+    borderWidth: 2,
+    borderRadius: knobSize / 2,
+    backgroundColor: Colors.turqoise500,
+    marginTop: -knobSize + 8,
+    marginLeft: -8,
   },
 });
