@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Server.Boundaries;
+using Core.Boundaries;
 using Web.Models;
 using System.Net;
 using Shared;
@@ -56,7 +56,6 @@ namespace Web.Controllers
             try
             {
                 // Get current user
-                // TODO Strip away internal data
                 user = await GetCurrentUserAsync();
             }
             catch (Exception e)

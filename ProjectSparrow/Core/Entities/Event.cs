@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Immutable;
 using Shared;
-using Server.Boundaries;
-using Server.Controls;
+using Core.Boundaries;
+using Core.Controls;
 
-namespace Server.Entities
+namespace Core.Entities
 {
     internal class Event
     {
@@ -86,12 +86,12 @@ namespace Server.Entities
 
 		public async Task SyncReports()
 		{
-			EventReports = await EventManager.Manager.GetEventReportsAsync(Id);
+			EventReports = await CoreTerminal.Terminal.ReportManager.GetEventReportsAsync(Id);
 		}
 
         public async Task SyncPosts()
         {
-            EventPosts = await EventManager.Manager.GetEventPostsAsync(Id);
+            EventPosts = await CoreTerminal.Terminal.PostManager.GetEventPostsAsync(Id);
         }
 
         public bool ValidateAndNormalise()
@@ -150,7 +150,7 @@ namespace Server.Entities
 
         public async Task<bool> IsAttendedBy(User user)
         {
-            Attendees ??= await EventManager.Manager.GetAttendeesInternalAsync(Id);
+            Attendees ??= await CoreTerminal.Terminal.EventManager.GetAttendeesInternalAsync(Id);
 
             // Check if user is on the guest list
             return Attendees.Find(x => x.Id == user.Id) != null;

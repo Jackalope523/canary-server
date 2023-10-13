@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Server.Controls;
+using Core.Controls;
 
-namespace Server.Boundaries
+namespace Core.Boundaries
 {
 	public class CoreTerminal
 	{
+		public static CoreTerminal Terminal { get; private set; }
+
 		public IAccountDatabase AccountDatabase { get; init; }
 		public IEventDatabase EventDatabase { get; init; }
 		public IPostDatabase PostDatabase { get; init; }
@@ -39,6 +41,8 @@ namespace Server.Boundaries
 		public CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IPostDatabase postDatabase, IProfileDatabase profileDatabase, IReportDatabase reportDatabase)
 		{
+			Terminal = this;
+
 			AccountDatabase = accountDatabase;
 			EventDatabase = eventDatabase;
 			PostDatabase = postDatabase;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Server.Boundaries;
+using Core.Boundaries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +25,15 @@ namespace Web.Controllers
 			CouldNotFindUser
 		}
 
-		IAccountOperations accounts;
+		IProfileOperations profiles;
+		IReportOperations reports;
 		UserManager<UserShard> userManager;
 
-		public ProfileController(IAccountOperations accountOperations, UserManager<UserShard> identityUserManager)
+		public ProfileController(IProfileOperations profileOperations,
+			IReportOperations reportOperations,UserManager<UserShard> identityUserManager)
 		{
-			accounts = accountOperations;
+			profiles = profileOperations;
+			reports = reportOperations;
 			userManager = identityUserManager;
 		}
 
@@ -49,7 +52,7 @@ namespace Web.Controllers
 				// Parse target identification and retrieve profile
 				var target = GetGUID(targetIdentification);
 				var user = await GetCurrentUserAsync();
-				profile = await accounts.GetUserProfileAsync(user.Id, target);
+				profile = await profiles.GetUserProfileAsync(user.Id, target);
 			}
 			catch (InvalidUserException e)
 			{
@@ -76,7 +79,7 @@ namespace Web.Controllers
 			{
 				var target = GetGUID(targetIdentification);
 				var user = await GetCurrentUserAsync();
-				await accounts.RateUserAsync(user.Id, target, details.Rating);
+				await profiles.RateUserAsync(user.Id, target, details.Rating);
             }
             catch (InvalidUserException e)
             {
@@ -106,7 +109,7 @@ namespace Web.Controllers
 				// Parse target identification and retrieve activity
 				var target = GetGUID(targetIdentification);
 				var user = await GetCurrentUserAsync();
-				activity = await accounts.GetUserActivityAsync(user.Id, target);
+				activity = await profiles.GetUserActivityAsync(user.Id, target);
 			}
 			catch (InvalidUserException e)
 			{
@@ -130,7 +133,7 @@ namespace Web.Controllers
 			{
 				// Retrieve activity
 				var user = await GetCurrentUserAsync();
-				activity = await accounts.GetFriendActivityAsync(user.Id);
+				activity = await profiles.GetFriendActivityAsync(user.Id);
 			}
 			catch (Exception e)
 			{
@@ -149,7 +152,7 @@ namespace Web.Controllers
 			{
 				// Retrieve all users that the current user is following
 				var user = await GetCurrentUserAsync();
-				followedUsers = await accounts.GetFollowedUsersAsync(user.Id);
+				followedUsers = await profiles.GetFollowedUsersAsync(user.Id);
 			}
 			catch (Exception e)
 			{
@@ -171,7 +174,7 @@ namespace Web.Controllers
 			{
 				// Follow other user
 				var user = await GetCurrentUserAsync();
-				await accounts.FollowUserAsync(user.Id, info.TargetID);
+				await profiles.FollowUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
 			{
@@ -193,7 +196,7 @@ namespace Web.Controllers
 			{
 				// Unfollow other user
 				var user = await GetCurrentUserAsync();
-				await accounts.UnfollowUserAsync(user.Id, info.TargetID);
+				await profiles.UnfollowUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
 			{
@@ -212,7 +215,7 @@ namespace Web.Controllers
 			{
 				// Retrieve all users that the current user is blocking
 				var user = await GetCurrentUserAsync();
-				blockedUsers = await accounts.GetBlockedUsersAsync(user.Id);
+				blockedUsers = await profiles.GetBlockedUsersAsync(user.Id);
 			}
 			catch (Exception e)
 			{
@@ -234,7 +237,7 @@ namespace Web.Controllers
 			{
 				// Block other user
 				var user = await GetCurrentUserAsync();
-				await accounts.BlockUserAsync(user.Id, info.TargetID);
+				await profiles.BlockUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
 			{
@@ -256,7 +259,7 @@ namespace Web.Controllers
 			{
 				// Unblock other user
 				var user = await GetCurrentUserAsync();
-				await accounts.UnblockUserAsync(user.Id, info.TargetID);
+				await profiles.UnblockUserAsync(user.Id, info.TargetID);
 			}
 			catch (Exception e)
 			{
@@ -278,7 +281,7 @@ namespace Web.Controllers
 			{
 				var user = await GetCurrentUserAsync();
 				Guid targetGUID = GetGUID(targetID);
-				await accounts.ReportUserAsync(user.Id, targetGUID, report.ReportType, report.ReportDetails);
+				await reports.ReportUserAsync(user.Id, targetGUID, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{

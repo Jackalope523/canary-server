@@ -4,7 +4,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
 using Repository.Entities;
 using Repository.Sentries;
-using Server.Boundaries;
+using Core.Boundaries;
 using Shared;
 using System;
 using System.Numerics;
@@ -14,7 +14,7 @@ namespace Repository
 {
     public class QueryStore : IAccountDatabase, IEventDatabase, IPostDatabase,
         IProfileDatabase, IReportDatabase
-    {     
+    {
         public static IAccountDatabase AccountDatabaseAccess => new QueryStore(new TestSentry());
         public static IEventDatabase EventDatabaseAccess => new QueryStore(new TestSentry());
         public static IPostDatabase PostDatabaseAccess => new QueryStore(new TestSentry());
@@ -28,17 +28,17 @@ namespace Repository
             storeSentry = sentry;
         }
 
-        public bool CreateUser(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, Character character)
+        public bool CreateUser(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
         {
             User toCreate = new User
             {
                 PhoneNumber = phoneNumber,
                 Email = email,
+                NormalizedEmail = normalisedEmail,
                 Name = name,
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTimeOffset.UtcNow,
                 Reputation = 100,
-                NormalizedEmail = email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccountStatus = UserAccountStatus.active,
                 Extroversion = character.Extraversion,
@@ -59,14 +59,13 @@ namespace Repository
             return true;
         }
 
-        public EventShard CreateEvent(Guid hostId, string name, string description, string eventType, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
+        public EventShard CreateEvent(Guid hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
         {
             Event toCreate = new Event
             {
                 HostId = hostId,
                 Name = name,
                 Description = description,
-                Type = eventType,
                 StartTime = startTime,
                 Location = new Point(longitude, latitude),
                 GroupMinimum = groupMinimum,
@@ -84,13 +83,12 @@ namespace Repository
             storeSentry.GetContext().Events.Add(toCreate);
 
 
-            return new ThinEvent
+            return new EventShard
                 (
                    toCreate.Id,
                    new UserSilhouette(toCreate.Host.Id, toCreate.Host.Name),
                    toCreate.Name,
                    toCreate.Description,
-                   toCreate.Type,
                    toCreate.StartTime,
                    toCreate.Location.Y,
                    toCreate.Location.X,
@@ -112,13 +110,12 @@ namespace Repository
         public EventShard FindEvent(Guid id)
         {
             EventShard @event;
-            @event = storeSentry.GetContext().Events.Where(e => e.Id == id).Select(e => new ThinEvent
+            @event = storeSentry.GetContext().Events.Where(e => e.Id == id).Select(e => new EventShard
                (
                    e.Id,
                    new UserSilhouette(e.Host.Id, e.Host.Name),
                    e.Name,
                    e.Description,
-                   e.Type,
                    e.StartTime,
                    e.Location.Y,
                    e.Location.X,
@@ -144,7 +141,7 @@ namespace Repository
             Point userLocation = new Point(longitude, latitude);
 
             closestEvents = storeSentry.GetContext().Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
-                                Select(e => new ThinnerEvent(e.Id, new UserSilhouette(e.Host.Id, e.Host.Name), e.Type, e.Location.Y, e.Location.X)).ToList();
+                                Select(e => new EventThinSlice(e.Id, new UserSilhouette(e.Host.Id, e.Host.Name), e.Location.Y, e.Location.X)).ToList();
 
             return closestEvents;
         }
@@ -404,7 +401,7 @@ namespace Repository
 
             return toReturn;
         }
-        public (List<UserReport>, List<EventReport>) GetReportsAboutUser(Guid id)
+        public (List<UserReport>, List<EventReport>) GetReportsForUser(Guid id)
         {
             List<Report> userReports = getReports(r => r.OtherId == id);
             List<Report> eventReports = getReports(r => r.OtherId == id && r.OtherId == r.Event.HostId);
@@ -475,13 +472,12 @@ namespace Repository
             guids = storeSentry.GetContext().EventLinks.Where(predicate).Select(l => l.EventId).ToList();
 
             List<EventShard> events;
-            events = storeSentry.GetContext().Events.Where(e => guids.Contains(e.Id)).Select(e => new ThinEvent
+            events = storeSentry.GetContext().Events.Where(e => guids.Contains(e.Id)).Select(e => new EventShard
                (
                    e.Id,
                    new UserSilhouette(e.HostId, e.Host.Name),
                    e.Name,
                    e.Description,
-                   e.Type,
                    e.StartTime,
                    e.Location.Y,
                    e.Location.X,
@@ -505,7 +501,7 @@ namespace Repository
         public List<EventShard> FindUpcomingEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
         public List<EventShard> FindPastEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
 
-        EventPost IEventDatabase.AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
+        public EventPost AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
         {
             Post toAdd = new Post { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
             storeSentry.GetContext().Posts.Add(toAdd);

@@ -2,7 +2,7 @@
 using NetTopologySuite.Geometries;
 using Repository.Entities;
 using Repository.Sentries;
-using Server.Boundaries;
+using Core.Boundaries;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Server.Boundaries;
+using Core.Boundaries;
 using System;
 using System.Collections.Generic;
 using System.Linq;

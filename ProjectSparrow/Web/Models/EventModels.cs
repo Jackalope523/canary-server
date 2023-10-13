@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-using Server.Boundaries;
+using Core.Boundaries;
 using Shared;
 
 namespace Web.Models

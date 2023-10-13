@@ -1,4 +1,4 @@
-﻿using Server.Boundaries;
+﻿using Core.Boundaries;
 using Shared;
 using System;
 using System.Collections.Generic;

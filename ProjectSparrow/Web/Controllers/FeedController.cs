@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Repository.Entities;
-using Server.Boundaries;
+using Core.Boundaries;
 using Web.Models;
 using System;
 using System.Collections.Generic;
@@ -24,14 +24,12 @@ namespace Web.Controllers
             CouldNotCompleteRequest
         }
 
-        IAccountOperations accounts;
-        IEventOperations events;
-		UserManager<UserShard> userManager;
+        IPostOperations posts;
+        UserManager<UserShard> userManager;
 
-		public FeedController(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
+        public FeedController(IPostOperations postOperations, UserManager<UserShard> identityUserManager)
         {
-            accounts = accountOperations;
-            events = eventOperations;
+            posts = postOperations;
             userManager = identityUserManager;
         }
 
@@ -49,7 +47,7 @@ namespace Web.Controllers
             {
                 // Retrieve current user
                 var user = await GetCurrentUserAsync();
-                userFeed = await events.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
+                userFeed = await posts.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
 			}
 			catch (Exception e)
 			{

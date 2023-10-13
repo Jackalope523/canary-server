@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Repository.Contexts;
 using Repository.Entities;
 using Repository.Sentries;
-using Server.Boundaries;
+using Core.Boundaries;
 using Shared;
 using System;
 using System.Numerics;

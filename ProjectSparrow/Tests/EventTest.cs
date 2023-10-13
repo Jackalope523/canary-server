@@ -1,4 +1,4 @@
-using Server.Entities;
+using Core.Entities;
 using System;
 using Xunit;
 

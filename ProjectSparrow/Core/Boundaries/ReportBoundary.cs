@@ -3,7 +3,7 @@ using Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Server.Boundaries
+namespace Core.Boundaries
 {
     public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);

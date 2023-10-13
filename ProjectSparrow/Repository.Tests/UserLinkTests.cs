@@ -2,7 +2,7 @@
 using Repository.Contexts;
 using Repository.Entities;
 using Repository.Sentries;
-using Server.Boundaries;
+using Core.Boundaries;
 using Xunit.Abstractions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static PhoneNumbers.PhoneNumber;

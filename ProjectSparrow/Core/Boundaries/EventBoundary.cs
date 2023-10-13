@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Threading.Tasks;
-using Server.Controls;
+using Core.Controls;
 using Shared;
 
-namespace Server.Boundaries
+namespace Core.Boundaries
 {
 	public record EventShard(Guid Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,

@@ -1,5 +1,5 @@
-﻿using Server.Boundaries;
-using Server.Entities;
+﻿using Core.Boundaries;
+using Core.Entities;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
-namespace Server.Controls
+namespace Core.Controls
 {
 	internal class EventManager : AbstractManager, IEventOperations
 	{

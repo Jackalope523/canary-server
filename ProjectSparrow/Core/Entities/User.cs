@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Server.Boundaries;
-using Server.Controls;
+using Core.Boundaries;
+using Core.Controls;
 using Shared;
 
-namespace Server.Entities
+namespace Core.Entities
 {
     internal class User
     {
@@ -119,7 +119,7 @@ namespace Server.Entities
         {
             try
             {
-                var userLocation = await AccountManager.Manager.GetLastKnownUserLocationAsync(Id);
+                var userLocation = await CoreTerminal.Terminal.AccountManager.GetLastKnownUserLocationAsync(Id);
                 LastKnownLocation = new() { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude };
                 LastKnownRadius = new() { Metres = userLocation.Radius };
             }
@@ -130,7 +130,7 @@ namespace Server.Entities
         {
             try
             {
-                var userHaunt = await AccountManager.Manager.GetUserHauntAsync(Id);
+                var userHaunt = await CoreTerminal.Terminal.AccountManager.GetUserHauntAsync(Id);
                 Haunt = new() { Latitude = userHaunt.Latitude, Longitude = userHaunt.Longitude };
                 HauntRadius = new() { Metres = userHaunt.Radius };
                 HauntStability = userHaunt.Stability;
@@ -143,19 +143,19 @@ namespace Server.Entities
         {
             try
             {
-                CurrentEvent = new(await EventManager.Manager.GetCurrentEventAsync(Id));
+                CurrentEvent = new(await CoreTerminal.Terminal.EventManager.GetCurrentEventAsync(Id));
             }
             catch { }
         }
 
         public async Task SyncReputation()
         {
-            Ratings = await AccountManager.Manager.GetAllRatingsAsync(Id);
+            Ratings = await CoreTerminal.Terminal.ProfileManager.GetAllRatingsAsync(Id);
         }
 
         public async Task SyncReports()
         {
-            var reports = await AccountManager.Manager.GetAllReportsAsync(Id);
+            var reports = await CoreTerminal.Terminal.ReportManager.GetAllReportsAsync(Id);
             Reports = reports.UserReports;
             EventReports = reports.EventReports;
         }
@@ -224,7 +224,7 @@ namespace Server.Entities
         public async Task<bool> IsFollowing(User otherUser)
         {
             // Set if null
-            Following ??= await AccountManager.Manager.GetFollowedUsersAsync(otherUser.Id);
+            Following ??= await CoreTerminal.Terminal.ProfileManager.GetFollowedUsersAsync(otherUser.Id);
 
 			// Check if user is following target
 			if (Following.Find(x => x.Id == otherUser.Id) != null)
@@ -239,7 +239,7 @@ namespace Server.Entities
         public async Task<bool> IsBlocking(User otherUser)
         {
             // Set if null
-            Blocking ??= await AccountManager.Manager.GetBlockedUsersAsync(otherUser.Id);
+            Blocking ??= await CoreTerminal.Terminal.ProfileManager.GetBlockedUsersAsync(otherUser.Id);
 
 			// Check if user is following target
 			if (Blocking.Find(x => x.Id == otherUser.Id) != null)

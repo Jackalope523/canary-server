@@ -4,9 +4,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using Server.Boundaries;
+using Core.Boundaries;
 
-namespace Server.Entities
+namespace Core.Entities
 {
 	internal readonly struct CharacterVector
 	{

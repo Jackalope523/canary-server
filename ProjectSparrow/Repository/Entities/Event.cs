@@ -1,5 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
-using Server.Boundaries;
+using Core.Boundaries;
 
 namespace Repository.Entities
 {

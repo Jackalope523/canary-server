@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Server.Controls;
+using Core.Controls;
 using System.Threading.Tasks;
-using Server.Entities;
+using Core.Entities;
 using Shared;
 
-namespace Server.Boundaries
+namespace Core.Boundaries
 {
 	public enum UserAccountStatus
 	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }

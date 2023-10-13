@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Server.Boundaries;
-using Server.Entities;
+using Core.Boundaries;
+using Core.Entities;
 using Shared;
 
-namespace Server.Controls
+namespace Core.Controls
 {
 	internal class PostManager : AbstractManager, IPostOperations
 	{

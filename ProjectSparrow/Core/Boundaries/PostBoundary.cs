@@ -3,7 +3,7 @@ using Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Server.Boundaries
+namespace Core.Boundaries
 {
     public record EventHeader(Guid Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
 

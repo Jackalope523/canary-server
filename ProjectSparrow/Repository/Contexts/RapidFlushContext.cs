@@ -8,7 +8,7 @@ namespace Repository.Contexts
         private int flushCounter = 0;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Test", x => x.UseNetTopologySuite());
+            optionsBuilder.UseSqlCore(@"Core=(localdb)\mssqllocaldb;Database=Test", x => x.UseNetTopologySuite());
         }
 
         public RapidFlushContext Execute()

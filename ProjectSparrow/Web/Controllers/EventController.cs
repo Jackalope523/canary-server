@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Server.Boundaries;
+using Core.Boundaries;
 using Web.Models;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -31,11 +31,17 @@ namespace Web.Controllers
 		}
 
 		IEventOperations events;
+		IPostOperations posts;
+		IReportOperations reports;
 		UserManager<UserShard> userManager;
 
-		public EventController(IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
+		public EventController(IEventOperations eventOperations,
+			IPostOperations postOperations, IReportOperations reportOperations,
+			UserManager<UserShard> identityUserManager)
         {
             events = eventOperations;
+			posts = postOperations;
+			reports = reportOperations;
 			userManager = identityUserManager;
         }
 
@@ -54,7 +60,7 @@ namespace Web.Controllers
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
 				Guid eventGUID = GetGUID(eventID);
-                targetEvent = await events.GetEventInformationAsync(user.Id, eventGUID); // TODO Return relevant information
+                targetEvent = await events.GetEventInformationAsync(user.Id, eventGUID);
 			}
 			catch (Exception e)
 			{
@@ -196,7 +202,7 @@ namespace Web.Controllers
 				var user = await GetCurrentUserAsync();
 				Guid eventGUID = GetGUID(eventID);
                 Guid hostGUID = GetGUID(hostID);
-                await events.ReportEventAsync(user.Id, eventGUID, hostGUID, report.ReportType, report.ReportDetails);
+                await reports.ReportEventAsync(user.Id, eventGUID, hostGUID, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{
@@ -222,7 +228,7 @@ namespace Web.Controllers
 				var user = await GetCurrentUserAsync();
 				Guid eventGUID = GetGUID(eventID);
 
-				eventPosts = await events.GetEventPostsAsync(user.Id, eventGUID);
+				eventPosts = await posts.GetEventPostsAsync(user.Id, eventGUID);
 			}
 			catch (Exception e)
 			{
@@ -246,7 +252,7 @@ namespace Web.Controllers
 			{
 				var user = await GetCurrentUserAsync();
 				Guid eventGUID = GetGUID(eventID);
-				newPost = await events.AddPostAsync(user.Id, eventGUID, post.ImageURL);
+				newPost = await posts.AddPostAsync(user.Id, eventGUID, post.ImageURL);
 			}
 			catch (Exception e)
 			{
@@ -268,7 +274,7 @@ namespace Web.Controllers
 			{
 				var user = await GetCurrentUserAsync();
 				Guid postGUID = GetGUID(postID);
-				await events.RemovePostAsync(user.Id, postGUID);
+				await posts.RemovePostAsync(user.Id, postGUID);
 			}
 			catch (Exception e)
 			{
@@ -290,7 +296,7 @@ namespace Web.Controllers
 			{
 				var user = await GetCurrentUserAsync();
 				var postGUID = GetGUID(postID);
-				await events.RatePostAsync(user.Id, postGUID, details.Rating);
+				await posts.RatePostAsync(user.Id, postGUID, details.Rating);
 			}
 			catch (Exception e)
 			{

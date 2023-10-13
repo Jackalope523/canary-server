@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Repository.Entities;
 using Microsoft.AspNetCore.Identity;
-using Server.Boundaries;
+using Core.Boundaries;
 
 namespace Web.Stores
 {

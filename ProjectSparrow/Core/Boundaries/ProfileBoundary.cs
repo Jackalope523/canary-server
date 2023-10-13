@@ -3,7 +3,7 @@ using Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Server.Boundaries
+namespace Core.Boundaries
 {
     public record UserProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
     public record UserSilhouette(Guid Id, string Name);
