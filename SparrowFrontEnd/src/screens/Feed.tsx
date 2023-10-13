@@ -113,8 +113,10 @@ const FeedScreen = () => {
         //     {/* <Text>SingleValueSelector here</Text> */}
         //     {/* <SingleValueSelector /> */}
         // </View>
-        <View>
-            <RangeSelector2 />
+        <View style={styles.container}>
+            <View style={styles.contentContainer}>
+                <RangeSelector2 />
+            </View>
         </View>
     );
 };
@@ -122,6 +124,19 @@ const FeedScreen = () => {
 export default FeedScreen
 
 const styles = StyleSheet.create ({
+    // TEMP. styles
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    contentContainer: {
+        width: '90%',
+        height: 300,
+    },
+
+    // other styles
     headingText: {
         color: Colors.sparrowDark,
         marginBottom: Spacing.md,
