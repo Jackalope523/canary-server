@@ -12,10 +12,14 @@ using static Repository.Entities.Report;
 
 namespace Repository
 {
-    public class QueryStore : IAccountDatabase, IEventDatabase
+    public class QueryStore : IAccountDatabase, IEventDatabase, IPostDatabase,
+        IProfileDatabase, IReportDatabase
     {     
         public static IAccountDatabase AccountDatabaseAccess => new QueryStore(new TestSentry());
         public static IEventDatabase EventDatabaseAccess => new QueryStore(new TestSentry());
+        public static IPostDatabase PostDatabaseAccess => new QueryStore(new TestSentry());
+        public static IProfileDatabase ProfileDatabaseAccess => new QueryStore(new TestSentry());
+        public static IReportDatabase ReportDatabaseAccess => new QueryStore(new TestSentry());
 
         Sentry storeSentry;
 

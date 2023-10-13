@@ -10,24 +10,13 @@ using System.Threading.Tasks;
 
 namespace Server.Controls
 {
-	public class EventManager : IEventOperations
+	internal class EventManager : AbstractManager, IEventOperations
 	{
-		internal static EventManager Manager { get; private set; }
-
-		private IAccountDatabase accounts;
-		private IEventDatabase events;
-
-		public EventManager(IAccountDatabase accountDatabase, IEventDatabase eventDatabase)
-		{
-			Manager = this;
-
-			accounts = accountDatabase;
-			events = eventDatabase;
-		}
+		public EventManager(CoreTerminal terminal) : base(terminal) { }
 
 		public async Task<EventShard> GetEventInformationAsync(Guid userID, Guid eventID)
         {
-			var user = await AccountManager.Manager.GetUser(userID);
+			var user = await GetUser(userID);
 			var targetEvent = await GetEvent(eventID);
 
 			// Check if user is allowed to view event
@@ -40,8 +29,8 @@ namespace Server.Controls
 		public async Task<List<EventThinSlice>> GetEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance)
 		{
-			var user = await AccountManager.Manager.GetUser(userID);
-			var nearbyEvents = events.FindEvents(latitude, longitude, distance);
+			var user = await GetUser(userID);
+			var nearbyEvents = Events.FindEvents(latitude, longitude, distance);
 
 			// Remove events from list that the user cannot access
 			await RemoveInaccessibleEventsAsync(user, nearbyEvents);
@@ -52,8 +41,8 @@ namespace Server.Controls
 		public async Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance)
 		{
-			var user = await AccountManager.Manager.GetUser(userID);
-			var nearbyEvents = events.FindEvents(latitude, longitude, distance);
+			var user = await GetUser(userID);
+			var nearbyEvents = Events.FindEvents(latitude, longitude, distance);
 
 			// Remove inaccessible events and events with a large difference between event and user interest
 			await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
@@ -68,7 +57,7 @@ namespace Server.Controls
 		{
 			// Check if user is already at an event
 			await ThrowIfUserAtEvent(userID);
-			var user = await AccountManager.Manager.GetUser(userID);
+			var user = await GetUser(userID);
 			
 			// Check if user can host
 			if (!user.CanHost)
@@ -91,7 +80,7 @@ namespace Server.Controls
             { throw new InvalidInformationException("Invalid event details provided."); }
 
             // Try to create an event
-            var newEvent = events.CreateEvent(userID, eventStub.Name, eventStub.Description,
+            var newEvent = Events.CreateEvent(userID, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter());
 			return newEvent;
@@ -128,12 +117,12 @@ namespace Server.Controls
 			}
 
 			// Push update
-			events.UpdateEvent(targetEvent.Id, edits);
+			Events.UpdateEvent(targetEvent.Id, edits);
 		}
 
 		public async Task JoinEventAsync(Guid userID, Guid eventID)
 		{
-			var user = await AccountManager.Manager.GetUser(userID);
+			var user = await GetUser(userID);
 			await ThrowIfUserAtEvent(userID);
 
 			var targetEvent = await GetEvent(eventID);
@@ -147,7 +136,7 @@ namespace Server.Controls
 			{ throw new InvalidEventException("Event is closed."); }
 
 			// Try to add user to the event
-			bool success = events.AddUserToEvent(userID, eventID);
+			bool success = Events.AddUserToEvent(userID, eventID);
 			if (!success)
 			{ throw new UnexpectedFailureException("Could not join event."); }
 		}
@@ -161,7 +150,7 @@ namespace Server.Controls
 			{ throw new InvalidUserException("Host cannot leave the event."); }
 
 			// Try to remove user from event
-			bool success = events.RemoveUserFromEvent(userID, eventID);
+			bool success = Events.RemoveUserFromEvent(userID, eventID);
             if (!success)
             { throw new UnexpectedFailureException("Could not leave event."); }
         }
@@ -175,18 +164,18 @@ namespace Server.Controls
 			{ throw new InvalidUserException("User does not have permissions to end event."); }
 
 			// Try to end to event
-			bool success = events.EndEvent(eventID);
+			bool success = Events.EndEvent(eventID);
             if (!success)
             { throw new UnexpectedFailureException("Could not end event."); }
 
 			// Update all participants' vectors
-			foreach (var guestDetails in events.GetGuestHistory(targetEvent.Id))
+			foreach (var guestDetails in Events.GetGuestHistory(targetEvent.Id))
 			{
 				User guest = new(guestDetails.User);
 
 				guest.CalculateCharacter(targetEvent, guestDetails.Left.Value - guestDetails.Joined);
 
-				accounts.UpdateUser(guest.Id, new() { ("Character", guest.Character) });
+				Accounts.UpdateUser(guest.Id, new() { ("Character", guest.Character) });
 			}
         }
 
@@ -198,7 +187,7 @@ namespace Server.Controls
 			if (!await targetEvent.IsAttendedBy(userID))
 			{
 				// Retrieve user's friends
-				var friends = accounts.GetFriends(userID);
+				var friends = Profiles.GetFriends(userID);
 				List<UserSilhouette> friendAttendees = new();
 
 				// Check if any friends are attending
@@ -220,138 +209,9 @@ namespace Server.Controls
 			return targetEvent.Attendees;
 		}
 
-        public async Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId,
-			EventReportType reportType, string reportDetails)
-		{
-			var targetEvent = await GetEvent(eventID);
-			events.ReportEvent(userID, eventID, hostId, reportType, reportDetails);
-
-			// Check if action is to be taken
-			if (await targetEvent.Reported())
-			{
-				// Threshold hit, end event
-				await EndEventAsync(targetEvent.Host.Id, eventID);
-
-				// Compute host's standing
-				var user = await AccountManager.Manager.GetUser(targetEvent.Host.Id);
-				var status = await user.EventReported();
-
-				// Check if host should be punished
-				if (user.AccountStatus != status)
-				{
-					accounts.UpdateUser(user.Id, new() { ("AccountStatus", status) });
-				}
-			}
-		}
-
-		public async Task<List<EventPost>> GetEventPostsAsync(Guid userID, Guid eventID)
-		{
-			var user = await AccountManager.Manager.GetUser(userID);
-			Event targetEvent = new(eventID);
-
-			// Ensure user can see the event
-			if (!await targetEvent.IsAttendedBy(user))
-			{ throw new InvalidEventException("User did not attend or is not attending event."); }
-
-			var eventPosts = events.GetPostsForEvent(eventID);
-
-			return eventPosts;
-		}
-
-		public async Task<EventPost> AddPostAsync(Guid userID, Guid eventID, string imageURL)
-		{
-			User user = new(userID);
-			var targetEvent = await GetEvent(eventID);
-
-			// Ensure the user can post to the event
-			if (!await targetEvent.IsAttendedBy(user))
-			{ throw new InvalidEventException("User is not attending event."); }
-
-			// Ensure event is still running
-			if (targetEvent.EndTime.HasValue)
-			{ throw new InvalidEventException("Event has already ended."); }
-			
-			// Try to post
-			var userPost = events.AddPost(eventID, userID, DateTimeOffset.UtcNow, imageURL);
-
-			return userPost;
-		}
-
-		public async Task RemovePostAsync(Guid userID, Guid postID)
-		{
-			var eventPost = events.GetPost(postID);
-			
-			// Check if user can delete post
-			if (!eventPost.UserId.Equals(userID))
-			{ throw new InvalidUserException("User cannot remove post."); }
-
-			events.RemovePost(postID);
-		}
-
-		public async Task RatePostAsync(Guid userID, Guid postID, UserRating rating)
-		{
-			User user = new(userID);
-			var eventOfPost = await GetEvent(events.GetPost(postID).EventId);
-			
-			// Check if user can interact with post
-			if (!await eventOfPost.IsAttendedBy(user))
-			{ throw new InvalidUserException("User cannot interact with post."); }
-
-			// Check if removing a rating
-			if (rating != UserRating.Remove)
-			{
-				events.RatePost(userID, postID, rating);
-			}
-			else
-			{
-				events.RemovePostRating(postID, userID);
-			}
-		}
-
-		public async Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)>
-			GetUserFeedAsync(Guid userID, int depth = 0, List<Guid> exclusionList = null)
-		{
-			User user = new(userID);
-			exclusionList ??= new();
-			Dictionary<Guid, EventHeader> eventHeaders = new();
-
-			// Retrieve friend-populated event posts after a specified time excluding previously viewed events
-			DateTimeOffset depthCharge = DateTimeOffset.UtcNow - TimeSpan.FromDays(1 + depth);
-			var friendPosts = events.GenerateFeedForUser(user.Id, depthCharge, exclusionList);
-
-			// Get the respective event headers for the posts
-			foreach (EventPost post in friendPosts)
-			{
-				// Add event header if it does not yet exist
-				if (!eventHeaders.ContainsKey(post.EventId))
-				{
-					Event postEvent = new(events.FindEvent(post.EventId));
-
-					eventHeaders.Add(post.EventId, postEvent.ToEventHeader(post.TimePosted));
-				}
-				// Update event header active time if post is more recent
-				else if (eventHeaders[post.EventId].LastActiveTime < post.TimePosted)
-				{
-					eventHeaders[post.EventId] = new(post.EventId,
-						eventHeaders[post.EventId].Name,
-						eventHeaders[post.EventId].IsActive,
-						post.TimePosted);
-				}
-			}
-
-			return (depth, eventHeaders.Values.ToList(), friendPosts);
-		}
-
-
-
-		internal async Task<Event> GetEvent(Guid eventID)
-		{
-			return new(events.FindEvent(eventID));
-		}
-
 		internal async Task<List<UserSilhouette>> GetAttendeesInternalAsync(Guid eventID)
 		{
-			return events.GetGuestList(eventID);
+			return Events.GetGuestList(eventID);
 		}
 
 		internal async Task<List<EventShard>>
@@ -401,17 +261,7 @@ namespace Server.Controls
 
 		internal async Task<EventShard> GetCurrentEventAsync(Guid userID)
 		{
-			return events.FindCurrentEventForUser(userID);
-		}
-
-		internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
-		{
-			return events.GetReportsForEvent(eventID);
-		}
-
-		internal async Task<List<EventPost>> GetEventPostsAsync(Guid eventID)
-		{
-			return events.GetPostsForEvent(eventID);
+			return Events.FindCurrentEventForUser(userID);
 		}
 
 
@@ -423,7 +273,5 @@ namespace Server.Controls
 			if (user.IsAtEvent)
 			{ throw new InvalidUserException("User is currently attending an event."); }
 		}
-
-       
     }
 }

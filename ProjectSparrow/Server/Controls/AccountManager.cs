@@ -2,31 +2,14 @@
 using Server.Entities;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Shared;
-using Microsoft.Extensions.Logging;
-using PhoneNumbers;
 
 namespace Server.Controls
 {
-    internal class AccountManager : IAccountOperations
+    internal class AccountManager : AbstractManager, IAccountOperations
     {
-        internal static AccountManager Manager { get; private set; }
-
-        private IAccountDatabase accounts { get; init; }
-        private IEventDatabase events { get; init; }
-
-        public AccountManager(IAccountDatabase accountDatabase, IEventDatabase eventDatabase)
-        {
-            Manager = this;
-
-            accounts = accountDatabase;
-            events = eventDatabase;
-        }
+        public AccountManager(CoreTerminal terminal) : base(terminal) { }
 
         public async Task<UserShard> GetUserAsync(Guid userID)
         {
@@ -39,54 +22,6 @@ namespace Server.Controls
             { throw new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."); }
             return (await GetUser(normalisedPhoneNumber)).ToThinUser();
 		}
-
-        public async Task<UserProfile> GetUserProfileAsync(Guid userID, Guid targetID)
-        {
-            var user = await GetUser(userID);
-            var targetUser = await GetUser(targetID);
-
-            // Check if user is blocked
-            if (await targetUser.IsBlocking(user))
-            { throw new InvalidUserException("User is unable to view target."); }
-
-            return targetUser.ToThinProfile();
-        }
-
-        public async Task<List<EventShard>> GetUserActivityAsync(Guid userID, Guid targetID)
-        {
-            var user = await GetUser(userID);
-            var targetUser = await GetUser(targetID);
-
-            // Check if users are friends
-            if (!await targetUser.IsFriendsWith(user)) 
-            { throw new InvalidUserException("User is unable to view target."); }
-
-            // Gather active and upcoming events
-            var upcomingActivity = await GetUserActivityInternalAsync(targetID);
-
-            // Remove active and upcoming events if the user cannot view them
-            await EventManager.Manager.RemoveInaccessibleEventsAsync(user, upcomingActivity);
-
-            return upcomingActivity.ToList();
-        }
-
-        public async Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(Guid userID)
-        {
-            var user = await GetUser(userID);
-            var friends = accounts.GetFriends(userID);
-
-            Dictionary<UserSilhouette, List<EventShard>> friendEvents = new();
-
-            // Gather visible activity of each friend
-			foreach (var friend in friends)
-            {
-                var friendActivity = await GetUserActivityInternalAsync(friend.Id);
-                await EventManager.Manager.RemoveInaccessibleEventsAsync(user, friendActivity);
-                friendEvents.Add(friend, friendActivity);
-            }
-
-            return friendEvents;
-        }
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
@@ -113,7 +48,7 @@ namespace Server.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            bool success = accounts.CreateUser(newUser.PhoneNumber, email, newUser.Email,
+            bool success = Accounts.CreateUser(newUser.PhoneNumber, email, newUser.Email,
                 newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
@@ -181,12 +116,12 @@ namespace Server.Controls
 			}
 
             // Push update
-            accounts.UpdateUser(editUser.Id, edits);
+            Accounts.UpdateUser(editUser.Id, edits);
 		}
 
         public async Task DeleteUserAsync(Guid userID)
         {
-            bool success = accounts.DeleteUser(userID);
+            bool success = Accounts.DeleteUser(userID);
             if (!success)
             { throw new UnexpectedFailureException("User deletion failed."); }
         }
@@ -200,88 +135,14 @@ namespace Server.Controls
 
             await user.HandleHaunt();
 
-            accounts.UpdateRecentLocation(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
-            accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
+            Accounts.UpdateRecentLocation(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
+            Accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
         }
 
-        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid userID)
-        {
-            return accounts.GetFollowedUsers(userID);
-		}
-
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid userID)
-		{
-			return accounts.GetBlockedUsers(userID);
-		}
-
-        public async Task FollowUserAsync(Guid userID, Guid targetID)
-        {
-            accounts.FollowUser(userID, targetID);
-		}
-
-		public async Task UnfollowUserAsync(Guid userID, Guid targetID)
-        {
-            accounts.UnfollowUser(userID, targetID);
-        }
-
-		public async Task BlockUserAsync(Guid userID, Guid targetID)
-        {
-            accounts.BlockUser(userID, targetID);
-        }
-
-		public async Task UnblockUserAsync(Guid userID, Guid targetID)
-        {
-            accounts.UnblockUser(userID, targetID);
-		}
-
-        public async Task RateUserAsync(Guid userID, Guid targetID, UserRating rating)
-        {
-            if (rating != UserRating.Remove)
-            {
-                accounts.RateUser(userID, targetID, rating);
-            }
-            else
-            {
-                accounts.RemoveUserRating(userID, targetID);
-            }
-
-            User targetUser = new(targetID);
-            await targetUser.SyncReputation();
-            targetUser.CalculateReputation();
-            accounts.UpdateUser(targetID, new() { ("Reputation", targetUser.Reputation) });
-        }
-
-        public async Task ReportUserAsync(Guid userID, Guid eventId, Guid targetID, UserReportType reportType, string reportDetails)
-        {
-            accounts.ReportUser(userID, eventId, targetID, reportType, reportDetails);
-
-			// Compute user's standing
-			var user = await GetUser(targetID);
-			var status = await user.Reported();
-
-			// Check if host should be punished
-			if (user.AccountStatus != status)
-			{
-                accounts.UpdateUser(targetID, new() { ("AccountStatus", status) });
-			}
-		}
-
-
-
-        internal async Task<User> GetUser(Guid userID)
-        {
-			User user = new(accounts.FindUserById(userID));
-
-			// Check if user account is locked
-			if (user.IsLocked)
-			{ throw new InvalidUserException("User account is locked."); }
-
-			return user;
-		}
 
         internal async Task<User> GetUser(string phoneNumber)
         {
-            User user = new(accounts.FindUserByPhoneNumber(phoneNumber));
+            User user = new(Accounts.FindUserByPhoneNumber(phoneNumber));
 
             // Check if user account is locked
             if (user.IsLocked)
@@ -290,26 +151,17 @@ namespace Server.Controls
             return user;
         }
 
-        internal async Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(Guid userID)
+        internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
+            GetUserHauntAsync(Guid userID)
         {
-            return accounts.GetUserHaunt(userID);
+            return Accounts.GetUserHaunt(userID);
         }
 
-        internal async Task<(double Latitude, double Longitude, double Radius)> GetLastKnownUserLocationAsync(Guid userID)
+        internal async Task<(double Latitude, double Longitude, double Radius)>
+            GetLastKnownUserLocationAsync(Guid userID)
         {
-            return accounts.GetRecentUserLocation(userID);
+            return Accounts.GetRecentUserLocation(userID);
         }
-
-        internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(Guid userID)
-        {
-            return accounts.GetUserRatings(userID);
-        }
-
-        internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)> GetAllReportsAsync(Guid userID)
-        {
-            return accounts.GetReportsAboutUser(userID);
-        }
-
 
 
         private async Task ThrowIfPhoneNumberTaken(string phoneNumber)
@@ -333,27 +185,13 @@ namespace Server.Controls
 			try
 			{
                 // Throws an exception if there is no user
-                accounts.FindUserByEmail(normalisedEmail);
+                Accounts.FindUserByEmail(normalisedEmail);
 				emailTaken = true;
 			}
 			catch { }
 
 			if (emailTaken)
 			{ throw new InvalidUserException("Email already registered."); }
-        }
-
-        private async Task<List<EventShard>> GetUserActivityInternalAsync(Guid userID)
-        {
-            // Gather all user event data
-            var upcomingActivity = events.FindUpcomingEventsForUser(userID);
-            upcomingActivity.Add(events.FindCurrentEventForUser(userID));
-
-            return upcomingActivity.ToList();
-        }
-
-        public Task ReportUserAsync(Guid userID, Guid targetID, UserReportType reportType, string reportDetails)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -11,20 +11,9 @@ namespace Server.Boundaries
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
 	public record EventThinSlice(Guid Id, UserSilhouette Host, double Latitude, double Longitude);
-	public record EventHeader(Guid Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
-
-	public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId,
-		Guid ReportedEventHostId, DateTimeOffset ReportTime,
-		EventReportType ReportType, string ReportDetails);
-
-	public record EventPost(Guid Id, Guid EventId, Guid UserId,
-		DateTimeOffset TimePosted, string ImageURL,
-		(int Positive, int Negative) Ratings);
 
 	public interface IEventDatabase
 	{
-        public static IEventDatabase EventDatabaseAccess;
-
         EventShard FindEvent(Guid id);
 		List<EventThinSlice> FindEvents(double latitude, double longitude, double distance);
 		EventShard FindCurrentEventForUser(Guid id);
@@ -42,29 +31,10 @@ namespace Server.Boundaries
 
 		List<UserSilhouette> GetGuestList(Guid id);
 		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(Guid id);
-
-		List<EventReport> GetReportsForEvent(Guid id);
-		bool ReportEvent(Guid userId, Guid eventId, Guid HostId,
-			EventReportType reportType, string reportDetails);
-
-		List<EventPost> GetPostsForEvent(Guid id);
-		List<EventPost> GetPostsByUser(Guid id);
-		EventPost GetPost(Guid id);
-		EventPost AddPost(Guid eventId, Guid posterId,
-			DateTimeOffset timePosted, string imageURL);
-		bool RemovePost(Guid postId);
-
-		bool RatePost(Guid postId, Guid voterId, UserRating rating);
-		bool RemovePostRating(Guid postId, Guid voterId);
-
-		List<EventPost> GenerateFeedForUser(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList);
 	}
 
 	public interface IEventOperations
 	{
-		static IEventOperations EventManager
-			=> new EventManager(IAccountDatabase.AccountDatabaseAccess, IEventDatabase.EventDatabaseAccess);
-
 		Task<EventShard> GetEventInformationAsync(Guid userID, Guid eventID);
 		Task<List<EventThinSlice>> GetEventsInAreaAsync(Guid userID,
 			double latitude, double longitude, double distance);
@@ -81,16 +51,5 @@ namespace Server.Boundaries
 		Task EndEventAsync(Guid userID, Guid eventID);
 
 		Task<List<UserSilhouette>> GetAttendeesAsync(Guid userID, Guid eventID);
-
-		Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId,
-			EventReportType reportType, string reportDetails);
-
-		Task<List<EventPost>> GetEventPostsAsync(Guid userID, Guid eventID);
-		Task<EventPost> AddPostAsync(Guid userID, Guid eventID, string imageURL);
-		Task RemovePostAsync(Guid userID, Guid postID);
-		Task RatePostAsync(Guid userID, Guid postID, UserRating rating);
-
-		Task<(int Depth, List<EventHeader> Headers, List<EventPost> Posts)> GetUserFeedAsync(Guid userID,
-			int depth, List<Guid> exclusionList = null);
 	}
 }

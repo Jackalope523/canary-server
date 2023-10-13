@@ -39,11 +39,14 @@ namespace Web
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
-            IAccountDatabase.AccountDatabaseAccess = Repository.QueryStore.AccountDatabaseAccess;
-            IEventDatabase.EventDatabaseAccess = Repository.QueryStore.EventDatabaseAccess;
+            CoreTerminal terminal = new(Repository.QueryStore.AccountDatabaseAccess, 
+                Repository.QueryStore.EventDatabaseAccess, Repository.QueryStore.PostDatabaseAccess,
+                Repository.QueryStore.ProfileDatabaseAccess, Repository.QueryStore.ReportDatabaseAccess);
 
-            services.AddSingleton(IAccountOperations.AccountManager);
-            services.AddSingleton(IEventOperations.EventManager);
+            foreach (var (DatabaseType, Instance) in terminal.Gates)
+            {
+                services.AddSingleton(DatabaseType, Instance);
+            }
 
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();
