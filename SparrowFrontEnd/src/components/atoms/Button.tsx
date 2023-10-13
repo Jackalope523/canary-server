@@ -19,7 +19,9 @@ interface ButtonProps {
 const Button: React.FC<ButtonProps> = ({onPress, btnText, btnStyle, btnTextStyle, btnIcon, btnIconStyle}) => {
   return (
     <Pressable onPress={onPress} style={[btnStyle, styles.btnBase]}>
+      {btnIcon && (
         <Icon style={btnIconStyle} name={btnIcon} />
+      )}
         <Text style={btnTextStyle}>{btnText}</Text>
     </Pressable>
   )

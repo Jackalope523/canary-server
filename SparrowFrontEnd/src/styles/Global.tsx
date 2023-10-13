@@ -140,53 +140,53 @@ export const globalStyles = StyleSheet.create({
     // Text
     // Color variants
     // Dark
-    // textDark: {
-    //     color: Colors.sparrowDark,
-    // },
-
-    // // Light
-    // textLight: {
-    //     color: Colors.sparrowSand,
-    // },
-
-    // // Primary
-    // textPrimary: {
-    //     backgroundColor: Colors.sparrowDarkBrown,
-    // },
-
-    // // Secondary
-    // textSecondary: {
-    //     backgroundColor: Colors.sparrowSand,
-    // },
-
-    // // Success
-    // textSuccess: {
-    //     backgroundColor: Colors.green400,
-    // },
-
-    // // Warning
-    // textWarning: {
-    //     backgroundColor: Colors.orange400,
-    // },
-
-    // // Error
-    // textError: {
-    //     backgroundColor: Colors.red400,
-    // },
-
-    // // Function
-    // textFunction: {
-    //     backgroundColor: Colors.turqoise300,
-    // },
-
-    // Buttons
-    buttonDark: {
+    textDark: {
         color: Colors.sparrowDark,
     },
 
     // Light
-    buttonLight: {
+    textLight: {
         color: Colors.sparrowSand,
+    },
+
+    // Primary
+    textPrimary: {
+        color: Colors.sparrowDarkBrown,
+    },
+
+    // Secondary
+    textSecondary: {
+        color: Colors.sparrowSand,
+    },
+
+    // Success
+    textSuccess: {
+        color: Colors.green400,
+    },
+
+    // Warning
+    textWarning: {
+        color: Colors.orange400,
+    },
+
+    // Error
+    textError: {
+        color: Colors.red400,
+    },
+
+    // Function
+    textFunction: {
+        color: Colors.turqoise300,
+    },
+
+    // Buttons
+    buttonDark: {
+        backgroundColor: Colors.sparrowDark,
+    },
+
+    // Light
+    buttonLight: {
+        backgroundColor: Colors.sparrowSand,
     },
 
     // Primary

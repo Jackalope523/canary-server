@@ -104,8 +104,8 @@ const NotificationsScreen = ({navigation}) => {
               <View style={notificationStyles.notification}>
                 <Image source={item.uri} resizeMode="cover" style={[avatarStyles.avatarSquareMedium, avatarStyles.avatarOffline]} />
                 <View style={notificationStyles.notification.textWrapper}>
-                  <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{item.name}{eventInviteText}</Text>
-                  <Text style={[globalStyles.labelTextAsTyped, globalStyles.buttonDark]}>{item.sent}</Text>
+                  <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.name}{eventInviteText}</Text>
+                  <Text style={[globalStyles.labelTextAsTyped, globalStyles.textDark]}>{item.sent}</Text>
                 </View>
               </View>
             )}

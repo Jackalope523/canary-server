@@ -129,7 +129,7 @@ const DiscoveryScreen = () => {
                                     btnIcon={'filter-fill'}
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimary, activeComponent === 'filter' ? globalStyles.buttonPrimaryLight : null]}
-                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.buttonLight]}
+                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                     onPress={toggleFilter}
                                 />
                                 <Button
@@ -137,7 +137,7 @@ const DiscoveryScreen = () => {
                                     btnIcon={'sort-outline'}
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonFull, activeComponent === 'sort' ? globalStyles.buttonPrimaryLight : null]}
-                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.buttonLight]}
+                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                     onPress={toggleSort}
                                 />
                             </View>
@@ -157,6 +157,10 @@ const DiscoveryScreen = () => {
                     {activeComponent === 'filter' && searchContentVisible ? (
                         <View>
                             <Text style={globalStyles.headingTextOne}>FILTER VIEW</Text>
+                            <Button
+                                btnText={'Date'}
+                                btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonLight, globalStyles.buttonContained]}
+                            />
                         </View>
                     ) : null }
 
@@ -183,7 +187,7 @@ const DiscoveryScreen = () => {
                             btnIcon={'add-outline'}
                             btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonContained]}
-                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textButtonExtraSmall.text.uppercase, globalStyles.buttonLight]}
+                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textButtonExtraSmall.text.uppercase, globalStyles.textLight]}
                             onPress={null}
                         />
                     </View>
