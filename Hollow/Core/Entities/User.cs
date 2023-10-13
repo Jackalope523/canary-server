@@ -119,7 +119,7 @@ namespace Core.Entities
         {
             try
             {
-                var userLocation = await CoreTerminal.Terminal.AccountManager.GetLastKnownUserLocationAsync(Id);
+                var userLocation = await CoreTerminal.Terminal.AccountDirector.GetLastKnownUserLocationAsync(Id);
                 LastKnownLocation = new() { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude };
                 LastKnownRadius = new() { Metres = userLocation.Radius };
             }
@@ -130,7 +130,7 @@ namespace Core.Entities
         {
             try
             {
-                var userHaunt = await CoreTerminal.Terminal.AccountManager.GetUserHauntAsync(Id);
+                var userHaunt = await CoreTerminal.Terminal.AccountDirector.GetUserHauntAsync(Id);
                 Haunt = new() { Latitude = userHaunt.Latitude, Longitude = userHaunt.Longitude };
                 HauntRadius = new() { Metres = userHaunt.Radius };
                 HauntStability = userHaunt.Stability;
@@ -143,19 +143,19 @@ namespace Core.Entities
         {
             try
             {
-                CurrentEvent = new(await CoreTerminal.Terminal.EventManager.GetCurrentEventAsync(Id));
+                CurrentEvent = new(await CoreTerminal.Terminal.EventDirector.GetCurrentEventAsync(Id));
             }
             catch { }
         }
 
         public async Task SyncReputation()
         {
-            Ratings = await CoreTerminal.Terminal.ProfileManager.GetAllRatingsAsync(Id);
+            Ratings = await CoreTerminal.Terminal.ProfileDirector.GetAllRatingsAsync(Id);
         }
 
         public async Task SyncReports()
         {
-            var reports = await CoreTerminal.Terminal.ReportManager.GetAllReportsAsync(Id);
+            var reports = await CoreTerminal.Terminal.ReportDirector.GetAllReportsAsync(Id);
             Reports = reports.UserReports;
             EventReports = reports.EventReports;
         }
@@ -224,7 +224,7 @@ namespace Core.Entities
         public async Task<bool> IsFollowing(User otherUser)
         {
             // Set if null
-            Following ??= await CoreTerminal.Terminal.ProfileManager.GetFollowedUsersAsync(otherUser.Id);
+            Following ??= await CoreTerminal.Terminal.ProfileDirector.GetFollowedUsersAsync(otherUser.Id);
 
 			// Check if user is following target
 			if (Following.Find(x => x.Id == otherUser.Id) != null)
@@ -239,7 +239,7 @@ namespace Core.Entities
         public async Task<bool> IsBlocking(User otherUser)
         {
             // Set if null
-            Blocking ??= await CoreTerminal.Terminal.ProfileManager.GetBlockedUsersAsync(otherUser.Id);
+            Blocking ??= await CoreTerminal.Terminal.ProfileDirector.GetBlockedUsersAsync(otherUser.Id);
 
 			// Check if user is following target
 			if (Blocking.Find(x => x.Id == otherUser.Id) != null)

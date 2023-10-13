@@ -12,12 +12,12 @@ using static Repository.Entities.Report;
 
 namespace Repository
 {
-    public class QueryStore : IAccountDatabase, IEventDatabase, IPostDatabase,
+    public class QueryStore : IAccountDatabase, IEventDatabase, IEtchingDatabase,
         IProfileDatabase, IReportDatabase
     {
         public static IAccountDatabase AccountDatabaseAccess => new QueryStore(new TestSentry());
         public static IEventDatabase EventDatabaseAccess => new QueryStore(new TestSentry());
-        public static IPostDatabase PostDatabaseAccess => new QueryStore(new TestSentry());
+        public static IEtchingDatabase EtchingDatabaseAccess => new QueryStore(new TestSentry());
         public static IProfileDatabase ProfileDatabaseAccess => new QueryStore(new TestSentry());
         public static IReportDatabase ReportDatabaseAccess => new QueryStore(new TestSentry());
 
@@ -232,7 +232,7 @@ namespace Repository
 
             return addLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId, Type = type });
         }
-        public bool RatePost(Guid postId, Guid voterId, UserRating rating)
+        public bool RateEtching(Guid postId, Guid voterId, UserRating rating)
         {
             PostLink.PostLinkType type;
             if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
@@ -244,7 +244,7 @@ namespace Repository
         {
             return removeLinkOperation(new UserLink { SelfId = selfId, OtherId = targetId });
         }
-        public bool RemovePostRating(Guid postId, Guid voterId)
+        public bool RemoveEtchingRating(Guid postId, Guid voterId)
         {
             return removeLinkOperation(new PostLink { SelfId = voterId, PostId = postId });
         }
@@ -501,14 +501,14 @@ namespace Repository
         public List<EventShard> FindUpcomingEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
         public List<EventShard> FindPastEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }  
 
-        public EventPost AddPost(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
+        public Etching AddEtching(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
         {
             Post toAdd = new Post { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
             storeSentry.GetContext().Posts.Add(toAdd);
-            return new EventPost(toAdd.Id, toAdd.EventId, toAdd.OwnerId, toAdd.PostedAt, toAdd.PhotoURL, new (0, 0));
+            return new Etching(toAdd.Id, toAdd.EventId, toAdd.OwnerId, toAdd.PostedAt, toAdd.PhotoURL, new (0, 0));
         }
 
-        public bool RemovePost(Guid postId)
+        public bool RemoveEtching(Guid postId)
         {
             storeSentry.GetContext().Posts.Remove(new Post { Id = postId });
             return true;
@@ -518,7 +518,7 @@ namespace Repository
         {
             return storeSentry.GetContext().PostLinks.Where(l => l.PostId == id && l.Type == type).Count();
         }
-        public EventPost GetPost(Guid id)
+        public Etching GetEtching(Guid id)
         {
             int Ups = countRatings(id, PostLink.PostLinkType.RateUp);
             int Downs = countRatings(id, PostLink.PostLinkType.RateDown);
@@ -526,10 +526,10 @@ namespace Repository
             return storeSentry.GetContext().
                 Posts.
                 Where(p => p.Id == id).
-                Select(p => new EventPost(p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, new (Ups, Downs))).Single();
+                Select(p => new Etching(p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, new (Ups, Downs))).Single();
         }
 
-        public List<EventPost> GetPostsForEvent(Guid id)
+        public List<Etching> GetEtchingsForEvent(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -567,7 +567,7 @@ namespace Repository
             return (result.Y, result.X, result.CurrentRadius);
         }
 
-        public List<EventPost> GetPostsByUser(Guid id)
+        public List<Etching> GetEtchingsByUser(Guid id)
         {
 
             return storeSentry.GetContext().Posts.Where(p => p.OwnerId == id).
@@ -581,11 +581,11 @@ namespace Repository
                 storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
                 p => p.Id,
                 l => l.PostId,
-                (a, b) => new EventPost(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
+                (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
                 )).ToList();
         }
 
-        public List<EventPost> GenerateFeedForUser(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList)
+        public List<Etching> GenerateFeedForUser(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList)
         {           
             // Get List of Friends.
             List<Guid> following = storeSentry.GetContext().UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.OtherId).ToList();
@@ -593,7 +593,7 @@ namespace Repository
             List<Guid> friends =  following.Intersect(followingMe).ToList();
 
             // Get unseen posts by friends from certain depth.
-            List<EventPost> friendPosts = storeSentry.GetContext().Posts.Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && p.PostedAt > depthCharge && p.PostedAt < DateTimeOffset.UtcNow).
+            List<Etching> friendPosts = storeSentry.GetContext().Posts.Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && p.PostedAt > depthCharge && p.PostedAt < DateTimeOffset.UtcNow).
                Join(
                storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
                p => p.Id,
@@ -604,20 +604,20 @@ namespace Repository
                storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
                p => p.Id,
                l => l.PostId,
-               (a, b) => new EventPost(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
+               (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
                )).ToList();
 
             // Compile unique list if events spanned by friend posts and a list of already loaded posts. 
             List<Guid> sitesToBeExplored = new List<Guid>();
             List<Guid> previouslyExtractedPosts = new List<Guid>();
-            foreach (EventPost p in friendPosts)
+            foreach (Etching p in friendPosts)
             {
                 if (!sitesToBeExplored.Contains(p.EventId)) sitesToBeExplored.Add(p.EventId);
                 previouslyExtractedPosts.Add(p.Id);
             }
 
             // Get remaining friend posts from same events as others even if outside time range. 
-            List<EventPost> nettedPosts = storeSentry.GetContext().Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
+            List<Etching> nettedPosts = storeSentry.GetContext().Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
                Join(
                storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
                p => p.Id,
@@ -628,7 +628,7 @@ namespace Repository
                storeSentry.GetContext().PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
                p => p.Id,
                l => l.PostId,
-               (a, b) => new EventPost(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
+               (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
                )).ToList();
 
             return friendPosts.Concat(nettedPosts).ToList();

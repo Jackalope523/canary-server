@@ -32,7 +32,7 @@ namespace Core.Entities
 
 		public List<EventReport> EventReports { get; set; }
 
-        public List<EventPost> EventPosts { get; set; }
+        public List<Etching> EventEtchings { get; set; }
 
 		#endregion
 
@@ -86,12 +86,12 @@ namespace Core.Entities
 
 		public async Task SyncReports()
 		{
-			EventReports = await CoreTerminal.Terminal.ReportManager.GetEventReportsAsync(Id);
+			EventReports = await CoreTerminal.Terminal.ReportDirector.GetEventReportsAsync(Id);
 		}
 
-        public async Task SyncPosts()
+        public async Task SyncEtchings()
         {
-            EventPosts = await CoreTerminal.Terminal.PostManager.GetEventPostsAsync(Id);
+            EventEtchings = await CoreTerminal.Terminal.EtchingDirector.GetEventEtchingsAsync(Id);
         }
 
         public bool ValidateAndNormalise()
@@ -150,7 +150,7 @@ namespace Core.Entities
 
         public async Task<bool> IsAttendedBy(User user)
         {
-            Attendees ??= await CoreTerminal.Terminal.EventManager.GetAttendeesInternalAsync(Id);
+            Attendees ??= await CoreTerminal.Terminal.EventDirector.GetAttendeesInternalAsync(Id);
 
             // Check if user is on the guest list
             return Attendees.Find(x => x.Id == user.Id) != null;
