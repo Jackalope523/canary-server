@@ -1,0 +1,135 @@
+export const Colors = {
+    // Colors
+    // Sparrow Primary
+    sparrowSand: "#F5F4F1",
+    sparrowRed: "#A94C37",
+    sparrowBrown: "#5D4548",
+    sparrowDarkBrown: "#362D2D",
+    sparrowDark: "#221B1B",
+
+    // Sands
+    sand100: "#FBF4EA",
+    sand200: "#E8DCCF",
+    sand300: "#DFD2C4",
+    sand400: "#BDAF9F",
+
+    // Yellow
+    yellow50: "#FEFEF9",
+    yellow100: "#F9F4CB",
+    yellow200: "#F4E99D",
+    yellow300: "#EFDF6F",
+    yellow400: "#EAD541",
+    yellow500: "#DFC719",
+    yellow600: "#B19E14",
+    yellow700: "#83750F",
+    yellow800: "#554C0A",
+    yellow900: "#282304",
+
+    // Orange
+    orange50: "#FFFBF8",
+    orange100: "#FFE2C5",
+    orange200: "#FFC892",
+    orange300: "#FFAE5F",
+    orange400: "#FF942C",
+    orange500: "#F87A00",
+    orange600: "#C56100",
+    orange700: "#924800",
+    orange800: "#5F2F00",
+    orange900: "#2C1600",
+
+    // Red
+    red50: "#FFF5F3",
+    red100: "#FECCC1",
+    red200: "#FCA390",
+    red300: "#FB795E",
+    red400: "#FA502C",
+    red500: "#ED2E06",
+    red600: "#BC2404",
+    red700: "#8A1B03",
+    red800: "#581102",
+    red900: "#260701",
+
+    // Rose
+    rose50: "#FFFEFE",
+    rose100: "#FFCBDA",
+    rose200: "#FE99B6",
+    rose300: "#FE6692",
+    rose400: "#FE336E",
+    rose500: "#FC024A",
+    rose600: "#CA013B",
+    rose700: "#97012C",
+    rose800: "#64011E",
+    rose900: "#32000F",
+
+    // Fuchsia
+    fuchsia50: "#FFFBFE",
+    fuchsia100: "#FFC8EC",
+    fuchsia200: "#FE96DA",
+    fuchsia300: "#FE63C8",
+    fuchsia400: "#FE30B6",
+    fuchsia500: "#FA01A3",
+    fuchsia600: "#C70182",
+    fuchsia700: "#940161",
+    fuchsia800: "#610140",
+    fuchsia900: "#2F001F",
+
+    // Lavender
+    lavender50: "#F9F8FA",
+    lavender100: "#E2DAE5",
+    lavender200: "#CABCD0",
+    lavender300: "#B29EBB",
+    lavender400: "#9A80A6",
+    lavender500: "#82648F",
+    lavender600: "#664F71",
+    lavender700: "#4B3A53",
+    lavender800: "#302535",
+    lavender900: "#151017",
+
+    // Azure
+    azure50: "#FBFDFF",
+    azure100:"#C8E5FF",
+    azure200: "#95CCFF",
+    azure300: "#62B4FF",
+    azure400: "#2F9BFF",
+    azure500: "#0083FB",
+    azure600: "#0068C8",
+    azure700: "#004D95",
+    azure800: "#003362",
+    azure900: "#00182F",
+
+    // Picton
+    picton50: "#F1FAFC",
+    picton100: "#C5E9F5",
+    picton200: "#9AD9ED",
+    picton300: "#6FC8E5",
+    picton400: "#43B8DE",
+    picton500: "#24A1CA",
+    picton600: "#1C7F9F",
+    picton700: "#155C73",
+    picton800: "#0D3A48",
+    picton900: "#05171D",
+    
+    // Turqoise
+    turqoise50: "#FBFDFD",
+    turqoise100: "#D7ECEE",
+    turqoise200: "#B4DADE",
+    turqoise300: "#91C9CE",
+    turqoise400: "#6DB7BF",
+    turqoise500: "#4CA4AD",
+    turqoise600: "#3D8289",
+    turqoise700: "#2D6166",
+    turqoise800: "#1D3F43",
+    turqoise900: "#0E1E1F",
+
+    // Green
+    green50: "#F6FCF6",
+    green100: "#CFF0D0",
+    green200: "#A8E4AB",
+    green300: "#81D885",
+    green400: "#5ACC5F",
+    green500: "#39BA3F",
+    green600: "#2D9332",
+    green700: "#216C25",
+    green800: "#154517",
+    green900: "#091E0A",
+}

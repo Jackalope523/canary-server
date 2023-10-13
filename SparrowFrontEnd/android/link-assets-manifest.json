@@ -1,0 +1,57 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/sparrow-icons.ttf",
+      "sha1": "146cb7e8133a6e963e0ae16060a2b3650a054b29"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-Bold.otf",
+      "sha1": "db8a93240b7daf1f48782ced69783744e15e428b"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-BoldItalic.otf",
+      "sha1": "c03dae74414417f6ec5b8997f78beed9e9787ee6"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-Book.otf",
+      "sha1": "8324b43af6a9bea84cf5a1d2639051007c423a6c"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-BookItalic.otf",
+      "sha1": "3d46e45ca1dd2228afe801269d0197753e8e2d65"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-Light.otf",
+      "sha1": "ddb13921331ce439a2ee8c8d802a68e26722d6e2"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-LightItalic.otf",
+      "sha1": "11959772d6e0bf8424cfbc3dc9961621618b19f6"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-Medium.otf",
+      "sha1": "12ccb640ea015441112068b694a70e93f153717d"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-MediumItalic.otf",
+      "sha1": "2d26c544d79ea735e82fb187f192ed8ca5ae6796"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-Regular.otf",
+      "sha1": "185b0a4a4c137e3f895b82bf9a65fb71079a18d5"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-RegularItalic.otf",
+      "sha1": "222ca5cb2bc88bb6ea91a3837fa46e61d324c1bd"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-Semibold.otf",
+      "sha1": "55dc325d4a8c62335c61f57535ca16b682c3ede8"
+    },
+    {
+      "path": "src/assets/fonts/UncutSans-SemiboldItalic.otf",
+      "sha1": "7f638c89b04ecb0530f6fb57e2bef812a15f3c72"
+    }
+  ]
+}
