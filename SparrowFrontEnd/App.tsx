@@ -3,7 +3,7 @@ import MainContainer from './src/containers/MainContainer';
 
 function App(){
   return (
-    <MainContainer/>
+    <MainContainer />
   );
 };
 
