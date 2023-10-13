@@ -351,3 +351,6 @@ MigrationBackup/
 
 #EF Core Garbage
 ProjectSparrow/Repository/Migrations/
+
+#Apple's gift from God
+.DS_Store
