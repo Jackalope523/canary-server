@@ -156,10 +156,12 @@ const DiscoveryScreen = () => {
                     {/* TODO make only one open - sort or filter - both cant be open at once */}
                     {activeComponent === 'filter' && searchContentVisible ? (
                         <View>
-                            <Text style={globalStyles.headingTextOne}>FILTER VIEW</Text>
+                            <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>Date</Text>
                             <Button
-                                btnText={'Date'}
-                                btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonLight, globalStyles.buttonContained]}
+                                btnText={'Today'}
+                                btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
+                                btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                btnActiveStyle={globalStyles.buttonLight}
                             />
                         </View>
                     ) : null }

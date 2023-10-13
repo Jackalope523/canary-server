@@ -187,6 +187,13 @@ export const globalStyles = StyleSheet.create({
     // Light
     buttonLight: {
         backgroundColor: Colors.sparrowSand,
+
+        outline: {
+            borderWidth: 2,
+            borderRadius: 8,
+            borderColor: Colors.sparrowSand,
+
+        },
     },
 
     // Primary
