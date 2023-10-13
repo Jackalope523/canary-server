@@ -158,9 +158,9 @@ const DiscoveryScreen = () => {
                     {activeComponent === 'filter' && searchContentVisible ? (
                         <View style={navigationStyles.search.searchOptionsInnerContainer}>
                             <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
-                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight]}>Date</Text>
+                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Date</Text>
                                 <GestureHandlerRootView>
-                                    <ScrollView horizontal={true} overScrollMode="never" showHorizontalScrollIndicator={false}>
+                                    <ScrollView horizontal={true} overScrollMode="never" showHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
                                         <Button
                                             btnText={'Today'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
@@ -193,6 +193,33 @@ const DiscoveryScreen = () => {
                                         />
                                     </ScrollView>
                                 </GestureHandlerRootView>
+                            </View>
+
+                            {/* TODO buttons need to change style when active (tapped and selected) */}
+                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
+                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Size</Text>
+                                <GestureHandlerRootView>
+                                    <ScrollView horizontal={true} overScrollMode="never" showHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
+                                        <Button
+                                            btnText={'Cozy'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                        <Button
+                                            btnText={'Thriving'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                        <Button
+                                            btnText={'Bombastic'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                    </ScrollView>
+                                </GestureHandlerRootView>
+                            </View>
+                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
+                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Distance</Text>
                             </View>
                         </View>
                     ) : null }
@@ -235,6 +262,10 @@ const DiscoveryScreen = () => {
 export default DiscoveryScreen
 
 const styles = StyleSheet.create ({
+    titleWrapper: {
+        paddingHorizontal: Spacing.md,
+    },
+
     buttonGap: {
         marginRight: Spacing.md,
     },

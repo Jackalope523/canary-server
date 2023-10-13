@@ -123,6 +123,7 @@ export const navigationStyles = StyleSheet.create({
 
             section: {
                 rowGap: Spacing.md,
+                paddingTop: Spacing.lg,
 
                 content: {
                     columnGap: Spacing.md,
