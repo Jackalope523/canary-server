@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{C
 		{517374C8-4EEE-4B43-9C64-2C073BFAC781} = {517374C8-4EEE-4B43-9C64-2C073BFAC781}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{517374C8-4EEE-4B43-9C64-2C073BFAC781}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{517374C8-4EEE-4B43-9C64-2C073BFAC781}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{C82BA0D8-5CDD-4556-80F2-3E3A873C1725}"
 	ProjectSection(ProjectDependencies) = postProject
