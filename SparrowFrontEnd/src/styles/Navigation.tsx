@@ -118,6 +118,18 @@ export const navigationStyles = StyleSheet.create({
             },
         },
 
+        searchOptionsInnerContainer: {
+            backgroundColor: Colors.sparrowBrown,
+
+            section: {
+                rowGap: Spacing.md,
+
+                content: {
+                    columnGap: Spacing.md,
+                },
+            },
+        },
+
         searchContent: {
             marginHorizontal: 24,
         },

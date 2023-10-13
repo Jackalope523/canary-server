@@ -23,29 +23,12 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = ({onPress, btnText, btnStyle, btnTextStyle, btnIcon, btnIconStyle, btnActiveStyle, btnActiveTextStyle, btnActiveIconStyle}) => {
-
-  const [isPressed, setIsPressed] = React.useState(false);
-
-  const handlePress = () => {
-    setIsPressed(!isPressed);
-  };
-
   return (
-    <Pressable onPress={handlePress} style={({ pressed }) => [
-      btnStyle,
-      styles.btnBase,
-      isPressed ? btnActiveStyle : pressed && btnActiveStyle,
-    ]}>
+    <Pressable onPress={onPress} style={([btnStyle, styles.btnBase])}>
       {btnIcon && (
-        <Icon style={({ pressed }) => [
-          btnIconStyle,
-          isPressed ? btnActiveIconStyle : pressed && btnActiveIconStyle,
-        ]} name={btnIcon} />
+        <Icon style={btnIconStyle} name={btnIcon} />
       )}
-        <Text style={({ pressed }) => [
-          btnTextStyle,
-          isPressed ? btnActiveTextStyle : pressed && btnActiveTextStyle,
-        ]}>{btnText}</Text>
+        <Text style={btnTextStyle}>{btnText}</Text>
     </Pressable>
   )
 }

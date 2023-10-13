@@ -17,6 +17,7 @@ import SearchFilter from '../components/organisms/SearchFilter';
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -155,14 +156,44 @@ const DiscoveryScreen = () => {
                     {/* TODO if sort and filter doesn't overlay SearchFilter - hide SearchFilter when sort or filter is active/visible */}
                     {/* TODO make only one open - sort or filter - both cant be open at once */}
                     {activeComponent === 'filter' && searchContentVisible ? (
-                        <View>
-                            <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>Date</Text>
-                            <Button
-                                btnText={'Today'}
-                                btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
-                                btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                btnActiveStyle={globalStyles.buttonLight}
-                            />
+                        <View style={navigationStyles.search.searchOptionsInnerContainer}>
+                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
+                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight]}>Date</Text>
+                                <GestureHandlerRootView>
+                                    <ScrollView horizontal={true} overScrollMode="never" showHorizontalScrollIndicator={false}>
+                                        <Button
+                                            btnText={'Today'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                        <Button
+                                            btnText={'Tomorrow'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                        <Button
+                                            btnText={'This week'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                        <Button
+                                            btnText={'This weekend'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                        <Button
+                                            btnText={'Next week'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                        <Button
+                                            btnText={'Next weekend'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                        />
+                                    </ScrollView>
+                                </GestureHandlerRootView>
+                            </View>
                         </View>
                     ) : null }
 
@@ -204,6 +235,10 @@ const DiscoveryScreen = () => {
 export default DiscoveryScreen
 
 const styles = StyleSheet.create ({
+    buttonGap: {
+        marginRight: Spacing.md,
+    },
+
     container: {
         rowGap: Spacing.md,
     },
