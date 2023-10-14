@@ -117,19 +117,19 @@ const NotificationsScreen = ({navigation}) => {
         // <ScrollView>
         //   <View style={styles.container}>
         //     <View style={styles.sectionWrapper}>
-        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonDark, styles.headingSpacing]}>Today</Text>
+        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonTertiary, styles.headingSpacing]}>Today</Text>
         //       <Notification />
         //       <Notification />
         //       <Notification />
         //       <Notification />
         //     </View>
         //     <View style={styles.sectionWrapper}>
-        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonDark, styles.headingSpacing]}>Tomorrow</Text>
+        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonTertiary, styles.headingSpacing]}>Tomorrow</Text>
         //       <Notification />
         //       <Notification />
         //     </View>
         //     <View style={styles.sectionWrapper}>
-        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonDark, styles.headingSpacing]}>Next week</Text>
+        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonTertiary, styles.headingSpacing]}>Next week</Text>
         //       <Notification />
         //       <Notification />
         //     </View>

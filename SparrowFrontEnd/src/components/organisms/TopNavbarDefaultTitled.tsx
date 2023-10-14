@@ -16,7 +16,7 @@ const TopNavbarDefaultTitled = () => {
   return (
     <View style={[navigationStyles.topNavbar, navigationStyles.topNavbar.defaultTitled]}>
       <Icon style={navigationStyles.topNavbar.icons} name="arrow-back-outline" />
-      <Text style={[globalStyles.headingTextFive, globalStyles.buttonDark]}>Notifications</Text>
+      <Text style={[globalStyles.headingTextFive, globalStyles.buttonTertiary]}>Notifications</Text>
     </View>
   )
 }

@@ -180,55 +180,78 @@ export const globalStyles = StyleSheet.create({
     },
 
     // Buttons
-    buttonDark: {
-        backgroundColor: Colors.sparrowDark,
-    },
+    // TODO delete buttonSecondary and replace it everywhere with buttonSecondary
+    // TODO replace buttonSecondary.outline with buttonSecondary.outline
+    // TODO delete buttonTertiary and create buttonTertiary instead, replace it mentioned everywhere with buttonTertiary
+    // buttonTertiary: {
+    //     backgroundColor: Colors.sparrowDark,
+    // },
 
-    // Light
-    buttonLight: {
-        backgroundColor: Colors.sparrowSand,
+    // // Light
+    // buttonSecondary: {
+    //     backgroundColor: Colors.sparrowSand,
+    //     borderColor: Colors.sparrowSand,
 
-        outline: {
-            borderWidth: 2,
-            borderRadius: 8,
-            borderColor: Colors.sparrowSand,
+    //     outline: {
+    //         borderWidth: 2,
+    //         borderRadius: 8,
+    //         borderColor: Colors.sparrowSand,
 
-        },
-    },
+    //     },
+    // },
 
     // Primary
     buttonPrimary: {
         backgroundColor: Colors.sparrowDarkBrown,
+        borderColor: Colors.sparrowDarkBrown,
     },
 
     // Primary Light
     buttonPrimaryLight: {
         backgroundColor: Colors.sparrowBrown,
+        borderColor: Colors.sparrowBrown,
     },
 
     // Secondary
     buttonSecondary: {
         backgroundColor: Colors.sparrowSand,
+        borderColor: Colors.sparrowSand,
+
+        outline: {
+            borderWidth: 2,
+            borderRadius: 8,
+            borderColor: Colors.sparrowSand,
+        },
+    },
+
+    // Button Tertiary
+    buttonTertiary: {
+        backgroundColor: Colors.sparrowDark,
+        borderColor: Colors.sparrowDark,
     },
 
     // Success
     buttonSuccess: {
         backgroundColor: Colors.green400,
+        borderColor: Colors.green400,
     },
 
     // Warning
     buttonWarning: {
         backgroundColor: Colors.orange400,
+        borderColor: Colors.orange400,
     },
 
     // Error
     buttonError: {
         backgroundColor: Colors.red400,
+        borderColor: Colors.red400,
     },
 
     // Function
     buttonFunction: {
         backgroundColor: Colors.turqoise300,
+        borderColor: Colors.turqoise300
     },
 
     // Layout
@@ -291,7 +314,7 @@ export const globalStyles = StyleSheet.create({
         paddingVertical: 24,
         paddingHorizontal: 32,
         borderRadius: 8,
-        // borderWidth: 2,
+        borderWidth: 2,
         // borderColor: Colors.sparrowDarkBrown,
 
         text: {
@@ -315,7 +338,7 @@ export const globalStyles = StyleSheet.create({
         paddingVertical: 16,
         paddingHorizontal: 24,
         borderRadius: 8,
-        // borderWidth: 2,
+        borderWidth: 2,
         // borderColor: Colors.sparrowDarkBrown,
 
         text: {
@@ -338,7 +361,7 @@ export const globalStyles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 8,
         paddingHorizontal: 16,
-        // borderWidth: 2,
+        borderWidth: 2,
         // borderColor: Colors.sparrowDarkBrown,
         borderRadius: 8,
 
@@ -364,7 +387,7 @@ export const globalStyles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 8,
-        // borderWidth: 2,
+        borderWidth: 2,
         // borderColor: Colors.sparrowDarkBrown,
         columnGap: Spacing.sm,
 

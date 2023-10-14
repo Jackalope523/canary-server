@@ -182,9 +182,9 @@ const DiscoveryScreen = () => {
                                     <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
                                         <Button
                                             btnText={'Today'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {1}
@@ -194,9 +194,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'Tomorrow'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {2}
@@ -205,9 +205,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'This week'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {3}
@@ -216,9 +216,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'This weekend'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {4}
@@ -227,9 +227,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'Next week'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {5}
@@ -238,9 +238,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'Next weekend'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {6}
@@ -258,9 +258,9 @@ const DiscoveryScreen = () => {
                                     <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
                                         <Button
                                             btnText={'Cozy'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self={1}
@@ -269,9 +269,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'Thriving'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self={2}
@@ -280,9 +280,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'Bombastic'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self={3}
@@ -300,9 +300,9 @@ const DiscoveryScreen = () => {
                                 <View style={styles.wrapper}>
                                     <Button
                                         btnText={'Confirm selection'}
-                                        btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonLight]}
+                                        btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonSecondary]}
                                         btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
-                                        btnActiveStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonLight]}
+                                        btnActiveStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonSecondary]}
                                         btnActiveTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
                                         onPress={null}
                                     />
@@ -319,9 +319,9 @@ const DiscoveryScreen = () => {
                                     <View style={styles.sortContentWrapper}>
                                         <Button
                                             btnText={'Most popular'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self={1}
@@ -330,9 +330,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'Closest'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self={2}
@@ -341,9 +341,9 @@ const DiscoveryScreen = () => {
                                         />
                                         <Button
                                             btnText={'Most recent'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary.outline]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonSecondary]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self={3}
