@@ -115,7 +115,7 @@ const FeedScreen = () => {
         // </View>
         <View style={styles.container}>
             <View style={styles.contentContainer}>
-                <RangeSelector2 />
+                <SingleValueSelector />
             </View>
         </View>
     );
