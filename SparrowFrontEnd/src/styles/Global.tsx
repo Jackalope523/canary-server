@@ -180,26 +180,6 @@ export const globalStyles = StyleSheet.create({
     },
 
     // Buttons
-    // TODO delete buttonSecondary and replace it everywhere with buttonSecondary
-    // TODO replace buttonSecondary.outline with buttonSecondary.outline
-    // TODO delete buttonTertiary and create buttonTertiary instead, replace it mentioned everywhere with buttonTertiary
-    // buttonTertiary: {
-    //     backgroundColor: Colors.sparrowDark,
-    // },
-
-    // // Light
-    // buttonSecondary: {
-    //     backgroundColor: Colors.sparrowSand,
-    //     borderColor: Colors.sparrowSand,
-
-    //     outline: {
-    //         borderWidth: 2,
-    //         borderRadius: 8,
-    //         borderColor: Colors.sparrowSand,
-
-    //     },
-    // },
-
     // Primary
     buttonPrimary: {
         backgroundColor: Colors.sparrowDarkBrown,
