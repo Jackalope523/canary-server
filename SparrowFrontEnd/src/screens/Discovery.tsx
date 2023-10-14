@@ -73,6 +73,8 @@ const DiscoveryScreen = () => {
         }
     };
 
+    const [state, setState] = React.useState(-1);
+
     // TODO when SEARCH is CLOSED - hide SORT view and/or FILTER view
 
     return (
@@ -168,7 +170,6 @@ const DiscoveryScreen = () => {
                         </View>
                     </View>
 
-                    {/* TODO insert sort and filter views here */}
                     {/* TODO if sort and filter doesn't overlay SearchFilter - hide SearchFilter when sort or filter is active/visible */}
                     {/* TODO make only one open - sort or filter - both cant be open at once */}
                     {activeComponent === 'filter' && searchContentVisible ? (
@@ -182,48 +183,67 @@ const DiscoveryScreen = () => {
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self = {1}
+                                            status = {state}
+                                            changeState = {setState}
+
                                         />
                                         <Button
                                             btnText={'Tomorrow'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self = {2}
+                                            status = {state}
+                                            changeState = {setState}
                                         />
                                         <Button
                                             btnText={'This week'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self = {3}
+                                            status = {state}
+                                            changeState = {setState}
                                         />
                                         <Button
                                             btnText={'This weekend'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self = {4}
+                                            status = {state}
+                                            changeState = {setState}
                                         />
                                         <Button
                                             btnText={'Next week'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self = {5}
+                                            status = {state}
+                                            changeState = {setState}
                                         />
                                         <Button
                                             btnText={'Next weekend'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self = {6}
+                                            status = {state}
+                                            changeState = {setState}
                                         />
                                     </ScrollView>
                                 </GestureHandlerRootView>
@@ -238,18 +258,24 @@ const DiscoveryScreen = () => {
                                             btnText={'Cozy'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                         />
                                         <Button
                                             btnText={'Thriving'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                         />
                                         <Button
                                             btnText={'Bombastic'}
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                         />
                                     </ScrollView>
