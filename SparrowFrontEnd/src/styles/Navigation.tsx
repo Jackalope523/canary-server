@@ -120,6 +120,7 @@ export const navigationStyles = StyleSheet.create({
 
         searchOptionsInnerContainer: {
             backgroundColor: Colors.sparrowBrown,
+            height: '100%',
 
             section: {
                 rowGap: Spacing.md,

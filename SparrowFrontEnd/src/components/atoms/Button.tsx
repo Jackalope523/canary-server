@@ -12,6 +12,7 @@ interface ButtonProps {
   btnText: string;
   btnStyle: StyleProp<ViewStyle>;
 
+  // Active styles
   btnActiveStyle: StyleProp<ViewStyle>;
   btnActiveTextStyle?: StyleProp<TextStyle>;
   btnActiveIconStyle?: StyleProp<ViewStyle>;
@@ -22,13 +23,22 @@ interface ButtonProps {
   btnIconStyle?: StyleProp<ViewStyle>;
 }
 
+// TODO conditional button styling
+//  1. change styles to Active styles when button is pressed/selected
+
 const Button: React.FC<ButtonProps> = ({onPress, btnText, btnStyle, btnTextStyle, btnIcon, btnIconStyle, btnActiveStyle, btnActiveTextStyle, btnActiveIconStyle}) => {
+  const [isPressed, setIsPressed] = React.useState(false);
+
+  const handlePressIn = () => {
+    setIsPressed(true);
+  };
+  
   return (
-    <Pressable onPress={onPress} style={([btnStyle, styles.btnBase])}>
-      {btnIcon && (
-        <Icon style={btnIconStyle} name={btnIcon} />
-      )}
-        <Text style={btnTextStyle}>{btnText}</Text>
+    <Pressable
+      onPress={(onPress)}
+      style={[btnStyle, styles.btnBase]}>
+      {btnIcon && <Icon style={btnIconStyle} name={btnIcon} /> }
+        <Text style={isPressed ? btnActiveTextStyle : btnTextStyle}>{btnText}</Text>
     </Pressable>
   )
 }
