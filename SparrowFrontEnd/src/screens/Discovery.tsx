@@ -73,9 +73,21 @@ const DiscoveryScreen = () => {
         }
     };
 
-    const [state, setState] = React.useState(-1);
+    // Filter and sort options button states
+    // Date
+    const [dateState, setDateState] = React.useState(-1);
 
-    // TODO when SEARCH is CLOSED - hide SORT view and/or FILTER view
+    // Size
+    const [sizeState, setSizeState] = React.useState(-1);
+
+    // Distance
+    // TODO make a distance range slider
+
+    // Sort by
+    const [sortState, setSortState] = React.useState(-1); 
+
+
+    // TODO when SEARCH is CLOSED - hide SORT view and/or FILTER view - reset SEARCH
 
     return (
         <View style={styles.mapWrapper}>
@@ -176,8 +188,8 @@ const DiscoveryScreen = () => {
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {1}
-                                            status = {state}
-                                            changeState = {setState}
+                                            status = {dateState}
+                                            changeState = {setDateState}
 
                                         />
                                         <Button
@@ -188,8 +200,8 @@ const DiscoveryScreen = () => {
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {2}
-                                            status = {state}
-                                            changeState = {setState}
+                                            status = {dateState}
+                                            changeState = {setDateState}
                                         />
                                         <Button
                                             btnText={'This week'}
@@ -199,8 +211,8 @@ const DiscoveryScreen = () => {
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {3}
-                                            status = {state}
-                                            changeState = {setState}
+                                            status = {dateState}
+                                            changeState = {setDateState}
                                         />
                                         <Button
                                             btnText={'This weekend'}
@@ -210,8 +222,8 @@ const DiscoveryScreen = () => {
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {4}
-                                            status = {state}
-                                            changeState = {setState}
+                                            status = {dateState}
+                                            changeState = {setDateState}
                                         />
                                         <Button
                                             btnText={'Next week'}
@@ -221,8 +233,8 @@ const DiscoveryScreen = () => {
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {5}
-                                            status = {state}
-                                            changeState = {setState}
+                                            status = {dateState}
+                                            changeState = {setDateState}
                                         />
                                         <Button
                                             btnText={'Next weekend'}
@@ -232,8 +244,8 @@ const DiscoveryScreen = () => {
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                             self = {6}
-                                            status = {state}
-                                            changeState = {setState}
+                                            status = {dateState}
+                                            changeState = {setDateState}
                                         />
                                     </ScrollView>
                                 </GestureHandlerRootView>
@@ -251,6 +263,9 @@ const DiscoveryScreen = () => {
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self={1}
+                                            status={sizeState}
+                                            changeState={setSizeState}
                                         />
                                         <Button
                                             btnText={'Thriving'}
@@ -259,6 +274,9 @@ const DiscoveryScreen = () => {
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self={2}
+                                            status={sizeState}
+                                            changeState={setSizeState}
                                         />
                                         <Button
                                             btnText={'Bombastic'}
@@ -267,6 +285,9 @@ const DiscoveryScreen = () => {
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self={3}
+                                            status={sizeState}
+                                            changeState={setSizeState}
                                         />
                                     </ScrollView>
                                 </GestureHandlerRootView>
@@ -303,6 +324,9 @@ const DiscoveryScreen = () => {
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self={1}
+                                            status={sortState}
+                                            changeState={setSortState}
                                         />
                                         <Button
                                             btnText={'Closest'}
@@ -311,6 +335,9 @@ const DiscoveryScreen = () => {
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self={2}
+                                            status={sortState}
+                                            changeState={setSortState}
                                         />
                                         <Button
                                             btnText={'Most recent'}
@@ -319,6 +346,9 @@ const DiscoveryScreen = () => {
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
+                                            self={3}
+                                            status={sortState}
+                                            changeState={setSortState}
                                         />
                                     </View>
                                 </GestureHandlerRootView>
@@ -344,6 +374,9 @@ const DiscoveryScreen = () => {
                             btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonContained]}
                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textButtonExtraSmall.text.uppercase, globalStyles.textLight]}
+                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonContained]}
+                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textButtonExtraSmall.text.uppercase, globalStyles.textLight]}
+                            btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                             onPress={null}
                         />
                     </View>
