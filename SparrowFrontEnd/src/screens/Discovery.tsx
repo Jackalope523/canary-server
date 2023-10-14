@@ -149,22 +149,6 @@ const DiscoveryScreen = () => {
                                     btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     onPress={toggleSort}
                                 />
-                                {/* <Button
-                                    btnText={'Filter'}
-                                    btnIcon={'filter-fill'}
-                                    btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimary, activeComponent === 'filter' ? globalStyles.buttonPrimaryLight : null]}
-                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                    onPress={toggleFilter}
-                                />
-                                <Button
-                                    btnText={'Sort'}
-                                    btnIcon={'sort-outline'}
-                                    btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                                    btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonFull, activeComponent === 'sort' ? globalStyles.buttonPrimaryLight : null]}
-                                    btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                    onPress={toggleSort}
-                                /> */}
                             </View>
                             {/* TODO fix last 2 events not visible */}
                             {/* Potential not-ideal fix = screen height - (searchBarWrapper height + filterSort height) */}
@@ -181,7 +165,7 @@ const DiscoveryScreen = () => {
                     {activeComponent === 'filter' && searchContentVisible ? (
                         <View style={navigationStyles.search.searchOptionsInnerContainer}>
                             <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
-                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Date</Text>
+                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>Date</Text>
                                 <GestureHandlerRootView>
                                     <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
                                         <Button
@@ -257,7 +241,7 @@ const DiscoveryScreen = () => {
 
                             {/* TODO buttons need to change style when active (tapped and selected) */}
                             <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
-                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Size</Text>
+                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>Size</Text>
                                 <GestureHandlerRootView>
                                     <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
                                         <Button
@@ -288,16 +272,20 @@ const DiscoveryScreen = () => {
                                 </GestureHandlerRootView>
                             </View>
                             <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
-                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Distance</Text>
+                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>Distance</Text>
                             </View>
                             <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
                                 {/* TODO confirm selection button is hidden/broken because of flex:1 from buttonFull style */}
-                                <Button
-                                    btnText={'Confirm selection'}
-                                    btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonLight]}
-                                    btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
-                                    onPress={null}
-                                />
+                                <View style={styles.wrapper}>
+                                    <Button
+                                        btnText={'Confirm selection'}
+                                        btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonLight]}
+                                        btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
+                                        btnActiveStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonLight]}
+                                        btnActiveTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
+                                        onPress={null}
+                                    />
+                                </View>
                             </View>
                         </View>
                     ) : null }
@@ -305,7 +293,7 @@ const DiscoveryScreen = () => {
                     {activeComponent === 'sort' && searchContentVisible ? (
                         <View style={navigationStyles.search.searchOptionsInnerContainer}>
                             <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
-                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Sort by</Text>
+                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>Sort by</Text>
                                 <GestureHandlerRootView>
                                     <View style={styles.sortContentWrapper}>
                                         <Button
@@ -377,7 +365,7 @@ const styles = StyleSheet.create ({
         flexWrap: 'wrap',
     },
 
-    titleWrapper: {
+    wrapper: {
         paddingHorizontal: Spacing.md,
     },
 
