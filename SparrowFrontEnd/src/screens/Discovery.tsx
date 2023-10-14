@@ -300,9 +300,9 @@ const DiscoveryScreen = () => {
                                 <View style={styles.wrapper}>
                                     <Button
                                         btnText={'Confirm selection'}
-                                        btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonSecondary]}
+                                        btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonSecondary]}
                                         btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
-                                        btnActiveStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonSecondary]}
+                                        btnActiveStyle={[globalStyles.textButtonMedium, globalStyles.buttonSecondary]}
                                         btnActiveTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
                                         onPress={null}
                                     />
