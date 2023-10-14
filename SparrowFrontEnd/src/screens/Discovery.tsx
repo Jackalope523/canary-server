@@ -133,6 +133,9 @@ const DiscoveryScreen = () => {
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimary]}
                                     btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
+                                    btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     onPress={toggleFilter}
                                 />
                                 <Button
@@ -141,6 +144,9 @@ const DiscoveryScreen = () => {
                                     btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonFull]}
                                     btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
+                                    btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                    btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                                     onPress={toggleSort}
                                 />
                                 {/* <Button
@@ -307,7 +313,7 @@ const DiscoveryScreen = () => {
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                         />
                                         <Button
@@ -315,7 +321,7 @@ const DiscoveryScreen = () => {
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                         />
                                         <Button
@@ -323,7 +329,7 @@ const DiscoveryScreen = () => {
                                             btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline]}
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textDark]}
                                             onPress={null}
                                         />
                                     </View>
