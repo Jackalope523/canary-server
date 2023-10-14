@@ -183,6 +183,105 @@ const DiscoveryScreen = () => {
                                             btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                        <Button
+                                            btnText={'Tomorrow'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                        <Button
+                                            btnText={'This week'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                        <Button
+                                            btnText={'This weekend'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                        <Button
+                                            btnText={'Next week'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                        <Button
+                                            btnText={'Next weekend'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                    </ScrollView>
+                                </GestureHandlerRootView>
+                            </View>
+
+                            {/* TODO buttons need to change style when active (tapped and selected) */}
+                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
+                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Size</Text>
+                                <GestureHandlerRootView>
+                                    <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
+                                        <Button
+                                            btnText={'Cozy'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                        <Button
+                                            btnText={'Thriving'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                        <Button
+                                            btnText={'Bombastic'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            onPress={null}
+                                        />
+                                    </ScrollView>
+                                </GestureHandlerRootView>
+                            </View>
+                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
+                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Distance</Text>
+                            </View>
+                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
+                                {/* TODO confirm selection button is hidden/broken because of flex:1 from buttonFull style */}
+                                <Button
+                                    btnText={'Confirm selection'}
+                                    btnStyle={[globalStyles.textButtonMedium, globalStyles.buttonFull, globalStyles.buttonLight]}
+                                    btnTextStyle={[globalStyles.textButtonMedium.text, globalStyles.textDark]}
+                                    onPress={null}
+                                />
+                            </View>
+                        </View>
+                    ) : null }
+
+                    {activeComponent === 'sort' && searchContentVisible ? (
+                        <View style={navigationStyles.search.searchOptionsInnerContainer}>
+                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
+                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Date</Text>
+                                <GestureHandlerRootView>
+                                    <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
+                                        <Button
+                                            btnText={'Today'}
+                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
+                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
+                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
+                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                         />
                                         <Button
                                             btnText={'Tomorrow'}
@@ -205,56 +304,9 @@ const DiscoveryScreen = () => {
                                             btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
                                             btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                                         />
-                                        <Button
-                                            btnText={'Next week'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
-                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                        />
-                                        <Button
-                                            btnText={'Next weekend'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
-                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                            btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight, styles.buttonGap]}
-                                            btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                        />
                                     </ScrollView>
                                 </GestureHandlerRootView>
                             </View>
-
-                            {/* TODO buttons need to change style when active (tapped and selected) */}
-                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
-                            <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Size</Text>
-                                <GestureHandlerRootView>
-                                    <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingHorizontal: Spacing.lg}}>
-                                        <Button
-                                            btnText={'Cozy'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
-                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                        />
-                                        <Button
-                                            btnText={'Thriving'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
-                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                        />
-                                        <Button
-                                            btnText={'Bombastic'}
-                                            btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonContained, globalStyles.buttonLight.outline, styles.buttonGap]}
-                                            btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                                        />
-                                    </ScrollView>
-                                </GestureHandlerRootView>
-                            </View>
-                            <View style={navigationStyles.search.searchOptionsInnerContainer.section}>
-                                <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.titleWrapper]}>Distance</Text>
-                            </View>
-                        </View>
-                    ) : null }
-
-                    {activeComponent === 'sort' && searchContentVisible ? (
-                        <View>
-                            <Text style={globalStyles.headingTextTwo}>SORT VIEW</Text>
                         </View>
                     ) : null }
 
