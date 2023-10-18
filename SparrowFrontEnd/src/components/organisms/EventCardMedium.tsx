@@ -41,25 +41,25 @@ const EventCardMedium = ({  eventDate, eventTime, eventAttendees, eventTitle, ev
                     <View style={cardStyles.eventCardMedium.content.container}>
                         <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
                             <Icon name="date-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                            <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{eventDate}</Text>
+                            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{eventDate}</Text>
                         </View>
                         <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
                             <Icon name="time-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                            <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{eventTime}</Text>
+                            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{eventTime}</Text>
                         </View>
                     </View>
                     <View style={cardStyles.eventCardMedium.content.container}>
                         <View style={cardStyles.eventCardMedium.content.container.textWrapper}>
                             <Icon name="account-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon}/>
-                            <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{eventAttendees}</Text>
+                            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{eventAttendees}</Text>
                         </View>
                     </View>
                 </View>
                 <View style={cardStyles.eventCardMedium.content.container}>
-                    <Text numberOfLines={2} style={[globalStyles.headingTextThree, globalStyles.buttonDark, cardStyles.eventCardMedium.content.container.title]}>{eventTitle}</Text>
+                    <Text numberOfLines={2} style={[globalStyles.headingTextThree, globalStyles.textDark, cardStyles.eventCardMedium.content.container.title]}>{eventTitle}</Text>
                     <View style={[cardStyles.eventCardMedium.content.container.textWrapper, cardStyles.eventCardMedium.content.container.textWrapperCenter]}>
                         <Icon name="location-outline" size={24} height={24} width={24} style={cardStyles.eventCardMedium.content.container.textWrapper.icon} />
-                        <Text numberOfLines={1} style={[globalStyles.bodyTextOne, globalStyles.buttonDark, cardStyles.eventCardMedium.content.container.textWrapper.innerText]}>{eventLocation}</Text>
+                        <Text numberOfLines={1} style={[globalStyles.bodyTextOne, globalStyles.textDark, cardStyles.eventCardMedium.content.container.textWrapper.innerText]}>{eventLocation}</Text>
                     </View>
                 </View>
             </View>
