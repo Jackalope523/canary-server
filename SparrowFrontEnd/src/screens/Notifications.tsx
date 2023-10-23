@@ -104,8 +104,8 @@ const NotificationsScreen = ({navigation}) => {
               <View style={notificationStyles.notification}>
                 <Image source={item.uri} resizeMode="cover" style={[avatarStyles.avatarSquareMedium, avatarStyles.avatarOffline]} />
                 <View style={notificationStyles.notification.textWrapper}>
-                  <Text style={[globalStyles.bodyTextOne, globalStyles.buttonDark]}>{item.name}{eventInviteText}</Text>
-                  <Text style={[globalStyles.labelTextAsTyped, globalStyles.buttonDark]}>{item.sent}</Text>
+                  <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>{item.name}{eventInviteText}</Text>
+                  <Text style={[globalStyles.labelTextAsTyped, globalStyles.textDark]}>{item.sent}</Text>
                 </View>
               </View>
             )}
@@ -117,19 +117,19 @@ const NotificationsScreen = ({navigation}) => {
         // <ScrollView>
         //   <View style={styles.container}>
         //     <View style={styles.sectionWrapper}>
-        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonDark, styles.headingSpacing]}>Today</Text>
+        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonTertiary, styles.headingSpacing]}>Today</Text>
         //       <Notification />
         //       <Notification />
         //       <Notification />
         //       <Notification />
         //     </View>
         //     <View style={styles.sectionWrapper}>
-        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonDark, styles.headingSpacing]}>Tomorrow</Text>
+        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonTertiary, styles.headingSpacing]}>Tomorrow</Text>
         //       <Notification />
         //       <Notification />
         //     </View>
         //     <View style={styles.sectionWrapper}>
-        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonDark, styles.headingSpacing]}>Next week</Text>
+        //       <Text style={[globalStyles.headingTextThree, globalStyles.buttonTertiary, styles.headingSpacing]}>Next week</Text>
         //       <Notification />
         //       <Notification />
         //     </View>

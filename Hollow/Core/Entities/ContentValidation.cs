@@ -1,0 +1,130 @@
+﻿using PhoneNumbers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mail;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace Core.Entities
+{
+	internal static class ContentValidation
+	{
+		private static TextFilter filter;
+		private static List<string> DisallowedPhrases = new()
+		#region Disallowed Phrases List
+		{ "crack", "cocaine" };
+		#endregion
+
+		static ContentValidation()
+		{
+			filter = new TextFilter(DisallowedPhrases);
+		}
+
+		public static bool IsEmailValid(string email)
+		{
+			if (!MailAddress.TryCreate(email, out _)) { return false; }
+
+			return true;
+		}
+
+		public static string NormaliseText(string content)
+		{
+			// Check if text contains inappropriate phrases
+			content = filter.CensorText(content);
+
+			// Check if text contains links, phone numbers, or emails
+			content = filter.HideInformation(content);
+
+			return content;
+		}
+
+		public static bool TryNormalisePhoneNumber(string phoneNumber, out string normalisedPhoneNumber)
+		{
+			normalisedPhoneNumber = PhoneNumberUtil.ExtractPossibleNumber(phoneNumber);
+
+			// Check if phone number is valid
+			if (string.IsNullOrEmpty(normalisedPhoneNumber)) { return false; }
+			if (!PhoneNumberUtil.IsViablePhoneNumber(normalisedPhoneNumber)) { return false; }
+
+			// Normalise number
+			normalisedPhoneNumber = PhoneNumberUtil.Normalize(normalisedPhoneNumber);
+			return true;
+		}
+	}
+
+	internal class TextFilter
+	{
+		public IList<string> CensoredWords { get; private set; }
+
+
+		public TextFilter(IEnumerable<string> censoredWords)
+		{
+			CensoredWords = new List<string>(censoredWords);
+		}
+
+		public string CensorText(string text)
+		{
+			if (string.IsNullOrEmpty(text))
+			{ throw new ArgumentNullException(nameof(text)); }
+				
+
+			string censoredText = text;
+
+			foreach (string censoredWord in CensoredWords)
+			{
+				string regularExpression = ToRegexPattern(censoredWord);
+
+				censoredText = Regex.Replace(censoredText, regularExpression, StarCensoredMatch,
+					RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+			}
+
+			return censoredText;
+		}
+
+		public string HideInformation(string text)
+		{
+            // Regular expression to find links
+            string linkPattern = @"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
+
+            // Regular expression to find phone numbers (10 digit)
+            string phonePattern = @"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b";
+			
+            // Regular expression to find emails
+            string emailPattern = @"[\w\.-]+@[\w\.-]+";
+
+            text = Regex.Replace(text, linkPattern, "[hidden]");
+            text = Regex.Replace(text, phonePattern, "[hidden]");
+            text = Regex.Replace(text, emailPattern, "[hidden]");
+
+			return text;
+        }
+
+		private static string StarCensoredMatch(Match m)
+		{
+			string word = m.Captures[0].Value;
+
+			return new string('*', word.Length);
+		}
+
+		private string ToRegexPattern(string wildcardSearch)
+		{
+			string regexPattern = Regex.Escape(wildcardSearch);
+
+			regexPattern = regexPattern.Replace(@"\*", ".*?");
+			regexPattern = regexPattern.Replace(@"\?", ".");
+
+			if (regexPattern.StartsWith(".*?"))
+			{
+				regexPattern = regexPattern.Substring(3);
+
+				regexPattern = @"(^\b)*?" + regexPattern;
+			}
+
+			regexPattern = @"\b" + regexPattern + @"\b";
+
+			return regexPattern;
+		}
+	}
+}

@@ -118,6 +118,20 @@ export const navigationStyles = StyleSheet.create({
             },
         },
 
+        searchOptionsInnerContainer: {
+            backgroundColor: Colors.sparrowBrown,
+            height: '100%',
+
+            section: {
+                rowGap: Spacing.md,
+                paddingTop: Spacing.lg,
+
+                content: {
+                    columnGap: Spacing.md,
+                },
+            },
+        },
+
         searchContent: {
             marginHorizontal: 24,
         },
@@ -130,60 +144,4 @@ export const navigationStyles = StyleSheet.create({
         textAlign: 'center',
         justifyContent: 'center'
     },
-
-    // OLD 2
-    // mapContainer: {
-    //     flex: 1,
-    // },
-
-    // mapImage: {
-    //     flex: 1,
-    // },
-
-    // tempTextInput: {
-    //     backgroundColor: 'lightgrey',
-    //     borderWidth: 2,
-    //     marginHorizontal: 22,
-    //     marginVertical: 16,
-    //     paddingHorizontal: 16,
-    // },
-
-    // // Search bar
-
-    // searchBarContainer: {
-    //     backgroundColor: Colors.orange200,
-    // },
-
-    // searchContainer: {
-    //     // temp. background color for testing purposes - replace with sparrow sand later
-    //     backgroundColor: Colors.azure200,
-    // },
-
-    // searchBarStylesVisible: {
-    //     backgroundColor: 'red',
-    //     flex: 3,
-
-    //     height: 50,
-    // },
-
-    // searchCloseStylesVisible: {
-    //     backgroundColor: 'blue',
-    //     flex: 1,
-
-    //     height: 50,
-    // },
-
-    // searchBarInnerContainerVisible: {
-    //     flexDirection: 'row',
-    // },
-
-    // // OLD
-    // searchBar: {
-    //     backgroundColor: Colors.azure400,
-
-    //     container: {
-    //         backgroundColor: Colors.azure400,
-    //         paddingHorizontal: 16,
-    //     },
-    // },
 });
