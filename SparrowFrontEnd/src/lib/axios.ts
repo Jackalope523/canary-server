@@ -18,3 +18,20 @@ export function initialiseAxiosSession(token: string) {
         validateStatus: (status) => { return status === 200 },
     });
 }
+
+export function handleError(error: any) {
+    console.log(error.toJSON());
+    if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+    } else if (error.request) {
+        console.log(error.request);
+    } else {
+        console.log('Axios call failed, error', error.message);
+    }
+
+    return Promise.reject();
+}
+
+export enum ratingType { 'Positive', 'Negative', 'Remove' };
