@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native'
-import React from 'react'
+import * as React from 'react'
 import { globalStyles } from '../../styles/Global';
 import { Spacing } from '../../styles/Spacing';
 

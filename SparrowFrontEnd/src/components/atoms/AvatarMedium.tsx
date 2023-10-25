@@ -1,5 +1,5 @@
 import { View, Text, Image } from 'react-native'
-import React from 'react'
+import * as React from 'react'
 import { avatarStyles } from '../../styles/Avatars';
 
 // !! THIS COMPONENT IS CURRENTLY NOT IN USE !!

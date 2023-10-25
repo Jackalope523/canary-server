@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, FlatList } from 'react-native'
-import React from 'react'
+import * as React from 'react'
 
 import EventCardMedium from '../../components/organisms/EventCardMedium';
 import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
