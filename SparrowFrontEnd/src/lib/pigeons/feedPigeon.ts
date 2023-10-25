@@ -18,11 +18,11 @@ export async function getUserFeed(options: feedOptions) {
         .then((response) => {
             console.log('User Feed:', response.data);
 
-            let depth: number = response.data['Depth']; // todo
+            let depth: number = response.data['Depth'];
 
             let headers: eventHeader[] = [];
 
-            for (const header of response.data) // todo
+            for (const header of response.data['Headers'])
             {
                 headers.push({
                     Id: header['Id'],
@@ -34,7 +34,7 @@ export async function getUserFeed(options: feedOptions) {
 
             let etchings: etchingShard[] = [];
 
-            for (const etching of response.data) // todo
+            for (const etching of response.data['Etchings'])
             {
                 etchings.push({
                     Id: etching['id'],

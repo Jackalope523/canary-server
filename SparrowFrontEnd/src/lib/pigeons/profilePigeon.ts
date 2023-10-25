@@ -106,28 +106,38 @@ export async function getFriendActivity() {
         .then((response) => {
             console.log('Friend Activity:', response.data);
             
-            let events: eventShard[] = [];
+            let users: userSilhouette[] = [];
+            let activity: { [id: string]: eventShard[] } = {};
 
-            for (const event of response.data) // todo
+            for (const pair of response.data)
             {
-                events.push({
-                    Id: event['Id'],
-                    Host: extractUserSilhouette(event['Host']),
-                    Name: event['Name'],
-                    Description: event['Description'],
-                    StartTime: extractDate(event['StartTime']),
-                    Latitude: event['Latitude'],
-                    Longitude: event['Longitude'],
-                    TimeEnded: event['TimeEnded'] ?
-                        extractDate(event['TimeEnded']) : undefined,
-                    IsOpen: event['IsOpen'],
-                    GroupMinimum: event['GroupMinimum'],
-                    GroupMaximum: event['GroupMaximum'],
-                    Character: extractCharacter(event['Character'])
-                });
+                users.push(extractUserSilhouette(pair[0]));
+
+                let events: eventShard[] = [];
+
+                for (const event of response.data)
+                {
+                    events.push({
+                        Id: event['Id'],
+                        Host: extractUserSilhouette(event['Host']),
+                        Name: event['Name'],
+                        Description: event['Description'],
+                        StartTime: extractDate(event['StartTime']),
+                        Latitude: event['Latitude'],
+                        Longitude: event['Longitude'],
+                        TimeEnded: event['TimeEnded'] ?
+                            extractDate(event['TimeEnded']) : undefined,
+                        IsOpen: event['IsOpen'],
+                        GroupMinimum: event['GroupMinimum'],
+                        GroupMaximum: event['GroupMaximum'],
+                        Character: extractCharacter(event['Character'])
+                    });
+                }
+
+                activity[pair[0]['Id']] = events;
             }
 
-            return Promise.resolve(events);
+            return Promise.resolve([ users, activity ]);
         })
         .catch(handleError);
 }
