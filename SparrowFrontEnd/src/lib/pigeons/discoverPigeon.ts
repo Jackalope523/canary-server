@@ -1,36 +1,52 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { userSession, handleError } from '../axios';
+import { eventShard, eventThinSlice } from './eventPigeon';
+import { extractUserSilhouette } from './profilePigeon';
 
 const apiBaseUrl = '/discover';
 
 // Get personalized events in the area
 export async function getPersonalizedEvents(latitude: number, longitude: number, distance: number) {
-    await userSession.get(`${apiBaseUrl}/${latitude}-${longitude}-${distance}`)
+    return await userSession.get(`${apiBaseUrl}/${latitude}-${longitude}-${distance}`)
         .then((response) => {
             console.log('Personalized Events:', response.data);
 
-            for (const event of response.data[''])
+            let events: eventThinSlice[] = [];
+
+            for (const event of response.data)
             {
-                eventList.push({
-                    id: '',
-                    host: { id: '', name: '' },
-                    name: response.data['name'],
-                    description: '',
-                    type: '',
-                    startTime: new Date(),
-                    position: { latitude: 0, longitude: 0 },
-                    numberAttendees: 0
+                events.push({
+                    Id: event['Id'],
+                    Host: extractUserSilhouette(event['Host']),
+                    Latitude: event['Latitude'],
+                    Longitude: event['Longitude']
                 });
             }
+
+            return Promise.resolve(events);
         })
         .catch(handleError);
 }
 
 // Get all events in the area
 export async function getAllEvents(latitude: number, longitude: number, distance: number) {
-    await userSession.get(`${apiBaseUrl}/all/${latitude}-${longitude}-${distance}`)
+    return await userSession.get(`${apiBaseUrl}/all/${latitude}-${longitude}-${distance}`)
         .then((response) => {
             console.log('All Events:', response.data);
+            
+            let events: eventThinSlice[] = [];
+
+            for (const event of response.data)
+            {
+                events.push({
+                    Id: event['Id'],
+                    Host: extractUserSilhouette(event['Host']),
+                    Latitude: event['Latitude'],
+                    Longitude: event['Longitude']
+                });
+            }
+
+            return Promise.resolve(events);
         })
         .catch(handleError);
 }
@@ -38,7 +54,7 @@ export async function getAllEvents(latitude: number, longitude: number, distance
 // Update user's current position
 // Ignore this method for the moment
 export async function updateCurrentPosition(latitude: number, longitude: number) {
-    await userSession.post(`${apiBaseUrl}/user/${latitude}-${longitude}`)
+    return await userSession.post(`${apiBaseUrl}/user/${latitude}-${longitude}`)
         .then(() => {
             console.log('User Position Updated Successfully');
         })

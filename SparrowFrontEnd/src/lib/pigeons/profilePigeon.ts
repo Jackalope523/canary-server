@@ -1,6 +1,29 @@
-import { userSession, handleError, ratingType } from '../axios';
+import { userSession, handleError, ratingType, extractDate } from '../axios';
+import { extractCharacter } from './accountPigeon';
+import { eventShard } from './eventPigeon';
 
 const apiBaseUrl = '/profile';
+
+export type userProfile = {
+    Id: string,
+    Name: string,
+    Reputation: number,
+    NumberOfFollowers: number
+};
+
+export type userSilhouette = {
+    Id: string,
+    Name: string
+};
+
+export function extractUserSilhouette(data: any) {
+    let silhouette: userSilhouette = {
+        Id: data['Id'],
+        Name: data['Name']
+    }
+
+    return silhouette;
+}
 
 //////////////////
 // Profile Flow //
@@ -12,17 +35,18 @@ export async function getUserProfile(targetIdentification: string) {
         return console.log('Target identification is missing.');
     }
 
-    await userSession.get(`${apiBaseUrl}/${targetIdentification}`)
+    return await userSession.get(`${apiBaseUrl}/${targetIdentification}`)
         .then((response) => {
             console.log('User Profile:', response.data);
             
-            user = {
-                name: response.data['name'],
-                numberOfFollowers: response.data['numberOfFollowers'],
-                reputation: response.data['reputation']
+            let profile: userProfile = {
+                Id: response.data['Id'],
+                Name: response.data['Name'],
+                Reputation: response.data['Reputation'],
+                NumberOfFollowers: response.data['NumberOfFollowers']
             }
 
-            Promise.resolve();
+            Promise.resolve(profile);
         })
         .catch(handleError);
 }
@@ -33,7 +57,7 @@ export async function rateUser(targetIdentification: string, rating: ratingType)
         return console.log('Target identification or rating is missing.');
     }
 
-    await userSession.post(`${apiBaseUrl}/${targetIdentification}`, { 'Rating': rating })
+    return await userSession.post(`${apiBaseUrl}/${targetIdentification}`, { 'Rating': rating })
         .then(() => {
             console.log('User Rated Successfully');
         })
@@ -46,27 +70,85 @@ export async function getUserActivity(targetIdentification: string) {
         return console.log('Target identification is missing.');
     }
 
-    await userSession.get(`${apiBaseUrl}/${targetIdentification}/activity`)
+    return await userSession.get(`${apiBaseUrl}/${targetIdentification}/activity`)
         .then((response) => {
             console.log('User Activity:', response.data);
+            
+            let events: eventShard[] = [];
+
+            for (const event of response.data)
+            {
+                events.push({
+                    Id: event['Id'],
+                    Host: extractUserSilhouette(event['Host']),
+                    Name: event['Name'],
+                    Description: event['Description'],
+                    StartTime: extractDate(event['StartTime']),
+                    Latitude: event['Latitude'],
+                    Longitude: event['Longitude'],
+                    TimeEnded: event['TimeEnded'] ?
+                        extractDate(event['TimeEnded']) : undefined,
+                    IsOpen: event['IsOpen'],
+                    GroupMinimum: event['GroupMinimum'],
+                    GroupMaximum: event['GroupMaximum'],
+                    Character: extractCharacter(event['Character'])
+                });
+            }
+
+            return Promise.resolve(events);
         })
         .catch(handleError);
 }
 
 // Get friend activity
 export async function getFriendActivity() {
-    await userSession.get(`${apiBaseUrl}/activity`)
+    return await userSession.get(`${apiBaseUrl}/activity`)
         .then((response) => {
             console.log('Friend Activity:', response.data);
+            
+            let events: eventShard[] = [];
+
+            for (const event of response.data) // todo
+            {
+                events.push({
+                    Id: event['Id'],
+                    Host: extractUserSilhouette(event['Host']),
+                    Name: event['Name'],
+                    Description: event['Description'],
+                    StartTime: extractDate(event['StartTime']),
+                    Latitude: event['Latitude'],
+                    Longitude: event['Longitude'],
+                    TimeEnded: event['TimeEnded'] ?
+                        extractDate(event['TimeEnded']) : undefined,
+                    IsOpen: event['IsOpen'],
+                    GroupMinimum: event['GroupMinimum'],
+                    GroupMaximum: event['GroupMaximum'],
+                    Character: extractCharacter(event['Character'])
+                });
+            }
+
+            return Promise.resolve(events);
         })
         .catch(handleError);
 }
 
 // Get followed users
 export async function getFollowedUsers() {
-    await userSession.get(`${apiBaseUrl}/following`)
+    return await userSession.get(`${apiBaseUrl}/following`)
         .then((response) => {
             console.log('Followed Users:', response.data);
+            
+            let users: userSilhouette[] = [];
+
+            for (const user of response.data)
+            {
+                users.push({
+                    Id: user['Id'],
+                    Name: user['Name']
+                });
+            }
+
+            return Promise.resolve(users);
         })
         .catch(handleError);
 }
@@ -77,7 +159,7 @@ export async function followUser(targetID: string) {
         return console.log('Target ID is missing.');
     }
 
-    await userSession.post(`${apiBaseUrl}/following`, { 'TargetID': targetID })
+    return await userSession.post(`${apiBaseUrl}/following`, { 'TargetID': targetID })
         .then(() => {
             console.log('User Followed Successfully');
         })
@@ -90,7 +172,7 @@ export async function unfollowUser(targetID: string) {
         return console.log('Target ID is missing.');
     }
 
-    await userSession.put(`${apiBaseUrl}/following`, { 'TargetID': targetID })
+    return await userSession.put(`${apiBaseUrl}/following`, { 'TargetID': targetID })
         .then(() => {
             console.log('User Unfollowed Successfully');
         })
@@ -99,9 +181,21 @@ export async function unfollowUser(targetID: string) {
 
 // Get blocked users
 export async function getBlockedUsers() {
-    await userSession.get(`${apiBaseUrl}/blocked`)
+    return await userSession.get(`${apiBaseUrl}/blocked`)
         .then((response) => {
             console.log('Blocked Users:', response.data);
+            
+            let users: userSilhouette[] = [];
+
+            for (const user of response.data)
+            {
+                users.push({
+                    Id: user['Id'],
+                    Name: user['Name']
+                });
+            }
+
+            return Promise.resolve(users);
         })
         .catch(handleError);
 }
@@ -112,7 +206,7 @@ export async function blockUser(targetID: string) {
         return console.log('Target ID is missing.');
     }
 
-    await userSession.post(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
+    return await userSession.post(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
         .then(() => {
             console.log('User Blocked Successfully');
         })
@@ -125,7 +219,7 @@ export async function unblockUser(targetID: string) {
         return console.log('Target ID is missing.');
     }
 
-    await userSession.put(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
+    return await userSession.put(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
         .then(() => {
             console.log('User Unblocked Successfully');
         })
@@ -146,7 +240,7 @@ export async function reportUser(targetID: string, report: userReport) {
         return console.log('Target ID or report is missing.');
     }
 
-    await userSession.post(`${apiBaseUrl}/${targetID}/report`, report)
+    return await userSession.post(`${apiBaseUrl}/${targetID}/report`, report)
         .then(() => {
             console.log('User Reported Successfully');
         })
