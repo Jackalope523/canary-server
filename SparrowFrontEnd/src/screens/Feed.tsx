@@ -10,6 +10,7 @@ import RangeSelector from '../components/atoms/testing/RangeSelector';
 import {createIconSetFromFontello} from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
 import SingleValueSelector from '../components/atoms/testing/SingleValueSelector';
+import RangeSelector2 from '../components/atoms/testing/RangeSelector2';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 

@@ -76,7 +76,7 @@ const RangeSelector = ({min, max, steps, onValueChange}) => {
       } else if (ctx.startX + event.translationX < position2.value) {
         position2.value = position.value;
         zIndex.value = 0;
-        zIndex.value = 1;
+        zIndex2.value = 1;
       } else {
         position2.value = ctx.startX + event.translationX;
       }
