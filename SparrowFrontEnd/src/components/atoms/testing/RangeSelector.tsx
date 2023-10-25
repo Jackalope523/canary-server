@@ -5,6 +5,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   useAnimatedProps,
+  runOnJS
 } from 'react-native-reanimated';
 import {Colors} from '../../../styles/Colors';
 import {
@@ -22,7 +23,7 @@ const THUMBSIZE = 18;
 const MAXWIDTH = SCREENWIDTH - THUMBSIZE / 2 + 6;
 const SLIDERWIDTH = SCREENWIDTH - 24 * 4;
 
-const RangeSelector = ({min, max, steps}) => {
+const RangeSelector = ({min, max, steps, onValueChange}) => {
   const position = useSharedValue(0);
   const position2 = useSharedValue(SLIDERWIDTH);
 
@@ -47,6 +48,19 @@ const RangeSelector = ({min, max, steps}) => {
         position.value = ctx.startX + event.translationX;
       }
     },
+
+    onEnd: () => {
+      runOnJS(onValueChange)({
+        min:
+          min +
+          Math.floor(position.value / (SLIDERWIDTH / ((max - min) / steps))) *
+            steps,
+        max:
+          min +
+          Math.floor(position2.value / (SLIDERWIDTH / ((max - min) / steps))) *
+            steps,
+      });
+    }
   });
 
   const gestureHandler2 = useAnimatedGestureHandler({
@@ -67,6 +81,19 @@ const RangeSelector = ({min, max, steps}) => {
         position2.value = ctx.startX + event.translationX;
       }
     },
+
+    onEnd: () => {
+      runOnJS(onValueChange)({
+        min:
+          min +
+          Math.floor(position.value / (SLIDERWIDTH / ((max - min) / steps))) *
+            steps,
+        max:
+          min +
+          Math.floor(position2.value / (SLIDERWIDTH / ((max - min) / steps))) *
+            steps,
+      });
+    }
   });
 
   const animatedStyle = useAnimatedStyle(() => ({
