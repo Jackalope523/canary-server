@@ -1,6 +1,6 @@
 import {StyleSheet, View, TextInput} from 'react-native';
 import React from 'react';
-import {GestureHandlerRootView, PanGestureHandler} from 'react-native-gesture-handler';
+import {PanGestureHandler} from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,7 +8,16 @@ import Animated, {
   useAnimatedProps,
   runOnJS,
 } from 'react-native-reanimated';
-const RangeSlider = ({sliderWidth, min, max, step, onValueChange}) => {
+
+type RangeSliderProps = {
+  sliderWidth: number;
+  min: number;
+  max: number;
+  step: number;
+  onValueChange: ({min: number, max: number}) => void;
+};
+
+const RangeSlider = ({sliderWidth, min, max, step, onValueChange}: RangeSliderProps) => {
   const position = useSharedValue(0);
   const position2 = useSharedValue(sliderWidth);
   const opacity = useSharedValue(0);
@@ -104,23 +113,17 @@ const RangeSlider = ({sliderWidth, min, max, step, onValueChange}) => {
   const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
   const minLabelText = useAnimatedProps(() => {
     return {
-      text: `$${
-        min +
-        Math.floor(position.value / (sliderWidth / ((max - min) / step))) * step
-      }`,
+      text: `$${min + Math.floor(position.value / (sliderWidth / ((max - min) / step))) * step}`,
     };
   });
   const maxLabelText = useAnimatedProps(() => {
     return {
-      text: `$${
-        min +
-        Math.floor(position2.value / (sliderWidth / ((max - min) / step))) *
-          step
-      }`,
+      text: `$${min + Math.floor(position2.value / (sliderWidth / ((max - min) / step))) * step}`,
     };
   });
+  
   return (
-    <GestureHandlerRootView style={[styles.sliderContainer, {width: sliderWidth}]}>
+    <View style={[styles.sliderContainer, {width: sliderWidth}]}>
       <View style={[styles.sliderBack, {width: sliderWidth}]} />
       <Animated.View style={[sliderStyle, styles.sliderFront]} />
       <PanGestureHandler onGestureEvent={gestureHandler}>
@@ -147,7 +150,7 @@ const RangeSlider = ({sliderWidth, min, max, step, onValueChange}) => {
           </Animated.View>
         </Animated.View>
       </PanGestureHandler>
-    </GestureHandlerRootView>
+    </View>
   );
 };
 
