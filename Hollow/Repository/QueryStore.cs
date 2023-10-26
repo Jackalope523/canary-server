@@ -13,13 +13,14 @@ using static Repository.Entities.Report;
 namespace Repository
 {
     public class QueryStore : IAccountDatabase, IEventDatabase, IEtchingDatabase,
-        IProfileDatabase, IReportDatabase
+        IProfileDatabase, IReportDatabase, INotificationDatabase
     {
         public static IAccountDatabase AccountDatabaseAccess => new QueryStore(new TestSentry());
         public static IEventDatabase EventDatabaseAccess => new QueryStore(new TestSentry());
         public static IEtchingDatabase EtchingDatabaseAccess => new QueryStore(new TestSentry());
         public static IProfileDatabase ProfileDatabaseAccess => new QueryStore(new TestSentry());
         public static IReportDatabase ReportDatabaseAccess => new QueryStore(new TestSentry());
+        public static INotificationDatabase NotificationDatabaseAccess => new QueryStore(new TestSentry());
 
         Sentry storeSentry;
 

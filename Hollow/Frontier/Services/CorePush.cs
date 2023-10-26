@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using Core.Boundaries;
 using CorePush.Apple;
 using CorePush.Google;
+using Newtonsoft.Json;
+using Shared;
 
 namespace Frontier.Services
 {
@@ -38,15 +40,16 @@ namespace Frontier.Services
 			FCMServerKey = fcmServerKey;
 		}
 
-		public async Task PushNotification(string deviceToken, string title, string message)
+		public async Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message)
 		{
-			if (deviceToken.StartsWith("")) // TODO Change to proper form
+			switch (deviceType)
 			{
-				await SendApnNotificationAsync(deviceToken, title, message);
-			}
-			else
-			{
-				await SendFcmNotificationAsync(deviceToken, title, message);
+				case DeviceType.iOS:
+					await SendApnNotificationAsync(deviceToken, title, message);
+					break;
+				case DeviceType.Android:
+					await SendFcmNotificationAsync(deviceToken, title, message);
+					break;
 			}
 		}
 
@@ -90,5 +93,46 @@ namespace Frontier.Services
 
 			var response = await fcm.SendAsync(fcmReceiverToken, payload);
 		}
+	}
+
+	public class AppleNotification
+	{
+		public class ApsPayload
+		{
+			public class Alert
+			{
+				[JsonProperty("title")]
+				public string Title { get; set; }
+
+				[JsonProperty("body")]
+				public string Body { get; set; }
+			}
+
+			[JsonProperty("alert")]
+			public Alert AlertBody { get; set; }
+
+			[JsonProperty("apns-push-type")]
+			public string PushType { get; set; } = "alert";
+		}
+
+		public AppleNotification(Guid id, string message, string title = "")
+		{
+			Id = id;
+
+			Aps = new ApsPayload
+			{
+				AlertBody = new ApsPayload.Alert
+				{
+					Title = title,
+					Body = message
+				}
+			};
+		}
+
+		[JsonProperty("aps")]
+		public ApsPayload Aps { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
 	}
 }
