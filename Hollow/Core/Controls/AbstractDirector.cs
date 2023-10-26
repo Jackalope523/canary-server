@@ -16,6 +16,7 @@ namespace Core.Controls
 		protected IEtchingDatabase Etchings { get; private set; }
 		protected IProfileDatabase Profiles { get; private set; }
 		protected IReportDatabase Reports { get; private set; }
+		protected INotificationDatabase Notifications { get; private set; }
 
 		public AbstractDirector(CoreTerminal terminal)
 		{
@@ -29,6 +30,7 @@ namespace Core.Controls
 			Etchings = Terminal.EtchingDatabase;
 			Profiles = Terminal.ProfileDatabase;
 			Reports = Terminal.ReportDatabase;
+			Notifications = Terminal.NotificationDatabase;
         }
 
         internal async Task<User> GetUser(Guid userID)

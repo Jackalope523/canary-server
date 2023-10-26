@@ -39,9 +39,14 @@ namespace Frontier
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
+            Services.CorePush pushNotifications = new();
+            Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
+                "", "");
+
             CoreTerminal terminal = new(Repository.QueryStore.AccountDatabaseAccess, 
                 Repository.QueryStore.EventDatabaseAccess, Repository.QueryStore.EtchingDatabaseAccess,
-                Repository.QueryStore.ProfileDatabaseAccess, Repository.QueryStore.ReportDatabaseAccess);
+                Repository.QueryStore.ProfileDatabaseAccess, Repository.QueryStore.ReportDatabaseAccess,
+                Repository.QueryStore.NotificationDatabaseAccess, pushNotifications);
 
             foreach (var (DatabaseType, Instance) in terminal.Gates)
             {
@@ -50,7 +55,7 @@ namespace Frontier
 
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();
-            TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+            // TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
             services.AddAuthentication(options =>
             {

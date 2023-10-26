@@ -58,6 +58,7 @@ namespace Core.Entities
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
 
+
         public User() { }
 
         public User(Guid userID)
@@ -294,6 +295,11 @@ namespace Core.Entities
 			{ return UserAccountStatus.inactive_under_review; }
 
             return UserAccountStatus.blacklisted;
+        }
+
+        public async Task Notify(string title, string message)
+        {
+            await CoreTerminal.Terminal.NotificationDirector.NotifyUserAsync(Id, title, message);
         }
     }
 }

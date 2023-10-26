@@ -13,6 +13,7 @@ namespace Core.Boundaries
 		public IEtchingDatabase EtchingDatabase { get; init; }
 		public IProfileDatabase ProfileDatabase { get; init; }
 		public IReportDatabase ReportDatabase { get; init; }
+		public INotificationDatabase NotificationDatabase { get; init; }
 
 		public IAccountOperations AccountOperations
 			=> AccountDirector;
@@ -24,22 +25,30 @@ namespace Core.Boundaries
 			=> ProfileDirector;
 		public IReportOperations ReportOperations
 			=> ReportDirector;
+		public INotificationOperations NotificationOperations
+			=> NotificationDirector;
+
+		public INotificationService NotificationService { get; init; }
 
 		internal AccountDirector AccountDirector { get; private set; }
 		internal EventDirector EventDirector { get; private set; }
 		internal EtchingDirector EtchingDirector { get; private set; }
 		internal ProfileDirector ProfileDirector { get; private set; }
 		internal ReportDirector ReportDirector { get; private set; }
+		internal NotificationDirector NotificationDirector { get; private set; }
 
 		public List<(Type DatabaseType, object Instance)> Gates
 			=> new() { (typeof(IAccountOperations), AccountOperations),
-				(typeof(IEventDatabase), EventOperations),
+				(typeof(IEventOperations), EventOperations),
 				(typeof(IEtchingOperations), EtchingOperations),
 				(typeof(IProfileOperations), ProfileOperations),
-				(typeof(IReportOperations), ReportOperations) };
+				(typeof(IReportOperations), ReportOperations),
+				(typeof(INotificationOperations), NotificationOperations) };
 
 		public CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
-			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase, IReportDatabase reportDatabase)
+			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
+			IReportDatabase reportDatabase, INotificationDatabase notificationDatabase,
+			INotificationService notificationService)
 		{
 			Terminal = this;
 
@@ -48,6 +57,9 @@ namespace Core.Boundaries
 			EtchingDatabase = etchingDatabase;
 			ProfileDatabase = profileDatabase;
 			ReportDatabase = reportDatabase;
+			NotificationDatabase = notificationDatabase;
+
+			NotificationService = notificationService;
 
 			CreateManagers();
 
@@ -61,6 +73,7 @@ namespace Core.Boundaries
 			EtchingDirector = new EtchingDirector(this);
 			ProfileDirector = new ProfileDirector(this);
 			ReportDirector = new ReportDirector(this);
+			NotificationDirector = new NotificationDirector(this);
 		}
 
 		private void BridgeManagers()
@@ -70,7 +83,7 @@ namespace Core.Boundaries
 			EtchingDirector.Bridge();
 			ProfileDirector.Bridge();
 			ReportDirector.Bridge();
+			NotificationDirector.Bridge();
 		}
 	}
 }
-

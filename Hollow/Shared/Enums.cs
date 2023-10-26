@@ -7,4 +7,7 @@ namespace Shared
         Positive, Negative, Remove
     }
 
+    public enum DeviceType
+    { iOS, Android }
+
 }
