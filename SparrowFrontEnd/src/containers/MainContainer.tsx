@@ -15,12 +15,12 @@ import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/b
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Screens
-import ActivityScreen from '../screens/Activity';
-import DiscoveryScreen from '../screens/Discovery';
-import FeedScreen from '../screens/Feed';
-import AccountScreen from '../screens/Account';
-import DiscoverySearchScreen from '../screens/DiscoverySearch';
-import NotificationsScreen from '../screens/Notifications';
+import ActivityScreen from '../flows/activity/Activity';
+import DiscoveryScreen from '../flows/discovery/Discovery';
+import FeedScreen from '../flows/feed/Feed';
+import AccountScreen from '../flows/profile/Account';
+import DiscoverySearchScreen from '../flows/discovery/DiscoverySearch';
+import NotificationsScreen from '../flows/activity/Notifications';
 
 // More imports
 import { BottomTabParamList, StackParamList } from '../components/atoms/types';

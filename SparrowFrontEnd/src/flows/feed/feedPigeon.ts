@@ -1,5 +1,5 @@
-import { userSession, handleError, extractDate } from '../axios';
-import { etchingShard, eventHeader } from './eventPigeon';
+import { userSession, handleError, extractDate } from '../../lib/axios';
+import { etchingShard, eventHeader } from '../event/eventPigeon';
 
 const apiBaseUrl = '/feed';
 
@@ -15,7 +15,7 @@ export async function getUserFeed(options: feedOptions) {
     }
 
     return await userSession.get(`${apiBaseUrl}/${options.Depth}`, { data: options })
-        .then((response) => {
+        .then((response: any) => {
             console.log('User Feed:', response.data);
 
             let depth: number = response.data['Depth'];

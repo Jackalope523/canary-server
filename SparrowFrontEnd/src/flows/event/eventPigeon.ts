@@ -1,6 +1,6 @@
-import { userSession, handleError, ratingType, extractDate } from '../axios';
-import { character, extractCharacter } from './accountPigeon';
-import { extractUserSilhouette, userSilhouette } from './profilePigeon';
+import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { character, extractCharacter } from '../auth/accountPigeon';
+import { extractUserSilhouette, userSilhouette } from '../profile/profilePigeon';
 
 const apiBaseUrl = '/event';
 
@@ -53,7 +53,7 @@ export async function getEvent(eventID: string) {
     }
 
     return await userSession.get('event/${eventID}')
-        .then((response) => {
+        .then((response: any) => {
             console.log('Event Details:', response.data);
 
             let event: eventShard = {
@@ -96,7 +96,7 @@ export async function createEvent(details: eventCreationDetails) {
     // TODO details.StartTime = details.StartTime.toISOString();
 
     return await userSession.post(`${apiBaseUrl}/`, details)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Event Created:', response.data);
 
             let event: eventShard = {
@@ -212,7 +212,7 @@ export async function getEventEtchings(eventID: string) {
     }
 
     return await userSession.get(`${apiBaseUrl}/${eventID}/etchings`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Event Etchings:', response.data);
 
             let etchings: etchingShard[] = [];
@@ -246,7 +246,7 @@ export async function etchIntoEvent(eventID: string, etching: eventEtching) {
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/etchings`, etching)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Etching Added to Event:', response.data);
 
             let etching: etchingShard = {

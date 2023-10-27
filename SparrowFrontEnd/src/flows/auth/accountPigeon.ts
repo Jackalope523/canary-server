@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, { AxiosResponse } from 'axios';
-import { handleError, initialiseAxiosSession, extractDate } from '../axios';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { handleError, initialiseAxiosSession, extractDate, userSession } from '../../lib/axios';
 
 const apiBaseUrl = '/account';
 
@@ -64,7 +64,7 @@ export async function login(credentials: accountCredentials) {
     }
 
     return await axios.post(`${apiBaseUrl}/login`, credentials)
-    .then((response) => {
+    .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
@@ -87,7 +87,7 @@ export async function signup(details: signUpDetails) {
 
     // TODO details.DateOfBirth = details.DateOfBirth.toISOString();
     return await axios.post(`${apiBaseUrl}/signup`, details)
-    .then((response) => {
+    .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
@@ -102,13 +102,13 @@ export async function verify(credentials: accountCredentials) {
     }
 
     return await axios.post(`${apiBaseUrl}/verify`, credentials)
-    .then((response) => {
+    .then((response: any) => {
         
         // Store cookie
         let tokenCookie = response.headers['set-cookie']?.[0];
         if (typeof  tokenCookie === 'string') {
             tokenCookie = tokenCookie.split(';', 2)[0];
-            AsyncStorage.setItem('token', tokenCookie);
+            // AsyncStorage.setItem('token', tokenCookie);
             initialiseAxiosSession(tokenCookie);
         }
     })
@@ -118,7 +118,7 @@ export async function verify(credentials: accountCredentials) {
 // Logout
 export async function logout() {
     return await axios.post(`${apiBaseUrl}/logout`)
-    .then((response) => {
+    .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
@@ -132,8 +132,8 @@ export async function logout() {
 
 // Get account details
 export async function getAccount() {
-  return await axios.get(`${apiBaseUrl}`)
-    .then((response) => {
+  return await userSession.get(`${apiBaseUrl}`)
+    .then((response: any) => {
         console.log('Account Details:', response.data);
         
         let user: userShard = {
@@ -170,8 +170,8 @@ export async function modifyAccount(details: accountDetails) {
         return console.log('Modified details are missing.');
     }
 
-  return await axios.put(`${apiBaseUrl}`, details)
-    .then((response) => {
+  return await userSession.put(`${apiBaseUrl}`, details)
+    .then((response: any) => {
             console.log('Account modified.', response.data);
     })
     .catch(handleError);

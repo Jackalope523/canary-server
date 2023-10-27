@@ -1,6 +1,6 @@
-import { userSession, handleError, ratingType, extractDate } from '../axios';
-import { extractCharacter } from './accountPigeon';
-import { eventShard } from './eventPigeon';
+import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { extractCharacter } from '../auth/accountPigeon';
+import { eventShard } from '../event/eventPigeon';
 
 const apiBaseUrl = '/profile';
 
@@ -36,7 +36,7 @@ export async function getUserProfile(targetIdentification: string) {
     }
 
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('User Profile:', response.data);
             
             let profile: userProfile = {
@@ -71,7 +71,7 @@ export async function getUserActivity(targetIdentification: string) {
     }
 
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}/activity`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('User Activity:', response.data);
             
             let events: eventShard[] = [];
@@ -103,7 +103,7 @@ export async function getUserActivity(targetIdentification: string) {
 // Get friend activity
 export async function getFriendActivity() {
     return await userSession.get(`${apiBaseUrl}/activity`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Friend Activity:', response.data);
             
             let users: userSilhouette[] = [];
@@ -145,7 +145,7 @@ export async function getFriendActivity() {
 // Get followed users
 export async function getFollowedUsers() {
     return await userSession.get(`${apiBaseUrl}/following`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Followed Users:', response.data);
             
             let users: userSilhouette[] = [];
@@ -192,7 +192,7 @@ export async function unfollowUser(targetID: string) {
 // Get blocked users
 export async function getBlockedUsers() {
     return await userSession.get(`${apiBaseUrl}/blocked`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Blocked Users:', response.data);
             
             let users: userSilhouette[] = [];
