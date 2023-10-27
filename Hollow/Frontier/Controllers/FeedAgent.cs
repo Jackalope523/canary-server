@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Repository.Entities;
 using Core.Boundaries;
-using Frontier.Models;
+using Frontier.Manifests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Frontier.Controllers
     [Route("feed")]
     [ApiController]
     [Authorize]
-    public class FeedController : Controller
+    public class FeedAgent : ControllerBase
     {
         enum FeedError
         {
@@ -27,14 +27,14 @@ namespace Frontier.Controllers
         IEtchingOperations etchings;
         UserManager<UserShard> userManager;
 
-        public FeedController(IEtchingOperations etchingOperations, UserManager<UserShard> identityUserManager)
+        public FeedAgent(IEtchingOperations etchingOperations, UserManager<UserShard> identityUserManager)
         {
             etchings = etchingOperations;
             userManager = identityUserManager;
         }
 
         [HttpGet("{feedDepth}")]
-        public async Task<IActionResult> GetFeed([FromBody] FeedModel feedOptions)
+        public async Task<IActionResult> GetFeed([FromBody] FeedManifest feedOptions)
         {
             if (feedOptions == null || !ModelState.IsValid)
             {

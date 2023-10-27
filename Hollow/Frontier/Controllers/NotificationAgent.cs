@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Frontier.Models;
+using Frontier.Manifests;
 using Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +18,7 @@ namespace Frontier.Controllers
 	[Route("notifications")]
 	[ApiController]
 	[Authorize]
-	public class NotificationController : Controller
+	public class NotificationAgent : ControllerBase
 	{
 		enum NotificationError
 		{
@@ -29,14 +29,14 @@ namespace Frontier.Controllers
 		INotificationOperations notifications;
 		UserManager<UserShard> userManager;
 
-		public NotificationController(INotificationOperations notificationOperations, UserManager<UserShard> identityUserManager)
+		public NotificationAgent(INotificationOperations notificationOperations, UserManager<UserShard> identityUserManager)
 		{
 			notifications = notificationOperations;
 			userManager = identityUserManager;
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionModel subscription)
+		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
 		{
 			if (subscription == null || !ModelState.IsValid)
 			{

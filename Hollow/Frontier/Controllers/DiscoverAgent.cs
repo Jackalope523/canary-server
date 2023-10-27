@@ -12,7 +12,7 @@ namespace Frontier.Controllers
     [Route("discover")]
     [ApiController]
     [Authorize]
-    public class DiscoverController : Controller
+    public class DiscoverAgent : ControllerBase
     {
         enum DiscoverError
         {
@@ -25,7 +25,7 @@ namespace Frontier.Controllers
         IEventOperations events;
 		UserManager<UserShard> userManager;
 
-		public DiscoverController(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
+		public DiscoverAgent(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
         {
             accounts = accountOperations;
             events = eventOperations;

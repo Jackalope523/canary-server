@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Frontier.Models;
+using Frontier.Manifests;
 using Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,7 +16,7 @@ namespace Frontier.Controllers
     [Route("profile")]
     [ApiController]
 	[Authorize]
-    public class ProfileController : Controller
+    public class ProfileAgent : ControllerBase
 	{
 		enum ProfileError
 		{
@@ -29,7 +29,7 @@ namespace Frontier.Controllers
 		IReportOperations reports;
 		UserManager<UserShard> userManager;
 
-		public ProfileController(IProfileOperations profileOperations,
+		public ProfileAgent(IProfileOperations profileOperations,
 			IReportOperations reportOperations,UserManager<UserShard> identityUserManager)
 		{
 			profiles = profileOperations;
@@ -68,7 +68,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{targetIdentification}")]
-		public async Task<IActionResult> RateUser(string targetIdentification, [FromBody] AccountRatingModel details)
+		public async Task<IActionResult> RateUser(string targetIdentification, [FromBody] AccountRatingManifest details)
         {
             if (targetIdentification == null && details != null && !ModelState.IsValid)
             {
@@ -163,7 +163,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("following")]
-		public async Task<IActionResult> FollowUser([FromBody] TargetModel info)
+		public async Task<IActionResult> FollowUser([FromBody] TargetManifest info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -185,7 +185,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPut("following")]
-		public async Task<IActionResult> UnfollowUser([FromBody] TargetModel info)
+		public async Task<IActionResult> UnfollowUser([FromBody] TargetManifest info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -226,7 +226,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("blocked")]
-		public async Task<IActionResult> BlockUser([FromBody] TargetModel info)
+		public async Task<IActionResult> BlockUser([FromBody] TargetManifest info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -248,7 +248,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPut("blocked")]
-		public async Task<IActionResult> UnblockUser([FromBody] TargetModel info)
+		public async Task<IActionResult> UnblockUser([FromBody] TargetManifest info)
 		{
 			if (info == null || !ModelState.IsValid)
 			{
@@ -270,7 +270,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{targetIdentification}/report")]
-		public async Task<IActionResult> ReportUser(string targetID, [FromBody] AccountReportModel report)
+		public async Task<IActionResult> ReportUser(string targetID, [FromBody] AccountReportManifest report)
 		{
 			if (string.IsNullOrEmpty(targetID) || report == null || !ModelState.IsValid)
 			{

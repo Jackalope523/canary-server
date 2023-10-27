@@ -6,9 +6,9 @@ using System.ComponentModel.DataAnnotations;
 using Core.Boundaries;
 using Shared;
 
-namespace Frontier.Models
+namespace Frontier.Manifests
 {
-    public class EventDetailsModel
+    public class EventDetailsManifest
     {
         [Required]
         public string EventName { get; set; }
@@ -33,19 +33,19 @@ namespace Frontier.Models
         public uint NumberOfParticipants { get; set; }
     }
 
-    public class EventEditModel
+    public class EventEditManifest
     {
         public string EventDescription { get; set; }
         public bool? EventIsOpen { get; set; }
     }
 
-    public class EventEtchingModel
+    public class EventEtchingManifest
     {
         [Required]
         public string ImageURL { get; set; }
     }
 
-    public class FeedModel
+    public class FeedManifest
     {
         [Required]
         public int Depth { get; set; }

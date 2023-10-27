@@ -5,15 +5,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Frontier.Models
+namespace Frontier.Manifests
 {
-    public class TargetModel
+    public class TargetManifest
     {
         [Required]
         public Guid TargetID { get; set; }
     }
 
-    public class AccountCredentialsModel
+    public class AccountCredentialsManifest
     {
 		[Required]
 		public string PhoneNumber { get; set; }
@@ -21,7 +21,7 @@ namespace Frontier.Models
 		public string Code { get; set; }
     }
 
-    public class AccountSignUpModel
+    public class AccountSignUpManifest
 	{
 		[Required]
 		public string PhoneNumber { get; set; }

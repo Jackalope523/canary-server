@@ -2,9 +2,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frontier.Models
+namespace Frontier.Manifests
 {
-	public class NotificationSubscriptionModel
+	public class NotificationSubscriptionManifest
 	{
 		[Required]
 		public DeviceType DeviceType { get; set; }

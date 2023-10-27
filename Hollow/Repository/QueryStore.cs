@@ -634,7 +634,37 @@ namespace Repository
 
             return friendPosts.Concat(nettedPosts).ToList();
         }
-    }
+
+		public (DeviceType DeviceType, string DeviceToken) GetUserSubscription(Guid id)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool SubscribeUser(Guid id, DeviceType deviceType, string deviceToken)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool UnsubscribeUser(Guid id)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool UpdateUser(Guid id, List<(string Property, object Value)> edits)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool UpdateEvent(Guid id, List<(string Property, object Value)> edits)
+		{
+			throw new NotImplementedException();
+		}
+
+		public List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(Guid id)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
 
 

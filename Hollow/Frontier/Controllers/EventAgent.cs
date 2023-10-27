@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Boundaries;
-using Frontier.Models;
+using Frontier.Manifests;
 using System.Net;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +21,7 @@ namespace Frontier.Controllers
     [Route("event")]
     [ApiController]
 	[Authorize]
-    public class EventController : ControllerBase
+    public class EventAgent : ControllerBase
     {
         enum EventError
 		{
@@ -35,7 +35,7 @@ namespace Frontier.Controllers
 		IReportOperations reports;
 		UserManager<UserShard> userManager;
 
-		public EventController(IEventOperations eventOperations,
+		public EventAgent(IEventOperations eventOperations,
 			IEtchingOperations etchingOperations, IReportOperations reportOperations,
 			UserManager<UserShard> identityUserManager)
         {
@@ -71,7 +71,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateEvent([FromBody] EventDetailsModel eventDetails)
+        public async Task<IActionResult> CreateEvent([FromBody] EventDetailsManifest eventDetails)
         {
             if (eventDetails == null || !ModelState.IsValid)
             {
@@ -98,7 +98,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{eventID}/edit")]
-        public async Task<IActionResult> EditEvent(string eventID, [FromBody] EventEditModel eventDetails)
+        public async Task<IActionResult> EditEvent(string eventID, [FromBody] EventEditManifest eventDetails)
 		{
 			if (eventID == null || eventDetails == null || !ModelState.IsValid)
 			{
@@ -190,7 +190,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{eventID}/report")]
-		public async Task<IActionResult> ReportEvent(string eventID, string hostID, [FromBody] EventReportModel report)
+		public async Task<IActionResult> ReportEvent(string eventID, string hostID, [FromBody] EventReportManifest report)
 		{
 			if (string.IsNullOrEmpty(eventID) || report == null || !ModelState.IsValid)
 			{
@@ -239,7 +239,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{eventID}/etchings")]
-		public async Task<IActionResult> EtchingToEvent(string eventID, [FromBody] EventEtchingModel etching)
+		public async Task<IActionResult> EtchingToEvent(string eventID, [FromBody] EventEtchingManifest etching)
 		{
 			if (string.IsNullOrEmpty(eventID) || etching == null || !ModelState.IsValid)
 			{
@@ -285,7 +285,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{eventID}/etchings/{etchingID}")]
-		public async Task<IActionResult> RateEtching(string eventID, string etchingID, [FromBody] AccountRatingModel details)
+		public async Task<IActionResult> RateEtching(string eventID, string etchingID, [FromBody] AccountRatingManifest details)
 		{
 			if (string.IsNullOrEmpty(eventID) || details == null || !ModelState.IsValid)
 			{

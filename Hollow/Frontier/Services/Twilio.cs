@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Core.Boundaries;
 
 namespace Frontier.Services
 {
@@ -9,9 +10,9 @@ namespace Frontier.Services
 	{
 		private static string senderPhoneNumber = "";
 
-		public static void Initialise(string accountID, string token, string phoneNumber)
+		public static void Initialise(string accountID, string accountToken, string phoneNumber)
 		{
-			TwilioClient.Init(accountID, token);
+			TwilioClient.Init(accountID, accountToken);
 
 			senderPhoneNumber = phoneNumber;
 		}

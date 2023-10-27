@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 
 namespace Frontier.Controllers
 {
-    [Route("")]
+    [Route("error")]
     [ApiController]
-    public class RootController : Controller
+    public class ErrorAgent : ControllerBase
     {
 
         [HttpGet]
-        public IActionResult IAmRoot()
-        {
-            return new StatusCodeResult(418);
-        }
+        public IActionResult Error()
+		{
+			return new StatusCodeResult(418);
+		}
 
     }
-    
+
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Boundaries;
-using Frontier.Models;
+using Frontier.Manifests;
 using System.Net;
 using Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +17,7 @@ namespace Frontier.Controllers
     [Route("account")]
     [ApiController]
     [Authorize]
-    public class AccountController : ControllerBase
+    public class AccountAgent : ControllerBase
     {
 		enum AccountError
 		{
@@ -36,7 +36,7 @@ namespace Frontier.Controllers
         ISMSService smsService;
         IEmailService emailService;
 
-        public AccountController(IAccountOperations accountOperations,
+        public AccountAgent(IAccountOperations accountOperations,
             UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
             ISMSService externalSMSService, IEmailService externalEmailService)
         {
@@ -68,7 +68,7 @@ namespace Frontier.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] AccountCredentialsModel credentials)
+        public async Task<IActionResult> Login([FromBody] AccountCredentialsManifest credentials)
         {
             if (credentials == null || !ModelState.IsValid)
             {
@@ -120,7 +120,7 @@ namespace Frontier.Controllers
 
         [HttpPost("verify")]
         [AllowAnonymous]
-        public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsModel credentials)
+        public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsManifest credentials)
         {
 			if (credentials == null || !ModelState.IsValid || credentials.Code == null)
             {
@@ -187,7 +187,7 @@ namespace Frontier.Controllers
 
         [HttpPost("signup")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpModel details)
+        public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpManifest details)
 		{
 			if (details == null || !ModelState.IsValid)
 			{
@@ -233,7 +233,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsModel details)
+        public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsManifest details)
         {
 			if (details == null || !ModelState.IsValid)
 			{

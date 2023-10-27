@@ -49,4 +49,14 @@ namespace Core.Boundaries
 
 		Task UpdateUserLocationAsync(Guid userID, double latitude, double longitude);
 	}
+
+	public interface IEmailService
+	{
+		Task SendEmailAsync(string email, string subject, string body);
+	}
+
+	public interface ISMSService
+	{
+		Task SendSMSAsync(string phoneNumber, string message);
+	}
 }
