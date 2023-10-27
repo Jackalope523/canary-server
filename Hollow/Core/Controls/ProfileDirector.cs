@@ -107,6 +107,12 @@ namespace Core.Controls
             Accounts.UpdateUser(targetID, new() { ("Reputation", targetUser.Reputation) });
         }
 
+
+        internal async Task<List<UserSilhouette>> GetUsersBlockingAsync(Guid userID)
+        {
+            return Profiles.GetUsersBlocking(userID);
+        }
+
         internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(Guid userID)
         {
             return Profiles.GetUserRatings(userID);

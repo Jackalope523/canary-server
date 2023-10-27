@@ -52,6 +52,7 @@ namespace Core.Entities
 
         public List<UserSilhouette> Following { get; set; }
         public List<UserSilhouette> Blocking { get; set; }
+        public List<UserSilhouette> BlockedBy { get; set; }
 
         public CharacterVector Character { get; set; }
 
@@ -242,14 +243,29 @@ namespace Core.Entities
             // Set if null
             Blocking ??= await CoreTerminal.Terminal.ProfileDirector.GetBlockedUsersAsync(otherUser.Id);
 
-			// Check if user is following target
+			// Check if user is blocking target
 			if (Blocking.Find(x => x.Id == otherUser.Id) != null)
-			{ return false; }
+			{ return true; }
 
-            return true;
+            return false;
         }
 
-        public void CalculateReputation()
+        public async Task<bool> IsBlockedBy(Guid userID)
+			=> await IsBlockedBy(new User(userID));
+
+		public async Task<bool> IsBlockedBy(User otherUser)
+		{
+			// Set if null
+			BlockedBy ??= await CoreTerminal.Terminal.ProfileDirector.GetUsersBlockingAsync(Id);
+
+			// Check if user is blocked by target
+			if (BlockedBy.Find(x => x.Id == otherUser.Id) != null)
+			{ return true; }
+
+			return false;
+		}
+
+		public void CalculateReputation()
         {
             int ratingDiff = Ratings.Postitive - Ratings.Negative;
             int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);

@@ -664,6 +664,11 @@ namespace Repository
 		{
 			throw new NotImplementedException();
 		}
+
+		public List<UserSilhouette> GetUsersBlocking(Guid id)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
 

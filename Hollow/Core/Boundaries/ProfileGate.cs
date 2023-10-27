@@ -13,6 +13,7 @@ namespace Core.Boundaries
         List<UserSilhouette> GetFriends(Guid id);
         List<UserSilhouette> GetFollowedUsers(Guid id);
         List<UserSilhouette> GetBlockedUsers(Guid id);
+        List<UserSilhouette> GetUsersBlocking(Guid id);
 
         bool FollowUser(Guid selfId, Guid targetId);
         bool UnfollowUser(Guid selfId, Guid targetId);
