@@ -1,5 +1,5 @@
 import { StyleSheet, Text, Pressable, StyleProp, ViewStyle, TextStyle } from 'react-native'
-import React from 'react'
+import * as React from 'react'
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';

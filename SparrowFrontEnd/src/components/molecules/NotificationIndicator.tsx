@@ -1,5 +1,5 @@
 import { View, Text, Pressable, Platform } from 'react-native'
-import React from 'react'
+import * as React from 'react'
 import { globalStyles } from '../../styles/Global';
 import { Colors } from '../../styles/Colors';
 import { notificationStyles } from '../../styles/Notifications';
