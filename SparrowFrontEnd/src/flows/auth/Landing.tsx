@@ -12,7 +12,7 @@ type LandingProps = StackScreenProps<AuthStackParamList, 'Landing'>;
 
 const LandingScreen = ({navigation}: LandingProps) => {
     const [buttonEnabled, setButtonEnabled] = React.useState(true);
-    
+
     // This should attempt to log the user in to their account before doing anything else
     function tryTokenLogin() {
         /* 
@@ -51,6 +51,7 @@ const LandingScreen = ({navigation}: LandingProps) => {
                 btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                 btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                 onPress={signupButton}
+                disabled={!buttonEnabled}
                 />
             <Button
                 btnText={'OR LOG IN'}
@@ -61,6 +62,7 @@ const LandingScreen = ({navigation}: LandingProps) => {
                 btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                 btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
                 onPress={loginButton}
+                disabled={!buttonEnabled}
                 />
         </View>
     );

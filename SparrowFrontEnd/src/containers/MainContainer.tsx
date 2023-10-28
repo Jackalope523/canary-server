@@ -46,7 +46,7 @@ const MainContainer = () => {
             <NavigationContainer>
                 <AppStack.Navigator initialRouteName="Auth">
                     <AppStack.Screen name="Auth" component={Authentication}
-                    options={{headerShown: false}}
+                    options={{headerShown: true}}
                     />
                     <AppStack.Screen name="Regular" component={Regular}
                     options={{headerShown: false}}

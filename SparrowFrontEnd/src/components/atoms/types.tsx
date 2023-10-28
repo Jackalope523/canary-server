@@ -15,8 +15,8 @@ export type BottomTabParamList = {
 export type AuthStackParamList = {
     Landing: undefined;
     Login: undefined;
-    Verify: undefined;
     Signup: undefined;
+    Verify: { PhoneNumber: string, Forward: () => void };
   };
 
 export type AppStackParamList = {
