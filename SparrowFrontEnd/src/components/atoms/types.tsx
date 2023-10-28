@@ -12,4 +12,16 @@ export type BottomTabParamList = {
     Account: undefined;
 }
 
+export type AuthStackParamList = {
+    Landing: undefined;
+    Login: undefined;
+    Verify: undefined;
+    Signup: undefined;
+  };
+
+export type AppStackParamList = {
+    Auth: undefined;
+    Regular: undefined;
+  };
+
 export type DiscoverySearchProp = NativeStackScreenProps<StackParamList>;

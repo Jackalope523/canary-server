@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-const API_URL = 'http://localhost:28721';
+const API_URL = 'https://hollow.azurewebsites.net';
 
 export function initialiseAxios() {
     axios.defaults.baseURL = API_URL;
