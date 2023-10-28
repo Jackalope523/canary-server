@@ -21,7 +21,12 @@ const VerifyScreen = ({route, navigation}: VerifyProps) => {
       setButtonEnabled(false);
       setErrorText('');
       Promise.resolve(verify({ PhoneNumber: route.params.PhoneNumber, Code }))
-      .then(route.params.Forward)
+      .then(() => { 
+        if (route.params.ContinueMessage != undefined)
+            navigation.navigate('Continue', { Message: route.params.ContinueMessage, Forward: route.params.Forward })
+        else
+            route.params.Forward();
+      })
       .catch(() => setErrorText('Incorrect code'))
       .finally(() => setButtonEnabled(true));
     }

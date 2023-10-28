@@ -16,7 +16,8 @@ export type AuthStackParamList = {
     Landing: undefined;
     Login: undefined;
     Signup: undefined;
-    Verify: { PhoneNumber: string, Forward: () => void };
+    Verify: { PhoneNumber: string, Forward: () => void, ContinueMessage?: string};
+    Continue: { Message: string, Forward: () => void };
   };
 
 export type AppStackParamList = {

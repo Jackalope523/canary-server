@@ -19,7 +19,12 @@ const LoginScreen = ({navigation}: LoginProps) => {
     function handleLogin() {
         setButtonEnabled(false);
         Promise.resolve(login({ PhoneNumber }))
-        .then(() => navigation.navigate('Verify', { PhoneNumber, Forward: () => { navigation.replace('Landing') } }))
+        .then(() => navigation.navigate('Verify',
+            {
+                PhoneNumber,
+                Forward: () => { navigation.replace('Landing') },
+                ContinueMessage: 'Welcome back.'
+            }))
         .finally(() => setButtonEnabled(true));
     }
 
