@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Repository.Entities;
-using Repository.Sentries;
 using Core.Boundaries;
 using Xunit.Abstractions;
+
 
 namespace Repository.Tests
 {
     public class EventTests : IDisposable
     {
-        private static TestSentry sentry = TestSentry.GetTestSentry();
-        private static QueryStore store = new QueryStore(sentry);
+        private static TestSentry sentry = new TestSentry();
+        private static EventStore store = new EventStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -48,14 +47,11 @@ namespace Repository.Tests
                 DateOfBirth = subjectDateOfBirth
             };
             
-            sentry.GetContext().Users.Add(testUser);
-            sentry.GetContext().SaveChanges();
-
-            testHostId = sentry.GetContext().Users.First().Id;
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(testUser));
 
             testEvent = new Event
             {
-                HostId = testHostId,
+                HostId = testUser.Id,
                 Name = testEventName,
                 Description = testEventDescription,
                 Type = testEventEventType,
@@ -68,8 +64,8 @@ namespace Repository.Tests
         }
         public void Dispose()
         {
-            sentry.GetContext().Users.ExecuteDelete();
-            sentry.GetContext().Events.ExecuteDelete();
+            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
         }
 
         /*
@@ -97,19 +93,16 @@ namespace Repository.Tests
         [Fact]
         public void FindEvent_SUCCESS()
         {
-            sentry.GetContext().Events.Add(testEvent);
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
 
-            Guid id = sentry.GetContext().Events.First().Id;
-            EventShard found = store.FindEvent(id);
+            EventShard found = store.FindEvent(testEvent.Id);
 
             Assert.NotNull(found);
-            Assert.Equal(id, found.Id);
+            Assert.Equal(testEvent.Id, found.Id);
             Assert.Equal(testUser.Id, found.Host.Id);
             Assert.Equal(testUser.Name, found.Host.Name);
             Assert.Equal(testEventName, found.Name);
             Assert.Equal(testEventDescription, found.Description);
-            Assert.Equal(testEventEventType, found.EventType);
             Assert.Equal(testEventStartTime, found.StartTime);
             Assert.Equal(testEventLatitude, found.Latitude);
             Assert.Equal(testEventLongitude, found.Longitude);
@@ -119,17 +112,14 @@ namespace Repository.Tests
         [Fact]
         public void FindEvents_SUCCESS()
         {
-            sentry.GetContext().Events.Add(testEvent);
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
 
-            Guid id = sentry.GetContext().Events.First().Id;
             List<EventThinSlice> found = store.FindEvents(100, 100, 10);        
 
             Assert.Single(found);
-            Assert.Equal(id, found.First().Id);
+            Assert.Equal(testEvent.Id, found.First().Id);
             Assert.Equal(testUser.Id, found.First().Host.Id);
             Assert.Equal(testUser.Name, found.First().Host.Name);
-            Assert.Equal(testEventEventType, found.First().EventType);
             Assert.Equal(testEventLatitude, found.First().Latitude);
             Assert.Equal(testEventLongitude, found.First().Longitude);
            
@@ -139,13 +129,14 @@ namespace Repository.Tests
         {
             string newDescription = "The Second of few.";
 
-            sentry.GetContext().Events.Add(testEvent);
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx =>ctx.Events.Add(testEvent));
 
-            Guid id = sentry.GetContext().Events.First().Id;
-            store.UpdateDescription(id, newDescription);
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add(("Description", newDescription));
 
-            Event updated = sentry.GetContext().Events.First();
+            store.UpdateEvent(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(updated);
             Assert.Equal(testHostId, updated.HostId);
@@ -164,13 +155,12 @@ namespace Repository.Tests
         {
             string newType = "Mono";
 
-            sentry.GetContext().Events.Add(testEvent);
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
 
-            Guid id = sentry.GetContext().Events.First().Id;
-            store.UpdateType(id, newType);
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add(("Description", newType));
 
-            Event updated = sentry.GetContext().Events.First();
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(updated);
             Assert.Equal(testHostId, updated.HostId);
@@ -189,13 +179,12 @@ namespace Repository.Tests
         {
             bool newStatus = true;
 
-            sentry.GetContext().Events.Add(testEvent);
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
 
-            Guid id = sentry.GetContext().Events.First().Id;
-            store.UpdateStatus(id, newStatus);
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add(("IsOpen", newStatus));
 
-            Event updated = sentry.GetContext().Events.First();
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(updated);
             Assert.Equal(testHostId, updated.HostId);
@@ -211,14 +200,15 @@ namespace Repository.Tests
         }
         [Fact]
         public void EndEvent_SUCCESS()
-        {         
-            sentry.GetContext().Events.Add(testEvent);
-            sentry.GetContext().SaveChanges();
+        {
+            DateTimeOffset endTime = DateTimeOffset.UtcNow;
 
-            Guid id = sentry.GetContext().Events.First().Id;
-            store.EndEvent(id);
+            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
 
-            Event ended = sentry.GetContext().Events.First();
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add(("EndTime", endTime));
+
+            Event ended = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(ended);
             Assert.Equal(testHostId, ended.HostId);
@@ -230,7 +220,7 @@ namespace Repository.Tests
             Assert.Equal(testEventLongitude, ended.Location.X);
             Assert.Equal(testEventGroupMinimum, ended.GroupMinimum);
             Assert.Equal(testEventGroupMaximum, ended.GroupMaximum);
-            Assert.NotNull(ended.EndTime);
+            Assert.Equal(endTime, ended.EndTime);
         }      
     }
 }

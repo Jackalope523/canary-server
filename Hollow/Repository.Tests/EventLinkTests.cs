@@ -1,22 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Repository.Entities;
-using Repository.Sentries;
 using Core.Boundaries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
-using Xunit.Sdk;
+
+
 
 namespace Repository.Tests
 {
     public class EventLinkTests : IDisposable
     {
-        private static TestSentry sentry = TestSentry.GetTestSentry();
-        private static QueryStore store = new QueryStore(sentry);
+        private static TestSentry sentry = new TestSentry();
+        private static EventStore store = new EventStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -55,10 +49,9 @@ namespace Repository.Tests
                 DateOfBirth = subjectDateOfBirth
             };
 
-            sentry.GetContext().Users.Add(testUser);
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(testUser));
 
-            testUserId = sentry.GetContext().Users.First().Id;
+            testUserId = testUser.Id;
 
             testEvent = new Event
             {
@@ -73,22 +66,20 @@ namespace Repository.Tests
                 IsEventOpen = testIsEventOpen
             };
 
-            sentry.GetContext().Events.Add(testEvent);
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
 
-            testEventId = sentry.GetContext().Events.First().Id;
+            testEventId = testEvent.Id;
         }
         public void Dispose()
         {
-            sentry.GetContext().Users.ExecuteDelete();
-            sentry.GetContext().Events.ExecuteDelete();
-            sentry.GetContext().EventLinks.ExecuteDelete();
+            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.ExecuteDelete());
         }
         [Fact]
         public void GetGuestList_SUCCESS()
         {
-            sentry.GetContext().EventLinks.Add(new EventLink { SelfId = testUserId, EventId = testEventId, Type = EventLink.EventLinkType.Attend });
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUserId, EventId = testEventId, Type = EventLink.EventLinkType.Attend }));
 
             List<UserSilhouette> guestList = store.GetGuestList(testEventId);
 
@@ -101,7 +92,7 @@ namespace Repository.Tests
         {
             store.AddUserToEvent(testUserId, testEventId);
 
-            EventLink link = sentry.GetContext().EventLinks.First();
+            EventLink link = sentry.ExecuteRead(ctx => ctx.EventLinks.First());
 
             Assert.NotNull(link);
             Assert.Equal(testUserId, link.SelfId);
@@ -111,12 +102,11 @@ namespace Repository.Tests
         [Fact]
         public void RemoveUserFromEvent_SUCCESS() 
         {
-            sentry.GetContext().EventLinks.Add(new EventLink { SelfId = testUserId, EventId = testEventId, Type = EventLink.EventLinkType.Attend });
-            sentry.GetContext().SaveChanges();
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUserId, EventId = testEventId, Type = EventLink.EventLinkType.Attend }));
 
             store.RemoveUserFromEvent(testUserId, testEventId);
 
-            int count = sentry.GetContext().EventLinks.Count();
+            int count = sentry.ExecuteRead(ctx => ctx.EventLinks.Count());
 
             Assert.Equal(0, count);
         }

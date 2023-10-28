@@ -1,32 +1,43 @@
-﻿using Repository.Contexts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Sentries
+namespace Repository
 {
     public class TestSentry : Sentry
     {
-        private static TestSentry singleton;
-
         public TestSentry() 
         {
             context = new TestContext();
+        }      
+
+        public override T ExecuteRead<T>(Func<QueryContext, T> read)
+        {
+            using (context = new TestContext())
+            {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                return read.Invoke(context);
+            }
         }
 
-        public static TestSentry GetTestSentry()
+        public override void ExecuteWrite(Action<QueryContext> write)
         {
-            if (singleton == null) singleton = new TestSentry();
-            return singleton;
+            using (context = new TestContext())
+            {
+                write.Invoke(context);
+                
+            }
         }
-        protected override void QueryMade()
+
+        public override void DiscussWrite(Action<QueryContext> write)
+        {
+            if (context == null) context = new TestContext();
+            write.Invoke(context);
+            
+        }
+
+        public override void ExecuteWrite()
         {
             context.SaveChanges();
             context.Dispose();
-
-            context = new TestContext();
         }
     }
 }
