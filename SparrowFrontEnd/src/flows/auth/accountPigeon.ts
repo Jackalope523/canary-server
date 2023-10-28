@@ -155,7 +155,7 @@ export async function getAccount() {
             Character: extractCharacter(response.data['Character']),
         }
 
-        return Promise.resolve(user);
+        return user;
     })
     .catch(handleError);
 }

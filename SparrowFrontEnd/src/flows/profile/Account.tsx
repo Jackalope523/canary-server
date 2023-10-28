@@ -4,7 +4,7 @@ import { View, Text } from 'react-native';
 const AccountScreen = () => {
     return (
         <View>
-            <Text>Account</Text>
+            <Text>Account settings and whatnot</Text>
         </View>
     );
 };

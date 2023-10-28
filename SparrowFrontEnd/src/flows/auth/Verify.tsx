@@ -20,7 +20,8 @@ const VerifyScreen = ({route}: VerifyProps) => {
     function handleVerify() {
       setButtonEnabled(false);
       setErrorText('');
-      Promise.resolve(verify({ PhoneNumber: route.params.PhoneNumber, Code }))
+      
+      verify({ PhoneNumber: route.params.PhoneNumber, Code })
       .then(route.params.Forward)
       .catch(() => setErrorText('Incorrect code'))
       .finally(() => setButtonEnabled(true));

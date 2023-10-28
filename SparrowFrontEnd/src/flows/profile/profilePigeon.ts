@@ -46,7 +46,7 @@ export async function getUserProfile(targetIdentification: string) {
                 NumberOfFollowers: response.data['NumberOfFollowers']
             }
 
-            Promise.resolve(profile);
+            return profile;
         })
         .catch(handleError);
 }
@@ -95,7 +95,7 @@ export async function getUserActivity(targetIdentification: string) {
                 });
             }
 
-            return Promise.resolve(events);
+            return events;
         })
         .catch(handleError);
 }
@@ -137,7 +137,7 @@ export async function getFriendActivity() {
                 activity[pair[0]['Id']] = events;
             }
 
-            return Promise.resolve([ users, activity ]);
+            return [ users, activity ];
         })
         .catch(handleError);
 }
@@ -158,7 +158,7 @@ export async function getFollowedUsers() {
                 });
             }
 
-            return Promise.resolve(users);
+            return users;
         })
         .catch(handleError);
 }
@@ -205,7 +205,7 @@ export async function getBlockedUsers() {
                 });
             }
 
-            return Promise.resolve(users);
+            return users;
         })
         .catch(handleError);
 }

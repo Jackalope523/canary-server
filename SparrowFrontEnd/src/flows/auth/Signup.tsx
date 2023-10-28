@@ -22,14 +22,15 @@ const SignupScreen = ({navigation}: SignupProps) => {
     
     function handleSignup() {
         setButtonEnabled(false);
-        Promise.resolve(signup({ PhoneNumber, Email, Name, DateOfBirth }))
+        
+        signup({ PhoneNumber, Email, Name, DateOfBirth })
         .then(() => navigation.navigate('Verify',
         {
             PhoneNumber,
             Forward: () => { navigation.navigate('Continue',
             {
                 Message: 'Your account has been successfully verified. Welcome to Sparrow!',
-                Forward: () => navigation.replace('Landing')
+                Forward: () => navigation.replace('Main')
             })},
         }))
         .finally(() => setButtonEnabled(true));
