@@ -33,7 +33,7 @@ namespace Core.Boundaries
 
 		public List<(Type DatabaseType, object Instance)> Gates
 			=> new() { (typeof(IAccountOperations), AccountOperations),
-				(typeof(IEventDatabase), EventOperations),
+				(typeof(IEventOperations), EventOperations),
 				(typeof(IEtchingOperations), EtchingOperations),
 				(typeof(IProfileOperations), ProfileOperations),
 				(typeof(IReportOperations), ReportOperations) };

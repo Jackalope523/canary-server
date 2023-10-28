@@ -2,7 +2,7 @@
 using NetTopologySuite.Geometries;
 using Repository.Entities;
 
-namespace Repository.Contexts
+namespace Repository
 {
     public abstract class QueryContext : DbContext
     {

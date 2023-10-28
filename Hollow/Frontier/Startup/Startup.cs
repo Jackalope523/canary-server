@@ -17,6 +17,7 @@ using Frontier.Controllers;
 using Frontier.Stores;
 using Frontier.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Repository.Stores;
 
 namespace Frontier
 {
@@ -39,9 +40,9 @@ namespace Frontier
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
-            CoreTerminal terminal = new(Repository.QueryStore.AccountDatabaseAccess, 
-                Repository.QueryStore.EventDatabaseAccess, Repository.QueryStore.EtchingDatabaseAccess,
-                Repository.QueryStore.ProfileDatabaseAccess, Repository.QueryStore.ReportDatabaseAccess);
+            CoreTerminal terminal = new(QueryStore.AccountDatabaseAccess, 
+                QueryStore.EventDatabaseAccess, QueryStore.EtchingDatabaseAccess,
+                QueryStore.ProfileDatabaseAccess, QueryStore.ReportDatabaseAccess);
 
             foreach (var (DatabaseType, Instance) in terminal.Gates)
             {
@@ -50,7 +51,7 @@ namespace Frontier
 
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();
-            TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+            //TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
             services.AddAuthentication(options =>
             {

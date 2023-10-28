@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Contexts
+namespace Repository
 {
     public class TestContext : QueryContext
     {

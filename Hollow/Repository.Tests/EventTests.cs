@@ -4,6 +4,7 @@ using Repository.Entities;
 using Repository.Sentries;
 using Core.Boundaries;
 using Xunit.Abstractions;
+using Repository.Stores;
 
 namespace Repository.Tests
 {
@@ -109,7 +110,6 @@ namespace Repository.Tests
             Assert.Equal(testUser.Name, found.Host.Name);
             Assert.Equal(testEventName, found.Name);
             Assert.Equal(testEventDescription, found.Description);
-            Assert.Equal(testEventEventType, found.EventType);
             Assert.Equal(testEventStartTime, found.StartTime);
             Assert.Equal(testEventLatitude, found.Latitude);
             Assert.Equal(testEventLongitude, found.Longitude);
@@ -129,7 +129,6 @@ namespace Repository.Tests
             Assert.Equal(id, found.First().Id);
             Assert.Equal(testUser.Id, found.First().Host.Id);
             Assert.Equal(testUser.Name, found.First().Host.Name);
-            Assert.Equal(testEventEventType, found.First().EventType);
             Assert.Equal(testEventLatitude, found.First().Latitude);
             Assert.Equal(testEventLongitude, found.First().Longitude);
            

@@ -1,7 +1,7 @@
 ﻿using NetTopologySuite.Geometries;
 using Core.Boundaries;
 
-namespace Repository.Entities
+namespace Repository
 {
     public class Event
     {
@@ -33,12 +33,5 @@ namespace Repository.Entities
         internal List<EventLink> Links { get; set; }
         internal List<Report> Reports { get; set; }
         internal List<Post> Posts { get; set; }
-
-
-
-        public EventThinSlice ToThinnerEvent()
-        {
-            return new(Id, Host.ToThinnerUser(), Type, Location.Y, Location.X);
-        }
     }
 }

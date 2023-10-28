@@ -10,6 +10,7 @@ using System.Numerics;
 using Xunit.Abstractions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static PhoneNumbers.PhoneNumber;
+using Repository.Stores;
 
 namespace Repository.Tests
 {

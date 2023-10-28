@@ -1,7 +1,7 @@
 ﻿using NetTopologySuite.Geometries;
 using Core.Boundaries;
 
-namespace Repository.Entities
+namespace Repository
 {
     public class User
     {

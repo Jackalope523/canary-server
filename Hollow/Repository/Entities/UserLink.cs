@@ -1,4 +1,4 @@
-﻿namespace Repository.Entities
+﻿namespace Repository
 {
     public class UserLink : Link
     {

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using Repository.Stores;
 
 namespace Repository.Tests
 {
