@@ -10,7 +10,7 @@ import Button from '../../components/atoms/Button';
 
 type ContinueProps = StackScreenProps<AuthStackParamList, 'Continue'>;
 
-const ContinueScreen = ({route, navigation}: ContinueProps) => {
+const ContinueScreen = ({route}: ContinueProps) => {
     return(
         <View>
             <Text>{route.params.Message}</Text>

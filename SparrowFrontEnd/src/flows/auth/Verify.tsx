@@ -12,7 +12,7 @@ import { verify } from './accountPigeon';
 
 type VerifyProps = StackScreenProps<AuthStackParamList, 'Verify'>;
 
-const VerifyScreen = ({route, navigation}: VerifyProps) => {
+const VerifyScreen = ({route}: VerifyProps) => {
     const [Code, setCode] = React.useState('');
     const [errorText, setErrorText] = React.useState('');
     const [buttonEnabled, setButtonEnabled] = React.useState(true);
@@ -21,12 +21,7 @@ const VerifyScreen = ({route, navigation}: VerifyProps) => {
       setButtonEnabled(false);
       setErrorText('');
       Promise.resolve(verify({ PhoneNumber: route.params.PhoneNumber, Code }))
-      .then(() => { 
-        if (route.params.ContinueMessage != undefined)
-            navigation.navigate('Continue', { Message: route.params.ContinueMessage, Forward: route.params.Forward })
-        else
-            route.params.Forward();
-      })
+      .then(route.params.Forward)
       .catch(() => setErrorText('Incorrect code'))
       .finally(() => setButtonEnabled(true));
     }

@@ -26,8 +26,11 @@ const SignupScreen = ({navigation}: SignupProps) => {
         .then(() => navigation.navigate('Verify',
         {
             PhoneNumber,
-            Forward: () => { navigation.replace('Landing') },
-            ContinueMessage: 'Your account has been successfully verified. Welcome to Sparrow!'
+            Forward: () => { navigation.navigate('Continue',
+            {
+                Message: 'Your account has been successfully verified. Welcome to Sparrow!',
+                Forward: () => navigation.replace('Landing')
+            })},
         }))
         .finally(() => setButtonEnabled(true));
     }
