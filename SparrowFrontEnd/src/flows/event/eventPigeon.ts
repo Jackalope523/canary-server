@@ -49,7 +49,8 @@ export type etchingShard = {
 // Get event details
 export async function getEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get('event/${eventID}')

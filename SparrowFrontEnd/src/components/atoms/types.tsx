@@ -28,6 +28,10 @@ export type StackParamList = {
   DiscoverySearch: undefined;
 }
 
+export type EventStackParamList = {
+  Event: { EventID: string };
+}
+
 export type AccountStackParamList = {
   Account: undefined;
 }
