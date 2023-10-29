@@ -30,6 +30,7 @@ export type StackParamList = {
 
 export type EventStackParamList = {
   Event: { EventID: string };
+  CreateEvent: undefined;
 }
 
 export type AccountStackParamList = {
