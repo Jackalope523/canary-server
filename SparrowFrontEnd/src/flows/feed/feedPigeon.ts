@@ -11,7 +11,8 @@ export type feedOptions = {
 // Get user feed
 export async function getUserFeed(options: feedOptions) {
     if (!options) {
-        return console.log('Feed options are missing.');
+        console.log('Feed options are missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${options.Depth}`, { data: options })

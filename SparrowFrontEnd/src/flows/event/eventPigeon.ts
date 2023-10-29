@@ -91,7 +91,8 @@ export type eventCreationDetails = {
 // Create event
 export async function createEvent(details: eventCreationDetails) {
     if (!details) {
-        return console.log('EventDetails are missing.');
+        console.log('EventDetails are missing.');
+        return Promise.reject();
     }
 
     // TODO details.StartTime = details.StartTime.toISOString();
@@ -129,7 +130,8 @@ export type eventEditDetails = {
 // Edit event
 export async function editEvent(eventID: string, details: eventEditDetails) {
     if (!eventID || !details) {
-        return console.log('EventID or Details are missing.');
+        console.log('EventID or Details are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/edit`, details)
@@ -142,7 +144,8 @@ export async function editEvent(eventID: string, details: eventEditDetails) {
 // End event
 export async function endEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.delete(`${apiBaseUrl}/${eventID}/edit`)
@@ -155,7 +158,8 @@ export async function endEvent(eventID: string) {
 // Join event
 export async function joinEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}`)
@@ -168,7 +172,8 @@ export async function joinEvent(eventID: string) {
 // Leave event
 export async function leaveEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/${eventID}`)
@@ -192,7 +197,8 @@ export type eventReport = {
 // Report event
 export async function reportEvent(eventID: string, hostID: string, report: eventReport) {
     if (!eventID || !hostID || !report) {
-        return console.log('EventID, HostID, or Report are missing.');
+        console.log('EventID, HostID, or Report are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/report`, { hostID, report })
@@ -209,7 +215,8 @@ export async function reportEvent(eventID: string, hostID: string, report: event
 // Get event etchings
 export async function getEventEtchings(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${eventID}/etchings`)
@@ -243,7 +250,8 @@ export type eventEtching = {
 // Add etching to event
 export async function etchIntoEvent(eventID: string, etching: eventEtching) {
     if (!eventID || !etching) {
-        return console.log('EventID or Etching are missing.');
+        console.log('EventID or Etching are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/etchings`, etching)
@@ -268,7 +276,8 @@ export async function etchIntoEvent(eventID: string, etching: eventEtching) {
 // Remove etching
 export async function removeEtching(eventID: string, etchingID: string) {
     if (!eventID || !etchingID) {
-        return console.log('EventID or EtchingID are missing.');
+        console.log('EventID or EtchingID are missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/${eventID}/etchings`, etchingID)
@@ -281,7 +290,8 @@ export async function removeEtching(eventID: string, etchingID: string) {
 // Rate etching
 export async function rateEtching(eventID: string, etchingID: string, rating: ratingType) {
     if (!eventID || !etchingID || !rating) {
-        return console.log('EventID, EtchingID, or Details are missing.');
+        console.log('EventID, EtchingID, or Details are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/etchings/${etchingID}`, { 'Rating': rating })

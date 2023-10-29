@@ -60,7 +60,8 @@ export type accountCredentials = {
 // Login
 export async function login(credentials: accountCredentials) {
     if (!credentials) {
-        return console.log('Credentials are missing.');
+        console.log('Credentials are missing.');
+        return Promise.reject();
     }
 
     return await axios.post(`${apiBaseUrl}/login`, credentials)
@@ -82,7 +83,8 @@ export type signUpDetails = {
 // Signup
 export async function signup(details: signUpDetails) {
     if (!details) {
-        return console.log('Sign up details are missing.');
+        console.log('Sign up details are missing.');
+        return Promise.reject();
     }
 
     // TODO details.DateOfBirth = details.DateOfBirth.toISOString();
@@ -98,7 +100,8 @@ export async function signup(details: signUpDetails) {
 // Verify login code
 export async function verify(credentials: accountCredentials) {
     if (!credentials) {
-        return console.log('Credentials are missing.');
+        console.log('Credentials are missing.');
+        return Promise.reject();
     }
 
     return await axios.post(`${apiBaseUrl}/verify`, credentials)
@@ -167,7 +170,8 @@ export type accountDetails = {
 // Modify Account
 export async function modifyAccount(details: accountDetails) {
     if (!details) {
-        return console.log('Modified details are missing.');
+        console.log('Modified details are missing.');
+        return Promise.reject();
     }
 
   return await userSession.put(`${apiBaseUrl}`, details)

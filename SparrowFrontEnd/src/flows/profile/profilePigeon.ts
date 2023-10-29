@@ -32,7 +32,8 @@ export function extractUserSilhouette(data: any) {
 // Get user profile
 export async function getUserProfile(targetIdentification: string) {
     if (!targetIdentification) {
-        return console.log('Target identification is missing.');
+        console.log('Target identification is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}`)
@@ -54,7 +55,8 @@ export async function getUserProfile(targetIdentification: string) {
 // Rate a user
 export async function rateUser(targetIdentification: string, rating: ratingType) {
     if (!targetIdentification || !rating) {
-        return console.log('Target identification or rating is missing.');
+        console.log('Target identification or rating is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${targetIdentification}`, { 'Rating': rating })
@@ -67,7 +69,8 @@ export async function rateUser(targetIdentification: string, rating: ratingType)
 // Get user activity
 export async function getUserActivity(targetIdentification: string) {
     if (!targetIdentification) {
-        return console.log('Target identification is missing.');
+        console.log('Target identification is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}/activity`)
@@ -166,7 +169,8 @@ export async function getFollowedUsers() {
 // Follow a user
 export async function followUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/following`, { 'TargetID': targetID })
@@ -179,7 +183,8 @@ export async function followUser(targetID: string) {
 // Unfollow a user
 export async function unfollowUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/following`, { 'TargetID': targetID })
@@ -213,7 +218,8 @@ export async function getBlockedUsers() {
 // Block a user
 export async function blockUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
@@ -226,7 +232,8 @@ export async function blockUser(targetID: string) {
 // Unblock a user
 export async function unblockUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
@@ -247,7 +254,8 @@ export type userReport = {
 // Report a user
 export async function reportUser(targetID: string, report: userReport) {
     if (!targetID || !report) {
-        return console.log('Target ID or report is missing.');
+        console.log('Target ID or report is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${targetID}/report`, report)
