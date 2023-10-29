@@ -17,7 +17,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // Screens
 import LandingScreen from '../flows/auth/Landing';
 import LoginScreen from '../flows/auth/Login';
-import SignupScreen from '../flows/auth/SignUp';
+import SignupScreen from '../flows/auth/Signup';
 import VerifyScreen from '../flows/auth/Verify';
 import ContinueScreen from '../flows/auth/Continue';
 
