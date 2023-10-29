@@ -50,15 +50,13 @@ function MainContainer () {
     return (
         <SafeAreaProvider>
             <NavigationContainer>
-                <AppStack.Navigator initialRouteName="Auth">
+                <AppStack.Navigator initialRouteName="Auth"
+                screenOptions={{headerShown: false}}>
                     <AppStack.Screen name="Auth" component={Authentication}
-                    options={{headerShown: true}}
                     />
                     <AppStack.Screen name="Main" component={Main}
-                    options={{headerShown: false}}
                     />
                     <AppStack.Screen name="Account" component={Account}
-                    options={{headerShown: false}}
                     />
                 </AppStack.Navigator>
             </NavigationContainer>
@@ -71,7 +69,8 @@ export default MainContainer;
 
 function Authentication () {
     return(
-        <AuthStack.Navigator initialRouteName="Landing">
+        <AuthStack.Navigator initialRouteName="Landing"
+        screenOptions={{headerShown: true}}>
             <AuthStack.Screen name="Landing" component={LandingScreen} />
             <AuthStack.Screen name="Login" component={LoginScreen} />
             <AuthStack.Screen name="Signup" component={SignupScreen} />

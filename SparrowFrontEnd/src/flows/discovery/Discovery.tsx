@@ -22,7 +22,7 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // TEMP. map image - replace with actual working map
-const tempMapImage = require('../assets/images/temp/temp-map.png');
+const tempMapImage = require('../../assets/images/temp/temp-map.png');
 
 const DiscoveryScreen = () => {
     const [searchContentVisible, setSearchContentVisible] = React.useState(false);
