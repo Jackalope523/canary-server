@@ -22,7 +22,7 @@ export async function getPersonalizedEvents(latitude: number, longitude: number,
                 });
             }
 
-            return Promise.resolve(events);
+            return events;
         })
         .catch(handleError);
 }
@@ -45,7 +45,7 @@ export async function getAllEvents(latitude: number, longitude: number, distance
                 });
             }
 
-            return Promise.resolve(events);
+            return events;
         })
         .catch(handleError);
 }

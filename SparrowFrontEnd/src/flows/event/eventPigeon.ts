@@ -72,7 +72,7 @@ export async function getEvent(eventID: string) {
                 Character: extractCharacter(response.data['Character'])
             }
 
-            return Promise.resolve(event);
+            return event;
         })
         .catch(handleError);
 }
@@ -115,7 +115,7 @@ export async function createEvent(details: eventCreationDetails) {
                 Character: extractCharacter(response.data['Character'])
             }
 
-            return Promise.resolve(event);
+            return event;
         })
         .catch(handleError);
 }
@@ -230,7 +230,7 @@ export async function getEventEtchings(eventID: string) {
                 });
             }
 
-            return Promise.resolve(etchings);
+            return etchings;
         })
         .catch(handleError);
 }
@@ -259,7 +259,7 @@ export async function etchIntoEvent(eventID: string, etching: eventEtching) {
                     response.data['Ratings']['Negative']]
             }
 
-            return Promise.resolve(etching);
+            return etching;
         })
         .catch(handleError);
 }

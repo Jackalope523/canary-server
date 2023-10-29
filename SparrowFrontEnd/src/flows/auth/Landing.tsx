@@ -21,7 +21,7 @@ const LandingScreen = ({navigation}: LandingProps) => {
         .then((token) => {
           if (token != null) {
             / initialiseAxiosSession(token);
-            Promise.resolve(getUserProfile())
+            getUserProfile()
             .then(() => navigation.replace('Landing'))
             .catch(() => console.log('login failed with token'))
             .finally(() => setButtonEnabled(true));

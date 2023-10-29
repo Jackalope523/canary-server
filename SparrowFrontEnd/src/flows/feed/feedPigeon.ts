@@ -47,7 +47,7 @@ export async function getUserFeed(options: feedOptions) {
                 });
             }
 
-            return Promise.resolve([ depth, headers, etchings ]);
+            return [ depth, headers, etchings ];
         })
         .catch(handleError);
 }
