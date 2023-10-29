@@ -38,16 +38,20 @@ const SignupScreen = ({navigation}: SignupProps) => {
 
     return(
         <View>
+            <Text>Phone Number</Text>
             <TextInput
                 value={PhoneNumber}
                 onChangeText={setPhoneNumber}
                 keyboardType='phone-pad' />
+            <Text>Email</Text>
             <TextInput
                 value={Email}
                 onChangeText={setEmail} />
+            <Text>Name</Text>
             <TextInput
                 value={Name}
                 onChangeText={setName} />
+            <Text>Date of Birth</Text>
             <DatePicker
                 date={DateOfBirth}
                 onDateChange={setDateOfBirth}

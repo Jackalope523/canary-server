@@ -34,6 +34,7 @@ const LoginScreen = ({navigation}: LoginProps) => {
 
     return(
         <View>
+            <Text>Phone Number</Text>
             <TextInput
                 value={PhoneNumber}
                 onChangeText={setPhoneNumber}
