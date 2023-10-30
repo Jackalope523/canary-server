@@ -20,16 +20,20 @@ const LoginScreen = ({navigation}: LoginProps) => {
         setButtonEnabled(false);
         
         login({ PhoneNumber })
-        .then(() => navigation.navigate('Verify',
+        .then(navigate)
+        .finally(() => setButtonEnabled(true));
+    }
+
+    function navigate() {
+        navigation.navigate('Verify',
         {
             PhoneNumber,
             Forward: () => { navigation.navigate('Continue',
             {
                 Message: 'Welcome back.',
                 Forward: () => navigation.replace('Main')
-            })},
-        }))
-        .finally(() => setButtonEnabled(true));
+            })}
+        });
     }
 
     return(
@@ -47,7 +51,7 @@ const LoginScreen = ({navigation}: LoginProps) => {
                 btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
                 btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                 btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                onPress={handleLogin}
+                onPress={navigate}
                 disabled={!buttonEnabled}
                 />
             <Button

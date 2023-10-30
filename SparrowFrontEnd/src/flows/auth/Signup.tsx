@@ -24,7 +24,12 @@ const SignupScreen = ({navigation}: SignupProps) => {
         setButtonEnabled(false);
         
         signup({ PhoneNumber, Email, Name, DateOfBirth })
-        .then(() => navigation.navigate('Verify',
+        .then(navigate)
+        .finally(() => setButtonEnabled(true));
+    }
+
+    function navigate() {
+        navigation.navigate('Verify',
         {
             PhoneNumber,
             Forward: () => { navigation.navigate('Continue',
@@ -32,8 +37,7 @@ const SignupScreen = ({navigation}: SignupProps) => {
                 Message: 'Your account has been successfully verified. Welcome to Sparrow!',
                 Forward: () => navigation.replace('Main')
             })},
-        }))
-        .finally(() => setButtonEnabled(true));
+        });
     }
 
     return(
@@ -66,7 +70,7 @@ const SignupScreen = ({navigation}: SignupProps) => {
                 btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
                 btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                 btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                onPress={handleSignup}
+                onPress={navigate}
                 disabled={!buttonEnabled}
                 />
         </View>

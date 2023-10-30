@@ -47,7 +47,7 @@ const VerifyScreen = ({route}: VerifyProps) => {
                 btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
                 btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
                 btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                onPress={handleVerify}
+                onPress={route.params.Forward}
                 disabled={!buttonEnabled}
                 />
             <Button
