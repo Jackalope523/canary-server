@@ -1,5 +1,6 @@
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { handleError, initialiseAxiosSession, extractDate, userSession } from '../../lib/axios';
 
 const apiBaseUrl = '/account';
@@ -111,7 +112,7 @@ export async function verify(credentials: accountCredentials) {
         let tokenCookie = response.headers['set-cookie']?.[0];
         if (typeof  tokenCookie === 'string') {
             tokenCookie = tokenCookie.split(';', 2)[0];
-            // AsyncStorage.setItem('token', tokenCookie);
+            AsyncStorage.setItem('token', tokenCookie);
             initialiseAxiosSession(tokenCookie);
         }
     })
