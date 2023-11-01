@@ -62,8 +62,6 @@ namespace Core.Boundaries
 			NotificationService = notificationService;
 
 			CreateManagers();
-
-			BridgeManagers();
 		}
 
 		private void CreateManagers()
@@ -74,16 +72,6 @@ namespace Core.Boundaries
 			ProfileDirector = new ProfileDirector(this);
 			ReportDirector = new ReportDirector(this);
 			NotificationDirector = new NotificationDirector(this);
-		}
-
-		private void BridgeManagers()
-		{
-			AccountDirector.Bridge();
-			EventDirector.Bridge();
-			EtchingDirector.Bridge();
-			ProfileDirector.Bridge();
-			ReportDirector.Bridge();
-			NotificationDirector.Bridge();
 		}
 	}
 }

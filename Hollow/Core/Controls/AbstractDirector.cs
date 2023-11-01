@@ -21,10 +21,7 @@ namespace Core.Controls
 		public AbstractDirector(CoreTerminal terminal)
 		{
 			Terminal = terminal;
-		}
-
-		internal void Bridge()
-		{
+			
 			Accounts = Terminal.AccountDatabase;
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
