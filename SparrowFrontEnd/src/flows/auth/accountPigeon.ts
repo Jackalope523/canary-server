@@ -1,6 +1,7 @@
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, { AxiosResponse } from 'axios';
-import { handleError, initialiseAxiosSession, extractDate } from '../axios';
+
+import { handleError, initialiseAxiosSession, extractDate, userSession } from '../../lib/axios';
 
 const apiBaseUrl = '/account';
 
@@ -60,11 +61,12 @@ export type accountCredentials = {
 // Login
 export async function login(credentials: accountCredentials) {
     if (!credentials) {
-        return console.log('Credentials are missing.');
+        console.log('Credentials are missing.');
+        return Promise.reject();
     }
 
     return await axios.post(`${apiBaseUrl}/login`, credentials)
-    .then((response) => {
+    .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
@@ -82,12 +84,13 @@ export type signUpDetails = {
 // Signup
 export async function signup(details: signUpDetails) {
     if (!details) {
-        return console.log('Sign up details are missing.');
+        console.log('Sign up details are missing.');
+        return Promise.reject();
     }
 
     // TODO details.DateOfBirth = details.DateOfBirth.toISOString();
     return await axios.post(`${apiBaseUrl}/signup`, details)
-    .then((response) => {
+    .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
@@ -98,11 +101,12 @@ export async function signup(details: signUpDetails) {
 // Verify login code
 export async function verify(credentials: accountCredentials) {
     if (!credentials) {
-        return console.log('Credentials are missing.');
+        console.log('Credentials are missing.');
+        return Promise.reject();
     }
 
     return await axios.post(`${apiBaseUrl}/verify`, credentials)
-    .then((response) => {
+    .then((response: any) => {
         
         // Store cookie
         let tokenCookie = response.headers['set-cookie']?.[0];
@@ -118,7 +122,7 @@ export async function verify(credentials: accountCredentials) {
 // Logout
 export async function logout() {
     return await axios.post(`${apiBaseUrl}/logout`)
-    .then((response) => {
+    .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
         console.log(response.headers);
@@ -132,8 +136,8 @@ export async function logout() {
 
 // Get account details
 export async function getAccount() {
-  return await axios.get(`${apiBaseUrl}`)
-    .then((response) => {
+  return await userSession.get(`${apiBaseUrl}`)
+    .then((response: any) => {
         console.log('Account Details:', response.data);
         
         let user: userShard = {
@@ -155,7 +159,7 @@ export async function getAccount() {
             Character: extractCharacter(response.data['Character']),
         }
 
-        return Promise.resolve(user);
+        return user;
     })
     .catch(handleError);
 }
@@ -167,11 +171,12 @@ export type accountDetails = {
 // Modify Account
 export async function modifyAccount(details: accountDetails) {
     if (!details) {
-        return console.log('Modified details are missing.');
+        console.log('Modified details are missing.');
+        return Promise.reject();
     }
 
-  return await axios.put(`${apiBaseUrl}`, details)
-    .then((response) => {
+  return await userSession.put(`${apiBaseUrl}`, details)
+    .then((response: any) => {
             console.log('Account modified.', response.data);
     })
     .catch(handleError);

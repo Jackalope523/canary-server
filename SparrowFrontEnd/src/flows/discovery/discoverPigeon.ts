@@ -1,14 +1,13 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { userSession, handleError } from '../axios';
-import { eventShard, eventThinSlice } from './eventPigeon';
-import { extractUserSilhouette } from './profilePigeon';
+import { userSession, handleError } from '../../lib/axios';
+import { eventShard, eventThinSlice } from '../event/eventPigeon';
+import { extractUserSilhouette } from '../profile/profilePigeon';
 
 const apiBaseUrl = '/discover';
 
 // Get personalized events in the area
 export async function getPersonalizedEvents(latitude: number, longitude: number, distance: number) {
     return await userSession.get(`${apiBaseUrl}/${latitude}-${longitude}-${distance}`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Personalized Events:', response.data);
 
             let events: eventThinSlice[] = [];
@@ -23,7 +22,7 @@ export async function getPersonalizedEvents(latitude: number, longitude: number,
                 });
             }
 
-            return Promise.resolve(events);
+            return events;
         })
         .catch(handleError);
 }
@@ -31,7 +30,7 @@ export async function getPersonalizedEvents(latitude: number, longitude: number,
 // Get all events in the area
 export async function getAllEvents(latitude: number, longitude: number, distance: number) {
     return await userSession.get(`${apiBaseUrl}/all/${latitude}-${longitude}-${distance}`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('All Events:', response.data);
             
             let events: eventThinSlice[] = [];
@@ -46,7 +45,7 @@ export async function getAllEvents(latitude: number, longitude: number, distance
                 });
             }
 
-            return Promise.resolve(events);
+            return events;
         })
         .catch(handleError);
 }

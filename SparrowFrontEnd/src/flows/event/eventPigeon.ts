@@ -1,6 +1,6 @@
-import { userSession, handleError, ratingType, extractDate } from '../axios';
-import { character, extractCharacter } from './accountPigeon';
-import { extractUserSilhouette, userSilhouette } from './profilePigeon';
+import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { character, extractCharacter } from '../auth/accountPigeon';
+import { extractUserSilhouette, userSilhouette } from '../profile/profilePigeon';
 
 const apiBaseUrl = '/event';
 
@@ -49,11 +49,12 @@ export type etchingShard = {
 // Get event details
 export async function getEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get('event/${eventID}')
-        .then((response) => {
+        .then((response: any) => {
             console.log('Event Details:', response.data);
 
             let event: eventShard = {
@@ -72,7 +73,7 @@ export async function getEvent(eventID: string) {
                 Character: extractCharacter(response.data['Character'])
             }
 
-            return Promise.resolve(event);
+            return event;
         })
         .catch(handleError);
 }
@@ -90,13 +91,14 @@ export type eventCreationDetails = {
 // Create event
 export async function createEvent(details: eventCreationDetails) {
     if (!details) {
-        return console.log('EventDetails are missing.');
+        console.log('EventDetails are missing.');
+        return Promise.reject();
     }
 
     // TODO details.StartTime = details.StartTime.toISOString();
 
     return await userSession.post(`${apiBaseUrl}/`, details)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Event Created:', response.data);
 
             let event: eventShard = {
@@ -115,7 +117,7 @@ export async function createEvent(details: eventCreationDetails) {
                 Character: extractCharacter(response.data['Character'])
             }
 
-            return Promise.resolve(event);
+            return event;
         })
         .catch(handleError);
 }
@@ -128,7 +130,8 @@ export type eventEditDetails = {
 // Edit event
 export async function editEvent(eventID: string, details: eventEditDetails) {
     if (!eventID || !details) {
-        return console.log('EventID or Details are missing.');
+        console.log('EventID or Details are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/edit`, details)
@@ -141,7 +144,8 @@ export async function editEvent(eventID: string, details: eventEditDetails) {
 // End event
 export async function endEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.delete(`${apiBaseUrl}/${eventID}/edit`)
@@ -154,7 +158,8 @@ export async function endEvent(eventID: string) {
 // Join event
 export async function joinEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}`)
@@ -167,7 +172,8 @@ export async function joinEvent(eventID: string) {
 // Leave event
 export async function leaveEvent(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/${eventID}`)
@@ -191,7 +197,8 @@ export type eventReport = {
 // Report event
 export async function reportEvent(eventID: string, hostID: string, report: eventReport) {
     if (!eventID || !hostID || !report) {
-        return console.log('EventID, HostID, or Report are missing.');
+        console.log('EventID, HostID, or Report are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/report`, { hostID, report })
@@ -208,11 +215,12 @@ export async function reportEvent(eventID: string, hostID: string, report: event
 // Get event etchings
 export async function getEventEtchings(eventID: string) {
     if (!eventID) {
-        return console.log('EventID is missing.');
+        console.log('EventID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${eventID}/etchings`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Event Etchings:', response.data);
 
             let etchings: etchingShard[] = [];
@@ -230,7 +238,7 @@ export async function getEventEtchings(eventID: string) {
                 });
             }
 
-            return Promise.resolve(etchings);
+            return etchings;
         })
         .catch(handleError);
 }
@@ -242,11 +250,12 @@ export type eventEtching = {
 // Add etching to event
 export async function etchIntoEvent(eventID: string, etching: eventEtching) {
     if (!eventID || !etching) {
-        return console.log('EventID or Etching are missing.');
+        console.log('EventID or Etching are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/etchings`, etching)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Etching Added to Event:', response.data);
 
             let etching: etchingShard = {
@@ -259,7 +268,7 @@ export async function etchIntoEvent(eventID: string, etching: eventEtching) {
                     response.data['Ratings']['Negative']]
             }
 
-            return Promise.resolve(etching);
+            return etching;
         })
         .catch(handleError);
 }
@@ -267,7 +276,8 @@ export async function etchIntoEvent(eventID: string, etching: eventEtching) {
 // Remove etching
 export async function removeEtching(eventID: string, etchingID: string) {
     if (!eventID || !etchingID) {
-        return console.log('EventID or EtchingID are missing.');
+        console.log('EventID or EtchingID are missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/${eventID}/etchings`, etchingID)
@@ -280,7 +290,8 @@ export async function removeEtching(eventID: string, etchingID: string) {
 // Rate etching
 export async function rateEtching(eventID: string, etchingID: string, rating: ratingType) {
     if (!eventID || !etchingID || !rating) {
-        return console.log('EventID, EtchingID, or Details are missing.');
+        console.log('EventID, EtchingID, or Details are missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${eventID}/etchings/${etchingID}`, { 'Rating': rating })

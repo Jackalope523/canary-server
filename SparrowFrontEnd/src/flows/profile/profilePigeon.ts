@@ -1,6 +1,6 @@
-import { userSession, handleError, ratingType, extractDate } from '../axios';
-import { extractCharacter } from './accountPigeon';
-import { eventShard } from './eventPigeon';
+import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { extractCharacter } from '../auth/accountPigeon';
+import { eventShard } from '../event/eventPigeon';
 
 const apiBaseUrl = '/profile';
 
@@ -32,11 +32,12 @@ export function extractUserSilhouette(data: any) {
 // Get user profile
 export async function getUserProfile(targetIdentification: string) {
     if (!targetIdentification) {
-        return console.log('Target identification is missing.');
+        console.log('Target identification is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('User Profile:', response.data);
             
             let profile: userProfile = {
@@ -46,7 +47,7 @@ export async function getUserProfile(targetIdentification: string) {
                 NumberOfFollowers: response.data['NumberOfFollowers']
             }
 
-            Promise.resolve(profile);
+            return profile;
         })
         .catch(handleError);
 }
@@ -54,7 +55,8 @@ export async function getUserProfile(targetIdentification: string) {
 // Rate a user
 export async function rateUser(targetIdentification: string, rating: ratingType) {
     if (!targetIdentification || !rating) {
-        return console.log('Target identification or rating is missing.');
+        console.log('Target identification or rating is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${targetIdentification}`, { 'Rating': rating })
@@ -67,11 +69,12 @@ export async function rateUser(targetIdentification: string, rating: ratingType)
 // Get user activity
 export async function getUserActivity(targetIdentification: string) {
     if (!targetIdentification) {
-        return console.log('Target identification is missing.');
+        console.log('Target identification is missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}/activity`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('User Activity:', response.data);
             
             let events: eventShard[] = [];
@@ -95,7 +98,7 @@ export async function getUserActivity(targetIdentification: string) {
                 });
             }
 
-            return Promise.resolve(events);
+            return events;
         })
         .catch(handleError);
 }
@@ -103,7 +106,7 @@ export async function getUserActivity(targetIdentification: string) {
 // Get friend activity
 export async function getFriendActivity() {
     return await userSession.get(`${apiBaseUrl}/activity`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Friend Activity:', response.data);
             
             let users: userSilhouette[] = [];
@@ -137,7 +140,7 @@ export async function getFriendActivity() {
                 activity[pair[0]['Id']] = events;
             }
 
-            return Promise.resolve([ users, activity ]);
+            return [ users, activity ];
         })
         .catch(handleError);
 }
@@ -145,7 +148,7 @@ export async function getFriendActivity() {
 // Get followed users
 export async function getFollowedUsers() {
     return await userSession.get(`${apiBaseUrl}/following`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Followed Users:', response.data);
             
             let users: userSilhouette[] = [];
@@ -158,7 +161,7 @@ export async function getFollowedUsers() {
                 });
             }
 
-            return Promise.resolve(users);
+            return users;
         })
         .catch(handleError);
 }
@@ -166,7 +169,8 @@ export async function getFollowedUsers() {
 // Follow a user
 export async function followUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/following`, { 'TargetID': targetID })
@@ -179,7 +183,8 @@ export async function followUser(targetID: string) {
 // Unfollow a user
 export async function unfollowUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/following`, { 'TargetID': targetID })
@@ -192,7 +197,7 @@ export async function unfollowUser(targetID: string) {
 // Get blocked users
 export async function getBlockedUsers() {
     return await userSession.get(`${apiBaseUrl}/blocked`)
-        .then((response) => {
+        .then((response: any) => {
             console.log('Blocked Users:', response.data);
             
             let users: userSilhouette[] = [];
@@ -205,7 +210,7 @@ export async function getBlockedUsers() {
                 });
             }
 
-            return Promise.resolve(users);
+            return users;
         })
         .catch(handleError);
 }
@@ -213,7 +218,8 @@ export async function getBlockedUsers() {
 // Block a user
 export async function blockUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
@@ -226,7 +232,8 @@ export async function blockUser(targetID: string) {
 // Unblock a user
 export async function unblockUser(targetID: string) {
     if (!targetID) {
-        return console.log('Target ID is missing.');
+        console.log('Target ID is missing.');
+        return Promise.reject();
     }
 
     return await userSession.put(`${apiBaseUrl}/blocked`, { 'TargetID': targetID })
@@ -247,7 +254,8 @@ export type userReport = {
 // Report a user
 export async function reportUser(targetID: string, report: userReport) {
     if (!targetID || !report) {
-        return console.log('Target ID or report is missing.');
+        console.log('Target ID or report is missing.');
+        return Promise.reject();
     }
 
     return await userSession.post(`${apiBaseUrl}/${targetID}/report`, report)

@@ -1,5 +1,5 @@
-import { userSession, handleError, extractDate } from '../axios';
-import { etchingShard, eventHeader } from './eventPigeon';
+import { userSession, handleError, extractDate } from '../../lib/axios';
+import { etchingShard, eventHeader } from '../event/eventPigeon';
 
 const apiBaseUrl = '/feed';
 
@@ -11,11 +11,12 @@ export type feedOptions = {
 // Get user feed
 export async function getUserFeed(options: feedOptions) {
     if (!options) {
-        return console.log('Feed options are missing.');
+        console.log('Feed options are missing.');
+        return Promise.reject();
     }
 
     return await userSession.get(`${apiBaseUrl}/${options.Depth}`, { data: options })
-        .then((response) => {
+        .then((response: any) => {
             console.log('User Feed:', response.data);
 
             let depth: number = response.data['Depth'];
@@ -47,7 +48,7 @@ export async function getUserFeed(options: feedOptions) {
                 });
             }
 
-            return Promise.resolve([ depth, headers, etchings ]);
+            return [ depth, headers, etchings ];
         })
         .catch(handleError);
 }
