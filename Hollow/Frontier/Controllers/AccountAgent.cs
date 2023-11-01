@@ -169,9 +169,10 @@ namespace Frontier.Controllers
 
 						if (!string.IsNullOrEmpty(user.Email))
 						{
-                            // Send verification email if an email is added
-                            // TODO
-							await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", "Verify your Sparrow email.");
+							// Send verification email if an email is added
+							var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+							var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
+							await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", $"Verify your Sparrow email.\n\n{confirmationLink}");
 						}
 					}
 					else
@@ -189,7 +190,67 @@ namespace Frontier.Controllers
 			return Ok();
         }
 
-        [HttpPost("signup")]
+        [HttpGet("email")]
+        [AllowAnonymous]
+		public async Task<IActionResult> VerifyEmail(string token, string email)
+        {
+			if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+			{
+				return BadRequest(AccountError.MissingInformation.ToString());
+			}
+
+			try
+            {
+				var user = await userManager.FindByEmailAsync(email);
+				if (user == null)
+                {
+					return BadRequest(AccountError.MissingInformation.ToString());
+                }
+
+				var result = await userManager.ConfirmEmailAsync(user, token);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+        [HttpPost("email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendEmailVerification(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+			{
+				return BadRequest(AccountError.MissingInformation.ToString());
+			}
+
+            try
+            {
+				var user = await userManager.FindByEmailAsync(email);
+				if (user == null)
+                {
+					return BadRequest(AccountError.MissingInformation.ToString());
+                }
+
+                // Send verification email if email is not confirmed
+                if (!user.IsEmailConfirmed)
+                {
+				    var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+				    var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
+				    await emailService.SendEmailAsync(user.Email, "Verify your Sparrow email.", $"Verify your Sparrow email.\n\n{confirmationLink}");
+                }
+            }
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+		[HttpPost("signup")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpManifest details)
 		{
