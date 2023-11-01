@@ -104,11 +104,15 @@ namespace Frontier.Controllers
         }
 
         [HttpGet("logout")]
+        [AllowAnonymous]
         public async Task<IActionResult> Logout()
         {
             try
             {
-                await signInManager.SignOutAsync();
+                if (signInManager.IsSignedIn(HttpContext.User))
+                {
+                    await signInManager.SignOutAsync();
+                }
             }
             catch (Exception e)
             {
