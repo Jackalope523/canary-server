@@ -61,7 +61,9 @@ namespace Core.Controls
 			
 			// Check if user can host
 			if (!user.CanHost)
-			{ throw new InvalidUserException("User cannot host."); }
+			{ throw new InvalidUserException("User cannot host.\n" +
+				$"Account Status: {user.AccountStatus}\n" +
+				$"Cooldown: {(user.HostCooldown.HasValue ? user.HostCooldown.Value : "none")}"); }
 
 			// Create event
 			Event eventStub = new()
@@ -80,9 +82,15 @@ namespace Core.Controls
             { throw new InvalidInformationException("Invalid event details provided."); }
 
             // Try to create an event
-            var newEvent = Events.CreateEvent(userID, eventStub.Name, eventStub.Description,
+            var newEvent = Events.CreateEvent(user.Id, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter());
+
+			user.EventCreated();
+
+			// On success, set host cooldown
+			Accounts.UpdateUser(user.Id, new() { ("HostCooldown", user.HostCooldown) });
+
 			return newEvent;
 		}
 

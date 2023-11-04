@@ -11,7 +11,7 @@ namespace Core.Entities
 {
     internal class User
     {
-		public Guid Id { get; init; }
+        public Guid Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
@@ -38,8 +38,14 @@ namespace Core.Entities
             AccountStatus == UserAccountStatus.active_no_host;
         public bool CanAttendFriends => CanAttend ||
             AccountStatus == UserAccountStatus.active_limited;
-		public bool CanHost => AccountStatus == UserAccountStatus.active;
+        public bool CanHost => AccountStatus == UserAccountStatus.active &&
+            (!HostCooldown.HasValue || HostCooldown.Value < DateTimeOffset.UtcNow);
         public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
+
+        public CharacterVector Character { get; set; }
+
+        public DateTimeOffset? HostCooldown { get; set; }
+
 
         public GeoLocation LastKnownLocation { get; set; }
         public Distance LastKnownRadius { get; set; }
@@ -53,8 +59,6 @@ namespace Core.Entities
         public List<UserSilhouette> Following { get; set; }
         public List<UserSilhouette> Blocking { get; set; }
         public List<UserSilhouette> BlockedBy { get; set; }
-
-        public CharacterVector Character { get; set; }
 
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
@@ -83,6 +87,7 @@ namespace Core.Entities
             LockoutDate = fromUser.LockoutDate;
             AccessTries = fromUser.AccessTries;
             Character = new(fromUser.Character);
+            HostCooldown = fromUser.HostCooldown;
         }
 
         public User(UserSilhouette fromUser)
@@ -104,7 +109,7 @@ namespace Core.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
+                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter(), HostCooldown);
         }
 
         public UserSilhouette ToThinnerUser()
@@ -281,6 +286,11 @@ namespace Core.Entities
             float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
 
             Character.MoveTowards(eventAttended.Character, modifier);
+        }
+
+        public void EventCreated()
+        {
+            HostCooldown = DateTimeOffset.UtcNow + TimeSpan.FromHours(1);
         }
 
         public async Task<UserAccountStatus> EventReported()
