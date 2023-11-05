@@ -35,7 +35,8 @@ namespace Core.Entities
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.active ||
-            AccountStatus == UserAccountStatus.active_no_host;
+            AccountStatus == UserAccountStatus.active_no_host &&
+            (!JoinCooldown.HasValue || JoinCooldown.Value < DateTimeOffset.UtcNow);
         public bool CanAttendFriends => CanAttend ||
             AccountStatus == UserAccountStatus.active_limited;
         public bool CanHost => AccountStatus == UserAccountStatus.active &&
@@ -44,6 +45,7 @@ namespace Core.Entities
 
         public CharacterVector Character { get; set; }
 
+        public DateTimeOffset? JoinCooldown { get; set; }
         public DateTimeOffset? HostCooldown { get; set; }
 
 
@@ -87,6 +89,7 @@ namespace Core.Entities
             LockoutDate = fromUser.LockoutDate;
             AccessTries = fromUser.AccessTries;
             Character = new(fromUser.Character);
+            JoinCooldown = fromUser.JoinCooldown;
             HostCooldown = fromUser.HostCooldown;
         }
 
@@ -109,7 +112,8 @@ namespace Core.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter(), HostCooldown);
+                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter(),
+                JoinCooldown, HostCooldown);
         }
 
         public UserSilhouette ToThinnerUser()
@@ -291,6 +295,11 @@ namespace Core.Entities
         public void EventCreated()
         {
             HostCooldown = DateTimeOffset.UtcNow + TimeSpan.FromHours(1);
+        }
+
+        public void EventJoined()
+        {
+            JoinCooldown = DateTimeOffset.UtcNow + TimeSpan.FromMinutes(5);
         }
 
         public async Task<UserAccountStatus> EventReported()

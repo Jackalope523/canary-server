@@ -63,7 +63,7 @@ namespace Core.Controls
 			if (!user.CanHost)
 			{ throw new InvalidUserException("User cannot host.\n" +
 				$"Account Status: {user.AccountStatus}\n" +
-				$"Cooldown: {(user.HostCooldown.HasValue ? user.HostCooldown.Value : "none")}"); }
+				$"Cooldown: {(user.HostCooldown.HasValue || user.HostCooldown.Value > DateTimeOffset.UtcNow ? user.HostCooldown.Value : "none")}"); }
 
 			// Create event
 			Event eventStub = new()
@@ -137,7 +137,10 @@ namespace Core.Controls
 
 			// Check if user is allowed to view event
 			if (!await targetEvent.IsVisibleTo(user))
-			{ throw new InvalidEventException("User is unable to view event."); }
+			{ throw new InvalidEventException("User is unable to view or join event.\n" +
+				$"Account Status: {user.AccountStatus}\n" +
+				$"Cooldown: {(user.JoinCooldown.HasValue || user.JoinCooldown.Value > DateTimeOffset.UtcNow ? user.JoinCooldown.Value : "none")}");
+			}
 
 			// Check if event is open
 			if (!targetEvent.IsOpen)
@@ -147,6 +150,11 @@ namespace Core.Controls
 			bool success = Events.AddUserToEvent(userID, eventID);
 			if (!success)
 			{ throw new UnexpectedFailureException("Could not join event."); }
+
+			user.EventJoined();
+
+			// On success, set join cooldown
+			Accounts.UpdateUser(user.Id, new() { ("JoinCooldown", user.JoinCooldown) });
 		}
 
 		public async Task LeaveEventAsync(Guid userID, Guid eventID)
