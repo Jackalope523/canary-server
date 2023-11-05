@@ -104,7 +104,7 @@ namespace Core.Controls
             User targetUser = new(targetID);
             await targetUser.SyncReputation();
             targetUser.CalculateReputation();
-            Accounts.UpdateUser(targetID, new() { ("Reputation", targetUser.Reputation) });
+            Accounts.UpdateUser(targetID, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }
 
 

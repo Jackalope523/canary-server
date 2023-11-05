@@ -61,9 +61,10 @@ namespace Core.Controls
 			
 			// Check if user can host
 			if (!user.CanHost)
-			{ throw new InvalidUserException("User cannot host.\n" +
-				$"Account Status: {user.AccountStatus}\n" +
-				$"Cooldown: {(user.HostCooldown.HasValue || user.HostCooldown.Value > DateTimeOffset.UtcNow ? user.HostCooldown.Value : "none")}"); }
+			{
+				throw new InvalidUserException("User cannot host.\n" +
+				$"Account Status: {user.AccountStatus}");
+			}
 
 			// Create event
 			Event eventStub = new()
@@ -85,11 +86,6 @@ namespace Core.Controls
             var newEvent = Events.CreateEvent(user.Id, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter());
-
-			user.EventCreated();
-
-			// On success, set host cooldown
-			Accounts.UpdateUser(user.Id, new() { ("HostCooldown", user.HostCooldown) });
 
 			return newEvent;
 		}
@@ -117,11 +113,11 @@ namespace Core.Controls
 			// Track individual edits
 			if (eventDescription != "")
 			{
-				edits.Add(("Description", targetEvent.Description));
+				edits.Add((nameof(EventShard.Description), targetEvent.Description));
 			}
 			if (isOpen.HasValue)
 			{
-				edits.Add(("IsOpen", targetEvent.IsOpen));
+				edits.Add((nameof(EventShard.IsOpen), targetEvent.IsOpen));
 			}
 
 			// Push update
@@ -138,8 +134,7 @@ namespace Core.Controls
 			// Check if user is allowed to view event
 			if (!await targetEvent.IsVisibleTo(user))
 			{ throw new InvalidEventException("User is unable to view or join event.\n" +
-				$"Account Status: {user.AccountStatus}\n" +
-				$"Cooldown: {(user.JoinCooldown.HasValue || user.JoinCooldown.Value > DateTimeOffset.UtcNow ? user.JoinCooldown.Value : "none")}");
+				$"Account Status: {user.AccountStatus}");
 			}
 
 			// Check if event is open
@@ -150,11 +145,6 @@ namespace Core.Controls
 			bool success = Events.AddUserToEvent(userID, eventID);
 			if (!success)
 			{ throw new UnexpectedFailureException("Could not join event."); }
-
-			user.EventJoined();
-
-			// On success, set join cooldown
-			Accounts.UpdateUser(user.Id, new() { ("JoinCooldown", user.JoinCooldown) });
 		}
 
 		public async Task LeaveEventAsync(Guid userID, Guid eventID)
@@ -191,7 +181,7 @@ namespace Core.Controls
 
 				guest.CalculateCharacter(targetEvent, guestDetails.Left.Value - guestDetails.Joined);
 
-				Accounts.UpdateUser(guest.Id, new() { ("Character", guest.Character) });
+				Accounts.UpdateUser(guest.Id, new() { (nameof(UserShard.Character), guest.Character) });
 			}
         }
 

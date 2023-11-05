@@ -81,38 +81,38 @@ namespace Core.Controls
 			if (phoneNumberChanged)
             {
                 await ThrowIfPhoneNumberTaken(editUser.PhoneNumber);
-                edits.Add(("PhoneNumber", editUser.PhoneNumber));
+                edits.Add((nameof(UserShard.PhoneNumber), editUser.PhoneNumber));
 			}
 			if (emailChanged)
 			{
                 await ThrowIfEmailTaken(editUser.Email);
-                edits.Add(("Email", email));
+                edits.Add((nameof(UserShard.Email), email));
                 edits.Add(("NormalisedEmail", editUser.Email));
 			}
 			if (!string.IsNullOrEmpty(name))
 			{
-                edits.Add(("Name", editUser.Name));
+                edits.Add((nameof(UserShard.Name), editUser.Name));
 			}
             // Internal attributes
 			if (isPhoneNumberConfirmed.HasValue)
 			{
-                edits.Add(("IsPhoneConfirmed", isPhoneNumberConfirmed.Value));
+                edits.Add((nameof(UserShard.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
 			}
 			if (isEmailConfirmed.HasValue)
 			{
-                edits.Add(("IsEmailConfirmed", isEmailConfirmed.Value));
+                edits.Add((nameof(UserShard.IsEmailConfirmed), isEmailConfirmed.Value));
 			}
 			if (!string.IsNullOrEmpty(securityStamp))
 			{
-                edits.Add(("SecurityStamp", securityStamp));
+                edits.Add((nameof(UserShard.SecurityStamp), securityStamp));
 			}
 			if (lockoutDate.HasValue)
 			{
-                edits.Add(("LockoutDate", lockoutDate.Value));
+                edits.Add((nameof(UserShard.LockoutDate), lockoutDate.Value));
 			}
 			if (accessTries.HasValue)
 			{
-                edits.Add(("AccessTries", accessTries.Value));
+                edits.Add((nameof(UserShard.AccessTries), accessTries.Value));
 			}
 
             // Push update

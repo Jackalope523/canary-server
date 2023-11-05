@@ -35,18 +35,13 @@ namespace Core.Entities
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.active ||
-            AccountStatus == UserAccountStatus.active_no_host &&
-            (!JoinCooldown.HasValue || JoinCooldown.Value < DateTimeOffset.UtcNow);
+            AccountStatus == UserAccountStatus.active_no_host;
         public bool CanAttendFriends => CanAttend ||
             AccountStatus == UserAccountStatus.active_limited;
-        public bool CanHost => AccountStatus == UserAccountStatus.active &&
-            (!HostCooldown.HasValue || HostCooldown.Value < DateTimeOffset.UtcNow);
+        public bool CanHost => AccountStatus == UserAccountStatus.active;
         public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
 
         public CharacterVector Character { get; set; }
-
-        public DateTimeOffset? JoinCooldown { get; set; }
-        public DateTimeOffset? HostCooldown { get; set; }
 
 
         public GeoLocation LastKnownLocation { get; set; }
@@ -89,8 +84,6 @@ namespace Core.Entities
             LockoutDate = fromUser.LockoutDate;
             AccessTries = fromUser.AccessTries;
             Character = new(fromUser.Character);
-            JoinCooldown = fromUser.JoinCooldown;
-            HostCooldown = fromUser.HostCooldown;
         }
 
         public User(UserSilhouette fromUser)
@@ -290,16 +283,6 @@ namespace Core.Entities
             float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
 
             Character.MoveTowards(eventAttended.Character, modifier);
-        }
-
-        public void EventCreated()
-        {
-            HostCooldown = DateTimeOffset.UtcNow + TimeSpan.FromHours(1);
-        }
-
-        public void EventJoined()
-        {
-            JoinCooldown = DateTimeOffset.UtcNow + TimeSpan.FromMinutes(5);
         }
 
         public async Task<UserAccountStatus> EventReported()

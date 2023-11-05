@@ -13,8 +13,7 @@ namespace Core.Boundaries
 	public record UserShard(Guid Id, string PhoneNumber, string Email, string Name,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character,
-		DateTimeOffset? JoinCooldown, DateTimeOffset? HostCooldown);
+		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
 
 	public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);

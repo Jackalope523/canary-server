@@ -25,7 +25,7 @@ namespace Core.Controls
             // Check if host should be punished
             if (user.AccountStatus != status)
             {
-                Accounts.UpdateUser(targetID, new() { ("AccountStatus", status) });
+                Accounts.UpdateUser(targetID, new() { (nameof(UserShard.AccountStatus), status) });
             }
         }
 
@@ -48,7 +48,7 @@ namespace Core.Controls
                 // Check if host should be punished
                 if (user.AccountStatus != status)
                 {
-                    Accounts.UpdateUser(user.Id, new() { ("AccountStatus", status) });
+                    Accounts.UpdateUser(user.Id, new() { (nameof(UserShard.AccountStatus), status) });
                 }
             }
         }
