@@ -45,8 +45,10 @@ namespace Core.Entities
 			normalisedPhoneNumber = PhoneNumberUtil.ExtractPossibleNumber(phoneNumber);
 
 			// Check if phone number is valid
-			if (string.IsNullOrEmpty(normalisedPhoneNumber)) { return false; }
-			if (!PhoneNumberUtil.IsViablePhoneNumber(normalisedPhoneNumber)) { return false; }
+			if (string.IsNullOrEmpty(normalisedPhoneNumber) ||
+				!PhoneNumberUtil.IsViablePhoneNumber(normalisedPhoneNumber) ||
+				normalisedPhoneNumber.Length < 6)
+			{ return false; }
 
 			// Normalise number
 			normalisedPhoneNumber = PhoneNumberUtil.Normalize(normalisedPhoneNumber);
