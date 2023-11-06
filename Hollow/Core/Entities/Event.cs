@@ -16,6 +16,8 @@ namespace Core.Entities
         public const int MaximumNameLength = 50;
         public const int MaximumDescLength = 400;
 
+        public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
+
         public Guid Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
@@ -135,6 +137,12 @@ namespace Core.Entities
 			// Check if user is blocked by event host
 			if (await user.IsBlockedBy(Host))
 			{ return false; }
+
+            // Check if user or user's haunt is within a reasonable distance
+            await user.SyncLocation();
+            if (!GeoLocation.AreInRange(user.LastKnownLocation, Location, MaximumJoinDistance) &&
+                !GeoLocation.AreInRange(user.Haunt, Location, MaximumJoinDistance))
+            { return false; }
 
 			return true;
 		}
