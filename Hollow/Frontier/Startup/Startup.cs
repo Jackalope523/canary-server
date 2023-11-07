@@ -17,7 +17,6 @@ using Frontier.Controllers;
 using Frontier.Stores;
 using Frontier.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Repository.Stores;
 
 namespace Frontier
 {
