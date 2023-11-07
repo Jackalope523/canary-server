@@ -3,7 +3,7 @@ using Shared;
 
 namespace Repository
 {
-    internal class ReportStore : QueryStore, IReportDatabase
+    public class ReportStore : QueryStore, IReportDatabase
     {
         public static IReportDatabase ReportDatabaseAccess => new ReportStore(new TestSentry());
 

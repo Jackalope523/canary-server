@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Repository.Entities;
 using Core.Boundaries;
 using Frontier.Models;
 using System;

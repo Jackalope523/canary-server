@@ -11,7 +11,6 @@ using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Repository.Entities;
 using Twilio.TwiML.Voice;
 using Microsoft.Extensions.Hosting;
 using Shared;

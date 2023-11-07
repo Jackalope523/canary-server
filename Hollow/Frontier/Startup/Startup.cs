@@ -17,7 +17,7 @@ using Frontier.Controllers;
 using Frontier.Stores;
 using Frontier.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Repository.Stores;
+using Repository;
 
 namespace Frontier
 {
@@ -40,9 +40,9 @@ namespace Frontier
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
-            CoreTerminal terminal = new(QueryStore.AccountDatabaseAccess, 
-                QueryStore.EventDatabaseAccess, QueryStore.EtchingDatabaseAccess,
-                QueryStore.ProfileDatabaseAccess, QueryStore.ReportDatabaseAccess);
+            CoreTerminal terminal = new(AccountStore.AccountDatabaseAccess, 
+                EventStore.EventDatabaseAccess, EtchingStore.EtchingDatabaseAccess,
+                ProfileStore.ProfileDatabaseAccess, ReportStore.ReportDatabaseAccess);
 
             foreach (var (DatabaseType, Instance) in terminal.Gates)
             {
