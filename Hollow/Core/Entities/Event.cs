@@ -134,8 +134,8 @@ namespace Core.Entities
 				{ return false; }
 			}
 
-			// Check if user is blocked by event host
-			if (await user.IsBlockedBy(Host))
+			// Check if user is blocked by or blocking event host
+			if (await user.IsBlockedBy(Host) || await user.IsBlocking(Host))
 			{ return false; }
 
             // Check if user or user's haunt is within a reasonable distance
