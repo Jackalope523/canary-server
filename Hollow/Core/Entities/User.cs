@@ -53,7 +53,9 @@ namespace Core.Entities
         public Event CurrentEvent { get; set; }
         public bool IsAtEvent => CurrentEvent != null;
 
+        public List<UserSilhouette> Friends { get; set; }
         public List<UserSilhouette> Following { get; set; }
+        public List<UserSilhouette> FollowedBy { get; set; }
         public List<UserSilhouette> Blocking { get; set; }
         public List<UserSilhouette> BlockedBy { get; set; }
 
@@ -105,8 +107,7 @@ namespace Core.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter(),
-                JoinCooldown, HostCooldown);
+                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }
 
         public UserSilhouette ToThinnerUser()
@@ -140,7 +141,6 @@ namespace Core.Entities
                 HauntStability = userHaunt.Stability;
             }
             catch { }
-
         }
 
         public async Task SyncCurrentEvent()
@@ -214,9 +214,12 @@ namespace Core.Entities
             => await IsFriendsWith(new User(userID));
 
         public async Task<bool> IsFriendsWith(User otherUser)
-        {
-            // Check if both users are following eachother
-            if (await IsFollowing(otherUser) && await otherUser.IsFollowing(this))
+		{
+			// Set if null
+			Friends ??= await CoreTerminal.Terminal.ProfileDirector.GetFriendsAsync(otherUser.Id);
+
+			// Check if users are friends
+			if (Friends.Find(x => x.Id == otherUser.Id) != null)
             { return true; }
 
             return false;

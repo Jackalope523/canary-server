@@ -60,6 +60,11 @@ namespace Core.Controls
             return friendEvents;
         }
 
+        public async Task<List<UserSilhouette>> GetFriendsAsync(Guid userID)
+        {
+            return Profiles.GetFriends(userID);
+        }
+
         public async Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid userID)
         {
             return Profiles.GetFollowedUsers(userID);
@@ -124,7 +129,7 @@ namespace Core.Controls
             var upcomingActivity = Events.FindUpcomingEventsForUser(userID);
             upcomingActivity.Add(Events.FindCurrentEventForUser(userID));
 
-            return upcomingActivity.ToList();
+            return upcomingActivity;
         }
     }
 }

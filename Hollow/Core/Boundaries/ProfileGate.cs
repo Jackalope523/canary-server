@@ -12,6 +12,7 @@ namespace Core.Boundaries
     {
         List<UserSilhouette> GetFriends(Guid id);
         List<UserSilhouette> GetFollowedUsers(Guid id);
+        List<UserSilhouette> GetUsersFollowing(Guid id);
         List<UserSilhouette> GetBlockedUsers(Guid id);
         List<UserSilhouette> GetUsersBlocking(Guid id);
 
@@ -32,6 +33,7 @@ namespace Core.Boundaries
         Task<List<EventShard>> GetUserActivityAsync(Guid userID, Guid targetID);
         Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(Guid userID);
 
+        Task<List<UserSilhouette>> GetFriendsAsync(Guid userID);
         Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid userID);
         Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid userID);
 
