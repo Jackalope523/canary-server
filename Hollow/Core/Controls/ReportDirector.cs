@@ -11,7 +11,7 @@ namespace Core.Controls
 	{
 		public ReportDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task ReportUserAsync(Guid userID, Guid targetID,
+        public async Task ReportUserAsync(ulong userID, ulong targetID,
             UserReportType reportType, string reportDetails)
         {
             Event occuringEvent = new(Events.FindCurrentEventForUser(targetID));
@@ -29,7 +29,7 @@ namespace Core.Controls
             }
         }
 
-        public async Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId,
+        public async Task ReportEventAsync(ulong userID, ulong eventID, ulong hostId,
             EventReportType reportType, string reportDetails)
         {
             var targetEvent = await GetEvent(eventID);
@@ -54,12 +54,12 @@ namespace Core.Controls
         }
 
         internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
-            GetAllReportsAsync(Guid userID)
+            GetAllReportsAsync(ulong userID)
         {
             return Reports.GetReportsForUser(userID);
         }
 
-        internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
+        internal async Task<List<EventReport>> GetEventReportsAsync(ulong eventID)
         {
             return Reports.GetReportsForEvent(eventID);
         }

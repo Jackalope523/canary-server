@@ -12,7 +12,7 @@ namespace Core.Controls
 	{
 		public EtchingDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task<List<Etching>> GetEventEtchingsAsync(Guid userID, Guid eventID)
+        public async Task<List<Etching>> GetEventEtchingsAsync(ulong userID, ulong eventID)
         {
             var user = await GetUser(userID);
             Event targetEvent = new(eventID);
@@ -26,7 +26,7 @@ namespace Core.Controls
             return eventEtchings;
         }
 
-        public async Task<Etching> AddEtchingAsync(Guid userID, Guid eventID, string imageURL)
+        public async Task<Etching> AddEtchingAsync(ulong userID, ulong eventID, string imageURL)
         {
             User user = new(userID);
             var targetEvent = await GetEvent(eventID);
@@ -45,7 +45,7 @@ namespace Core.Controls
             return userEtching;
         }
 
-        public async Task RemoveEtchingAsync(Guid userID, Guid etchingID)
+        public async Task RemoveEtchingAsync(ulong userID, ulong etchingID)
         {
             var eventEtching = Etchings.GetEtching(etchingID);
 
@@ -56,7 +56,7 @@ namespace Core.Controls
             Etchings.RemoveEtching(etchingID);
         }
 
-        public async Task RateEtchingAsync(Guid userID, Guid etchingID, UserRating rating)
+        public async Task RateEtchingAsync(ulong userID, ulong etchingID, UserRating rating)
         {
             User user = new(userID);
             var eventOfEtching = await GetEvent(Etchings.GetEtching(etchingID).EventId);
@@ -77,11 +77,11 @@ namespace Core.Controls
         }
 
         public async Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
-            GetUserFeedAsync(Guid userID, int depth = 0, List<Guid> exclusionList = null)
+            GetUserFeedAsync(ulong userID, int depth = 0, List<ulong> exclusionList = null)
         {
             User user = new(userID);
             exclusionList ??= new();
-            Dictionary<Guid, EventHeader> eventHeaders = new();
+            Dictionary<ulong, EventHeader> eventHeaders = new();
 
             // Retrieve friend-populated event etchings after a specified time excluding previously viewed events
             DateTimeOffset depthCharge = DateTimeOffset.UtcNow - TimeSpan.FromDays(1 + depth);
@@ -111,7 +111,7 @@ namespace Core.Controls
         }
 
 
-        internal async Task<List<Etching>> GetEventEtchingsAsync(Guid eventID)
+        internal async Task<List<Etching>> GetEventEtchingsAsync(ulong eventID)
         {
             return Etchings.GetEtchingsForEvent(eventID);
         }

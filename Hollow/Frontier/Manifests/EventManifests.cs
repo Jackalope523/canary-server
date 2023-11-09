@@ -51,6 +51,6 @@ namespace Frontier.Manifests
         public int Depth { get; set; }
 
         [Required]
-        public Guid[] ExclusionList { get; set; }
+        public ulong[] ExclusionList { get; set; }
     }
 }

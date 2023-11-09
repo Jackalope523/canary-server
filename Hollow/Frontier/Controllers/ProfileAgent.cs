@@ -50,7 +50,7 @@ namespace Frontier.Controllers
 			try
 			{
 				// Parse target identification and retrieve profile
-				var target = GetGUID(targetIdentification);
+				var target = GetId(targetIdentification);
 				var user = await GetCurrentUserAsync();
 				profile = await profiles.GetUserProfileAsync(user.Id, target);
 			}
@@ -77,7 +77,7 @@ namespace Frontier.Controllers
 
 			try
 			{
-				var target = GetGUID(targetIdentification);
+				var target = GetId(targetIdentification);
 				var user = await GetCurrentUserAsync();
 				await profiles.RateUserAsync(user.Id, target, details.Rating);
             }
@@ -107,7 +107,7 @@ namespace Frontier.Controllers
 			try
 			{
 				// Parse target identification and retrieve activity
-				var target = GetGUID(targetIdentification);
+				var target = GetId(targetIdentification);
 				var user = await GetCurrentUserAsync();
 				activity = await profiles.GetUserActivityAsync(user.Id, target);
 			}
@@ -280,8 +280,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				Guid targetGUID = GetGUID(targetID);
-				await reports.ReportUserAsync(user.Id, targetGUID, report.ReportType, report.ReportDetails);
+				ulong targetulong = GetId(targetID);
+				await reports.ReportUserAsync(user.Id, targetulong, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{
@@ -296,14 +296,14 @@ namespace Frontier.Controllers
 			return await userManager.GetUserAsync(HttpContext.User);
 		}
 
-		private Guid GetGUID(string id)
+		private ulong GetId(string id)
 		{
-			if (!Guid.TryParse(id, out Guid guid))
+			if (!ulong.TryParse(id, out ulong parsedId))
 			{
-				throw new ArgumentException("Not a valid GUID.", nameof(id));
+				throw new ArgumentException("Not a valid ulong.", nameof(id));
 			}
 
-			return guid;
+			return parsedId;
 		}
 	}
 

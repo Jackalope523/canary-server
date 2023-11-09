@@ -5,31 +5,31 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
-    public record UserReport(Guid Id, Guid ReportingUserId, Guid ReportedUserId, DateTimeOffset ReportTime,
+    public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);
 
-    public record EventReport(Guid Id, Guid ReportingUserId, Guid ReportedEventId,
-        Guid ReportedEventHostId, DateTimeOffset ReportTime,
+    public record EventReport(ulong Id, ulong ReportingUserId, ulong ReportedEventId,
+        ulong ReportedEventHostId, DateTimeOffset ReportTime,
         EventReportType ReportType, string ReportDetails);
 
     public interface IReportDatabase
     {
-        (List<UserReport>, List<EventReport>) GetReportsForUser(Guid id);
-        (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id);
-        bool ReportUser(Guid selfId, Guid eventId, Guid targetId,
+        (List<UserReport>, List<EventReport>) GetReportsForUser(ulong id);
+        (List<UserReport>, List<EventReport>) GetReportsByUser(ulong id);
+        bool ReportUser(ulong selfId, ulong eventId, ulong targetId,
             UserReportType reportType, string reportDetails);
 
-        List<EventReport> GetReportsForEvent(Guid id);
-        bool ReportEvent(Guid userId, Guid eventId, Guid HostId,
+        List<EventReport> GetReportsForEvent(ulong id);
+        bool ReportEvent(ulong userId, ulong eventId, ulong HostId,
             EventReportType reportType, string reportDetails);
     }
 
     public interface IReportOperations
     {
-        Task ReportUserAsync(Guid userID, Guid targetID,
+        Task ReportUserAsync(ulong userID, ulong targetID,
             UserReportType reportType, string reportDetails);
 
-        Task ReportEventAsync(Guid userID, Guid eventID, Guid hostId,
+        Task ReportEventAsync(ulong userID, ulong eventID, ulong hostId,
             EventReportType reportType, string reportDetails);
     }
 }

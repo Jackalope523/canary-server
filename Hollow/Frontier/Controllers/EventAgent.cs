@@ -59,8 +59,8 @@ namespace Frontier.Controllers
             {
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-				Guid eventGUID = GetGUID(eventID);
-                targetEvent = await events.GetEventInformationAsync(user.Id, eventGUID);
+				ulong eventulong = GetId(eventID);
+                targetEvent = await events.GetEventInformationAsync(user.Id, eventulong);
 			}
 			catch (Exception e)
 			{
@@ -108,7 +108,7 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				await events.EditEventAsync(user.Id, GetGUID(eventID),
+				await events.EditEventAsync(user.Id, GetId(eventID),
 					eventDescription: eventDetails.EventDescription ?? "",
 					isOpen: eventDetails.EventIsOpen);
 			}
@@ -132,8 +132,8 @@ namespace Frontier.Controllers
 			{
 				// End an event as the current user
 				var user = await GetCurrentUserAsync();
-				Guid eventGUID = GetGUID(eventID);
-				await events.EndEventAsync(user.Id, eventGUID);
+				ulong eventulong = GetId(eventID);
+				await events.EndEventAsync(user.Id, eventulong);
 			}
 			catch (Exception e)
 			{
@@ -155,8 +155,8 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
-				Guid eventGUID = GetGUID(eventID);
-				await events.JoinEventAsync(user.Id, eventGUID);
+				ulong eventulong = GetId(eventID);
+				await events.JoinEventAsync(user.Id, eventulong);
 			}
 			catch (Exception e)
 			{
@@ -178,8 +178,8 @@ namespace Frontier.Controllers
 			{
 				// Leave an event as the current user
 				var user = await GetCurrentUserAsync();
-				Guid eventGUID = GetGUID(eventID);
-				await events.LeaveEventAsync(user.Id, eventGUID);
+				ulong eventulong = GetId(eventID);
+				await events.LeaveEventAsync(user.Id, eventulong);
 			}
 			catch (Exception e)
 			{
@@ -200,9 +200,9 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				Guid eventGUID = GetGUID(eventID);
-                Guid hostGUID = GetGUID(hostID);
-                await reports.ReportEventAsync(user.Id, eventGUID, hostGUID, report.ReportType, report.ReportDetails);
+				ulong eventulong = GetId(eventID);
+                ulong hostulong = GetId(hostID);
+                await reports.ReportEventAsync(user.Id, eventulong, hostulong, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{
@@ -226,9 +226,9 @@ namespace Frontier.Controllers
 			{
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-				Guid eventGUID = GetGUID(eventID);
+				ulong eventulong = GetId(eventID);
 
-				eventEtchings = await etchings.GetEventEtchingsAsync(user.Id, eventGUID);
+				eventEtchings = await etchings.GetEventEtchingsAsync(user.Id, eventulong);
 			}
 			catch (Exception e)
 			{
@@ -251,8 +251,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				Guid eventGUID = GetGUID(eventID);
-				newEtching = await etchings.AddEtchingAsync(user.Id, eventGUID, etching.ImageURL);
+				ulong eventulong = GetId(eventID);
+				newEtching = await etchings.AddEtchingAsync(user.Id, eventulong, etching.ImageURL);
 			}
 			catch (Exception e)
 			{
@@ -273,8 +273,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				Guid etchingGUID = GetGUID(etchingID);
-				await etchings.RemoveEtchingAsync(user.Id, etchingGUID);
+				ulong etchingulong = GetId(etchingID);
+				await etchings.RemoveEtchingAsync(user.Id, etchingulong);
 			}
 			catch (Exception e)
 			{
@@ -295,8 +295,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				var etchingGUID = GetGUID(etchingID);
-				await etchings.RateEtchingAsync(user.Id, etchingGUID, details.Rating);
+				var etchingulong = GetId(etchingID);
+				await etchings.RateEtchingAsync(user.Id, etchingulong, details.Rating);
 			}
 			catch (Exception e)
 			{
@@ -311,14 +311,14 @@ namespace Frontier.Controllers
 			return await userManager.GetUserAsync(HttpContext.User);
 		}
 
-		private Guid GetGUID(string id)
+		private ulong GetId(string id)
 		{
-			if (!Guid.TryParse(id, out Guid guid))
+			if (!ulong.TryParse(id, out ulong parsedId))
 			{
-				throw new ArgumentException("Not a valid GUID.", nameof(id));
+				throw new ArgumentException("Not a valid ulong.", nameof(id));
 			}
 
-			return guid;
+			return parsedId;
 		}
 	}
 

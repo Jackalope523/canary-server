@@ -11,7 +11,7 @@ namespace Core.Entities
 {
     internal class User
     {
-        public Guid Id { get; init; }
+        public ulong Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
@@ -65,7 +65,7 @@ namespace Core.Entities
 
         public User() { }
 
-        public User(Guid userID)
+        public User(ulong userID)
         {
             Id = userID;
         }
@@ -210,7 +210,7 @@ namespace Core.Entities
             }
         }
 
-        public async Task<bool> IsFriendsWith(Guid userID)
+        public async Task<bool> IsFriendsWith(ulong userID)
             => await IsFriendsWith(new User(userID));
 
         public async Task<bool> IsFriendsWith(User otherUser)
@@ -225,7 +225,7 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsFollowing(Guid userID)
+        public async Task<bool> IsFollowing(ulong userID)
             => await IsFollowing(new User(userID));
 		
         public async Task<bool> IsFollowing(User otherUser)
@@ -240,7 +240,7 @@ namespace Core.Entities
             return true;
         }
 
-        public async Task<bool> IsBlocking(Guid userID)
+        public async Task<bool> IsBlocking(ulong userID)
             => await IsBlocking(new User(userID));
 
         public async Task<bool> IsBlocking(User otherUser)
@@ -255,7 +255,7 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsBlockedBy(Guid userID)
+        public async Task<bool> IsBlockedBy(ulong userID)
 			=> await IsBlockedBy(new User(userID));
 
 		public async Task<bool> IsBlockedBy(User otherUser)

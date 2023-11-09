@@ -12,18 +12,18 @@ namespace Core.Controls
 	{
 		public NotificationDirector(CoreTerminal terminal) : base(terminal) { }
 
-		public async Task SubscribeUserAsync(Guid userID, DeviceType deviceType, string deviceToken)
+		public async Task SubscribeUserAsync(ulong userID, DeviceType deviceType, string deviceToken)
 		{
 			Notifications.SubscribeUser(userID, deviceType, deviceToken);
 		}
 
-		public async Task UnsubscribeUserAsync(Guid userID)
+		public async Task UnsubscribeUserAsync(ulong userID)
 		{
 			Notifications.UnsubscribeUser(userID);
 		}
 
 
-		internal async Task NotifyUserAsync(Guid userID, string title, string message)
+		internal async Task NotifyUserAsync(ulong userID, string title, string message)
 		{
 			var userSettings = Notifications.GetUserSubscription(userID);
 			// Check if user is subscribed

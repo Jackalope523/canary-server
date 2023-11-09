@@ -30,7 +30,7 @@ namespace Core.Controls
 			Notifications = Terminal.NotificationDatabase;
         }
 
-        internal async Task<User> GetUser(Guid userID)
+        internal async Task<User> GetUser(ulong userID)
         {
             User user = new(Accounts.FindUserById(userID));
 
@@ -41,7 +41,7 @@ namespace Core.Controls
             return user;
         }
 
-        internal async Task<Event> GetEvent(Guid eventID)
+        internal async Task<Event> GetEvent(ulong eventID)
         {
             return new(Events.FindEvent(eventID));
         }

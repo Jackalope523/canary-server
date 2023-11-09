@@ -18,7 +18,7 @@ namespace Core.Entities
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
 
-        public Guid Id { get; init; }
+        public ulong Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -40,7 +40,7 @@ namespace Core.Entities
 
 		public Event() { }
 
-        public Event(Guid eventID)
+        public Event(ulong eventID)
         {
             Id = eventID;
         }
@@ -147,7 +147,7 @@ namespace Core.Entities
 			return true;
 		}
 
-        public async Task<bool> IsModifiableBy(Guid userID)
+        public async Task<bool> IsModifiableBy(ulong userID)
             => await IsModifiableBy(new User(userID));
 
         public async Task<bool> IsModifiableBy(User user)
@@ -159,7 +159,7 @@ namespace Core.Entities
 			return false;
         }
 
-        public async Task<bool> IsAttendedBy(Guid userID)
+        public async Task<bool> IsAttendedBy(ulong userID)
             => await IsAttendedBy(new User(userID));
 
         public async Task<bool> IsAttendedBy(User user)

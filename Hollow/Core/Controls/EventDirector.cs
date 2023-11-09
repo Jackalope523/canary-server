@@ -14,7 +14,7 @@ namespace Core.Controls
 	{
 		public EventDirector(CoreTerminal terminal) : base(terminal) { }
 
-		public async Task<EventShard> GetEventInformationAsync(Guid userID, Guid eventID)
+		public async Task<EventShard> GetEventInformationAsync(ulong userID, ulong eventID)
         {
 			var user = await GetUser(userID);
 			var targetEvent = await GetEvent(eventID);
@@ -26,7 +26,7 @@ namespace Core.Controls
 			return targetEvent.ToThinEvent();
 		}
 
-		public async Task<List<EventThinSlice>> GetEventsInAreaAsync(Guid userID,
+		public async Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userID,
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUser(userID);
@@ -38,7 +38,7 @@ namespace Core.Controls
 			return nearbyEvents;
 		}
 
-		public async Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(Guid userID,
+		public async Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(ulong userID,
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUser(userID);
@@ -50,7 +50,7 @@ namespace Core.Controls
 			return nearbyEvents;
 		}
 
-		public async Task<EventShard> CreateEventAsync(Guid userID,
+		public async Task<EventShard> CreateEventAsync(ulong userID,
 			string eventName, string eventDescription, DateTimeOffset startTime,
 			double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum)
@@ -90,7 +90,7 @@ namespace Core.Controls
 			return newEvent;
 		}
 
-		public async Task EditEventAsync(Guid userID, Guid eventID,
+		public async Task EditEventAsync(ulong userID, ulong eventID,
 			string eventDescription = "", bool? isOpen = null)
 		{
 			var targetEvent = await GetEvent(eventID);
@@ -124,7 +124,7 @@ namespace Core.Controls
 			Events.UpdateEvent(targetEvent.Id, edits);
 		}
 
-		public async Task JoinEventAsync(Guid userID, Guid eventID)
+		public async Task JoinEventAsync(ulong userID, ulong eventID)
 		{
 			var user = await GetUser(userID);
 			await ThrowIfUserAtEvent(userID);
@@ -147,7 +147,7 @@ namespace Core.Controls
 			{ throw new UnexpectedFailureException("Could not join event."); }
 		}
 
-		public async Task LeaveEventAsync(Guid userID, Guid eventID)
+		public async Task LeaveEventAsync(ulong userID, ulong eventID)
 		{
 			var targetEvent = await GetEvent(eventID);
 
@@ -161,7 +161,7 @@ namespace Core.Controls
             { throw new UnexpectedFailureException("Could not leave event."); }
         }
 
-		public async Task EndEventAsync(Guid userID, Guid eventID)
+		public async Task EndEventAsync(ulong userID, ulong eventID)
 		{
 			var targetEvent = await GetEvent(eventID);
 
@@ -185,7 +185,7 @@ namespace Core.Controls
 			}
         }
 
-		public async Task<List<UserSilhouette>> GetAttendeesAsync(Guid userID, Guid eventID)
+		public async Task<List<UserSilhouette>> GetAttendeesAsync(ulong userID, ulong eventID)
 		{
 			Event targetEvent = new(eventID);
 
@@ -215,7 +215,7 @@ namespace Core.Controls
 			return targetEvent.Attendees;
 		}
 
-		internal async Task<List<UserSilhouette>> GetAttendeesInternalAsync(Guid eventID)
+		internal async Task<List<UserSilhouette>> GetAttendeesInternalAsync(ulong eventID)
 		{
 			return Events.GetGuestList(eventID);
 		}
@@ -265,13 +265,13 @@ namespace Core.Controls
 			return events;
 		}
 
-		internal async Task<EventShard> GetCurrentEventAsync(Guid userID)
+		internal async Task<EventShard> GetCurrentEventAsync(ulong userID)
 		{
 			return Events.FindCurrentEventForUser(userID);
 		}
 
 
-		private async Task ThrowIfUserAtEvent(Guid userID)
+		private async Task ThrowIfUserAtEvent(ulong userID)
 		{
 			User user = new(userID);
 			await user.SyncCurrentEvent();

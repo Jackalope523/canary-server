@@ -7,49 +7,49 @@ using Shared;
 
 namespace Core.Boundaries
 {
-	public record EventShard(Guid Id, UserSilhouette Host, string Name, string Description,
+	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
-	public record EventThinSlice(Guid Id, UserSilhouette Host, double Latitude, double Longitude);
+	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
 
 	public interface IEventDatabase
 	{
-        EventShard FindEvent(Guid id);
+        EventShard FindEvent(ulong id);
 		List<EventThinSlice> FindEvents(double latitude, double longitude, double distance);
-		EventShard FindCurrentEventForUser(Guid id);
-		List<EventShard> FindUpcomingEventsForUser(Guid id);
-		List<EventShard> FindPastEventsForUser(Guid id);
+		EventShard FindCurrentEventForUser(ulong id);
+		List<EventShard> FindUpcomingEventsForUser(ulong id);
+		List<EventShard> FindPastEventsForUser(ulong id);
 
-		EventShard CreateEvent(Guid hostId, string name, string description,
+		EventShard CreateEvent(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character);
-		bool UpdateEvent(Guid id, List<(string Property, object Value)> edits);
-		bool EndEvent(Guid id);
+		bool UpdateEvent(ulong id, List<(string Property, object Value)> edits);
+		bool EndEvent(ulong id);
 
-		bool AddUserToEvent(Guid userId, Guid eventId);
-		bool RemoveUserFromEvent(Guid userId, Guid eventId);
+		bool AddUserToEvent(ulong userId, ulong eventId);
+		bool RemoveUserFromEvent(ulong userId, ulong eventId);
 
-		List<UserSilhouette> GetGuestList(Guid id);
-		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(Guid id);
+		List<UserSilhouette> GetGuestList(ulong id);
+		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(ulong id);
 	}
 
 	public interface IEventOperations
 	{
-		Task<EventShard> GetEventInformationAsync(Guid userID, Guid eventID);
-		Task<List<EventThinSlice>> GetEventsInAreaAsync(Guid userID,
+		Task<EventShard> GetEventInformationAsync(ulong userID, ulong eventID);
+		Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userID,
 			double latitude, double longitude, double distance);
-		Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(Guid userID,
+		Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(ulong userID,
 			double latitude, double longitude, double distance);
 
-		Task<EventShard> CreateEventAsync(Guid userID, string eventName, string eventDescription,
+		Task<EventShard> CreateEventAsync(ulong userID, string eventName, string eventDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum);
-		Task EditEventAsync(Guid userID, Guid eventID,
+		Task EditEventAsync(ulong userID, ulong eventID,
 			string eventDescription = "", bool? isOpen = null);
-		Task JoinEventAsync(Guid userID, Guid eventID);
-		Task LeaveEventAsync(Guid userID, Guid eventID);
-		Task EndEventAsync(Guid userID, Guid eventID);
+		Task JoinEventAsync(ulong userID, ulong eventID);
+		Task LeaveEventAsync(ulong userID, ulong eventID);
+		Task EndEventAsync(ulong userID, ulong eventID);
 
-		Task<List<UserSilhouette>> GetAttendeesAsync(Guid userID, Guid eventID);
+		Task<List<UserSilhouette>> GetAttendeesAsync(ulong userID, ulong eventID);
 	}
 }

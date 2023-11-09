@@ -11,7 +11,7 @@ namespace Core.Controls
     {
         public AccountDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task<UserShard> GetUserAsync(Guid userID)
+        public async Task<UserShard> GetUserAsync(ulong userID)
         {
             return (await GetUser(userID)).ToThinUser();
         }
@@ -54,7 +54,7 @@ namespace Core.Controls
             { throw new UnexpectedFailureException("User creation failed."); }
         }
 
-        public async Task EditUserAsync(Guid userID,
+        public async Task EditUserAsync(ulong userID,
             string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
@@ -119,14 +119,14 @@ namespace Core.Controls
             Accounts.UpdateUser(editUser.Id, edits);
 		}
 
-        public async Task DeleteUserAsync(Guid userID)
+        public async Task DeleteUserAsync(ulong userID)
         {
             bool success = Accounts.DeleteUser(userID);
             if (!success)
             { throw new UnexpectedFailureException("User deletion failed."); }
         }
 
-        public async Task UpdateUserLocationAsync(Guid userID, double latitude, double longitude)
+        public async Task UpdateUserLocationAsync(ulong userID, double latitude, double longitude)
 		{
 			var user = await GetUser(userID);
             await user.SyncLocation();
@@ -152,13 +152,13 @@ namespace Core.Controls
         }
 
         internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
-            GetUserHauntAsync(Guid userID)
+            GetUserHauntAsync(ulong userID)
         {
             return Accounts.GetUserHaunt(userID);
         }
 
         internal async Task<(double Latitude, double Longitude, double Radius)>
-            GetLastKnownUserLocationAsync(Guid userID)
+            GetLastKnownUserLocationAsync(ulong userID)
         {
             return Accounts.GetRecentUserLocation(userID);
         }

@@ -11,7 +11,7 @@ namespace Core.Entities
         public IList<Participant> ActiveParticipants => GetActiveParticipants();
 
 
-        private Dictionary<Guid, LinkedList<ParticipantAction>> log;
+        private Dictionary<ulong, LinkedList<ParticipantAction>> log;
 
         private IList<Participant> cachedActiveParticipants;
         private bool participantsIsStale = true;
@@ -19,10 +19,10 @@ namespace Core.Entities
 
         public ParticipantLog()
         {
-            log = new Dictionary<Guid, LinkedList<ParticipantAction>>();
+            log = new Dictionary<ulong, LinkedList<ParticipantAction>>();
         }
 
-        public void AddParticipant(Guid participantID)
+        public void AddParticipant(ulong participantID)
         {
             participantsIsStale = true;
 
@@ -34,7 +34,7 @@ namespace Core.Entities
             log[participantID].AddLast(new ParticipantAction(PerformedAction.Joined));
         }
 
-        public void RemoveParticipant(Guid participantID)
+        public void RemoveParticipant(ulong participantID)
         {
             participantsIsStale = true;
 
@@ -55,7 +55,7 @@ namespace Core.Entities
 
             var currentTime = DateTime.Now;
 
-            foreach (Guid participant in log.Keys)
+            foreach (ulong participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -74,7 +74,7 @@ namespace Core.Entities
 
             var currentTime = DateTime.Now;
 
-            foreach (Guid participant in log.Keys)
+            foreach (ulong participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -105,7 +105,7 @@ namespace Core.Entities
 
             List<Participant> activeParticipants = new List<Participant>();
 
-            foreach (Guid participant in log.Keys)
+            foreach (ulong participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -124,16 +124,16 @@ namespace Core.Entities
 
     internal readonly struct Participant : IComparable<Participant>
     {
-        public Guid ID { get; }
+        public ulong ID { get; }
         public DateTime JoinedTime { get; }
 
-        public Participant(Guid userID)
+        public Participant(ulong userID)
         {
             ID = userID;
             JoinedTime = DateTime.UtcNow;
         }
 
-        public Participant(Guid userID, DateTime timeJoined)
+        public Participant(ulong userID, DateTime timeJoined)
         {
             ID = userID;
             JoinedTime = timeJoined;
