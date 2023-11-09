@@ -43,7 +43,7 @@ namespace Repository.Tests
             {
                 PhoneNumber = testUserPhoneNumber,
                 Email = testUserEmail,
-                NormalizedEmail = testUserNormalizedEmail,
+                NormalisedEmail = testUserNormalizedEmail,
                 Name = testUserName,
                 SecurityStamp = testUserSecurityStamp,
                 DateOfBirth = subjectDateOfBirth
@@ -58,7 +58,6 @@ namespace Repository.Tests
                 HostId = Guid.Empty,
                 Name = testEventName,
                 Description = testEventDescription,
-                Type = testEventEventType,
                 StartTime = testEventStartTime,
                 Location = new Point(testEventLongitude, testEventLatitude),
                 GroupMinimum = testEventGroupMinimum,

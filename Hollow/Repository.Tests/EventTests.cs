@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 using Core.Boundaries;
 using Xunit.Abstractions;
-
+using Repository.Repository;
 
 namespace Repository.Tests
 {
@@ -10,57 +9,23 @@ namespace Repository.Tests
     {
         private static TestSentry sentry = new TestSentry();
         private static EventStore store = new EventStore(sentry);
+        private static UserFactory userFactory = new UserFactory();
+        private static EventFactory eventFactory = new EventFactory();
 
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private Guid testHostId;
-        private string testUserPhoneNumber = "000-000-0000";
-        private string testUserEmail = "email_0@test.com";
-        private string testUserNormalizedEmail = "email_0@test.com";
-        private string testUserName = "name";
-        private string testUserSecurityStamp = "stamp";
-        private DateTimeOffset subjectDateOfBirth = new DateTimeOffset(new DateTime(0));
         private User testUser;
-
-        private string testEventName = "event1";
-        private string testEventDescription = "The first of many.";
-        private string testEventEventType = "Proto";
-        private DateTimeOffset testEventStartTime = new DateTimeOffset(new DateTime(0));
-        private double testEventLatitude = 100;
-        private double testEventLongitude = 100;
-        private int testEventGroupMinimum = 0;
-        private int testEventGroupMaximum = 1;
-        private bool testIsEventOpen = false;     
         private Event testEvent;
 
         public EventTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
-            testUser = new User
-            {
-                PhoneNumber = testUserPhoneNumber,
-                Email = testUserEmail,
-                NormalizedEmail = testUserNormalizedEmail,
-                Name = testUserName,
-                SecurityStamp = testUserSecurityStamp,
-                DateOfBirth = subjectDateOfBirth
-            };
-            
+            testUser = userFactory.Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(testUser));
 
-            testEvent = new Event
-            {
-                HostId = testUser.Id,
-                Name = testEventName,
-                Description = testEventDescription,
-                Type = testEventEventType,
-                StartTime = testEventStartTime,
-                Location = new Point(testEventLongitude, testEventLatitude),
-                GroupMinimum = testEventGroupMinimum,
-                GroupMaximum = testEventGroupMaximum,
-                IsEventOpen= testIsEventOpen
-            };
+            testEvent = eventFactory.Create();
+            testEvent.HostId = testUser.Id;
         }
         public void Dispose()
         {
@@ -101,13 +66,13 @@ namespace Repository.Tests
             Assert.Equal(testEvent.Id, found.Id);
             Assert.Equal(testUser.Id, found.Host.Id);
             Assert.Equal(testUser.Name, found.Host.Name);
-            Assert.Equal(testEventName, found.Name);
-            Assert.Equal(testEventDescription, found.Description);
-            Assert.Equal(testEventStartTime, found.StartTime);
-            Assert.Equal(testEventLatitude, found.Latitude);
-            Assert.Equal(testEventLongitude, found.Longitude);
-            Assert.Equal(testEventGroupMinimum, found.GroupMinimum);
-            Assert.Equal(testEventGroupMaximum, found.GroupMaximum);
+            Assert.Equal(testEvent.Name, found.Name);
+            Assert.Equal(testEvent.Description, found.Description);
+            Assert.Equal(testEvent.StartTime, found.StartTime);
+            Assert.Equal(testEvent.Location.Y, found.Latitude);
+            Assert.Equal(testEvent.Location.X, found.Longitude);
+            Assert.Equal(testEvent.GroupMinimum, found.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, found.GroupMaximum);
         }
         [Fact]
         public void FindEvents_SUCCESS()
@@ -120,8 +85,8 @@ namespace Repository.Tests
             Assert.Equal(testEvent.Id, found.First().Id);
             Assert.Equal(testUser.Id, found.First().Host.Id);
             Assert.Equal(testUser.Name, found.First().Host.Name);
-            Assert.Equal(testEventLatitude, found.First().Latitude);
-            Assert.Equal(testEventLongitude, found.First().Longitude);
+            Assert.Equal(testEvent.Location.Y, found.First().Latitude);
+            Assert.Equal(testEvent.Location.X, found.First().Longitude);
            
         }
         [Fact]
@@ -139,40 +104,15 @@ namespace Repository.Tests
             Event updated = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(updated);
-            Assert.Equal(testHostId, updated.HostId);
-            Assert.Equal(testEventName, updated.Name);
-            Assert.NotEqual(testEventDescription, updated.Description);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.NotEqual(testEvent.Description, updated.Description);
             Assert.Equal(newDescription, updated.Description);
-            Assert.Equal(testEventEventType, updated.Type);
-            Assert.Equal(testEventStartTime, updated.StartTime);
-            Assert.Equal(testEventLatitude, updated.Location.Y);
-            Assert.Equal(testEventLongitude, updated.Location.X);
-            Assert.Equal(testEventGroupMinimum, updated.GroupMinimum);
-            Assert.Equal(testEventGroupMaximum, updated.GroupMaximum);
-        }
-        [Fact]
-        public void UpdateType_SUCCESS()
-        {
-            string newType = "Mono";
-
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
-
-            List<(string, object)> updates = new List<(string, object)>();
-            updates.Add(("Description", newType));
-
-            Event updated = sentry.ExecuteRead(ctx => ctx.Events.First());
-
-            Assert.NotNull(updated);
-            Assert.Equal(testHostId, updated.HostId);
-            Assert.Equal(testEventName, updated.Name);
-            Assert.Equal(testEventDescription, updated.Description);
-            Assert.NotEqual(testEventEventType, updated.Type);
-            Assert.Equal(newType, updated.Type);
-            Assert.Equal(testEventStartTime, updated.StartTime);
-            Assert.Equal(testEventLatitude, updated.Location.Y);
-            Assert.Equal(testEventLongitude, updated.Location.X);
-            Assert.Equal(testEventGroupMinimum, updated.GroupMinimum);
-            Assert.Equal(testEventGroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
         }
         [Fact]
         public void UpdateStatus_SUCCESS()
@@ -187,15 +127,14 @@ namespace Repository.Tests
             Event updated = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(updated);
-            Assert.Equal(testHostId, updated.HostId);
-            Assert.Equal(testEventName, updated.Name);
-            Assert.Equal(testEventDescription, updated.Description);
-            Assert.Equal(testEventEventType, updated.Type);
-            Assert.Equal(testEventStartTime, updated.StartTime);
-            Assert.Equal(testEventLatitude, updated.Location.Y);
-            Assert.Equal(testEventLongitude, updated.Location.X);
-            Assert.Equal(testEventGroupMinimum, updated.GroupMinimum);
-            Assert.Equal(testEventGroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
             Assert.True(updated.IsEventOpen);
         }
         [Fact]
@@ -211,15 +150,14 @@ namespace Repository.Tests
             Event ended = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(ended);
-            Assert.Equal(testHostId, ended.HostId);
-            Assert.Equal(testEventName, ended.Name);
-            Assert.Equal(testEventDescription, ended.Description);
-            Assert.Equal(testEventEventType, ended.Type);
-            Assert.Equal(testEventStartTime, ended.StartTime);
-            Assert.Equal(testEventLatitude, ended.Location.Y);
-            Assert.Equal(testEventLongitude, ended.Location.X);
-            Assert.Equal(testEventGroupMinimum, ended.GroupMinimum);
-            Assert.Equal(testEventGroupMaximum, ended.GroupMaximum);
+            Assert.Equal(testUser.Id, ended.HostId);
+            Assert.Equal(testEvent.Name, ended.Name);
+            Assert.Equal(testEvent.Description, ended.Description);
+            Assert.Equal(testEvent.StartTime, ended.StartTime);
+            Assert.Equal(testEvent.Location.Y, ended.Location.Y);
+            Assert.Equal(testEvent.Location.X, ended.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, ended.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, ended.GroupMaximum);
             Assert.Equal(endTime, ended.EndTime);
         }      
     }

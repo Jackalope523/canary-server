@@ -13,7 +13,7 @@ namespace Repository
         public DateTimeOffset JoinDate { get; init; }
         public int Reputation { get; set; }
 
-        public string NormalizedEmail { get; set; }
+        public string NormalisedEmail { get; set; }
         public bool IsPhoneConfirmed { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public string SecurityStamp { get; set; }
@@ -43,14 +43,5 @@ namespace Repository
         internal List<Report> ReporterList { get; set; }
         internal List<Report> ReporteeList { get; set; }
         internal List<Post> Posts { get; set; }
-
-        public UserSilhouette ToThinnerUser()
-        {
-            return new(Id, Name);
-        }
-        public UserProfile ToThinProfile()
-        {
-            return new(Id, Name, Reputation, 0);
-        }
     }
 }

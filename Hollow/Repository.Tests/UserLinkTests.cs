@@ -35,7 +35,7 @@ namespace Repository.Tests
             {
                 PhoneNumber = subject1PhoneNumber,
                 Email = subject1Email,
-                NormalizedEmail = subject1NormalizedEmail,
+                NormalisedEmail = subject1NormalizedEmail,
                 Name = subject1Name,
                 SecurityStamp = subject1SecurityStamp,
                 DateOfBirth = subject1DateOfBirth
@@ -45,7 +45,7 @@ namespace Repository.Tests
             {
                 PhoneNumber = subject2PhoneNumber,
                 Email = subject2Email,
-                NormalizedEmail = subject2NormalizedEmail,
+                NormalisedEmail = subject2NormalizedEmail,
                 Name = subject2Name,
                 SecurityStamp = subject2SecurityStamp,
                 DateOfBirth = subject2DateOfBirth

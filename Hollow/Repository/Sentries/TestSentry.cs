@@ -4,9 +4,11 @@ namespace Repository
 {
     public class TestSentry : Sentry
     {
+        private bool activeDiscussion = false;
+
         public TestSentry() 
         {
-            context = new TestContext();
+
         }      
 
         public override T ExecuteRead<T>(Func<QueryContext, T> read)
@@ -23,21 +25,25 @@ namespace Repository
             using (context = new TestContext())
             {
                 write.Invoke(context);
-                
+                context.SaveChanges();
             }
         }
 
         public override void DiscussWrite(Action<QueryContext> write)
         {
-            if (context == null) context = new TestContext();
+            if (!activeDiscussion)
+            {
+                activeDiscussion = true;
+                context = new TestContext();
+            }
             write.Invoke(context);
-            
         }
 
         public override void ExecuteWrite()
         {
             context.SaveChanges();
             context.Dispose();
+            activeDiscussion = false;
         }
     }
 }

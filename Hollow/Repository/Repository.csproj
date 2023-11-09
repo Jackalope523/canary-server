@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\TestDBMigrations\**" />
     <Compile Remove="TestDBMigrations\**" />
+    <EmbeddedResource Remove="Migrations\TestDBMigrations\**" />
     <EmbeddedResource Remove="TestDBMigrations\**" />
+    <None Remove="Migrations\TestDBMigrations\**" />
     <None Remove="TestDBMigrations\**" />
   </ItemGroup>
 
@@ -34,7 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\TestDBMigrations\" />
+    <Folder Include="Migrations\" />
+    <Folder Include="Migrations\TestMigrations\" />
   </ItemGroup>
 
 </Project>

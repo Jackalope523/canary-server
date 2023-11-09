@@ -82,7 +82,7 @@ namespace Repository
                     Id = Guid.NewGuid(),
                     PhoneNumber = "0",
                     Email = "",
-                    NormalizedEmail = "",
+                    NormalisedEmail = "",
                     Name = "Signy of Sváfnir",
                     SecurityStamp = Guid.NewGuid().ToString()
                 },
@@ -91,7 +91,7 @@ namespace Repository
                     Id = Guid.NewGuid(),
                     PhoneNumber = "1",
                     Email = "",
-                    NormalizedEmail = "",
+                    NormalisedEmail = "",
                     Name = "Huginn",
                     SecurityStamp = Guid.NewGuid().ToString()
                 },
@@ -100,7 +100,7 @@ namespace Repository
                     Id = Guid.NewGuid(),
                     PhoneNumber = "2",
                     Email = "",
-                    NormalizedEmail = "",
+                    NormalisedEmail = "",
                     Name = "Muninn",
                     SecurityStamp = Guid.NewGuid().ToString()
                 }
@@ -131,7 +131,6 @@ namespace Repository
                     HostId = users[1].Id,
                     Name = "The First Few",
                     Description = "nothing interesting",
-                    Type = "campfire,stories",
                     Location = new Point(0, 0) { SRID=4237 },
                     StartTime = new DateTimeOffset(800, 4, 2, 18, 00, 0, TimeSpan.Zero),
                     EndTime = new DateTimeOffset(800, 4, 3, 1, 37, 0, TimeSpan.Zero)
@@ -142,7 +141,6 @@ namespace Repository
                     HostId = users[1].Id,
                     Name = "Then There Were Two",
                     Description = "still nothing interesting",
-                    Type = "skiing,drinks,rager",
                     Location = new Point(0, 0) { SRID=4237 },
                     StartTime = new DateTimeOffset(800, 11, 2, 13, 00, 0, TimeSpan.Zero),
                     EndTime = new DateTimeOffset(800, 11, 4, 11, 03, 0, TimeSpan.Zero)
@@ -153,7 +151,6 @@ namespace Repository
                     HostId = users[0].Id,
                     Name = "Masquerade",
                     Description = "something interesting",
-                    Type = "chill,drinks",
                     Location = new Point(23.4413325,-76.0092066) { SRID=4237 },
                     StartTime = new DateTimeOffset(2025, 6, 25, 17, 00, 0, TimeSpan.Zero)
                 }

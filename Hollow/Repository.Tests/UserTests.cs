@@ -8,30 +8,16 @@ namespace Repository.Tests
     {
         private static TestSentry sentry = new TestSentry();
         private static AccountStore store = new AccountStore(sentry);
+        private static UserFactory userFactory = new UserFactory();
 
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private string subjectPhoneNumber = "000-000-0000";
-        private string subjectEmail = "email_0@test.com";
-        private string subjectNormalizedEmail = "email_0@test.com";
-        private string subjectName = "name";
-        private string subjectSecurityStamp = "stamp";
-        private DateTimeOffset subjectDateOfBirth = new DateTimeOffset(new DateTime(0));
-        private User subject;
+        private User subject ;
 
         public UserTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-
-            subject = new User
-            {
-                PhoneNumber = subjectPhoneNumber,
-                Email = subjectEmail,
-                NormalizedEmail = subjectNormalizedEmail,
-                Name = subjectName,
-                SecurityStamp = subjectSecurityStamp,
-                DateOfBirth = subjectDateOfBirth          
-            };
+            subject = userFactory.Create();
         }
         public void Dispose()
         {
@@ -71,40 +57,41 @@ namespace Repository.Tests
         {
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
 
+            Guid id = sentry.ExecuteRead(ctx => ctx.Users.First()).Id;
             UserShard found = store.FindUserById(subject.Id);        
 
             Assert.NotNull(found);
             Assert.Equal(subject.Id, found.Id);    
-            Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
-            Assert.Equal(subjectEmail, found.Email);
-            Assert.Equal(subjectName, found.Name);
-            Assert.Equal(subjectDateOfBirth, found.DateOfBirth);
+            Assert.Equal(subject.PhoneNumber, found.PhoneNumber);
+            Assert.Equal(subject.Email, found.Email);
+            Assert.Equal(subject.Name, found.Name);
+            Assert.Equal(subject.DateOfBirth, found.DateOfBirth);
         }
         [Fact]
         public void FindUserByPhoneNumber_SUCCESS()
         {
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
 
-            UserShard found = store.FindUserByPhoneNumber(subjectPhoneNumber);       
+            UserShard found = store.FindUserByPhoneNumber(subject.PhoneNumber);       
 
             Assert.NotNull(found);
-            Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
-            Assert.Equal(subjectEmail, found.Email);
-            Assert.Equal(subjectName, found.Name);
-            Assert.Equal(subjectDateOfBirth, found.DateOfBirth);
+            Assert.Equal(subject.PhoneNumber, found.PhoneNumber);
+            Assert.Equal(subject.Email, found.Email);
+            Assert.Equal(subject.Name, found.Name);
+            Assert.Equal(subject.DateOfBirth, found.DateOfBirth);
         }
         [Fact]
         public void FindUserByEmail_SUCCESS()
         {
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
 
-            UserShard found = store.FindUserByEmail(subjectEmail);         
+            UserShard found = store.FindUserByEmail(subject.Email);         
 
             Assert.NotNull(found);
-            Assert.Equal(subjectPhoneNumber, found.PhoneNumber);
-            Assert.Equal(subjectEmail, found.Email);
-            Assert.Equal(subjectName, found.Name);
-            Assert.Equal(subjectDateOfBirth, found.DateOfBirth);
+            Assert.Equal(subject.PhoneNumber, found.PhoneNumber);
+            Assert.Equal(subject.Email, found.Email);
+            Assert.Equal(subject.Name, found.Name);
+            Assert.Equal(subject.DateOfBirth, found.DateOfBirth);
         } 
         [Fact]
         public void UpdatePhoneNumber_SUCCESS() 
@@ -121,13 +108,13 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.NotEqual(subjectPhoneNumber, updated.PhoneNumber);
+            Assert.NotEqual(subject.PhoneNumber, updated.PhoneNumber);
             Assert.Equal(newPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
         }
         [Fact]
         public void UpdateEmail_SUCCESS() 
@@ -145,13 +132,13 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.NotEqual(subjectEmail, updated.Email);
+            Assert.NotEqual(subject.Email, updated.Email);
             Assert.Equal(newEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
         }
         [Fact]
         public void UpdateNormalisedEmail_SUCCESS() 
@@ -169,13 +156,13 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.NotEqual(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(newNormalizedEmail, updated.NormalizedEmail);          
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.NotEqual(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(newNormalizedEmail, updated.NormalisedEmail);          
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
         }
         [Fact]
         public void UpdateName_SUCCESS() 
@@ -193,13 +180,13 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.NotEqual(subjectName, updated.Name);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.NotEqual(subject.Name, updated.Name);
             Assert.Equal(newName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
         }
         [Fact]
         public void UpdatePhoneConfirmation_SUCCESS() 
@@ -215,12 +202,12 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
             Assert.True(updated.IsPhoneConfirmed);
         }
         [Fact]
@@ -237,12 +224,12 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
             Assert.True(updated.IsEmailConfirmed);
         }
         [Fact]
@@ -261,13 +248,13 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.NotEqual(subjectSecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.NotEqual(subject.SecurityStamp, updated.SecurityStamp);
             Assert.Equal(newSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
         }
         [Fact]
         public void UpdateLockoutDate_SUCCESS() 
@@ -285,12 +272,12 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
             Assert.Equal(newLockoutDate, updated.LockoutDate);
         }
         [Fact]
@@ -309,12 +296,12 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
             Assert.Equal(newAccessTries, updated.AccessTries);
         }
         [Fact]
@@ -333,12 +320,12 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
             Assert.Equal(newAccountStatus, updated.AccountStatus);
         }
         [Fact]
@@ -357,12 +344,12 @@ namespace Repository.Tests
 
             Assert.NotNull(updated);
             Assert.Equal(subject.Id, updated.Id);
-            Assert.Equal(subjectEmail, updated.Email);
-            Assert.Equal(subjectNormalizedEmail, updated.NormalizedEmail);
-            Assert.Equal(subjectPhoneNumber, updated.PhoneNumber);
-            Assert.Equal(subjectName, updated.Name);
-            Assert.Equal(subjectSecurityStamp, updated.SecurityStamp);
-            Assert.Equal(subjectDateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
             Assert.Equal(newReputation, updated.Reputation);
         }
 

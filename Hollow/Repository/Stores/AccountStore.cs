@@ -17,7 +17,7 @@ namespace Repository
             {
                 PhoneNumber = phoneNumber,
                 Email = email,
-                NormalizedEmail = normalisedEmail,
+                NormalisedEmail = normalisedEmail,
                 Name = name,
                 DateOfBirth = dateOfBirth,
                 JoinDate = DateTimeOffset.UtcNow,
@@ -47,7 +47,7 @@ namespace Repository
 
         public UserShard FindUserById(Guid id) { return FindUserBy(u => u.Id == id); }
         public UserShard FindUserByPhoneNumber(string phoneNumber) { return FindUserBy(u => u.PhoneNumber == phoneNumber); }
-        public UserShard FindUserByEmail(string email) { return FindUserBy(u => u.NormalizedEmail == email); }
+        public UserShard FindUserByEmail(string email) { return FindUserBy(u => u.NormalisedEmail == email); }
 
         public (double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(Guid id)
         {
@@ -76,7 +76,7 @@ namespace Repository
                         u.Email = (string)edit.Value;
                         break;
                     case "NormalisedEmail":
-                        u.NormalizedEmail = (string)edit.Value;
+                        u.NormalisedEmail = (string)edit.Value;
                         break;
                     case "Name":
                         u.Name = (string)edit.Value;

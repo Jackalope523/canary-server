@@ -9,7 +9,6 @@ namespace Repository
 
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public Guid HostId { get; set; }
         internal User Host { get; set; }
