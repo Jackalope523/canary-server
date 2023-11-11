@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Core.Boundaries;
 using Xunit.Abstractions;
-using Repository.Repository;
+using NetTopologySuite.Geometries;
 
 namespace Repository.Tests
 {
@@ -79,7 +79,8 @@ namespace Repository.Tests
         {
             sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
 
-            List<EventThinSlice> found = store.FindEvents(100, 100, 10);        
+            Point location = testEvent.Location;
+            List<EventThinSlice> found = store.FindEvents(location.Y, location.X, 10);
 
             Assert.Single(found);
             Assert.Equal(testEvent.Id, found.First().Id);
@@ -87,7 +88,6 @@ namespace Repository.Tests
             Assert.Equal(testUser.Name, found.First().Host.Name);
             Assert.Equal(testEvent.Location.Y, found.First().Latitude);
             Assert.Equal(testEvent.Location.X, found.First().Longitude);
-           
         }
         [Fact]
         public void UpdateDescription_SUCCESS()
@@ -124,6 +124,8 @@ namespace Repository.Tests
             List<(string, object)> updates = new List<(string, object)>();
             updates.Add(("IsOpen", newStatus));
 
+            store.UpdateEvent(testEvent.Id, updates);
+
             Event updated = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(updated);
@@ -135,7 +137,7 @@ namespace Repository.Tests
             Assert.Equal(testEvent.Location.X, updated.Location.X);
             Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
-            Assert.True(updated.IsEventOpen);
+            Assert.True(updated.IsOpen);
         }
         [Fact]
         public void EndEvent_SUCCESS()
@@ -146,6 +148,8 @@ namespace Repository.Tests
 
             List<(string, object)> updates = new List<(string, object)>();
             updates.Add(("EndTime", endTime));
+
+            store.UpdateEvent(testEvent.Id, updates);
 
             Event ended = sentry.ExecuteRead(ctx => ctx.Events.First());
 

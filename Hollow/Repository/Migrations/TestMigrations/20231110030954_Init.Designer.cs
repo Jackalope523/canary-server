@@ -12,7 +12,7 @@ using Repository;
 namespace Repository.Migrations.TestMigrations
 {
     [DbContext(typeof(TestContext))]
-    [Migration("20231109044917_Init")]
+    [Migration("20231110030954_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -58,7 +58,7 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Industriousness")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsEventOpen")
+                    b.Property<bool>("IsOpen")
                         .HasColumnType("INTEGER");
 
                     b.Property<Point>("Location")

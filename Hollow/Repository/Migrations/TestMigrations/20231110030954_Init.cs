@@ -25,7 +25,7 @@ namespace Repository.Migrations.TestMigrations
                     StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     HostId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Location = table.Column<Point>(type: "POINT", nullable: false),
-                    IsEventOpen = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsOpen = table.Column<bool>(type: "INTEGER", nullable: false),
                     GroupMinimum = table.Column<int>(type: "INTEGER", nullable: false),
                     GroupMaximum = table.Column<int>(type: "INTEGER", nullable: false),
                     EndTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),

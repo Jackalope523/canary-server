@@ -117,7 +117,7 @@ namespace Repository
                    e.Location.Y,
                    e.Location.X,
                    e.EndTime,
-                   e.IsEventOpen,
+                   e.IsOpen,
                    e.GroupMinimum,
                    e.GroupMaximum,
                    new Character(

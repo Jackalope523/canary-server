@@ -45,7 +45,7 @@ namespace Repository
                    toCreate.Location.Y,
                    toCreate.Location.X,
                    toCreate.EndTime,
-                   toCreate.IsEventOpen,
+                   toCreate.IsOpen,
                    toCreate.GroupMinimum,
                    toCreate.GroupMaximum,
                    new Character(
@@ -63,18 +63,17 @@ namespace Repository
 
         public EventShard FindEvent(Guid id)
         {
-            EventShard @event;
-            @event = storeSentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == id).Select(e => new EventShard
+            EventShard @event = storeSentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == id).Select(e => new EventShard
                (
                    e.Id,
-                   new UserSilhouette(e.Host.Id, e.Host.Name),
+                   new UserSilhouette(e.HostId, null),
                    e.Name,
                    e.Description,
                    e.StartTime,
                    e.Location.Y,
                    e.Location.X,
                    e.EndTime,
-                   e.IsEventOpen,
+                   e.IsOpen,
                    e.GroupMinimum,
                    e.GroupMaximum,
                    new Character(
@@ -87,7 +86,9 @@ namespace Repository
                    e.Openness)
                )).Single());
 
-            return @event;
+            UserSilhouette host = storeSentry.ExecuteRead(ctx => ctx.Users.Where(u => u.Id == @event.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).Single()) ;
+
+            return @event with {Host = host } ;
         }
 
         public List<EventThinSlice> FindEvents(double latitude, double longitude, double distance)
@@ -96,7 +97,11 @@ namespace Repository
             Point userLocation = new Point(longitude, latitude);
 
             closestEvents = storeSentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
-                                Select(e => new EventThinSlice(e.Id, new UserSilhouette(e.Host.Id, e.Host.Name), e.Location.Y, e.Location.X)).ToList());
+                                Join(ctx.Users, 
+                                e => e.HostId, 
+                                u => u.Id, 
+                                (e,u) => new EventThinSlice(e.Id, new UserSilhouette(u.Id, u.Name), e.Location.Y, e.Location.X)).
+                                ToList());
 
             return closestEvents;
         }
@@ -126,7 +131,7 @@ namespace Repository
                         e.Description = (string)edit.Value;
                         break;
                     case "IsOpen":
-                        e.IsEventOpen = (bool)edit.Value;
+                        e.IsOpen = (bool)edit.Value;
                         break;
                     case "EndTime":
                         e.EndTime = (DateTimeOffset?)edit.Value;

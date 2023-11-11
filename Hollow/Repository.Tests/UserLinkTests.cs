@@ -11,45 +11,16 @@ namespace Repository.Tests
         private readonly ITestOutputHelper _testOutputHelper;
 
         private User subject1;
-        private string subject1PhoneNumber = "000-000-0000";
-        private string subject1Email = "email_0@test.com";
-        private string subject1NormalizedEmail = "email_0@test.com";
-        private string subject1Name = "name";
-        private string subject1SecurityStamp = "stamp";
-        private DateTimeOffset subject1DateOfBirth = new DateTimeOffset(new DateTime(0));
-
         private User subject2;
-        private string subject2PhoneNumber = "111-111-1111";
-        private string subject2Email = "email_1@test.com";
-        private string subject2NormalizedEmail = "email_1@test.com";
-        private string subject2Name = "nome";
-        private string subject2SecurityStamp = "Stampy";
-        private DateTimeOffset subject2DateOfBirth = new DateTimeOffset(new DateTime(10));
-
+       
 
         public UserLinkTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
-            subject1 = new User
-            {
-                PhoneNumber = subject1PhoneNumber,
-                Email = subject1Email,
-                NormalisedEmail = subject1NormalizedEmail,
-                Name = subject1Name,
-                SecurityStamp = subject1SecurityStamp,
-                DateOfBirth = subject1DateOfBirth
-            };
-
-            subject2 = new User
-            {
-                PhoneNumber = subject2PhoneNumber,
-                Email = subject2Email,
-                NormalisedEmail = subject2NormalizedEmail,
-                Name = subject2Name,
-                SecurityStamp = subject2SecurityStamp,
-                DateOfBirth = subject2DateOfBirth
-            };
+            UserFactory userFactory = new UserFactory();
+            subject1 = userFactory.Create();
+            subject2 = userFactory.Create();
 
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject1));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject2));

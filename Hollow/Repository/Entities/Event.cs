@@ -14,7 +14,7 @@ namespace Repository
         internal User Host { get; set; }
         public Point Location { get; set; } // X = Longitude Y = Latitude
 
-        public bool IsEventOpen { get; set; }
+        public bool IsOpen { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public DateTimeOffset? EndTime { get; set; }

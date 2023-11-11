@@ -14,60 +14,19 @@ namespace Repository.Tests
 
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private Guid testUserId;
-        private string testUserPhoneNumber = "000-000-0000";
-        private string testUserEmail = "email_0@test.com";
-        private string testUserNormalizedEmail = "email_0@test.com";
-        private string testUserName = "name";
-        private string testUserSecurityStamp = "stamp";
-        private DateTimeOffset subjectDateOfBirth = new DateTimeOffset(new DateTime(0));
         private User testUser;
-
-        private Guid testEventId;
-        private string testEventName = "event1";
-        private string testEventDescription = "The first of many.";
-        private string testEventEventType = "Proto";
-        private DateTimeOffset testEventStartTime = new DateTimeOffset(new DateTime(0));
-        private double testEventLatitude = 100;
-        private double testEventLongitude = 100;
-        private int testEventGroupMinimum = 0;
-        private int testEventGroupMaximum = 1;
-        private bool testIsEventOpen = false;
         private Event testEvent;
 
         public EventLinkTests(ITestOutputHelper testOutputHelper) 
         {
             _testOutputHelper = testOutputHelper;
 
-            testUser = new User
-            {
-                PhoneNumber = testUserPhoneNumber,
-                Email = testUserEmail,
-                NormalisedEmail = testUserNormalizedEmail,
-                Name = testUserName,
-                SecurityStamp = testUserSecurityStamp,
-                DateOfBirth = subjectDateOfBirth
-            };
-
+            testUser = new UserFactory().Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(testUser));
 
-            testUserId = testUser.Id;
-
-            testEvent = new Event
-            {
-                HostId = Guid.Empty,
-                Name = testEventName,
-                Description = testEventDescription,
-                StartTime = testEventStartTime,
-                Location = new Point(testEventLongitude, testEventLatitude),
-                GroupMinimum = testEventGroupMinimum,
-                GroupMaximum = testEventGroupMaximum,
-                IsEventOpen = testIsEventOpen
-            };
-
+            testEvent = new EventFactory().Create();
+            testEvent.HostId = testUser.Id;
             sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
-
-            testEventId = testEvent.Id;
         }
         public void Dispose()
         {
@@ -78,32 +37,32 @@ namespace Repository.Tests
         [Fact]
         public void GetGuestList_SUCCESS()
         {
-            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUserId, EventId = testEventId, Type = EventLink.EventLinkType.Attend }));
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, EventId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
 
-            List<UserSilhouette> guestList = store.GetGuestList(testEventId);
+            List<UserSilhouette> guestList = store.GetGuestList(testEvent.Id);
 
             Assert.Single(guestList);
-            Assert.Equal(testUserId, guestList.First().Id);
-            Assert.Equal(testUserName, guestList.First().Name);
+            Assert.Equal(testUser.Id, guestList.First().Id);
+            Assert.Equal(testUser.Name, guestList.First().Name);
         }
         [Fact]
         public void AddUserToEvent_SUCCESS() 
         {
-            store.AddUserToEvent(testUserId, testEventId);
+            store.AddUserToEvent(testUser.Id, testEvent.Id);
 
             EventLink link = sentry.ExecuteRead(ctx => ctx.EventLinks.First());
 
             Assert.NotNull(link);
-            Assert.Equal(testUserId, link.SelfId);
-            Assert.Equal(testEventId, link.EventId);
+            Assert.Equal(testUser.Id, link.SelfId);
+            Assert.Equal(testEvent.Id, link.EventId);
             Assert.Equal(EventLink.EventLinkType.Attend, link.Type);
         }
         [Fact]
         public void RemoveUserFromEvent_SUCCESS() 
         {
-            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUserId, EventId = testEventId, Type = EventLink.EventLinkType.Attend }));
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, EventId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
 
-            store.RemoveUserFromEvent(testUserId, testEventId);
+            store.RemoveUserFromEvent(testUser.Id, testEvent.Id);
 
             int count = sentry.ExecuteRead(ctx => ctx.EventLinks.Count());
 

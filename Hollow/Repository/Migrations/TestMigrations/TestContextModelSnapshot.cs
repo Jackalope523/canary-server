@@ -55,7 +55,7 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Industriousness")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsEventOpen")
+                    b.Property<bool>("IsOpen")
                         .HasColumnType("INTEGER");
 
                     b.Property<Point>("Location")

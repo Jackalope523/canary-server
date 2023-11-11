@@ -57,7 +57,6 @@ namespace Repository.Tests
         {
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
 
-            Guid id = sentry.ExecuteRead(ctx => ctx.Users.First()).Id;
             UserShard found = store.FindUserById(subject.Id);        
 
             Assert.NotNull(found);
