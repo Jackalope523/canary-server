@@ -1,5 +1,4 @@
-﻿using Core.Boundaries;
-
+﻿
 namespace Repository.Tests
 {
     public class ReportTests
@@ -28,12 +27,6 @@ namespace Repository.Tests
         public void ReportEvent_SUCCESS()
         {
             throw new NotImplementedException();
-        }
-
-
-        public EventShard FindAttendingEvent(Guid id) { throw new NotImplementedException(); }
-        public List<EventShard> FindUpcomingEvents(Guid id) { throw new NotImplementedException(); }
-        public List<EventShard> FindPastEvents(Guid id) { throw new NotImplementedException(); }
-       
+        }     
     }
 }

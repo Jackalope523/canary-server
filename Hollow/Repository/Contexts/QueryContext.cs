@@ -24,7 +24,8 @@ namespace Repository
             modelBuilder.Entity<Link>()
                 .HasDiscriminator<string>("link_type")
                 .HasValue<UserLink>("user")
-                .HasValue<EventLink>("event");
+                .HasValue<EventLink>("event")
+                .HasValue<PostLink>("post");
 
 
             modelBuilder.Entity<UserLink>()
@@ -41,6 +42,18 @@ namespace Repository
                 .HasColumnName("SelfId");
 
             modelBuilder.Entity<EventLink>()
+                .Property(l => l.OtherId)
+                .HasColumnName("OtherId");
+
+            modelBuilder.Entity<EventLink>()
+                .Property(l => l.Type)
+                .HasColumnName("Type");
+
+            modelBuilder.Entity<PostLink>()
+                .Property(l => l.SelfId)
+                .HasColumnName("SelfId");
+
+            modelBuilder.Entity<PostLink>()
                 .Property(l => l.Type)
                 .HasColumnName("Type");
 
@@ -160,25 +173,25 @@ namespace Repository
             {
                 // The First Few Attendees
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[0].Id, EventId = events[0].Id },
+                { Id = Guid.NewGuid(), SelfId = users[0].Id, OtherId = events[0].Id },
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[1].Id, EventId = events[0].Id },
+                { Id = Guid.NewGuid(), SelfId = users[1].Id, OtherId = events[0].Id },
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[2].Id, EventId = events[0].Id },
+                { Id = Guid.NewGuid(), SelfId = users[2].Id, OtherId = events[0].Id },
 
                 // Then There Were Two Attendees
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[0].Id, EventId = events[1].Id },
+                { Id = Guid.NewGuid(), SelfId = users[0].Id, OtherId = events[1].Id },
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[1].Id, EventId = events[1].Id },
+                { Id = Guid.NewGuid(), SelfId = users[1].Id, OtherId = events[1].Id },
 
                 // Masquerade Attendees
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[0].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watch },
+                { Id = Guid.NewGuid(), SelfId = users[0].Id, OtherId = events[2].Id, Type = EventLink.EventLinkType.Watching },
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[1].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watch },
+                { Id = Guid.NewGuid(), SelfId = users[1].Id, OtherId = events[2].Id, Type = EventLink.EventLinkType.Watching },
                 new EventLink
-                { Id = Guid.NewGuid(), SelfId = users[2].Id, EventId = events[2].Id, Type = EventLink.EventLinkType.Watch },
+                { Id = Guid.NewGuid(), SelfId = users[2].Id, OtherId = events[2].Id, Type = EventLink.EventLinkType.Watching },
             };
 
 

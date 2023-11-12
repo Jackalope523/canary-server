@@ -63,12 +63,12 @@ namespace Repository
         }
         protected bool removeLinkOperation(EventLink link)
         {
-            storeSentry.ExecuteWrite(ctx => ctx.EventLinks.Where(l => l.SelfId == link.SelfId && l.EventId == link.EventId && l.Type == link.Type).ExecuteDelete());
+            storeSentry.ExecuteWrite(ctx => ctx.EventLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
             return true;
         }
         protected bool removeLinkOperation(PostLink link)
         {
-            storeSentry.ExecuteWrite(ctx => ctx.PostLinks.Where(l => l.SelfId == link.SelfId && l.PostId == link.PostId && l.Type == link.Type).ExecuteDelete());
+            storeSentry.ExecuteWrite(ctx => ctx.PostLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
             return true;
         }
        
@@ -104,7 +104,7 @@ namespace Repository
         protected List<EventShard> FindEventsBy(Func<EventLink, bool> predicate)
         {
             List<Guid> guids = new List<Guid>();
-            guids = storeSentry.ExecuteRead(ctx => ctx.EventLinks.Where(predicate).Select(l => l.EventId).ToList());
+            guids = storeSentry.ExecuteRead(ctx => ctx.EventLinks.Where(predicate).Select(l => l.OtherId).ToList());
 
             List<EventShard> events;
             events = storeSentry.ExecuteRead(ctx=> ctx.Events.Where(e => guids.Contains(e.Id)).Select(e => new EventShard
@@ -135,7 +135,7 @@ namespace Repository
 
         protected int countRatings(Guid id, PostLink.PostLinkType type)
         {
-            return storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.PostId == id && l.Type == type).Count());
+            return storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.OtherId == id && l.Type == type).Count());
         }
     }
 }

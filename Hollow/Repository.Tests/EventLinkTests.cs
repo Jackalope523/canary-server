@@ -37,7 +37,7 @@ namespace Repository.Tests
         [Fact]
         public void GetGuestList_SUCCESS()
         {
-            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, EventId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, OtherId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
 
             List<UserSilhouette> guestList = store.GetGuestList(testEvent.Id);
 
@@ -54,13 +54,13 @@ namespace Repository.Tests
 
             Assert.NotNull(link);
             Assert.Equal(testUser.Id, link.SelfId);
-            Assert.Equal(testEvent.Id, link.EventId);
+            Assert.Equal(testEvent.Id, link.OtherId);
             Assert.Equal(EventLink.EventLinkType.Attend, link.Type);
         }
         [Fact]
         public void RemoveUserFromEvent_SUCCESS() 
         {
-            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, EventId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, OtherId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
 
             store.RemoveUserFromEvent(testUser.Id, testEvent.Id);
 

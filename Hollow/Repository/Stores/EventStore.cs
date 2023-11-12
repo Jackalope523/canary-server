@@ -58,7 +58,7 @@ namespace Repository
                    toCreate.Openness));
         }
         public EventShard FindCurrentEventForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
-        public List<EventShard> FindUpcomingEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watch); }
+        public List<EventShard> FindUpcomingEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watching); }
         public List<EventShard> FindPastEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
 
         public EventShard FindEvent(Guid id)
@@ -110,13 +110,13 @@ namespace Repository
         {
             List<UserSilhouette> guests;
 
-            guests = storeSentry.ExecuteRead(ctx => ctx.EventLinks.Where(l => l.EventId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new UserSilhouette(l.Self.Id, l.Self.Name)).ToList());
+            guests = storeSentry.ExecuteRead(ctx => ctx.EventLinks.Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new UserSilhouette(l.Self.Id, l.Self.Name)).ToList());
 
             return guests;
         }
 
-        public bool AddUserToEvent(Guid userId, Guid eventId) { return addLinkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }); }
-        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return removeLinkOperation(new EventLink { SelfId = userId, EventId = eventId, Type = EventLink.EventLinkType.Attend }); }
+        public bool AddUserToEvent(Guid userId, Guid eventId) { return addLinkOperation(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
+        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return removeLinkOperation(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
 
         public bool UpdateEvent(Guid id, List<(string Property, object Value)> edits)
         {

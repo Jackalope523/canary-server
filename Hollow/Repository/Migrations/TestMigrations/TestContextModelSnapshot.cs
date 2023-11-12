@@ -86,6 +86,10 @@ namespace Repository.Migrations.TestMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("OtherId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("OtherId");
+
                     b.Property<Guid>("SelfId")
                         .HasColumnType("TEXT")
                         .HasColumnName("SelfId");
@@ -280,27 +284,17 @@ namespace Repository.Migrations.TestMigrations
                 {
                     b.HasBaseType("Repository.Link");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("Type");
 
-                    b.ToTable("Links", t =>
-                        {
-                            t.Property("Type")
-                                .HasColumnName("PostLink_Type");
-                        });
-
-                    b.HasDiscriminator().HasValue("PostLink");
+                    b.HasDiscriminator().HasValue("post");
                 });
 
             modelBuilder.Entity("Repository.UserLink", b =>
                 {
                     b.HasBaseType("Repository.Link");
-
-                    b.Property<Guid>("OtherId")
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
                         .ValueGeneratedOnUpdateSometimes()
