@@ -18,7 +18,7 @@ namespace Core.Controls
             Event targetEvent = new(eventID);
 
             // Ensure user can see the event
-            if (!await targetEvent.IsAttendedBy(user))
+            if (!await targetEvent.WasAttendedBy(user))
             { throw new InvalidEventException("User did not attend or is not attending event."); }
 
             var eventEtchings = Etchings.GetEtchingsForEvent(eventID);
@@ -32,11 +32,11 @@ namespace Core.Controls
             var targetEvent = await GetEvent(eventID);
 
             // Ensure the user can etching to the event
-            if (!await targetEvent.IsAttendedBy(user))
-            { throw new InvalidEventException("User is not attending event."); }
+            if (!await targetEvent.WasAttendedBy(user))
+            { throw new InvalidEventException("User did not attend event."); }
 
-            // Ensure event is still running
-            if (targetEvent.EndTime.HasValue)
+            // Ensure etching is added within a day of event ending
+            if (targetEvent.EndTime.HasValue && targetEvent.EndTime + TimeSpan.FromDays(1) < DateTimeOffset.UtcNow)
             { throw new InvalidEventException("Event has already ended."); }
 
             // Try to etching
@@ -62,7 +62,7 @@ namespace Core.Controls
             var eventOfEtching = await GetEvent(Etchings.GetEtching(etchingID).EventId);
 
             // Check if user can interact with etching
-            if (!await eventOfEtching.IsAttendedBy(user))
+            if (!await eventOfEtching.WasAttendedBy(user))
             { throw new InvalidUserException("User cannot interact with etching."); }
 
             // Check if removing a rating

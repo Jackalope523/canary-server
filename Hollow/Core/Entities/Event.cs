@@ -30,7 +30,8 @@ namespace Core.Entities
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
 
-        public List<UserSilhouette> Attendees { get; set; }
+        public List<UserSilhouette> Guests { get; set; }
+        public List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> AllGuests { get; set; }
 
 		public List<EventReport> EventReports { get; set; }
 
@@ -164,10 +165,21 @@ namespace Core.Entities
 
         public async Task<bool> IsAttendedBy(User user)
         {
-            Attendees ??= await CoreTerminal.Terminal.EventDirector.GetAttendeesInternalAsync(Id);
+            Guests ??= await CoreTerminal.Terminal.EventDirector.GetGuestsInternalAsync(Id);
 
             // Check if user is on the guest list
-            return Attendees.Find(x => x.Id == user.Id) != null;
+            return Guests.Find(x => x.Id == user.Id) != null;
+		}
+
+        public async Task<bool> WasAttendedBy(ulong userID)
+            => await WasAttendedBy(new User(userID));
+
+        public async Task<bool> WasAttendedBy(User user)
+        {
+            AllGuests ??= await CoreTerminal.Terminal.EventDirector.GetAllGuestsInternalAsync(Id);
+
+            // Check if user is or was on the guest list
+            return AllGuests.Find(x => x.User.Id == user.Id).User != null;
 		}
 
         public async Task<bool> Reported()

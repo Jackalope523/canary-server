@@ -131,10 +131,7 @@ namespace Core.Controls
 
 			// Check if user is allowed to view event
 			if (!await targetEvent.IsVisibleTo(user))
-			{
-				throw new InvalidEventException("User is unable to view or join event.\n" +
-					$"Account Status: {user.AccountStatus}");
-			}
+			{ throw new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"); }
 
 			// TODO Can user watch events if time conflict
 
@@ -245,7 +242,11 @@ namespace Core.Controls
 			Event targetEvent = new(eventID);
 
 			// Check if user attended
-			if (!await targetEvent.IsAttendedBy(userID))
+			if (await targetEvent.IsAttendedBy(userID))
+			{
+				return targetEvent.Guests;
+			}
+			else
 			{
 				// Retrieve user's friends
 				var friends = Profiles.GetFriends(userID);
@@ -254,26 +255,25 @@ namespace Core.Controls
 				// Check if any friends are attending
 				foreach (var friend in friends)
 				{
-					if (await targetEvent.IsAttendedBy(friend.Id))
+					if (await targetEvent.WasAttendedBy(friend.Id))
 					{
 						friendAttendees.Add(friend);
 					}
 				}
 
-				// Check if user had friends that attended
-				if (friendAttendees.Count == 0)
-				{ throw new InvalidUserException("User did not attend event."); }
-
 				return friendAttendees;
 			}
-
-			return targetEvent.Attendees;
 		}
 
 
-		internal async Task<List<UserSilhouette>> GetAttendeesInternalAsync(ulong eventID)
+		internal async Task<List<UserSilhouette>> GetGuestsInternalAsync(ulong eventID)
 		{
 			return Events.GetGuests(eventID);
+		}
+
+		internal async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetAllGuestsInternalAsync(ulong eventID)
+		{
+			return Events.GetGuestHistory(eventID);
 		}
 
 		internal async Task<List<EventShard>>
