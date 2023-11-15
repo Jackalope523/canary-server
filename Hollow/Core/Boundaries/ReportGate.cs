@@ -14,22 +14,22 @@ namespace Core.Boundaries
 
     public interface IReportDatabase
     {
-        (List<UserReport>, List<EventReport>) GetReportsForUser(ulong id);
-        (List<UserReport>, List<EventReport>) GetReportsByUser(ulong id);
-        bool ReportUser(ulong selfId, ulong eventId, ulong targetId,
+        (List<UserReport>, List<EventReport>) GetReportsForUser(ulong userId);
+        (List<UserReport>, List<EventReport>) GetReportsByUser(ulong userId);
+        bool ReportUser(ulong userId, ulong eventId, ulong targetUserId,
             UserReportType reportType, string reportDetails);
 
-        List<EventReport> GetReportsForEvent(ulong id);
-        bool ReportEvent(ulong userId, ulong eventId, ulong HostId,
+        List<EventReport> GetReportsForEvent(ulong eventId);
+        bool ReportEvent(ulong userId, ulong eventId, ulong hostId,
             EventReportType reportType, string reportDetails);
     }
 
     public interface IReportOperations
     {
-        Task ReportUserAsync(ulong userID, ulong targetID,
+        Task ReportUserAsync(ulong userId, ulong targetId,
             UserReportType reportType, string reportDetails);
 
-        Task ReportEventAsync(ulong userID, ulong eventID, ulong hostId,
+        Task ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
             EventReportType reportType, string reportDetails);
     }
 }

@@ -30,9 +30,9 @@ namespace Core.Controls
 			Notifications = Terminal.NotificationDatabase;
         }
 
-        internal async Task<User> GetUser(ulong userID)
+        internal async Task<User> GetUser(ulong userId)
         {
-            User user = new(Accounts.FindUserById(userID));
+            User user = new(Accounts.FindUserById(userId));
 
             // Check if user account is locked
             if (user.IsLocked)
@@ -41,9 +41,9 @@ namespace Core.Controls
             return user;
         }
 
-        internal async Task<Event> GetEvent(ulong eventID)
+        internal async Task<Event> GetEvent(ulong eventId)
         {
-            return new(Events.FindEvent(eventID));
+            return new(Events.FindEvent(eventId));
         }
     }
 }

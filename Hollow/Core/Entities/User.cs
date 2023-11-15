@@ -65,9 +65,9 @@ namespace Core.Entities
 
         public User() { }
 
-        public User(ulong userID)
+        public User(ulong userId)
         {
-            Id = userID;
+            Id = userId;
         }
 
         public User(UserShard fromUser)
@@ -210,8 +210,8 @@ namespace Core.Entities
             }
         }
 
-        public async Task<bool> IsFriendsWith(ulong userID)
-            => await IsFriendsWith(new User(userID));
+        public async Task<bool> IsFriendsWith(ulong userId)
+            => await IsFriendsWith(new User(userId));
 
         public async Task<bool> IsFriendsWith(User otherUser)
 		{
@@ -225,8 +225,8 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsFollowing(ulong userID)
-            => await IsFollowing(new User(userID));
+        public async Task<bool> IsFollowing(ulong userId)
+            => await IsFollowing(new User(userId));
 		
         public async Task<bool> IsFollowing(User otherUser)
         {
@@ -240,8 +240,8 @@ namespace Core.Entities
             return true;
         }
 
-        public async Task<bool> IsBlocking(ulong userID)
-            => await IsBlocking(new User(userID));
+        public async Task<bool> IsBlocking(ulong userId)
+            => await IsBlocking(new User(userId));
 
         public async Task<bool> IsBlocking(User otherUser)
         {
@@ -255,8 +255,8 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsBlockedBy(ulong userID)
-			=> await IsBlockedBy(new User(userID));
+        public async Task<bool> IsBlockedBy(ulong userId)
+			=> await IsBlockedBy(new User(userId));
 
 		public async Task<bool> IsBlockedBy(User otherUser)
 		{

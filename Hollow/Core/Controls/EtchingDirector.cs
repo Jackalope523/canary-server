@@ -12,24 +12,24 @@ namespace Core.Controls
 	{
 		public EtchingDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task<List<Etching>> GetEventEtchingsAsync(ulong userID, ulong eventID)
+        public async Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId)
         {
-            var user = await GetUser(userID);
-            Event targetEvent = new(eventID);
+            var user = await GetUser(userId);
+            Event targetEvent = new(eventId);
 
             // Ensure user can see the event
             if (!await targetEvent.WasAttendedBy(user))
             { throw new InvalidEventException("User did not attend or is not attending event."); }
 
-            var eventEtchings = Etchings.GetEtchingsForEvent(eventID);
+            var eventEtchings = Etchings.GetEtchingsForEvent(eventId);
 
             return eventEtchings;
         }
 
-        public async Task<Etching> AddEtchingAsync(ulong userID, ulong eventID, string imageURL)
+        public async Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL)
         {
-            User user = new(userID);
-            var targetEvent = await GetEvent(eventID);
+            User user = new(userId);
+            var targetEvent = await GetEvent(eventId);
 
             // Ensure the user can etching to the event
             if (!await targetEvent.WasAttendedBy(user))
@@ -40,26 +40,26 @@ namespace Core.Controls
             { throw new InvalidEventException("Event has already ended."); }
 
             // Try to etching
-            var userEtching = Etchings.AddEtching(eventID, userID, DateTimeOffset.UtcNow, imageURL);
+            var userEtching = Etchings.AddEtching(eventId, userId, DateTimeOffset.UtcNow, imageURL);
 
             return userEtching;
         }
 
-        public async Task RemoveEtchingAsync(ulong userID, ulong etchingID)
+        public async Task RemoveEtchingAsync(ulong userId, ulong etchingId)
         {
-            var eventEtching = Etchings.GetEtching(etchingID);
+            var eventEtching = Etchings.GetEtching(etchingId);
 
             // Check if user can delete etching
-            if (!eventEtching.UserId.Equals(userID))
+            if (!eventEtching.UserId.Equals(userId))
             { throw new InvalidUserException("User cannot remove etching."); }
 
-            Etchings.RemoveEtching(etchingID);
+            Etchings.RemoveEtching(etchingId);
         }
 
-        public async Task RateEtchingAsync(ulong userID, ulong etchingID, UserRating rating)
+        public async Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating)
         {
-            User user = new(userID);
-            var eventOfEtching = await GetEvent(Etchings.GetEtching(etchingID).EventId);
+            User user = new(userId);
+            var eventOfEtching = await GetEvent(Etchings.GetEtching(etchingId).EventId);
 
             // Check if user can interact with etching
             if (!await eventOfEtching.WasAttendedBy(user))
@@ -68,18 +68,18 @@ namespace Core.Controls
             // Check if removing a rating
             if (rating != UserRating.Remove)
             {
-                Etchings.RateEtching(userID, etchingID, rating);
+                Etchings.RateEtching(userId, etchingId, rating);
             }
             else
             {
-                Etchings.RemoveEtchingRating(etchingID, userID);
+                Etchings.RemoveEtchingRating(etchingId, userId);
             }
         }
 
         public async Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
-            GetUserFeedAsync(ulong userID, int depth = 0, List<ulong> exclusionList = null)
+            GetUserFeedAsync(ulong userId, int depth = 0, List<ulong> exclusionList = null)
         {
-            User user = new(userID);
+            User user = new(userId);
             exclusionList ??= new();
             Dictionary<ulong, EventHeader> eventHeaders = new();
 
@@ -111,9 +111,9 @@ namespace Core.Controls
         }
 
 
-        internal async Task<List<Etching>> GetEventEtchingsAsync(ulong eventID)
+        internal async Task<List<Etching>> GetEventEtchingsAsync(ulong eventId)
         {
-            return Etchings.GetEtchingsForEvent(eventID);
+            return Etchings.GetEtchingsForEvent(eventId);
         }
     }
 }

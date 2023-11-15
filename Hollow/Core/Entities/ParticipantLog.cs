@@ -22,25 +22,25 @@ namespace Core.Entities
             log = new Dictionary<ulong, LinkedList<ParticipantAction>>();
         }
 
-        public void AddParticipant(ulong participantID)
+        public void AddParticipant(ulong participantId)
         {
             participantsIsStale = true;
 
-            if (!log.ContainsKey(participantID))
+            if (!log.ContainsKey(participantId))
             {
-                log.Add(participantID, new LinkedList<ParticipantAction>());
+                log.Add(participantId, new LinkedList<ParticipantAction>());
             }
 
-            log[participantID].AddLast(new ParticipantAction(PerformedAction.Joined));
+            log[participantId].AddLast(new ParticipantAction(PerformedAction.Joined));
         }
 
-        public void RemoveParticipant(ulong participantID)
+        public void RemoveParticipant(ulong participantId)
         {
             participantsIsStale = true;
 
-            if (log.ContainsKey(participantID))
+            if (log.ContainsKey(participantId))
             {
-                log[participantID].AddLast(new ParticipantAction(PerformedAction.Left));
+                log[participantId].AddLast(new ParticipantAction(PerformedAction.Left));
             }
             else
             {
@@ -124,24 +124,24 @@ namespace Core.Entities
 
     internal readonly struct Participant : IComparable<Participant>
     {
-        public ulong ID { get; }
+        public ulong Id { get; }
         public DateTime JoinedTime { get; }
 
-        public Participant(ulong userID)
+        public Participant(ulong userId)
         {
-            ID = userID;
+            Id = userId;
             JoinedTime = DateTime.UtcNow;
         }
 
-        public Participant(ulong userID, DateTime timeJoined)
+        public Participant(ulong userId, DateTime timeJoined)
         {
-            ID = userID;
+            Id = userId;
             JoinedTime = timeJoined;
         }
 
         public int CompareTo(Participant other)
         {
-            return ID.CompareTo(other.ID);
+            return Id.CompareTo(other.Id);
         }
     }
 

@@ -11,35 +11,35 @@ namespace Core.Controls
 	{
 		public ReportDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task ReportUserAsync(ulong userID, ulong targetID,
+        public async Task ReportUserAsync(ulong userId, ulong targetId,
             UserReportType reportType, string reportDetails)
         {
-            Event occuringEvent = new(Events.FindCurrentEventForUser(targetID));
+            Event occuringEvent = new(Events.FindCurrentEventForUser(targetId));
             
-            Reports.ReportUser(userID, occuringEvent.Id, targetID, reportType, reportDetails);
+            Reports.ReportUser(userId, occuringEvent.Id, targetId, reportType, reportDetails);
 
             // Compute user's standing
-            var user = await GetUser(targetID);
+            var user = await GetUser(targetId);
             var status = await user.Reported();
 
             // Check if host should be punished
             if (user.AccountStatus != status)
             {
-                Accounts.UpdateUser(targetID, new() { (nameof(UserShard.AccountStatus), status) });
+                Accounts.UpdateUser(targetId, new() { (nameof(UserShard.AccountStatus), status) });
             }
         }
 
-        public async Task ReportEventAsync(ulong userID, ulong eventID, ulong hostId,
+        public async Task ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
             EventReportType reportType, string reportDetails)
         {
-            var targetEvent = await GetEvent(eventID);
-            Reports.ReportEvent(userID, eventID, hostId, reportType, reportDetails);
+            var targetEvent = await GetEvent(eventId);
+            Reports.ReportEvent(userId, eventId, hostId, reportType, reportDetails);
 
             // Check if action is to be taken
             if (await targetEvent.Reported())
             {
                 // Threshold hit, end event
-                await Terminal.EventDirector.EndEventAsync(targetEvent.Host.Id, eventID);
+                await Terminal.EventDirector.EndEventAsync(targetEvent.Host.Id, eventId);
 
                 // Compute host's standing
                 var user = await GetUser(targetEvent.Host.Id);
@@ -54,14 +54,14 @@ namespace Core.Controls
         }
 
         internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
-            GetAllReportsAsync(ulong userID)
+            GetAllReportsAsync(ulong userId)
         {
-            return Reports.GetReportsForUser(userID);
+            return Reports.GetReportsForUser(userId);
         }
 
-        internal async Task<List<EventReport>> GetEventReportsAsync(ulong eventID)
+        internal async Task<List<EventReport>> GetEventReportsAsync(ulong eventId)
         {
-            return Reports.GetReportsForEvent(eventID);
+            return Reports.GetReportsForEvent(eventId);
         }
     }
 }

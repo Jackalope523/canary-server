@@ -174,7 +174,7 @@ namespace Frontier.Controllers
 			{
 				// Follow other user
 				var user = await GetCurrentUserAsync();
-				await profiles.FollowUserAsync(user.Id, info.TargetID);
+				await profiles.FollowUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
 			{
@@ -196,7 +196,7 @@ namespace Frontier.Controllers
 			{
 				// Unfollow other user
 				var user = await GetCurrentUserAsync();
-				await profiles.UnfollowUserAsync(user.Id, info.TargetID);
+				await profiles.UnfollowUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
 			{
@@ -237,7 +237,7 @@ namespace Frontier.Controllers
 			{
 				// Block other user
 				var user = await GetCurrentUserAsync();
-				await profiles.BlockUserAsync(user.Id, info.TargetID);
+				await profiles.BlockUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
 			{
@@ -259,7 +259,7 @@ namespace Frontier.Controllers
 			{
 				// Unblock other user
 				var user = await GetCurrentUserAsync();
-				await profiles.UnblockUserAsync(user.Id, info.TargetID);
+				await profiles.UnblockUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
 			{
@@ -270,9 +270,9 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{targetIdentification}/report")]
-		public async Task<IActionResult> ReportUser(string targetID, [FromBody] AccountReportManifest report)
+		public async Task<IActionResult> ReportUser(string targetId, [FromBody] AccountReportManifest report)
 		{
-			if (string.IsNullOrEmpty(targetID) || report == null || !ModelState.IsValid)
+			if (string.IsNullOrEmpty(targetId) || report == null || !ModelState.IsValid)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
@@ -280,7 +280,7 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				ulong targetulong = GetId(targetID);
+				ulong targetulong = GetId(targetId);
 				await reports.ReportUserAsync(user.Id, targetulong, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)

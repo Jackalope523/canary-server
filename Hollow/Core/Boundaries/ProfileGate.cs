@@ -10,39 +10,39 @@ namespace Core.Boundaries
 
     public interface IProfileDatabase
     {
-        List<UserSilhouette> GetFriends(ulong id);
-        List<UserSilhouette> GetFollowedUsers(ulong id);
-        List<UserSilhouette> GetUsersFollowing(ulong id);
-        List<UserSilhouette> GetBlockedUsers(ulong id);
-        List<UserSilhouette> GetUsersBlocking(ulong id);
+        List<UserSilhouette> GetFriends(ulong userId);
+        List<UserSilhouette> GetFollowedUsers(ulong userId);
+        List<UserSilhouette> GetUsersFollowing(ulong userId);
+        List<UserSilhouette> GetBlockedUsers(ulong userId);
+        List<UserSilhouette> GetUsersBlocking(ulong userId);
 
-        bool FollowUser(ulong selfId, ulong targetId);
-        bool UnfollowUser(ulong selfId, ulong targetId);
-        bool BlockUser(ulong selfId, ulong targetId);
-        bool UnblockUser(ulong selfId, ulong targetId);
+        bool FollowUser(ulong userId, ulong targetUserId);
+        bool UnfollowUser(ulong userId, ulong targetUserId);
+		bool BlockUser(ulong userId, ulong targetUserId);
+		bool UnblockUser(ulong userId, ulong targetUserId);
 
-        bool RateUser(ulong selfId, ulong targetId, UserRating rating);
-        bool RemoveUserRating(ulong selfId, ulong targetId);
-        (int Positive, int Negative) GetUserRatings(ulong id);
+		bool RateUser(ulong userId, ulong targetUserId, UserRating rating);
+        bool RemoveUserRating(ulong userId, ulong targetUserId);
+		(int Positive, int Negative) GetUserRatings(ulong userId);
     }
 
 	public interface IProfileOperations
     {
-        Task<UserProfile> GetUserProfileAsync(ulong userID, ulong targetID);
+        Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId);
 
-        Task<List<EventShard>> GetUserActivityAsync(ulong userID, ulong targetID);
-        Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userID);
+        Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId);
+        Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId);
 
-        Task<List<UserSilhouette>> GetFriendsAsync(ulong userID);
-        Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userID);
-        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userID);
+        Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
+        Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
 
-        Task FollowUserAsync(ulong userID, ulong targetID);
-        Task UnfollowUserAsync(ulong userID, ulong targetID);
-        Task BlockUserAsync(ulong userID, ulong targetID);
-        Task UnblockUserAsync(ulong userID, ulong targetID);
+        Task FollowUserAsync(ulong userId, ulong targetId);
+        Task UnfollowUserAsync(ulong userId, ulong targetId);
+        Task BlockUserAsync(ulong userId, ulong targetId);
+        Task UnblockUserAsync(ulong userId, ulong targetId);
 
-        Task RateUserAsync(ulong userID, ulong targetID, UserRating rating);
+        Task RateUserAsync(ulong userId, ulong targetId, UserRating rating);
     }
 }
 

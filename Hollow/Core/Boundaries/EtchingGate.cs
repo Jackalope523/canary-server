@@ -13,9 +13,9 @@ namespace Core.Boundaries
 
     public interface IEtchingDatabase
     {
-        List<Etching> GetEtchingsForEvent(ulong id);
-        List<Etching> GetEtchingsByUser(ulong id);
-        Etching GetEtching(ulong id);
+        List<Etching> GetEtchingsForEvent(ulong eventId);
+        List<Etching> GetEtchingsByUser(ulong userId);
+        Etching GetEtching(ulong etchingId);
         Etching AddEtching(ulong eventId, ulong etcherId,
             DateTimeOffset timeEtched, string imageURL);
         bool RemoveEtching(ulong etchingId);
@@ -23,18 +23,18 @@ namespace Core.Boundaries
         bool RateEtching(ulong etchingId, ulong voterId, UserRating rating);
         bool RemoveEtchingRating(ulong etchingId, ulong voterId);
 
-        List<Etching> GenerateFeedForUser(ulong id, DateTimeOffset depthCharge, List<ulong> exclusionList);
+        List<Etching> GenerateFeedForUser(ulong userId, DateTimeOffset depthCharge, List<ulong> exclusionList);
     }
 
     public interface IEtchingOperations
     {
-        Task<List<Etching>> GetEventEtchingsAsync(ulong userID, ulong eventID);
-        Task<Etching> AddEtchingAsync(ulong userID, ulong eventID, string imageURL);
-        Task RemoveEtchingAsync(ulong userID, ulong etchingID);
-        Task RateEtchingAsync(ulong userID, ulong etchingID, UserRating rating);
+        Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId);
+        Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL);
+        Task RemoveEtchingAsync(ulong userId, ulong etchingId);
+        Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating);
 
         Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
-            GetUserFeedAsync(ulong userID, int depth,
+            GetUserFeedAsync(ulong userId, int depth,
             List<ulong> exclusionList = null);
     }
 }

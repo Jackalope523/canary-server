@@ -9,15 +9,15 @@ namespace Core.Boundaries
 {
 	public interface INotificationDatabase
 	{
-		(DeviceType DeviceType, string DeviceToken) GetUserSubscription(ulong id);
-		bool SubscribeUser(ulong id, DeviceType deviceType, string deviceToken);
-		bool UnsubscribeUser(ulong id);
+		(DeviceType DeviceType, string DeviceToken) GetUserSubscription(ulong userId);
+		bool SubscribeUser(ulong userId, DeviceType deviceType, string deviceToken);
+		bool UnsubscribeUser(ulong userId);
 	}
 
 	public interface INotificationOperations
 	{
-		Task SubscribeUserAsync(ulong userID, DeviceType deviceType, string deviceToken);
-		Task UnsubscribeUserAsync(ulong userID);
+		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
+		Task UnsubscribeUserAsync(ulong userId);
 	}
 
 	public interface INotificationService

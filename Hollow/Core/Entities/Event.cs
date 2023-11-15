@@ -41,9 +41,9 @@ namespace Core.Entities
 
 		public Event() { }
 
-        public Event(ulong eventID)
+        public Event(ulong eventId)
         {
-            Id = eventID;
+            Id = eventId;
         }
 
         public Event(EventShard fromEvent)
@@ -148,8 +148,8 @@ namespace Core.Entities
 			return true;
 		}
 
-        public async Task<bool> IsModifiableBy(ulong userID)
-            => await IsModifiableBy(new User(userID));
+        public async Task<bool> IsModifiableBy(ulong userId)
+            => await IsModifiableBy(new User(userId));
 
         public async Task<bool> IsModifiableBy(User user)
         {
@@ -160,8 +160,8 @@ namespace Core.Entities
 			return false;
         }
 
-        public async Task<bool> IsAttendedBy(ulong userID)
-            => await IsAttendedBy(new User(userID));
+        public async Task<bool> IsAttendedBy(ulong userId)
+            => await IsAttendedBy(new User(userId));
 
         public async Task<bool> IsAttendedBy(User user)
         {
@@ -171,8 +171,8 @@ namespace Core.Entities
             return Guests.Find(x => x.Id == user.Id) != null;
 		}
 
-        public async Task<bool> WasAttendedBy(ulong userID)
-            => await WasAttendedBy(new User(userID));
+        public async Task<bool> WasAttendedBy(ulong userId)
+            => await WasAttendedBy(new User(userId));
 
         public async Task<bool> WasAttendedBy(User user)
         {

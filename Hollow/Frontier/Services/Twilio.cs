@@ -10,9 +10,9 @@ namespace Frontier.Services
 	{
 		private static string senderPhoneNumber = "";
 
-		public static void Initialise(string accountID, string accountToken, string phoneNumber)
+		public static void Initialise(string accountId, string accountToken, string phoneNumber)
 		{
-			TwilioClient.Init(accountID, accountToken);
+			TwilioClient.Init(accountId, accountToken);
 
 			senderPhoneNumber = phoneNumber;
 		}

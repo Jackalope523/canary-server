@@ -12,10 +12,10 @@ namespace Core.Controls
 	{
 		public ProfileDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task<UserProfile> GetUserProfileAsync(ulong userID, ulong targetID)
+        public async Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId)
         {
-            var user = await GetUser(userID);
-            var targetUser = await GetUser(targetID);
+            var user = await GetUser(userId);
+            var targetUser = await GetUser(targetId);
 
             // Check if user is blocked
             if (await targetUser.IsBlocking(user))
@@ -24,17 +24,17 @@ namespace Core.Controls
             return targetUser.ToThinProfile();
         }
 
-        public async Task<List<EventShard>> GetUserActivityAsync(ulong userID, ulong targetID)
+        public async Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId)
         {
-            var user = await GetUser(userID);
-            var targetUser = await GetUser(targetID);
+            var user = await GetUser(userId);
+            var targetUser = await GetUser(targetId);
 
             // Check if users are friends
             if (!await targetUser.IsFriendsWith(user))
             { throw new InvalidUserException("User is unable to view target."); }
 
             // Gather active and upcoming events
-            var upcomingActivity = await GetUserActivityInternalAsync(targetID);
+            var upcomingActivity = await GetUserActivityInternalAsync(targetId);
 
             // Remove active and upcoming events if the user cannot view them
             await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
@@ -42,10 +42,10 @@ namespace Core.Controls
             return upcomingActivity.ToList();
         }
 
-        public async Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userID)
+        public async Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId)
         {
-            var user = await GetUser(userID);
-            var friends = Profiles.GetFriends(userID);
+            var user = await GetUser(userId);
+            var friends = Profiles.GetFriends(userId);
 
             Dictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
@@ -60,74 +60,74 @@ namespace Core.Controls
             return friendEvents;
         }
 
-        public async Task<List<UserSilhouette>> GetFriendsAsync(ulong userID)
+        public async Task<List<UserSilhouette>> GetFriendsAsync(ulong userId)
         {
-            return Profiles.GetFriends(userID);
+            return Profiles.GetFriends(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userID)
+        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId)
         {
-            return Profiles.GetFollowedUsers(userID);
+            return Profiles.GetFollowedUsers(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userID)
+        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId)
         {
-            return Profiles.GetBlockedUsers(userID);
+            return Profiles.GetBlockedUsers(userId);
         }
 
-        public async Task FollowUserAsync(ulong userID, ulong targetID)
+        public async Task FollowUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.FollowUser(userID, targetID);
+            Profiles.FollowUser(userId, targetId);
         }
 
-        public async Task UnfollowUserAsync(ulong userID, ulong targetID)
+        public async Task UnfollowUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.UnfollowUser(userID, targetID);
+            Profiles.UnfollowUser(userId, targetId);
         }
 
-        public async Task BlockUserAsync(ulong userID, ulong targetID)
+        public async Task BlockUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.BlockUser(userID, targetID);
+            Profiles.BlockUser(userId, targetId);
         }
 
-        public async Task UnblockUserAsync(ulong userID, ulong targetID)
+        public async Task UnblockUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.UnblockUser(userID, targetID);
+            Profiles.UnblockUser(userId, targetId);
         }
 
-        public async Task RateUserAsync(ulong userID, ulong targetID, UserRating rating)
+        public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
         {
             if (rating != UserRating.Remove)
             {
-                Profiles.RateUser(userID, targetID, rating);
+                Profiles.RateUser(userId, targetId, rating);
             }
             else
             {
-                Profiles.RemoveUserRating(userID, targetID);
+                Profiles.RemoveUserRating(userId, targetId);
             }
 
-            User targetUser = new(targetID);
+            User targetUser = new(targetId);
             await targetUser.SyncReputation();
             targetUser.CalculateReputation();
-            Accounts.UpdateUser(targetID, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
+            Accounts.UpdateUser(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }
 
 
-        internal async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userID)
+        internal async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
         {
-            return Profiles.GetUsersBlocking(userID);
+            return Profiles.GetUsersBlocking(userId);
         }
 
-        internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(ulong userID)
+        internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(ulong userId)
         {
-            return Profiles.GetUserRatings(userID);
+            return Profiles.GetUserRatings(userId);
         }
 
-        private async Task<List<EventShard>> GetUserActivityInternalAsync(ulong userID)
+        private async Task<List<EventShard>> GetUserActivityInternalAsync(ulong userId)
         {
             // Gather all user event data
-            var upcomingActivity = Events.FindUpcomingEventsForUser(userID);
-            upcomingActivity.Add(Events.FindCurrentEventForUser(userID));
+            var upcomingActivity = Events.FindUpcomingEventsForUser(userId);
+            upcomingActivity.Add(Events.FindCurrentEventForUser(userId));
 
             return upcomingActivity;
         }

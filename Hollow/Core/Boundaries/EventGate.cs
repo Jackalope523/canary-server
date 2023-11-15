@@ -14,47 +14,47 @@ namespace Core.Boundaries
 
 	public interface IEventDatabase
 	{
-        EventShard FindEvent(ulong id);
+        EventShard FindEvent(ulong eventId);
 		List<EventThinSlice> FindEvents(double latitude, double longitude, double distance);
-		EventShard FindCurrentEventForUser(ulong id);
-		List<EventShard> FindUpcomingEventsForUser(ulong id);
-		List<EventShard> FindPastEventsForUser(ulong id);
+		EventShard FindCurrentEventForUser(ulong userId);
+		List<EventShard> FindUpcomingEventsForUser(ulong userId);
+		List<EventShard> FindPastEventsForUser(ulong userId);
 
 		EventShard CreateEvent(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character);
-		bool UpdateEvent(ulong id, List<(string Property, object Value)> edits);
-		bool EndEvent(ulong id);
+		bool UpdateEvent(ulong eventId, List<(string Property, object Value)> edits);
+		bool EndEvent(ulong eventId);
 
 		EventUserState? GetUserState(ulong userId, ulong eventId);
 		bool SetUserState(ulong userId, ulong eventId, EventUserState userState);
 		bool RemoveUser(ulong userId, ulong eventId);
 
-		List<UserSilhouette> GetWatchers(ulong id);
-		List<UserSilhouette> GetAttendees(ulong id);
-		List<UserSilhouette> GetGuests(ulong id);
-		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(ulong id);
+		List<UserSilhouette> GetWatchers(ulong eventId);
+		List<UserSilhouette> GetAttendees(ulong eventId);
+		List<UserSilhouette> GetGuests(ulong eventId);
+		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(ulong eventId);
 	}
 
 	public interface IEventOperations
 	{
-		Task<EventShard> GetEventInformationAsync(ulong userID, ulong eventID);
-		Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userID,
+		Task<EventShard> GetEventInformationAsync(ulong userId, ulong eventId);
+		Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance);
-		Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(ulong userID,
+		Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance);
 
-		Task<EventShard> CreateEventAsync(ulong userID, string eventName, string eventDescription,
+		Task<EventShard> CreateEventAsync(ulong userId, string eventName, string eventDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum);
-		Task EditEventAsync(ulong userID, ulong eventID,
+		Task EditEventAsync(ulong userId, ulong eventId,
 			string eventDescription = "", bool? isOpen = null);
-		Task WatchEventAsync(ulong userID, ulong eventID);
-		Task UnwatchEventAsync(ulong userID, ulong eventID);
-		Task JoinEventAsync(ulong userID, ulong eventID);
-		Task LeaveEventAsync(ulong userID, ulong eventID);
-		Task EndEventAsync(ulong userID, ulong eventID);
+		Task WatchEventAsync(ulong userId, ulong eventId);
+		Task UnwatchEventAsync(ulong userId, ulong eventId);
+		Task JoinEventAsync(ulong userId, ulong eventId);
+		Task LeaveEventAsync(ulong userId, ulong eventId);
+		Task EndEventAsync(ulong userId, ulong eventId);
 
-		Task<List<UserSilhouette>> GetAttendeesAsync(ulong userID, ulong eventID);
+		Task<List<UserSilhouette>> GetAttendeesAsync(ulong userId, ulong eventId);
 	}
 }

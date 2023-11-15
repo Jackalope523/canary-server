@@ -10,7 +10,7 @@ namespace Frontier.Manifests
     public class TargetManifest
     {
         [Required]
-        public ulong TargetID { get; set; }
+        public ulong TargetId { get; set; }
     }
 
     public class AccountCredentialsManifest

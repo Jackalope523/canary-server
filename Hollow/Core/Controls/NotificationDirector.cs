@@ -12,20 +12,20 @@ namespace Core.Controls
 	{
 		public NotificationDirector(CoreTerminal terminal) : base(terminal) { }
 
-		public async Task SubscribeUserAsync(ulong userID, DeviceType deviceType, string deviceToken)
+		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
 		{
-			Notifications.SubscribeUser(userID, deviceType, deviceToken);
+			Notifications.SubscribeUser(userId, deviceType, deviceToken);
 		}
 
-		public async Task UnsubscribeUserAsync(ulong userID)
+		public async Task UnsubscribeUserAsync(ulong userId)
 		{
-			Notifications.UnsubscribeUser(userID);
+			Notifications.UnsubscribeUser(userId);
 		}
 
 
-		internal async Task NotifyUserAsync(ulong userID, string title, string message)
+		internal async Task NotifyUserAsync(ulong userId, string title, string message)
 		{
-			var userSettings = Notifications.GetUserSubscription(userID);
+			var userSettings = Notifications.GetUserSubscription(userId);
 			// Check if user is subscribed
 			if  (userSettings == (null, null))
 			{ return; }

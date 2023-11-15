@@ -9,9 +9,9 @@ namespace Frontier.Services
 {
 	public class SendGridService : IEmailService
 	{
-		public static void Initialise(string accountID, string accountToken)
+		public static void Initialise(string accountId, string accountToken)
 		{
-			SendGridClient client = new(accountID, accountToken);
+			SendGridClient client = new(accountId, accountToken);
 		}
 
 		public Task SendEmailAsync(string email, string subject, string body)

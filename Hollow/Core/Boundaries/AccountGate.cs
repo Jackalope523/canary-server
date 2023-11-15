@@ -20,34 +20,34 @@ namespace Core.Boundaries
 
 	public interface IAccountDatabase
 	{
-		UserShard FindUserById(ulong id);
+		UserShard FindUserById(ulong userId);
         UserShard FindUserByPhoneNumber(string phoneNumber);
 		UserShard FindUserByEmail(string normalisedEmail);
         bool CreateUser(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, Character character);
-		bool UpdateUser(ulong id, List<(string Property, object Value)> edits);
-        bool DeleteUser(ulong id);
+		bool UpdateUser(ulong userId, List<(string Property, object Value)> edits);
+        bool DeleteUser(ulong userId);
 
-		(double Latitude, double Longitude, double Radius) GetRecentUserLocation(ulong id);
-		bool UpdateRecentLocation(ulong id, double latitude, double longitude, double radius);
+		(double Latitude, double Longitude, double Radius) GetRecentUserLocation(ulong userId);
+		bool UpdateRecentLocation(ulong userId, double latitude, double longitude, double radius);
 
-		(double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(ulong id);
-		bool UpdateHaunt(ulong id, double latitude, double longitude, double radius, int stability);
+		(double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(ulong userId);
+		bool UpdateHaunt(ulong userId, double latitude, double longitude, double radius, int stability);
 	}
 
 	public interface IAccountOperations
 	{
-		Task<UserShard> GetUserAsync(ulong userID);
+		Task<UserShard> GetUserAsync(ulong userId);
 		Task<UserShard> GetUserAsync(string phoneNumber);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
-		Task EditUserAsync(ulong userID,
+		Task EditUserAsync(ulong userId,
 			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null);
-		Task DeleteUserAsync(ulong userID);
+		Task DeleteUserAsync(ulong userId);
 
-		Task UpdateUserLocationAsync(ulong userID, double latitude, double longitude);
+		Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude);
 	}
 
 	public interface IEmailService

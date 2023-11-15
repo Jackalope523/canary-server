@@ -45,10 +45,10 @@ namespace Frontier.Controllers
 			userManager = identityUserManager;
         }
 
-        [HttpGet("{eventID}")]
-        public async Task<IActionResult> GetEvent(string eventID)
+        [HttpGet("{eventId}")]
+        public async Task<IActionResult> GetEvent(string eventId)
         {
-			if (eventID == null)
+			if (eventId == null)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -59,7 +59,7 @@ namespace Frontier.Controllers
             {
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
                 targetEvent = await events.GetEventInformationAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
@@ -97,10 +97,10 @@ namespace Frontier.Controllers
             return Ok(newEvent);
         }
 
-        [HttpPost("{eventID}/edit")]
-        public async Task<IActionResult> EditEvent(string eventID, [FromBody] EventEditManifest eventDetails)
+        [HttpPost("{eventId}/edit")]
+        public async Task<IActionResult> EditEvent(string eventId, [FromBody] EventEditManifest eventDetails)
 		{
-			if (eventID == null || eventDetails == null || !ModelState.IsValid)
+			if (eventId == null || eventDetails == null || !ModelState.IsValid)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -108,7 +108,7 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				await events.EditEventAsync(user.Id, GetId(eventID),
+				await events.EditEventAsync(user.Id, GetId(eventId),
 					eventDescription: eventDetails.EventDescription ?? "",
 					isOpen: eventDetails.EventIsOpen);
 			}
@@ -120,10 +120,10 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-        [HttpDelete("{eventID}/edit")]
-        public async Task<IActionResult> EndEvent(string eventID)
+        [HttpDelete("{eventId}/edit")]
+        public async Task<IActionResult> EndEvent(string eventId)
 		{
-			if (eventID == null)
+			if (eventId == null)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -132,7 +132,7 @@ namespace Frontier.Controllers
 			{
 				// End an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
 				await events.EndEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
@@ -143,10 +143,10 @@ namespace Frontier.Controllers
 			return Ok();
         }
 
-		[HttpPost("{eventID}/watch")]
-		public async Task<IActionResult> WatchEvent(string eventID)
+		[HttpPost("{eventId}/watch")]
+		public async Task<IActionResult> WatchEvent(string eventId)
 		{
-			if (string.IsNullOrEmpty(eventID))
+			if (string.IsNullOrEmpty(eventId))
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -155,7 +155,7 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
 				await events.WatchEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
@@ -166,10 +166,10 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		[HttpPut("{eventID}/watch")]
-		public async Task<IActionResult> UnwatchEvent(string eventID)
+		[HttpPut("{eventId}/watch")]
+		public async Task<IActionResult> UnwatchEvent(string eventId)
 		{
-			if (string.IsNullOrEmpty(eventID))
+			if (string.IsNullOrEmpty(eventId))
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -178,7 +178,7 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
 				await events.UnwatchEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
@@ -189,10 +189,10 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		[HttpPost("{eventID}")]
-        public async Task<IActionResult> JoinEvent(string eventID)
+		[HttpPost("{eventId}")]
+        public async Task<IActionResult> JoinEvent(string eventId)
 		{
-			if (string.IsNullOrEmpty(eventID))
+			if (string.IsNullOrEmpty(eventId))
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -201,7 +201,7 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
 				await events.JoinEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
@@ -212,10 +212,10 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		[HttpPut("{eventID}")]
-		public async Task<IActionResult> LeaveEvent(string eventID)
+		[HttpPut("{eventId}")]
+		public async Task<IActionResult> LeaveEvent(string eventId)
 		{
-			if (eventID == null)
+			if (eventId == null)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -224,7 +224,7 @@ namespace Frontier.Controllers
 			{
 				// Leave an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
 				await events.LeaveEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
@@ -235,10 +235,10 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		[HttpPost("{eventID}/report")]
-		public async Task<IActionResult> ReportEvent(string eventID, string hostID, [FromBody] EventReportManifest report)
+		[HttpPost("{eventId}/report")]
+		public async Task<IActionResult> ReportEvent(string eventId, string hostId, [FromBody] EventReportManifest report)
 		{
-			if (string.IsNullOrEmpty(eventID) || report == null || !ModelState.IsValid)
+			if (string.IsNullOrEmpty(eventId) || report == null || !ModelState.IsValid)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -246,8 +246,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
-                ulong hostulong = GetId(hostID);
+				ulong eventUlong = GetId(eventId);
+                ulong hostulong = GetId(hostId);
                 await reports.ReportEventAsync(user.Id, eventUlong, hostulong, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
@@ -258,10 +258,10 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		[HttpGet("{eventID}/etchings")]
-		public async Task<IActionResult> GetEventEtchings(string eventID)
+		[HttpGet("{eventId}/etchings")]
+		public async Task<IActionResult> GetEventEtchings(string eventId)
 		{
-			if (string.IsNullOrEmpty(eventID))
+			if (string.IsNullOrEmpty(eventId))
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -272,7 +272,7 @@ namespace Frontier.Controllers
 			{
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
 
 				eventEtchings = await etchings.GetEventEtchingsAsync(user.Id, eventUlong);
 			}
@@ -284,10 +284,10 @@ namespace Frontier.Controllers
 			return Ok(eventEtchings);
 		}
 
-		[HttpPost("{eventID}/etchings")]
-		public async Task<IActionResult> EtchingToEvent(string eventID, [FromBody] EventEtchingManifest etching)
+		[HttpPost("{eventId}/etchings")]
+		public async Task<IActionResult> EtchingToEvent(string eventId, [FromBody] EventEtchingManifest etching)
 		{
-			if (string.IsNullOrEmpty(eventID) || etching == null || !ModelState.IsValid)
+			if (string.IsNullOrEmpty(eventId) || etching == null || !ModelState.IsValid)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -297,7 +297,7 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				ulong eventUlong = GetId(eventID);
+				ulong eventUlong = GetId(eventId);
 				newEtching = await etchings.AddEtchingAsync(user.Id, eventUlong, etching.ImageURL);
 			}
 			catch (Exception e)
@@ -308,10 +308,10 @@ namespace Frontier.Controllers
 			return Ok(newEtching);
 		}
 
-		[HttpPut("{eventID}/etchings")]
-		public async Task<IActionResult> RemoveEtching(string eventID, string etchingID)
+		[HttpPut("{eventId}/etchings")]
+		public async Task<IActionResult> RemoveEtching(string eventId, string etchingId)
 		{
-			if (string.IsNullOrEmpty(eventID) || string.IsNullOrEmpty(etchingID))
+			if (string.IsNullOrEmpty(eventId) || string.IsNullOrEmpty(etchingId))
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -319,7 +319,7 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				ulong etchingulong = GetId(etchingID);
+				ulong etchingulong = GetId(etchingId);
 				await etchings.RemoveEtchingAsync(user.Id, etchingulong);
 			}
 			catch (Exception e)
@@ -330,10 +330,10 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		[HttpPost("{eventID}/etchings/{etchingID}")]
-		public async Task<IActionResult> RateEtching(string eventID, string etchingID, [FromBody] AccountRatingManifest details)
+		[HttpPost("{eventId}/etchings/{etchingId}")]
+		public async Task<IActionResult> RateEtching(string eventId, string etchingId, [FromBody] AccountRatingManifest details)
 		{
-			if (string.IsNullOrEmpty(eventID) || details == null || !ModelState.IsValid)
+			if (string.IsNullOrEmpty(eventId) || details == null || !ModelState.IsValid)
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -341,7 +341,7 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				var etchingulong = GetId(etchingID);
+				var etchingulong = GetId(etchingId);
 				await etchings.RateEtchingAsync(user.Id, etchingulong, details.Rating);
 			}
 			catch (Exception e)

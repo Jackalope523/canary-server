@@ -11,9 +11,9 @@ namespace Core.Controls
     {
         public AccountDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task<UserShard> GetUserAsync(ulong userID)
+        public async Task<UserShard> GetUserAsync(ulong userId)
         {
-            return (await GetUser(userID)).ToThinUser();
+            return (await GetUser(userId)).ToThinUser();
         }
 
         public async Task<UserShard> GetUserAsync(string phoneNumber)
@@ -54,13 +54,13 @@ namespace Core.Controls
             { throw new UnexpectedFailureException("User creation failed."); }
         }
 
-        public async Task EditUserAsync(ulong userID,
+        public async Task EditUserAsync(ulong userId,
             string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
         {
             // Throws if user not found or locked
-            User editUser = await GetUser(userID);
+            User editUser = await GetUser(userId);
             
             // Check unique details changed to avoid errors
             bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && editUser.PhoneNumber != phoneNumber;
@@ -119,16 +119,16 @@ namespace Core.Controls
             Accounts.UpdateUser(editUser.Id, edits);
 		}
 
-        public async Task DeleteUserAsync(ulong userID)
+        public async Task DeleteUserAsync(ulong userId)
         {
-            bool success = Accounts.DeleteUser(userID);
+            bool success = Accounts.DeleteUser(userId);
             if (!success)
             { throw new UnexpectedFailureException("User deletion failed."); }
         }
 
-        public async Task UpdateUserLocationAsync(ulong userID, double latitude, double longitude)
+        public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
 		{
-			var user = await GetUser(userID);
+			var user = await GetUser(userId);
             await user.SyncLocation();
 
             user.LastKnownLocation = new() { Latitude = latitude, Longitude = longitude };
@@ -152,15 +152,15 @@ namespace Core.Controls
         }
 
         internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
-            GetUserHauntAsync(ulong userID)
+            GetUserHauntAsync(ulong userId)
         {
-            return Accounts.GetUserHaunt(userID);
+            return Accounts.GetUserHaunt(userId);
         }
 
         internal async Task<(double Latitude, double Longitude, double Radius)>
-            GetLastKnownUserLocationAsync(ulong userID)
+            GetLastKnownUserLocationAsync(ulong userId)
         {
-            return Accounts.GetRecentUserLocation(userID);
+            return Accounts.GetRecentUserLocation(userId);
         }
 
 
