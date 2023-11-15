@@ -59,8 +59,8 @@ namespace Frontier.Controllers
             {
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-				ulong eventulong = GetId(eventID);
-                targetEvent = await events.GetEventInformationAsync(user.Id, eventulong);
+				ulong eventUlong = GetId(eventID);
+                targetEvent = await events.GetEventInformationAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
 			{
@@ -132,8 +132,8 @@ namespace Frontier.Controllers
 			{
 				// End an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventulong = GetId(eventID);
-				await events.EndEventAsync(user.Id, eventulong);
+				ulong eventUlong = GetId(eventID);
+				await events.EndEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
 			{
@@ -143,10 +143,10 @@ namespace Frontier.Controllers
 			return Ok();
         }
 
-		[HttpPost("{eventID}")]
-        public async Task<IActionResult> JoinEvent(string eventID)
+		[HttpPost("{eventID}/watch")]
+		public async Task<IActionResult> WatchEvent(string eventID)
 		{
-			if (eventID == null)
+			if (string.IsNullOrEmpty(eventID))
 			{
 				return BadRequest(EventError.MissingInformation.ToString());
 			}
@@ -155,8 +155,54 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventulong = GetId(eventID);
-				await events.JoinEventAsync(user.Id, eventulong);
+				ulong eventUlong = GetId(eventID);
+				await events.WatchEventAsync(user.Id, eventUlong);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+		[HttpPut("{eventID}/watch")]
+		public async Task<IActionResult> UnwatchEvent(string eventID)
+		{
+			if (string.IsNullOrEmpty(eventID))
+			{
+				return BadRequest(EventError.MissingInformation.ToString());
+			}
+
+			try
+			{
+				// Join an event as the current user
+				var user = await GetCurrentUserAsync();
+				ulong eventUlong = GetId(eventID);
+				await events.UnwatchEventAsync(user.Id, eventUlong);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+		[HttpPost("{eventID}")]
+        public async Task<IActionResult> JoinEvent(string eventID)
+		{
+			if (string.IsNullOrEmpty(eventID))
+			{
+				return BadRequest(EventError.MissingInformation.ToString());
+			}
+
+			try
+			{
+				// Join an event as the current user
+				var user = await GetCurrentUserAsync();
+				ulong eventUlong = GetId(eventID);
+				await events.JoinEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
 			{
@@ -178,8 +224,8 @@ namespace Frontier.Controllers
 			{
 				// Leave an event as the current user
 				var user = await GetCurrentUserAsync();
-				ulong eventulong = GetId(eventID);
-				await events.LeaveEventAsync(user.Id, eventulong);
+				ulong eventUlong = GetId(eventID);
+				await events.LeaveEventAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
 			{
@@ -200,9 +246,9 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				ulong eventulong = GetId(eventID);
+				ulong eventUlong = GetId(eventID);
                 ulong hostulong = GetId(hostID);
-                await reports.ReportEventAsync(user.Id, eventulong, hostulong, report.ReportType, report.ReportDetails);
+                await reports.ReportEventAsync(user.Id, eventUlong, hostulong, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{
@@ -226,9 +272,9 @@ namespace Frontier.Controllers
 			{
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-				ulong eventulong = GetId(eventID);
+				ulong eventUlong = GetId(eventID);
 
-				eventEtchings = await etchings.GetEventEtchingsAsync(user.Id, eventulong);
+				eventEtchings = await etchings.GetEventEtchingsAsync(user.Id, eventUlong);
 			}
 			catch (Exception e)
 			{
@@ -251,8 +297,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				ulong eventulong = GetId(eventID);
-				newEtching = await etchings.AddEtchingAsync(user.Id, eventulong, etching.ImageURL);
+				ulong eventUlong = GetId(eventID);
+				newEtching = await etchings.AddEtchingAsync(user.Id, eventUlong, etching.ImageURL);
 			}
 			catch (Exception e)
 			{

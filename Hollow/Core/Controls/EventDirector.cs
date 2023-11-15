@@ -124,27 +124,73 @@ namespace Core.Controls
 			Events.UpdateEvent(targetEvent.Id, edits);
 		}
 
-		public async Task JoinEventAsync(ulong userID, ulong eventID)
+		public async Task WatchEventAsync(ulong userID, ulong eventID)
 		{
 			var user = await GetUser(userID);
-			await ThrowIfUserAtEvent(userID);
-
 			var targetEvent = await GetEvent(eventID);
 
 			// Check if user is allowed to view event
 			if (!await targetEvent.IsVisibleTo(user))
-			{ throw new InvalidEventException("User is unable to view or join event.\n" +
-				$"Account Status: {user.AccountStatus}");
+			{
+				throw new InvalidEventException("User is unable to view or join event.\n" +
+					$"Account Status: {user.AccountStatus}");
 			}
+
+			// TODO Can user watch events if time conflict
+
+			var userIntention = Events.GetUserState(userID, eventID);
+			bool success;
+
+			// Ensure correct state transition
+			if (!userIntention.HasValue)
+			{
+				// Try to add user to the event
+				success = Events.SetUserState(userID, eventID, EventUserState.Watching);
+				if (!success)
+				{ throw new UnexpectedFailureException("Could not watch event."); }
+			}
+			else if (userIntention.HasValue)
+			{ throw new InvalidOperationException($"Could not watch event, user currently {userIntention.Value} event."); }
+		}
+
+		public async Task UnwatchEventAsync(ulong userID, ulong eventID)
+		{
+			var userIntention = Events.GetUserState(userID, eventID);
+			bool success;
+
+			// Ensure correct state transition
+			if (userIntention.HasValue && userIntention.Value.Equals(EventUserState.Watching))
+			{
+				// Try to remove user from event
+				success = Events.RemoveUser(userID, eventID);
+				if (!success)
+				{ throw new UnexpectedFailureException("Could not unwatch event."); }
+			}
+			else if (userIntention.HasValue)
+			{ throw new InvalidOperationException($"Could not unwatch event, user currently {userIntention.Value} event."); }
+		}
+
+		public async Task JoinEventAsync(ulong userID, ulong eventID)
+		{
+			var user = await GetUser(userID);
+			var targetEvent = await GetEvent(eventID);
+
+			// Check if user is allowed to view event
+			if (!await targetEvent.IsVisibleTo(user))
+			{ throw new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"); }
 
 			// Check if event is open
 			if (!targetEvent.IsOpen)
 			{ throw new InvalidEventException("Event is closed."); }
 
+			// TODO Check if conflicting and check if currently active and there
+
+			await ThrowIfUserAtEvent(userID);
+
 			// Try to add user to the event
-			bool success = Events.AddUserToEvent(userID, eventID);
+			bool success = Events.SetUserState(userID, eventID, EventUserState.Attending);
 			if (!success)
-			{ throw new UnexpectedFailureException("Could not join event."); }
+			{ throw new UnexpectedFailureException("Could not attend event."); }
 		}
 
 		public async Task LeaveEventAsync(ulong userID, ulong eventID)
@@ -155,11 +201,20 @@ namespace Core.Controls
 			if (targetEvent.Host.Id.Equals(userID))
 			{ throw new InvalidUserException("Host cannot leave the event."); }
 
-			// Try to remove user from event
-			bool success = Events.RemoveUserFromEvent(userID, eventID);
-            if (!success)
-            { throw new UnexpectedFailureException("Could not leave event."); }
-        }
+			// Get the user's current status
+			var userIntention = Events.GetUserState(userID, eventID);
+			bool success;
+
+			if (userIntention.Equals(EventUserState.Present))
+			{
+				// Try to remove user from event
+				success = Events.SetUserState(userID, eventID, EventUserState.Left);
+				if (!success)
+				{ throw new UnexpectedFailureException("Could not leave event."); }
+			}
+			else if (userIntention.HasValue)
+			{ throw new InvalidOperationException($"Could not leave event, user currently {userIntention.Value} event."); }
+		}
 
 		public async Task EndEventAsync(ulong userID, ulong eventID)
 		{
@@ -215,9 +270,10 @@ namespace Core.Controls
 			return targetEvent.Attendees;
 		}
 
+
 		internal async Task<List<UserSilhouette>> GetAttendeesInternalAsync(ulong eventID)
 		{
-			return Events.GetGuestList(eventID);
+			return Events.GetGuests(eventID);
 		}
 
 		internal async Task<List<EventShard>>

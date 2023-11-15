@@ -26,10 +26,13 @@ namespace Core.Boundaries
 		bool UpdateEvent(ulong id, List<(string Property, object Value)> edits);
 		bool EndEvent(ulong id);
 
-		bool AddUserToEvent(ulong userId, ulong eventId);
-		bool RemoveUserFromEvent(ulong userId, ulong eventId);
+		EventUserState? GetUserState(ulong userId, ulong eventId);
+		bool SetUserState(ulong userId, ulong eventId, EventUserState userState);
+		bool RemoveUser(ulong userId, ulong eventId);
 
-		List<UserSilhouette> GetGuestList(ulong id);
+		List<UserSilhouette> GetWatchers(ulong id);
+		List<UserSilhouette> GetAttendees(ulong id);
+		List<UserSilhouette> GetGuests(ulong id);
 		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(ulong id);
 	}
 
@@ -46,6 +49,8 @@ namespace Core.Boundaries
 			int? groupMinimum, int? groupMaximum);
 		Task EditEventAsync(ulong userID, ulong eventID,
 			string eventDescription = "", bool? isOpen = null);
+		Task WatchEventAsync(ulong userID, ulong eventID);
+		Task UnwatchEventAsync(ulong userID, ulong eventID);
 		Task JoinEventAsync(ulong userID, ulong eventID);
 		Task LeaveEventAsync(ulong userID, ulong eventID);
 		Task EndEventAsync(ulong userID, ulong eventID);

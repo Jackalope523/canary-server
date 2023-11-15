@@ -3,11 +3,11 @@
 namespace Shared
 {
     public enum UserRating
-    {
-        Positive, Negative, Remove
-    }
+    { Positive, Negative, Remove }
+
+    public enum EventUserState
+    { Watching, Attending, Present, Left }
 
     public enum DeviceType
     { iOS, Android }
-
 }
