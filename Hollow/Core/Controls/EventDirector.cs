@@ -209,6 +209,13 @@ namespace Core.Controls
 				if (!success)
 				{ throw new UnexpectedFailureException("Could not leave event."); }
 			}
+			else if (userIntention.Equals(EventUserState.Attending))
+			{
+				// Try to remove user from event
+				success = Events.RemoveUser(userId, eventId);
+				if (!success)
+				{ throw new UnexpectedFailureException("Could not unattend event."); }
+			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not leave event, user currently {userIntention.Value} event."); }
 		}

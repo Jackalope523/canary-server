@@ -137,6 +137,21 @@ namespace Core.Controls
 
             Accounts.UpdateRecentLocation(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
             Accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
+
+            List<EventShard> upcomingEvents;
+
+            // Check if we are attending or on our way to an event
+            if (Events.FindCurrentEventForUser(user.Id) == null &&
+                (upcomingEvents = Events.FindUpcomingEventsForUser(user.Id)).Count > 0)
+            {
+                Event nextEvent = new(upcomingEvents[0]);
+
+                // Check if user is close enough to be a guest
+                if (nextEvent.IsInRange(user))
+                {
+                    Events.SetUserState(user.Id, nextEvent.Id, EventUserState.Present);
+                }
+            }
         }
 
 

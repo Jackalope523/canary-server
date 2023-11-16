@@ -17,6 +17,7 @@ namespace Core.Entities
         public const int MaximumDescLength = 400;
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
+        public readonly Distance GuestDistance = new() { Metres = 75 };
 
         public ulong Id { get; init; }
         public User Host { get; set; }
@@ -181,6 +182,12 @@ namespace Core.Entities
             // Check if user is or was on the guest list
             return AllGuests.Find(x => x.User.Id == user.Id).User != null;
 		}
+
+        public bool IsInRange(ulong userId)
+            => IsInRange(new User(userId));
+
+        public bool IsInRange(User user)
+            => GeoLocation.AreInRange(Location, user.LastKnownLocation, GuestDistance);
 
         public async Task<bool> Reported()
         {
