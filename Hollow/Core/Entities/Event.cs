@@ -70,16 +70,16 @@ namespace Core.Entities
                 { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
         }
 
-        public EventShard ToThinEvent()
+        public EventShard ToEventShard()
         {
-            return new(Id, Host.ToThinnerUser(), Name, Description,
+            return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter());
         }
 
-        public EventThinSlice ToThinnerEvent()
+        public EventThinSlice ToEventThinSlice()
         {
-            return new(Id, Host.ToThinnerUser(), Location.Latitude, Location.Longitude);
+            return new(Id, Host.ToUserSilhouette(), Location.Latitude, Location.Longitude);
         }
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)

@@ -102,7 +102,7 @@ namespace Core.Entities
             NumberOfFollowers = fromUser.NumberOfFollowers;
         }
 
-        public UserShard ToThinUser()
+        public UserShard ToUserShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
@@ -110,12 +110,12 @@ namespace Core.Entities
                 JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }
 
-        public UserSilhouette ToThinnerUser()
+        public UserSilhouette ToUserSilhouette()
         {
             return new(Id, Name);
         }
 
-        public UserProfile ToThinProfile()
+        public UserProfile ToUserProfile()
         {
             return new(Id, Name, Reputation, NumberOfFollowers);
         }

@@ -13,14 +13,14 @@ namespace Core.Controls
 
         public async Task<UserShard> GetUserAsync(ulong userId)
         {
-            return (await GetUser(userId)).ToThinUser();
+            return (await GetUser(userId)).ToUserShard();
         }
 
         public async Task<UserShard> GetUserAsync(string phoneNumber)
 		{
             if (!ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber))
             { throw new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."); }
-            return (await GetUser(normalisedPhoneNumber)).ToThinUser();
+            return (await GetUser(normalisedPhoneNumber)).ToUserShard();
 		}
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)

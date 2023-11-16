@@ -23,7 +23,7 @@ namespace Core.Controls
 			if (!await targetEvent.IsVisibleTo(user))
 			{ throw new InvalidEventException("User is unable to view event."); }
 
-			return targetEvent.ToThinEvent();
+			return targetEvent.ToEventShard();
 		}
 
 		public async Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userId,
