@@ -24,6 +24,39 @@ namespace Core.Controls
             return targetUser.ToThinProfile();
         }
 
+        public async Task<(List<EventThinSlice> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId)
+        {
+            var user = await GetUser(userId);
+            var targetUser = await GetUser(targetId);
+
+            // Check if user is blocked
+            if (await user.IsBlockedBy(targetId))
+            { throw new InvalidUserException("User is unable to view target."); }
+
+            (List<EventThinSlice> Events, List<Etching> Etchings) nest = (new(), new());
+
+            // Check if users are friends
+            if (await targetUser.IsFriendsWith(user))
+            {
+                // Gather active and upcoming events visible to the user
+                var upcomingActivity = await GetUserActivityInternalAsync(targetId);
+                await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
+
+                // Get private events and etchings
+                nest.Events = Events.FindPastEventsForUser(targetUser.Id).ConvertAll(e => new Event(e).ToThinnerEvent());
+                nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToThinnerEvent()));
+
+                nest.Etchings = Etchings.GetEtchingsByUser(targetUser.Id);
+            }
+            else
+            {
+                // Get public hosted events
+                nest.Events = Events.FindEventsByUser(userId).ConvertAll(e => new Event(e).ToThinnerEvent());
+            }
+
+            return nest;
+        }
+
         public async Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId)
         {
             var user = await GetUser(userId);

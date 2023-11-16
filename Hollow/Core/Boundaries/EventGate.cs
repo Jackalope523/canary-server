@@ -19,6 +19,7 @@ namespace Core.Boundaries
 		EventShard FindCurrentEventForUser(ulong userId);
 		List<EventShard> FindUpcomingEventsForUser(ulong userId);
 		List<EventShard> FindPastEventsForUser(ulong userId);
+		List<EventShard> FindEventsByUser(ulong userId);
 
 		EventShard CreateEvent(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,

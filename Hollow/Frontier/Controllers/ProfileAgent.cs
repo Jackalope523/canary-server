@@ -38,7 +38,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{targetIdentification}")]
-        public async Task<IActionResult> GetUser(string targetIdentification)
+        public async Task<IActionResult> GetProfile(string targetIdentification)
         {
 			if (targetIdentification == null)
 			{
@@ -65,6 +65,36 @@ namespace Frontier.Controllers
 			}
 
 			return Ok(profile);
+		}
+
+		[HttpGet("{targetIdentification}/nest")]
+        public async Task<IActionResult> GetNest(string targetIdentification)
+        {
+			if (targetIdentification == null)
+			{
+				return BadRequest(ProfileError.MissingInformation.ToString());
+			}
+
+			(List<EventThinSlice> Events, List<Etching> Etchings) nest;
+
+			try
+			{
+				// Parse target identification and retrieve nest
+				var target = GetId(targetIdentification);
+				var user = await GetCurrentUserAsync();
+				nest = await profiles.GetUserNestAsync(user.Id, target);
+			}
+			catch (InvalidUserException e)
+			{
+				// User does not exist
+				return BadRequest(e.ToString());
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok(nest);
 		}
 
 		[HttpPost("{targetIdentification}")]
