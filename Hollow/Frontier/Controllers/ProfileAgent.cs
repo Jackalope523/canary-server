@@ -38,21 +38,15 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{targetIdentification}")]
-        public async Task<IActionResult> GetProfile(string targetIdentification)
+        public async Task<IActionResult> GetProfile(ulong targetIdentification)
         {
-			if (targetIdentification == null)
-			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
-			}
-
 			UserProfile profile;
 
 			try
 			{
-				// Parse target identification and retrieve profile
-				var target = GetId(targetIdentification);
+				// Retrieve profile
 				var user = await GetCurrentUserAsync();
-				profile = await profiles.GetUserProfileAsync(user.Id, target);
+				profile = await profiles.GetUserProfileAsync(user.Id, targetIdentification);
 			}
 			catch (InvalidUserException e)
 			{
@@ -68,21 +62,15 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{targetIdentification}/nest")]
-        public async Task<IActionResult> GetNest(string targetIdentification)
+        public async Task<IActionResult> GetNest(ulong targetIdentification)
         {
-			if (targetIdentification == null)
-			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
-			}
-
 			(List<EventThinSlice> Events, List<Etching> Etchings) nest;
 
 			try
 			{
-				// Parse target identification and retrieve nest
-				var target = GetId(targetIdentification);
+				// Retrieve nest
 				var user = await GetCurrentUserAsync();
-				nest = await profiles.GetUserNestAsync(user.Id, target);
+				nest = await profiles.GetUserNestAsync(user.Id, targetIdentification);
 			}
 			catch (InvalidUserException e)
 			{
@@ -98,18 +86,17 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{targetIdentification}")]
-		public async Task<IActionResult> RateUser(string targetIdentification, [FromBody] AccountRatingManifest details)
+		public async Task<IActionResult> RateUser(ulong targetIdentification, [FromBody] AccountRatingManifest details)
         {
-            if (targetIdentification == null && details != null && !ModelState.IsValid)
+            if (details != null && !ModelState.IsValid)
             {
                 return BadRequest(ProfileError.MissingInformation.ToString());
             }
 
 			try
 			{
-				var target = GetId(targetIdentification);
 				var user = await GetCurrentUserAsync();
-				await profiles.RateUserAsync(user.Id, target, details.Rating);
+				await profiles.RateUserAsync(user.Id, targetIdentification, details.Rating);
             }
             catch (InvalidUserException e)
             {
@@ -125,21 +112,15 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{targetIdentification}/activity")]
-		public async Task<IActionResult> GetUserActivity(string targetIdentification)
+		public async Task<IActionResult> GetUserActivity(ulong targetIdentification)
 		{
-			if (targetIdentification == null)
-			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
-			}
-
 			List<EventShard> activity;
 
 			try
 			{
-				// Parse target identification and retrieve activity
-				var target = GetId(targetIdentification);
+				// Retrieve activity
 				var user = await GetCurrentUserAsync();
-				activity = await profiles.GetUserActivityAsync(user.Id, target);
+				activity = await profiles.GetUserActivityAsync(user.Id, targetIdentification);
 			}
 			catch (InvalidUserException e)
 			{
@@ -300,9 +281,9 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{targetIdentification}/report")]
-		public async Task<IActionResult> ReportUser(string targetId, [FromBody] AccountReportManifest report)
+		public async Task<IActionResult> ReportUser(ulong targetId, [FromBody] AccountReportManifest report)
 		{
-			if (string.IsNullOrEmpty(targetId) || report == null || !ModelState.IsValid)
+			if (report == null || !ModelState.IsValid)
 			{
 				return BadRequest(ProfileError.MissingInformation.ToString());
 			}
@@ -310,8 +291,7 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-				ulong targetulong = GetId(targetId);
-				await reports.ReportUserAsync(user.Id, targetulong, report.ReportType, report.ReportDetails);
+				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{
@@ -324,16 +304,6 @@ namespace Frontier.Controllers
 		private async Task<UserShard> GetCurrentUserAsync()
 		{
 			return await userManager.GetUserAsync(HttpContext.User);
-		}
-
-		private ulong GetId(string id)
-		{
-			if (!ulong.TryParse(id, out ulong parsedId))
-			{
-				throw new ArgumentException("Not a valid ulong.", nameof(id));
-			}
-
-			return parsedId;
 		}
 	}
 
