@@ -5,10 +5,16 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
-    public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
+	#region Schemas
+
+	public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
     public record UserSilhouette(ulong Id, string Name);
 
-    public interface IProfileDatabase
+	#endregion
+
+	#region Gates
+
+	public interface IProfileDatabase
     {
         List<UserSilhouette> GetFriends(ulong userId);
         List<UserSilhouette> GetFollowedUsers(ulong userId);
@@ -45,5 +51,7 @@ namespace Core.Boundaries
 
         Task RateUserAsync(ulong userId, ulong targetId, UserRating rating);
     }
+
+	#endregion
 }
 

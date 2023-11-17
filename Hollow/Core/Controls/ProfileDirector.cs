@@ -10,9 +10,15 @@ namespace Core.Controls
 {
 	internal class ProfileDirector : AbstractDirector, IProfileOperations
 	{
+		#region Initialisation
+
 		public ProfileDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId)
+		#endregion
+
+		#region Operations
+
+		public async Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId)
         {
             var user = await GetUser(userId);
             var targetUser = await GetUser(targetId);
@@ -145,8 +151,11 @@ namespace Core.Controls
             Accounts.UpdateUser(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }
 
+		#endregion
 
-        internal async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+		#region Favours
+
+		internal async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
         {
             return Profiles.GetUsersBlocking(userId);
         }
@@ -156,7 +165,11 @@ namespace Core.Controls
             return Profiles.GetUserRatings(userId);
         }
 
-        private async Task<List<EventShard>> GetUserActivityInternalAsync(ulong userId)
+		#endregion
+
+		#region Tools
+
+		private async Task<List<EventShard>> GetUserActivityInternalAsync(ulong userId)
         {
             // Gather all user event data
             var upcomingActivity = Events.FindUpcomingEventsForUser(userId);
@@ -164,6 +177,8 @@ namespace Core.Controls
 
             return upcomingActivity;
         }
-    }
+
+		#endregion
+	}
 }
 

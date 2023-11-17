@@ -9,9 +9,15 @@ namespace Core.Controls
 {
     internal class AccountDirector : AbstractDirector, IAccountOperations
     {
-        public AccountDirector(CoreTerminal terminal) : base(terminal) { }
+		#region Initialisation
 
-        public async Task<UserShard> GetUserAsync(ulong userId)
+		public AccountDirector(CoreTerminal terminal) : base(terminal) { }
+
+		#endregion
+
+		#region Operations
+
+		public async Task<UserShard> GetUserAsync(ulong userId)
         {
             return (await GetUser(userId)).ToUserShard();
         }
@@ -154,8 +160,11 @@ namespace Core.Controls
             }
         }
 
+		#endregion
 
-        internal async Task<User> GetUser(string phoneNumber)
+		#region Favours
+
+		internal async Task<User> GetUser(string phoneNumber)
         {
             User user = new(Accounts.FindUserByPhoneNumber(phoneNumber));
 
@@ -178,8 +187,11 @@ namespace Core.Controls
             return Accounts.GetRecentUserLocation(userId);
         }
 
+		#endregion
 
-        private async Task ThrowIfPhoneNumberTaken(string phoneNumber)
+		#region Tools
+
+		private async Task ThrowIfPhoneNumberTaken(string phoneNumber)
         {
 			bool numberTaken = false;
 			try
@@ -208,5 +220,7 @@ namespace Core.Controls
 			if (emailTaken)
 			{ throw new InvalidUserException("Email already registered."); }
         }
-    }
+
+		#endregion
+	}
 }

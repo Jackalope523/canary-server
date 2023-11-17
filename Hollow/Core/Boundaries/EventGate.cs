@@ -7,10 +7,16 @@ using Shared;
 
 namespace Core.Boundaries
 {
+	#region Schemas
+
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
 	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
+
+	#endregion
+
+	#region Gates
 
 	public interface IEventDatabase
 	{
@@ -58,4 +64,6 @@ namespace Core.Boundaries
 
 		Task<List<UserSilhouette>> GetAttendeesAsync(ulong userId, ulong eventId);
 	}
+
+	#endregion
 }

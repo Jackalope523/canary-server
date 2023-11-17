@@ -10,9 +10,15 @@ namespace Core.Controls
 {
 	internal class EtchingDirector : AbstractDirector, IEtchingOperations
 	{
+		#region Initialisation
+
 		public EtchingDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId)
+		#endregion
+
+		#region Operations
+
+		public async Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId)
         {
             var user = await GetUser(userId);
             Event targetEvent = new(eventId);
@@ -110,11 +116,16 @@ namespace Core.Controls
             return (depth, eventHeaders.Values.ToList(), friendEtchings);
         }
 
+		#endregion
 
-        internal async Task<List<Etching>> GetEventEtchingsAsync(ulong eventId)
+		#region Favours
+
+		internal async Task<List<Etching>> GetEventEtchingsAsync(ulong eventId)
         {
             return Etchings.GetEtchingsForEvent(eventId);
         }
-    }
+
+		#endregion
+	}
 }
 

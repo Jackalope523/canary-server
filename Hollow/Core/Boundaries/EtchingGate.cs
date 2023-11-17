@@ -5,13 +5,19 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
-    public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
+	#region Schemas
+
+	public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
 
     public record Etching(ulong Id, ulong EventId, ulong UserId,
         DateTimeOffset TimeEtched, string ImageURL,
         (int Positive, int Negative) Ratings);
 
-    public interface IEtchingDatabase
+	#endregion
+
+	#region Gates
+
+	public interface IEtchingDatabase
     {
         List<Etching> GetEtchingsForEvent(ulong eventId);
         List<Etching> GetEtchingsByUser(ulong userId);
@@ -37,5 +43,7 @@ namespace Core.Boundaries
             GetUserFeedAsync(ulong userId, int depth,
             List<ulong> exclusionList = null);
     }
+
+	#endregion
 }
 

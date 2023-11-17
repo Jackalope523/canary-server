@@ -6,6 +6,8 @@ namespace Core.Boundaries
 {
 	public class CoreTerminal
 	{
+		#region Variables
+
 		public static CoreTerminal Terminal { get; private set; }
 
 		public IAccountDatabase AccountDatabase { get; init; }
@@ -45,6 +47,10 @@ namespace Core.Boundaries
 				(typeof(IReportOperations), ReportOperations),
 				(typeof(INotificationOperations), NotificationOperations) };
 
+		#endregion
+
+		#region Initialisation
+
 		public CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
 			IReportDatabase reportDatabase, INotificationDatabase notificationDatabase,
@@ -73,5 +79,7 @@ namespace Core.Boundaries
 			ReportDirector = new ReportDirector(this);
 			NotificationDirector = new NotificationDirector(this);
 		}
+
+		#endregion
 	}
 }

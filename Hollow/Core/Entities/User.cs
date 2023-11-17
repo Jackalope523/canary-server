@@ -11,7 +11,9 @@ namespace Core.Entities
 {
     internal class User
     {
-        public ulong Id { get; init; }
+		#region Variables
+
+		public ulong Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
@@ -43,7 +45,6 @@ namespace Core.Entities
 
         public CharacterVector Character { get; set; }
 
-
         public GeoLocation LastKnownLocation { get; set; }
         public Distance LastKnownRadius { get; set; }
         public GeoLocation Haunt { get; set; }
@@ -62,8 +63,11 @@ namespace Core.Entities
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
 
+		#endregion
 
-        public User() { }
+		#region Initialisation & Extraction
+
+		public User() { }
 
         public User(ulong userId)
         {
@@ -120,7 +124,11 @@ namespace Core.Entities
             return new(Id, Name, Reputation, NumberOfFollowers);
         }
 
-        public async Task SyncLocation()
+		#endregion
+
+		#region Synchronisation
+
+		public async Task SyncLocation()
         {
             try
             {
@@ -164,7 +172,11 @@ namespace Core.Entities
             EventReports = reports.EventReports;
         }
 
-        public bool ValidateAndNormalise()
+		#endregion
+
+		#region Composition
+
+		public bool ValidateAndNormalise()
         {
             // Verify Phone Number
             if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
@@ -188,29 +200,29 @@ namespace Core.Entities
             SecurityStamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(20));
         }
 
-        public async Task HandleHaunt()
+		public void CalculateReputation()
         {
-            await SyncHaunt();
+            int ratingDiff = Ratings.Postitive - Ratings.Negative;
+            int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
 
-            // Check if recent location is within haunt area
-            if (GeoLocation.DistanceBetween(Haunt, LastKnownLocation) < HauntRadius)
-            {
-                HauntStability += 1;
-            }
-            else
-            {
-                HauntStability -= 1;
+            float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
 
-                // If our haunt is unstable, move it
-                if (HauntStability < 0)
-                {
-                    HauntStability = 0;
-                    Haunt = LastKnownLocation;
-                }
-            }
+            Reputation = (int) (MathF.Atan(reputationRaw * normal) * (MaximumReputation / ReputationIntensity) + (MaximumReputation / 2));
         }
 
-        public async Task<bool> IsFriendsWith(ulong userId)
+        public void CalculateCharacter(Event eventAttended, TimeSpan timeAttended)
+        {
+            // Modified by time spent
+            float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
+
+            Character.MoveTowards(eventAttended.Character, modifier);
+        }
+
+		#endregion
+
+		#region Checks
+
+		public async Task<bool> IsFriendsWith(ulong userId)
             => await IsFriendsWith(new User(userId));
 
         public async Task<bool> IsFriendsWith(User otherUser)
@@ -270,25 +282,33 @@ namespace Core.Entities
 			return false;
 		}
 
-		public void CalculateReputation()
+		#endregion
+
+		#region Effects
+        
+        public async Task HandleHaunt()
         {
-            int ratingDiff = Ratings.Postitive - Ratings.Negative;
-            int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
+            await SyncHaunt();
 
-            float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
+            // Check if recent location is within haunt area
+            if (GeoLocation.DistanceBetween(Haunt, LastKnownLocation) < HauntRadius)
+            {
+                HauntStability += 1;
+            }
+            else
+            {
+                HauntStability -= 1;
 
-            Reputation = (int) (MathF.Atan(reputationRaw * normal) * (MaximumReputation / ReputationIntensity) + (MaximumReputation / 2));
+                // If our haunt is unstable, move it
+                if (HauntStability < 0)
+                {
+                    HauntStability = 0;
+                    Haunt = LastKnownLocation;
+                }
+            }
         }
 
-        public void CalculateCharacter(Event eventAttended, TimeSpan timeAttended)
-        {
-            // Modified by time spent
-            float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
-
-            Character.MoveTowards(eventAttended.Character, modifier);
-        }
-
-        public async Task<UserAccountStatus> EventReported()
+		public async Task<UserAccountStatus> EventReported()
         {
             await SyncReports();
 
@@ -318,9 +338,15 @@ namespace Core.Entities
             return UserAccountStatus.blacklisted;
         }
 
-        public async Task Notify(string title, string message)
+		#endregion
+
+		#region Actions
+
+		public async Task Notify(string title, string message)
         {
             await CoreTerminal.Terminal.NotificationDirector.NotifyUserAsync(Id, title, message);
         }
-    }
+
+		#endregion
+	}
 }

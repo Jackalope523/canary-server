@@ -9,6 +9,8 @@ namespace Core.Controls
 {
 	internal abstract class AbstractDirector
 	{
+		#region Variables
+
 		protected CoreTerminal Terminal { get; init; }
 
 		protected IAccountDatabase Accounts { get; private set; }
@@ -17,6 +19,10 @@ namespace Core.Controls
 		protected IProfileDatabase Profiles { get; private set; }
 		protected IReportDatabase Reports { get; private set; }
 		protected INotificationDatabase Notifications { get; private set; }
+
+		#endregion
+
+		#region Initialisation
 
 		public AbstractDirector(CoreTerminal terminal)
 		{
@@ -30,7 +36,11 @@ namespace Core.Controls
 			Notifications = Terminal.NotificationDatabase;
         }
 
-        internal async Task<User> GetUser(ulong userId)
+		#endregion
+
+		#region Favours
+
+		internal async Task<User> GetUser(ulong userId)
         {
             User user = new(Accounts.FindUserById(userId));
 
@@ -45,6 +55,8 @@ namespace Core.Controls
         {
             return new(Events.FindEvent(eventId));
         }
-    }
+
+		#endregion
+	}
 }
 

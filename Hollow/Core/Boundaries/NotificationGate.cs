@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
+	#region Gates
+
 	public interface INotificationDatabase
 	{
 		(DeviceType DeviceType, string DeviceToken) GetUserSubscription(ulong userId);
@@ -24,4 +26,6 @@ namespace Core.Boundaries
 	{
 		Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message);
 	}
+
+	#endregion
 }

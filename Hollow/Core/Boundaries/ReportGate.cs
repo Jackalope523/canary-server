@@ -5,14 +5,20 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
-    public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
+	#region Schemas
+
+	public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);
 
     public record EventReport(ulong Id, ulong ReportingUserId, ulong ReportedEventId,
         ulong ReportedEventHostId, DateTimeOffset ReportTime,
         EventReportType ReportType, string ReportDetails);
 
-    public interface IReportDatabase
+	#endregion
+
+	#region Gates
+
+	public interface IReportDatabase
     {
         (List<UserReport>, List<EventReport>) GetReportsForUser(ulong userId);
         (List<UserReport>, List<EventReport>) GetReportsByUser(ulong userId);
@@ -32,5 +38,7 @@ namespace Core.Boundaries
         Task ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
             EventReportType reportType, string reportDetails);
     }
+
+	#endregion
 }
 

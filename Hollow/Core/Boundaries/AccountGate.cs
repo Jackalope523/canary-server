@@ -7,6 +7,8 @@ using Shared;
 
 namespace Core.Boundaries
 {
+	#region Schemas
+
 	public enum UserAccountStatus
 	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }
 
@@ -17,6 +19,10 @@ namespace Core.Boundaries
 
 	public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
+
+	#endregion
+
+	#region Gates
 
 	public interface IAccountDatabase
 	{
@@ -59,4 +65,6 @@ namespace Core.Boundaries
 	{
 		Task SendSMSAsync(string phoneNumber, string message);
 	}
+
+	#endregion
 }

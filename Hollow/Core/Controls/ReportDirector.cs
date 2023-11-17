@@ -9,9 +9,15 @@ namespace Core.Controls
 {
 	internal class ReportDirector : AbstractDirector, IReportOperations
 	{
+		#region Initialisation
+
 		public ReportDirector(CoreTerminal terminal) : base(terminal) { }
 
-        public async Task ReportUserAsync(ulong userId, ulong targetId,
+		#endregion
+
+		#region Operations
+
+		public async Task ReportUserAsync(ulong userId, ulong targetId,
             UserReportType reportType, string reportDetails)
         {
             Event occuringEvent = new(Events.FindCurrentEventForUser(targetId));
@@ -53,7 +59,11 @@ namespace Core.Controls
             }
         }
 
-        internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
+		#endregion
+
+		#region Favours
+
+		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
             GetAllReportsAsync(ulong userId)
         {
             return Reports.GetReportsForUser(userId);
@@ -63,6 +73,8 @@ namespace Core.Controls
         {
             return Reports.GetReportsForEvent(eventId);
         }
-    }
+
+		#endregion
+	}
 }
 

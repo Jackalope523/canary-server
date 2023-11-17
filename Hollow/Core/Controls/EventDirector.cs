@@ -12,7 +12,13 @@ namespace Core.Controls
 {
 	internal class EventDirector : AbstractDirector, IEventOperations
 	{
+		#region Initialisation
+
 		public EventDirector(CoreTerminal terminal) : base(terminal) { }
+
+		#endregion
+
+		#region Operations
 
 		public async Task<EventShard> GetEventInformationAsync(ulong userId, ulong eventId)
         {
@@ -272,13 +278,17 @@ namespace Core.Controls
 			}
 		}
 
+		#endregion
+
+		#region Favours
 
 		internal async Task<List<UserSilhouette>> GetGuestsInternalAsync(ulong eventId)
 		{
 			return Events.GetGuests(eventId);
 		}
 
-		internal async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetAllGuestsInternalAsync(ulong eventId)
+		internal async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>>
+			GetAllGuestsInternalAsync(ulong eventId)
 		{
 			return Events.GetGuestHistory(eventId);
 		}
@@ -333,6 +343,9 @@ namespace Core.Controls
 			return Events.FindCurrentEventForUser(userId);
 		}
 
+		#endregion
+
+		#region Tools
 
 		private async Task ThrowIfUserAtEvent(ulong userId)
 		{
@@ -342,5 +355,7 @@ namespace Core.Controls
 			if (user.IsAtEvent)
 			{ throw new InvalidUserException("User is currently attending an event."); }
 		}
-    }
+
+		#endregion
+	}
 }

@@ -40,6 +40,8 @@ namespace Core.Entities
 
 		#endregion
 
+		#region Initialisation & Extraction
+
 		public Event() { }
 
         public Event(ulong eventId)
@@ -88,6 +90,10 @@ namespace Core.Entities
             return new(Id, Name, EndTime.HasValue, lastActiveTime);
         }
 
+		#endregion
+
+		#region Synchronisation
+
 		public async Task SyncReports()
 		{
 			EventReports = await CoreTerminal.Terminal.ReportDirector.GetEventReportsAsync(Id);
@@ -98,7 +104,11 @@ namespace Core.Entities
             EventEtchings = await CoreTerminal.Terminal.EtchingDirector.GetEventEtchingsAsync(Id);
         }
 
-        public bool ValidateAndNormalise()
+		#endregion
+
+		#region Composition
+
+		public bool ValidateAndNormalise()
         { 
             // Sanitise User content
             Name = ContentValidation.NormaliseText(Name[..MaximumNameLength]);
@@ -114,6 +124,10 @@ namespace Core.Entities
 
             return true;
         }
+
+		#endregion
+
+		#region Checks
 
 		public async Task<bool> IsVisibleTo(User user)
 		{
@@ -189,7 +203,11 @@ namespace Core.Entities
         public bool IsInRange(User user)
             => GeoLocation.AreInRange(Location, user.LastKnownLocation, GuestDistance);
 
-        public async Task<bool> Reported()
+		#endregion
+
+		#region Effects
+
+		public async Task<bool> Reported()
         {
             await SyncReports();
 
@@ -199,5 +217,11 @@ namespace Core.Entities
 
             return true;
         }
-    }
+
+		#endregion
+
+		#region Actions
+
+		#endregion
+	}
 }

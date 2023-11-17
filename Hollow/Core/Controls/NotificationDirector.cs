@@ -10,7 +10,13 @@ namespace Core.Controls
 {
 	internal class NotificationDirector : AbstractDirector, INotificationOperations
 	{
+		#region Initialisation
+
 		public NotificationDirector(CoreTerminal terminal) : base(terminal) { }
+
+		#endregion
+
+		#region Operations
 
 		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
 		{
@@ -22,6 +28,9 @@ namespace Core.Controls
 			Notifications.UnsubscribeUser(userId);
 		}
 
+		#endregion
+
+		#region Favours
 
 		internal async Task NotifyUserAsync(ulong userId, string title, string message)
 		{
@@ -32,5 +41,7 @@ namespace Core.Controls
 
 			await Terminal.NotificationService.PushNotification(userSettings.DeviceType, userSettings.DeviceToken, title, message);
 		}
+
+		#endregion
 	}
 }
