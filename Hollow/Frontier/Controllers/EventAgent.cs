@@ -38,7 +38,9 @@ namespace Frontier.Controllers
             {
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
-                targetEvent = await events.GetEventInformationAsync(user.Id, eventId);
+				ThrowIfUnverified(user);
+
+				targetEvent = await events.GetEventInformationAsync(user.Id, eventId);
 			}
 			catch (Exception e)
 			{
@@ -62,7 +64,9 @@ namespace Frontier.Controllers
             {
 				// Create a new event as the current user
 				var user = await GetCurrentUserAsync();
-                newEvent = await events.CreateEventAsync(user.Id,
+				ThrowIfUnverified(user);
+
+				newEvent = await events.CreateEventAsync(user.Id,
 					eventDetails.EventName, eventDetails.EventDescription,
 					eventDetails.StartTime,	eventDetails.Latitude, eventDetails.Longitude,
 					eventDetails.GroupMinimum, eventDetails.GroupMaximum);
@@ -86,6 +90,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await events.EditEventAsync(user.Id, eventId,
 					eventDescription: eventDetails.EventDescription ?? "",
 					isOpen: eventDetails.EventIsOpen);
@@ -105,6 +111,8 @@ namespace Frontier.Controllers
 			{
 				// End an event as the current user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await events.EndEventAsync(user.Id, eventId);
 			}
 			catch (Exception e)
@@ -122,6 +130,8 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await events.WatchEventAsync(user.Id, eventId);
 			}
 			catch (Exception e)
@@ -139,6 +149,8 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await events.UnwatchEventAsync(user.Id, eventId);
 			}
 			catch (Exception e)
@@ -156,6 +168,8 @@ namespace Frontier.Controllers
 			{
 				// Join an event as the current user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await events.JoinEventAsync(user.Id, eventId);
 			}
 			catch (Exception e)
@@ -173,6 +187,8 @@ namespace Frontier.Controllers
 			{
 				// Leave an event as the current user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await events.LeaveEventAsync(user.Id, eventId);
 			}
 			catch (Exception e)
@@ -194,7 +210,9 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
-                await reports.ReportEventAsync(user.Id, eventId, hostId, report.ReportType, report.ReportDetails);
+				ThrowIfUnverified(user);
+
+				await reports.ReportEventAsync(user.Id, eventId, hostId, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{
@@ -213,6 +231,8 @@ namespace Frontier.Controllers
 			{
 				// Retrieve event information as current user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				eventEtchings = await etchings.GetEventEtchingsAsync(user.Id, eventId);
 			}
 			catch (Exception e)
@@ -236,6 +256,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				newEtching = await etchings.AddEtchingAsync(user.Id, eventId, etching.ImageURL);
 			}
 			catch (Exception e)
@@ -252,6 +274,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await etchings.RemoveEtchingAsync(user.Id, etchingId);
 			}
 			catch (Exception e)
@@ -273,6 +297,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await etchings.RateEtchingAsync(user.Id, etchingId, details.Rating);
 			}
 			catch (Exception e)

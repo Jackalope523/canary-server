@@ -39,6 +39,8 @@ namespace Frontier.Controllers
 			{
 				// Retrieve profile
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				profile = await profiles.GetUserProfileAsync(user.Id, targetIdentification);
 			}
 			catch (InvalidUserException e)
@@ -63,6 +65,8 @@ namespace Frontier.Controllers
 			{
 				// Retrieve nest
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				nest = await profiles.GetUserNestAsync(user.Id, targetIdentification);
 			}
 			catch (InvalidUserException e)
@@ -89,6 +93,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await profiles.RateUserAsync(user.Id, targetIdentification, details.Rating);
             }
             catch (InvalidUserException e)
@@ -113,6 +119,8 @@ namespace Frontier.Controllers
 			{
 				// Retrieve activity
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				activity = await profiles.GetUserActivityAsync(user.Id, targetIdentification);
 			}
 			catch (InvalidUserException e)
@@ -137,6 +145,8 @@ namespace Frontier.Controllers
 			{
 				// Retrieve activity
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				activity = await profiles.GetFriendActivityAsync(user.Id);
 			}
 			catch (Exception e)
@@ -156,6 +166,8 @@ namespace Frontier.Controllers
 			{
 				// Retrieve all users that the current user is following
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				followedUsers = await profiles.GetFollowedUsersAsync(user.Id);
 			}
 			catch (Exception e)
@@ -178,6 +190,8 @@ namespace Frontier.Controllers
 			{
 				// Follow other user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await profiles.FollowUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
@@ -200,6 +214,8 @@ namespace Frontier.Controllers
 			{
 				// Unfollow other user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await profiles.UnfollowUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
@@ -219,6 +235,8 @@ namespace Frontier.Controllers
 			{
 				// Retrieve all users that the current user is blocking
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				blockedUsers = await profiles.GetBlockedUsersAsync(user.Id);
 			}
 			catch (Exception e)
@@ -241,6 +259,8 @@ namespace Frontier.Controllers
 			{
 				// Block other user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await profiles.BlockUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
@@ -263,6 +283,8 @@ namespace Frontier.Controllers
 			{
 				// Unblock other user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await profiles.UnblockUserAsync(user.Id, info.TargetId);
 			}
 			catch (Exception e)
@@ -284,6 +306,8 @@ namespace Frontier.Controllers
 			try
 			{
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)

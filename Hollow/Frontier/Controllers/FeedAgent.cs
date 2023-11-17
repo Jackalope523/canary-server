@@ -44,7 +44,9 @@ namespace Frontier.Controllers
             {
                 // Retrieve current user
                 var user = await GetCurrentUserAsync();
-                userFeed = await etchings.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
+				ThrowIfUnverified(user);
+
+				userFeed = await etchings.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
 			}
 			catch (Exception e)
 			{

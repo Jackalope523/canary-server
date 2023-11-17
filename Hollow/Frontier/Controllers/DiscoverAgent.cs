@@ -37,6 +37,8 @@ namespace Frontier.Controllers
             {
                 // Retrieve events personalised for the current user
                 var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
                 eventList = await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
 			}
 			catch (Exception e)
@@ -56,6 +58,8 @@ namespace Frontier.Controllers
 			{
                 // Retrieve all events available to the current user
 				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
 				eventList = await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
 			}
 			catch (Exception e)

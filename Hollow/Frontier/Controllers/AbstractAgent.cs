@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace Frontier.Controllers
 {
@@ -73,6 +74,12 @@ namespace Frontier.Controllers
 		public async Task<UserShard> GetCurrentUserAsync()
 		{
 			return await userManager.GetUserAsync(HttpContext.User);
+		}
+
+		public void ThrowIfUnverified(UserShard user)
+		{
+			if (user.IsEmailConfirmed)
+			{ throw new InvalidUserException("User has not yet confirmed their email."); }
 		}
 
 		#endregion
