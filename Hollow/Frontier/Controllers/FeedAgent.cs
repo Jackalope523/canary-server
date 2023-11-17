@@ -1,44 +1,41 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Repository.Entities;
-using Core.Boundaries;
-using Frontier.Manifests;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Frontier.Manifests;
+using Core.Boundaries;
 
 namespace Frontier.Controllers
 {
     [Route("feed")]
-    [ApiController]
-    [Authorize]
-    public class FeedAgent : ControllerBase
+    public class FeedAgent : AbstractAgent
     {
-        enum FeedError
-        {
-            MissingInformation,
-            CouldNotFindEvent,
-            CouldNotCompleteRequest
-        }
+		#region Initialisation
 
-        IEtchingOperations etchings;
-        UserManager<UserShard> userManager;
+		public FeedAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				reportOperations, notificationOperations,
+				externalSMSService, externalEmailService)
+		{ }
 
-        public FeedAgent(IEtchingOperations etchingOperations, UserManager<UserShard> identityUserManager)
-        {
-            etchings = etchingOperations;
-            userManager = identityUserManager;
-        }
+		#endregion
 
-        [HttpGet("{feedDepth}")]
+		#region Actions
+
+		[HttpGet("{feedDepth}")]
         public async Task<IActionResult> GetFeed([FromBody] FeedManifest feedOptions)
         {
             if (feedOptions == null || !ModelState.IsValid)
             {
-                return BadRequest(FeedError.MissingInformation.ToString());
+                return BadRequest(HollowError.MissingInformation.ToString());
             }
 
             (int Depth, List<EventHeader>, List<Etching>) userFeed;
@@ -57,10 +54,6 @@ namespace Frontier.Controllers
 			return Ok(userFeed);
         }
 
-		private async Task<UserShard> GetCurrentUserAsync()
-        {
-			return await userManager.GetUserAsync(HttpContext.User);
-		}
+		#endregion
 	}
-
 }

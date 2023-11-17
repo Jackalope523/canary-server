@@ -1,46 +1,39 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Core.Boundaries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System;
 using System.Threading.Tasks;
-using Frontier.Manifests;
-using Shared;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Org.BouncyCastle.Asn1.X509;
-
+using Microsoft.AspNetCore.Mvc;
+using Frontier.Manifests;
+using Core.Boundaries;
 
 namespace Frontier.Controllers
 {
 	[Route("notifications")]
-	[ApiController]
-	[Authorize]
-	public class NotificationAgent : ControllerBase
+	public class NotificationAgent : AbstractAgent
 	{
-		enum NotificationError
-		{
-			MissingInformation,
-			CouldNotCompleteRequest
-		}
+		#region Initialisation
 
-		INotificationOperations notifications;
-		UserManager<UserShard> userManager;
+		public NotificationAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				reportOperations, notificationOperations,
+				externalSMSService, externalEmailService)
+		{ }
 
-		public NotificationAgent(INotificationOperations notificationOperations, UserManager<UserShard> identityUserManager)
-		{
-			notifications = notificationOperations;
-			userManager = identityUserManager;
-		}
+		#endregion
+
+		#region Actions
 
 		[HttpPost]
 		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
 		{
 			if (subscription == null || !ModelState.IsValid)
 			{
-				return BadRequest(NotificationError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -72,9 +65,6 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		private async Task<UserShard> GetCurrentUserAsync()
-		{
-			return await userManager.GetUserAsync(HttpContext.User);
-		}
+		#endregion
 	}
 }

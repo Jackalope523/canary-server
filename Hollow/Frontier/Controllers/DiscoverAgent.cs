@@ -1,38 +1,34 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Core.Boundaries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Frontier.Controllers
 {
     [Route("discover")]
-    [ApiController]
-    [Authorize]
-    public class DiscoverAgent : ControllerBase
-    {
-        enum DiscoverError
-        {
-            MissingInformation,
-            CouldNotFindEvent,
-            CouldNotCompleteRequest
-        }
+    public class DiscoverAgent : AbstractAgent
+	{
+		#region Initialisation
 
-        IAccountOperations accounts;
-        IEventOperations events;
-		UserManager<UserShard> userManager;
+		public DiscoverAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				reportOperations, notificationOperations,
+				externalSMSService, externalEmailService)
+		{ }
 
-		public DiscoverAgent(IAccountOperations accountOperations, IEventOperations eventOperations, UserManager<UserShard> identityUserManager)
-        {
-            accounts = accountOperations;
-            events = eventOperations;
-            userManager = identityUserManager;
-        }
+		#endregion
 
-        [HttpGet("{latitude}-{longitude}-{distance}")]
+		#region Actions
+
+		[HttpGet("{latitude}-{longitude}-{distance}")]
         public async Task<IActionResult> GetEvents(float latitude, float longitude, float distance)
         {
             List<EventThinSlice> eventList;
@@ -86,10 +82,6 @@ namespace Frontier.Controllers
             return Ok();
         }
 
-		private async Task<UserShard> GetCurrentUserAsync()
-        {
-			return await userManager.GetUserAsync(HttpContext.User);
-		}
+		#endregion
 	}
-
 }

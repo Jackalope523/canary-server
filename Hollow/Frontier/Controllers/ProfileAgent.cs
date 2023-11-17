@@ -1,41 +1,34 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Core.Boundaries;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using Frontier.Manifests;
-using Shared;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Frontier.Manifests;
+using Core.Boundaries;
+using Shared;
 
 namespace Frontier.Controllers
 {
     [Route("profile")]
-    [ApiController]
-	[Authorize]
-    public class ProfileAgent : ControllerBase
+    public class ProfileAgent : AbstractAgent
 	{
-		enum ProfileError
-		{
-			MissingInformation,
-			CouldNotCompleteRequest,
-			CouldNotFindUser
-		}
+		#region Initialisation
 
-		IProfileOperations profiles;
-		IReportOperations reports;
-		UserManager<UserShard> userManager;
+		public ProfileAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				reportOperations, notificationOperations,
+				externalSMSService, externalEmailService)
+		{ }
 
-		public ProfileAgent(IProfileOperations profileOperations,
-			IReportOperations reportOperations,UserManager<UserShard> identityUserManager)
-		{
-			profiles = profileOperations;
-			reports = reportOperations;
-			userManager = identityUserManager;
-		}
+		#endregion
+
+		#region Actions
 
 		[HttpGet("{targetIdentification}")]
         public async Task<IActionResult> GetProfile(ulong targetIdentification)
@@ -90,7 +83,7 @@ namespace Frontier.Controllers
         {
             if (details != null && !ModelState.IsValid)
             {
-                return BadRequest(ProfileError.MissingInformation.ToString());
+                return BadRequest(HollowError.MissingInformation.ToString());
             }
 
 			try
@@ -178,7 +171,7 @@ namespace Frontier.Controllers
 		{
 			if (info == null || !ModelState.IsValid)
 			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -200,7 +193,7 @@ namespace Frontier.Controllers
 		{
 			if (info == null || !ModelState.IsValid)
 			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -241,7 +234,7 @@ namespace Frontier.Controllers
 		{
 			if (info == null || !ModelState.IsValid)
 			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -263,7 +256,7 @@ namespace Frontier.Controllers
 		{
 			if (info == null || !ModelState.IsValid)
 			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -285,7 +278,7 @@ namespace Frontier.Controllers
 		{
 			if (report == null || !ModelState.IsValid)
 			{
-				return BadRequest(ProfileError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -301,10 +294,6 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		private async Task<UserShard> GetCurrentUserAsync()
-		{
-			return await userManager.GetUserAsync(HttpContext.User);
-		}
+		#endregion
 	}
-
 }

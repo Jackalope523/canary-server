@@ -1,54 +1,37 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
-using Core.Boundaries;
-using Frontier.Manifests;
-using System.Net;
-using Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Frontier.Services;
+using Microsoft.AspNetCore.Mvc;
+using Frontier.Manifests;
+using Core.Boundaries;
+using Shared;
 
 namespace Frontier.Controllers
 {
     [Route("account")]
-    [ApiController]
-    [Authorize]
-    public class AccountAgent : ControllerBase
-    {
-		enum AccountError
-		{
-			MissingInformation,
-            IncorrectCode,
-            UserLockedOut,
-			CouldNotLoginUser,
-			CouldNotCreateUser,
-            CouldNotModifyUser
-		}
+    public class AccountAgent : AbstractAgent
+	{
+		#region Initialisation
 
-		IAccountOperations accounts;
-        UserManager<UserShard> userManager;
-        SignInManager<UserShard> signInManager;
+		public AccountAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				reportOperations, notificationOperations,
+				externalSMSService, externalEmailService)
+		{ }
 
-        ISMSService smsService;
-        IEmailService emailService;
+		#endregion
 
-        public AccountAgent(IAccountOperations accountOperations,
-            UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-            ISMSService externalSMSService, IEmailService externalEmailService)
-        {
-            accounts = accountOperations;
-            userManager = identityUserManager;
-            signInManager = identitySignInManager;
+		#region Actions
 
-            smsService = externalSMSService;
-            emailService = externalEmailService;
-        }
-
-        [HttpGet]
+		[HttpGet]
         public async Task<IActionResult> GetAccount()
         {
             UserShard user;
@@ -72,7 +55,7 @@ namespace Frontier.Controllers
         {
             if (credentials == null || !ModelState.IsValid)
             {
-                return BadRequest(AccountError.MissingInformation.ToString());
+                return BadRequest(HollowError.MissingInformation.ToString());
             }
 
             try
@@ -128,7 +111,7 @@ namespace Frontier.Controllers
         {
 			if (credentials == null || !ModelState.IsValid || credentials.Code == null)
             {
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -137,7 +120,7 @@ namespace Frontier.Controllers
                 
                 if (await userManager.IsLockedOutAsync(user))
                 {
-                    return BadRequest(AccountError.UserLockedOut.ToString());
+                    return BadRequest(HollowError.UserLockedOut.ToString());
                 }
 
                 // Check if the account is activated
@@ -154,7 +137,7 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-                        return BadRequest(AccountError.IncorrectCode.ToString());
+                        return BadRequest(HollowError.IncorrectCode.ToString());
                     }
                 }
                 else
@@ -178,7 +161,7 @@ namespace Frontier.Controllers
 					else
 					{
                         await userManager.AccessFailedAsync(user);
-						return BadRequest(AccountError.IncorrectCode.ToString());
+						return BadRequest(HollowError.IncorrectCode.ToString());
 					}
 				}
 			}
@@ -196,7 +179,7 @@ namespace Frontier.Controllers
         {
 			if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
 			{
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -204,7 +187,7 @@ namespace Frontier.Controllers
 				var user = await userManager.FindByEmailAsync(email);
 				if (user == null)
                 {
-					return BadRequest(AccountError.MissingInformation.ToString());
+					return BadRequest(HollowError.MissingInformation.ToString());
                 }
 
 				var result = await userManager.ConfirmEmailAsync(user, token);
@@ -223,7 +206,7 @@ namespace Frontier.Controllers
         {
             if (string.IsNullOrEmpty(email))
 			{
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
             try
@@ -231,7 +214,7 @@ namespace Frontier.Controllers
 				var user = await userManager.FindByEmailAsync(email);
 				if (user == null)
                 {
-					return BadRequest(AccountError.MissingInformation.ToString());
+					return BadRequest(HollowError.MissingInformation.ToString());
                 }
 
                 // Send verification email if email is not confirmed
@@ -256,7 +239,7 @@ namespace Frontier.Controllers
 		{
 			if (details == null || !ModelState.IsValid)
 			{
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
             try
@@ -302,7 +285,7 @@ namespace Frontier.Controllers
         {
 			if (details == null || !ModelState.IsValid)
 			{
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
             try
@@ -323,10 +306,6 @@ namespace Frontier.Controllers
 			return Ok();
         }
 
-        private async Task<UserShard> GetCurrentUserAsync()
-        {
-            return await userManager.GetUserAsync(HttpContext.User);
-        }
-    }
-
+		#endregion
+	}
 }

@@ -1,23 +1,36 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Core.Boundaries;
 
 namespace Frontier.Controllers
 {
     [Route("")]
-    [ApiController]
-    public class RootAgent : ControllerBase
+    public class RootAgent : AbstractAgent
     {
+		#region Initialisation
 
-        [HttpGet]
+		public RootAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+            IAccountOperations accountOperations, IProfileOperations profileOperations,
+            IEventOperations eventOperations, IEtchingOperations etchingOperations,
+            IReportOperations reportOperations, INotificationOperations notificationOperations,
+            ISMSService externalSMSService, IEmailService externalEmailService) :
+            base(identityUserManager, identitySignInManager,
+                accountOperations, profileOperations,
+                eventOperations, etchingOperations,
+                reportOperations, notificationOperations,
+                externalSMSService, externalEmailService)
+		{ }
+
+		#endregion
+
+		#region Actions
+
+		[HttpGet]
         public IActionResult IAmRoot()
         {
             return new StatusCodeResult(418);
         }
 
-    }
-    
+		#endregion
+	}
 }

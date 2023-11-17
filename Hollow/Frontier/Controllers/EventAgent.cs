@@ -1,51 +1,35 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Core.Boundaries;
-using Frontier.Manifests;
-using System.Net;
-using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Repository.Entities;
-using Twilio.TwiML.Voice;
-using Microsoft.Extensions.Hosting;
-using Shared;
+using Microsoft.AspNetCore.Mvc;
+using Frontier.Manifests;
+using Core.Boundaries;
 
 namespace Frontier.Controllers
 {
     [Route("event")]
-    [ApiController]
-	[Authorize]
-    public class EventAgent : ControllerBase
-    {
-        enum EventError
-		{
-			MissingInformation,
-			CouldNotFindEvent,
-			CouldNotCompleteRequest
-		}
+    public class EventAgent : AbstractAgent
+	{
+		#region Initialisation
 
-		IEventOperations events;
-		IEtchingOperations etchings;
-		IReportOperations reports;
-		UserManager<UserShard> userManager;
+		public EventAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				reportOperations, notificationOperations,
+				externalSMSService, externalEmailService)
+		{ }
 
-		public EventAgent(IEventOperations eventOperations,
-			IEtchingOperations etchingOperations, IReportOperations reportOperations,
-			UserManager<UserShard> identityUserManager)
-        {
-            events = eventOperations;
-			etchings = etchingOperations;
-			reports = reportOperations;
-			userManager = identityUserManager;
-        }
+		#endregion
 
-        [HttpGet("{eventId}")]
+		#region Actions
+
+		[HttpGet("{eventId}")]
         public async Task<IActionResult> GetEvent(ulong eventId)
         {
 			EventShard targetEvent;
@@ -69,7 +53,7 @@ namespace Frontier.Controllers
         {
             if (eventDetails == null || !ModelState.IsValid)
             {
-                return BadRequest(EventError.MissingInformation.ToString());
+                return BadRequest(HollowError.MissingInformation.ToString());
             }
 
 			EventShard newEvent;
@@ -96,7 +80,7 @@ namespace Frontier.Controllers
 		{
 			if (eventDetails == null || !ModelState.IsValid)
 			{
-				return BadRequest(EventError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -204,7 +188,7 @@ namespace Frontier.Controllers
 		{
 			if (report == null || !ModelState.IsValid)
 			{
-				return BadRequest(EventError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -244,7 +228,7 @@ namespace Frontier.Controllers
 		{
 			if (etching == null || !ModelState.IsValid)
 			{
-				return BadRequest(EventError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			Etching newEtching;
@@ -283,7 +267,7 @@ namespace Frontier.Controllers
 		{
 			if (details == null || !ModelState.IsValid)
 			{
-				return BadRequest(EventError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -299,10 +283,6 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
-		private async Task<UserShard> GetCurrentUserAsync()
-		{
-			return await userManager.GetUserAsync(HttpContext.User);
-		}
+		#endregion
 	}
-
 }
