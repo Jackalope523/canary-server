@@ -37,6 +37,7 @@ namespace Core.Boundaries
 		bool SetUserState(ulong userId, ulong eventId, EventUserState userState);
 		bool RemoveUser(ulong userId, ulong eventId);
 
+		List<(UserSilhouette User, EventUserState State)> GetAllUsers(ulong eventId);
 		List<UserSilhouette> GetWatchers(ulong eventId);
 		List<UserSilhouette> GetAttendees(ulong eventId);
 		List<UserSilhouette> GetGuests(ulong eventId);
@@ -62,7 +63,8 @@ namespace Core.Boundaries
 		Task LeaveEventAsync(ulong userId, ulong eventId);
 		Task EndEventAsync(ulong userId, ulong eventId);
 
-		Task<List<UserSilhouette>> GetAttendeesAsync(ulong userId, ulong eventId);
+		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
+			GetGuestListAsync(ulong userId, ulong eventId);
 	}
 
 	#endregion

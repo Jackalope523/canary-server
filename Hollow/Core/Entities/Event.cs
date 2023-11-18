@@ -31,8 +31,12 @@ namespace Core.Entities
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
 
+        public List<(UserSilhouette User, EventUserState State)> AllUsers { get; set; }
+        public List<UserSilhouette> Watchers { get; set; }
+        public List<UserSilhouette> Incoming { get; set; }
         public List<UserSilhouette> Guests { get; set; }
-        public List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> AllGuests { get; set; }
+        public List<UserSilhouette> Left { get; set; }
+        public List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GuestHistory { get; set; }
 
 		public List<EventReport> EventReports { get; set; }
 
@@ -98,6 +102,15 @@ namespace Core.Entities
 		{
 			EventReports = await CoreTerminal.Terminal.ReportDirector.GetEventReportsAsync(Id);
 		}
+
+        public async Task SyncUsers()
+        {
+            AllUsers = await CoreTerminal.Terminal.EventDirector.GetAllUsersAsync(Id);
+            Watchers = AllUsers.FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User);
+            Incoming = AllUsers.FindAll(user => user.State.Equals(EventUserState.Attending)).ConvertAll(user => user.User);
+            Guests = AllUsers.FindAll(user => user.State.Equals(EventUserState.Present)).ConvertAll(user => user.User);
+            Left = AllUsers.FindAll(user => user.State.Equals(EventUserState.Left)).ConvertAll(user => user.User);
+        }
 
         public async Task SyncEtchings()
         {
@@ -169,7 +182,7 @@ namespace Core.Entities
         public async Task<bool> IsModifiableBy(User user)
         {
 			// Check if user is event host
-			if (Host.Id == user.Id)
+			if (Host.Id.Equals(user.Id))
 			{ return true; }
 
 			return false;
@@ -191,10 +204,11 @@ namespace Core.Entities
 
         public async Task<bool> WasAttendedBy(User user)
         {
-            AllGuests ??= await CoreTerminal.Terminal.EventDirector.GetAllGuestsInternalAsync(Id);
+            if (Guests == null || Left == null)
+            { await SyncUsers(); }
 
             // Check if user is or was on the guest list
-            return AllGuests.Find(x => x.User.Id == user.Id).User != null;
+            return Guests.Find(x => x.Id == user.Id) != null || Left.Find(x => x.Id == user.Id) != null;
 		}
 
         public bool IsInRange(ulong userId)

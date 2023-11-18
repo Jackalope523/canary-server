@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
+using Shared;
 
 namespace Frontier.Controllers
 {
@@ -197,6 +198,26 @@ namespace Frontier.Controllers
 			}
 
 			return Ok();
+		}
+
+		[HttpGet("{eventId}/guests")]
+		public async Task<IActionResult> GetGuestList(ulong eventId)
+		{
+			(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests) guestList;
+
+			try
+			{
+				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
+				guestList = await events.GetGuestListAsync(user.Id, eventId);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok(guestList);
 		}
 
 		[HttpPost("{eventId}/report")]

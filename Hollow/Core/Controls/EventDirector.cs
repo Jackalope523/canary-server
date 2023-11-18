@@ -250,37 +250,107 @@ namespace Core.Controls
 			}
         }
 
-		public async Task<List<UserSilhouette>> GetAttendeesAsync(ulong userId, ulong eventId)
+		public async Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
+			GetGuestListAsync(ulong userId, ulong eventId)
 		{
-			Event targetEvent = new(eventId);
+			var user = await GetUser(userId);
+			var targetEvent = await GetEvent(eventId);
 
-			// Check if user attended
-			if (await targetEvent.IsAttendedBy(userId))
-			{
-				return targetEvent.Guests;
-			}
-			else
+			(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)
+				guestList = new(0, 0, new());
+
+			await targetEvent.SyncUsers();
+
+			// Check if user is host
+			if (await targetEvent.IsModifiableBy(userId))
 			{
 				// Retrieve user's friends
 				var friends = Profiles.GetFriends(userId);
-				List<UserSilhouette> friendAttendees = new();
 
-				// Check if any friends are attending
+				// Check if any friends are watching
 				foreach (var friend in friends)
 				{
-					if (await targetEvent.WasAttendedBy(friend.Id))
+					var friendDetails = targetEvent.Watchers.Find(guest => guest.Id.Equals(friend.Id));
+					if (friendDetails != null)
 					{
-						friendAttendees.Add(friend);
+						guestList.Guests.Add((friendDetails, EventUserState.Watching));
 					}
 				}
 
-				return friendAttendees;
+				// Add visible information
+				guestList.Guests.AddRange(targetEvent.Incoming.ConvertAll(guest => (guest, EventUserState.Attending)));
+				guestList.Guests.AddRange(targetEvent.Guests.ConvertAll(guest => (guest, EventUserState.Present)));
+				guestList.Guests.AddRange(targetEvent.Left.ConvertAll(guest => (guest, EventUserState.Left)));
+
+				guestList.GuestCount = targetEvent.Guests.Count;
+				guestList.Watchers = targetEvent.Watchers.Count;
+
+				return guestList;
 			}
+			// Check if user attended
+			else if (await targetEvent.WasAttendedBy(user))
+			{
+				// Retrieve user's friends
+				var friends = Profiles.GetFriends(user.Id);
+
+				// Check if any friends are watching or incoming
+				foreach (var friend in friends)
+				{
+					var friendDetails = targetEvent.Watchers.Find(guest => guest.Id.Equals(friend.Id));
+					if (friendDetails != null)
+					{
+						guestList.Guests.Add((friendDetails, EventUserState.Watching));
+					}
+
+					friendDetails = targetEvent.Incoming.Find(guest => guest.Id.Equals(friend.Id));
+					if (friendDetails != null)
+					{
+						guestList.Guests.Add((friendDetails, EventUserState.Attending));
+					}
+				}
+
+				// Add visible information
+				guestList.Guests.AddRange(targetEvent.Guests.ConvertAll(guest => (guest, EventUserState.Present)));
+				guestList.Guests.AddRange(targetEvent.Left.ConvertAll(guest => (guest, EventUserState.Left)));
+
+				guestList.GuestCount = targetEvent.Guests.Count;
+
+				return guestList;
+			}
+			// Check if user can view event
+			else if (await targetEvent.IsVisibleTo(user))
+			{
+				// Retrieve user's friends
+				var friends = Profiles.GetFriends(user.Id);
+
+				// Check if any friends will be, are, or were attending
+				foreach (var friend in friends)
+				{
+					var friendDetails = targetEvent.AllUsers.Find(guestDetails => guestDetails.User.Id.Equals(friend.Id));
+					if (friendDetails.User != null)
+					{
+						guestList.Guests.Add(friendDetails);
+					}
+				}
+
+				// Add visible information
+				guestList.GuestCount = targetEvent.Guests.Count;
+
+				return guestList;
+			}
+
+			// User cannot recieve information about event
+			throw new InvalidUserException("User cannot view event.");
 		}
 
 		#endregion
 
 		#region Favours
+		
+		internal async Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId)
+		{
+			return Events.GetAllUsers(eventId);
+		}
 
 		internal async Task<List<UserSilhouette>> GetGuestsInternalAsync(ulong eventId)
 		{
