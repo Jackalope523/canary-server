@@ -232,10 +232,25 @@ namespace Core.Entities
             return true;
         }
 
-		#endregion
+        #endregion
 
-		#region Actions
+        #region Actions
 
-		#endregion
-	}
+        public async Task NotifyGuests(string title, string message)
+        {
+            if (Guests == null)
+            { await SyncUsers(); }
+
+            foreach (var guestSilhouette in Guests)
+            {
+                User guest = new(guestSilhouette);
+                if (await IsModifiableBy(guest))
+                { continue; }
+
+                guest.Notify(title, message);
+            }
+        }
+
+        #endregion
+    }
 }

@@ -57,11 +57,12 @@ namespace Core.Boundaries
 			int? groupMinimum, int? groupMaximum);
 		Task EditEventAsync(ulong userId, ulong eventId,
 			string eventDescription = "", bool? isOpen = null);
+		Task EndEventAsync(ulong userId, ulong eventId);
+
 		Task WatchEventAsync(ulong userId, ulong eventId);
 		Task UnwatchEventAsync(ulong userId, ulong eventId);
 		Task JoinEventAsync(ulong userId, ulong eventId);
 		Task LeaveEventAsync(ulong userId, ulong eventId);
-		Task EndEventAsync(ulong userId, ulong eventId);
 
 		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
 			GetGuestListAsync(ulong userId, ulong eventId);

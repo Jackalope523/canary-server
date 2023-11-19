@@ -165,6 +165,16 @@ namespace Core.Entities
             Ratings = await CoreTerminal.Terminal.ProfileDirector.GetAllRatingsAsync(Id);
         }
 
+        public async Task SyncFriends()
+        {
+            Friends = await CoreTerminal.Terminal.ProfileDirector.GetFriendsAsync(Id);
+        }
+
+        public async Task SyncFollowers()
+        {
+            FollowedBy = await CoreTerminal.Terminal.ProfileDirector.GetFollowersAsync(Id);
+        }
+
         public async Task SyncReports()
         {
             var reports = await CoreTerminal.Terminal.ReportDirector.GetAllReportsAsync(Id);
@@ -345,6 +355,18 @@ namespace Core.Entities
 		public async Task Notify(string title, string message)
         {
             await CoreTerminal.Terminal.NotificationDirector.NotifyUserAsync(Id, title, message);
+        }
+
+        public async Task NotifyFollowers(string title, string message)
+        {
+            if (FollowedBy == null)
+            { await SyncFollowers(); }
+
+            foreach (var followerSilhouette in FollowedBy)
+            {
+                User follower = new(followerSilhouette);
+                follower.Notify(title, message);
+            }
         }
 
 		#endregion

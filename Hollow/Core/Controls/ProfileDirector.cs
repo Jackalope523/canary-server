@@ -155,6 +155,11 @@ namespace Core.Controls
 
 		#region Favours
 
+        internal async Task<List<UserSilhouette>> GetFollowersAsync(ulong userId)
+        {
+            return Profiles.GetUsersFollowing(userId);
+        }
+
 		internal async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
         {
             return Profiles.GetUsersBlocking(userId);

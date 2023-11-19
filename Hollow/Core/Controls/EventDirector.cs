@@ -61,9 +61,9 @@ namespace Core.Controls
 			double latitude, double longitude,
 			int? groupMinimum, int? groupMaximum)
 		{
-			// Check if user is already at an event
-			await ThrowIfUserAtEvent(userId);
 			var user = await GetUser(userId);
+			// Check if user is already at an event
+			await ThrowIfUserAtEvent(user);
 			
 			// Check if user can host
 			if (!user.CanHost)
@@ -92,6 +92,9 @@ namespace Core.Controls
             var newEvent = Events.CreateEvent(user.Id, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter());
+
+			// Notify followers of event
+			user.NotifyFollowers($"New Sparrow Event", $"{user.Name} just created a new event {newEvent.Name}");
 
 			return newEvent;
 		}
@@ -129,6 +132,33 @@ namespace Core.Controls
 			// Push update
 			Events.UpdateEvent(targetEvent.Id, edits);
 		}
+
+		public async Task EndEventAsync(ulong userId, ulong eventId)
+		{
+			var targetEvent = await GetEvent(eventId);
+
+			// Check if the user is able to end the event
+			if (!await targetEvent.IsModifiableBy(userId))
+			{ throw new InvalidUserException("User does not have permissions to end event."); }
+
+			// Try to end to event
+			bool success = Events.EndEvent(eventId);
+            if (!success)
+            { throw new UnexpectedFailureException("Could not end event."); }
+
+			// Update all participants' vectors and notify
+			foreach (var guestDetails in Events.GetGuestHistory(targetEvent.Id))
+			{
+				User guest = new(guestDetails.User);
+
+				guest.CalculateCharacter(targetEvent, guestDetails.Left.Value - guestDetails.Joined);
+
+				Accounts.UpdateUser(guest.Id, new() { (nameof(UserShard.Character), guest.Character) });
+
+				// Notify of event ending
+				guest.Notify($"{targetEvent.Name}", $"Event has concluded.");
+			}
+        }
 
 		public async Task WatchEventAsync(ulong userId, ulong eventId)
 		{
@@ -188,12 +218,16 @@ namespace Core.Controls
 
 			// TODO Check if conflicting and check if currently active and there
 
-			await ThrowIfUserAtEvent(userId);
+			await ThrowIfUserAtEvent(user);
 
 			// Try to add user to the event
 			bool success = Events.SetUserState(userId, eventId, EventUserState.Attending);
 			if (!success)
 			{ throw new UnexpectedFailureException("Could not attend event."); }
+
+			// Notify host if event was already started
+			if (targetEvent.StartTime < DateTimeOffset.UtcNow)
+			{ targetEvent.Host.Notify($"Sparrower Inbound", $"{user.Name} is joining your event."); }
 		}
 
 		public async Task LeaveEventAsync(ulong userId, ulong eventId)
@@ -225,30 +259,6 @@ namespace Core.Controls
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not leave event, user currently {userIntention.Value} event."); }
 		}
-
-		public async Task EndEventAsync(ulong userId, ulong eventId)
-		{
-			var targetEvent = await GetEvent(eventId);
-
-			// Check if the user is able to end the event
-			if (!await targetEvent.IsModifiableBy(userId))
-			{ throw new InvalidUserException("User does not have permissions to end event."); }
-
-			// Try to end to event
-			bool success = Events.EndEvent(eventId);
-            if (!success)
-            { throw new UnexpectedFailureException("Could not end event."); }
-
-			// Update all participants' vectors
-			foreach (var guestDetails in Events.GetGuestHistory(targetEvent.Id))
-			{
-				User guest = new(guestDetails.User);
-
-				guest.CalculateCharacter(targetEvent, guestDetails.Left.Value - guestDetails.Joined);
-
-				Accounts.UpdateUser(guest.Id, new() { (nameof(UserShard.Character), guest.Character) });
-			}
-        }
 
 		public async Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
 			GetGuestListAsync(ulong userId, ulong eventId)
@@ -417,9 +427,8 @@ namespace Core.Controls
 
 		#region Tools
 
-		private async Task ThrowIfUserAtEvent(ulong userId)
+		private async Task ThrowIfUserAtEvent(User user)
 		{
-			User user = new(userId);
 			await user.SyncCurrentEvent();
 
 			if (user.IsAtEvent)
