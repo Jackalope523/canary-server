@@ -88,6 +88,9 @@ namespace Core.Controls
             if (!valid)
             { throw new InvalidInformationException("Invalid event details provided."); }
 
+			// Verify that user has no conflict
+			// TODO
+
             // Try to create an event
             var newEvent = Events.CreateEvent(user.Id, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
@@ -212,13 +215,28 @@ namespace Core.Controls
 			if (!await targetEvent.IsVisibleTo(user))
 			{ throw new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"); }
 
-			// Check if event is open
-			if (!targetEvent.IsOpen)
+			// Check if event is open and has not ended
+			if (!targetEvent.IsOpen ||
+				(targetEvent.EndTime.HasValue && targetEvent.EndTime < DateTimeOffset.UtcNow))
 			{ throw new InvalidEventException("Event is closed."); }
 
-			// TODO Check if conflicting and check if currently active and there
+			// Check if user has an active event conflict
+			if (targetEvent.StartTime < DateTimeOffset.UtcNow)
+			{ await ThrowIfUserAtEvent(user); }
+			else
+			{
+				var upcomingEvents = Events.FindUpcomingEventsForUser(user.Id);
 
-			await ThrowIfUserAtEvent(user);
+				// Check if user has an upcoming conflict
+				var conflict = upcomingEvents.Find(e => e.StartTime - targetEvent.StartTime < TimeSpan.FromMinutes(30));
+				if (conflict != null)
+				{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
+			}
+
+			// Check if event is active and user is already there
+			if (targetEvent.StartTime < DateTimeOffset.UtcNow &&
+				targetEvent.IsInRange(user))
+			{ Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Present); }
 
 			// Try to add user to the event
 			bool success = Events.SetUserState(userId, eventId, EventUserState.Attending);
