@@ -144,10 +144,37 @@ namespace Core.Controls
             Accounts.UpdateRecentLocation(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
             Accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
 
-            List<EventShard> upcomingEvents;
+            Event currentEvent = new(Events.FindCurrentEventForUser(user.Id));
+			List<EventShard> upcomingEvents;
 
-            // Check if we are attending or on our way to an event
-            if (Events.FindCurrentEventForUser(user.Id) == null &&
+            // Check if we are at an event
+            if (currentEvent != null)
+            {
+                // Check if we left the event radius
+                if (!GeoLocation.AreInRange(user.LastKnownLocation, currentEvent.Location, currentEvent.Radius))
+                {
+                    // Check if we are a guest or the host
+                    if (currentEvent.Host.Id.Equals(user.Id))
+                    {
+                        // End the event if we are the host
+                        await Terminal.EventDirector.EndEventAsync(user.Id, currentEvent.Id);
+                    }
+                    else
+                    {
+                        // Leave the event if we are a guest
+                        await Terminal.EventDirector.LeaveEventAsync(user.Id, currentEvent.Id);
+                    }
+                }
+                // Check if we are the host
+                else if (currentEvent.Host.Id.Equals(user.Id))
+                {
+                    // Update the position of the event
+                    Events.UpdateEvent(currentEvent.Id, new() { (nameof(EventShard.Latitude), user.LastKnownLocation.Latitude),
+                        (nameof(EventShard.Longitude), user.LastKnownLocation.Longitude) });
+                }
+            }
+            // Check if on our way to an event
+            else if (currentEvent == null &&
                 (upcomingEvents = Events.FindUpcomingEventsForUser(user.Id)).Count > 0)
             {
                 Event nextEvent = new(upcomingEvents[0]);

@@ -11,7 +11,8 @@ namespace Core.Boundaries
 
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
+		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character,
+		double Radius, bool IsDynamic);
 	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
 
 	#endregion
@@ -29,7 +30,8 @@ namespace Core.Boundaries
 
 		EventShard CreateEvent(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int groupMinimum, int groupMaximum, Character character);
+			int groupMinimum, int groupMaximum, Character character,
+			double Radius, bool isDynamic);
 		bool UpdateEvent(ulong eventId, List<(string Property, object Value)> edits);
 		bool EndEvent(ulong eventId);
 
@@ -54,7 +56,7 @@ namespace Core.Boundaries
 
 		Task<EventShard> CreateEventAsync(ulong userId, string eventName, string eventDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int? groupMinimum, int? groupMaximum);
+			int? groupMinimum, int? groupMaximum, double radius, bool isDynamic);
 		Task EditEventAsync(ulong userId, ulong eventId,
 			string eventDescription = "", bool? isOpen = null);
 		Task EndEventAsync(ulong userId, ulong eventId);

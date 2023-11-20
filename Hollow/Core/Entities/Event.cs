@@ -26,6 +26,8 @@ namespace Core.Entities
         public CharacterVector Character { get; set; }
         public DateTimeOffset StartTime { get; init; }
         public GeoLocation Location { get; set; }
+        public Distance Radius { get; set; }
+        public bool IsDynamic { get; set; }
         public DateTimeOffset? EndTime { get; init; }
         public bool IsOpen { get; set; }
         public int GroupMinimum { get; set; }
@@ -67,6 +69,8 @@ namespace Core.Entities
             GroupMinimum = fromEvent.GroupMinimum;
             GroupMaximum = fromEvent.GroupMaximum;
             Character = new(fromEvent.Character);
+            Radius = new() { Kilometres = fromEvent.Radius };
+            IsDynamic = fromEvent.IsDynamic;
         }
 
         public Event(EventThinSlice fromEvent)
@@ -81,7 +85,8 @@ namespace Core.Entities
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
-                IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter());
+                IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter(),
+                Radius.Kilometres, IsDynamic);
         }
 
         public EventThinSlice ToEventThinSlice()

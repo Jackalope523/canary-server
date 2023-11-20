@@ -28,6 +28,12 @@ namespace Frontier.Manifests
         public int? GroupMinimum { get; set; }
         public int? GroupMaximum { get; set; }
 
+        [Required]
+        public float Radius { get; set; }
+
+        [Required]
+        public bool IsDynamic { get; set; }
+
         public UserSilhouette Host { get; set; }
 
         public uint NumberOfParticipants { get; set; }

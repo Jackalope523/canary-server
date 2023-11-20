@@ -70,7 +70,8 @@ namespace Frontier.Controllers
 				newEvent = await events.CreateEventAsync(user.Id,
 					eventDetails.EventName, eventDetails.EventDescription,
 					eventDetails.StartTime,	eventDetails.Latitude, eventDetails.Longitude,
-					eventDetails.GroupMinimum, eventDetails.GroupMaximum);
+					eventDetails.GroupMinimum, eventDetails.GroupMaximum,
+					eventDetails.Radius, eventDetails.IsDynamic);
             }
             catch (Exception e)
 			{
