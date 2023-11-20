@@ -35,7 +35,7 @@ namespace Core.Boundaries
         Task ReportUserAsync(ulong userId, ulong targetId,
             UserReportType reportType, string reportDetails);
 
-        Task ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
+        Task ReportEventAsync(ulong userId, ulong eventId,
             EventReportType reportType, string reportDetails);
     }
 

@@ -222,7 +222,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{eventId}/report")]
-		public async Task<IActionResult> ReportEvent(ulong eventId, ulong hostId, [FromBody] EventReportManifest report)
+		public async Task<IActionResult> ReportEvent(ulong eventId, [FromBody] EventReportManifest report)
 		{
 			if (report == null || !ModelState.IsValid)
 			{
@@ -234,7 +234,7 @@ namespace Frontier.Controllers
 				var user = await GetCurrentUserAsync();
 				ThrowIfUnverified(user);
 
-				await reports.ReportEventAsync(user.Id, eventId, hostId, report.ReportType, report.ReportDetails);
+				await reports.ReportEventAsync(user.Id, eventId, report.ReportType, report.ReportDetails);
 			}
 			catch (Exception e)
 			{

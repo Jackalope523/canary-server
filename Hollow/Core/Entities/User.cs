@@ -308,13 +308,30 @@ namespace Core.Entities
             if (CurrentEvent == null)
             { await SyncCurrentEvent(); }
 
-            return CurrentEvent != null;
+            if (CurrentEvent == null)
+            { return false; }
+
+            return true;
         }
 
         public bool Etched(Etching etching)
         {
             return etching.UserId.Equals(Id);
 		}
+
+        public async Task<bool> CanReport()
+        {
+            if (Reports == null || EventReports == null)
+            { await SyncReports(); }
+            
+            var recentReportCount = Reports.Count(report => report.ReportTime > DateTimeOffset.UtcNow - TimeSpan.FromMinutes(10))
+                + EventReports.Count(report => report.ReportTime > DateTimeOffset.UtcNow - TimeSpan.FromMinutes(10));
+
+            if (recentReportCount > 3)
+            { return false; }
+
+            return true;
+        }
 
 		#endregion
 

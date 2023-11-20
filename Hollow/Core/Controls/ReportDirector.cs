@@ -20,10 +20,14 @@ namespace Core.Controls
 		public async Task ReportUserAsync(ulong userId, ulong targetId,
             UserReportType reportType, string reportDetails)
         {
+            var user = await GetUser(userId);
             var targetUser = await GetUser(targetId);
             await targetUser.SyncCurrentEvent();
             var occuringEvent = targetUser.CurrentEvent ?? new(0);
-            
+
+            Try(await user.CanReport(),
+                new InvalidUserException("User has a cooldown to report."));
+
             Reports.ReportUser(userId, occuringEvent.Id, targetUser.Id, reportType, reportDetails);
 
             // Compute user's standing
@@ -36,11 +40,16 @@ namespace Core.Controls
             }
         }
 
-        public async Task ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
+        public async Task ReportEventAsync(ulong userId, ulong eventId,
             EventReportType reportType, string reportDetails)
         {
+            User user = new(userId);
             var targetEvent = await GetEvent(eventId);
-            Reports.ReportEvent(userId, eventId, hostId, reportType, reportDetails);
+
+            Try(await user.CanReport(),
+                new InvalidUserException("User has a cooldown to report."));
+
+            Reports.ReportEvent(user.Id, targetEvent.Id, targetEvent.Host.Id, reportType, reportDetails);
 
             // Check if action is to be taken
             if (await targetEvent.Reported())
