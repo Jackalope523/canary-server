@@ -139,7 +139,7 @@ namespace Frontier.Controllers
 		[HttpGet("activity")]
 		public async Task<IActionResult> GetFriendActivity()
 		{
-			Dictionary<UserSilhouette, List<EventShard>> activity;
+			IDictionary<UserSilhouette, List<EventShard>> activity;
 
 			try
 			{

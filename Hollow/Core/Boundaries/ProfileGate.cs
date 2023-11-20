@@ -38,7 +38,7 @@ namespace Core.Boundaries
         Task<(List<EventThinSlice> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId);
 
         Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId);
-        Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId);
+        Task<IDictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId);
 
         Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
         Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);

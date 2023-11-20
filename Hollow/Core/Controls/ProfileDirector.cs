@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -82,12 +83,12 @@ namespace Core.Controls
             return upcomingActivity.ToList();
         }
 
-        public async Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId)
+        public async Task<IDictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId)
         {
             var user = await GetUser(userId);
             await user.SyncFriends();
 
-            Dictionary<UserSilhouette, List<EventShard>> friendEvents = new();
+            ConcurrentDictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
             // Gather visible activity of each friend
             user.Friends.AsParallel()
@@ -95,7 +96,7 @@ namespace Core.Controls
                 {
                     var friendActivity = await GetUserActivity(friend);
                     await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, friendActivity);
-                    friendEvents.Add(friend.ToUserSilhouette(), friendActivity);
+                    friendEvents.TryAdd(friend.ToUserSilhouette(), friendActivity);
                 });
 
             return friendEvents;
