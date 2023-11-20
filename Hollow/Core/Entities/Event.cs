@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using Shared;
 using Core.Boundaries;
 using Core.Controls;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Entities
 {
@@ -33,16 +34,16 @@ namespace Core.Entities
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
 
-        public List<(UserSilhouette User, EventUserState State)> AllUsers { get; set; }
-        public List<UserSilhouette> Watchers { get; set; }
-        public List<UserSilhouette> Incoming { get; set; }
-        public List<UserSilhouette> Guests { get; set; }
-        public List<UserSilhouette> Left { get; set; }
-        public List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GuestHistory { get; set; }
+        public List<(User User, EventUserState State)> AllUsers { get; set; }
+        public List<User> Watchers { get; set; }
+        public List<User> Incoming { get; set; }
+        public List<User> Guests { get; set; }
+        public List<User> Left { get; set; }
+        public List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)> GuestHistory { get; set; }
 
 		public List<EventReport> EventReports { get; set; }
 
-        public List<Etching> EventEtchings { get; set; }
+        public List<Etching> Etchings { get; set; }
 
 		#endregion
 
@@ -105,12 +106,12 @@ namespace Core.Entities
 
 		public async Task SyncReports()
 		{
-			EventReports = await CoreTerminal.Terminal.ReportDirector.GetEventReportsAsync(Id);
+			EventReports = await CoreTerminal.Terminal.ReportDirector.RequestEventReportsAsync(this);
 		}
 
         public async Task SyncUsers()
         {
-            AllUsers = await CoreTerminal.Terminal.EventDirector.GetAllUsersAsync(Id);
+            AllUsers = await CoreTerminal.Terminal.EventDirector.RequestAllUsersFromEventAsync(this);
             Watchers = AllUsers.FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User);
             Incoming = AllUsers.FindAll(user => user.State.Equals(EventUserState.Attending)).ConvertAll(user => user.User);
             Guests = AllUsers.FindAll(user => user.State.Equals(EventUserState.Present)).ConvertAll(user => user.User);
@@ -119,7 +120,7 @@ namespace Core.Entities
 
         public async Task SyncEtchings()
         {
-            EventEtchings = await CoreTerminal.Terminal.EtchingDirector.GetEventEtchingsAsync(Id);
+            Etchings = await CoreTerminal.Terminal.EtchingDirector.RequestEventEtchingsAsync(this);
         }
 
 		#endregion
@@ -141,6 +142,21 @@ namespace Core.Entities
                 GroupMaximum < 4)) { return false; }
 
             return true;
+        }
+
+        public async Task<List<(User User, EventUserState State)>> GetFriendsOf(User user)
+        {
+            List<(User User, EventUserState State)> friends = new();
+
+            foreach (var userDetails in AllUsers)
+            {
+                if (await user.IsFriendsWith(userDetails.User))
+                {
+                    friends.Add(userDetails);
+                }
+            }
+
+            return friends;
         }
 
 		#endregion
@@ -181,10 +197,7 @@ namespace Core.Entities
 			return true;
 		}
 
-        public async Task<bool> IsModifiableBy(ulong userId)
-            => await IsModifiableBy(new User(userId));
-
-        public async Task<bool> IsModifiableBy(User user)
+        public bool IsModifiableBy(User user)
         {
 			// Check if user is event host
 			if (Host.Id.Equals(user.Id))
@@ -193,19 +206,22 @@ namespace Core.Entities
 			return false;
         }
 
-        public async Task<bool> IsAttendedBy(ulong userId)
-            => await IsAttendedBy(new User(userId));
+        public bool IsHostedBy(User user)
+        {
+			// Check if user is event host
+			if (Host.Id.Equals(user.Id))
+			{ return true; }
+
+			return false;
+        }
 
         public async Task<bool> IsAttendedBy(User user)
         {
-            Guests ??= await CoreTerminal.Terminal.EventDirector.GetGuestsInternalAsync(Id);
+            Guests ??= await CoreTerminal.Terminal.EventDirector.RequestGuestsAsync(this);
 
             // Check if user is on the guest list
             return Guests.Find(x => x.Id == user.Id) != null;
 		}
-
-        public async Task<bool> WasAttendedBy(ulong userId)
-            => await WasAttendedBy(new User(userId));
 
         public async Task<bool> WasAttendedBy(User user)
         {
@@ -216,15 +232,43 @@ namespace Core.Entities
             return Guests.Find(x => x.Id == user.Id) != null || Left.Find(x => x.Id == user.Id) != null;
 		}
 
-        public bool IsInRange(ulong userId)
-            => IsInRange(new User(userId));
-
         public bool IsInRange(User user)
             => GeoLocation.AreInRange(Location, user.LastKnownLocation, GuestDistance);
 
 		#endregion
 
 		#region Effects
+
+        public async Task<List<User>> Ended()
+        {
+            await SyncUsers();
+
+            List<User> updatedGuests = new();
+
+            // Update all participants' vectors and notify
+			foreach ((var joined, var left, var guest) in GuestHistory)
+			{
+				guest.CalculateCharacter(this, left.Value - joined);
+
+                updatedGuests.Add(guest);
+
+				// Notify of event ending
+				_ = guest.Notify($"{Name}", $"Event has concluded.");
+			}
+
+            return updatedGuests;
+		}
+
+        public async Task Etched(User user)
+        {
+			// Ensure the user can etch into the event
+			if (!await WasAttendedBy(user))
+			{ throw new InvalidEventException("User did not attend event."); }
+
+			// Ensure etching is added within a day of event ending
+			if (EndTime.HasValue && EndTime + TimeSpan.FromDays(1) < DateTimeOffset.UtcNow)
+			{ throw new InvalidEventException("Event has already ended."); }
+		}
 
 		public async Task<bool> Reported()
         {
@@ -246,13 +290,12 @@ namespace Core.Entities
             if (Guests == null)
             { await SyncUsers(); }
 
-            foreach (var guestSilhouette in Guests)
+            foreach (var guest in Guests)
             {
-                User guest = new(guestSilhouette);
-                if (await IsModifiableBy(guest))
+                if (IsHostedBy(guest))
                 { continue; }
 
-                guest.Notify(title, message);
+                _ = guest.Notify(title, message);
             }
         }
 

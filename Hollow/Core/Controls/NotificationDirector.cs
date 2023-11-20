@@ -1,10 +1,11 @@
-﻿using Core.Boundaries;
-using Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Boundaries;
+using Core.Entities;
+using Shared;
 
 namespace Core.Controls
 {
@@ -32,9 +33,9 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task NotifyUserAsync(ulong userId, string title, string message)
+		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-			var userSettings = Notifications.GetUserSubscription(userId);
+			var userSettings = Notifications.GetUserSubscription(user.Id);
 			// Check if user is subscribed
 			if  (userSettings == (null, null))
 			{ return; }

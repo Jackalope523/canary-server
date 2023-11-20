@@ -20,18 +20,19 @@ namespace Core.Controls
 		public async Task ReportUserAsync(ulong userId, ulong targetId,
             UserReportType reportType, string reportDetails)
         {
-            Event occuringEvent = new(Events.FindCurrentEventForUser(targetId));
+            var targetUser = await GetUser(targetId);
+            await targetUser.SyncCurrentEvent();
+            var occuringEvent = targetUser.CurrentEvent ?? new(0);
             
-            Reports.ReportUser(userId, occuringEvent.Id, targetId, reportType, reportDetails);
+            Reports.ReportUser(userId, occuringEvent.Id, targetUser.Id, reportType, reportDetails);
 
             // Compute user's standing
-            var user = await GetUser(targetId);
-            var status = await user.Reported();
+            var status = await targetUser.Reported();
 
-            // Check if host should be punished
-            if (user.AccountStatus != status)
+            // Check if user should be punished
+            if (targetUser.AccountStatus != status)
             {
-                Accounts.UpdateUser(targetId, new() { (nameof(UserShard.AccountStatus), status) });
+                Accounts.UpdateUser(targetUser.Id, new() { (nameof(UserShard.AccountStatus), status) });
             }
         }
 
@@ -44,17 +45,18 @@ namespace Core.Controls
             // Check if action is to be taken
             if (await targetEvent.Reported())
             {
+                var host = await GetUser(targetEvent.Host.Id);
+
                 // Threshold hit, end event
-                await Terminal.EventDirector.EndEventAsync(targetEvent.Host.Id, eventId);
+                _ = Terminal.EventDirector.EndEventAsync(host.Id, eventId);
 
                 // Compute host's standing
-                var user = await GetUser(targetEvent.Host.Id);
-                var status = await user.EventReported();
+                var status = await host.EventReported();
 
                 // Check if host should be punished
-                if (user.AccountStatus != status)
+                if (host.AccountStatus != status)
                 {
-                    Accounts.UpdateUser(user.Id, new() { (nameof(UserShard.AccountStatus), status) });
+                    Accounts.UpdateUser(host.Id, new() { (nameof(UserShard.AccountStatus), status) });
                 }
             }
         }
@@ -64,14 +66,14 @@ namespace Core.Controls
 		#region Favours
 
 		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
-            GetAllReportsAsync(ulong userId)
+            RequestAllReportsAsync(User user)
         {
-            return Reports.GetReportsForUser(userId);
+            return Reports.GetReportsForUser(user.Id);
         }
 
-        internal async Task<List<EventReport>> GetEventReportsAsync(ulong eventId)
+        internal async Task<List<EventReport>> RequestEventReportsAsync(Event @event)
         {
-            return Reports.GetReportsForEvent(eventId);
+            return Reports.GetReportsForEvent(@event.Id);
         }
 
 		#endregion

@@ -38,9 +38,9 @@ namespace Core.Controls
 
 		#endregion
 
-		#region Favours
+		#region Tools
 
-		internal async Task<User> GetUser(ulong userId)
+		protected async Task<User> GetUser(ulong userId)
         {
             User user = new(Accounts.FindUserById(userId));
 
@@ -51,7 +51,7 @@ namespace Core.Controls
             return user;
         }
 
-        internal async Task<Event> GetEvent(ulong eventId)
+        protected async Task<Event> GetEvent(ulong eventId)
         {
             return new(Events.FindEvent(eventId));
         }

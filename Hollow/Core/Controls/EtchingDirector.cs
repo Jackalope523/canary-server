@@ -20,55 +20,54 @@ namespace Core.Controls
 
 		public async Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId)
         {
-            var user = await GetUser(userId);
+            User user = new(userId);
             Event targetEvent = new(eventId);
+            var etchingsSync = targetEvent.SyncEtchings();
 
             // Ensure user can see the event
             if (!await targetEvent.WasAttendedBy(user))
             { throw new InvalidEventException("User did not attend or is not attending event."); }
 
-            var eventEtchings = Etchings.GetEtchingsForEvent(eventId);
-
-            return eventEtchings;
+            await etchingsSync;
+            return targetEvent.Etchings;
         }
 
         public async Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL)
         {
-            User user = new(userId);
+            var user = await GetUser(userId);
             var targetEvent = await GetEvent(eventId);
 
-            // Ensure the user can etching to the event
-            if (!await targetEvent.WasAttendedBy(user))
-            { throw new InvalidEventException("User did not attend event."); }
+            await targetEvent.Etched(user);
 
-            // Ensure etching is added within a day of event ending
-            if (targetEvent.EndTime.HasValue && targetEvent.EndTime + TimeSpan.FromDays(1) < DateTimeOffset.UtcNow)
-            { throw new InvalidEventException("Event has already ended."); }
-
-            // Try to etching
-            var userEtching = Etchings.AddEtching(eventId, userId, DateTimeOffset.UtcNow, imageURL);
+            // Try to etch
+            var userEtching = Etchings.AddEtching(targetEvent.Id, user.Id, DateTimeOffset.UtcNow, imageURL);
 
             return userEtching;
         }
 
         public async Task RemoveEtchingAsync(ulong userId, ulong etchingId)
         {
-            var eventEtching = Etchings.GetEtching(etchingId);
+            User user = new(userId);
+            var etching = Etchings.GetEtching(etchingId);
+            var eventEtched = await GetEvent(etching.EventId);
 
-            // Check if user can delete etching
-            if (!eventEtching.UserId.Equals(userId))
+            // Check if user owns the etching or can modify the event
+            if (!user.Etched(etching) || !eventEtched.IsModifiableBy(user))
+            {
+                Etchings.RemoveEtching(etching.Id);
+            }
+            else
             { throw new InvalidUserException("User cannot remove etching."); }
-
-            Etchings.RemoveEtching(etchingId);
         }
 
         public async Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating)
         {
             User user = new(userId);
-            var eventOfEtching = await GetEvent(Etchings.GetEtching(etchingId).EventId);
+            var etching = Etchings.GetEtching(etchingId);
+            var eventEtched = await GetEvent(etching.EventId);
 
             // Check if user can interact with etching
-            if (!await eventOfEtching.WasAttendedBy(user))
+            if (!await eventEtched.WasAttendedBy(user))
             { throw new InvalidUserException("User cannot interact with etching."); }
 
             // Check if removing a rating
@@ -94,14 +93,14 @@ namespace Core.Controls
             var friendEtchings = Etchings.GenerateFeedForUser(user.Id, depthCharge, exclusionList);
 
             // Get the respective event headers for the etchings
-            foreach (Etching etching in friendEtchings)
+            foreach (var etching in friendEtchings)
             {
                 // Add event header if it does not yet exist
                 if (!eventHeaders.ContainsKey(etching.EventId))
                 {
-                    Event etchingEvent = new(Events.FindEvent(etching.EventId));
+                    var etchedEvent = await GetEvent(etching.EventId);
 
-                    eventHeaders.Add(etching.EventId, etchingEvent.ToEventHeader(etching.TimeEtched));
+                    eventHeaders.Add(etching.EventId, etchedEvent.ToEventHeader(etching.TimeEtched));
                 }
                 // Update event header active time if etching is more recent
                 else if (eventHeaders[etching.EventId].LastActiveTime < etching.TimeEtched)
@@ -120,9 +119,9 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task<List<Etching>> GetEventEtchingsAsync(ulong eventId)
+		internal async Task<List<Etching>> RequestEventEtchingsAsync(Event @event)
         {
-            return Etchings.GetEtchingsForEvent(eventId);
+            return Etchings.GetEtchingsForEvent(@event.Id);
         }
 
 		#endregion

@@ -52,13 +52,14 @@ namespace Core.Entities
         public int HauntStability { get; set; }
 
         public Event CurrentEvent { get; set; }
-        public bool IsAtEvent => CurrentEvent != null;
+        public List<Event> PastEvents { get; set; }
+        public List<Event> UpcomingEvents { get; set; }
 
-        public List<UserSilhouette> Friends { get; set; }
-        public List<UserSilhouette> Following { get; set; }
-        public List<UserSilhouette> FollowedBy { get; set; }
-        public List<UserSilhouette> Blocking { get; set; }
-        public List<UserSilhouette> BlockedBy { get; set; }
+        public List<User> Friends { get; set; }
+        public List<User> Following { get; set; }
+        public List<User> FollowedBy { get; set; }
+        public List<User> Blocking { get; set; }
+        public List<User> BlockedBy { get; set; }
 
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
@@ -132,7 +133,7 @@ namespace Core.Entities
         {
             try
             {
-                var userLocation = await CoreTerminal.Terminal.AccountDirector.GetLastKnownUserLocationAsync(Id);
+                var userLocation = await CoreTerminal.Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this);
                 LastKnownLocation = new() { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude };
                 LastKnownRadius = new() { Metres = userLocation.Radius };
             }
@@ -143,7 +144,7 @@ namespace Core.Entities
         {
             try
             {
-                var userHaunt = await CoreTerminal.Terminal.AccountDirector.GetUserHauntAsync(Id);
+                var userHaunt = await CoreTerminal.Terminal.AccountDirector.RequestUserHauntAsync(this);
                 Haunt = new() { Latitude = userHaunt.Latitude, Longitude = userHaunt.Longitude };
                 HauntRadius = new() { Metres = userHaunt.Radius };
                 HauntStability = userHaunt.Stability;
@@ -155,29 +156,40 @@ namespace Core.Entities
         {
             try
             {
-                CurrentEvent = new(await CoreTerminal.Terminal.EventDirector.GetCurrentEventAsync(Id));
+                CurrentEvent = await CoreTerminal.Terminal.EventDirector.RequestCurrentEventForUserAsync(this);
             }
             catch { }
         }
 
+        public async Task SyncPastEvents()
+        {
+            PastEvents = await CoreTerminal.Terminal.EventDirector.RequestPastEventsForUserAsync(this);
+        }
+
+        public async Task SyncUpcomingEvents()
+        {
+            UpcomingEvents = await CoreTerminal.Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this);
+        }
+
         public async Task SyncReputation()
         {
-            Ratings = await CoreTerminal.Terminal.ProfileDirector.GetAllRatingsAsync(Id);
+            Ratings = await CoreTerminal.Terminal.ProfileDirector.RequestAllRatingsAsync(this);
         }
 
         public async Task SyncFriends()
         {
-            Friends = await CoreTerminal.Terminal.ProfileDirector.GetFriendsAsync(Id);
+            Friends = (await CoreTerminal.Terminal.ProfileDirector.GetFriendsAsync(Id))
+				.ConvertAll(user => new User(user));
         }
 
         public async Task SyncFollowers()
         {
-            FollowedBy = await CoreTerminal.Terminal.ProfileDirector.GetFollowersAsync(Id);
+            FollowedBy = await CoreTerminal.Terminal.ProfileDirector.RequestFollowersAsync(this);
         }
 
         public async Task SyncReports()
         {
-            var reports = await CoreTerminal.Terminal.ReportDirector.GetAllReportsAsync(Id);
+            var reports = await CoreTerminal.Terminal.ReportDirector.RequestAllReportsAsync(this);
             Reports = reports.UserReports;
             EventReports = reports.EventReports;
         }
@@ -228,17 +240,23 @@ namespace Core.Entities
             Character.MoveTowards(eventAttended.Character, modifier);
         }
 
+        public async Task<Event> NextEvent()
+        {
+            if (UpcomingEvents == null)
+            { await SyncUpcomingEvents(); }
+
+            return UpcomingEvents[0];
+        }
+
 		#endregion
 
 		#region Checks
 
-		public async Task<bool> IsFriendsWith(ulong userId)
-            => await IsFriendsWith(new User(userId));
-
         public async Task<bool> IsFriendsWith(User otherUser)
 		{
 			// Set if null
-			Friends ??= await CoreTerminal.Terminal.ProfileDirector.GetFriendsAsync(otherUser.Id);
+			if (Friends == null)
+            { await SyncFriends(); }
 
 			// Check if users are friends
 			if (Friends.Find(x => x.Id == otherUser.Id) != null)
@@ -247,13 +265,11 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsFollowing(ulong userId)
-            => await IsFollowing(new User(userId));
-		
         public async Task<bool> IsFollowing(User otherUser)
         {
             // Set if null
-            Following ??= await CoreTerminal.Terminal.ProfileDirector.GetFollowedUsersAsync(otherUser.Id);
+            Following ??= (await CoreTerminal.Terminal.ProfileDirector.GetFollowedUsersAsync(otherUser.Id))
+				.ConvertAll(user => new User(user));
 
 			// Check if user is following target
 			if (Following.Find(x => x.Id == otherUser.Id) != null)
@@ -262,13 +278,11 @@ namespace Core.Entities
             return true;
         }
 
-        public async Task<bool> IsBlocking(ulong userId)
-            => await IsBlocking(new User(userId));
-
         public async Task<bool> IsBlocking(User otherUser)
         {
             // Set if null
-            Blocking ??= await CoreTerminal.Terminal.ProfileDirector.GetBlockedUsersAsync(otherUser.Id);
+            Blocking ??= (await CoreTerminal.Terminal.ProfileDirector.GetBlockedUsersAsync(otherUser.Id))
+				.ConvertAll(user => new User(user));
 
 			// Check if user is blocking target
 			if (Blocking.Find(x => x.Id == otherUser.Id) != null)
@@ -277,19 +291,29 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsBlockedBy(ulong userId)
-			=> await IsBlockedBy(new User(userId));
-
 		public async Task<bool> IsBlockedBy(User otherUser)
 		{
 			// Set if null
-			BlockedBy ??= await CoreTerminal.Terminal.ProfileDirector.GetUsersBlockingAsync(Id);
+			BlockedBy ??= await CoreTerminal.Terminal.ProfileDirector.RequestUsersBlockingAsync(this);
 
 			// Check if user is blocked by target
 			if (BlockedBy.Find(x => x.Id == otherUser.Id) != null)
 			{ return true; }
 
 			return false;
+		}
+
+        public async Task<bool> IsAtEvent()
+        {
+            if (CurrentEvent == null)
+            { await SyncCurrentEvent(); }
+
+            return CurrentEvent != null;
+        }
+
+        public bool Etched(Etching etching)
+        {
+            return etching.UserId.Equals(Id);
 		}
 
 		#endregion
@@ -354,7 +378,7 @@ namespace Core.Entities
 
 		public async Task Notify(string title, string message)
         {
-            await CoreTerminal.Terminal.NotificationDirector.NotifyUserAsync(Id, title, message);
+            await CoreTerminal.Terminal.NotificationDirector.NotifyUserAsync(this, title, message);
         }
 
         public async Task NotifyFollowers(string title, string message)
@@ -362,11 +386,7 @@ namespace Core.Entities
             if (FollowedBy == null)
             { await SyncFollowers(); }
 
-            foreach (var followerSilhouette in FollowedBy)
-            {
-                User follower = new(followerSilhouette);
-                follower.Notify(title, message);
-            }
+            FollowedBy.ForEach(follower => _ = follower.Notify(title, message));
         }
 
 		#endregion

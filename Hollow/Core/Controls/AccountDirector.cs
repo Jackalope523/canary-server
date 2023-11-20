@@ -66,19 +66,19 @@ namespace Core.Controls
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
         {
             // Throws if user not found or locked
-            User editUser = await GetUser(userId);
+            var user = await GetUser(userId);
             
             // Check unique details changed to avoid errors
-            bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && editUser.PhoneNumber != phoneNumber;
-            bool emailChanged = !string.IsNullOrEmpty(email) && editUser.Email != email;
+            bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && user.PhoneNumber != phoneNumber;
+            bool emailChanged = !string.IsNullOrEmpty(email) && user.Email != email;
 
             // Modify user for validation
-            editUser.PhoneNumber = string.IsNullOrEmpty(phoneNumber) ? editUser.PhoneNumber : phoneNumber;
-            editUser.Email = string.IsNullOrEmpty(email) ? editUser.Email : email;
-            editUser.Name = string.IsNullOrEmpty(name) ? editUser.Name : name;
+            user.PhoneNumber = string.IsNullOrEmpty(phoneNumber) ? user.PhoneNumber : phoneNumber;
+            user.Email = string.IsNullOrEmpty(email) ? user.Email : email;
+            user.Name = string.IsNullOrEmpty(name) ? user.Name : name;
 
             // Validate and Normalise
-            if ((phoneNumberChanged || emailChanged) && !editUser.ValidateAndNormalise())
+            if ((phoneNumberChanged || emailChanged) && !user.ValidateAndNormalise())
             { throw new InvalidInformationException("Invalid details provided."); }
 
             List<(string Property, object Value)> edits = new();
@@ -86,18 +86,18 @@ namespace Core.Controls
             // Track individual edits
 			if (phoneNumberChanged)
             {
-                await ThrowIfPhoneNumberTaken(editUser.PhoneNumber);
-                edits.Add((nameof(UserShard.PhoneNumber), editUser.PhoneNumber));
+                await ThrowIfPhoneNumberTaken(user.PhoneNumber);
+                edits.Add((nameof(UserShard.PhoneNumber), user.PhoneNumber));
 			}
 			if (emailChanged)
 			{
-                await ThrowIfEmailTaken(editUser.Email);
+                await ThrowIfEmailTaken(user.Email);
                 edits.Add((nameof(UserShard.Email), email));
-                edits.Add(("NormalisedEmail", editUser.Email));
+                edits.Add(("NormalisedEmail", user.Email));
 			}
 			if (!string.IsNullOrEmpty(name))
 			{
-                edits.Add((nameof(UserShard.Name), editUser.Name));
+                edits.Add((nameof(UserShard.Name), user.Name));
 			}
             // Internal attributes
 			if (isPhoneNumberConfirmed.HasValue)
@@ -122,7 +122,7 @@ namespace Core.Controls
 			}
 
             // Push update
-            Accounts.UpdateUser(editUser.Id, edits);
+            Accounts.UpdateUser(user.Id, edits);
 		}
 
         public async Task DeleteUserAsync(ulong userId)
@@ -136,49 +136,49 @@ namespace Core.Controls
 		{
 			var user = await GetUser(userId);
             await user.SyncLocation();
+            var userIsAtEvent = user.IsAtEvent();
+            var upcomingEventsSync = user.SyncUpcomingEvents();
 
-            user.LastKnownLocation = new() { Latitude = latitude, Longitude = longitude };
-
+			user.LastKnownLocation = new() { Latitude = latitude, Longitude = longitude };
             await user.HandleHaunt();
 
+            // Position updates
             Accounts.UpdateRecentLocation(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
             Accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
 
-            Event currentEvent = new(Events.FindCurrentEventForUser(user.Id));
-			List<EventShard> upcomingEvents;
+            await upcomingEventsSync;
+            var nextEvent = await user.NextEvent();
 
-            // Check if we are at an event
-            if (currentEvent != null)
+            // Check if user is at an event
+            if (await userIsAtEvent)
             {
-                // Check if we left the event radius
-                if (!GeoLocation.AreInRange(user.LastKnownLocation, currentEvent.Location, currentEvent.Radius))
+                // Check if user left the event radius
+                if (!GeoLocation.AreInRange(user.LastKnownLocation, user.CurrentEvent.Location, user.CurrentEvent.Radius))
                 {
-                    // Check if we are a guest or the host
-                    if (currentEvent.Host.Id.Equals(user.Id))
+                    // Check if user is a guest or the host
+                    if (user.CurrentEvent.IsHostedBy(user))
                     {
-                        // End the event if we are the host
-                        await Terminal.EventDirector.EndEventAsync(user.Id, currentEvent.Id);
+                        // End the event if user is the host
+                        await Terminal.EventDirector.EndEventAsync(user.Id, user.CurrentEvent.Id);
                     }
                     else
                     {
-                        // Leave the event if we are a guest
-                        await Terminal.EventDirector.LeaveEventAsync(user.Id, currentEvent.Id);
+                        // Leave the event if user is a guest
+                        await Terminal.EventDirector.LeaveEventAsync(user.Id, user.CurrentEvent.Id);
                     }
                 }
-                // Check if we are the host
-                else if (currentEvent.Host.Id.Equals(user.Id))
+                // Check if user is the host
+                else if (user.CurrentEvent.IsHostedBy(user))
                 {
                     // Update the position of the event
-                    Events.UpdateEvent(currentEvent.Id, new() { (nameof(EventShard.Latitude), user.LastKnownLocation.Latitude),
+                    Events.UpdateEvent(user.CurrentEvent.Id, new() { (nameof(EventShard.Latitude), user.LastKnownLocation.Latitude),
                         (nameof(EventShard.Longitude), user.LastKnownLocation.Longitude) });
                 }
             }
-            // Check if on our way to an event
-            else if (currentEvent == null &&
-                (upcomingEvents = Events.FindUpcomingEventsForUser(user.Id)).Count > 0)
+            // Check if user is on their way to an event
+            else if (!await userIsAtEvent &&
+                nextEvent != null)
             {
-                Event nextEvent = new(upcomingEvents[0]);
-
                 // Check if user is close enough to be a guest
                 if (nextEvent.IsInRange(user))
                 {
@@ -191,7 +191,28 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task<User> GetUser(string phoneNumber)
+        internal async Task UpdateAllAsync(List<User> users, Func<User,List<(string Property, object Value)>> edits)
+        {
+            users.ForEach(user => Accounts.UpdateUser(user.Id, edits(user)));
+		}
+
+        internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
+            RequestUserHauntAsync(User user)
+        {
+            return Accounts.GetUserHaunt(user.Id);
+        }
+
+        internal async Task<(double Latitude, double Longitude, double Radius)>
+            RequestLastKnownUserLocationAsync(User user)
+        {
+            return Accounts.GetRecentUserLocation(user.Id);
+        }
+
+		#endregion
+
+		#region Tools
+
+		private async Task<User> GetUser(string phoneNumber)
         {
             User user = new(Accounts.FindUserByPhoneNumber(phoneNumber));
 
@@ -201,22 +222,6 @@ namespace Core.Controls
 
             return user;
         }
-
-        internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
-            GetUserHauntAsync(ulong userId)
-        {
-            return Accounts.GetUserHaunt(userId);
-        }
-
-        internal async Task<(double Latitude, double Longitude, double Radius)>
-            GetLastKnownUserLocationAsync(ulong userId)
-        {
-            return Accounts.GetRecentUserLocation(userId);
-        }
-
-		#endregion
-
-		#region Tools
 
 		private async Task ThrowIfPhoneNumberTaken(string phoneNumber)
         {

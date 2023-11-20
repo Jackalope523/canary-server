@@ -36,7 +36,7 @@ namespace Core.Controls
             var targetUser = await GetUser(targetId);
 
             // Check if user is blocked
-            if (await user.IsBlockedBy(targetId))
+            if (await user.IsBlockedBy(targetUser))
             { throw new InvalidUserException("User is unable to view target."); }
 
             (List<EventThinSlice> Events, List<Etching> Etchings) nest = (new(), new());
@@ -45,11 +45,12 @@ namespace Core.Controls
             if (await targetUser.IsFriendsWith(user))
             {
                 // Gather active and upcoming events visible to the user
-                var upcomingActivity = await GetUserActivityInternalAsync(targetId);
+                var upcomingActivity = await GetUserActivity(targetUser);
                 await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
-                nest.Events = Events.FindPastEventsForUser(targetUser.Id).ConvertAll(e => new Event(e).ToEventThinSlice());
+                await targetUser.SyncPastEvents();
+                nest.Events = targetUser.PastEvents.ConvertAll(e => e.ToEventThinSlice());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
 
                 nest.Etchings = Etchings.GetEtchingsByUser(targetUser.Id);
@@ -57,7 +58,7 @@ namespace Core.Controls
             else
             {
                 // Get public hosted events
-                nest.Events = Events.FindEventsByUser(userId).ConvertAll(e => new Event(e).ToEventThinSlice());
+                nest.Events = Events.FindEventsByUser(user.Id).ConvertAll(e => new Event(e).ToEventThinSlice());
             }
 
             return nest;
@@ -73,7 +74,7 @@ namespace Core.Controls
             { throw new InvalidUserException("User is unable to view target."); }
 
             // Gather active and upcoming events
-            var upcomingActivity = await GetUserActivityInternalAsync(targetId);
+            var upcomingActivity = await GetUserActivity(targetUser);
 
             // Remove active and upcoming events if the user cannot view them
             await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
@@ -84,17 +85,18 @@ namespace Core.Controls
         public async Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId)
         {
             var user = await GetUser(userId);
-            var friends = Profiles.GetFriends(userId);
+            await user.SyncFriends();
 
             Dictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
             // Gather visible activity of each friend
-            foreach (var friend in friends)
-            {
-                var friendActivity = await GetUserActivityInternalAsync(friend.Id);
-                await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, friendActivity);
-                friendEvents.Add(friend, friendActivity);
-            }
+            user.Friends.AsParallel()
+                .ForAll(async friend =>
+                {
+                    var friendActivity = await GetUserActivity(friend);
+                    await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, friendActivity);
+                    friendEvents.Add(friend.ToUserSilhouette(), friendActivity);
+                });
 
             return friendEvents;
         }
@@ -155,32 +157,42 @@ namespace Core.Controls
 
 		#region Favours
 
-        internal async Task<List<UserSilhouette>> GetFollowersAsync(ulong userId)
+        internal async Task<List<User>> RequestFollowersAsync(User user)
         {
-            return Profiles.GetUsersFollowing(userId);
+            return Profiles.GetUsersFollowing(user.Id)
+                .ConvertAll(user => new User(user));
+		}
+
+		internal async Task<List<User>> RequestUsersBlockingAsync(User user)
+        {
+            return Profiles.GetUsersBlocking(user.Id)
+				.ConvertAll(user => new User(user));
         }
 
-		internal async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        internal async Task<(int Positive, int Negative)> RequestAllRatingsAsync(User user)
         {
-            return Profiles.GetUsersBlocking(userId);
-        }
-
-        internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(ulong userId)
-        {
-            return Profiles.GetUserRatings(userId);
+            return Profiles.GetUserRatings(user.Id);
         }
 
 		#endregion
 
 		#region Tools
 
-		private async Task<List<EventShard>> GetUserActivityInternalAsync(ulong userId)
+		private async Task<List<EventShard>> GetUserActivity(User user)
         {
-            // Gather all user event data
-            var upcomingActivity = Events.FindUpcomingEventsForUser(userId);
-            upcomingActivity.Add(Events.FindCurrentEventForUser(userId));
+            var upcomingEventsSync = user.SyncUpcomingEvents();
+            var currentEventSync = user.SyncCurrentEvent();
 
-            return upcomingActivity;
+            
+            // Gather all user event data
+            await upcomingEventsSync;
+            var upcomingActivity = user.UpcomingEvents;
+
+            await currentEventSync;
+            upcomingActivity.Add(user.CurrentEvent);
+
+            return upcomingActivity
+				.ConvertAll(@event => @event.ToEventShard());
         }
 
 		#endregion
