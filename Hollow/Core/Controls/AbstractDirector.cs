@@ -56,6 +56,12 @@ namespace Core.Controls
             return new(Events.FindEvent(eventId));
         }
 
+		protected void Try<E>(bool success, E exception) where E : Exception
+		{
+			if (!success)
+			{ throw exception; }
+		}
+
 		#endregion
 	}
 }
