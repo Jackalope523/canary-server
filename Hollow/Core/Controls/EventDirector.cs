@@ -183,7 +183,7 @@ namespace Core.Controls
 			Try(Events.UpdateEvent(targetEvent.Id, edits),
 				new UnexpectedFailureException("Failed to edit event."));
 
-			_ = targetEvent.NotifyUsers($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
+			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
 		}
 
 		public async Task EndEventAsync(ulong userId, ulong eventId)

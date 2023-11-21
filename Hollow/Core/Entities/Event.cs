@@ -296,12 +296,12 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task NotifyUsers(string title, string message)
+        public async Task NotifyActive(string title, string message)
         {
-            if (Guests == null)
+            if (Incoming == null || Guests == null)
             { await SyncUsers(); }
 
-            foreach (var guest in Guests)
+            foreach (var guest in Incoming.Concat(Guests))
             {
                 if (IsHostedBy(guest))
                 { continue; }
