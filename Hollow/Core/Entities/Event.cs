@@ -104,7 +104,7 @@ namespace Core.Entities
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Name, EndTime.HasValue, lastActiveTime);
+            return new(Id, Name, IsActive, lastActiveTime);
         }
 
 		#endregion

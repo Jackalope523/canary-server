@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Shared;
 
 using static Core.Entities.Arbiter;
+using static Core.Entities.Artificer;
 using static Core.Entities.Psijic;
 
 namespace Core.Controls
@@ -73,11 +74,12 @@ namespace Core.Controls
             // Check unique details changed to avoid errors
             bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && user.PhoneNumber != phoneNumber;
             bool emailChanged = !string.IsNullOrEmpty(email) && user.Email != email;
+            bool nameChanged = !string.IsNullOrEmpty(name);
 
             // Modify user for validation
-            user.PhoneNumber = string.IsNullOrEmpty(phoneNumber) ? user.PhoneNumber : phoneNumber;
-            user.Email = string.IsNullOrEmpty(email) ? user.Email : email;
-            user.Name = string.IsNullOrEmpty(name) ? user.Name : name;
+            user.PhoneNumber = phoneNumberChanged ? phoneNumber : user.PhoneNumber;
+            user.Email = emailChanged ? email : user.Email;
+            user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
             Try(user.ValidateAndNormalise(),
@@ -97,16 +99,16 @@ namespace Core.Controls
                 edits.Add((nameof(UserShard.Email), email));
                 edits.Add(("NormalisedEmail", user.Email));
 			}
-			if (!string.IsNullOrEmpty(name))
+			if (nameChanged)
 			{
                 edits.Add((nameof(UserShard.Name), user.Name));
 			}
             // Internal attributes for account store
-			if (isPhoneNumberConfirmed.HasValue)
+			if (IsNotNull(isPhoneNumberConfirmed))
 			{
                 edits.Add((nameof(UserShard.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
 			}
-			if (isEmailConfirmed.HasValue)
+			if (IsNotNull(isEmailConfirmed))
 			{
                 edits.Add((nameof(UserShard.IsEmailConfirmed), isEmailConfirmed.Value));
 			}
@@ -114,11 +116,11 @@ namespace Core.Controls
 			{
                 edits.Add((nameof(UserShard.SecurityStamp), securityStamp));
 			}
-			if (lockoutDate.HasValue)
+			if (IsNotNull(lockoutDate))
 			{
                 edits.Add((nameof(UserShard.LockoutDate), lockoutDate.Value));
 			}
-			if (accessTries.HasValue)
+			if (IsNotNull(accessTries))
 			{
                 edits.Add((nameof(UserShard.AccessTries), accessTries.Value));
 			}

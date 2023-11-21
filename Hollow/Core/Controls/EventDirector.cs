@@ -10,6 +10,7 @@ using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 using static Core.Entities.Arbiter;
+using static Core.Entities.Artificer;
 using static Core.Entities.Psijic;
 
 namespace Core.Controls
@@ -143,39 +144,39 @@ namespace Core.Controls
 
 			List<(string Property, object Value)> edits = new();
 
-			// Track individual edits
+			// Gather individual edits
 			if (!string.IsNullOrEmpty(eventDescription))
 			{
-				edits.Add((nameof(EventShard.Description), targetEvent.Description));
+				edits.Add((nameof(EventShard.Description), editedEvent.Description));
 			}
-			if (isOpen.HasValue)
+			if (IsNotNull(isOpen))
 			{
-				edits.Add((nameof(EventShard.IsOpen), targetEvent.IsOpen));
+				edits.Add((nameof(EventShard.IsOpen), editedEvent.IsOpen));
 			}
 			if (IsNotNull(startTime))
 			{
-				edits.Add((nameof(EventShard.StartTime), startTime));
+				edits.Add((nameof(EventShard.StartTime), editedEvent.StartTime));
 			}
 			if (IsNotNull(latitude) && IsNotNull(longitude))
 			{
-				edits.Add((nameof(EventShard.Latitude), latitude));
-				edits.Add((nameof(EventShard.Longitude), longitude));
+				edits.Add((nameof(EventShard.Latitude), editedEvent.Location.Latitude));
+				edits.Add((nameof(EventShard.Longitude), editedEvent.Location.Longitude));
 			}
 			if (IsNotNull(radius))
 			{
-				edits.Add((nameof(EventShard.Radius), radius));
+				edits.Add((nameof(EventShard.Radius), editedEvent.Radius));
 			}
 			if (IsNotNull(isDynamic))
 			{
-				edits.Add((nameof(EventShard.IsDynamic), isDynamic));
+				edits.Add((nameof(EventShard.IsDynamic), editedEvent.IsDynamic));
 			}
 			if (IsNotNull(groupMinimum))
 			{
-				edits.Add((nameof(EventShard.GroupMinimum), groupMinimum));
+				edits.Add((nameof(EventShard.GroupMinimum), editedEvent.GroupMinimum));
 			}
 			if (IsNotNull(groupMaximum))
 			{
-				edits.Add((nameof(EventShard.GroupMaximum), groupMaximum));
+				edits.Add((nameof(EventShard.GroupMaximum), editedEvent.GroupMaximum));
 			}
 
 			// Push update
@@ -477,16 +478,6 @@ namespace Core.Controls
 			SelectAsSilhouette(List<(User User, EventUserState State)> users, Func<(User User, EventUserState State), bool> predicate)
 		{
 			return users.Where(predicate).ToList().ConvertAll(userDetails => (userDetails.User.ToUserSilhouette(), userDetails.State));
-		}
-
-		private bool IsNull<T>(T? obj) where T : struct
-		{
-			return obj == null || !obj.HasValue;
-		}
-
-		private bool IsNotNull<T>(T? obj) where T : struct
-		{
-			return obj != null && obj.HasValue;
 		}
 
 		#endregion

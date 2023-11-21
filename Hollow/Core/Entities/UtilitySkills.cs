@@ -26,6 +26,23 @@ namespace Core.Entities
 		#endregion
 	}
 
+	internal static class Artificer
+	{
+		#region Skills
+
+		public static bool IsNull<T>(T? obj) where T : struct
+		{
+			return obj == null || !obj.HasValue;
+		}
+
+		public static bool IsNotNull<T>(T? obj) where T : struct
+		{
+			return obj != null && obj.HasValue;
+		}
+
+		#endregion
+	}
+
 	internal static class Psijic
 	{
 		#region Knowledge
