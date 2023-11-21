@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
 using Shared;
+using NetTopologySuite.Utilities;
 
 namespace Frontier.Controllers
 {
@@ -70,8 +71,8 @@ namespace Frontier.Controllers
 				newEvent = await events.CreateEventAsync(user.Id,
 					eventDetails.EventName, eventDetails.EventDescription,
 					eventDetails.StartTime,	eventDetails.Latitude, eventDetails.Longitude,
-					eventDetails.GroupMinimum, eventDetails.GroupMaximum,
-					eventDetails.Radius, eventDetails.IsDynamic);
+					eventDetails.Radius, eventDetails.IsDynamic,
+					eventDetails.GroupMinimum, eventDetails.GroupMaximum);
             }
             catch (Exception e)
 			{
@@ -82,7 +83,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{eventId}/edit")]
-        public async Task<IActionResult> EditEvent(ulong eventId, [FromBody] EventEditManifest eventDetails)
+        public async Task<IActionResult> EditEvent(ulong eventId, [FromBody] EventDetailsManifest eventDetails)
 		{
 			if (eventDetails == null || !ModelState.IsValid)
 			{
@@ -96,7 +97,11 @@ namespace Frontier.Controllers
 
 				await events.EditEventAsync(user.Id, eventId,
 					eventDescription: eventDetails.EventDescription ?? "",
-					isOpen: eventDetails.EventIsOpen);
+					isOpen: eventDetails.IsOpen,
+					startTime: eventDetails.StartTime,
+					latitude: eventDetails.Latitude, longitude: eventDetails.Longitude,
+					radius: eventDetails.Radius, isDynamic: eventDetails.IsDynamic, 
+					groupMinimum: eventDetails.GroupMinimum, groupMaximum: eventDetails.GroupMaximum);
 			}
 			catch (Exception e)
 			{

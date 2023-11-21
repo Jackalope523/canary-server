@@ -15,6 +15,8 @@ namespace Frontier.Manifests
 
         [Required]
         public string EventDescription { get; set; }
+        
+        public bool? IsOpen { get; set; }
 
         [Required]
         public float Latitude { get; set; }
@@ -25,24 +27,18 @@ namespace Frontier.Manifests
         [Required]
         public DateTimeOffset StartTime { get; set; }
 
-        public int? GroupMinimum { get; set; }
-        public int? GroupMaximum { get; set; }
-
         [Required]
         public float Radius { get; set; }
 
         [Required]
         public bool IsDynamic { get; set; }
 
+        public int? GroupMinimum { get; set; }
+        public int? GroupMaximum { get; set; }
+
         public UserSilhouette Host { get; set; }
 
         public uint NumberOfParticipants { get; set; }
-    }
-
-    public class EventEditManifest
-    {
-        public string EventDescription { get; set; }
-        public bool? EventIsOpen { get; set; }
     }
 
     public class EventEtchingManifest

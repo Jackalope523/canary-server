@@ -296,6 +296,20 @@ namespace Core.Entities
 
         #region Actions
 
+        public async Task NotifyUsers(string title, string message)
+        {
+            if (Guests == null)
+            { await SyncUsers(); }
+
+            foreach (var guest in Guests)
+            {
+                if (IsHostedBy(guest))
+                { continue; }
+
+                _ = guest.Notify(title, message);
+            }
+        }
+
         public async Task NotifyGuests(string title, string message)
         {
             if (Guests == null)

@@ -4,6 +4,7 @@ using Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
@@ -62,7 +63,7 @@ namespace Core.Controls
 		public async Task<EventShard> CreateEventAsync(ulong userId,
 			string eventName, string eventDescription, DateTimeOffset startTime,
 			double latitude, double longitude,
-			int? groupMinimum, int? groupMaximum, double radius, bool isDynamic)
+			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum)
 		{
 			var user = await GetUser(userId);
 			// Check if user is already at an event
@@ -109,7 +110,9 @@ namespace Core.Controls
 		}
 
 		public async Task EditEventAsync(ulong userId, ulong eventId,
-			string eventDescription = "", bool? isOpen = null)
+			string eventDescription = "", bool? isOpen = null,
+			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null,
+			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null)
 		{
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
@@ -122,10 +125,21 @@ namespace Core.Controls
 			Try(targetEvent.IsActive,
 				new InvalidEventException("Unable to edit event, event has ended."));
 
-			targetEvent.Description = eventDescription;
-			targetEvent.IsOpen = isOpen ?? targetEvent.IsOpen;
+			Event editedEvent = new(targetEvent.ToEventShard())
+			{
+				Description = eventDescription,
+				IsOpen = isOpen ?? targetEvent.IsOpen,
+				StartTime = startTime ?? targetEvent.StartTime,
+				Location = (IsNull(latitude) || IsNull(longitude)) ? targetEvent.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
+				Radius = IsNull(radius) ? targetEvent.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
+				IsDynamic = isDynamic ?? targetEvent.IsDynamic,
+				GroupMinimum = groupMinimum ?? targetEvent.GroupMinimum,
+				GroupMaximum = groupMaximum ?? targetEvent.GroupMaximum,
+			};
 
-			targetEvent.ValidateAndNormalise();
+			// Validate event
+			Try(editedEvent.ValidateAndNormalise(),
+				new InvalidInformationException("Invalid event details provided."));
 
 			List<(string Property, object Value)> edits = new();
 
@@ -138,9 +152,37 @@ namespace Core.Controls
 			{
 				edits.Add((nameof(EventShard.IsOpen), targetEvent.IsOpen));
 			}
+			if (IsNotNull(startTime))
+			{
+				edits.Add((nameof(EventShard.StartTime), startTime));
+			}
+			if (IsNotNull(latitude) && IsNotNull(longitude))
+			{
+				edits.Add((nameof(EventShard.Latitude), latitude));
+				edits.Add((nameof(EventShard.Longitude), longitude));
+			}
+			if (IsNotNull(radius))
+			{
+				edits.Add((nameof(EventShard.Radius), radius));
+			}
+			if (IsNotNull(isDynamic))
+			{
+				edits.Add((nameof(EventShard.IsDynamic), isDynamic));
+			}
+			if (IsNotNull(groupMinimum))
+			{
+				edits.Add((nameof(EventShard.GroupMinimum), groupMinimum));
+			}
+			if (IsNotNull(groupMaximum))
+			{
+				edits.Add((nameof(EventShard.GroupMaximum), groupMaximum));
+			}
 
 			// Push update
-			Events.UpdateEvent(targetEvent.Id, edits);
+			Try(Events.UpdateEvent(targetEvent.Id, edits),
+				new UnexpectedFailureException("Failed to edit event."));
+
+			_ = targetEvent.NotifyUsers($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
 		}
 
 		public async Task EndEventAsync(ulong userId, ulong eventId)
@@ -435,6 +477,16 @@ namespace Core.Controls
 			SelectAsSilhouette(List<(User User, EventUserState State)> users, Func<(User User, EventUserState State), bool> predicate)
 		{
 			return users.Where(predicate).ToList().ConvertAll(userDetails => (userDetails.User.ToUserSilhouette(), userDetails.State));
+		}
+
+		private bool IsNull<T>(T? obj) where T : struct
+		{
+			return obj == null || !obj.HasValue;
+		}
+
+		private bool IsNotNull<T>(T? obj) where T : struct
+		{
+			return obj != null && obj.HasValue;
 		}
 
 		#endregion

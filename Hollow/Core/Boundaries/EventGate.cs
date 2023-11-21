@@ -56,9 +56,11 @@ namespace Core.Boundaries
 
 		Task<EventShard> CreateEventAsync(ulong userId, string eventName, string eventDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int? groupMinimum, int? groupMaximum, double radius, bool isDynamic);
+			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum);
 		Task EditEventAsync(ulong userId, ulong eventId,
-			string eventDescription = "", bool? isOpen = null);
+			string eventDescription = "", bool? isOpen = null,
+			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null,
+			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
 		Task EndEventAsync(ulong userId, ulong eventId);
 
 		Task WatchEventAsync(ulong userId, ulong eventId);
