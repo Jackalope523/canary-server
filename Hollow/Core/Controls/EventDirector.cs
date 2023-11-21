@@ -126,12 +126,19 @@ namespace Core.Controls
 			Try(targetEvent.IsActive,
 				new InvalidEventException("Unable to edit event, event has ended."));
 
+			// Check for edits that may not be done during the event
+			Fail(HasAlready(targetEvent.StartTime) &&
+				(!string.IsNullOrEmpty(eventDescription) || IsNotNull(startTime) ||
+				AreNotNull(latitude, longitude) ||
+				IsNotNull(radius) || IsNotNull(isDynamic)),
+				new InvalidEventException("Cannot edit certain event attributes once it has started."));
+
 			Event editedEvent = new(targetEvent.ToEventShard())
 			{
 				Description = eventDescription,
 				IsOpen = isOpen ?? targetEvent.IsOpen,
 				StartTime = startTime ?? targetEvent.StartTime,
-				Location = (IsNull(latitude) || IsNull(longitude)) ? targetEvent.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
+				Location = AreNull(latitude, longitude) ? targetEvent.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
 				Radius = IsNull(radius) ? targetEvent.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
 				IsDynamic = isDynamic ?? targetEvent.IsDynamic,
 				GroupMinimum = groupMinimum ?? targetEvent.GroupMinimum,

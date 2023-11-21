@@ -301,12 +301,12 @@ namespace Core.Entities
             if (Incoming == null || Guests == null)
             { await SyncUsers(); }
 
-            foreach (var guest in Incoming.Concat(Guests))
+            foreach (var user in Incoming.Concat(Guests))
             {
-                if (IsHostedBy(guest))
+                if (IsHostedBy(user))
                 { continue; }
 
-                _ = guest.Notify(title, message);
+                _ = user.Notify(title, message);
             }
         }
 

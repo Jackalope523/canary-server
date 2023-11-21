@@ -40,6 +40,16 @@ namespace Core.Entities
 			return obj != null && obj.HasValue;
 		}
 
+		public static bool AreNull<T>(params T?[] objs) where T : struct
+		{
+			return objs.All(obj => IsNull(obj));
+		}
+
+		public static bool AreNotNull<T>(params T?[] objs) where T : struct
+		{
+			return objs.All(obj => IsNotNull(obj));
+		}
+
 		#endregion
 	}
 
