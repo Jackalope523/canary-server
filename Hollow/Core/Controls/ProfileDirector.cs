@@ -7,6 +7,8 @@ using Core.Boundaries;
 using Core.Entities;
 using Shared;
 
+using static Core.Entities.Arbiter;
+
 namespace Core.Controls
 {
 	internal class ProfileDirector : AbstractDirector, IProfileOperations
@@ -25,8 +27,8 @@ namespace Core.Controls
             var targetUser = await GetUser(targetId);
 
             // Check if user is blocked
-            if (await targetUser.IsBlocking(user))
-            { throw new InvalidUserException("User is unable to view target."); }
+            Fail(await targetUser.IsBlocking(user),
+                new InvalidUserException("User is unable to view target."));
 
             return targetUser.ToUserProfile();
         }
@@ -37,8 +39,8 @@ namespace Core.Controls
             var targetUser = await GetUser(targetId);
 
             // Check if user is blocked
-            if (await user.IsBlockedBy(targetUser))
-            { throw new InvalidUserException("User is unable to view target."); }
+            Fail(await user.IsBlockedBy(targetUser),
+                new InvalidUserException("User is unable to view target."));
 
             (List<EventThinSlice> Events, List<Etching> Etchings) nest = (new(), new());
 
@@ -71,8 +73,8 @@ namespace Core.Controls
             var targetUser = await GetUser(targetId);
 
             // Check if users are friends
-            if (!await targetUser.IsFriendsWith(user))
-            { throw new InvalidUserException("User is unable to view target."); }
+            Try(await targetUser.IsFriendsWith(user),
+                new InvalidUserException("User is unable to view target."));
 
             // Gather active and upcoming events
             var upcomingActivity = await GetUserActivity(targetUser);
@@ -183,7 +185,6 @@ namespace Core.Controls
         {
             var upcomingEventsSync = user.SyncUpcomingEvents();
             var currentEventSync = user.SyncCurrentEvent();
-
             
             // Gather all user event data
             await upcomingEventsSync;

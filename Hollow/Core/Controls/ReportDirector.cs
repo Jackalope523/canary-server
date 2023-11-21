@@ -5,6 +5,8 @@ using Core.Boundaries;
 using Core.Entities;
 using Shared;
 
+using static Core.Entities.Arbiter;
+
 namespace Core.Controls
 {
 	internal class ReportDirector : AbstractDirector, IReportOperations

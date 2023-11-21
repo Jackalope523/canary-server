@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+using static Core.Entities.Arbiter;
+
 namespace Core.Entities
 {
 	internal static class ContentValidation
@@ -89,9 +91,8 @@ namespace Core.Entities
 
 		public string CensorText(string text)
 		{
-			if (string.IsNullOrEmpty(text))
-			{ throw new ArgumentNullException(nameof(text)); }
-				
+			Fail(string.IsNullOrEmpty(text),
+				new ArgumentNullException(nameof(text)));
 
 			string censoredText = text;
 

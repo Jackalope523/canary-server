@@ -8,6 +8,9 @@ using Core.Boundaries;
 using Core.Controls;
 using Microsoft.Extensions.Logging;
 
+using static Core.Entities.Arbiter;
+using static Core.Entities.Psijic;
+
 namespace Core.Entities
 {
     internal class Event
@@ -33,6 +36,10 @@ namespace Core.Entities
         public bool IsOpen { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
+
+        public bool IsActive
+            => !EndTime.HasValue ||
+                HasYet(EndTime.Value);
 
         public List<(User User, EventUserState State)> AllUsers { get; set; }
         public List<User> Watchers { get; set; }
@@ -134,7 +141,7 @@ namespace Core.Entities
             Description = ContentValidation.NormaliseText(Description[..MaximumDescLength]);
 
             // Verify Event is within a reasonable time
-            if (StartTime > DateTimeOffset.UtcNow + TimeSpan.FromDays(7)) { return false; }
+            if (After(StartTime, Time + OneWeek)) { return false; }
 
             // Verify group bounds
             if (GroupMaximum != 0 &&
@@ -261,13 +268,17 @@ namespace Core.Entities
 
         public async Task Etched(User user)
         {
-			// Ensure the user can etch into the event
-			if (!await WasAttendedBy(user))
-			{ throw new InvalidEventException("User did not attend event."); }
+            // Ensure the user can etch into the event
+            Try(await WasAttendedBy(user),
+                new InvalidEventException("User did not attend event."));
 
-			// Ensure etching is added within a day of event ending
-			if (EndTime.HasValue && EndTime + TimeSpan.FromDays(1) < DateTimeOffset.UtcNow)
-			{ throw new InvalidEventException("Event has already ended."); }
+            // Ensure etching is not before event starting or user is host
+            Try(HasAlready(StartTime) || IsModifiableBy(user),
+                new InvalidEventException("Event has yet to start."));
+
+            // Ensure etching is added before event is closed
+            Try(IsActive || HasYet(EndTime.Value + OneDay),
+                new InvalidEventException("Event has already ended."));
 		}
 
 		public async Task<bool> Reported()

@@ -5,6 +5,8 @@ using Core.Boundaries;
 using Core.Entities;
 using Shared;
 
+using static Core.Entities.Arbiter;
+
 namespace Core.Controls
 {
 	internal abstract class AbstractDirector
@@ -44,23 +46,22 @@ namespace Core.Controls
         {
             User user = new(Accounts.FindUserById(userId));
 
-            // Check if user account is locked
-            if (user.IsLocked)
-            { throw new InvalidUserException("User account is locked."); }
+			// Check if user account is locked
+			Fail(user.IsLocked,
+				new InvalidUserException("User account is locked."));
 
             return user;
+        }
+
+		protected async Task<User> GetUserUnsafe(ulong userId)
+        {
+            return new(Accounts.FindUserById(userId));
         }
 
         protected async Task<Event> GetEvent(ulong eventId)
         {
             return new(Events.FindEvent(eventId));
         }
-
-		protected void Try<E>(bool success, E exception) where E : Exception
-		{
-			if (!success)
-			{ throw exception; }
-		}
 
 		#endregion
 	}

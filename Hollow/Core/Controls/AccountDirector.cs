@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shared;
 
+using static Core.Entities.Arbiter;
+using static Core.Entities.Psijic;
+
 namespace Core.Controls
 {
     internal class AccountDirector : AbstractDirector, IAccountOperations
@@ -24,8 +27,9 @@ namespace Core.Controls
 
         public async Task<UserShard> GetUserAsync(string phoneNumber)
 		{
-            if (!ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber))
-            { throw new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."); }
+            Try(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
+                new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."));
+
             return (await GetUser(normalisedPhoneNumber)).ToUserShard();
 		}
 
@@ -38,13 +42,12 @@ namespace Core.Controls
                 Email = email,
                 Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTimeOffset.UtcNow
+                JoinDate = Time
             };
 
             // Validate and normalise user
-            bool valid = newUser.ValidateAndNormalise();
-            if (!valid)
-            { throw new InvalidInformationException("Invalid account details provided."); }
+            Try(newUser.ValidateAndNormalise(),
+                new InvalidInformationException("Invalid account details provided."));
 
             // Check if phone number is in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
@@ -54,10 +57,9 @@ namespace Core.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            bool success = Accounts.CreateUser(newUser.PhoneNumber, email, newUser.Email,
-                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
-            if (!success)
-            { throw new UnexpectedFailureException("User creation failed."); }
+            Try(Accounts.CreateUser(newUser.PhoneNumber, email, newUser.Email,
+                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter()),
+                new UnexpectedFailureException("User creation failed."));
         }
 
         public async Task EditUserAsync(ulong userId,
@@ -78,12 +80,12 @@ namespace Core.Controls
             user.Name = string.IsNullOrEmpty(name) ? user.Name : name;
 
             // Validate and Normalise
-            if ((phoneNumberChanged || emailChanged) && !user.ValidateAndNormalise())
-            { throw new InvalidInformationException("Invalid details provided."); }
+            Try(user.ValidateAndNormalise(),
+                new InvalidInformationException("Invalid details provided."));
 
             List<(string Property, object Value)> edits = new();
 
-            // Track individual edits
+            // Gather individual edits
 			if (phoneNumberChanged)
             {
                 await ThrowIfPhoneNumberTaken(user.PhoneNumber);
@@ -99,7 +101,7 @@ namespace Core.Controls
 			{
                 edits.Add((nameof(UserShard.Name), user.Name));
 			}
-            // Internal attributes
+            // Internal attributes for account store
 			if (isPhoneNumberConfirmed.HasValue)
 			{
                 edits.Add((nameof(UserShard.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
@@ -127,9 +129,8 @@ namespace Core.Controls
 
         public async Task DeleteUserAsync(ulong userId)
         {
-            bool success = Accounts.DeleteUser(userId);
-            if (!success)
-            { throw new UnexpectedFailureException("User deletion failed."); }
+            Try(Accounts.DeleteUser(userId),
+                new UnexpectedFailureException("User deletion failed."));
         }
 
         public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
@@ -217,8 +218,8 @@ namespace Core.Controls
             User user = new(Accounts.FindUserByPhoneNumber(phoneNumber));
 
             // Check if user account is locked
-            if (user.IsLocked)
-            { throw new InvalidUserException("User account is locked."); }
+            Fail(user.IsLocked,
+                new InvalidUserException("User account is locked."));
 
             return user;
         }
@@ -234,8 +235,8 @@ namespace Core.Controls
 			}
 			catch { }
 
-			if (numberTaken)
-			{ throw new InvalidUserException("Phone Number already registered."); }
+            Fail(numberTaken,
+                new InvalidUserException("Phone Number already registered."));
 		}
 
         private async Task ThrowIfEmailTaken(string normalisedEmail)
@@ -249,8 +250,8 @@ namespace Core.Controls
 			}
 			catch { }
 
-			if (emailTaken)
-			{ throw new InvalidUserException("Email already registered."); }
+			Fail(emailTaken,
+                new InvalidUserException("Email already registered."));
         }
 
 		#endregion

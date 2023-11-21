@@ -6,6 +6,9 @@ using Core.Boundaries;
 using Core.Entities;
 using Shared;
 
+using static Core.Entities.Arbiter;
+using static Core.Entities.Psijic;
+
 namespace Core.Controls
 {
 	internal class EtchingDirector : AbstractDirector, IEtchingOperations
@@ -25,8 +28,8 @@ namespace Core.Controls
             var etchingsSync = targetEvent.SyncEtchings();
 
             // Ensure user can see the event
-            if (!await targetEvent.WasAttendedBy(user))
-            { throw new InvalidEventException("User did not attend or is not attending event."); }
+            Try(await targetEvent.WasAttendedBy(user),
+                new InvalidEventException("User did not attend event."));
 
             await etchingsSync;
             return targetEvent.Etchings;
@@ -40,7 +43,7 @@ namespace Core.Controls
             await targetEvent.Etched(user);
 
             // Try to etch
-            var userEtching = Etchings.AddEtching(targetEvent.Id, user.Id, DateTimeOffset.UtcNow, imageURL);
+            var userEtching = Etchings.AddEtching(targetEvent.Id, user.Id, Time, imageURL);
 
             return userEtching;
         }
@@ -52,12 +55,10 @@ namespace Core.Controls
             var eventEtched = await GetEvent(etching.EventId);
 
             // Check if user owns the etching or can modify the event
-            if (!user.Etched(etching) || !eventEtched.IsModifiableBy(user))
-            {
-                Etchings.RemoveEtching(etching.Id);
-            }
-            else
-            { throw new InvalidUserException("User cannot remove etching."); }
+            Try(user.Etched(etching) || eventEtched.IsModifiableBy(user),
+                new InvalidUserException("User cannot remove etching."));
+
+            Etchings.RemoveEtching(etching.Id);
         }
 
         public async Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating)
@@ -67,17 +68,17 @@ namespace Core.Controls
             var eventEtched = await GetEvent(etching.EventId);
 
             // Check if user can interact with etching
-            if (!await eventEtched.WasAttendedBy(user))
-            { throw new InvalidUserException("User cannot interact with etching."); }
+            Try(await eventEtched.WasAttendedBy(user),
+                new InvalidUserException("User cannot interact with etching."));
 
             // Check if removing a rating
             if (rating != UserRating.Remove)
             {
-                Etchings.RateEtching(userId, etchingId, rating);
+                Etchings.RateEtching(user.Id, etching.Id, rating);
             }
             else
             {
-                Etchings.RemoveEtchingRating(etchingId, userId);
+                Etchings.RemoveEtchingRating(etching.Id, user.Id);
             }
         }
 
@@ -89,7 +90,7 @@ namespace Core.Controls
             Dictionary<ulong, EventHeader> eventHeaders = new();
 
             // Retrieve friend-populated event etchings after a specified time excluding previously viewed events
-            DateTimeOffset depthCharge = DateTimeOffset.UtcNow - TimeSpan.FromDays(1 + depth);
+            DateTimeOffset depthCharge = Time - TimeSpan.FromDays(1 + depth);
             var friendEtchings = Etchings.GenerateFeedForUser(user.Id, depthCharge, exclusionList);
 
             // Get the respective event headers for the etchings
@@ -103,7 +104,7 @@ namespace Core.Controls
                     eventHeaders.Add(etching.EventId, etchedEvent.ToEventHeader(etching.TimeEtched));
                 }
                 // Update event header active time if etching is more recent
-                else if (eventHeaders[etching.EventId].LastActiveTime < etching.TimeEtched)
+                else if (HappenedBefore(eventHeaders[etching.EventId].LastActiveTime, etching.TimeEtched))
                 {
                     eventHeaders[etching.EventId] = new(etching.EventId,
                         eventHeaders[etching.EventId].Name,

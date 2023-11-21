@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -73,6 +74,16 @@ namespace Core.Entities
 
         public static bool operator >(Distance a, Distance b)
             => a.Metres > b.Metres;
+
+		public override bool Equals(object obj)
+		{
+			return obj is Distance other && this == other;
+		}
+        
+		public override int GetHashCode()
+		{
+			return Metres.GetHashCode();
+		}
 
 		#endregion
 	}

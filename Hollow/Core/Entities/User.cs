@@ -7,6 +7,8 @@ using Core.Boundaries;
 using Core.Controls;
 using Shared;
 
+using static Core.Entities.Psijic;
+
 namespace Core.Entities
 {
     internal class User
@@ -208,7 +210,7 @@ namespace Core.Entities
                 !ContentValidation.IsEmailValid(Email)) { return false; }
 
             // Verify User age
-            if (DateOfBirth + TimeSpan.FromDays(365 * 18) > DateTimeOffset.UtcNow) { return false; }
+            if (HasAlready(DateOfBirth + (OneYear * 18))) { return false; }
 
             // Normalise
             Email = string.IsNullOrEmpty(Email) ? Email : Email.ToLower();
@@ -324,8 +326,8 @@ namespace Core.Entities
             if (Reports == null || EventReports == null)
             { await SyncReports(); }
             
-            var recentReportCount = Reports.Count(report => report.ReportTime > DateTimeOffset.UtcNow - TimeSpan.FromMinutes(10))
-                + EventReports.Count(report => report.ReportTime > DateTimeOffset.UtcNow - TimeSpan.FromMinutes(10));
+            var recentReportCount = Reports.Count(report => After(report.ReportTime, Time - QuarterHour))
+                + EventReports.Count(report => After(report.ReportTime, Time - QuarterHour));
 
             if (recentReportCount > 3)
             { return false; }

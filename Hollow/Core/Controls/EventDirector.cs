@@ -8,6 +8,9 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
+using static Core.Entities.Arbiter;
+using static Core.Entities.Psijic;
+
 namespace Core.Controls
 {
 	internal class EventDirector : AbstractDirector, IEventOperations
@@ -26,8 +29,8 @@ namespace Core.Controls
 			var targetEvent = await GetEvent(eventId);
 
 			// Check if user is allowed to view event
-			if (!await targetEvent.IsVisibleTo(user))
-			{ throw new InvalidEventException("User is unable to view event."); }
+			Try(await targetEvent.IsVisibleTo(user),
+				new InvalidEventException("User is unable to view event."));
 
 			return targetEvent.ToEventShard();
 		}
@@ -64,13 +67,11 @@ namespace Core.Controls
 			var user = await GetUser(userId);
 			// Check if user is already at an event
 			await ThrowIfUserAtEvent(user);
-			
+
 			// Check if user can host
-			if (!user.CanHost)
-			{
-				throw new InvalidUserException("User cannot host.\n" +
-				$"Account Status: {user.AccountStatus}");
-			}
+			Try(user.CanHost,
+				new InvalidUserException("User cannot host.\n" +
+				$"Account Status: {user.AccountStatus}"));
 
 			// Create event
 			Event eventStub = new()
@@ -86,13 +87,12 @@ namespace Core.Controls
 			};
 
 			// Validate event
-			bool valid = eventStub.ValidateAndNormalise();
-            if (!valid)
-            { throw new InvalidInformationException("Invalid event details provided."); }
+			Try(eventStub.ValidateAndNormalise(),
+				new InvalidInformationException("Invalid event details provided."));
 
 			// Verify that user has no conflict
 			await user.SyncUpcomingEvents();
-			var conflict = user.UpcomingEvents.Find(e => e.StartTime - eventStub.StartTime < TimeSpan.FromMinutes(30));
+			var conflict = user.UpcomingEvents.Find(e => IsWithin(e.StartTime - eventStub.StartTime, HalfHour));
 			if (conflict != null)
 			{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 
@@ -115,12 +115,12 @@ namespace Core.Controls
 			var targetEvent = await GetEvent(eventId);
 
 			// Verify that user is event host
-			if (!targetEvent.IsModifiableBy(user))
-			{ throw new InvalidEventException("User is unable to edit event."); }
+			Try(targetEvent.IsModifiableBy(user),
+				new InvalidEventException("User is unable to edit event."));
 
 			// Verify that event is still active
-			if (targetEvent.EndTime.HasValue)
-			{ throw new InvalidEventException("Unable to edit event, event has ended."); }
+			Try(targetEvent.IsActive,
+				new InvalidEventException("Unable to edit event, event has ended."));
 
 			targetEvent.Description = eventDescription;
 			targetEvent.IsOpen = isOpen ?? targetEvent.IsOpen;
@@ -130,7 +130,7 @@ namespace Core.Controls
 			List<(string Property, object Value)> edits = new();
 
 			// Track individual edits
-			if (eventDescription != "")
+			if (!string.IsNullOrEmpty(eventDescription))
 			{
 				edits.Add((nameof(EventShard.Description), targetEvent.Description));
 			}
@@ -149,13 +149,12 @@ namespace Core.Controls
 			var targetEvent = await GetEvent(eventId);
 
 			// Check if the user is able to end the event
-			if (!targetEvent.IsModifiableBy(user))
-			{ throw new InvalidUserException("User does not have permissions to end event."); }
+			Try(targetEvent.IsModifiableBy(user),
+				new InvalidUserException("User does not have permissions to end event."));
 
 			// Try to end to event
-			bool success = Events.EndEvent(eventId);
-            if (!success)
-            { throw new UnexpectedFailureException("Could not end event."); }
+			Try(Events.EndEvent(eventId),
+				new UnexpectedFailureException("Could not end event."));
 
 			var participants = await targetEvent.Ended();
 
@@ -169,19 +168,17 @@ namespace Core.Controls
 			var targetEvent = await GetEvent(eventId);
 
 			// Check if user is allowed to view event
-			if (!await targetEvent.IsVisibleTo(user))
-			{ throw new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"); }
+			Try(await targetEvent.IsVisibleTo(user),
+				new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"));
 
 			var userIntention = Events.GetUserState(userId, eventId);
-			bool success;
 
 			// Ensure correct state transition
 			if (!userIntention.HasValue)
 			{
 				// Try to add user to the event
-				success = Events.SetUserState(userId, eventId, EventUserState.Watching);
-				if (!success)
-				{ throw new UnexpectedFailureException("Could not watch event."); }
+				Try(Events.SetUserState(userId, eventId, EventUserState.Watching),
+					new UnexpectedFailureException("Could not watch event."));
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not watch event, user currently {userIntention.Value} event."); }
@@ -190,15 +187,14 @@ namespace Core.Controls
 		public async Task UnwatchEventAsync(ulong userId, ulong eventId)
 		{
 			var userIntention = Events.GetUserState(userId, eventId);
-			bool success;
 
 			// Ensure correct state transition
-			if (userIntention.HasValue && userIntention.Value.Equals(EventUserState.Watching))
+			if (userIntention.HasValue &&
+				userIntention.Value.Equals(EventUserState.Watching))
 			{
 				// Try to remove user from event
-				success = Events.RemoveUser(userId, eventId);
-				if (!success)
-				{ throw new UnexpectedFailureException("Could not unwatch event."); }
+				Try(Events.RemoveUser(userId, eventId),
+					new UnexpectedFailureException("Could not unwatch event."));
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not unwatch event, user currently {userIntention.Value} event."); }
@@ -210,23 +206,22 @@ namespace Core.Controls
 			var targetEvent = await GetEvent(eventId);
 
 			// Check if user is allowed to view event
-			if (!await targetEvent.IsVisibleTo(user))
-			{ throw new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"); }
+			Try(await targetEvent.IsVisibleTo(user),
+				new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"));
 
 			// Check if event is open and has not ended
-			if (!targetEvent.IsOpen ||
-				(targetEvent.EndTime.HasValue && targetEvent.EndTime < DateTimeOffset.UtcNow))
-			{ throw new InvalidEventException("Event is closed."); }
+			Try(targetEvent.IsOpen || targetEvent.IsActive,
+				new InvalidEventException("Event is closed."));
 
 			// Check if user has an active event conflict
-			if (targetEvent.StartTime < DateTimeOffset.UtcNow)
+			if (HasAlready(targetEvent.StartTime))
 			{ await ThrowIfUserAtEvent(user); }
 			else
 			{
 				await user.SyncUpcomingEvents();
 
 				// Check if user has an upcoming conflict
-				var conflict = user.UpcomingEvents.Find(e => e.StartTime - targetEvent.StartTime < TimeSpan.FromMinutes(30));
+				var conflict = user.UpcomingEvents.Find(e => IsWithin(e.StartTime - targetEvent.StartTime, HalfHour));
 				if (conflict != null)
 				{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 			}
@@ -234,9 +229,10 @@ namespace Core.Controls
 			bool success;
 
 			// Check if event is active and user is already there
-			if (targetEvent.StartTime < DateTimeOffset.UtcNow &&
+			if (HasAlready(targetEvent.StartTime) &&
 				targetEvent.IsInRange(user))
 			{
+				// Try to add user to the event
 				success = Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Present);
 			}
 			else
@@ -245,39 +241,36 @@ namespace Core.Controls
 				success = Events.SetUserState(userId, eventId, EventUserState.Attending);
 			}
 
-			if (!success)
-			{ throw new UnexpectedFailureException("Could not join event."); }
+			Try(success, new UnexpectedFailureException("Could not join event."));
 
 			// Notify host if event has already started
-			if (targetEvent.StartTime < DateTimeOffset.UtcNow)
+			if (HasAlready(targetEvent.StartTime))
 			{ _ = targetEvent.Host.Notify($"Sparrower Inbound", $"{user.Name} is joining your event."); }
 		}
 
 		public async Task LeaveEventAsync(ulong userId, ulong eventId)
 		{
+			User user = new(userId);
 			var targetEvent = await GetEvent(eventId);
 
 			// Check if user is the host
-			if (targetEvent.Host.Id.Equals(userId))
-			{ throw new InvalidUserException("Host cannot leave the event."); }
+			Try(targetEvent.IsHostedBy(user),
+				new InvalidUserException("Host cannot leave the event."));
 
 			// Get the user's current status
-			var userIntention = Events.GetUserState(userId, eventId);
-			bool success;
+			var userIntention = Events.GetUserState(user.Id, targetEvent.Id);
 
 			if (userIntention.Equals(EventUserState.Present))
 			{
 				// Try to remove user from event
-				success = Events.SetUserState(userId, eventId, EventUserState.Left);
-				if (!success)
-				{ throw new UnexpectedFailureException("Could not leave event."); }
+				Try(Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Left),
+					new UnexpectedFailureException("Could not leave event."));
 			}
 			else if (userIntention.Equals(EventUserState.Attending))
 			{
 				// Try to remove user from event
-				success = Events.RemoveUser(userId, eventId);
-				if (!success)
-				{ throw new UnexpectedFailureException("Could not unattend event."); }
+				Try(Events.RemoveUser(user.Id, targetEvent.Id),
+					new UnexpectedFailureException("Could not unattend event."));
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not leave event, user currently {userIntention.Value} event."); }
@@ -434,8 +427,8 @@ namespace Core.Controls
 
 		private async Task ThrowIfUserAtEvent(User user)
 		{
-			if (await user.IsAtEvent())
-			{ throw new InvalidUserException("User is currently attending an event."); }
+			Fail(await user.IsAtEvent(),
+				new InvalidUserException("User is currently attending an event."));
 		}
 
 		private List<(UserSilhouette User, EventUserState State)>
