@@ -172,7 +172,7 @@ namespace Core.Controls
                     }
                 }
                 // Check if user is the host
-                else if (user.CurrentEvent.IsHostedBy(user))
+                else if (user.CurrentEvent.IsHostedBy(user) && user.CurrentEvent.IsDynamic)
                 {
                     // Update the position of the event
                     Events.UpdateEvent(user.CurrentEvent.Id, new() { (nameof(EventShard.Latitude), user.LastKnownLocation.Latitude),
