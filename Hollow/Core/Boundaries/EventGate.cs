@@ -61,6 +61,7 @@ namespace Core.Boundaries
 			string eventDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null,
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
+		Task StartEventAsync(ulong userId, ulong eventId);
 		Task EndEventAsync(ulong userId, ulong eventId);
 
 		Task WatchEventAsync(ulong userId, ulong eventId);

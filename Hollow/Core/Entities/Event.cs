@@ -37,6 +37,8 @@ namespace Core.Entities
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
 
+        public bool IsStarted { get; set; }
+
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value);
@@ -79,6 +81,7 @@ namespace Core.Entities
             Character = new(fromEvent.Character);
             Radius = new() { Kilometres = fromEvent.Radius };
             IsDynamic = fromEvent.IsDynamic;
+            IsStarted = false;
         }
 
         public Event(EventThinSlice fromEvent)
@@ -242,9 +245,22 @@ namespace Core.Entities
         public bool IsInRange(User user)
             => GeoLocation.AreInRange(Location, user.LastKnownLocation, GuestDistance);
 
+        public bool IsStartable()
+        {
+            if (HasAlready(StartTime))
+            { return true; }
+
+            return false;
+        }
+
 		#endregion
 
 		#region Effects
+
+        public async Task Started()
+        {
+            _ = NotifyActive($"{Name}", "Event is active!");
+        }
 
         public async Task<List<User>> Ended()
         {

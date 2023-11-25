@@ -111,6 +111,25 @@ namespace Frontier.Controllers
 			return Ok();
 		}
 
+		[HttpGet("{eventId}/start")]
+		public async Task<IActionResult> StartEvent(ulong eventId)
+		{
+			try
+			{
+				// Start event as the current user
+				var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
+				await events.StartEventAsync(user.Id, eventId);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
         [HttpDelete("{eventId}/edit")]
         public async Task<IActionResult> EndEvent(ulong eventId)
 		{

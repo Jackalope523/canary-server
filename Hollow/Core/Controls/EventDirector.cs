@@ -193,6 +193,22 @@ namespace Core.Controls
 			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
 		}
 
+		public async Task BeginEvent(ulong userId, ulong eventId)
+		{
+			var user = await GetUser(userId);
+			var targetEvent = await GetEvent(eventId);
+
+			// Check if the user is host
+			Try(targetEvent.IsHostedBy(user),
+				new InvalidUserException("User is not the host of this event"));
+
+			// Check if the event can be started
+			Try(targetEvent.IsStartable(),
+				new InvalidEventException("Event cannot be started."));
+
+			await targetEvent.Started();
+		}
+
 		public async Task EndEventAsync(ulong userId, ulong eventId)
 		{
 			var user = await GetUser(userId);

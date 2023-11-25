@@ -186,6 +186,14 @@ namespace Core.Controls
                 if (nextEvent.IsInRange(user))
                 {
                     Events.SetUserState(user.Id, nextEvent.Id, EventUserState.Present);
+
+                    // Check if user is host and can start event
+                    if (!nextEvent.IsStarted &&
+                        HasAlready(nextEvent.StartTime) &&
+                        nextEvent.IsHostedBy(user))
+                    {
+                        await Terminal.EventDirector.BeginEvent(user.Id, nextEvent.Id);
+                    }
                 }
             }
         }
