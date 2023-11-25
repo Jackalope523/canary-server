@@ -185,7 +185,7 @@ namespace Core.Controls
                 // Check if user is close enough to be a guest
                 if (nextEvent.IsInRange(user))
                 {
-                    Events.SetUserState(user.Id, nextEvent.Id, EventUserState.Present);
+                    Events.SetUserState(user.Id, nextEvent.Id, EventUserState.Guest);
 
                     // Check if user is host and can start event
                     if (nextEvent.IsWaiting &&

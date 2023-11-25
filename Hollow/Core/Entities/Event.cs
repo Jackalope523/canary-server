@@ -52,7 +52,7 @@ namespace Core.Entities
                 HasYet(EndTime.Value + MaximumEtchingLateness);
 
         public List<(User User, EventUserState State)> AllUsers { get; set; }
-        public List<User> Watchers { get; set; }
+        public List<User> Watching { get; set; }
         public List<User> Incoming { get; set; }
         public List<User> Guests { get; set; }
         public List<User> Left { get; set; }
@@ -129,9 +129,9 @@ namespace Core.Entities
         public async Task SyncUsers()
         {
             AllUsers = await CoreTerminal.Terminal.EventDirector.RequestAllUsersFromEventAsync(this);
-            Watchers = AllUsers.FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User);
-            Incoming = AllUsers.FindAll(user => user.State.Equals(EventUserState.Attending)).ConvertAll(user => user.User);
-            Guests = AllUsers.FindAll(user => user.State.Equals(EventUserState.Present)).ConvertAll(user => user.User);
+            Watching = AllUsers.FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User);
+            Incoming = AllUsers.FindAll(user => user.State.Equals(EventUserState.Incoming)).ConvertAll(user => user.User);
+            Guests = AllUsers.FindAll(user => user.State.Equals(EventUserState.Guest)).ConvertAll(user => user.User);
             Left = AllUsers.FindAll(user => user.State.Equals(EventUserState.Left)).ConvertAll(user => user.User);
         }
 
@@ -244,14 +244,6 @@ namespace Core.Entities
 
 			return false;
         }
-
-        public async Task<bool> IsAttendedBy(User user)
-        {
-            Guests ??= await CoreTerminal.Terminal.EventDirector.RequestGuestsAsync(this);
-
-            // Check if user is on the guest list
-            return Guests.Find(x => x.Id == user.Id) != null;
-		}
 
         public async Task<bool> WasAttendedBy(User user)
         {

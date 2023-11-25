@@ -304,12 +304,12 @@ namespace Core.Controls
 				targetEvent.IsInRange(user))
 			{
 				// Try to add user to the event
-				success = Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Present);
+				success = Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Guest);
 			}
 			else
 			{
 				// Try to add user to the event
-				success = Events.SetUserState(userId, eventId, EventUserState.Attending);
+				success = Events.SetUserState(userId, eventId, EventUserState.Incoming);
 			}
 
 			Try(success, new UnexpectedFailureException("Could not join event."));
@@ -331,13 +331,13 @@ namespace Core.Controls
 			// Get the user's current status
 			var userIntention = Events.GetUserState(user.Id, targetEvent.Id);
 
-			if (userIntention.Equals(EventUserState.Present))
+			if (userIntention.Equals(EventUserState.Guest))
 			{
 				// Try to remove user from event
 				Try(Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Left),
 					new UnexpectedFailureException("Could not leave event."));
 			}
-			else if (userIntention.Equals(EventUserState.Attending))
+			else if (userIntention.Equals(EventUserState.Incoming))
 			{
 				// Try to remove user from event
 				Try(Events.RemoveUser(user.Id, targetEvent.Id),
@@ -372,7 +372,7 @@ namespace Core.Controls
 					user => !user.State.Equals(EventUserState.Watching)));
 
 				guestList.GuestCount = targetEvent.Guests.Count;
-				guestList.Watchers = targetEvent.Watchers.Count;
+				guestList.Watchers = targetEvent.Watching.Count;
 			}
 			// Check if user is a guest
 			else if (await targetEvent.WasAttendedBy(user))
@@ -381,11 +381,11 @@ namespace Core.Controls
 				var friends = await targetEvent.GetFriendsOf(user);
 
 				guestList.Guests.AddRange(SelectAsSilhouette(friends,
-					friend => friend.State.Equals(EventUserState.Watching) || friend.State.Equals(EventUserState.Attending)));
+					friend => friend.State.Equals(EventUserState.Watching) || friend.State.Equals(EventUserState.Incoming)));
 
 				// Add visible users
 				guestList.Guests.AddRange(SelectAsSilhouette(targetEvent.AllUsers,
-					user => user.State.Equals(EventUserState.Present) || user.State.Equals(EventUserState.Left)));
+					user => user.State.Equals(EventUserState.Guest) || user.State.Equals(EventUserState.Left)));
 
 				guestList.GuestCount = targetEvent.Guests.Count;
 			}
@@ -434,14 +434,8 @@ namespace Core.Controls
 				.ConvertAll(userDetails => (new User(userDetails.User), userDetails.State));
 		}
 
-		internal async Task<List<User>> RequestGuestsAsync(Event @event)
-		{
-			return Events.GetGuests(@event.Id)
-				.ConvertAll(user => new User(user));
-		}
-
 		internal async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>>
-			RequestAllGuestsAsync(Event @event)
+			RequestGuestHistoryAsync(Event @event)
 		{
 			return Events.GetGuestHistory(@event.Id)
 				.ConvertAll(userDetails => (userDetails.Joined, userDetails.Left, new User(userDetails.User)));

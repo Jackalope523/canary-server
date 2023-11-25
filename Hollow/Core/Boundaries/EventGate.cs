@@ -43,9 +43,6 @@ namespace Core.Boundaries
 		bool RemoveUser(ulong userId, ulong eventId);
 
 		List<(UserSilhouette User, EventUserState State)> GetAllUsers(ulong eventId);
-		List<UserSilhouette> GetWatchers(ulong eventId);
-		List<UserSilhouette> GetAttendees(ulong eventId);
-		List<UserSilhouette> GetGuests(ulong eventId);
 		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(ulong eventId);
 	}
 
