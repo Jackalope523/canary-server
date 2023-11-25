@@ -202,14 +202,14 @@ namespace Core.Entities
 
 		public bool ValidateAndNormalise()
         {
-            // Verify Phone Number
+            // Verify phone number
             if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
 
-            // Verify Email if it exists
+            // Verify email if it exists
             if (!string.IsNullOrEmpty(Email) &&
                 !ContentValidation.IsEmailValid(Email)) { return false; }
 
-            // Verify User age
+            // Verify user age
             if (HasAlready(DateOfBirth + (OneYear * 18))) { return false; }
 
             // Normalise

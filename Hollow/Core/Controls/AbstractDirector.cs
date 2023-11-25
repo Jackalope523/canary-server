@@ -46,7 +46,7 @@ namespace Core.Controls
         {
             User user = new(Accounts.FindUserById(userId));
 
-			// Check if user account is locked
+			// Fail if user account is locked
 			Fail(user.IsLocked,
 				new InvalidUserException("User account is locked."));
 

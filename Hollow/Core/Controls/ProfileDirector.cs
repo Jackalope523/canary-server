@@ -26,7 +26,7 @@ namespace Core.Controls
             var user = await GetUser(userId);
             var targetUser = await GetUser(targetId);
 
-            // Check if user is blocked
+            // Fail if user is blocked
             Fail(await targetUser.IsBlocking(user),
                 new InvalidUserException("User is unable to view target."));
 
@@ -38,7 +38,7 @@ namespace Core.Controls
             var user = await GetUser(userId);
             var targetUser = await GetUser(targetId);
 
-            // Check if user is blocked
+            // Fail if user is blocked
             Fail(await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User is unable to view target."));
 
@@ -72,7 +72,7 @@ namespace Core.Controls
             var user = await GetUser(userId);
             var targetUser = await GetUser(targetId);
 
-            // Check if users are friends
+            // Verify users are friends
             Try(await targetUser.IsFriendsWith(user),
                 new InvalidUserException("User is unable to view target."));
 
@@ -141,6 +141,7 @@ namespace Core.Controls
 
         public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
         {
+            // Check if rating is to remove
             if (rating != UserRating.Remove)
             {
                 Profiles.RateUser(userId, targetId, rating);

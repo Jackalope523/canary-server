@@ -30,7 +30,7 @@ namespace Core.Controls
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
 
-			// Check if user is allowed to view event
+			// Verify user is allowed to view event
 			Try(await targetEvent.IsVisibleTo(user),
 				new InvalidEventException("User is unable to view event."));
 
@@ -67,10 +67,10 @@ namespace Core.Controls
 			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum)
 		{
 			var user = await GetUser(userId);
-			// Check if user is already at an event
+			// Verify user is already at an event
 			await ThrowIfUserAtEvent(user);
 
-			// Check if user can host
+			// Verify user can host
 			Try(user.CanHost,
 				new InvalidUserException("User cannot host.\n" +
 				$"Account Status: {user.AccountStatus}"));
@@ -92,7 +92,7 @@ namespace Core.Controls
 			Try(eventStub.ValidateAndNormalise(),
 				new InvalidInformationException("Invalid event details provided."));
 
-			// Verify that user has no conflict
+			// Verify user has no conflict
 			await user.SyncUpcomingEvents();
 			var conflict = user.UpcomingEvents.Find(e => IsWithin(e.StartTime - eventStub.StartTime, HalfHour));
 			if (conflict != null)
@@ -118,15 +118,15 @@ namespace Core.Controls
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
 
-			// Verify that user is event host
+			// Verify user is event host
 			Try(targetEvent.IsModifiableBy(user),
 				new InvalidEventException("User is unable to edit event."));
 
-			// Verify that event is still active
+			// Verify event is still active
 			Try(targetEvent.IsActive,
 				new InvalidEventException("Unable to edit event, event has ended."));
 
-			// Check for edits that may not be done during the event
+			// Fail if edits may not be done during the event
 			Fail(HasAlready(targetEvent.StartTime) &&
 				(!string.IsNullOrEmpty(eventDescription) || IsNotNull(startTime) ||
 				AreNotNull(latitude, longitude) ||
@@ -199,11 +199,11 @@ namespace Core.Controls
 			var targetEvent = await GetEvent(eventId);
 			await targetEvent.Host.SyncLocation();
 
-			// Check if the user is host
+			// Verify user is host
 			Try(targetEvent.IsHostedBy(user),
 				new InvalidUserException("User is not the host of this event"));
 
-			// Check if the event can be started
+			// Verify event can be started
 			Try(targetEvent.IsStartable(),
 				new InvalidEventException("Event cannot be started."));
 
@@ -219,7 +219,7 @@ namespace Core.Controls
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
 
-			// Check if the user is able to end the event
+			// Verify user is able to end the event
 			Try(targetEvent.IsModifiableBy(user),
 				new InvalidUserException("User does not have permissions to end event."));
 
@@ -238,7 +238,7 @@ namespace Core.Controls
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
 
-			// Check if user is allowed to view event
+			// Verify user is allowed to view event
 			Try(await targetEvent.IsVisibleTo(user),
 				new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"));
 
@@ -276,11 +276,11 @@ namespace Core.Controls
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
 
-			// Check if user is allowed to view event
+			// Verify user is allowed to view event
 			Try(await targetEvent.IsVisibleTo(user),
 				new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"));
 
-			// Check if event is open
+			// Verify event is open
 			Try(targetEvent.IsOpen,
 				new InvalidEventException("Event is closed."));
 
@@ -324,7 +324,7 @@ namespace Core.Controls
 			User user = new(userId);
 			var targetEvent = await GetEvent(eventId);
 
-			// Check if user is the host
+			// Verify user is the host
 			Try(targetEvent.IsHostedBy(user),
 				new InvalidUserException("Host cannot leave the event."));
 

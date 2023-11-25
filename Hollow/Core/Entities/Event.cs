@@ -301,15 +301,15 @@ namespace Core.Entities
 
         public async Task Etched(User user)
         {
-            // Ensure the user can etch into the event
+            // Verify user can etch into the event
             Try(await WasAttendedBy(user),
                 new InvalidEventException("User did not attend event."));
 
-            // Ensure etching is not before event starting or user is host
+            // Verify etching is not before event starting or user is host
             Try(HasAlready(StartTime) || IsModifiableBy(user),
                 new InvalidEventException("Event has yet to start."));
 
-            // Ensure etching is added before event is closed
+            // Verify etching is added before event is closed
             Try(IsActive,
                 new InvalidEventException("Event has already ended."));
 		}

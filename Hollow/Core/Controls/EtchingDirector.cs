@@ -27,7 +27,7 @@ namespace Core.Controls
             Event targetEvent = new(eventId);
             var etchingsSync = targetEvent.SyncEtchings();
 
-            // Ensure user can see the event
+            // Verify user can see the event
             Try(await targetEvent.WasAttendedBy(user),
                 new InvalidEventException("User did not attend event."));
 
@@ -54,7 +54,7 @@ namespace Core.Controls
             var etching = Etchings.GetEtching(etchingId);
             var eventEtched = await GetEvent(etching.EventId);
 
-            // Check if user owns the etching or can modify the event
+            // Verify user owns the etching or can modify the event
             Try(user.Etched(etching) || eventEtched.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove etching."));
 
@@ -67,7 +67,7 @@ namespace Core.Controls
             var etching = Etchings.GetEtching(etchingId);
             var eventEtched = await GetEvent(etching.EventId);
 
-            // Check if user can interact with etching
+            // Verify user can interact with etching
             Try(await eventEtched.WasAttendedBy(user),
                 new InvalidUserException("User cannot interact with etching."));
 

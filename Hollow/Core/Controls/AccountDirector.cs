@@ -28,6 +28,7 @@ namespace Core.Controls
 
         public async Task<UserShard> GetUserAsync(string phoneNumber)
 		{
+            // Verify phone number is valid
             Try(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
                 new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."));
 
@@ -50,7 +51,7 @@ namespace Core.Controls
             Try(newUser.ValidateAndNormalise(),
                 new InvalidInformationException("Invalid account details provided."));
 
-            // Check if phone number is in use
+            // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
 
             // Check if email is in use

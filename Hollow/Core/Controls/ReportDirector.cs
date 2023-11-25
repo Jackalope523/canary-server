@@ -27,6 +27,7 @@ namespace Core.Controls
             await targetUser.SyncCurrentEvent();
             var occuringEvent = targetUser.CurrentEvent ?? new(0);
 
+            // Verify user can report
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
@@ -48,6 +49,7 @@ namespace Core.Controls
             User user = new(userId);
             var targetEvent = await GetEvent(eventId);
 
+            // Verify user can report
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
