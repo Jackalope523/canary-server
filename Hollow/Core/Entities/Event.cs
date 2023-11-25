@@ -22,26 +22,34 @@ namespace Core.Entities
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public readonly Distance GuestDistance = new() { Metres = 75 };
+        public readonly TimeSpan MaximumEtchingLateness = OneDay;
 
         public ulong Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public CharacterVector Character { get; set; }
-        public DateTimeOffset StartTime { get; init; }
+        public DateTimeOffset StartTime { get; set; }
         public GeoLocation Location { get; set; }
         public Distance Radius { get; set; }
         public bool IsDynamic { get; set; }
-        public DateTimeOffset? EndTime { get; init; }
-        public bool IsOpen { get; set; }
+        public DateTimeOffset? EndTime { get; set; }
+        public EventState State { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
 
-        public bool IsStarted { get; set; }
-
+        public bool IsWaiting
+            => State.Equals(EventState.upcoming) &&
+                HasAlready(StartTime);
+        public bool IsOpen
+            => State.Equals(EventState.upcoming) ||
+                State.Equals(EventState.active_open);
+        public bool IsOngoing
+            => State.Equals(EventState.active_open) ||
+                State.Equals(EventState.active_closed);
         public bool IsActive
             => !EndTime.HasValue ||
-                HasYet(EndTime.Value);
+                HasYet(EndTime.Value + MaximumEtchingLateness);
 
         public List<(User User, EventUserState State)> AllUsers { get; set; }
         public List<User> Watchers { get; set; }
@@ -75,13 +83,12 @@ namespace Core.Entities
             Location = new()
                 { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
             EndTime = fromEvent.TimeEnded;
-            IsOpen = fromEvent.IsOpen;
+            State = fromEvent.State;
             GroupMinimum = fromEvent.GroupMinimum;
             GroupMaximum = fromEvent.GroupMaximum;
             Character = new(fromEvent.Character);
             Radius = new() { Kilometres = fromEvent.Radius };
             IsDynamic = fromEvent.IsDynamic;
-            IsStarted = false;
         }
 
         public Event(EventThinSlice fromEvent)
@@ -96,7 +103,7 @@ namespace Core.Entities
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
-                IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter(),
+                State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic);
         }
 
@@ -198,14 +205,27 @@ namespace Core.Entities
 			if (await user.IsBlockedBy(Host) || await user.IsBlocking(Host))
 			{ return false; }
 
+			return true;
+		}
+
+        public async Task<bool> IsJoinableBy(User user)
+        {
+            // Check if event is joinable
+            if (IsOpen)
+            { return false; }
+
+            // Check if user can see event
+            if (!await IsVisibleTo(user))
+            { return false; }
+
             // Check if user or user's haunt is within a reasonable distance
             await user.SyncLocation();
             if (!GeoLocation.AreInRange(user.LastKnownLocation, Location, MaximumJoinDistance) &&
                 !GeoLocation.AreInRange(user.Haunt, Location, MaximumJoinDistance))
             { return false; }
 
-			return true;
-		}
+            return true;
+        }
 
         public bool IsModifiableBy(User user)
         {
@@ -247,10 +267,15 @@ namespace Core.Entities
 
         public bool IsStartable()
         {
-            if (HasAlready(StartTime))
-            { return true; }
+            // Check if event has not yet started
+            if (!IsWaiting)
+            { return false; }
 
-            return false;
+            // Check if host is within range
+            if (!IsInRange(Host))
+            { return false; }
+
+            return true;
         }
 
 		#endregion
@@ -293,7 +318,7 @@ namespace Core.Entities
                 new InvalidEventException("Event has yet to start."));
 
             // Ensure etching is added before event is closed
-            Try(IsActive || HasYet(EndTime.Value + OneDay),
+            Try(IsActive,
                 new InvalidEventException("Event has already ended."));
 		}
 

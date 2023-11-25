@@ -9,9 +9,12 @@ namespace Core.Boundaries
 {
 	#region Schemas
 
+	public enum EventState
+	{ upcoming, active_open, active_closed, ended }
+
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character,
+		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
 		double Radius, bool IsDynamic);
 	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
 

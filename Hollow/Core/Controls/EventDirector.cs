@@ -136,7 +136,7 @@ namespace Core.Controls
 			Event editedEvent = new(targetEvent.ToEventShard())
 			{
 				Description = eventDescription,
-				IsOpen = isOpen ?? targetEvent.IsOpen,
+				State = IsNull(isOpen) ? targetEvent.State : (isOpen.Value ? EventState.active_open : EventState.active_closed),
 				StartTime = startTime ?? targetEvent.StartTime,
 				Location = AreNull(latitude, longitude) ? targetEvent.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
 				Radius = IsNull(radius) ? targetEvent.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
@@ -158,7 +158,7 @@ namespace Core.Controls
 			}
 			if (IsNotNull(isOpen))
 			{
-				edits.Add((nameof(EventShard.IsOpen), editedEvent.IsOpen));
+				edits.Add((nameof(EventShard.State), editedEvent.State));
 			}
 			if (IsNotNull(startTime))
 			{
@@ -193,10 +193,11 @@ namespace Core.Controls
 			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
 		}
 
-		public async Task BeginEvent(ulong userId, ulong eventId)
+		public async Task StartEventAsync(ulong userId, ulong eventId)
 		{
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
+			await targetEvent.Host.SyncLocation();
 
 			// Check if the user is host
 			Try(targetEvent.IsHostedBy(user),
@@ -205,6 +206,10 @@ namespace Core.Controls
 			// Check if the event can be started
 			Try(targetEvent.IsStartable(),
 				new InvalidEventException("Event cannot be started."));
+
+			// Try to start event
+			Try(Events.UpdateEvent(targetEvent.Id, new() { (nameof(EventShard.State), EventState.active_open) }),
+				new UnexpectedFailureException("Could not start event."));
 
 			await targetEvent.Started();
 		}
@@ -275,8 +280,8 @@ namespace Core.Controls
 			Try(await targetEvent.IsVisibleTo(user),
 				new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"));
 
-			// Check if event is open and has not ended
-			Try(targetEvent.IsOpen || targetEvent.IsActive,
+			// Check if event is open
+			Try(targetEvent.IsOpen,
 				new InvalidEventException("Event is closed."));
 
 			// Check if user has an active event conflict
@@ -477,7 +482,7 @@ namespace Core.Controls
 			{
 				Event targetEvent = new(e);
 
-				if (!await targetEvent.IsVisibleTo(user))
+				if (!await targetEvent.IsJoinableBy(user))
 				{ events.Remove(e); continue; }
 
 				if (CharacterVector.AngleBetweenAffected(user.Character, targetEvent.Character) > maximumAngle)

@@ -188,11 +188,10 @@ namespace Core.Controls
                     Events.SetUserState(user.Id, nextEvent.Id, EventUserState.Present);
 
                     // Check if user is host and can start event
-                    if (!nextEvent.IsStarted &&
-                        HasAlready(nextEvent.StartTime) &&
+                    if (nextEvent.IsWaiting &&
                         nextEvent.IsHostedBy(user))
                     {
-                        await Terminal.EventDirector.BeginEvent(user.Id, nextEvent.Id);
+                        await Terminal.EventDirector.StartEventAsync(user.Id, nextEvent.Id);
                     }
                 }
             }
