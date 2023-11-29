@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
 
 // Testing components
 import {Spacing} from '../../styles/Spacing';
@@ -14,6 +14,7 @@ import fontelloConfig from '../../config.json';
 import SingleValueSelector from '../../components/atoms/testing/SingleValueSelector';
 import RangeSlider from '../../components/atoms/testing/RangeSlider';
 import SingleValueSlider from '../../components/atoms/SingleValueSlider';
+import { ButtonErrorExtraSmallContained, ButtonErrorExtraSmallFull, ButtonErrorLargeContained, ButtonErrorLargeFull, ButtonErrorMediumContained, ButtonErrorMediumFull, ButtonErrorSmallContained, ButtonErrorSmallFull, ButtonFunctionExtraSmallContained, ButtonFunctionExtraSmallFull, ButtonFunctionLargeContained, ButtonFunctionLargeFull, ButtonFunctionMediumContained, ButtonFunctionMediumFull, ButtonFunctionSmallContained, ButtonFunctionSmallFull, ButtonPrimaryExtraSmallContained, ButtonPrimaryExtraSmallFull, ButtonPrimaryLargeContained, ButtonPrimaryLargeFull, ButtonPrimaryMediumContained, ButtonPrimaryMediumFull, ButtonPrimarySmallContained, ButtonPrimarySmallFull, ButtonSecondaryExtraSmallContained, ButtonSecondaryExtraSmallFull, ButtonSecondaryLargeContained, ButtonSecondaryLargeFull, ButtonSecondaryMediumContained, ButtonSecondaryMediumFull, ButtonSecondarySmallContained, ButtonSecondarySmallFull, ButtonSuccessExtraSmallContained, ButtonSuccessExtraSmallFull, ButtonSuccessLargeContained, ButtonSuccessLargeFull, ButtonSuccessMediumContained, ButtonSuccessMediumFull, ButtonSuccessSmallContained, ButtonSuccessSmallFull, ButtonTertiaryExtraSmallContained, ButtonTertiaryExtraSmallFull, ButtonTertiaryLargeContained, ButtonTertiaryLargeFull, ButtonTertiaryMediumContained, ButtonTertiaryMediumFull, ButtonTertiarySmallContained, ButtonTertiarySmallFull, ButtonWarningExtraSmallContained, ButtonWarningExtraSmallFull, ButtonWarningLargeContained, ButtonWarningLargeFull, ButtonWarningMediumContained, ButtonWarningMediumFull, ButtonWarningSmallContained, ButtonWarningSmallFull } from '../../components/Button';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -36,9 +37,89 @@ const FeedScreen = () => {
   const [maxValue, setMaxValue] = useState(MAX_DEFAULT);
 
   return (
-    <View style={styles.container}>
-      <SingleValueSlider />
-    </View>
+    <ScrollView>
+      <View style={styles.container}>
+        <SingleValueSlider />
+
+        <Text>Primary buttons</Text>
+
+        <ButtonPrimaryLargeContained />
+        <ButtonPrimaryLargeFull />
+        <ButtonPrimaryMediumContained />
+        <ButtonPrimaryMediumFull />
+        <ButtonPrimarySmallContained />
+        <ButtonPrimarySmallFull />
+        <ButtonPrimaryExtraSmallContained />
+        <ButtonPrimaryExtraSmallFull />
+
+        <Text>Secondary buttons</Text>
+
+        <ButtonSecondaryLargeContained />
+        <ButtonSecondaryLargeFull />
+        <ButtonSecondaryMediumContained />
+        <ButtonSecondaryMediumFull />
+        <ButtonSecondarySmallContained />
+        <ButtonSecondarySmallFull />
+        <ButtonSecondaryExtraSmallContained />
+        <ButtonSecondaryExtraSmallFull />
+
+        <Text>Tertiary buttons</Text>
+
+        <ButtonTertiaryLargeContained />
+        <ButtonTertiaryLargeFull />
+        <ButtonTertiaryMediumContained />
+        <ButtonTertiaryMediumFull />
+        <ButtonTertiarySmallContained />
+        <ButtonTertiarySmallFull />
+        <ButtonTertiaryExtraSmallContained />
+        <ButtonTertiaryExtraSmallFull />
+
+        <Text>Success buttons</Text>
+
+        <ButtonSuccessLargeContained />
+        <ButtonSuccessLargeFull />
+        <ButtonSuccessMediumContained />
+        <ButtonSuccessMediumFull />
+        <ButtonSuccessSmallContained />
+        <ButtonSuccessSmallFull />
+        <ButtonSuccessExtraSmallContained />
+        <ButtonSuccessExtraSmallFull />
+
+        <Text>Warning buttons</Text>
+
+        <ButtonWarningLargeContained />
+        <ButtonWarningLargeFull />
+        <ButtonWarningMediumContained />
+        <ButtonWarningMediumFull />
+        <ButtonWarningSmallContained />
+        <ButtonWarningSmallFull />
+        <ButtonWarningExtraSmallContained />
+        <ButtonWarningExtraSmallFull />
+
+        <Text>Error buttons</Text>
+
+        <ButtonErrorLargeContained />
+        <ButtonErrorLargeFull />
+        <ButtonErrorMediumContained />
+        <ButtonErrorMediumFull />
+        <ButtonErrorSmallContained />
+        <ButtonErrorSmallFull />
+        <ButtonErrorExtraSmallContained />
+        <ButtonErrorExtraSmallFull />
+
+        <Text>Function buttons</Text>
+
+        <ButtonFunctionLargeContained />
+        <ButtonFunctionLargeFull />
+        <ButtonFunctionMediumContained />
+        <ButtonFunctionMediumFull />
+        <ButtonFunctionSmallContained />
+        <ButtonFunctionSmallFull />
+        <ButtonFunctionExtraSmallContained />
+        <ButtonFunctionExtraSmallFull />
+
+      </View>
+    </ScrollView>
     // <GestureHandlerRootView style={{flex: 1}}>
     //   <View style={styles.container}>
     //     <View style={styles.contentContainer}>

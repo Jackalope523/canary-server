@@ -179,6 +179,8 @@ export const globalStyles = StyleSheet.create({
         color: Colors.turqoise300,
     },
 
+    // BUTTONS HAVE BEEN MOVED TO BUTTONS.TSX
+    // TODO delete the buttons code below and update the existing buttons
     // Buttons
     // Primary
     buttonPrimary: {
