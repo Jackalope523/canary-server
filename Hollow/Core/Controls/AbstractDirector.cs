@@ -5,10 +5,14 @@ using Core.Boundaries;
 using Core.Entities;
 using Shared;
 
+using static Core.Entities.Arbiter;
+
 namespace Core.Controls
 {
 	internal abstract class AbstractDirector
 	{
+		#region Variables
+
 		protected CoreTerminal Terminal { get; init; }
 
 		protected IAccountDatabase Accounts { get; private set; }
@@ -18,13 +22,14 @@ namespace Core.Controls
 		protected IReportDatabase Reports { get; private set; }
 		protected INotificationDatabase Notifications { get; private set; }
 
+		#endregion
+
+		#region Initialisation
+
 		public AbstractDirector(CoreTerminal terminal)
 		{
 			Terminal = terminal;
-		}
-
-		internal void Bridge()
-		{
+			
 			Accounts = Terminal.AccountDatabase;
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
@@ -33,21 +38,32 @@ namespace Core.Controls
 			Notifications = Terminal.NotificationDatabase;
         }
 
-        internal async Task<User> GetUser(Guid userID)
-        {
-            User user = new(Accounts.FindUserById(userID));
+		#endregion
 
-            // Check if user account is locked
-            if (user.IsLocked)
-            { throw new InvalidUserException("User account is locked."); }
+		#region Tools
+
+		protected async Task<User> GetUser(ulong userId)
+        {
+            User user = new(Accounts.FindUserById(userId));
+
+			// Fail if user account is locked
+			Fail(user.IsLocked,
+				new InvalidUserException("User account is locked."));
 
             return user;
         }
 
-        internal async Task<Event> GetEvent(Guid eventID)
+		protected async Task<User> GetUserUnsafe(ulong userId)
         {
-            return new(Events.FindEvent(eventID));
+            return new(Accounts.FindUserById(userId));
         }
-    }
+
+        protected async Task<Event> GetEvent(ulong eventId)
+        {
+            return new(Events.FindEvent(eventId));
+        }
+
+		#endregion
+	}
 }
 

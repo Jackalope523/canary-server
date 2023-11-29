@@ -10,6 +10,8 @@ namespace Core.Entities
 {
 	internal readonly struct CharacterVector
 	{
+		#region Olive Branches
+
 		public static float AngleBetween(CharacterVector firstVector, CharacterVector secondVector)
 		{
 			int dotProduct =
@@ -38,6 +40,26 @@ namespace Core.Entities
 			Chaoticness = 50, Competitiveness = 50, Industriousness = 50, NightOwl = 50,
 			Openness = 50 };
 
+		#endregion
+
+		#region Variables
+
+		public int Extraversion { get; init; }
+		public int Athleticism { get; init; }
+		public int Chaoticness { get; init; }
+		public int Competitiveness { get; init; }
+		public int Industriousness { get; init; }
+		public int NightOwl { get; init; }
+		
+		public int Openness { get; init; }
+
+		public float Magnitude => MathF.Sqrt(Extraversion * Extraversion + Athleticism * Athleticism +
+			Chaoticness * Chaoticness + Competitiveness * Competitiveness + NightOwl * NightOwl);
+
+		#endregion
+
+		#region Initialisation & Extraction
+
 		public CharacterVector(Character fromCharacter)
 		{
 			Extraversion = fromCharacter.Extraversion;
@@ -55,22 +77,18 @@ namespace Core.Entities
 				Competitiveness, Industriousness, NightOwl, Openness);
 		}
 
-		public int Extraversion { get; init; }
-		public int Athleticism { get; init; }
-		public int Chaoticness { get; init; }
-		public int Competitiveness { get; init; }
-		public int Industriousness { get; init; }
-		public int NightOwl { get; init; }
-		
-		public int Openness { get; init; }
+		#endregion
 
-		public float Magnitude => MathF.Sqrt(Extraversion * Extraversion + Athleticism * Athleticism +
-			Chaoticness * Chaoticness + Competitiveness * Competitiveness + NightOwl * NightOwl);
+		#region Actions
 
 		public CharacterVector MoveTowards(CharacterVector otherVector, float modifier = 0.1f)
 		{
 			return this + ((otherVector - this) * modifier);
 		}
+
+		#endregion
+
+		#region Dissimilation
 
 		public static CharacterVector operator +(CharacterVector a, CharacterVector b)
 		{
@@ -110,5 +128,7 @@ namespace Core.Entities
 				NightOwl = (int) (a.NightOwl * f)
 			};
 		}
+
+		#endregion
 	}
 }

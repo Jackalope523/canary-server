@@ -2,9 +2,9 @@
 using Shared;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frontier.Models
+namespace Frontier.Manifests
 {
-    public class AccountReportModel
+    public class AccountReportManifest
     {
         [Required]
         public UserReportType ReportType { get; set; }
@@ -12,7 +12,7 @@ namespace Frontier.Models
         public string ReportDetails { get; set; }
     }
 
-    public class EventReportModel
+    public class EventReportManifest
     {
         [Required]
         public EventReportType ReportType { get; set; }

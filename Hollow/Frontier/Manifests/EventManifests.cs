@@ -6,15 +6,17 @@ using System.ComponentModel.DataAnnotations;
 using Core.Boundaries;
 using Shared;
 
-namespace Frontier.Models
+namespace Frontier.Manifests
 {
-    public class EventDetailsModel
+    public class EventDetailsManifest
     {
         [Required]
         public string EventName { get; set; }
 
         [Required]
         public string EventDescription { get; set; }
+        
+        public bool? IsOpen { get; set; }
 
         [Required]
         public float Latitude { get; set; }
@@ -25,6 +27,12 @@ namespace Frontier.Models
         [Required]
         public DateTimeOffset StartTime { get; set; }
 
+        [Required]
+        public float Radius { get; set; }
+
+        [Required]
+        public bool IsDynamic { get; set; }
+
         public int? GroupMinimum { get; set; }
         public int? GroupMaximum { get; set; }
 
@@ -33,24 +41,18 @@ namespace Frontier.Models
         public uint NumberOfParticipants { get; set; }
     }
 
-    public class EventEditModel
-    {
-        public string EventDescription { get; set; }
-        public bool? EventIsOpen { get; set; }
-    }
-
-    public class EventEtchingModel
+    public class EventEtchingManifest
     {
         [Required]
         public string ImageURL { get; set; }
     }
 
-    public class FeedModel
+    public class FeedManifest
     {
         [Required]
         public int Depth { get; set; }
 
         [Required]
-        public Guid[] ExclusionList { get; set; }
+        public ulong[] ExclusionList { get; set; }
     }
 }

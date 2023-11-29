@@ -1,36 +1,48 @@
-﻿using Core.Boundaries;
-using Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Boundaries;
+using Core.Entities;
+using Shared;
 
 namespace Core.Controls
 {
 	internal class NotificationDirector : AbstractDirector, INotificationOperations
 	{
+		#region Initialisation
+
 		public NotificationDirector(CoreTerminal terminal) : base(terminal) { }
 
-		public async Task SubscribeUserAsync(Guid userID, DeviceType deviceType, string deviceToken)
+		#endregion
+
+		#region Operations
+
+		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
 		{
-			Notifications.SubscribeUser(userID, deviceType, deviceToken);
+			Notifications.SubscribeUser(userId, deviceType, deviceToken);
 		}
 
-		public async Task UnsubscribeUserAsync(Guid userID)
+		public async Task UnsubscribeUserAsync(ulong userId)
 		{
-			Notifications.UnsubscribeUser(userID);
+			Notifications.UnsubscribeUser(userId);
 		}
 
+		#endregion
 
-		internal async Task NotifyUserAsync(Guid userID, string title, string message)
+		#region Favours
+
+		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-			var userSettings = Notifications.GetUserSubscription(userID);
+			var userSettings = Notifications.GetUserSubscription(user.Id);
 			// Check if user is subscribed
 			if  (userSettings == (null, null))
 			{ return; }
 
 			await Terminal.NotificationService.PushNotification(userSettings.DeviceType, userSettings.DeviceToken, title, message);
 		}
+
+		#endregion
 	}
 }

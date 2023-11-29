@@ -7,21 +7,25 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
+	#region Gates
+
 	public interface INotificationDatabase
 	{
-		(DeviceType DeviceType, string DeviceToken) GetUserSubscription(Guid id);
-		bool SubscribeUser(Guid id, DeviceType deviceType, string deviceToken);
-		bool UnsubscribeUser(Guid id);
+		(DeviceType DeviceType, string DeviceToken) GetUserSubscription(ulong userId);
+		bool SubscribeUser(ulong userId, DeviceType deviceType, string deviceToken);
+		bool UnsubscribeUser(ulong userId);
 	}
 
 	public interface INotificationOperations
 	{
-		Task SubscribeUserAsync(Guid userID, DeviceType deviceType, string deviceToken);
-		Task UnsubscribeUserAsync(Guid userID);
+		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
+		Task UnsubscribeUserAsync(ulong userId);
 	}
 
 	public interface INotificationService
 	{
 		Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message);
 	}
+
+	#endregion
 }

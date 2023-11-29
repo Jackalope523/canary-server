@@ -7,11 +7,15 @@ using Core.Boundaries;
 using Core.Controls;
 using Shared;
 
+using static Core.Entities.Psijic;
+
 namespace Core.Entities
 {
     internal class User
     {
-		public Guid Id { get; init; }
+		#region Variables
+
+		public ulong Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
@@ -38,8 +42,10 @@ namespace Core.Entities
             AccountStatus == UserAccountStatus.active_no_host;
         public bool CanAttendFriends => CanAttend ||
             AccountStatus == UserAccountStatus.active_limited;
-		public bool CanHost => AccountStatus == UserAccountStatus.active;
+        public bool CanHost => AccountStatus == UserAccountStatus.active;
         public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
+
+        public CharacterVector Character { get; set; }
 
         public GeoLocation LastKnownLocation { get; set; }
         public Distance LastKnownRadius { get; set; }
@@ -48,22 +54,27 @@ namespace Core.Entities
         public int HauntStability { get; set; }
 
         public Event CurrentEvent { get; set; }
-        public bool IsAtEvent => CurrentEvent != null;
+        public List<Event> PastEvents { get; set; }
+        public List<Event> UpcomingEvents { get; set; }
 
-        public List<UserSilhouette> Following { get; set; }
-        public List<UserSilhouette> Blocking { get; set; }
-
-        public CharacterVector Character { get; set; }
+        public List<User> Friends { get; set; }
+        public List<User> Following { get; set; }
+        public List<User> FollowedBy { get; set; }
+        public List<User> Blocking { get; set; }
+        public List<User> BlockedBy { get; set; }
 
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
 
+		#endregion
 
-        public User() { }
+		#region Initialisation & Extraction
 
-        public User(Guid userID)
+		public User() { }
+
+        public User(ulong userId)
         {
-            Id = userID;
+            Id = userId;
         }
 
         public User(UserShard fromUser)
@@ -98,7 +109,7 @@ namespace Core.Entities
             NumberOfFollowers = fromUser.NumberOfFollowers;
         }
 
-        public UserShard ToThinUser()
+        public UserShard ToUserShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
@@ -106,21 +117,25 @@ namespace Core.Entities
                 JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }
 
-        public UserSilhouette ToThinnerUser()
+        public UserSilhouette ToUserSilhouette()
         {
             return new(Id, Name);
         }
 
-        public UserProfile ToThinProfile()
+        public UserProfile ToUserProfile()
         {
             return new(Id, Name, Reputation, NumberOfFollowers);
         }
 
-        public async Task SyncLocation()
+		#endregion
+
+		#region Synchronisation
+
+		public async Task SyncLocation()
         {
             try
             {
-                var userLocation = await CoreTerminal.Terminal.AccountDirector.GetLastKnownUserLocationAsync(Id);
+                var userLocation = await CoreTerminal.Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this);
                 LastKnownLocation = new() { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude };
                 LastKnownRadius = new() { Metres = userLocation.Radius };
             }
@@ -131,47 +146,71 @@ namespace Core.Entities
         {
             try
             {
-                var userHaunt = await CoreTerminal.Terminal.AccountDirector.GetUserHauntAsync(Id);
+                var userHaunt = await CoreTerminal.Terminal.AccountDirector.RequestUserHauntAsync(this);
                 Haunt = new() { Latitude = userHaunt.Latitude, Longitude = userHaunt.Longitude };
                 HauntRadius = new() { Metres = userHaunt.Radius };
                 HauntStability = userHaunt.Stability;
             }
             catch { }
-
         }
 
         public async Task SyncCurrentEvent()
         {
             try
             {
-                CurrentEvent = new(await CoreTerminal.Terminal.EventDirector.GetCurrentEventAsync(Id));
+                CurrentEvent = await CoreTerminal.Terminal.EventDirector.RequestCurrentEventForUserAsync(this);
             }
             catch { }
         }
 
+        public async Task SyncPastEvents()
+        {
+            PastEvents = await CoreTerminal.Terminal.EventDirector.RequestPastEventsForUserAsync(this);
+        }
+
+        public async Task SyncUpcomingEvents()
+        {
+            UpcomingEvents = await CoreTerminal.Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this);
+        }
+
         public async Task SyncReputation()
         {
-            Ratings = await CoreTerminal.Terminal.ProfileDirector.GetAllRatingsAsync(Id);
+            Ratings = await CoreTerminal.Terminal.ProfileDirector.RequestAllRatingsAsync(this);
+        }
+
+        public async Task SyncFriends()
+        {
+            Friends = (await CoreTerminal.Terminal.ProfileDirector.GetFriendsAsync(Id))
+				.ConvertAll(user => new User(user));
+        }
+
+        public async Task SyncFollowers()
+        {
+            FollowedBy = await CoreTerminal.Terminal.ProfileDirector.RequestFollowersAsync(this);
         }
 
         public async Task SyncReports()
         {
-            var reports = await CoreTerminal.Terminal.ReportDirector.GetAllReportsAsync(Id);
+            var reports = await CoreTerminal.Terminal.ReportDirector.RequestAllReportsAsync(this);
             Reports = reports.UserReports;
             EventReports = reports.EventReports;
         }
 
-        public bool ValidateAndNormalise()
+		#endregion
+
+		#region Composition
+
+		public bool ValidateAndNormalise()
         {
-            // Verify Phone Number
+            // Verify phone number
             if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
 
-            // Verify Email if it exists
+            // Verify email if it exists
             if (!string.IsNullOrEmpty(Email) &&
                 !ContentValidation.IsEmailValid(Email)) { return false; }
 
-            // Verify User age
-            if (DateOfBirth + TimeSpan.FromDays(365 * 18) > DateTimeOffset.UtcNow) { return false; }
+            // Verify user age
+            if (HasAlready(DateOfBirth + (OneYear * 18))) { return false; }
 
             // Normalise
             Email = string.IsNullOrEmpty(Email) ? Email : Email.ToLower();
@@ -185,6 +224,121 @@ namespace Core.Entities
             SecurityStamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(20));
         }
 
+		public void CalculateReputation()
+        {
+            int ratingDiff = Ratings.Postitive - Ratings.Negative;
+            int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
+
+            float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
+
+            Reputation = (int) (MathF.Atan(reputationRaw * normal) * (MaximumReputation / ReputationIntensity) + (MaximumReputation / 2));
+        }
+
+        public void CalculateCharacter(Event eventAttended, TimeSpan timeAttended)
+        {
+            // Modified by time spent
+            float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
+
+            Character.MoveTowards(eventAttended.Character, modifier);
+        }
+
+        public async Task<Event> NextEvent()
+        {
+            if (UpcomingEvents == null)
+            { await SyncUpcomingEvents(); }
+
+            return UpcomingEvents[0];
+        }
+
+		#endregion
+
+		#region Checks
+
+        public async Task<bool> IsFriendsWith(User otherUser)
+		{
+			// Set if null
+			if (Friends == null)
+            { await SyncFriends(); }
+
+			// Check if users are friends
+			if (Friends.Find(x => x.Id == otherUser.Id) != null)
+            { return true; }
+
+            return false;
+        }
+
+        public async Task<bool> IsFollowing(User otherUser)
+        {
+            // Set if null
+            Following ??= (await CoreTerminal.Terminal.ProfileDirector.GetFollowedUsersAsync(otherUser.Id))
+				.ConvertAll(user => new User(user));
+
+			// Check if user is following target
+			if (Following.Find(x => x.Id == otherUser.Id) != null)
+			{ return false; }
+
+            return true;
+        }
+
+        public async Task<bool> IsBlocking(User otherUser)
+        {
+            // Set if null
+            Blocking ??= (await CoreTerminal.Terminal.ProfileDirector.GetBlockedUsersAsync(otherUser.Id))
+				.ConvertAll(user => new User(user));
+
+			// Check if user is blocking target
+			if (Blocking.Find(x => x.Id == otherUser.Id) != null)
+			{ return true; }
+
+            return false;
+        }
+
+		public async Task<bool> IsBlockedBy(User otherUser)
+		{
+			// Set if null
+			BlockedBy ??= await CoreTerminal.Terminal.ProfileDirector.RequestUsersBlockingAsync(this);
+
+			// Check if user is blocked by target
+			if (BlockedBy.Find(x => x.Id == otherUser.Id) != null)
+			{ return true; }
+
+			return false;
+		}
+
+        public async Task<bool> IsAtEvent()
+        {
+            if (CurrentEvent == null)
+            { await SyncCurrentEvent(); }
+
+            if (CurrentEvent == null)
+            { return false; }
+
+            return true;
+        }
+
+        public bool Etched(Etching etching)
+        {
+            return etching.UserId.Equals(Id);
+		}
+
+        public async Task<bool> CanReport()
+        {
+            if (Reports == null || EventReports == null)
+            { await SyncReports(); }
+            
+            var recentReportCount = Reports.Count(report => After(report.ReportTime, Time - QuarterHour))
+                + EventReports.Count(report => After(report.ReportTime, Time - QuarterHour));
+
+            if (recentReportCount > 3)
+            { return false; }
+
+            return true;
+        }
+
+		#endregion
+
+		#region Effects
+        
         public async Task HandleHaunt()
         {
             await SyncHaunt();
@@ -207,67 +361,7 @@ namespace Core.Entities
             }
         }
 
-        public async Task<bool> IsFriendsWith(Guid userID)
-            => await IsFriendsWith(new User(userID));
-
-        public async Task<bool> IsFriendsWith(User otherUser)
-        {
-            // Check if both users are following eachother
-            if (await IsFollowing(otherUser) && await otherUser.IsFollowing(this))
-            { return true; }
-
-            return false;
-        }
-
-        public async Task<bool> IsFollowing(Guid userID)
-            => await IsFollowing(new User(userID));
-		
-        public async Task<bool> IsFollowing(User otherUser)
-        {
-            // Set if null
-            Following ??= await CoreTerminal.Terminal.ProfileDirector.GetFollowedUsersAsync(otherUser.Id);
-
-			// Check if user is following target
-			if (Following.Find(x => x.Id == otherUser.Id) != null)
-			{ return false; }
-
-            return true;
-        }
-
-        public async Task<bool> IsBlocking(Guid userID)
-            => await IsBlocking(new User(userID));
-
-        public async Task<bool> IsBlocking(User otherUser)
-        {
-            // Set if null
-            Blocking ??= await CoreTerminal.Terminal.ProfileDirector.GetBlockedUsersAsync(otherUser.Id);
-
-			// Check if user is following target
-			if (Blocking.Find(x => x.Id == otherUser.Id) != null)
-			{ return false; }
-
-            return true;
-        }
-
-        public void CalculateReputation()
-        {
-            int ratingDiff = Ratings.Postitive - Ratings.Negative;
-            int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
-
-            float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
-
-            Reputation = (int) (MathF.Atan(reputationRaw * normal) * (MaximumReputation / ReputationIntensity) + (MaximumReputation / 2));
-        }
-
-        public void CalculateCharacter(Event eventAttended, TimeSpan timeAttended)
-        {
-            // Modified by time spent
-            float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
-
-            Character.MoveTowards(eventAttended.Character, modifier);
-        }
-
-        public async Task<UserAccountStatus> EventReported()
+		public async Task<UserAccountStatus> EventReported()
         {
             await SyncReports();
 
@@ -297,9 +391,23 @@ namespace Core.Entities
             return UserAccountStatus.blacklisted;
         }
 
-        public async Task Notify(string title, string message)
+		#endregion
+
+		#region Actions
+
+		public async Task Notify(string title, string message)
         {
-            await CoreTerminal.Terminal.NotificationDirector.NotifyUserAsync(Id, title, message);
+            await CoreTerminal.Terminal.NotificationDirector.NotifyUserAsync(this, title, message);
         }
-    }
+
+        public async Task NotifyFollowers(string title, string message)
+        {
+            if (FollowedBy == null)
+            { await SyncFollowers(); }
+
+            FollowedBy.ForEach(follower => _ = follower.Notify(title, message));
+        }
+
+		#endregion
+	}
 }

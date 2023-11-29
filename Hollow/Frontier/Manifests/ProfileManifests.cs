@@ -2,14 +2,14 @@
 using Shared;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frontier.Models
+namespace Frontier.Manifests
 {
-    public class AccountDetailsModel
+    public class AccountDetailsManifest
     {
         public string Name { get; set; }
     }
 
-    public class AccountRatingModel
+    public class AccountRatingManifest
     {
         [Required]
         public UserRating Rating { get; set; }

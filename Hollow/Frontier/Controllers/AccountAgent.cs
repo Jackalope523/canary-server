@@ -1,54 +1,37 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
-using Core.Boundaries;
-using Frontier.Models;
-using System.Net;
-using Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Frontier.Services;
+using Microsoft.AspNetCore.Mvc;
+using Frontier.Manifests;
+using Core.Boundaries;
+using Shared;
 
 namespace Frontier.Controllers
 {
     [Route("account")]
-    [ApiController]
-    [Authorize]
-    public class AccountController : ControllerBase
-    {
-		enum AccountError
-		{
-			MissingInformation,
-            IncorrectCode,
-            UserLockedOut,
-			CouldNotLoginUser,
-			CouldNotCreateUser,
-            CouldNotModifyUser
-		}
+    public class AccountAgent : AbstractAgent
+	{
+		#region Initialisation
 
-		IAccountOperations accounts;
-        UserManager<UserShard> userManager;
-        SignInManager<UserShard> signInManager;
+		public AccountAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				reportOperations, notificationOperations,
+				externalSMSService, externalEmailService)
+		{ }
 
-        ISMSService smsService;
-        IEmailService emailService;
+		#endregion
 
-        public AccountController(IAccountOperations accountOperations,
-            UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-            ISMSService externalSMSService, IEmailService externalEmailService)
-        {
-            accounts = accountOperations;
-            userManager = identityUserManager;
-            signInManager = identitySignInManager;
+		#region Actions
 
-            smsService = externalSMSService;
-            emailService = externalEmailService;
-        }
-
-        [HttpGet]
+		[HttpGet]
         public async Task<IActionResult> GetAccount()
         {
             UserShard user;
@@ -68,11 +51,11 @@ namespace Frontier.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] AccountCredentialsModel credentials)
+        public async Task<IActionResult> Login([FromBody] AccountCredentialsManifest credentials)
         {
             if (credentials == null || !ModelState.IsValid)
             {
-                return BadRequest(AccountError.MissingInformation.ToString());
+                return BadRequest(HollowError.MissingInformation.ToString());
             }
 
             try
@@ -104,11 +87,15 @@ namespace Frontier.Controllers
         }
 
         [HttpGet("logout")]
+        [AllowAnonymous]
         public async Task<IActionResult> Logout()
         {
             try
             {
-                await signInManager.SignOutAsync();
+                if (signInManager.IsSignedIn(HttpContext.User))
+                {
+                    await signInManager.SignOutAsync();
+                }
             }
             catch (Exception e)
             {
@@ -120,11 +107,11 @@ namespace Frontier.Controllers
 
         [HttpPost("verify")]
         [AllowAnonymous]
-        public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsModel credentials)
+        public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsManifest credentials)
         {
 			if (credentials == null || !ModelState.IsValid || credentials.Code == null)
             {
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
 			try
@@ -133,7 +120,7 @@ namespace Frontier.Controllers
                 
                 if (await userManager.IsLockedOutAsync(user))
                 {
-                    return BadRequest(AccountError.UserLockedOut.ToString());
+                    return BadRequest(HollowError.UserLockedOut.ToString());
                 }
 
                 // Check if the account is activated
@@ -150,7 +137,7 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-                        return BadRequest(AccountError.IncorrectCode.ToString());
+                        return BadRequest(HollowError.IncorrectCode.ToString());
                     }
                 }
                 else
@@ -165,15 +152,16 @@ namespace Frontier.Controllers
 
 						if (!string.IsNullOrEmpty(user.Email))
 						{
-                            // Send verification email if an email is added
-                            // TODO
-							await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", "Verify your Sparrow email.");
+							// Send verification email if an email is added
+							var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+							var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
+							await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", $"Verify your Sparrow email.\n\n{confirmationLink}");
 						}
 					}
 					else
 					{
                         await userManager.AccessFailedAsync(user);
-						return BadRequest(AccountError.IncorrectCode.ToString());
+						return BadRequest(HollowError.IncorrectCode.ToString());
 					}
 				}
 			}
@@ -185,13 +173,73 @@ namespace Frontier.Controllers
 			return Ok();
         }
 
-        [HttpPost("signup")]
+        [HttpGet("email")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpModel details)
+		public async Task<IActionResult> VerifyEmail(string token, string email)
+        {
+			if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+			{
+				return BadRequest(HollowError.MissingInformation.ToString());
+			}
+
+			try
+            {
+				var user = await userManager.FindByEmailAsync(email);
+				if (user == null)
+                {
+					return BadRequest(HollowError.MissingInformation.ToString());
+                }
+
+				var result = await userManager.ConfirmEmailAsync(user, token);
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+        [HttpPost("email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendEmailVerification(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+			{
+				return BadRequest(HollowError.MissingInformation.ToString());
+			}
+
+            try
+            {
+				var user = await userManager.FindByEmailAsync(email);
+				if (user == null)
+                {
+					return BadRequest(HollowError.MissingInformation.ToString());
+                }
+
+                // Send verification email if email is not confirmed
+                if (!user.IsEmailConfirmed)
+                {
+				    var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+				    var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
+				    await emailService.SendEmailAsync(user.Email, "Verify your Sparrow email.", $"Verify your Sparrow email.\n\n{confirmationLink}");
+                }
+            }
+			catch (Exception e)
+			{
+				return BadRequest(e.ToString());
+			}
+
+			return Ok();
+		}
+
+		[HttpPost("signup")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpManifest details)
 		{
 			if (details == null || !ModelState.IsValid)
 			{
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
             try
@@ -233,11 +281,11 @@ namespace Frontier.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsModel details)
+        public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsManifest details)
         {
 			if (details == null || !ModelState.IsValid)
 			{
-				return BadRequest(AccountError.MissingInformation.ToString());
+				return BadRequest(HollowError.MissingInformation.ToString());
 			}
 
             try
@@ -258,10 +306,6 @@ namespace Frontier.Controllers
 			return Ok();
         }
 
-        private async Task<UserShard> GetCurrentUserAsync()
-        {
-            return await userManager.GetUserAsync(HttpContext.User);
-        }
-    }
-
+		#endregion
+	}
 }

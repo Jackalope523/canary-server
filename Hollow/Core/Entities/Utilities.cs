@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,7 +10,9 @@ namespace Core.Entities
 {
     public readonly struct GeoLocation
     {
-        public static Distance DistanceBetween(GeoLocation locationAlpha, GeoLocation locationBeta)
+		#region Olive Branches
+
+		public static Distance DistanceBetween(GeoLocation locationAlpha, GeoLocation locationBeta)
         {
 
             double sdlat = Math.Sin((locationBeta.LatitudeInRadians - locationAlpha.LatitudeInRadians) / 2);
@@ -31,25 +34,36 @@ namespace Core.Entities
 
         public static Distance EarthRadius => new() { Kilometres = 6371 };
 
+		#endregion
 
-        public double Latitude { get; init; }
+		#region Variables
+
+		public double Latitude { get; init; }
         public double Longitude { get; init; }
 
         public double LatitudeInRadians => (Math.PI / 180) * Latitude;
         public double LongitudeInRadians => (Math.PI / 180) * Longitude;
-    }
+
+		#endregion
+	}
 
 
-    public struct Distance
+	public struct Distance
     {
-        public double Kilometres
+		#region Variables
+
+		public double Kilometres
         { 
             get => Metres / 1000d;
             set => Metres = value * 1000d;
         }
         public double Metres { get; set; }
 
-        public static bool operator ==(Distance a, Distance b)
+		#endregion
+
+		#region Dissimilation
+
+		public static bool operator ==(Distance a, Distance b)
             => a.Metres == b.Metres;
 
         public static bool operator !=(Distance a, Distance b)
@@ -60,5 +74,17 @@ namespace Core.Entities
 
         public static bool operator >(Distance a, Distance b)
             => a.Metres > b.Metres;
+
+		public override bool Equals(object obj)
+		{
+			return obj is Distance other && this == other;
+		}
+        
+		public override int GetHashCode()
+		{
+			return Metres.GetHashCode();
+		}
+
+		#endregion
 	}
 }
