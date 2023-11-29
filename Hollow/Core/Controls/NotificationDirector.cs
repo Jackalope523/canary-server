@@ -7,6 +7,8 @@ using Core.Boundaries;
 using Core.Entities;
 using Shared;
 
+using static Core.Entities.Psijic;
+
 namespace Core.Controls
 {
 	internal class NotificationDirector : AbstractDirector, INotificationOperations
@@ -18,6 +20,13 @@ namespace Core.Controls
 		#endregion
 
 		#region Operations
+
+		public async Task<List<Note>> GetNotesAsync(ulong userId)
+		{
+			var user = await GetUser(userId);
+
+			return Notifications.GetNotes(user.Id);
+		}
 
 		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
 		{
@@ -32,6 +41,15 @@ namespace Core.Controls
 		#endregion
 
 		#region Favours
+
+		internal async Task PostNoteAsync(User user, User notifier, string message, string action)
+		{
+			// Check if notifier can notify user
+			if (await notifier.IsBlocking(user) || await notifier.IsBlockedBy(user))
+			{ return; }
+
+			Notifications.SaveNote(user.Id, notifier.Id, Time, message, action);
+		}
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
 		{

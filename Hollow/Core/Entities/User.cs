@@ -63,6 +63,8 @@ namespace Core.Entities
         public List<User> Blocking { get; set; }
         public List<User> BlockedBy { get; set; }
 
+        public List<Note> Notes { get; set; }
+
         public List<UserReport> Reports { get; set; }
         public List<EventReport> EventReports { get; set; }
 
@@ -187,6 +189,11 @@ namespace Core.Entities
         public async Task SyncFollowers()
         {
             FollowedBy = await CoreTerminal.Terminal.ProfileDirector.RequestFollowersAsync(this);
+        }
+
+        public async Task SyncNotes()
+        {
+            Notes = await CoreTerminal.Terminal.NotificationDirector.GetNotesAsync(Id);
         }
 
         public async Task SyncReports()
@@ -394,6 +401,12 @@ namespace Core.Entities
 		#endregion
 
 		#region Actions
+
+        public async Task PostNote(User notifier, string message, string action)
+        {
+            await CoreTerminal.Terminal.NotificationDirector.PostNoteAsync(this, notifier,
+                message, action);
+        }
 
 		public async Task Notify(string title, string message)
         {

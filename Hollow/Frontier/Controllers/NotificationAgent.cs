@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
+using System.Collections.Generic;
 
 namespace Frontier.Controllers
 {
@@ -27,6 +28,26 @@ namespace Frontier.Controllers
 		#endregion
 
 		#region Actions
+
+		[HttpGet]
+		public async Task<IActionResult> GetNotes()
+		{
+			List<Note> notes;
+
+            try
+            {
+                var user = await GetCurrentUserAsync();
+				ThrowIfUnverified(user);
+
+                notes = await notifications.GetNotesAsync(user.Id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok(notes);
+        }
 
 		[HttpPost]
 		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
