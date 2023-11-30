@@ -25,6 +25,7 @@ namespace Core.Boundaries
         Etching AddEtching(ulong eventId, ulong etcherId,
             DateTimeOffset timeEtched, string imageURL);
         bool RemoveEtching(ulong etchingId);
+        bool DetachEtching(ulong etchingId);
 
         bool RateEtching(ulong etchingId, ulong voterId, UserRating rating);
         bool RemoveEtchingRating(ulong etchingId, ulong voterId);

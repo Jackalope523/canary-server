@@ -285,6 +285,24 @@ namespace Frontier.Controllers
             return Ok();
         }
 
+		[HttpPut("{eventId}/guests")]
+		public async Task<IActionResult> KickUser(ulong targetId, ulong eventId)
+		{
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                ThrowIfUnverified(user);
+
+                await events.KickUserAsync(user.Id, targetId, eventId);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok();
+		}
+
 		[HttpPost("{eventId}/report")]
 		public async Task<IActionResult> ReportEvent(ulong eventId, [FromBody] EventReportManifest report)
 		{
