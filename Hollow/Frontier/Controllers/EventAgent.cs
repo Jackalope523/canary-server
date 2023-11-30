@@ -7,6 +7,8 @@ using Frontier.Manifests;
 using Core.Boundaries;
 using Shared;
 using NetTopologySuite.Utilities;
+using Microsoft.Extensions.Logging;
+using Repository.Entities;
 
 namespace Frontier.Controllers
 {
@@ -244,6 +246,44 @@ namespace Frontier.Controllers
 
 			return Ok(guestList);
 		}
+
+		[HttpGet("{eventId}/invite")]
+		public async Task<IActionResult> GetPotentialInvitees(ulong eventId)
+		{
+			List<UserSilhouette> users;
+
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                ThrowIfUnverified(user);
+
+                users = await events.GetPotentialInviteesAsync(user.Id, eventId);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok(users);
+        }
+
+		[HttpPost("{eventId}/invite")]
+		public async Task<IActionResult> InviteUser(ulong inviteeId, ulong eventId)
+		{
+            try
+            {
+                var user = await GetCurrentUserAsync();
+                ThrowIfUnverified(user);
+
+                await events.InviteUserAsync(user.Id, inviteeId, eventId);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+
+            return Ok();
+        }
 
 		[HttpPost("{eventId}/report")]
 		public async Task<IActionResult> ReportEvent(ulong eventId, [FromBody] EventReportManifest report)

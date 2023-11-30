@@ -245,6 +245,15 @@ namespace Core.Entities
 			return false;
         }
 
+        public async Task<bool> HasUserRelationship(User user)
+        {
+            if (AllUsers == null)
+            { await SyncUsers(); }
+
+            // Check if user has interacted with event
+            return AllUsers.FindAll(x => x.User.Id == user.Id).Count == 1;
+        }
+
         public async Task<bool> WasAttendedBy(User user)
         {
             if (Guests == null || Left == null)

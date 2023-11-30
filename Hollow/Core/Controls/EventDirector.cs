@@ -407,6 +407,49 @@ namespace Core.Controls
 			return guestList;
 		}
 
+		public async Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId)
+		{
+			var user = await GetUser(userId);
+			var @event = await GetEvent(eventId);
+
+			await user.SyncFriends();
+
+			List<User> potentialUsers = new();
+
+			// Add all friends that can join event
+			foreach (var friend in user.Friends)
+			{
+				if (await @event.IsJoinableBy(friend))
+				{ potentialUsers.Add(friend); }
+			}
+
+			return potentialUsers
+				.ConvertAll(u => u.ToUserSilhouette());
+		}
+
+		public async Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId)
+		{
+			var inviter = await GetUser(inviterId);
+			var invitee = await GetUser(inviteeId);
+			var @event = await GetEvent(eventId);
+			await @event.SyncUsers();
+
+			// Verify inviter has relationship with event
+			Try(await @event.HasUserRelationship(inviter),
+				new InvalidEventException("User must be watching, incoming, or at event to invite."));
+
+			// Verify that the invitee can join the event
+			Try(await @event.IsJoinableBy(invitee),
+				new InvalidUserException("Invited cannot join event."));
+
+			// Verify that inviter is friends with the invitee
+			Try(await inviter.IsFriendsWith(invitee),
+				new InvalidUserException("Cannot invite non-friends."));
+
+			_ = invitee.PostNote(inviter, $"has invited you to {@event.Name}", $"{@event.Id}");
+			_ = invitee.Notify("Sparrow", "You were invited to ");
+		}
+
 		#endregion
 
 		#region Favours
