@@ -2,12 +2,11 @@ import * as React from 'react'
 import { StyleSheet, Text, Pressable, StyleProp, ViewStyle, TextStyle } from 'react-native'
 import { globalStyles } from '../styles/Global';
 import { buttonStyles } from '../styles/Buttons';
-import { Gap, Spacing } from '../styles/Spacing';
+import { Gap } from '../styles/Spacing';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
-import { Colors } from '../styles/Colors';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -30,7 +29,13 @@ interface ButtonProps {
   btnStyle?: ViewStyle[];
   btnTextStyle?: TextStyle[];
   btnIconStyle?: TextStyle[];
+  
+// THIS ALSO WORKS
+//   btnStyle?: StyleProp<ViewStyle>[];
+//   btnTextStyle?: StyleProp<TextStyle>[];
+//   btnIconStyle?: StyleProp<TextStyle>[];
 
+// TODO delete this
 //   btnStyle?: StyleProp<ViewStyle>;
 //   btnTextStyle?: StyleProp<TextStyle>;
 //   btnIconStyle?: StyleProp<TextStyle>;
@@ -40,6 +45,12 @@ interface ButtonProps {
   btnActiveTextStyle?: TextStyle[];
   btnActiveIconStyle?: TextStyle[];
 
+// THIS ALSO WORKS
+//   btnActiveStyle?: StyleProp<ViewStyle>[];
+//   btnActiveTextStyle?: StyleProp<TextStyle>[];
+//   btnActiveIconStyle?: StyleProp<TextStyle>[];
+
+// TODO delete this
 //   btnActiveStyle?: StyleProp<ViewStyle>;
 //   btnActiveTextStyle?: StyleProp<TextStyle>;
 //   btnActiveIconStyle?: StyleProp<TextStyle>;
