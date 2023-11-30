@@ -15,6 +15,7 @@ import SingleValueSelector from '../../components/atoms/testing/SingleValueSelec
 import RangeSlider from '../../components/atoms/testing/RangeSlider';
 import SingleValueSlider from '../../components/atoms/SingleValueSlider';
 import { ButtonErrorExtraSmallContained, ButtonErrorExtraSmallFull, ButtonErrorLargeContained, ButtonErrorLargeFull, ButtonErrorMediumContained, ButtonErrorMediumFull, ButtonErrorSmallContained, ButtonErrorSmallFull, ButtonFunctionExtraSmallContained, ButtonFunctionExtraSmallFull, ButtonFunctionLargeContained, ButtonFunctionLargeFull, ButtonFunctionMediumContained, ButtonFunctionMediumFull, ButtonFunctionSmallContained, ButtonFunctionSmallFull, ButtonPrimaryExtraSmallContained, ButtonPrimaryExtraSmallFull, ButtonPrimaryLargeContained, ButtonPrimaryLargeFull, ButtonPrimaryMediumContained, ButtonPrimaryMediumFull, ButtonPrimarySmallContained, ButtonPrimarySmallFull, ButtonSecondaryExtraSmallContained, ButtonSecondaryExtraSmallFull, ButtonSecondaryLargeContained, ButtonSecondaryLargeFull, ButtonSecondaryMediumContained, ButtonSecondaryMediumFull, ButtonSecondarySmallContained, ButtonSecondarySmallFull, ButtonSuccessExtraSmallContained, ButtonSuccessExtraSmallFull, ButtonSuccessLargeContained, ButtonSuccessLargeFull, ButtonSuccessMediumContained, ButtonSuccessMediumFull, ButtonSuccessSmallContained, ButtonSuccessSmallFull, ButtonTertiaryExtraSmallContained, ButtonTertiaryExtraSmallFull, ButtonTertiaryLargeContained, ButtonTertiaryLargeFull, ButtonTertiaryMediumContained, ButtonTertiaryMediumFull, ButtonTertiarySmallContained, ButtonTertiarySmallFull, ButtonWarningExtraSmallContained, ButtonWarningExtraSmallFull, ButtonWarningLargeContained, ButtonWarningLargeFull, ButtonWarningMediumContained, ButtonWarningMediumFull, ButtonWarningSmallContained, ButtonWarningSmallFull } from '../../components/Button';
+import TestButton from '../../components/TestButton';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -40,6 +41,10 @@ const FeedScreen = () => {
     <ScrollView>
       <View style={styles.container}>
         <SingleValueSlider />
+
+        <Text>TestButton</Text>
+        <TestButton type='PrimaryDark' size='Large' display='Contained' btnText='I MADE A BUTTON!' btnIcon='settings-outline' />
+        <TestButton type='Secondary' size='Large' display='Contained' btnText='Another one' />
 
         <Text>Primary buttons</Text>
 

@@ -15,3 +15,26 @@ export const Spacing = {
     // Extra large
     xl: 32,
 }
+
+export const Gap = {
+    // Gaps
+    gapExtraSmall: {
+        gap: Spacing.xs,
+    },
+
+    gapSmall: {
+        gap: Spacing.sm,
+    },
+
+    gapMedium: {
+        gap: Spacing.md,
+    },
+
+    gapLarge: {
+        gap: Spacing.lg,
+    },
+
+    gapExtraLarge: {
+        gap: Spacing.xl,
+    },
+}
