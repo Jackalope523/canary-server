@@ -491,7 +491,7 @@ namespace Core.Controls
 			{
 				Event targetEvent = new(e);
 
-				if (!await targetEvent.IsVisibleTo(user))
+				if (!await user.CanView(targetEvent))
 				{ events.Remove(e); }
 			}
 
@@ -505,7 +505,7 @@ namespace Core.Controls
 			{
 				Event targetEvent = new(e);
 
-				if (!await targetEvent.IsVisibleTo(user))
+				if (!await user.CanView(targetEvent))
 				{ events.Remove(e); }
 			}
 
@@ -519,7 +519,7 @@ namespace Core.Controls
 			{
 				Event targetEvent = new(e);
 
-				if (!await targetEvent.IsJoinableBy(user))
+				if (!await user.CanJoin(targetEvent))
 				{ events.Remove(e); continue; }
 
 				if (CharacterVector.AngleBetweenAffected(user.Character, targetEvent.Character) > maximumAngle)

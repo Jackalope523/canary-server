@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Controls;
+using Microsoft.Extensions.Hosting;
 using Shared;
 
 using static Core.Entities.Psijic;
@@ -323,7 +324,50 @@ namespace Core.Entities
             return true;
         }
 
-        public bool Etched(Etching etching)
+		public async Task<bool> CanView(Event @event)
+		{
+			// Note: This is efficient with multiple events. For multiple users, see Event.IsVisibleTo
+
+			// Check if user account is locked
+			if (IsLocked)
+			{ return false; }
+
+			// Check if user's account is limited
+			if (!CanAttend)
+			{
+                // User cannot join normal events
+                // Check if user can join friend events and Host is friends with the user
+				if (!CanAttendFriends || !await IsFriendsWith(@event.Host))
+				{ return false; }
+			}
+
+            // Check if user is blocked by or blocking event host
+            if (await IsBlockedBy(@event.Host) || await IsBlocking(@event.Host))
+			{ return false; }
+
+			return true;
+		}
+
+		public async Task<bool> CanJoin(Event @event)
+		{
+			// Check if event is joinable
+			if (@event.IsOpen)
+			{ return false; }
+
+			// Check if user can see event
+			if (!await CanView(@event))
+			{ return false; }
+
+			// Check if user or user's haunt is within a reasonable distance
+			await SyncLocation();
+			if (!GeoLocation.AreInRange(LastKnownLocation, @event.Location, @event.MaximumJoinDistance) &&
+				!GeoLocation.AreInRange(Haunt, @event.Location, @event.MaximumJoinDistance))
+			{ return false; }
+
+			return true;
+		}
+
+		public bool Etched(Etching etching)
         {
             return etching.UserId.Equals(Id);
 		}
