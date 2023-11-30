@@ -468,12 +468,12 @@ namespace Core.Controls
 			// Kick target user from event
 			Events.SetUserState(targetUser.Id, @event.Id, EventUserState.Kicked);
 
-			// Remove target user's etchings from event
+			// Hide target user's etchings from event
 			await @event.SyncEtchings();
 			foreach (Etching etching in @event.Etchings)
 			{
 				if (targetUser.Etched(etching))
-				{ Etchings.DetachEtching(etching.Id); }
+				{ Etchings.HideEtching(etching.Id); }
 			}
 		}
 

@@ -11,7 +11,7 @@ namespace Core.Boundaries
 
     public record Etching(ulong Id, ulong EventId, ulong UserId,
         DateTimeOffset TimeEtched, string ImageURL,
-        (int Positive, int Negative) Ratings);
+        (int Positive, int Negative) Ratings, bool IsHidden);
 
 	#endregion
 
@@ -25,7 +25,7 @@ namespace Core.Boundaries
         Etching AddEtching(ulong eventId, ulong etcherId,
             DateTimeOffset timeEtched, string imageURL);
         bool RemoveEtching(ulong etchingId);
-        bool DetachEtching(ulong etchingId);
+        bool HideEtching(ulong etchingId);
 
         bool RateEtching(ulong etchingId, ulong voterId, UserRating rating);
         bool RemoveEtchingRating(ulong etchingId, ulong voterId);
