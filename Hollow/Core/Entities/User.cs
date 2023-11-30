@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -269,7 +270,7 @@ namespace Core.Entities
             { await SyncFriends(); }
 
 			// Check if users are friends
-			if (Friends.Find(x => x.Id == otherUser.Id) != null)
+			if (Friends.Contains(otherUser))
             { return true; }
 
             return false;
@@ -282,7 +283,7 @@ namespace Core.Entities
 				.ConvertAll(user => new User(user));
 
 			// Check if user is following target
-			if (Following.Find(x => x.Id == otherUser.Id) != null)
+			if (Following.Contains(otherUser))
 			{ return false; }
 
             return true;
@@ -295,7 +296,7 @@ namespace Core.Entities
 				.ConvertAll(user => new User(user));
 
 			// Check if user is blocking target
-			if (Blocking.Find(x => x.Id == otherUser.Id) != null)
+			if (Blocking.Contains(otherUser))
 			{ return true; }
 
             return false;
@@ -307,7 +308,7 @@ namespace Core.Entities
 			BlockedBy ??= await CoreTerminal.Terminal.ProfileDirector.RequestUsersBlockingAsync(this);
 
 			// Check if user is blocked by target
-			if (BlockedBy.Find(x => x.Id == otherUser.Id) != null)
+			if (BlockedBy.Contains(otherUser))
 			{ return true; }
 
 			return false;
@@ -464,6 +465,20 @@ namespace Core.Entities
 
             FollowedBy.ForEach(follower => _ = follower.Notify(title, message));
         }
+
+		#endregion
+
+		#region Dissimilation
+
+		public override bool Equals(object obj)
+		{
+			return obj is User other && Id.Equals(other.Id);
+		}
+
+		public override int GetHashCode()
+		{
+			return Id.GetHashCode();
+		}
 
 		#endregion
 	}

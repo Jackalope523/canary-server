@@ -260,7 +260,7 @@ namespace Core.Entities
             { await SyncUsers(); }
 
             // Check if user is or was on the guest list
-            return Guests.Find(x => x.Id == user.Id) != null || Left.Find(x => x.Id == user.Id) != null;
+            return Guests.Contains(user) || Left.Contains(user);
 		}
 
         public bool IsInRange(User user)
@@ -366,6 +366,20 @@ namespace Core.Entities
             }
         }
 
-        #endregion
-    }
+		#endregion
+
+		#region Dissimilation
+
+		public override bool Equals(object obj)
+		{
+			return obj is Event other && Id.Equals(other.Id);
+		}
+
+		public override int GetHashCode()
+		{
+			return Id.GetHashCode();
+		}
+
+		#endregion
+	}
 }
