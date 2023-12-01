@@ -3,26 +3,79 @@
 
 namespace Shared
 {
-    #region Repository
+    #region Hollow
+
     [Serializable]
-    public class InsuifficientRadiusException : Exception
+    public abstract class HollowFailureException : Exception
     {
-        public InsuifficientRadiusException()
+        public HollowFailureException()
         {
         }
 
-        public InsuifficientRadiusException(string message)
+        public HollowFailureException(string message)
             : base(message)
         {
         }
 
-        public InsuifficientRadiusException(string message, Exception inner)
+        public HollowFailureException(string message, Exception inner)
             : base(message, inner)
         {
         }
     }
 
-    public class ExcessiveRadiusException : Exception
+    [Serializable]
+    public abstract class UserErrorException : Exception
+	{
+		public UserErrorException()
+		{
+		}
+
+		public UserErrorException(string message)
+			: base(message)
+		{
+		}
+
+		public UserErrorException(string message, Exception inner)
+			: base(message, inner)
+		{
+		}
+	}
+
+	[Serializable]
+	public class UnexpectedFailureException : HollowFailureException
+	{
+		public UnexpectedFailureException()
+			: base() { }
+		public UnexpectedFailureException(string message)
+			: base(message) { }
+		public UnexpectedFailureException(string message, Exception innerException)
+			: base(message, innerException) { }
+	}
+
+	#endregion
+
+
+	#region Repository
+
+	[Serializable]
+    public class InsufficientRadiusException : HollowFailureException
+    {
+        public InsufficientRadiusException()
+        {
+        }
+
+        public InsufficientRadiusException(string message)
+            : base(message)
+        {
+        }
+
+        public InsufficientRadiusException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+
+    public class ExcessiveRadiusException : HollowFailureException
     {
         public ExcessiveRadiusException()
         {
@@ -38,12 +91,14 @@ namespace Shared
         {
         }
     }
-    #endregion
 
-    #region Accounts
+	#endregion
 
-    [Serializable]
-	public class InvalidUserException : Exception
+
+	#region Core
+
+	[Serializable]
+	public class InvalidUserException : UserErrorException
 	{
 		public InvalidUserException()
             : base() { }
@@ -54,7 +109,7 @@ namespace Shared
     }
 
     [Serializable]
-    public class InvalidInformationException : Exception
+    public class InvalidInformationException : UserErrorException
     {
         public InvalidInformationException()
             : base() { }
@@ -65,7 +120,7 @@ namespace Shared
     }
 
     [Serializable]
-    public class InsufficientPermissionsException : Exception
+    public class InsufficientPermissionsException : UserErrorException
     {
         public InsufficientPermissionsException()
             : base() { }
@@ -76,22 +131,7 @@ namespace Shared
     }
 
     [Serializable]
-    public class UnexpectedFailureException : Exception
-    {
-        public UnexpectedFailureException()
-            : base() { }
-        public UnexpectedFailureException(string message)
-            : base(message) { }
-        public UnexpectedFailureException(string message, Exception innerException)
-            : base(message, innerException) { }
-    }
-
-    #endregion
-
-    #region Events
-
-    [Serializable]
-    public class InvalidEventException : Exception
+    public class InvalidEventException : UserErrorException
     {
         public InvalidEventException()
             : base() { }
@@ -101,5 +141,5 @@ namespace Shared
             : base(message, innerException) { }
     }
 
-    #endregion
+	#endregion
 }

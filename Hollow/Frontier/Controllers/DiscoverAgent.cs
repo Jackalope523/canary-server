@@ -31,59 +31,34 @@ namespace Frontier.Controllers
 		[HttpGet("{latitude}-{longitude}-{distance}")]
         public async Task<IActionResult> GetEvents(float latitude, float longitude, float distance)
         {
-            List<EventThinSlice> eventList;
-
-            try
-            {
-                // Retrieve events personalised for the current user
-                var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
-                eventList = await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
-			}
-			catch (Exception e)
+			return await Execute(async user =>
 			{
-				return BadRequest(e.ToString());
-			}
+				// Retrieve events personalised for the current user
+				var eventList = await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
 
-			return Ok(eventList);
+				return Ok(eventList);
+			});
         }
 
         [HttpGet("all/{latitude}-{longitude}-{distance}")]
         public async Task<IActionResult> GetAllEvents(float latitude, float longitude, float distance)
         {
-            List<EventThinSlice> eventList;
-
-            try
+			return await Execute(async user =>
 			{
-                // Retrieve all events available to the current user
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
+				// Retrieve all events available to the current user
+				var eventList = await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
 
-				eventList = await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok(eventList);
+				return Ok(eventList);
+			});
         }
 
         [HttpPost("user/{latitude}-{longitude}")]
         public async Task<IActionResult> UpdateCurrentPosition(float latitude, float longitude)
         {
-            try
-            {
-                var user = await GetCurrentUserAsync();
-                await accounts.UpdateUserLocationAsync(user.Id, latitude, longitude);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
-
-            return Ok();
+			return await Execute(async user =>
+			{
+				await accounts.UpdateUserLocationAsync(user.Id, latitude, longitude);
+			}, allowUnverified: true);
         }
 
 		#endregion

@@ -32,290 +32,155 @@ namespace Frontier.Controllers
 
 		[HttpGet("{targetIdentification}")]
         public async Task<IActionResult> GetProfile(ulong targetIdentification)
-        {
-			UserProfile profile;
-
-			try
+		{
+			return await Execute(async user =>
 			{
 				// Retrieve profile
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
+				var profile = await profiles.GetUserProfileAsync(user.Id, targetIdentification);
 
-				profile = await profiles.GetUserProfileAsync(user.Id, targetIdentification);
-			}
-			catch (InvalidUserException e)
-			{
-				// User does not exist
-				return BadRequest(e.ToString());
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok(profile);
+				return Ok(profile);
+			});
 		}
 
 		[HttpGet("{targetIdentification}/nest")]
         public async Task<IActionResult> GetNest(ulong targetIdentification)
-        {
-			(List<EventThinSlice> Events, List<Etching> Etchings) nest;
-
-			try
+		{
+			return await Execute(async user =>
 			{
 				// Retrieve nest
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
+				var nest = await profiles.GetUserNestAsync(user.Id, targetIdentification);
 
-				nest = await profiles.GetUserNestAsync(user.Id, targetIdentification);
-			}
-			catch (InvalidUserException e)
-			{
-				// User does not exist
-				return BadRequest(e.ToString());
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok(nest);
+				return Ok(nest);
+			});
 		}
 
 		[HttpPost("{targetIdentification}")]
 		public async Task<IActionResult> RateUser(ulong targetIdentification, [FromBody] AccountRatingManifest details)
         {
+			// Verify parameters
             if (details != null && !ModelState.IsValid)
-            {
-                return BadRequest(HollowError.MissingInformation.ToString());
-            }
+            { return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+			return await Execute(async user =>
 			{
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
 				await profiles.RateUserAsync(user.Id, targetIdentification, details.Rating);
-            }
-            catch (InvalidUserException e)
-            {
-                // User does not exist
-                return BadRequest(e.ToString());
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
-
-            return Ok();
+			});
 		}
 
 		[HttpGet("{targetIdentification}/activity")]
 		public async Task<IActionResult> GetUserActivity(ulong targetIdentification)
 		{
-			List<EventShard> activity;
-
-			try
+			return await Execute(async user =>
 			{
 				// Retrieve activity
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
+				var activity = await profiles.GetUserActivityAsync(user.Id, targetIdentification);
 
-				activity = await profiles.GetUserActivityAsync(user.Id, targetIdentification);
-			}
-			catch (InvalidUserException e)
-			{
-				// User does not exist
-				return BadRequest(e.ToString());
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok(activity);
+				return Ok(activity);
+			});
 		}
 
 		[HttpGet("activity")]
 		public async Task<IActionResult> GetFriendActivity()
 		{
-			IDictionary<UserSilhouette, List<EventShard>> activity;
-
-			try
+			return await Execute(async user =>
 			{
 				// Retrieve activity
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
+				var activity = await profiles.GetFriendActivityAsync(user.Id);
 
-				activity = await profiles.GetFriendActivityAsync(user.Id);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok(activity);
+				return Ok(activity);
+			});
 		}
 
 		[HttpGet("following")]
         public async Task<IActionResult> GetFollowed()
-        {
-			List<UserSilhouette> followedUsers;
-
-			try
+		{
+			return await Execute(async user =>
 			{
 				// Retrieve all users that the current user is following
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
+				var followedUsers = await profiles.GetFollowedUsersAsync(user.Id);
 
-				followedUsers = await profiles.GetFollowedUsersAsync(user.Id);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok(followedUsers);
+				return Ok(followedUsers);
+			});
 		}
 
 		[HttpPost("following")]
 		public async Task<IActionResult> FollowUser([FromBody] TargetManifest info)
 		{
+			// Verify parameters
 			if (info == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+			return await Execute(async user =>
 			{
 				// Follow other user
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
 				await profiles.FollowUserAsync(user.Id, info.TargetId);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+			});
 		}
 
 		[HttpPut("following")]
 		public async Task<IActionResult> UnfollowUser([FromBody] TargetManifest info)
 		{
+			// Verify parameters
 			if (info == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+			return await Execute(async user =>
 			{
 				// Unfollow other user
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
 				await profiles.UnfollowUserAsync(user.Id, info.TargetId);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+			});
 		}
 
 		[HttpGet("blocked")]
 		public async Task<IActionResult> GetBlocked()
 		{
-			List<UserSilhouette> blockedUsers; // Change to something more meaningful
-
-			try
+			return await Execute(async user =>
 			{
 				// Retrieve all users that the current user is blocking
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
+				var blockedUsers = await profiles.GetBlockedUsersAsync(user.Id);
 
-				blockedUsers = await profiles.GetBlockedUsersAsync(user.Id);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok(blockedUsers);
+				return Ok(blockedUsers);
+			});
 		}
 
 		[HttpPost("blocked")]
 		public async Task<IActionResult> BlockUser([FromBody] TargetManifest info)
 		{
+			// Verify parameters
 			if (info == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+			return await Execute(async user =>
 			{
 				// Block other user
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
 				await profiles.BlockUserAsync(user.Id, info.TargetId);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+			});
 		}
 
 		[HttpPut("blocked")]
 		public async Task<IActionResult> UnblockUser([FromBody] TargetManifest info)
 		{
 			if (info == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+			return await Execute(async user =>
 			{
 				// Unblock other user
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
 				await profiles.UnblockUserAsync(user.Id, info.TargetId);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+			});
 		}
 
 		[HttpPost("{targetIdentification}/report")]
 		public async Task<IActionResult> ReportUser(ulong targetId, [FromBody] AccountReportManifest report)
 		{
+			// Verify parameters
 			if (report == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+			return await Execute(async user =>
 			{
-				var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
 				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+			});
 		}
 
 		#endregion

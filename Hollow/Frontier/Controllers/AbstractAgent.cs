@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
+using System;
 
 namespace Frontier.Controllers
 {
@@ -70,6 +71,62 @@ namespace Frontier.Controllers
 		#endregion
 
 		#region Favours
+
+		public async Task<IActionResult> Execute(Func<Task<IActionResult>> action)
+		{
+			try
+			{
+				return await action.Invoke();
+			}
+			catch (HollowFailureException ex)
+			{
+				// Log failure
+
+				return StatusCode(500);
+			}
+			catch (UserErrorException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				// Log failure
+
+				return StatusCode(500);
+			}
+		}
+
+		public async Task<IActionResult> Execute(Func<Task> action)
+		{
+			return await Execute(async () =>
+			{
+				await action.Invoke();
+				return Ok();
+			});
+		}
+
+		public async Task<IActionResult> Execute(Func<UserShard, Task> action, bool allowUnverified = false)
+		{
+			return await Execute(async user =>
+			{
+				await action.Invoke(user);
+				return Ok();
+			},
+			allowUnverified);
+		}
+
+		public async Task<IActionResult> Execute(Func<UserShard, Task<IActionResult>> action, bool allowUnverified = false)
+		{
+			return await Execute(async () =>
+			{
+				var user = await GetCurrentUserAsync();
+
+				if (!allowUnverified)
+				{ ThrowIfUnverified(user); }
+
+				return await action.Invoke(user);
+			});
+		}
 
 		public async Task<UserShard> GetCurrentUserAsync()
 		{
