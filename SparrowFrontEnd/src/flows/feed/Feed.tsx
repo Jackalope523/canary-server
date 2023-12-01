@@ -42,9 +42,20 @@ const FeedScreen = () => {
       <View style={styles.container}>
         <SingleValueSlider />
 
-        <Text>TestButton</Text>
+        <Text>TestButton Contained</Text>
         <TestButton type={ButtonType.PrimaryDark} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='I MADE A BUTTON!' btnIcon='settings-outline' />
         <TestButton type={ButtonType.Secondary} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='Another one' />
+        <TestButton type={ButtonType.Tertiary} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='Another one' />
+        <TestButton type={ButtonType.Success} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='Another one' />
+        <TestButton type={ButtonType.Warning} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='Another one' />
+        <TestButton type={ButtonType.Error} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='Another one' />
+        <TestButton type={ButtonType.Function} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='Another one' />
+        
+        <Text>TestButton Full</Text>
+        <TestButton type={ButtonType.Success} size={ButtonSize.Small} display={ButtonDisplay.Full} btnText='Small Button' />
+        <TestButton type={ButtonType.Success} size={ButtonSize.Medium} display={ButtonDisplay.Full} btnText='Medium Button' />
+        <TestButton type={ButtonType.Success} size={ButtonSize.Large} display={ButtonDisplay.Full} btnText='Large Button' />
+        <TestButton type={ButtonType.Success} size={ButtonSize.ExtraSmall} display={ButtonDisplay.Full} btnText='Extra Small Button' />
 
       </View>
     </ScrollView>

@@ -104,7 +104,10 @@ export const TestButton: React.FC<ButtonProps> = ({
       Full = "Full",
     }
 
-    // Type
+    // ! ||--------------------------------------------------------------------------------||
+    // ! ||                                      Type                                      ||
+    // ! ||--------------------------------------------------------------------------------||
+
     // Primary
     const PrimaryDark = {
         btnStyle: buttonStyles.buttonPrimaryDark,
@@ -167,7 +170,116 @@ export const TestButton: React.FC<ButtonProps> = ({
         btnActiveIconStyle = [...btnActiveIconStyle, Secondary.btnActiveIconStyle];
     }
 
-    // Size
+    // Tertiary
+    const Tertiary = {
+        btnStyle: buttonStyles.buttonTertiary,
+        btnTextStyle: globalStyles.textLight,
+        btnIconStyle: globalStyles.textLight,
+        btnActiveStyle: buttonStyles.buttonTertiary,
+        btnActiveTextStyle: globalStyles.textLight,
+        btnActiveIconStyle: globalStyles.textLight,
+    }
+
+    if (type === ButtonType.Tertiary) {
+        console.log('Applying Tertiary styles');
+
+        btnStyle = [...btnStyle, Tertiary.btnStyle];
+        btnTextStyle = [...btnTextStyle, Tertiary.btnTextStyle];
+        btnIconStyle = [...btnIconStyle, Tertiary.btnIconStyle];
+        btnActiveStyle = [...btnActiveStyle, Tertiary.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, Tertiary.btnActiveTextStyle];
+        btnActiveIconStyle = [...btnActiveIconStyle, Tertiary.btnActiveIconStyle];
+    }
+
+    // Success
+    const Success = {
+        btnStyle: buttonStyles.buttonSuccess,
+        btnTextStyle: globalStyles.textDark,
+        btnIconStyle: globalStyles.textDark,
+        btnActiveStyle: buttonStyles.buttonSuccess,
+        btnActiveTextStyle: globalStyles.textDark,
+        btnActiveIconStyle: globalStyles.textDark,
+    }
+
+    if (type === ButtonType.Success) {
+        console.log('Applying Success styles');
+
+        btnStyle = [...btnStyle, Success.btnStyle];
+        btnTextStyle = [...btnTextStyle, Success.btnTextStyle];
+        btnIconStyle = [...btnIconStyle, Success.btnIconStyle];
+        btnActiveStyle = [...btnActiveStyle, Success.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, Success.btnActiveTextStyle];
+        btnActiveIconStyle = [...btnActiveIconStyle, Success.btnActiveIconStyle];
+    }
+
+    // Warning
+    const Warning = {
+        btnStyle: buttonStyles.buttonWarning,
+        btnTextStyle: globalStyles.textDark,
+        btnIconStyle: globalStyles.textDark,
+        btnActiveStyle: buttonStyles.buttonWarning,
+        btnActiveTextStyle: globalStyles.textDark,
+        btnActiveIconStyle: globalStyles.textDark,
+    }
+
+    if (type === ButtonType.Warning) {
+        console.log('Applying Warning styles');
+
+        btnStyle = [...btnStyle, Warning.btnStyle];
+        btnTextStyle = [...btnTextStyle, Warning.btnTextStyle];
+        btnIconStyle = [...btnIconStyle, Warning.btnIconStyle];
+        btnActiveStyle = [...btnActiveStyle, Warning.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, Warning.btnActiveTextStyle];
+        btnActiveIconStyle = [...btnActiveIconStyle, Warning.btnActiveIconStyle];
+    }
+
+    // Error
+    const Error = {
+        btnStyle: buttonStyles.buttonError,
+        btnTextStyle: globalStyles.textDark,
+        btnIconStyle: globalStyles.textDark,
+        btnActiveStyle: buttonStyles.buttonError,
+        btnActiveTextStyle: globalStyles.textDark,
+        btnActiveIconStyle: globalStyles.textDark,
+    }
+
+    if (type === ButtonType.Error) {
+        console.log('Applying Error styles');
+
+        btnStyle = [...btnStyle, Error.btnStyle];
+        btnTextStyle = [...btnTextStyle, Error.btnTextStyle];
+        btnIconStyle = [...btnIconStyle, Error.btnIconStyle];
+        btnActiveStyle = [...btnActiveStyle, Error.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, Error.btnActiveTextStyle];
+        btnActiveIconStyle = [...btnActiveIconStyle, Error.btnActiveIconStyle];
+    }
+
+    // Function
+    const Function = {
+        btnStyle: buttonStyles.buttonFunction,
+        btnTextStyle: globalStyles.textDark,
+        btnIconStyle: globalStyles.textDark,
+        btnActiveStyle: buttonStyles.buttonFunction,
+        btnActiveTextStyle: globalStyles.textDark,
+        btnActiveIconStyle: globalStyles.textDark,
+    }
+
+    if (type === ButtonType.Function) {
+        console.log('Applying Function styles');
+
+        btnStyle = [...btnStyle, Function.btnStyle];
+        btnTextStyle = [...btnTextStyle, Function.btnTextStyle];
+        btnIconStyle = [...btnIconStyle, Function.btnIconStyle];
+        btnActiveStyle = [...btnActiveStyle, Function.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, Function.btnActiveTextStyle];
+        btnActiveIconStyle = [...btnActiveIconStyle, Function.btnActiveIconStyle];
+    }
+
+    // ! ||--------------------------------------------------------------------------------||
+    // ! ||                                      Size                                      ||
+    // ! ||--------------------------------------------------------------------------------||
+
+    // Large
     const Large = {
         btnStyle: [buttonStyles.textButtonLarge, Gap.gapMedium],
         btnTextStyle: [globalStyles.buttonTextOne],
@@ -184,7 +296,62 @@ export const TestButton: React.FC<ButtonProps> = ({
         btnActiveTextStyle = [...btnActiveTextStyle, ...Large.btnActiveTextStyle];
     }
 
-    // Display
+    // Medium
+    const Medium = {
+        btnStyle: [buttonStyles.textButtonMedium, Gap.gapMedium],
+        btnTextStyle: [globalStyles.buttonTextOne],
+        btnActiveStyle: [buttonStyles.textButtonMedium, Gap.gapMedium],
+        btnActiveTextStyle: [globalStyles.buttonTextOne],
+    }
+
+    if (size === ButtonSize.Medium) {
+        console.log('Applying Medium styles')
+
+        btnStyle = [...btnStyle, ...Medium.btnStyle];
+        btnTextStyle = [...btnTextStyle, ...Medium.btnTextStyle];
+        btnActiveStyle = [...btnActiveStyle, ...Medium.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, ...Medium.btnActiveTextStyle];
+    }
+
+    // Small
+    const Small = {
+        btnStyle: [buttonStyles.textButtonSmall, Gap.gapMedium],
+        btnTextStyle: [globalStyles.buttonTextTwo],
+        btnActiveStyle: [buttonStyles.textButtonSmall, Gap.gapMedium],
+        btnActiveTextStyle: [globalStyles.buttonTextTwo],
+    }
+
+    if (size === ButtonSize.Small) {
+        console.log('Applying Small styles')
+
+        btnStyle = [...btnStyle, ...Small.btnStyle];
+        btnTextStyle = [...btnTextStyle, ...Small.btnTextStyle];
+        btnActiveStyle = [...btnActiveStyle, ...Small.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, ...Small.btnActiveTextStyle];
+    }
+
+    // Extra Small
+    const ExtraSmall = {
+        btnStyle: [buttonStyles.textButtonExtraSmall, Gap.gapMedium],
+        btnTextStyle: [globalStyles.buttonTextThree],
+        btnActiveStyle: [buttonStyles.textButtonExtraSmall, Gap.gapMedium],
+        btnActiveTextStyle: [globalStyles.buttonTextThree],
+    }
+    
+    if (size === ButtonSize.ExtraSmall) {
+        console.log('Applying Extra Small styles')
+
+        btnStyle = [...btnStyle, ...ExtraSmall.btnStyle];
+        btnTextStyle = [...btnTextStyle, ...ExtraSmall.btnTextStyle];
+        btnActiveStyle = [...btnActiveStyle, ...ExtraSmall.btnActiveStyle];
+        btnActiveTextStyle = [...btnActiveTextStyle, ...ExtraSmall.btnActiveTextStyle];
+    }
+
+    // ! ||--------------------------------------------------------------------------------||
+    // ! ||                                     Display                                    ||
+    // ! ||--------------------------------------------------------------------------------||
+
+    // Contained
     const Contained = {
         btnStyle: buttonStyles.buttonContained,
         btnActiveStyle: buttonStyles.buttonContained,
@@ -195,6 +362,19 @@ export const TestButton: React.FC<ButtonProps> = ({
 
         btnStyle = [...btnStyle, Contained.btnStyle];
         btnActiveStyle = [...btnActiveStyle, Contained.btnActiveStyle];
+    }
+
+    // Full
+    const Full = {
+        btnStyle: buttonStyles.buttonFull,
+        btnActiveStyle: buttonStyles.buttonFull,
+    }
+
+    if (display === ButtonDisplay.Full) {
+        console.log('Applying Full styles')
+
+        btnStyle = [...btnStyle, Full.btnStyle];
+        btnActiveStyle = [...btnActiveStyle, Full.btnActiveStyle];
     }
 
     // Logging checks
