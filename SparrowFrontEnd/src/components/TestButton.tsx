@@ -80,6 +80,30 @@ export const TestButton: React.FC<ButtonProps> = ({
     console.log('size:', size);
     console.log('display:', display);
 
+    // Enums
+    enum ButtonType {
+      PrimaryDark = "PrimaryDark",
+      PrimaryLight = "PrimaryLight",
+      Secondary = "Secondary",
+      Tertiary = "Tertiary",
+      Success = "Success",
+      Warning = "Warning",
+      Error = "Error",
+      Function = "Function",
+    }
+
+    enum ButtonSize {
+      Large = "Large",
+      Medium = "Medium",
+      Small = "Small",
+      ExtraSmall = "ExtraSmall",
+    }
+
+    enum ButtonDisplay {
+      Contained = "Contained",
+      Full = "Full",
+    }
+
     // Type
     // Primary
     const PrimaryDark = {
@@ -91,7 +115,7 @@ export const TestButton: React.FC<ButtonProps> = ({
         btnActiveIconStyle: globalStyles.textLight,
     }
 
-    if (type === "PrimaryDark") {
+    if (type === ButtonType.PrimaryDark) {
         console.log('Applying Primary Dark styles');
 
         btnStyle = [...btnStyle, PrimaryDark.btnStyle];
@@ -111,7 +135,7 @@ export const TestButton: React.FC<ButtonProps> = ({
         btnActiveIconStyle: globalStyles.textLight,
     }
 
-    if (type === "PrimaryLight") {
+    if (type === ButtonType.PrimaryLight) {
         console.log('Applying Primary Light styles');
 
         btnStyle = [...btnStyle, PrimaryLight.btnStyle];
@@ -132,7 +156,7 @@ export const TestButton: React.FC<ButtonProps> = ({
         btnActiveIconStyle: globalStyles.textDark,
     }
 
-    if (type === "Secondary") {
+    if (type === ButtonType.Secondary) {
         console.log('Applying Secondary styles');
 
         btnStyle = [...btnStyle, Secondary.btnStyle];
@@ -151,7 +175,7 @@ export const TestButton: React.FC<ButtonProps> = ({
         btnActiveTextStyle: [globalStyles.buttonTextOne],
     }
 
-    if (size === "Large") {
+    if (size === ButtonSize.Large) {
         console.log('Applying Large styles')
 
         btnStyle = [...btnStyle, ...Large.btnStyle];
@@ -166,7 +190,7 @@ export const TestButton: React.FC<ButtonProps> = ({
         btnActiveStyle: buttonStyles.buttonContained,
     }
 
-    if (display === "Contained") {
+    if (display === ButtonDisplay.Contained) {
         console.log('Applying Contained styles')
 
         btnStyle = [...btnStyle, Contained.btnStyle];
@@ -206,6 +230,33 @@ export const TestButton: React.FC<ButtonProps> = ({
         <Text style={(self == status) || isPressed ? btnActiveTextStyle : btnTextStyle}>{btnText}</Text>
     </Pressable>
   )
+}
+
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                                 Exported ENUMS                                 ||
+// ! ||--------------------------------------------------------------------------------||
+
+export enum ButtonType {
+  PrimaryDark = "PrimaryDark",
+  PrimaryLight = "PrimaryLight",
+  Secondary = "Secondary",
+  Tertiary = "Tertiary",
+  Success = "Success",
+  Warning = "Warning",
+  Error = "Error",
+  Function = "Function",
+}
+
+export enum ButtonSize {
+  Large = "Large",
+  Medium = "Medium",
+  Small = "Small",
+  ExtraSmall = "ExtraSmall",
+}
+
+export enum ButtonDisplay {
+  Contained = "Contained",
+  Full = "Full",
 }
 
 const styles = StyleSheet.create ({

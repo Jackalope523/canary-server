@@ -15,7 +15,7 @@ import SingleValueSelector from '../../components/atoms/testing/SingleValueSelec
 import RangeSlider from '../../components/atoms/testing/RangeSlider';
 import SingleValueSlider from '../../components/atoms/SingleValueSlider';
 import { ButtonErrorExtraSmallContained, ButtonErrorExtraSmallFull, ButtonErrorLargeContained, ButtonErrorLargeFull, ButtonErrorMediumContained, ButtonErrorMediumFull, ButtonErrorSmallContained, ButtonErrorSmallFull, ButtonFunctionExtraSmallContained, ButtonFunctionExtraSmallFull, ButtonFunctionLargeContained, ButtonFunctionLargeFull, ButtonFunctionMediumContained, ButtonFunctionMediumFull, ButtonFunctionSmallContained, ButtonFunctionSmallFull, ButtonPrimaryExtraSmallContained, ButtonPrimaryExtraSmallFull, ButtonPrimaryLargeContained, ButtonPrimaryLargeFull, ButtonPrimaryMediumContained, ButtonPrimaryMediumFull, ButtonPrimarySmallContained, ButtonPrimarySmallFull, ButtonSecondaryExtraSmallContained, ButtonSecondaryExtraSmallFull, ButtonSecondaryLargeContained, ButtonSecondaryLargeFull, ButtonSecondaryMediumContained, ButtonSecondaryMediumFull, ButtonSecondarySmallContained, ButtonSecondarySmallFull, ButtonSuccessExtraSmallContained, ButtonSuccessExtraSmallFull, ButtonSuccessLargeContained, ButtonSuccessLargeFull, ButtonSuccessMediumContained, ButtonSuccessMediumFull, ButtonSuccessSmallContained, ButtonSuccessSmallFull, ButtonTertiaryExtraSmallContained, ButtonTertiaryExtraSmallFull, ButtonTertiaryLargeContained, ButtonTertiaryLargeFull, ButtonTertiaryMediumContained, ButtonTertiaryMediumFull, ButtonTertiarySmallContained, ButtonTertiarySmallFull, ButtonWarningExtraSmallContained, ButtonWarningExtraSmallFull, ButtonWarningLargeContained, ButtonWarningLargeFull, ButtonWarningMediumContained, ButtonWarningMediumFull, ButtonWarningSmallContained, ButtonWarningSmallFull } from '../../components/Button';
-import TestButton from '../../components/TestButton';
+import TestButton, { ButtonDisplay, ButtonSize, ButtonType } from '../../components/TestButton';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -43,85 +43,8 @@ const FeedScreen = () => {
         <SingleValueSlider />
 
         <Text>TestButton</Text>
-        <TestButton type='PrimaryDark' size='Large' display='Contained' btnText='I MADE A BUTTON!' btnIcon='settings-outline' />
-        <TestButton type='Secondary' size='Large' display='Contained' btnText='Another one' />
-
-        <Text>Primary buttons</Text>
-
-        <ButtonPrimaryLargeContained />
-        <ButtonPrimaryLargeFull />
-        <ButtonPrimaryMediumContained />
-        <ButtonPrimaryMediumFull />
-        <ButtonPrimarySmallContained />
-        <ButtonPrimarySmallFull />
-        <ButtonPrimaryExtraSmallContained />
-        <ButtonPrimaryExtraSmallFull />
-
-        <Text>Secondary buttons</Text>
-
-        <ButtonSecondaryLargeContained />
-        <ButtonSecondaryLargeFull />
-        <ButtonSecondaryMediumContained />
-        <ButtonSecondaryMediumFull />
-        <ButtonSecondarySmallContained />
-        <ButtonSecondarySmallFull />
-        <ButtonSecondaryExtraSmallContained />
-        <ButtonSecondaryExtraSmallFull />
-
-        <Text>Tertiary buttons</Text>
-
-        <ButtonTertiaryLargeContained />
-        <ButtonTertiaryLargeFull />
-        <ButtonTertiaryMediumContained />
-        <ButtonTertiaryMediumFull />
-        <ButtonTertiarySmallContained />
-        <ButtonTertiarySmallFull />
-        <ButtonTertiaryExtraSmallContained />
-        <ButtonTertiaryExtraSmallFull />
-
-        <Text>Success buttons</Text>
-
-        <ButtonSuccessLargeContained />
-        <ButtonSuccessLargeFull />
-        <ButtonSuccessMediumContained />
-        <ButtonSuccessMediumFull />
-        <ButtonSuccessSmallContained />
-        <ButtonSuccessSmallFull />
-        <ButtonSuccessExtraSmallContained />
-        <ButtonSuccessExtraSmallFull />
-
-        <Text>Warning buttons</Text>
-
-        <ButtonWarningLargeContained />
-        <ButtonWarningLargeFull />
-        <ButtonWarningMediumContained />
-        <ButtonWarningMediumFull />
-        <ButtonWarningSmallContained />
-        <ButtonWarningSmallFull />
-        <ButtonWarningExtraSmallContained />
-        <ButtonWarningExtraSmallFull />
-
-        <Text>Error buttons</Text>
-
-        <ButtonErrorLargeContained />
-        <ButtonErrorLargeFull />
-        <ButtonErrorMediumContained />
-        <ButtonErrorMediumFull />
-        <ButtonErrorSmallContained />
-        <ButtonErrorSmallFull />
-        <ButtonErrorExtraSmallContained />
-        <ButtonErrorExtraSmallFull />
-
-        <Text>Function buttons</Text>
-
-        <ButtonFunctionLargeContained />
-        <ButtonFunctionLargeFull />
-        <ButtonFunctionMediumContained />
-        <ButtonFunctionMediumFull />
-        <ButtonFunctionSmallContained />
-        <ButtonFunctionSmallFull />
-        <ButtonFunctionExtraSmallContained />
-        <ButtonFunctionExtraSmallFull />
+        <TestButton type={ButtonType.PrimaryDark} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='I MADE A BUTTON!' btnIcon='settings-outline' />
+        <TestButton type={ButtonType.Secondary} size={ButtonSize.Large} display={ButtonDisplay.Contained} btnText='Another one' />
 
       </View>
     </ScrollView>
