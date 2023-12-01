@@ -114,7 +114,6 @@ export const globalStyles = StyleSheet.create({
     buttonTextThree: {
         fontSize: 16,
         fontFamily: 'UncutSans-Bold',
-        textTransform: 'uppercase',
         // lineHeight: 24,
         // letterSpacing: 2.2,
     },
