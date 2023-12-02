@@ -10,7 +10,7 @@ namespace Frontier.Controllers
 {
 	[ApiController]
 	[Authorize]
-	public class AbstractAgent : ControllerBase
+	public class AbstractGuard : ControllerBase
 	{
 		#region Schemas
 
@@ -48,7 +48,7 @@ namespace Frontier.Controllers
 
 		#region Initialisation
 
-		public AbstractAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public AbstractGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,

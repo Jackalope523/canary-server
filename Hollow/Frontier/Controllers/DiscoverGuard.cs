@@ -8,11 +8,11 @@ using Core.Boundaries;
 namespace Frontier.Controllers
 {
     [Route("discover")]
-    public class DiscoverAgent : AbstractAgent
+    public class DiscoverGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public DiscoverAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public DiscoverGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,

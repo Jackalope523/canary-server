@@ -13,11 +13,11 @@ using Repository.Entities;
 namespace Frontier.Controllers
 {
     [Route("event")]
-    public class EventAgent : AbstractAgent
+    public class EventGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public EventAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public EventGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,

@@ -10,11 +10,11 @@ using Core.Boundaries;
 namespace Frontier.Controllers
 {
     [Route("feed")]
-    public class FeedAgent : AbstractAgent
+    public class FeedGuard : AbstractGuard
     {
 		#region Initialisation
 
-		public FeedAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public FeedGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,

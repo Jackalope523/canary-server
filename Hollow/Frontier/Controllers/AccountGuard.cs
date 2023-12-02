@@ -11,11 +11,11 @@ using Shared;
 namespace Frontier.Controllers
 {
     [Route("account")]
-    public class AccountAgent : AbstractAgent
+    public class AccountGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public AccountAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public AccountGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,

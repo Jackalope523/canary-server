@@ -9,11 +9,11 @@ using System.Collections.Generic;
 namespace Frontier.Controllers
 {
 	[Route("notifications")]
-	public class NotificationAgent : AbstractAgent
+	public class NotificationGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public NotificationAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public NotificationGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,

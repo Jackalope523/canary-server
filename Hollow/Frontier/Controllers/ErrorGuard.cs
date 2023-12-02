@@ -5,11 +5,11 @@ using Core.Boundaries;
 namespace Frontier.Controllers
 {
     [Route("error")]
-    public class ErrorAgent : AbstractAgent
+    public class ErrorGuard : AbstractGuard
     {
 		#region Initialisation
 
-		public ErrorAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public ErrorGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,
