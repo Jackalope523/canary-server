@@ -6,39 +6,42 @@ namespace Shared
     #region Hollow
 
     [Serializable]
-    public abstract class HollowFailureException : Exception
+    public abstract class HollowException : Exception
     {
-        public HollowFailureException()
-        {
-        }
+        public HollowException()
+        { }
 
-        public HollowFailureException(string message)
-            : base(message)
-        {
-        }
+        public HollowException(string message)
+            : base(message) { }
 
-        public HollowFailureException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
+        public HollowException(string message, Exception innerException)
+            : base(message, innerException) { }
     }
 
     [Serializable]
-    public abstract class UserErrorException : Exception
+    public abstract class HollowFailureException : HollowException
+    {
+        public HollowFailureException()
+        { }
+
+        public HollowFailureException(string message)
+            : base(message) { }
+
+        public HollowFailureException(string message, Exception inner)
+            : base(message, inner) { }
+    }
+
+    [Serializable]
+    public abstract class UserErrorException : HollowException
 	{
 		public UserErrorException()
-		{
-		}
+		{ }
 
 		public UserErrorException(string message)
-			: base(message)
-		{
-		}
+			: base(message) { }
 
 		public UserErrorException(string message, Exception inner)
-			: base(message, inner)
-		{
-		}
+			: base(message, inner) { }
 	}
 
 	[Serializable]

@@ -30,7 +30,7 @@ namespace Core.Controls
 		{
             // Verify phone number is valid
             Try(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
-                new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."));
+                new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
 
             return (await GetUser(normalisedPhoneNumber)).ToUserShard();
 		}
