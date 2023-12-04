@@ -31,7 +31,7 @@ namespace Core.Controls
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            Reports.ReportUser(userId, occuringEvent.Id, targetUser.Id, reportType, reportDetails);
+            Reports.ReportUserAsync(userId, occuringEvent.Id, targetUser.Id, reportType, reportDetails);
 
             // Compute user's standing
             var status = await targetUser.Reported();
@@ -39,7 +39,7 @@ namespace Core.Controls
             // Check if user should be punished
             if (targetUser.AccountStatus != status)
             {
-                Accounts.UpdateUser(targetUser.Id, new() { (nameof(UserShard.AccountStatus), status) });
+                Accounts.UpdateUserAsync(targetUser.Id, new() { (nameof(UserShard.AccountStatus), status) });
             }
         }
 
@@ -53,7 +53,7 @@ namespace Core.Controls
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            Reports.ReportEvent(user.Id, targetEvent.Id, targetEvent.Host.Id, reportType, reportDetails);
+            Reports.ReportEventAsync(user.Id, targetEvent.Id, targetEvent.Host.Id, reportType, reportDetails);
 
             // Check if action is to be taken
             if (await targetEvent.Reported())
@@ -69,7 +69,7 @@ namespace Core.Controls
                 // Check if host should be punished
                 if (host.AccountStatus != status)
                 {
-                    Accounts.UpdateUser(host.Id, new() { (nameof(UserShard.AccountStatus), status) });
+                    Accounts.UpdateUserAsync(host.Id, new() { (nameof(UserShard.AccountStatus), status) });
                 }
             }
         }
@@ -81,12 +81,12 @@ namespace Core.Controls
 		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
             RequestAllReportsAsync(User user)
         {
-            return Reports.GetReportsForUser(user.Id);
+            return Reports.GetReportsForUserAsync(user.Id);
         }
 
         internal async Task<List<EventReport>> RequestEventReportsAsync(Event @event)
         {
-            return Reports.GetReportsForEvent(@event.Id);
+            return Reports.GetReportsForEventAsync(@event.Id);
         }
 
 		#endregion

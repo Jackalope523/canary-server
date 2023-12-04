@@ -16,20 +16,20 @@ namespace Core.Boundaries
 
 	public interface IProfileDatabase
     {
-        List<UserSilhouette> GetFriends(ulong userId);
-        List<UserSilhouette> GetFollowedUsers(ulong userId);
-        List<UserSilhouette> GetUsersFollowing(ulong userId);
-        List<UserSilhouette> GetBlockedUsers(ulong userId);
-        List<UserSilhouette> GetUsersBlocking(ulong userId);
+        Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
+		Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId);
+        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId);
 
-        bool FollowUser(ulong userId, ulong targetUserId);
-        bool UnfollowUser(ulong userId, ulong targetUserId);
-		bool BlockUser(ulong userId, ulong targetUserId);
-		bool UnblockUser(ulong userId, ulong targetUserId);
+        Task<bool> FollowUserAsync(ulong userId, ulong targetUserId);
+		Task<bool> UnfollowUserAsync(ulong userId, ulong targetUserId);
+		Task<bool> BlockUserAsync(ulong userId, ulong targetUserId);
+		Task<bool> UnblockUserAsync(ulong userId, ulong targetUserId);
 
-		bool RateUser(ulong userId, ulong targetUserId, UserRating rating);
-        bool RemoveUserRating(ulong userId, ulong targetUserId);
-		(int Positive, int Negative) GetUserRatings(ulong userId);
+		Task<bool> RateUserAsync(ulong userId, ulong targetUserId, UserRating rating);
+		Task<bool> RemoveUserRatingAsync(ulong userId, ulong targetUserId);
+		Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong userId);
     }
 
 	public interface IProfileOperations

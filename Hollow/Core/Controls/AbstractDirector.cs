@@ -44,7 +44,7 @@ namespace Core.Controls
 
 		protected async Task<User> GetUser(ulong userId)
         {
-            User user = new(Accounts.FindUserById(userId));
+            User user = new(Accounts.FindUserByIdAsync(userId));
 
 			// Fail if user account is locked
 			Fail(user.IsLocked,
@@ -55,12 +55,12 @@ namespace Core.Controls
 
 		protected async Task<User> GetUserUnsafe(ulong userId)
         {
-            return new(Accounts.FindUserById(userId));
+            return new(Accounts.FindUserByIdAsync(userId));
         }
 
         protected async Task<Event> GetEvent(ulong eventId)
         {
-            return new(Events.FindEvent(eventId));
+            return new(Events.FindEventAsync(eventId));
         }
 
 		#endregion

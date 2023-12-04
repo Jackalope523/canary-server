@@ -24,26 +24,26 @@ namespace Core.Boundaries
 
 	public interface IEventDatabase
 	{
-        EventShard FindEvent(ulong eventId);
-		List<EventThinSlice> FindEvents(double latitude, double longitude, double distance);
-		EventShard FindCurrentEventForUser(ulong userId);
-		List<EventShard> FindUpcomingEventsForUser(ulong userId);
-		List<EventShard> FindPastEventsForUser(ulong userId);
-		List<EventShard> FindEventsByUser(ulong userId);
+        Task<EventShard> FindEventAsync(ulong eventId);
+		Task<List<EventThinSlice>> FindEventsAsync(double latitude, double longitude, double distance);
+		Task<EventShard> FindCurrentEventForUserAsync(ulong userId);
+		Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong userId);
+		Task<List<EventShard>> FindPastEventsForUserAsync(ulong userId);
+		Task<List<EventShard>> FindEventsByUserAsync(ulong userId);
 
-		EventShard CreateEvent(ulong hostId, string name, string description,
+		Task<EventShard> CreateEventAsync(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character,
 			double Radius, bool isDynamic);
-		bool UpdateEvent(ulong eventId, List<(string Property, object Value)> edits);
-		bool EndEvent(ulong eventId);
+		Task<bool> UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
+		Task<bool> EndEventAsync(ulong eventId);
 
-		EventUserState? GetUserState(ulong userId, ulong eventId);
-		bool SetUserState(ulong userId, ulong eventId, EventUserState userState);
-		bool RemoveUser(ulong userId, ulong eventId);
+		Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId);
+		Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState);
+		Task<bool> RemoveUserAsync(ulong userId, ulong eventId);
 
-		List<(UserSilhouette User, EventUserState State)> GetAllUsers(ulong eventId);
-		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(ulong eventId);
+		Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId);
+		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong eventId);
 	}
 
 	public interface IEventOperations

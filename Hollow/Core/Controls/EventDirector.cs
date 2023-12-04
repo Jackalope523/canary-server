@@ -41,7 +41,7 @@ namespace Core.Controls
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUser(userId);
-			var nearbyEvents = Events.FindEvents(latitude, longitude, distance);
+			var nearbyEvents = Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove events from list that the user cannot access
 			await RemoveInaccessibleEventsAsync(user, nearbyEvents);
@@ -53,7 +53,7 @@ namespace Core.Controls
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUser(userId);
-			var nearbyEvents = Events.FindEvents(latitude, longitude, distance);
+			var nearbyEvents = Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove inaccessible events and events with a large difference between event and user interest
 			await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
@@ -99,7 +99,7 @@ namespace Core.Controls
 			{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 
 			// Try to create an event
-			var newEvent = Events.CreateEvent(user.Id, eventStub.Name, eventStub.Description,
+			var newEvent = Events.CreateEventAsync(user.Id, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter(),
 				eventStub.Radius.Kilometres, eventStub.IsDynamic);
@@ -187,7 +187,7 @@ namespace Core.Controls
 			}
 
 			// Push update
-			Try(Events.UpdateEvent(targetEvent.Id, edits),
+			Try(Events.UpdateEventAsync(targetEvent.Id, edits),
 				new UnexpectedFailureException("Failed to edit event."));
 
 			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
@@ -208,7 +208,7 @@ namespace Core.Controls
 				new InvalidEventException("Event cannot be started."));
 
 			// Try to start event
-			Try(Events.UpdateEvent(targetEvent.Id, new() { (nameof(EventShard.State), EventState.active_open) }),
+			Try(Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.active_open) }),
 				new UnexpectedFailureException("Could not start event."));
 
 			await targetEvent.Started();
@@ -224,7 +224,7 @@ namespace Core.Controls
 				new InvalidUserException("User does not have permissions to end event."));
 
 			// Try to end to event
-			Try(Events.EndEvent(eventId),
+			Try(Events.EndEventAsync(eventId),
 				new UnexpectedFailureException("Could not end event."));
 
 			var participants = await targetEvent.Ended();
@@ -242,13 +242,13 @@ namespace Core.Controls
 			Try(await targetEvent.IsJoinableBy(user),
 				new InvalidEventException($"User is unable to join event.\nAccount Status: {user.AccountStatus}"));
 
-			var userIntention = Events.GetUserState(userId, eventId);
+			var userIntention = Events.GetUserStateAsync(userId, eventId);
 
 			// Ensure correct state transition
 			if (!userIntention.HasValue)
 			{
 				// Try to add user to the event
-				Try(Events.SetUserState(userId, eventId, EventUserState.Watching),
+				Try(Events.SetUserStateAsync(userId, eventId, EventUserState.Watching),
 					new UnexpectedFailureException("Could not watch event."));
 			}
 			else if (userIntention.HasValue)
@@ -257,14 +257,14 @@ namespace Core.Controls
 
 		public async Task UnwatchEventAsync(ulong userId, ulong eventId)
 		{
-			var userIntention = Events.GetUserState(userId, eventId);
+			var userIntention = Events.GetUserStateAsync(userId, eventId);
 
 			// Ensure correct state transition
 			if (userIntention.HasValue &&
 				userIntention.Value.Equals(EventUserState.Watching))
 			{
 				// Try to remove user from event
-				Try(Events.RemoveUser(userId, eventId),
+				Try(Events.RemoveUserAsync(userId, eventId),
 					new UnexpectedFailureException("Could not unwatch event."));
 			}
 			else if (userIntention.HasValue)
@@ -300,12 +300,12 @@ namespace Core.Controls
 				targetEvent.IsInRange(user))
 			{
 				// Try to add user to the event
-				success = Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Guest);
+				success = Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Guest);
 			}
 			else
 			{
 				// Try to add user to the event
-				success = Events.SetUserState(userId, eventId, EventUserState.Incoming);
+				success = Events.SetUserStateAsync(userId, eventId, EventUserState.Incoming);
 			}
 
 			Try(success, new UnexpectedFailureException("Could not join event."));
@@ -325,19 +325,19 @@ namespace Core.Controls
 				new InvalidUserException("Host cannot leave the event."));
 
 			// Get the user's current status
-			var userIntention = Events.GetUserState(user.Id, targetEvent.Id);
+			var userIntention = Events.GetUserStateAsync(user.Id, targetEvent.Id);
 			
 			// Check if user is guest or incoming
 			if (userIntention.Equals(EventUserState.Guest))
 			{
 				// Try to remove user from event
-				Try(Events.SetUserState(user.Id, targetEvent.Id, EventUserState.Left),
+				Try(Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Left),
 					new UnexpectedFailureException("Could not leave event."));
 			}
 			else if (userIntention.Equals(EventUserState.Incoming))
 			{
 				// Try to remove user from event
-				Try(Events.RemoveUser(user.Id, targetEvent.Id),
+				Try(Events.RemoveUserAsync(user.Id, targetEvent.Id),
 					new UnexpectedFailureException("Could not unattend event."));
 			}
 			else if (userIntention.HasValue)
@@ -466,14 +466,14 @@ namespace Core.Controls
 				new InvalidUserException("Host cannot kick themself."));
 
 			// Kick target user from event
-			Events.SetUserState(targetUser.Id, @event.Id, EventUserState.Kicked);
+			Events.SetUserStateAsync(targetUser.Id, @event.Id, EventUserState.Kicked);
 
 			// Hide target user's etchings from event
 			await @event.SyncEtchings();
 			foreach (Etching etching in @event.Etchings)
 			{
 				if (targetUser.Etched(etching))
-				{ Etchings.HideEtching(etching.Id); }
+				{ Etchings.HideEtchingAsync(etching.Id); }
 			}
 		}
 
@@ -483,31 +483,31 @@ namespace Core.Controls
 
 		internal async Task<Event> RequestCurrentEventForUserAsync(User user)
 		{
-			return new(Events.FindCurrentEventForUser(user.Id));
+			return new(Events.FindCurrentEventForUserAsync(user.Id));
 		}
 
 		internal async Task<List<Event>> RequestPastEventsForUserAsync(User user)
 		{
-			return Events.FindPastEventsForUser(user.Id)
+			return Events.FindPastEventsForUserAsync(user.Id)
 				.ConvertAll(@event => new Event(@event));
 		}
 
 		internal async Task<List<Event>> RequestUpcomingEventsForUserAsync(User user)
 		{
-			return Events.FindUpcomingEventsForUser(user.Id)
+			return Events.FindUpcomingEventsForUserAsync(user.Id)
 				.ConvertAll(@event => new Event(@event));
 		}
 		
 		internal async Task<List<(User User, EventUserState State)>> RequestAllUsersFromEventAsync(Event @event)
 		{
-			return Events.GetAllUsers(@event.Id)
+			return Events.GetAllUsersAsync(@event.Id)
 				.ConvertAll(userDetails => (new User(userDetails.User), userDetails.State));
 		}
 
 		internal async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>>
 			RequestGuestHistoryAsync(Event @event)
 		{
-			return Events.GetGuestHistory(@event.Id)
+			return Events.GetGuestHistoryAsync(@event.Id)
 				.ConvertAll(userDetails => (userDetails.Joined, userDetails.Left, new User(userDetails.User)));
 		}
 

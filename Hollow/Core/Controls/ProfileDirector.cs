@@ -56,12 +56,12 @@ namespace Core.Controls
                 nest.Events = targetUser.PastEvents.ConvertAll(e => e.ToEventThinSlice());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
 
-                nest.Etchings = Etchings.GetEtchingsByUser(targetUser.Id);
+                nest.Etchings = Etchings.GetEtchingsByUserAsync(targetUser.Id);
             }
             else
             {
                 // Get public hosted events
-                nest.Events = Events.FindEventsByUser(user.Id).ConvertAll(e => new Event(e).ToEventThinSlice());
+                nest.Events = Events.FindEventsByUserAsync(user.Id).ConvertAll(e => new Event(e).ToEventThinSlice());
             }
 
             return nest;
@@ -106,37 +106,37 @@ namespace Core.Controls
 
         public async Task<List<UserSilhouette>> GetFriendsAsync(ulong userId)
         {
-            return Profiles.GetFriends(userId);
+            return Profiles.GetFriendsAsync(userId);
         }
 
         public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId)
         {
-            return Profiles.GetFollowedUsers(userId);
+            return Profiles.GetFollowedUsersAsync(userId);
         }
 
         public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId)
         {
-            return Profiles.GetBlockedUsers(userId);
+            return Profiles.GetBlockedUsersAsync(userId);
         }
 
         public async Task FollowUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.FollowUser(userId, targetId);
+            Profiles.FollowUserAsync(userId, targetId);
         }
 
         public async Task UnfollowUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.UnfollowUser(userId, targetId);
+            Profiles.UnfollowUserAsync(userId, targetId);
         }
 
         public async Task BlockUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.BlockUser(userId, targetId);
+            Profiles.BlockUserAsync(userId, targetId);
         }
 
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.UnblockUser(userId, targetId);
+            Profiles.UnblockUserAsync(userId, targetId);
         }
 
         public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
@@ -144,17 +144,17 @@ namespace Core.Controls
             // Check if rating is to remove
             if (rating != UserRating.Remove)
             {
-                Profiles.RateUser(userId, targetId, rating);
+                Profiles.RateUserAsync(userId, targetId, rating);
             }
             else
             {
-                Profiles.RemoveUserRating(userId, targetId);
+                Profiles.RemoveUserRatingAsync(userId, targetId);
             }
 
             User targetUser = new(targetId);
             await targetUser.SyncReputation();
             targetUser.CalculateReputation();
-            Accounts.UpdateUser(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
+            Accounts.UpdateUserAsync(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }
 
 		#endregion
@@ -163,19 +163,19 @@ namespace Core.Controls
 
         internal async Task<List<User>> RequestFollowersAsync(User user)
         {
-            return Profiles.GetUsersFollowing(user.Id)
+            return Profiles.GetUsersFollowingAsync(user.Id)
                 .ConvertAll(user => new User(user));
 		}
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)
         {
-            return Profiles.GetUsersBlocking(user.Id)
+            return Profiles.GetUsersBlockingAsync(user.Id)
 				.ConvertAll(user => new User(user));
         }
 
         internal async Task<(int Positive, int Negative)> RequestAllRatingsAsync(User user)
         {
-            return Profiles.GetUserRatings(user.Id);
+            return Profiles.GetUserRatingsAsync(user.Id);
         }
 
 		#endregion

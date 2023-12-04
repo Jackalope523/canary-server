@@ -20,13 +20,13 @@ namespace Core.Boundaries
 
 	public interface IReportDatabase
     {
-        (List<UserReport>, List<EventReport>) GetReportsForUser(ulong userId);
-        (List<UserReport>, List<EventReport>) GetReportsByUser(ulong userId);
-        bool ReportUser(ulong userId, ulong eventId, ulong targetUserId,
+        Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(ulong userId);
+        Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(ulong userId);
+        Task<bool> ReportUserAsync(ulong userId, ulong eventId, ulong targetUserId,
             UserReportType reportType, string reportDetails);
 
-        List<EventReport> GetReportsForEvent(ulong eventId);
-        bool ReportEvent(ulong userId, ulong eventId, ulong hostId,
+        Task<List<EventReport>> GetReportsForEventAsync(ulong eventId);
+        Task<bool> ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
             EventReportType reportType, string reportDetails);
     }
 

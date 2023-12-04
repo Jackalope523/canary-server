@@ -19,18 +19,18 @@ namespace Core.Boundaries
 
 	public interface IEtchingDatabase
     {
-        List<Etching> GetEtchingsForEvent(ulong eventId);
-        List<Etching> GetEtchingsByUser(ulong userId);
-        Etching GetEtching(ulong etchingId);
-        Etching AddEtching(ulong eventId, ulong etcherId,
+        Task<List<Etching>> GetEtchingsForEventAsync(ulong eventId);
+        Task<List<Etching>> GetEtchingsByUserAsync(ulong userId);
+        Task<Etching> GetEtchingAsync(ulong etchingId);
+        Task<Etching> AddEtchingAsync(ulong eventId, ulong etcherId,
             DateTimeOffset timeEtched, string imageURL);
-        bool RemoveEtching(ulong etchingId);
-        bool HideEtching(ulong etchingId);
+		Task<bool> RemoveEtchingAsync(ulong etchingId);
+		Task<bool> HideEtchingAsync(ulong etchingId);
 
-        bool RateEtching(ulong etchingId, ulong voterId, UserRating rating);
-        bool RemoveEtchingRating(ulong etchingId, ulong voterId);
+		Task<bool> RateEtchingAsync(ulong etchingId, ulong voterId, UserRating rating);
+		Task<bool> RemoveEtchingRatingAsync(ulong etchingId, ulong voterId);
 
-        List<Etching> GenerateFeedForUser(ulong userId, DateTimeOffset depthCharge, List<ulong> exclusionList);
+        Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, List<ulong> exclusionList);
     }
 
     public interface IEtchingOperations

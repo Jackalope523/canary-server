@@ -43,7 +43,7 @@ namespace Core.Controls
             await targetEvent.Etched(user);
 
             // Try to etch
-            var userEtching = Etchings.AddEtching(targetEvent.Id, user.Id, Time, imageURL);
+            var userEtching = Etchings.AddEtchingAsync(targetEvent.Id, user.Id, Time, imageURL);
 
             return userEtching;
         }
@@ -51,20 +51,20 @@ namespace Core.Controls
         public async Task RemoveEtchingAsync(ulong userId, ulong etchingId)
         {
             User user = new(userId);
-            var etching = Etchings.GetEtching(etchingId);
+            var etching = Etchings.GetEtchingAsync(etchingId);
             var eventEtched = await GetEvent(etching.EventId);
 
             // Verify user owns the etching or can modify the event
             Try(user.Etched(etching) || eventEtched.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove etching."));
 
-            Etchings.RemoveEtching(etching.Id);
+            Etchings.RemoveEtchingAsync(etching.Id);
         }
 
         public async Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating)
         {
             User user = new(userId);
-            var etching = Etchings.GetEtching(etchingId);
+            var etching = Etchings.GetEtchingAsync(etchingId);
             var eventEtched = await GetEvent(etching.EventId);
 
             // Verify user can interact with etching
@@ -74,11 +74,11 @@ namespace Core.Controls
             // Check if removing a rating
             if (rating != UserRating.Remove)
             {
-                Etchings.RateEtching(user.Id, etching.Id, rating);
+                Etchings.RateEtchingAsync(user.Id, etching.Id, rating);
             }
             else
             {
-                Etchings.RemoveEtchingRating(etching.Id, user.Id);
+                Etchings.RemoveEtchingRatingAsync(etching.Id, user.Id);
             }
         }
 
@@ -91,7 +91,7 @@ namespace Core.Controls
 
             // Retrieve friend-populated event etchings after a specified time excluding previously viewed events
             DateTimeOffset depthCharge = Time - TimeSpan.FromDays(1 + depth);
-            var friendEtchings = Etchings.GenerateFeedForUser(user.Id, depthCharge, exclusionList);
+            var friendEtchings = Etchings.GenerateFeedForUserAsync(user.Id, depthCharge, exclusionList);
 
             // Get the respective event headers for the etchings
             foreach (var etching in friendEtchings)
@@ -122,7 +122,7 @@ namespace Core.Controls
 
 		internal async Task<List<Etching>> RequestEventEtchingsAsync(Event @event)
         {
-            return Etchings.GetEtchingsForEvent(@event.Id);
+            return Etchings.GetEtchingsForEventAsync(@event.Id);
         }
 
 		#endregion
