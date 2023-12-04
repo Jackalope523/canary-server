@@ -1,10 +1,11 @@
-﻿using Core.Boundaries;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
-using System;
+using Core.Boundaries;
+using Serilog;
 
 namespace Frontier.Controllers
 {
@@ -81,6 +82,7 @@ namespace Frontier.Controllers
 			catch (HollowFailureException ex)
 			{
 				// Log failure
+				Log.Error(ex, ex.Message);
 
 				return StatusCode(500);
 			}
@@ -91,6 +93,7 @@ namespace Frontier.Controllers
 			catch (Exception ex)
 			{
 				// Log failure
+				Log.Error(ex, ex.Message);
 
 				return StatusCode(500);
 			}
