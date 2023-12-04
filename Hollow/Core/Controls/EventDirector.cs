@@ -317,7 +317,7 @@ namespace Core.Controls
 
 		public async Task LeaveEventAsync(ulong userId, ulong eventId)
 		{
-			User user = new(userId);
+			var user = await GetUserAsync(userId);
 			var targetEvent = await GetEventAsync(eventId);
 
 			// Verify user is the host

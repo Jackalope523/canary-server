@@ -23,8 +23,8 @@ namespace Core.Controls
 
 		public async Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId)
         {
-            User user = new(userId);
-            Event targetEvent = new(eventId);
+            var user = await GetUserAsync(userId);
+            var targetEvent = await GetEventAsync(eventId);
             var etchingsSync = targetEvent.SyncEtchings();
 
             // Verify user can see the event

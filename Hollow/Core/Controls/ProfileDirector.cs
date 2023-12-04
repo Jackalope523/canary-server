@@ -151,7 +151,7 @@ namespace Core.Controls
                 _ = Profiles.RemoveUserRatingAsync(userId, targetId);
             }
 
-            User targetUser = new(targetId);
+            var targetUser = await GetUserAsync(targetId);
             await targetUser.SyncReputation();
             targetUser.CalculateReputation();
             _ = Accounts.UpdateUserAsync(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });

@@ -21,6 +21,9 @@ namespace Core.Entities
         public readonly Distance GuestDistance = new() { Metres = 75 };
         public readonly TimeSpan MaximumEtchingLateness = OneDay;
 
+        public static Event None
+            => new() { Id = 0 };
+
         public ulong Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
@@ -65,11 +68,6 @@ namespace Core.Entities
 		#region Initialisation & Extraction
 
 		public Event() { }
-
-        public Event(ulong eventId)
-        {
-            Id = eventId;
-        }
 
         public Event(EventShard fromEvent)
         {

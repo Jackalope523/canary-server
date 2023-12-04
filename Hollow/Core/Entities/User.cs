@@ -76,11 +76,6 @@ namespace Core.Entities
 
 		public User() { }
 
-        public User(ulong userId)
-        {
-            Id = userId;
-        }
-
         public User(UserShard fromUser)
         {
             Id = fromUser.Id;
