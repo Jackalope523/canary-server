@@ -23,8 +23,8 @@ namespace Core.Controls
 
 		public async Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId)
         {
-            var user = await GetUser(userId);
-            var targetUser = await GetUser(targetId);
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
 
             // Fail if user is blocked
             Fail(await targetUser.IsBlocking(user),
@@ -35,8 +35,8 @@ namespace Core.Controls
 
         public async Task<(List<EventThinSlice> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId)
         {
-            var user = await GetUser(userId);
-            var targetUser = await GetUser(targetId);
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
 
             // Fail if user is blocked
             Fail(await user.IsBlockedBy(targetUser),
@@ -56,12 +56,12 @@ namespace Core.Controls
                 nest.Events = targetUser.PastEvents.ConvertAll(e => e.ToEventThinSlice());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
 
-                nest.Etchings = Etchings.GetEtchingsByUserAsync(targetUser.Id);
+                nest.Etchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
             }
             else
             {
                 // Get public hosted events
-                nest.Events = Events.FindEventsByUserAsync(user.Id).ConvertAll(e => new Event(e).ToEventThinSlice());
+                nest.Events = (await Events.FindEventsByUserAsync(user.Id)).ConvertAll(e => new Event(e).ToEventThinSlice());
             }
 
             return nest;
@@ -69,8 +69,8 @@ namespace Core.Controls
 
         public async Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId)
         {
-            var user = await GetUser(userId);
-            var targetUser = await GetUser(targetId);
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
 
             // Verify users are friends
             Try(await targetUser.IsFriendsWith(user),
@@ -87,7 +87,7 @@ namespace Core.Controls
 
         public async Task<IDictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId)
         {
-            var user = await GetUser(userId);
+            var user = await GetUserAsync(userId);
             await user.SyncFriends();
 
             ConcurrentDictionary<UserSilhouette, List<EventShard>> friendEvents = new();
@@ -106,37 +106,37 @@ namespace Core.Controls
 
         public async Task<List<UserSilhouette>> GetFriendsAsync(ulong userId)
         {
-            return Profiles.GetFriendsAsync(userId);
+            return await Profiles.GetFriendsAsync(userId);
         }
 
         public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId)
         {
-            return Profiles.GetFollowedUsersAsync(userId);
+            return await Profiles.GetFollowedUsersAsync(userId);
         }
 
         public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId)
         {
-            return Profiles.GetBlockedUsersAsync(userId);
+            return await Profiles.GetBlockedUsersAsync(userId);
         }
 
         public async Task FollowUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.FollowUserAsync(userId, targetId);
+            await Profiles.FollowUserAsync(userId, targetId);
         }
 
         public async Task UnfollowUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.UnfollowUserAsync(userId, targetId);
+            await Profiles.UnfollowUserAsync(userId, targetId);
         }
 
         public async Task BlockUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.BlockUserAsync(userId, targetId);
+            await Profiles.BlockUserAsync(userId, targetId);
         }
 
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
         {
-            Profiles.UnblockUserAsync(userId, targetId);
+            await Profiles.UnblockUserAsync(userId, targetId);
         }
 
         public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
@@ -144,17 +144,17 @@ namespace Core.Controls
             // Check if rating is to remove
             if (rating != UserRating.Remove)
             {
-                Profiles.RateUserAsync(userId, targetId, rating);
+                _ = Profiles.RateUserAsync(userId, targetId, rating);
             }
             else
             {
-                Profiles.RemoveUserRatingAsync(userId, targetId);
+                _ = Profiles.RemoveUserRatingAsync(userId, targetId);
             }
 
             User targetUser = new(targetId);
             await targetUser.SyncReputation();
             targetUser.CalculateReputation();
-            Accounts.UpdateUserAsync(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
+            _ = Accounts.UpdateUserAsync(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }
 
 		#endregion
@@ -163,19 +163,19 @@ namespace Core.Controls
 
         internal async Task<List<User>> RequestFollowersAsync(User user)
         {
-            return Profiles.GetUsersFollowingAsync(user.Id)
+            return (await Profiles.GetUsersFollowingAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)
         {
-            return Profiles.GetUsersBlockingAsync(user.Id)
+            return (await Profiles.GetUsersBlockingAsync(user.Id))
 				.ConvertAll(user => new User(user));
         }
 
         internal async Task<(int Positive, int Negative)> RequestAllRatingsAsync(User user)
         {
-            return Profiles.GetUserRatingsAsync(user.Id);
+            return await Profiles.GetUserRatingsAsync(user.Id);
         }
 
 		#endregion

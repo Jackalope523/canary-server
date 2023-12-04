@@ -93,6 +93,9 @@ namespace Core.Entities
 		public static bool IsWithin(TimeSpan time, TimeSpan time2)
 			=> time.Duration() < time2.Duration();
 
+		public static async Task Once(params Task[] tasks)
+			=> await Task.WhenAll(tasks);
+
 		#endregion
 	}
 }

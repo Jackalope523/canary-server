@@ -23,7 +23,7 @@ namespace Core.Controls
 
 		public async Task<UserShard> GetUserAsync(ulong userId)
         {
-            return (await GetUser(userId)).ToUserShard();
+            return (await base.GetUserAsync(userId)).ToUserShard();
         }
 
         public async Task<UserShard> GetUserAsync(string phoneNumber)
@@ -59,7 +59,7 @@ namespace Core.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            Try(Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
+            Try(await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
                 newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter()),
                 new UnexpectedFailureException("User creation failed."));
         }
@@ -70,7 +70,7 @@ namespace Core.Controls
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
         {
             // Throws if user not found or locked
-            var user = await GetUser(userId);
+            var user = await base.GetUserAsync(userId);
             
             // Check unique details changed to avoid errors
             bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && user.PhoneNumber != phoneNumber;
@@ -127,30 +127,28 @@ namespace Core.Controls
 			}
 
             // Push update
-            Accounts.UpdateUserAsync(user.Id, edits);
+            _ = Accounts.UpdateUserAsync(user.Id, edits);
 		}
 
         public async Task DeleteUserAsync(ulong userId)
         {
-            Try(Accounts.DeleteUserAsync(userId),
+            Try(await Accounts.DeleteUserAsync(userId),
                 new UnexpectedFailureException("User deletion failed."));
         }
 
         public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
 		{
-			var user = await GetUser(userId);
-            await user.SyncLocation();
+			var user = await base.GetUserAsync(userId);
             var userIsAtEvent = user.IsAtEvent();
-            var upcomingEventsSync = user.SyncUpcomingEvents();
 
+            await user.SyncLocation();
 			user.LastKnownLocation = new() { Latitude = latitude, Longitude = longitude };
             await user.HandleHaunt();
 
             // Position updates
-            Accounts.UpdateRecentLocationAsync(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
-            Accounts.UpdateHauntAsync(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
+            _ = Accounts.UpdateRecentLocationAsync(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
+            _ = Accounts.UpdateHauntAsync(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
 
-            await upcomingEventsSync;
             var nextEvent = await user.NextEvent();
 
             // Check if user is at an event
@@ -175,7 +173,7 @@ namespace Core.Controls
                 else if (user.CurrentEvent.IsHostedBy(user) && user.CurrentEvent.IsDynamic)
                 {
                     // Update the position of the event
-                    Events.UpdateEventAsync(user.CurrentEvent.Id, new() { (nameof(EventShard.Latitude), user.LastKnownLocation.Latitude),
+                    _ = Events.UpdateEventAsync(user.CurrentEvent.Id, new() { (nameof(EventShard.Latitude), user.LastKnownLocation.Latitude),
                         (nameof(EventShard.Longitude), user.LastKnownLocation.Longitude) });
                 }
             }
@@ -186,7 +184,7 @@ namespace Core.Controls
                 // Check if user is close enough to be a guest
                 if (nextEvent.IsInRange(user))
                 {
-                    Events.SetUserStateAsync(user.Id, nextEvent.Id, EventUserState.Guest);
+                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventUserState.Guest);
 
                     // Check if user is host and can start event
                     if (nextEvent.IsWaiting &&
@@ -210,13 +208,13 @@ namespace Core.Controls
         internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
             RequestUserHauntAsync(User user)
         {
-            return Accounts.GetUserHauntAsync(user.Id);
+            return await Accounts.GetUserHauntAsync(user.Id);
         }
 
         internal async Task<(double Latitude, double Longitude, double Radius)>
             RequestLastKnownUserLocationAsync(User user)
         {
-            return Accounts.GetRecentUserLocationAsync(user.Id);
+            return await Accounts.GetRecentUserLocationAsync(user.Id);
         }
 
 		#endregion
@@ -225,7 +223,7 @@ namespace Core.Controls
 
 		private async Task<User> GetUser(string phoneNumber)
         {
-            User user = new(Accounts.FindUserByPhoneNumberAsync(phoneNumber));
+            User user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
 
             // Check if user account is locked
             Fail(user.IsLocked,
@@ -255,7 +253,7 @@ namespace Core.Controls
 			try
 			{
                 // Throws an exception if there is no user
-                Accounts.FindUserByEmailAsync(normalisedEmail);
+                await Accounts.FindUserByEmailAsync(normalisedEmail);
 				emailTaken = true;
 			}
 			catch { }
