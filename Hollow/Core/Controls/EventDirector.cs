@@ -239,8 +239,8 @@ namespace Core.Controls
 			var targetEvent = await GetEvent(eventId);
 
 			// Verify user is allowed to view event
-			Try(await targetEvent.IsVisibleTo(user),
-				new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"));
+			Try(await targetEvent.IsJoinableBy(user),
+				new InvalidEventException($"User is unable to join event.\nAccount Status: {user.AccountStatus}"));
 
 			var userIntention = Events.GetUserState(userId, eventId);
 
@@ -276,13 +276,9 @@ namespace Core.Controls
 			var user = await GetUser(userId);
 			var targetEvent = await GetEvent(eventId);
 
-			// Verify user is allowed to view event
-			Try(await targetEvent.IsVisibleTo(user),
-				new InvalidEventException($"User is unable to view or join event.\nAccount Status: {user.AccountStatus}"));
-
-			// Verify event is open
-			Try(targetEvent.IsOpen,
-				new InvalidEventException("Event is closed."));
+			// Verify user is allowed to join event
+			Try(await targetEvent.IsJoinableBy(user),
+				new InvalidEventException($"User is unable to join event.\nAccount Status: {user.AccountStatus}"));
 
 			// Check if user has an active event conflict
 			if (HasAlready(targetEvent.StartTime))
@@ -330,7 +326,8 @@ namespace Core.Controls
 
 			// Get the user's current status
 			var userIntention = Events.GetUserState(user.Id, targetEvent.Id);
-
+			
+			// Check if user is guest or incoming
 			if (userIntention.Equals(EventUserState.Guest))
 			{
 				// Try to remove user from event
@@ -448,6 +445,36 @@ namespace Core.Controls
 
 			_ = invitee.PostNote(inviter, $"has invited you to {@event.Name}", $"{@event.Id}");
 			_ = invitee.Notify("Sparrow", "You were invited to ");
+		}
+
+		public async Task KickUserAsync(ulong hostId, ulong targetId, ulong eventId)
+		{
+			var host = await GetUser(hostId);
+			var targetUser = await GetUser(targetId);
+			var @event = await GetEvent(eventId);
+
+			// Verify kicking user is the host
+			Try(@event.IsHostedBy(host),
+				new InvalidUserException("User cannot kick guests."));
+
+			// Verify event is active
+			Try(@event.IsActive,
+				new InvalidEventException("Cannot kick users after event has been archived."));
+
+			// Verify host is not kicking themself
+			Try(@event.IsHostedBy(targetUser),
+				new InvalidUserException("Host cannot kick themself."));
+
+			// Kick target user from event
+			Events.SetUserState(targetUser.Id, @event.Id, EventUserState.Kicked);
+
+			// Hide target user's etchings from event
+			await @event.SyncEtchings();
+			foreach (Etching etching in @event.Etchings)
+			{
+				if (targetUser.Etched(etching))
+				{ Etchings.HideEtching(etching.Id); }
+			}
 		}
 
 		#endregion

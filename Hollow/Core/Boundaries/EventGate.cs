@@ -71,9 +71,9 @@ namespace Core.Boundaries
 
 		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
 			GetGuestListAsync(ulong userId, ulong eventId);
-
 		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId);
+		Task KickUserAsync(ulong hostId, ulong targetId, ulong eventId);
 	}
 
 	#endregion

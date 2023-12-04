@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Immutable;
 using Shared;
 using Core.Boundaries;
-using Core.Controls;
-using Microsoft.Extensions.Logging;
 
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
@@ -56,6 +53,7 @@ namespace Core.Entities
         public List<User> Incoming { get; set; }
         public List<User> Guests { get; set; }
         public List<User> Left { get; set; }
+        public List<User> Kicked { get; set; }
         public List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)> GuestHistory { get; set; }
 
 		public List<EventReport> EventReports { get; set; }
@@ -133,6 +131,7 @@ namespace Core.Entities
             Incoming = AllUsers.FindAll(user => user.State.Equals(EventUserState.Incoming)).ConvertAll(user => user.User);
             Guests = AllUsers.FindAll(user => user.State.Equals(EventUserState.Guest)).ConvertAll(user => user.User);
             Left = AllUsers.FindAll(user => user.State.Equals(EventUserState.Left)).ConvertAll(user => user.User);
+            Kicked = AllUsers.FindAll(user => user.State.Equals(EventUserState.Kicked)).ConvertAll(user => user.User);
         }
 
         public async Task SyncEtchings()
@@ -214,6 +213,11 @@ namespace Core.Entities
             if (!await IsVisibleTo(user))
             { return false; }
 
+            // Check if user is kicked from event
+            await SyncUsers();
+            if (Kicked.Contains(user))
+            { return false; }
+
             // Check if user or user's haunt is within a reasonable distance
             await user.SyncLocation();
             if (!GeoLocation.AreInRange(user.LastKnownLocation, Location, MaximumJoinDistance) &&
@@ -256,7 +260,7 @@ namespace Core.Entities
             { await SyncUsers(); }
 
             // Check if user is or was on the guest list
-            return Guests.Find(x => x.Id == user.Id) != null || Left.Find(x => x.Id == user.Id) != null;
+            return Guests.Contains(user) || Left.Contains(user);
 		}
 
         public bool IsInRange(User user)
@@ -362,6 +366,20 @@ namespace Core.Entities
             }
         }
 
-        #endregion
-    }
+		#endregion
+
+		#region Dissimilation
+
+		public override bool Equals(object obj)
+		{
+			return obj is Event other && Id.Equals(other.Id);
+		}
+
+		public override int GetHashCode()
+		{
+			return Id.GetHashCode();
+		}
+
+		#endregion
+	}
 }
