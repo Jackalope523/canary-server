@@ -182,11 +182,7 @@ namespace Core.Entities
 
 		public async Task<bool> IsVisibleTo(User user)
 		{
-			// Note: This is efficient when user is singular but highly
-            // inefficient if being called multiple times with different users.
-			// If the second case, create a User method to accomplish this method (multiple events, same user)
-			// and change this one to be efficient for the second case (same event, multiple users).
-            // Currently, no use case warrants one event checking multiple users.
+			// Note: This is efficient with multiple users. For multiple events, see User.CanView
 
 			// Check if user account is locked
 			if (user.IsLocked)
@@ -197,12 +193,12 @@ namespace Core.Entities
 			{
 				// User cannot join normal events
                 // Check if user can join friend events and Host is friends with the user
-				if (!user.CanAttendFriends || !await user.IsFriendsWith(Host))
+				if (!user.CanAttendFriends || !await Host.IsFriendsWith(user))
 				{ return false; }
 			}
 
 			// Check if user is blocked by or blocking event host
-			if (await user.IsBlockedBy(Host) || await user.IsBlocking(Host))
+			if (await Host.IsBlockedBy(user) || await Host.IsBlocking(user))
 			{ return false; }
 
 			return true;
@@ -243,6 +239,15 @@ namespace Core.Entities
 			{ return true; }
 
 			return false;
+        }
+
+        public async Task<bool> HasUserRelationship(User user)
+        {
+            if (AllUsers == null)
+            { await SyncUsers(); }
+
+            // Check if user has interacted with event
+            return AllUsers.FindAll(x => x.User.Id == user.Id).Count == 1;
         }
 
         public async Task<bool> WasAttendedBy(User user)
