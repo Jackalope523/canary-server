@@ -7,6 +7,11 @@ namespace Core.Boundaries
 {
 	#region Schemas
 
+    public enum PenaltyType
+    { }
+
+    public record Penalty(PenaltyType Offence, DateTimeOffset TimeOfPenalty);
+
 	public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);
 
@@ -20,6 +25,9 @@ namespace Core.Boundaries
 
 	public interface IReportDatabase
     {
+        Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId);
+        Task<bool> PenaliseUserAsync(ulong userId, Penalty penalty);
+
         Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(ulong userId);
         Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(ulong userId);
         Task<bool> ReportUserAsync(ulong userId, ulong eventId, ulong targetUserId,

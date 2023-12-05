@@ -103,6 +103,8 @@ namespace Core.Entities
         public Synced<List<Note>> Notes
             => new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
 
+        public Synced<List<Penalty>> Penalties
+            => new(() => Terminal.ReportDirector.RequestPenaltiesForUserAsync(this));
         public Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync
             => new(() => Terminal.ReportDirector.RequestAllReportsAsync(this));
         public Synced<List<UserReport>> Reports

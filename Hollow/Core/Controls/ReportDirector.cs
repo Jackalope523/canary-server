@@ -77,6 +77,16 @@ namespace Core.Controls
 
 		#region Favours
 
+        internal async Task<List<Penalty>> RequestPenaltiesForUserAsync(User user)
+        {
+            return await Reports.GetPenaltiesForUserAsync(user.Id);
+        }
+
+        internal async Task<bool> PenaliseUserAsync(User user, Penalty penalty)
+        {
+            return await Reports.PenaliseUserAsync(user.Id, penalty);
+        }
+
 		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
             RequestAllReportsAsync(User user)
         {
