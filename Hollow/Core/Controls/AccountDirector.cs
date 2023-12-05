@@ -205,16 +205,18 @@ namespace Core.Controls
             users.ForEach(user => Accounts.UpdateUserAsync(user.Id, edits(user)));
 		}
 
-        internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
+        internal async Task<(GeoLocation Location, Distance Radius, int Stability)>
             RequestUserHauntAsync(User user)
         {
-            return await Accounts.GetUserHauntAsync(user.Id);
+            var result = await Accounts.GetUserHauntAsync(user.Id);
+            return (new() { Latitude = result.Latitude, Longitude = result.Longitude }, new() { Metres = result.Radius }, result.Stability);
         }
 
-        internal async Task<(double Latitude, double Longitude, double Radius)>
+        internal async Task<(GeoLocation Location, Distance Radius)>
             RequestLastKnownUserLocationAsync(User user)
         {
-            return await Accounts.GetRecentUserLocationAsync(user.Id);
+            var result = await Accounts.GetRecentUserLocationAsync(user.Id);
+            return (new() { Latitude = result.Latitude, Longitude = result.Longitude }, new() { Metres = result.Radius });
         }
 
 		#endregion

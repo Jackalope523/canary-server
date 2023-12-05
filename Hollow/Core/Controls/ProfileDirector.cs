@@ -161,11 +161,29 @@ namespace Core.Controls
 
 		#region Favours
 
+        internal async Task<List<User>> RequestFriendsAsync(User user)
+        {
+            return (await Profiles.GetFriendsAsync(user.Id))
+                .ConvertAll(user => new User(user));
+		}
+
+        internal async Task<List<User>> RequestFollowedUsersAsync(User user)
+        {
+            return (await Profiles.GetFollowedUsersAsync(user.Id))
+                .ConvertAll(user => new User(user));
+		}
+
         internal async Task<List<User>> RequestFollowersAsync(User user)
         {
             return (await Profiles.GetUsersFollowingAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
+
+		internal async Task<List<User>> RequestBlockedUsersAsync(User user)
+        {
+            return (await Profiles.GetBlockedUsersAsync(user.Id))
+				.ConvertAll(user => new User(user));
+        }
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)
         {
