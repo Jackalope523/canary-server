@@ -52,8 +52,7 @@ namespace Core.Controls
                 await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
-                await targetUser.SyncPastEvents();
-                nest.Events = targetUser.PastEvents.ConvertAll(e => e.ToEventThinSlice());
+                nest.Events = (await targetUser.PastEvents.Value()).ConvertAll(e => e.ToEventThinSlice());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
 
                 nest.Etchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
@@ -88,12 +87,11 @@ namespace Core.Controls
         public async Task<IDictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
-            await user.SyncFriends();
 
             ConcurrentDictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
             // Gather visible activity of each friend
-            user.Friends.AsParallel()
+            (await user.Friends.Value()).AsParallel()
                 .ForAll(async friend =>
                 {
                     var friendActivity = await GetUserActivity(friend);
@@ -152,8 +150,7 @@ namespace Core.Controls
             }
 
             var targetUser = await GetUserAsync(targetId);
-            await targetUser.SyncReputation();
-            targetUser.CalculateReputation();
+            await targetUser.CalculateReputation();
             _ = Accounts.UpdateUserAsync(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }
 
@@ -202,15 +199,13 @@ namespace Core.Controls
 
 		private async Task<List<EventShard>> GetUserActivity(User user)
         {
-            var upcomingEventsSync = user.SyncUpcomingEvents();
-            var currentEventSync = user.SyncCurrentEvent();
+            _ = user.UpcomingEvents.Sync();
+            _ = user.CurrentEvent.Sync();
             
             // Gather all user event data
-            await upcomingEventsSync;
-            var upcomingActivity = user.UpcomingEvents;
+            var upcomingActivity = await user.UpcomingEvents.Value();
 
-            await currentEventSync;
-            upcomingActivity.Add(user.CurrentEvent);
+            upcomingActivity.Add(await user.CurrentEvent.Value());
 
             return upcomingActivity
 				.ConvertAll(@event => @event.ToEventShard());

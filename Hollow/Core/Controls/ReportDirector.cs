@@ -24,8 +24,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
-            await targetUser.SyncCurrentEvent();
-            var occuringEvent = targetUser.CurrentEvent ?? Event.None;
+            var occuringEvent = (await targetUser.CurrentEvent.Value()) ?? Event.None;
 
             // Verify user can report
             Try(await user.CanReport(),

@@ -93,8 +93,7 @@ namespace Core.Controls
 				new InvalidInformationException("Invalid event details provided."));
 
 			// Verify user has no conflict
-			await user.SyncUpcomingEvents();
-			var conflict = user.UpcomingEvents.Find(e => IsWithin(e.StartTime - eventStub.StartTime, HalfHour));
+			var conflict = (await user.UpcomingEvents.Value()).Find(e => IsWithin(e.StartTime - eventStub.StartTime, HalfHour));
 			if (conflict != null)
 			{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 
@@ -197,14 +196,14 @@ namespace Core.Controls
 		{
 			var user = await GetUserAsync(userId);
 			var targetEvent = await GetEventAsync(eventId);
-			await targetEvent.Host.SyncLocation();
+			_ = targetEvent.Host.LastKnownLocation.Sync();
 
 			// Verify user is host
 			Try(targetEvent.IsHostedBy(user),
 				new InvalidUserException("User is not the host of this event"));
 
 			// Verify event can be started
-			Try(targetEvent.IsStartable(),
+			Try(await targetEvent.IsStartable(),
 				new InvalidEventException("Event cannot be started."));
 
 			// Try to start event
@@ -275,6 +274,7 @@ namespace Core.Controls
 		{
 			var user = await GetUserAsync(userId);
 			var targetEvent = await GetEventAsync(eventId);
+			_ = user.LastKnownLocation.Sync();
 
 			// Verify user is allowed to join event
 			Try(await targetEvent.IsJoinableBy(user),
@@ -285,10 +285,8 @@ namespace Core.Controls
 			{ await ThrowIfUserAtEvent(user); }
 			else
 			{
-				await user.SyncUpcomingEvents();
-
 				// Check if user has an upcoming conflict
-				var conflict = user.UpcomingEvents.Find(e => IsWithin(e.StartTime - targetEvent.StartTime, HalfHour));
+				var conflict = (await user.UpcomingEvents.Value()).Find(e => IsWithin(e.StartTime - targetEvent.StartTime, HalfHour));
 				if (conflict != null)
 				{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 			}
@@ -297,7 +295,7 @@ namespace Core.Controls
 
 			// Check if event is active and user is already there
 			if (HasAlready(targetEvent.StartTime) &&
-				targetEvent.IsInRange(user))
+				await targetEvent.IsInRange(user))
 			{
 				// Try to add user to the event
 				success = await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Guest);
@@ -353,8 +351,6 @@ namespace Core.Controls
 			(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)
 				guestList = new(0, 0, new());
 
-			await targetEvent.SyncUsers();
-
 			// Check if user is host
 			if (targetEvent.IsModifiableBy(user))
 			{
@@ -365,11 +361,11 @@ namespace Core.Controls
 					friend => friend.State.Equals(EventUserState.Watching)));
 
 				// Add visible users
-				guestList.Guests.AddRange(SelectAsSilhouette(targetEvent.AllUsers,
+				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers.Value(),
 					user => !user.State.Equals(EventUserState.Watching)));
 
-				guestList.GuestCount = targetEvent.Guests.Count;
-				guestList.Watchers = targetEvent.Watching.Count;
+				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
+				guestList.Watchers = (await targetEvent.Watching.Value()).Count;
 			}
 			// Check if user is a guest
 			else if (await targetEvent.WasAttendedBy(user))
@@ -381,10 +377,10 @@ namespace Core.Controls
 					friend => friend.State.Equals(EventUserState.Watching) || friend.State.Equals(EventUserState.Incoming)));
 
 				// Add visible users
-				guestList.Guests.AddRange(SelectAsSilhouette(targetEvent.AllUsers,
+				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers.Value(),
 					user => user.State.Equals(EventUserState.Guest) || user.State.Equals(EventUserState.Left)));
 
-				guestList.GuestCount = targetEvent.Guests.Count;
+				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
 			}
 			// Check if user can view event
 			else if (await targetEvent.IsVisibleTo(user))
@@ -395,7 +391,7 @@ namespace Core.Controls
 				guestList.Guests = SelectAsSilhouette(friends, friend => !friend.State.Equals(EventUserState.Watching));
 
 				// Add visible information
-				guestList.GuestCount = targetEvent.Guests.Count;
+				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
 			}
 			// User cannot recieve information about event
 			else
@@ -409,12 +405,10 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 			var @event = await GetEventAsync(eventId);
 
-			await user.SyncFriends();
-
 			List<User> potentialUsers = new();
 
 			// Add all friends that can join event
-			foreach (var friend in user.Friends)
+			foreach (var friend in await user.Friends.Value())
 			{
 				if (await @event.IsJoinableBy(friend))
 				{ potentialUsers.Add(friend); }
@@ -429,7 +423,6 @@ namespace Core.Controls
 			var inviter = await GetUserAsync(inviterId);
 			var invitee = await GetUserAsync(inviteeId);
 			var @event = await GetEventAsync(eventId);
-			await @event.SyncUsers();
 
 			// Verify inviter has relationship with event
 			Try(await @event.HasUserRelationship(inviter),
@@ -469,11 +462,10 @@ namespace Core.Controls
 			Events.SetUserStateAsync(targetUser.Id, @event.Id, EventUserState.Kicked);
 
 			// Hide target user's etchings from event
-			await @event.SyncEtchings();
-			foreach (Etching etching in @event.Etchings)
+			foreach (Etching etching in await @event.Etchings.Value())
 			{
 				if (targetUser.Etched(etching))
-				{ Etchings.HideEtchingAsync(etching.Id); }
+				{ _ = Etchings.HideEtchingAsync(etching.Id); }
 			}
 		}
 

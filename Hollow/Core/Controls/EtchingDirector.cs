@@ -25,14 +25,13 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetEvent = await GetEventAsync(eventId);
-            var etchingsSync = targetEvent.SyncEtchings();
+            _ = targetEvent.Etchings.Sync();
 
             // Verify user can see the event
             Try(await targetEvent.WasAttendedBy(user),
                 new InvalidEventException("User did not attend event."));
 
-            await etchingsSync;
-            return targetEvent.Etchings;
+            return await targetEvent.Etchings.Value();
         }
 
         public async Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL)

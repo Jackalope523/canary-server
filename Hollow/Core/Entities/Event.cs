@@ -14,9 +14,13 @@ namespace Core.Entities
 
     internal class Event
     {
-        #region Variables
+		#region Variables
 
-        public const int MaximumNameLength = 50;
+		//////
+		// Constants
+		//////////////
+
+		public const int MaximumNameLength = 50;
         public const int MaximumDescLength = 400;
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
@@ -26,7 +30,11 @@ namespace Core.Entities
         public static Event None
             => new() { Id = 0 };
 
-        public ulong Id { get; init; }
+		///////
+		// Properties
+		///////////////
+
+		public ulong Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -53,7 +61,11 @@ namespace Core.Entities
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumEtchingLateness);
 
-        public Synced<List<(User User, EventUserState State)>> AllUsers
+		////////
+		// Synced Properties
+		//////////////////////
+
+		public Synced<List<(User User, EventUserState State)>> AllUsers
             => new(() => Terminal.EventDirector.RequestAllUsersFromEventAsync(this));
         public Synced<List<User>> Watching
             => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User));

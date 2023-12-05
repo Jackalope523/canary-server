@@ -141,40 +141,48 @@ namespace Core.Controls
 			var user = await base.GetUserAsync(userId);
             var userIsAtEvent = user.IsAtEvent();
 
-            await user.SyncLocation();
-			user.LastKnownLocation = new() { Latitude = latitude, Longitude = longitude };
+            user.LastKnownLocation.Set(new() { Latitude = latitude, Longitude = longitude });
             await user.HandleHaunt();
 
-            // Position updates
-            _ = Accounts.UpdateRecentLocationAsync(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
-            _ = Accounts.UpdateHauntAsync(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
+            // Position update
+            _ = Accounts.UpdateRecentLocationAsync(user.Id,
+                (await user.LastKnownLocation.Value()).Latitude,
+                (await user.LastKnownLocation.Value()).Longitude,
+                (await user.LastKnownRadius.Value()).Metres);
+            // Haunt update
+            _ = Accounts.UpdateHauntAsync(user.Id,
+                (await user.Haunt.Value()).Latitude,
+                (await user.Haunt.Value()).Longitude,
+                (await user.HauntRadius.Value()).Metres,
+                await user.HauntStability.Value());
 
             var nextEvent = await user.NextEvent();
 
             // Check if user is at an event
             if (await userIsAtEvent)
             {
+                var currentEvent = await user.CurrentEvent.Value();
                 // Check if user left the event radius
-                if (!GeoLocation.AreInRange(user.LastKnownLocation, user.CurrentEvent.Location, user.CurrentEvent.Radius))
+                if (!GeoLocation.AreInRange(await user.LastKnownLocation.Value(), currentEvent.Location, currentEvent.Radius))
                 {
                     // Check if user is a guest or the host
-                    if (user.CurrentEvent.IsHostedBy(user))
+                    if (currentEvent.IsHostedBy(user))
                     {
                         // End the event if user is the host
-                        await Terminal.EventDirector.EndEventAsync(user.Id, user.CurrentEvent.Id);
+                        await Terminal.EventDirector.EndEventAsync(user.Id, currentEvent.Id);
                     }
                     else
                     {
                         // Leave the event if user is a guest
-                        await Terminal.EventDirector.LeaveEventAsync(user.Id, user.CurrentEvent.Id);
+                        await Terminal.EventDirector.LeaveEventAsync(user.Id, currentEvent.Id);
                     }
                 }
                 // Check if user is the host
-                else if (user.CurrentEvent.IsHostedBy(user) && user.CurrentEvent.IsDynamic)
+                else if (currentEvent.IsHostedBy(user) && currentEvent.IsDynamic)
                 {
                     // Update the position of the event
-                    _ = Events.UpdateEventAsync(user.CurrentEvent.Id, new() { (nameof(EventShard.Latitude), user.LastKnownLocation.Latitude),
-                        (nameof(EventShard.Longitude), user.LastKnownLocation.Longitude) });
+                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { (nameof(EventShard.Latitude), (await user.LastKnownLocation.Value()).Latitude),
+                        (nameof(EventShard.Longitude), (await user.LastKnownLocation.Value()).Longitude) });
                 }
             }
             // Check if user is on their way to an event
@@ -182,7 +190,7 @@ namespace Core.Controls
                 nextEvent != null)
             {
                 // Check if user is close enough to be a guest
-                if (nextEvent.IsInRange(user))
+                if (await nextEvent.IsInRange(user))
                 {
                     _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventUserState.Guest);
 
