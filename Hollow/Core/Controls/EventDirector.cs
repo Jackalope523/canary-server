@@ -474,9 +474,7 @@ namespace Core.Controls
 		#region Favours
 
 		internal async Task<Event> RequestCurrentEventForUserAsync(User user)
-		{
-			return new(await Events.FindCurrentEventForUserAsync(user.Id));
-		}
+			=> new(await Events.FindCurrentEventForUserAsync(user.Id));
 
 		internal async Task<List<Event>> RequestPastEventsForUserAsync(User user)
 		{

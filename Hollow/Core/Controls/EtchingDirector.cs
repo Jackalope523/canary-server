@@ -124,9 +124,7 @@ namespace Core.Controls
 		#region Favours
 
 		internal async Task<List<Etching>> RequestEventEtchingsAsync(Event @event)
-        {
-            return await Etchings.GetEtchingsForEventAsync(@event.Id);
-        }
+            => await Etchings.GetEtchingsForEventAsync(@event.Id);
 
 		#endregion
 	}

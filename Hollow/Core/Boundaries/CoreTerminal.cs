@@ -14,7 +14,7 @@ namespace Core.Boundaries
 		public IEventDatabase EventDatabase { get; init; }
 		public IEtchingDatabase EtchingDatabase { get; init; }
 		public IProfileDatabase ProfileDatabase { get; init; }
-		public IDisciplineDatabase ReportDatabase { get; init; }
+		public IDisciplineDatabase DisciplineDatabase { get; init; }
 		public INotificationDatabase NotificationDatabase { get; init; }
 
 		public IAccountOperations AccountOperations
@@ -25,8 +25,8 @@ namespace Core.Boundaries
 			=> EtchingDirector;
 		public IProfileOperations ProfileOperations
 			=> ProfileDirector;
-		public IDisciplineOperations ReportOperations
-			=> ReportDirector;
+		public IDisciplineOperations DisciplineOperations
+			=> DisciplineDirector;
 		public INotificationOperations NotificationOperations
 			=> NotificationDirector;
 
@@ -36,7 +36,7 @@ namespace Core.Boundaries
 		internal EventDirector EventDirector { get; private set; }
 		internal EtchingDirector EtchingDirector { get; private set; }
 		internal ProfileDirector ProfileDirector { get; private set; }
-		internal DisciplineDirector ReportDirector { get; private set; }
+		internal DisciplineDirector DisciplineDirector { get; private set; }
 		internal NotificationDirector NotificationDirector { get; private set; }
 
 		public List<(Type DatabaseType, object Instance)> Gates
@@ -44,7 +44,7 @@ namespace Core.Boundaries
 				(typeof(IEventOperations), EventOperations),
 				(typeof(IEtchingOperations), EtchingOperations),
 				(typeof(IProfileOperations), ProfileOperations),
-				(typeof(IDisciplineOperations), ReportOperations),
+				(typeof(IDisciplineOperations), DisciplineOperations),
 				(typeof(INotificationOperations), NotificationOperations) };
 
 		#endregion
@@ -53,7 +53,7 @@ namespace Core.Boundaries
 
 		public CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
-			IDisciplineDatabase reportDatabase, INotificationDatabase notificationDatabase,
+			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
 			INotificationService notificationService)
 		{
 			Terminal = this;
@@ -62,7 +62,7 @@ namespace Core.Boundaries
 			EventDatabase = eventDatabase;
 			EtchingDatabase = etchingDatabase;
 			ProfileDatabase = profileDatabase;
-			ReportDatabase = reportDatabase;
+			DisciplineDatabase = disciplineDatabase;
 			NotificationDatabase = notificationDatabase;
 
 			NotificationService = notificationService;
@@ -76,7 +76,7 @@ namespace Core.Boundaries
 			EventDirector = new EventDirector(this);
 			EtchingDirector = new EtchingDirector(this);
 			ProfileDirector = new ProfileDirector(this);
-			ReportDirector = new DisciplineDirector(this);
+			DisciplineDirector = new DisciplineDirector(this);
 			NotificationDirector = new NotificationDirector(this);
 		}
 

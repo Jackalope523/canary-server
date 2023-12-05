@@ -104,9 +104,9 @@ namespace Core.Entities
             => new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
 
         public Synced<List<Penalty>> Penalties
-            => new(() => Terminal.ReportDirector.RequestPenaltiesForUserAsync(this));
+            => new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
         public Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync
-            => new(() => Terminal.ReportDirector.RequestAllReportsAsync(this));
+            => new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
         public Synced<List<UserReport>> Reports
             => new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
         public Synced<List<EventReport>> EventReports

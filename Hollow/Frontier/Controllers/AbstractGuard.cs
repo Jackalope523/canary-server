@@ -52,7 +52,7 @@ namespace Frontier.Controllers
 		public AbstractGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations reportOperations, INotificationOperations notificationOperations,
+			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService)
 		{
 			userManager = identityUserManager;
@@ -62,7 +62,7 @@ namespace Frontier.Controllers
 			profiles = profileOperations;
 			events = eventOperations;
 			etchings = etchingOperations;
-			reports = reportOperations;
+			reports = disciplineOperations;
 			notifications = notificationOperations;
 
 			smsService = externalSMSService;
@@ -132,9 +132,7 @@ namespace Frontier.Controllers
 		}
 
 		public async Task<UserShard> GetCurrentUserAsync()
-		{
-			return await userManager.GetUserAsync(HttpContext.User);
-		}
+			=> await userManager.GetUserAsync(HttpContext.User);
 
 		public void ThrowIfUnverified(UserShard user)
 		{

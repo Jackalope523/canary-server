@@ -12,12 +12,12 @@ namespace Frontier.Controllers
 		public RootGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
             IAccountOperations accountOperations, IProfileOperations profileOperations,
             IEventOperations eventOperations, IEtchingOperations etchingOperations,
-            IDisciplineOperations reportOperations, INotificationOperations notificationOperations,
+            IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
             ISMSService externalSMSService, IEmailService externalEmailService) :
             base(identityUserManager, identitySignInManager,
                 accountOperations, profileOperations,
                 eventOperations, etchingOperations,
-                reportOperations, notificationOperations,
+                disciplineOperations, notificationOperations,
                 externalSMSService, externalEmailService)
 		{ }
 

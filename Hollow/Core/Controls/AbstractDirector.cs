@@ -34,7 +34,7 @@ namespace Core.Controls
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
 			Profiles = Terminal.ProfileDatabase;
-			Reports = Terminal.ReportDatabase;
+			Reports = Terminal.DisciplineDatabase;
 			Notifications = Terminal.NotificationDatabase;
         }
 
