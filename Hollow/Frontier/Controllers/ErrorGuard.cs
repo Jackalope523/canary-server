@@ -12,7 +12,7 @@ namespace Frontier.Controllers
 		public ErrorGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			IDisciplineOperations reportOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService) :
 			base(identityUserManager, identitySignInManager,
 				accountOperations, profileOperations,

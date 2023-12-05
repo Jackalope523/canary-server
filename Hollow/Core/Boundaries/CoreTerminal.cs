@@ -14,7 +14,7 @@ namespace Core.Boundaries
 		public IEventDatabase EventDatabase { get; init; }
 		public IEtchingDatabase EtchingDatabase { get; init; }
 		public IProfileDatabase ProfileDatabase { get; init; }
-		public IReportDatabase ReportDatabase { get; init; }
+		public IDisciplineDatabase ReportDatabase { get; init; }
 		public INotificationDatabase NotificationDatabase { get; init; }
 
 		public IAccountOperations AccountOperations
@@ -25,7 +25,7 @@ namespace Core.Boundaries
 			=> EtchingDirector;
 		public IProfileOperations ProfileOperations
 			=> ProfileDirector;
-		public IReportOperations ReportOperations
+		public IDisciplineOperations ReportOperations
 			=> ReportDirector;
 		public INotificationOperations NotificationOperations
 			=> NotificationDirector;
@@ -36,7 +36,7 @@ namespace Core.Boundaries
 		internal EventDirector EventDirector { get; private set; }
 		internal EtchingDirector EtchingDirector { get; private set; }
 		internal ProfileDirector ProfileDirector { get; private set; }
-		internal ReportDirector ReportDirector { get; private set; }
+		internal DisciplineDirector ReportDirector { get; private set; }
 		internal NotificationDirector NotificationDirector { get; private set; }
 
 		public List<(Type DatabaseType, object Instance)> Gates
@@ -44,7 +44,7 @@ namespace Core.Boundaries
 				(typeof(IEventOperations), EventOperations),
 				(typeof(IEtchingOperations), EtchingOperations),
 				(typeof(IProfileOperations), ProfileOperations),
-				(typeof(IReportOperations), ReportOperations),
+				(typeof(IDisciplineOperations), ReportOperations),
 				(typeof(INotificationOperations), NotificationOperations) };
 
 		#endregion
@@ -53,7 +53,7 @@ namespace Core.Boundaries
 
 		public CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
-			IReportDatabase reportDatabase, INotificationDatabase notificationDatabase,
+			IDisciplineDatabase reportDatabase, INotificationDatabase notificationDatabase,
 			INotificationService notificationService)
 		{
 			Terminal = this;
@@ -76,7 +76,7 @@ namespace Core.Boundaries
 			EventDirector = new EventDirector(this);
 			EtchingDirector = new EtchingDirector(this);
 			ProfileDirector = new ProfileDirector(this);
-			ReportDirector = new ReportDirector(this);
+			ReportDirector = new DisciplineDirector(this);
 			NotificationDirector = new NotificationDirector(this);
 		}
 

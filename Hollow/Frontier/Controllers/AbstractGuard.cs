@@ -39,7 +39,7 @@ namespace Frontier.Controllers
 		public IProfileOperations profiles;
 		public IEventOperations events;
 		public IEtchingOperations etchings;
-		public IReportOperations reports;
+		public IDisciplineOperations reports;
 		public INotificationOperations notifications;
 
 		public ISMSService smsService;
@@ -52,7 +52,7 @@ namespace Frontier.Controllers
 		public AbstractGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IReportOperations reportOperations, INotificationOperations notificationOperations,
+			IDisciplineOperations reportOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService)
 		{
 			userManager = identityUserManager;

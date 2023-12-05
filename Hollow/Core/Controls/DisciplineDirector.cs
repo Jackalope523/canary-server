@@ -9,11 +9,11 @@ using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
-	internal class ReportDirector : AbstractDirector, IReportOperations
+	internal class DisciplineDirector : AbstractDirector, IDisciplineOperations
 	{
 		#region Initialisation
 
-		public ReportDirector(CoreTerminal terminal) : base(terminal) { }
+		public DisciplineDirector(CoreTerminal terminal) : base(terminal) { }
 
 		#endregion
 
