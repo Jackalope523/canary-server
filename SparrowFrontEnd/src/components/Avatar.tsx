@@ -1,15 +1,20 @@
-import { View, Text, Image } from 'react-native';
+import { View, Text, ViewStyle } from 'react-native';
 import * as React from 'react';
 import { avatarStyles } from '../styles/Avatars';
 
 interface AvatarProps {
   status?: AvatarStatus;
   size?: AvatarSize;
+
+  avatarBorder?: ViewStyle[];
+  avatarContainer?: ViewStyle[];
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
   status = null,
   size = null,
+  avatarBorder = [],
+  avatarContainer = [],
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Status                                     ||
@@ -17,11 +22,11 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   switch (status) {
     case AvatarStatus.Online:
-      avatarStyles.avatarOnline;
+      avatarBorder = [avatarStyles.avatarOnline];
       break;
 
     case AvatarStatus.Offline:
-      avatarStyles.avatarOffline;
+      avatarBorder = [avatarStyles.avatarOffline];
       break;
   }
 
@@ -31,15 +36,15 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   switch (size) {
     case AvatarSize.Small:
-      avatarStyles.avatarSquareSmall;
+      avatarContainer = [avatarStyles.avatarSquareSmall];
       break;
 
     case AvatarSize.Medium:
-      avatarStyles.avatarSquareMedium;
+      avatarContainer = [avatarStyles.avatarSquareMedium];
       break;
 
     case AvatarSize.Large:
-      avatarStyles.avatarSquareLarge;
+      avatarContainer = [avatarStyles.avatarSquareLarge];
       break;
   }
 
