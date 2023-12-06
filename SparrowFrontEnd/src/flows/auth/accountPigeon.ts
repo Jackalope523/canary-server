@@ -32,7 +32,7 @@ export function extractCharacter(data: any) {
 }
 
 export type userShard = {
-    Id: string,
+    Id: number,
     PhoneNumber: string,
     Email: string,
     Name: string,

@@ -5,7 +5,7 @@ const apiBaseUrl = '/feed';
 
 export type feedOptions = {
     Depth: number,
-    ExclusionList: string[]
+    ExclusionList: number[]
 }
 
 // Get user feed

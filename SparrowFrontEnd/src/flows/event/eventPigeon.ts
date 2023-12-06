@@ -5,7 +5,7 @@ import { extractUserSilhouette, userSilhouette } from '../profile/profilePigeon'
 const apiBaseUrl = '/event';
 
 export type eventShard = {
-    Id: string,
+    Id: number,
     Host: userSilhouette,
     Name: string,
     Description: string,
@@ -20,23 +20,23 @@ export type eventShard = {
 };
 
 export type eventThinSlice = {
-    Id: string,
+    Id: number,
     Host: userSilhouette,
     Latitude: number,
     Longitude: number
 };
 
 export type eventHeader = {
-    Id: string,
+    Id: number,
     Name: string,
     IsActive: string,
     LastActiveTime: Date
 }
 
 export type etchingShard = {
-    Id: string,
-    EventId: string,
-    UserId: string,
+    Id: number,
+    EventId: number,
+    UserId: number,
     TimeEtched: Date,
     ImageURL: string,
     Ratings: [Positive: number, Negative: number]
@@ -47,7 +47,7 @@ export type etchingShard = {
 ////////////////
 
 // Get event details
-export async function getEvent(eventID: string) {
+export async function getEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -128,7 +128,7 @@ export type eventEditDetails = {
 };
 
 // Edit event
-export async function editEvent(eventID: string, details: eventEditDetails) {
+export async function editEvent(eventID: number, details: eventEditDetails) {
     if (!eventID || !details) {
         console.log('EventID or Details are missing.');
         return Promise.reject();
@@ -142,7 +142,7 @@ export async function editEvent(eventID: string, details: eventEditDetails) {
 }
 
 // End event
-export async function endEvent(eventID: string) {
+export async function endEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -156,7 +156,7 @@ export async function endEvent(eventID: string) {
 }
 
 // Join event
-export async function joinEvent(eventID: string) {
+export async function joinEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -170,7 +170,7 @@ export async function joinEvent(eventID: string) {
 }
 
 // Leave event
-export async function leaveEvent(eventID: string) {
+export async function leaveEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -195,7 +195,7 @@ export type eventReport = {
 };
 
 // Report event
-export async function reportEvent(eventID: string, hostID: string, report: eventReport) {
+export async function reportEvent(eventID: number, hostID: number, report: eventReport) {
     if (!eventID || !hostID || !report) {
         console.log('EventID, HostID, or Report are missing.');
         return Promise.reject();
@@ -213,7 +213,7 @@ export async function reportEvent(eventID: string, hostID: string, report: event
 //////////////////
 
 // Get event etchings
-export async function getEventEtchings(eventID: string) {
+export async function getEventEtchings(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -248,7 +248,7 @@ export type eventEtching = {
 };
 
 // Add etching to event
-export async function etchIntoEvent(eventID: string, etching: eventEtching) {
+export async function etchIntoEvent(eventID: number, etching: eventEtching) {
     if (!eventID || !etching) {
         console.log('EventID or Etching are missing.');
         return Promise.reject();
@@ -274,7 +274,7 @@ export async function etchIntoEvent(eventID: string, etching: eventEtching) {
 }
 
 // Remove etching
-export async function removeEtching(eventID: string, etchingID: string) {
+export async function removeEtching(eventID: number, etchingID: number) {
     if (!eventID || !etchingID) {
         console.log('EventID or EtchingID are missing.');
         return Promise.reject();
@@ -288,7 +288,7 @@ export async function removeEtching(eventID: string, etchingID: string) {
 }
 
 // Rate etching
-export async function rateEtching(eventID: string, etchingID: string, rating: ratingType) {
+export async function rateEtching(eventID: number, etchingID: number, rating: ratingType) {
     if (!eventID || !etchingID || !rating) {
         console.log('EventID, EtchingID, or Details are missing.');
         return Promise.reject();

@@ -5,14 +5,14 @@ import { eventShard } from '../event/eventPigeon';
 const apiBaseUrl = '/profile';
 
 export type userProfile = {
-    Id: string,
+    Id: number,
     Name: string,
     Reputation: number,
     NumberOfFollowers: number
 };
 
 export type userSilhouette = {
-    Id: string,
+    Id: number,
     Name: string
 };
 
@@ -30,7 +30,7 @@ export function extractUserSilhouette(data: any) {
 //////////////////
 
 // Get user profile
-export async function getUserProfile(targetIdentification: string) {
+export async function getUserProfile(targetIdentification: number) {
     if (!targetIdentification) {
         console.log('Target identification is missing.');
         return Promise.reject();
@@ -53,7 +53,7 @@ export async function getUserProfile(targetIdentification: string) {
 }
 
 // Rate a user
-export async function rateUser(targetIdentification: string, rating: ratingType) {
+export async function rateUser(targetIdentification: number, rating: ratingType) {
     if (!targetIdentification || !rating) {
         console.log('Target identification or rating is missing.');
         return Promise.reject();
@@ -67,7 +67,7 @@ export async function rateUser(targetIdentification: string, rating: ratingType)
 }
 
 // Get user activity
-export async function getUserActivity(targetIdentification: string) {
+export async function getUserActivity(targetIdentification: number) {
     if (!targetIdentification) {
         console.log('Target identification is missing.');
         return Promise.reject();
@@ -110,7 +110,7 @@ export async function getFriendActivity() {
             console.log('Friend Activity:', response.data);
             
             let users: userSilhouette[] = [];
-            let activity: { [id: string]: eventShard[] } = {};
+            let activity: { [id: number]: eventShard[] } = {};
 
             for (const pair of response.data)
             {
@@ -167,7 +167,7 @@ export async function getFollowedUsers() {
 }
 
 // Follow a user
-export async function followUser(targetID: string) {
+export async function followUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -181,7 +181,7 @@ export async function followUser(targetID: string) {
 }
 
 // Unfollow a user
-export async function unfollowUser(targetID: string) {
+export async function unfollowUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -216,7 +216,7 @@ export async function getBlockedUsers() {
 }
 
 // Block a user
-export async function blockUser(targetID: string) {
+export async function blockUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -230,7 +230,7 @@ export async function blockUser(targetID: string) {
 }
 
 // Unblock a user
-export async function unblockUser(targetID: string) {
+export async function unblockUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -252,7 +252,7 @@ export type userReport = {
 };
 
 // Report a user
-export async function reportUser(targetID: string, report: userReport) {
+export async function reportUser(targetID: number, report: userReport) {
     if (!targetID || !report) {
         console.log('Target ID or report is missing.');
         return Promise.reject();
