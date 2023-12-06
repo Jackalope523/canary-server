@@ -136,7 +136,7 @@ namespace Repository
 
             return @event;
         }
-        public List<EventThinSlice> FindEvents(double latitude, double longitude, double distance)
+        public List<EventThinSlice> FindEventsAsync(double latitude, double longitude, double distance)
         {
             List<EventThinSlice> closestEvents;
             Point userLocation = new Point(longitude, latitude);

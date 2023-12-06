@@ -55,6 +55,19 @@ namespace Shared
 			: base(message, innerException) { }
 	}
 
+    [Serializable]
+    public class UndefinedBehaviourException : HollowException
+    {
+        public UndefinedBehaviourException()
+        { }
+
+        public UndefinedBehaviourException(string message)
+            : base(message) { }
+
+        public UndefinedBehaviourException(string message, Exception innerException)
+            : base(message, innerException) { }
+    }
+
 	#endregion
 
 

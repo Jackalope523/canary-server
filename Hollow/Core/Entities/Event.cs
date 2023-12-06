@@ -10,18 +10,31 @@ using static Core.Entities.Psijic;
 
 namespace Core.Entities
 {
+    using static CoreTerminal;
+
     internal class Event
     {
-        #region Variables
+		#region Variables
 
-        public const int MaximumNameLength = 50;
+		//////
+		// Constants
+		//////////////
+
+		public const int MaximumNameLength = 50;
         public const int MaximumDescLength = 400;
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public readonly Distance GuestDistance = new() { Metres = 75 };
         public readonly TimeSpan MaximumEtchingLateness = OneDay;
 
-        public ulong Id { get; init; }
+        public static Event None
+            => new() { Id = 0 };
+
+		///////
+		// Properties
+		///////////////
+
+		public ulong Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -48,28 +61,36 @@ namespace Core.Entities
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumEtchingLateness);
 
-        public List<(User User, EventUserState State)> AllUsers { get; set; }
-        public List<User> Watching { get; set; }
-        public List<User> Incoming { get; set; }
-        public List<User> Guests { get; set; }
-        public List<User> Left { get; set; }
-        public List<User> Kicked { get; set; }
-        public List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)> GuestHistory { get; set; }
+		////////
+		// Synced Properties
+		//////////////////////
 
-		public List<EventReport> EventReports { get; set; }
+		public Synced<List<(User User, EventUserState State)>> AllUsers
+            => new(() => Terminal.EventDirector.RequestAllUsersFromEventAsync(this));
+        public Synced<List<User>> Watching
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User));
+		public Synced<List<User>> Incoming
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Incoming)).ConvertAll(user => user.User));
+        public Synced<List<User>> Guests
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Guest)).ConvertAll(user => user.User));
+        public Synced<List<User>> Left
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Left)).ConvertAll(user => user.User));
+        public Synced<List<User>> Kicked
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Kicked)).ConvertAll(user => user.User));
+        public Synced<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>> GuestHistory
+            => new(() => Terminal.EventDirector.RequestGuestHistoryAsync(this));
 
-        public List<Etching> Etchings { get; set; }
+        public Synced<List<EventReport>> EventReports
+            => new(() => Terminal.ReportDirector.RequestEventReportsAsync(this));
+
+        public Synced<List<Etching>> Etchings
+            => new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));
 
 		#endregion
 
 		#region Initialisation & Extraction
 
 		public Event() { }
-
-        public Event(ulong eventId)
-        {
-            Id = eventId;
-        }
 
         public Event(EventShard fromEvent)
         {
@@ -117,30 +138,6 @@ namespace Core.Entities
 
 		#endregion
 
-		#region Synchronisation
-
-		public async Task SyncReports()
-		{
-			EventReports = await CoreTerminal.Terminal.ReportDirector.RequestEventReportsAsync(this);
-		}
-
-        public async Task SyncUsers()
-        {
-            AllUsers = await CoreTerminal.Terminal.EventDirector.RequestAllUsersFromEventAsync(this);
-            Watching = AllUsers.FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User);
-            Incoming = AllUsers.FindAll(user => user.State.Equals(EventUserState.Incoming)).ConvertAll(user => user.User);
-            Guests = AllUsers.FindAll(user => user.State.Equals(EventUserState.Guest)).ConvertAll(user => user.User);
-            Left = AllUsers.FindAll(user => user.State.Equals(EventUserState.Left)).ConvertAll(user => user.User);
-            Kicked = AllUsers.FindAll(user => user.State.Equals(EventUserState.Kicked)).ConvertAll(user => user.User);
-        }
-
-        public async Task SyncEtchings()
-        {
-            Etchings = await CoreTerminal.Terminal.EtchingDirector.RequestEventEtchingsAsync(this);
-        }
-
-		#endregion
-
 		#region Composition
 
 		public bool ValidateAndNormalise()
@@ -164,7 +161,7 @@ namespace Core.Entities
         {
             List<(User User, EventUserState State)> friends = new();
 
-            foreach (var userDetails in AllUsers)
+            foreach (var userDetails in await AllUsers.Value())
             {
                 if (await user.IsFriendsWith(userDetails.User))
                 {
@@ -214,14 +211,12 @@ namespace Core.Entities
             { return false; }
 
             // Check if user is kicked from event
-            await SyncUsers();
-            if (Kicked.Contains(user))
+            if ((await Kicked.Value()).Contains(user))
             { return false; }
 
             // Check if user or user's haunt is within a reasonable distance
-            await user.SyncLocation();
-            if (!GeoLocation.AreInRange(user.LastKnownLocation, Location, MaximumJoinDistance) &&
-                !GeoLocation.AreInRange(user.Haunt, Location, MaximumJoinDistance))
+            if (!GeoLocation.AreInRange(await user.LastKnownLocation.Value(), Location, MaximumJoinDistance) &&
+                !GeoLocation.AreInRange(await user.Haunt.Value(), Location, MaximumJoinDistance))
             { return false; }
 
             return true;
@@ -247,33 +242,27 @@ namespace Core.Entities
 
         public async Task<bool> HasUserRelationship(User user)
         {
-            if (AllUsers == null)
-            { await SyncUsers(); }
-
             // Check if user has interacted with event
-            return AllUsers.FindAll(x => x.User.Id == user.Id).Count == 1;
+            return (await AllUsers.Value()).FindAll(x => x.User.Id == user.Id).Count == 1;
         }
 
         public async Task<bool> WasAttendedBy(User user)
         {
-            if (Guests == null || Left == null)
-            { await SyncUsers(); }
-
             // Check if user is or was on the guest list
-            return Guests.Contains(user) || Left.Contains(user);
+            return (await Guests.Value()).Contains(user) || (await Left.Value()).Contains(user);
 		}
 
-        public bool IsInRange(User user)
-            => GeoLocation.AreInRange(Location, user.LastKnownLocation, GuestDistance);
+        public async Task<bool> IsInRange(User user)
+            => GeoLocation.AreInRange(Location, await user.LastKnownLocation.Value(), GuestDistance);
 
-        public bool IsStartable()
+        public async Task<bool> IsStartable()
         {
             // Check if event has not yet started
             if (!IsWaiting)
             { return false; }
 
             // Check if host is within range
-            if (!IsInRange(Host))
+            if (!await IsInRange(Host))
             { return false; }
 
             return true;
@@ -290,12 +279,10 @@ namespace Core.Entities
 
         public async Task<List<User>> Ended()
         {
-            await SyncUsers();
-
             List<User> updatedGuests = new();
 
             // Update all participants' vectors and notify
-			foreach ((var joined, var left, var guest) in GuestHistory)
+			foreach ((var joined, var left, var guest) in await GuestHistory.Value())
 			{
 				guest.CalculateCharacter(this, left.Value - joined);
 
@@ -325,10 +312,8 @@ namespace Core.Entities
 
 		public async Task<bool> Reported()
         {
-            await SyncReports();
-
             // Check if there are enough reports
-            if (EventReports.Count < 3)
+            if ((await EventReports.Value()).Count < 3)
             { return false; }
 
             return true;
@@ -340,10 +325,7 @@ namespace Core.Entities
 
         public async Task NotifyActive(string title, string message)
         {
-            if (Incoming == null || Guests == null)
-            { await SyncUsers(); }
-
-            foreach (var user in Incoming.Concat(Guests))
+            foreach (var user in (await Incoming.Value()).Concat(await Guests.Value()))
             {
                 if (IsHostedBy(user))
                 { continue; }
@@ -354,10 +336,7 @@ namespace Core.Entities
 
         public async Task NotifyGuests(string title, string message)
         {
-            if (Guests == null)
-            { await SyncUsers(); }
-
-            foreach (var guest in Guests)
+            foreach (var guest in await Guests.Value())
             {
                 if (IsHostedBy(guest))
                 { continue; }

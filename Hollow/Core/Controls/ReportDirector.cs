@@ -22,16 +22,15 @@ namespace Core.Controls
 		public async Task ReportUserAsync(ulong userId, ulong targetId,
             UserReportType reportType, string reportDetails)
         {
-            var user = await GetUser(userId);
-            var targetUser = await GetUser(targetId);
-            await targetUser.SyncCurrentEvent();
-            var occuringEvent = targetUser.CurrentEvent ?? new(0);
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+            var occuringEvent = (await targetUser.CurrentEvent.Value()) ?? Event.None;
 
             // Verify user can report
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            Reports.ReportUser(userId, occuringEvent.Id, targetUser.Id, reportType, reportDetails);
+            await Reports.ReportUserAsync(userId, occuringEvent.Id, targetUser.Id, reportType, reportDetails);
 
             // Compute user's standing
             var status = await targetUser.Reported();
@@ -39,26 +38,26 @@ namespace Core.Controls
             // Check if user should be punished
             if (targetUser.AccountStatus != status)
             {
-                Accounts.UpdateUser(targetUser.Id, new() { (nameof(UserShard.AccountStatus), status) });
+                _ = Accounts.UpdateUserAsync(targetUser.Id, new() { (nameof(UserShard.AccountStatus), status) });
             }
         }
 
         public async Task ReportEventAsync(ulong userId, ulong eventId,
             EventReportType reportType, string reportDetails)
         {
-            User user = new(userId);
-            var targetEvent = await GetEvent(eventId);
+            var user = await GetUserAsync(userId);
+            var targetEvent = await GetEventAsync(eventId);
 
             // Verify user can report
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            Reports.ReportEvent(user.Id, targetEvent.Id, targetEvent.Host.Id, reportType, reportDetails);
+            await Reports.ReportEventAsync(user.Id, targetEvent.Id, targetEvent.Host.Id, reportType, reportDetails);
 
             // Check if action is to be taken
             if (await targetEvent.Reported())
             {
-                var host = await GetUser(targetEvent.Host.Id);
+                var host = await GetUserAsync(targetEvent.Host.Id);
 
                 // Threshold hit, end event
                 _ = Terminal.EventDirector.EndEventAsync(host.Id, eventId);
@@ -69,7 +68,7 @@ namespace Core.Controls
                 // Check if host should be punished
                 if (host.AccountStatus != status)
                 {
-                    Accounts.UpdateUser(host.Id, new() { (nameof(UserShard.AccountStatus), status) });
+                    _ = Accounts.UpdateUserAsync(host.Id, new() { (nameof(UserShard.AccountStatus), status) });
                 }
             }
         }
@@ -81,12 +80,12 @@ namespace Core.Controls
 		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
             RequestAllReportsAsync(User user)
         {
-            return Reports.GetReportsForUser(user.Id);
+            return await Reports.GetReportsForUserAsync(user.Id);
         }
 
         internal async Task<List<EventReport>> RequestEventReportsAsync(Event @event)
         {
-            return Reports.GetReportsForEvent(@event.Id);
+            return await Reports.GetReportsForEventAsync(@event.Id);
         }
 
 		#endregion

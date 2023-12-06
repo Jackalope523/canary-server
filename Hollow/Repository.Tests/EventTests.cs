@@ -123,7 +123,7 @@ namespace Repository.Tests
             sentry.GetContext().SaveChanges();
 
             Guid id = sentry.GetContext().Events.First().Id;
-            List<EventThinSlice> found = store.FindEvents(100, 100, 10);        
+            List<EventThinSlice> found = store.FindEventsAsync(100, 100, 10);        
 
             Assert.Single(found);
             Assert.Equal(id, found.First().Id);

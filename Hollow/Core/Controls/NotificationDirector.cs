@@ -23,19 +23,19 @@ namespace Core.Controls
 
 		public async Task<List<Note>> GetNotesAsync(ulong userId)
 		{
-			var user = await GetUser(userId);
+			var user = await GetUserAsync(userId);
 
-			return Notifications.GetNotes(user.Id);
+			return await Notifications.GetNotesAsync(user.Id);
 		}
 
 		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
 		{
-			Notifications.SubscribeUser(userId, deviceType, deviceToken);
+			await Notifications.SubscribeUserAsync(userId, deviceType, deviceToken);
 		}
 
 		public async Task UnsubscribeUserAsync(ulong userId)
 		{
-			Notifications.UnsubscribeUser(userId);
+			await Notifications.UnsubscribeUserAsync(userId);
 		}
 
 		#endregion
@@ -48,12 +48,13 @@ namespace Core.Controls
 			if (await notifier.IsBlocking(user) || await notifier.IsBlockedBy(user))
 			{ return; }
 
-			Notifications.SaveNote(user.Id, notifier.Id, Time, message, action);
+			await Notifications.SaveNoteAsync(user.Id, notifier.Id, Time, message, action);
 		}
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-			var userSettings = Notifications.GetUserSubscription(user.Id);
+			var userSettings = await Notifications.GetUserSubscriptionAsync(user.Id);
+
 			// Check if user is subscribed
 			if  (userSettings == (null, null))
 			{ return; }

@@ -26,19 +26,19 @@ namespace Core.Boundaries
 
 	public interface IAccountDatabase
 	{
-		UserShard FindUserById(ulong userId);
-        UserShard FindUserByPhoneNumber(string phoneNumber);
-		UserShard FindUserByEmail(string normalisedEmail);
-        bool CreateUser(string phoneNumber, string email, string normalisedEmail,
+		Task<UserShard> FindUserByIdAsync(ulong userId);
+        Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber);
+		Task<UserShard> FindUserByEmailAsync(string normalisedEmail);
+		Task<bool> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, Character character);
-		bool UpdateUser(ulong userId, List<(string Property, object Value)> edits);
-        bool DeleteUser(ulong userId);
+		Task<bool> UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
+		Task<bool> DeleteUserAsync(ulong userId);
 
-		(double Latitude, double Longitude, double Radius) GetRecentUserLocation(ulong userId);
-		bool UpdateRecentLocation(ulong userId, double latitude, double longitude, double radius);
+		Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(ulong userId);
+		Task<bool> UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius);
 
-		(double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(ulong userId);
-		bool UpdateHaunt(ulong userId, double latitude, double longitude, double radius, int stability);
+		Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(ulong userId);
+		Task<bool> UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability);
 	}
 
 	public interface IAccountOperations
