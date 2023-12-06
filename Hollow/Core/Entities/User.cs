@@ -198,8 +198,12 @@ namespace Core.Entities
 
 		public async Task CalculateReputation()
         {
+            _ = (Penalties.Sync(), Ratings.Sync());
+
+            // Get all recent penalties
+            var penalties = (await Penalties.Value()).Where(penalty => HasYet(penalty.TimeOfPenalty + OneYear)).ToList();
             var ratings = await Ratings.Value();
-            int ratingDiff = ratings.Postitive - ratings.Negative;
+            int ratingDiff = ratings.Postitive - ratings.Negative - penalties.Count/2;
             int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
 
             float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
@@ -349,6 +353,9 @@ namespace Core.Entities
                 }
             }
         }
+
+        public async Task Penalised()
+            => await CalculateReputation();
 
 		public async Task<UserAccountStatus> EventReported()
         {

@@ -26,7 +26,7 @@ namespace Core.Boundaries
 	public interface IDisciplineDatabase
     {
         Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId);
-        Task<bool> PenaliseUserAsync(ulong userId, Penalty penalty);
+        Task<bool> PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
 
         Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(ulong userId);
         Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(ulong userId);
