@@ -44,7 +44,8 @@ export async function getUserFeed(options: feedOptions) {
                     TimeEtched: extractDate(etching['TimeEtched']),
                     ImageURL: etching['ImageURL'],
                     Ratings: [etching['Ratings']['Positive'],
-                        etching['Ratings']['Negative']]
+                        etching['Ratings']['Negative']],
+                    IsHidden: etching['IsHidden']
                 });
             }
 

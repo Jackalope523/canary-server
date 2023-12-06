@@ -49,8 +49,8 @@ export type userShard = {
     Character: character
 };
 
-////////////////////////
-// Account login flow //
+/////////
+// Account login flow
 ////////////////////////
 
 export type accountCredentials = {
@@ -119,9 +119,14 @@ export async function verify(credentials: accountCredentials) {
     .catch(handleError);
 }
 
-// Logout
-export async function logout() {
-    return await axios.post(`${apiBaseUrl}/logout`)
+// Resend email verification
+export async function resendEmailVerification(email: string) {
+    if (!email) {
+        console.log('Email is missing.');
+        return Promise.reject();
+    }
+
+    return await axios.post(`${apiBaseUrl}/email`, email)
     .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
@@ -130,8 +135,19 @@ export async function logout() {
     .catch(handleError);
 }
 
-//////////////////////
-// Account use flow //
+// Logout
+export async function logout() {
+    return await axios.get(`${apiBaseUrl}/logout`)
+    .then((response: any) => {
+        console.log(response.data);
+        console.log(response.status);
+        console.log(response.headers);
+    })
+    .catch(handleError);
+}
+
+////////
+// Account use flow
 //////////////////////
 
 // Get account details

@@ -1,6 +1,6 @@
 import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
 import { extractCharacter } from '../auth/accountPigeon';
-import { eventShard } from '../event/eventPigeon';
+import { etchingShard, eventShard, eventThinSlice } from '../event/eventPigeon';
 
 const apiBaseUrl = '/profile';
 
@@ -25,8 +25,8 @@ export function extractUserSilhouette(data: any) {
     return silhouette;
 }
 
-//////////////////
-// Profile Flow //
+///////
+// Profile Flow
 //////////////////
 
 // Get user profile
@@ -48,6 +48,50 @@ export async function getUserProfile(targetIdentification: number) {
             }
 
             return profile;
+        })
+        .catch(handleError);
+}
+
+// Get user nest
+export async function getUserNest(targetIdentification: number) {
+    if (!targetIdentification) {
+        console.log('Target identification is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.get(`${apiBaseUrl}/${targetIdentification}/nest`)
+        .then((response: any) => {
+            console.log('User Nest:', response.data);
+            
+            let events: eventThinSlice[] = [];
+            let etchings: etchingShard[] = [];
+
+            for (const event of response.data['Events'])
+            {
+                events.push({
+                    Id: event['Id'],
+                    Host: extractUserSilhouette(event['Host']),
+                    Latitude: event['Latitude'],
+                    Longitude: event['Longitude']
+                });
+            }
+
+            for (const etching of response.data['Etchings'])
+            {
+                etchings.push({
+                    Id: etching['id'],
+                    EventId: etching['EventId'],
+                    UserId: etching['UserId'],
+                    TimeEtched: extractDate(etching['TimeEtched']),
+                    ImageURL: etching['ImageURL'],
+                    Ratings: [etching['Ratings']['Positive'],
+                        etching['Ratings']['Negative']],
+                    IsHidden: etching['IsHidden']
+                });
+
+            }
+
+            return [ events, etchings ];
         })
         .catch(handleError);
 }
@@ -91,10 +135,12 @@ export async function getUserActivity(targetIdentification: number) {
                     Longitude: event['Longitude'],
                     TimeEnded: event['TimeEnded'] ?
                         extractDate(event['TimeEnded']) : undefined,
-                    IsOpen: event['IsOpen'],
+                    State: event['State'],
                     GroupMinimum: event['GroupMinimum'],
                     GroupMaximum: event['GroupMaximum'],
-                    Character: extractCharacter(event['Character'])
+                    Character: extractCharacter(event['Character']),
+                    Radius: event['Radius'],
+                    IsDynamic: event['IsDynamic']
                 });
             }
 
@@ -130,10 +176,12 @@ export async function getFriendActivity() {
                         Longitude: event['Longitude'],
                         TimeEnded: event['TimeEnded'] ?
                             extractDate(event['TimeEnded']) : undefined,
-                        IsOpen: event['IsOpen'],
+                        State: event['State'],
                         GroupMinimum: event['GroupMinimum'],
                         GroupMaximum: event['GroupMaximum'],
-                        Character: extractCharacter(event['Character'])
+                        Character: extractCharacter(event['Character']),
+                        Radius: event['Radius'],
+                        IsDynamic: event['IsDynamic']
                     });
                 }
 
