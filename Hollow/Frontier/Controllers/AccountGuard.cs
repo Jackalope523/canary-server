@@ -11,11 +11,11 @@ using Shared;
 namespace Frontier.Controllers
 {
     [Route("account")]
-    public class AccountAgent : AbstractAgent
+    public class AccountGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public AccountAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public AccountGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,
@@ -34,31 +34,24 @@ namespace Frontier.Controllers
 		[HttpGet]
         public async Task<IActionResult> GetAccount()
         {
-            UserShard user;
-
-            try
+            return await Execute(async () =>
             {
                 // Get current user
-                user = await GetCurrentUserAsync();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
+                var user = await GetCurrentUserAsync();
 
-            return Ok(user);
+                return Ok(user);
+            });
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] AccountCredentialsManifest credentials)
         {
+            // Verify parameters
             if (credentials == null || !ModelState.IsValid)
-            {
-                return BadRequest(HollowError.MissingInformation.ToString());
-            }
+            { return BadRequest(HollowError.MissingInformation.ToString()); }
 
-            try
+            return await Execute(async () =>
             {
                 var user = await accounts.GetUserAsync(credentials.PhoneNumber);
                 string code;
@@ -70,54 +63,41 @@ namespace Frontier.Controllers
                     code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
                 }
                 else
-				{
-					// Account is not activated, generate change number token
-					code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-				}
-                
+                {
+                    // Account is not activated, generate change number token
+                    code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                }
+
                 // Send user an SMS with code
                 await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+            });
         }
 
         [HttpGet("logout")]
         [AllowAnonymous]
         public async Task<IActionResult> Logout()
         {
-            try
+            return await Execute(async () =>
             {
                 if (signInManager.IsSignedIn(HttpContext.User))
                 {
                     await signInManager.SignOutAsync();
                 }
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
-
-            return Ok();
+            });
         }
 
         [HttpPost("verify")]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyCode([FromBody] AccountCredentialsManifest credentials)
         {
+            // Verify parameters
 			if (credentials == null || !ModelState.IsValid || credentials.Code == null)
-            {
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+            { return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
-			{
-				var user = await accounts.GetUserAsync(credentials.PhoneNumber);
-                
+            return await Execute(async () =>
+            {
+                var user = await accounts.GetUserAsync(credentials.PhoneNumber);
+
                 if (await userManager.IsLockedOutAsync(user))
                 {
                     return BadRequest(HollowError.UserLockedOut.ToString());
@@ -127,7 +107,7 @@ namespace Frontier.Controllers
                 if (await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
                     // Account is activated, check 2FA token validity
-				    var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
+                    var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
                     if (result)
                     {
                         // Token matched, reset access tries and sign user in
@@ -141,106 +121,91 @@ namespace Frontier.Controllers
                     }
                 }
                 else
-				{
-					// Account is not activated, check change number token validity
-					var result = await userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, credentials.Code);
-					if (result.Succeeded)
-					{
+                {
+                    // Account is not activated, check change number token validity
+                    var result = await userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, credentials.Code);
+                    if (result.Succeeded)
+                    {
                         // Token matched, reset access tries and sign user in
                         await userManager.ResetAccessFailedCountAsync(user);
-						await signInManager.SignInAsync(user, false);
+                        await signInManager.SignInAsync(user, false);
 
-						if (!string.IsNullOrEmpty(user.Email))
-						{
-							// Send verification email if an email is added
-							var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-							var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
-							await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", $"Verify your Sparrow email.\n\n{confirmationLink}");
-						}
-					}
-					else
-					{
+                        if (!string.IsNullOrEmpty(user.Email))
+                        {
+                            // Send verification email if an email is added
+                            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                            var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
+                            await emailService.SendEmailAsync(user.Email, "Welcome to Sparrow!", $"Verify your Sparrow email.\n\n{confirmationLink}");
+                        }
+                    }
+                    else
+                    {
                         await userManager.AccessFailedAsync(user);
-						return BadRequest(HollowError.IncorrectCode.ToString());
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
+                        return BadRequest(HollowError.IncorrectCode.ToString());
+                    }
+                }
 
-			return Ok();
+                return Ok();
+            });
         }
 
         [HttpGet("email")]
         [AllowAnonymous]
 		public async Task<IActionResult> VerifyEmail(string token, string email)
         {
+            // Verify parameters
 			if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+            return await Execute(async () =>
             {
-				var user = await userManager.FindByEmailAsync(email);
-				if (user == null)
+                var user = await userManager.FindByEmailAsync(email);
+                if (user == null)
                 {
-					return BadRequest(HollowError.MissingInformation.ToString());
+                    return BadRequest(HollowError.MissingInformation.ToString());
                 }
 
-				var result = await userManager.ConfirmEmailAsync(user, token);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
+                var result = await userManager.ConfirmEmailAsync(user, token);
 
-			return Ok();
+                return Ok();
+            });
 		}
 
         [HttpPost("email")]
         [AllowAnonymous]
         public async Task<IActionResult> ResendEmailVerification(string email)
         {
+            // Verify parameters
             if (string.IsNullOrEmpty(email))
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-            try
+            return await Execute(async () =>
             {
-				var user = await userManager.FindByEmailAsync(email);
-				if (user == null)
+                var user = await userManager.FindByEmailAsync(email);
+                if (user == null)
                 {
-					return BadRequest(HollowError.MissingInformation.ToString());
+                    return BadRequest(HollowError.MissingInformation.ToString());
                 }
 
                 // Send verification email if email is not confirmed
                 if (!user.IsEmailConfirmed)
                 {
-				    var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-				    var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
-				    await emailService.SendEmailAsync(user.Email, "Verify your Sparrow email.", $"Verify your Sparrow email.\n\n{confirmationLink}");
+                    var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
+                    await emailService.SendEmailAsync(user.Email, "Verify your Sparrow email.", $"Verify your Sparrow email.\n\n{confirmationLink}");
                 }
-            }
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+                
+                return Ok();
+            });
 		}
 
 		[HttpPost("signup")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateAccount([FromBody] AccountSignUpManifest details)
 		{
+            // Verify parameters
 			if (details == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
             try
 			{
@@ -283,27 +248,15 @@ namespace Frontier.Controllers
         [HttpPut]
         public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsManifest details)
         {
+            // Verify parameters
 			if (details == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-            try
+            return await Execute(async user =>
             {
                 // Send updates to account manager
-                var user = await GetCurrentUserAsync();
                 await accounts.EditUserAsync(user.Id, name: details.Name);
-            }
-            catch (InvalidInformationException e)
-            {
-                return BadRequest(e.ToString());
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+            }, allowUnverified: true);
         }
 
 		#endregion

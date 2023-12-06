@@ -5,11 +5,11 @@ using Core.Boundaries;
 namespace Frontier.Controllers
 {
     [Route("")]
-    public class RootAgent : AbstractAgent
+    public class RootGuard : AbstractGuard
     {
 		#region Initialisation
 
-		public RootAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public RootGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
             IAccountOperations accountOperations, IProfileOperations profileOperations,
             IEventOperations eventOperations, IEtchingOperations etchingOperations,
             IReportOperations reportOperations, INotificationOperations notificationOperations,

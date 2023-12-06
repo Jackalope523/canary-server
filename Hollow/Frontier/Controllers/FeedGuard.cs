@@ -10,11 +10,11 @@ using Core.Boundaries;
 namespace Frontier.Controllers
 {
     [Route("feed")]
-    public class FeedAgent : AbstractAgent
+    public class FeedGuard : AbstractGuard
     {
 		#region Initialisation
 
-		public FeedAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public FeedGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,
@@ -33,27 +33,16 @@ namespace Frontier.Controllers
 		[HttpGet("{feedDepth}")]
         public async Task<IActionResult> GetFeed([FromBody] FeedManifest feedOptions)
         {
+			// Verify parameters
             if (feedOptions == null || !ModelState.IsValid)
-            {
-                return BadRequest(HollowError.MissingInformation.ToString());
-            }
+            { return BadRequest(HollowError.MissingInformation.ToString()); }
 
-            (int Depth, List<EventHeader>, List<Etching>) userFeed;
-
-            try
-            {
-                // Retrieve current user
-                var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
-				userFeed = await etchings.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
-			}
-			catch (Exception e)
+			return await Execute(async user =>
 			{
-				return BadRequest(e.ToString());
-			}
+				var userFeed = await etchings.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
 
-			return Ok(userFeed);
+				return Ok(userFeed);
+			});
         }
 
 		#endregion

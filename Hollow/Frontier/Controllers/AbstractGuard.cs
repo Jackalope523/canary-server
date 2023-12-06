@@ -1,15 +1,17 @@
-﻿using Core.Boundaries;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
+using Core.Boundaries;
+using Serilog;
 
 namespace Frontier.Controllers
 {
 	[ApiController]
 	[Authorize]
-	public class AbstractAgent : ControllerBase
+	public class AbstractGuard : ControllerBase
 	{
 		#region Schemas
 
@@ -47,7 +49,7 @@ namespace Frontier.Controllers
 
 		#region Initialisation
 
-		public AbstractAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public AbstractGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,
@@ -70,6 +72,64 @@ namespace Frontier.Controllers
 		#endregion
 
 		#region Favours
+
+		public async Task<IActionResult> Execute(Func<Task<IActionResult>> action)
+		{
+			try
+			{
+				return await action.Invoke();
+			}
+			catch (HollowFailureException ex)
+			{
+				// Log failure
+				Log.Error(ex, ex.Message);
+
+				return StatusCode(500);
+			}
+			catch (UserErrorException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				// Log failure
+				Log.Error(ex, ex.Message);
+
+				return StatusCode(500);
+			}
+		}
+
+		public async Task<IActionResult> Execute(Func<Task> action)
+		{
+			return await Execute(async () =>
+			{
+				await action.Invoke();
+				return Ok();
+			});
+		}
+
+		public async Task<IActionResult> Execute(Func<UserShard, Task> action, bool allowUnverified = false)
+		{
+			return await Execute(async user =>
+			{
+				await action.Invoke(user);
+				return Ok();
+			},
+			allowUnverified);
+		}
+
+		public async Task<IActionResult> Execute(Func<UserShard, Task<IActionResult>> action, bool allowUnverified = false)
+		{
+			return await Execute(async () =>
+			{
+				var user = await GetCurrentUserAsync();
+
+				if (!allowUnverified)
+				{ ThrowIfUnverified(user); }
+
+				return await action.Invoke(user);
+			});
+		}
 
 		public async Task<UserShard> GetCurrentUserAsync()
 		{

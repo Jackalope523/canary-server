@@ -9,11 +9,11 @@ using System.Collections.Generic;
 namespace Frontier.Controllers
 {
 	[Route("notifications")]
-	public class NotificationAgent : AbstractAgent
+	public class NotificationGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public NotificationAgent(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public NotificationGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IReportOperations reportOperations, INotificationOperations notificationOperations,
@@ -32,58 +32,34 @@ namespace Frontier.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetNotes()
 		{
-			List<Note> notes;
+			return await Execute(async user =>
+			{
+				var notes = await notifications.GetNotesAsync(user.Id);
 
-            try
-            {
-                var user = await GetCurrentUserAsync();
-				ThrowIfUnverified(user);
-
-                notes = await notifications.GetNotesAsync(user.Id);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
-
-            return Ok(notes);
+				return Ok(notes);
+			});
         }
 
 		[HttpPost]
 		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
 		{
+			// Verify parameters
 			if (subscription == null || !ModelState.IsValid)
-			{
-				return BadRequest(HollowError.MissingInformation.ToString());
-			}
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-			try
+			return await Execute(async user =>
 			{
-				var user = await GetCurrentUserAsync();
 				await notifications.SubscribeUserAsync(user.Id, subscription.DeviceType, subscription.DeviceToken);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+			}, allowUnverified: true);
 		}
 
 		[HttpDelete]
 		public async Task<IActionResult> Unsubscribe()
 		{
-			try
+			return await Execute(async user =>
 			{
-				var user = await GetCurrentUserAsync();
 				await notifications.UnsubscribeUserAsync(user.Id);
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e.ToString());
-			}
-
-			return Ok();
+			}, allowUnverified: true);
 		}
 
 		#endregion

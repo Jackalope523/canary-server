@@ -1,4 +1,5 @@
 ﻿using PhoneNumbers;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,7 +93,7 @@ namespace Core.Entities
 		public string CensorText(string text)
 		{
 			Fail(string.IsNullOrEmpty(text),
-				new ArgumentNullException(nameof(text)));
+				new InvalidInformationException($"{nameof(text)} cannot be null or empty."));
 
 			string censoredText = text;
 

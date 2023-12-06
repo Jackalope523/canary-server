@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Serilog;
 
 namespace Frontier
 {
@@ -24,7 +25,25 @@ namespace Frontier
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+			Log.Logger = new LoggerConfiguration()
+				.WriteTo.Console()
+				.CreateLogger();
+
+			try
+			{
+				CreateHostBuilder(args)
+					.UseSerilog()
+					.Build()
+					.Run();
+			}
+			catch (Exception ex)
+			{
+				Log.Fatal(ex, "Hollow failed unexpectedly.");
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
