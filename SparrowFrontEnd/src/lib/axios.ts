@@ -40,3 +40,14 @@ export function extractDate(data: any) {
 
     return new Date;
 }
+
+export function extractList<T>(listData: any, extractingFunction: (data: any) => T) {
+    let items: T[] = [];
+    
+    for (const datum of listData['Events'])
+    {
+        items.push(extractingFunction(datum));
+    }
+
+    return items;
+}

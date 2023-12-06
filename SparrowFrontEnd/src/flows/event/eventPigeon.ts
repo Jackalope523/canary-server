@@ -1,4 +1,4 @@
-import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { character, extractCharacter } from '../auth/accountPigeon';
 import { extractUserSilhouette, userSilhouette } from '../profile/profilePigeon';
 
@@ -23,6 +23,28 @@ export type eventShard = {
     IsDynamic: boolean
 };
 
+export function extractEventShard(data: any) {
+    let event: eventShard = {
+        Id: data['Id'],
+        Host: extractUserSilhouette(data['Host']),
+        Name: data['Name'],
+        Description: data['Description'],
+        StartTime: extractDate(data['StartTime']),
+        Latitude: data['Latitude'],
+        Longitude: data['Longitude'],
+        TimeEnded: data['TimeEnded'] ?
+            extractDate(data['TimeEnded']) : undefined,
+        State: data['State'],
+        GroupMinimum: data['GroupMinimum'],
+        GroupMaximum: data['GroupMaximum'],
+        Character: extractCharacter(data['Character']),
+        Radius: data['Radius'],
+        IsDynamic: data['IsDynamic']
+    }
+
+    return event;
+}
+
 export type eventThinSlice = {
     Id: number,
     Host: userSilhouette,
@@ -30,11 +52,33 @@ export type eventThinSlice = {
     Longitude: number
 };
 
+export function extractEventThinSlice(data: any) {
+    let event: eventThinSlice = {
+        Id: data['Id'],
+        Host: extractUserSilhouette(data['Host']),
+        Latitude: data['Latitude'],
+        Longitude: data['Longitude']
+    };
+
+    return event;
+}
+
 export type eventHeader = {
     Id: number,
     Name: string,
     IsActive: string,
     LastActiveTime: Date
+}
+
+export function extractEventHeader(data: any) {
+    let header: eventHeader = {
+        Id: data['Id'],
+        Name: data['EventId'],
+        IsActive: data['IsActive'],
+        LastActiveTime: extractDate(data['LastTimeActive'])
+    };
+
+    return header;
 }
 
 export type etchingShard = {
@@ -46,6 +90,21 @@ export type etchingShard = {
     Ratings: [Positive: number, Negative: number],
     IsHidden: boolean
 };
+
+export function extractEtchingShard(data: any) {
+    let etching: etchingShard = {
+        Id: data['id'],
+        EventId: data['EventId'],
+        UserId: data['UserId'],
+        TimeEtched: extractDate(data['TimeEtched']),
+        ImageURL: data['ImageURL'],
+        Ratings: [data['Ratings']['Positive'],
+            data['Ratings']['Negative']],
+        IsHidden: data['IsHidden']
+    };
+
+    return etching;
+}
 
 //////
 // Event Flow
@@ -62,25 +121,7 @@ export async function getEvent(eventID: number) {
         .then((response: any) => {
             console.log('Event Details:', response.data);
 
-            let event: eventShard = {
-                Id: response.data['Id'],
-                Host: extractUserSilhouette(response.data['Host']),
-                Name: response.data['Name'],
-                Description: response.data['Description'],
-                StartTime: extractDate(response.data['StartTime']),
-                Latitude: response.data['Latitude'],
-                Longitude: response.data['Longitude'],
-                TimeEnded: response.data['TimeEnded'] ?
-                    extractDate(response.data['TimeEnded']) : undefined,
-                State: response.data['State'],
-                GroupMinimum: response.data['GroupMinimum'],
-                GroupMaximum: response.data['GroupMaximum'],
-                Character: extractCharacter(response.data['Character']),
-                Radius: response.data['Radius'],
-                IsDynamic: response.data['IsDynamic']
-            }
-
-            return event;
+            return extractEventShard(response.data);
         })
         .catch(handleError);
 }
@@ -111,25 +152,7 @@ export async function createEvent(details: eventCreationDetails) {
         .then((response: any) => {
             console.log('Event Created:', response.data);
 
-            let event: eventShard = {
-                Id: response.data['Id'],
-                Host: response.data['Host'],
-                Name: response.data['Name'],
-                Description: response.data['Description'],
-                StartTime: extractDate(response.data['StartTime']),
-                Latitude: response.data['Latitude'],
-                Longitude: response.data['Longitude'],
-                TimeEnded: response.data['TimeEnded'] ?
-                    extractDate(response.data['TimeEnded']) : undefined,
-                State: response.data['State'],
-                GroupMinimum: response.data['GroupMinimum'],
-                GroupMaximum: response.data['GroupMaximum'],
-                Character: extractCharacter(response.data['Character']),
-                Radius: response.data['Radius'],
-                IsDynamic: response.data['IsDynamic']
-            }
-
-            return event;
+            return extractEventShard(response.data);
         })
         .catch(handleError);
 }
@@ -241,14 +264,7 @@ export async function getGuestList(eventID: number) {
 
     return await userSession.get(`${apiBaseUrl}/${eventID}/guests`)
     .then((response: any) => {
-        let guests: userSilhouette[] = [];
-
-        for (const user of response.data)
-        {
-            guests.push(extractUserSilhouette(user));
-        }
-
-        return guests;
+        return extractList(response.data, extractUserSilhouette);
     })
         .catch(handleError);
 }
@@ -262,14 +278,7 @@ export async function getPotentialInvitees(eventID: number) {
 
     return await userSession.get(`${apiBaseUrl}/${eventID}/invite`)
         .then((response: any) => {
-            let invitees: userSilhouette[] = [];
-
-            for (const user of response.data)
-            {
-                invitees.push(extractUserSilhouette(user));
-            }
-
-            return invitees;
+            return extractList(response.data, extractUserSilhouette);
         })
         .catch(handleError);
 }
@@ -342,23 +351,7 @@ export async function getEventEtchings(eventID: number) {
         .then((response: any) => {
             console.log('Event Etchings:', response.data);
 
-            let etchings: etchingShard[] = [];
-
-            for (const etching of response.data)
-            {
-                etchings.push({
-                    Id: etching['id'],
-                    EventId: etching['EventId'],
-                    UserId: etching['UserId'],
-                    TimeEtched: extractDate(etching['TimeEtched']),
-                    ImageURL: etching['ImageURL'],
-                    Ratings: [etching['Ratings']['Positive'],
-                        etching['Ratings']['Negative']],
-                    IsHidden: etching['IsHidden']
-                });
-            }
-
-            return etchings;
+            return extractList(response.data, extractEtchingShard);
         })
         .catch(handleError);
 }
@@ -378,18 +371,7 @@ export async function etchIntoEvent(eventID: number, etching: eventEtching) {
         .then((response: any) => {
             console.log('Etching Added to Event:', response.data);
 
-            let etching: etchingShard = {
-                Id: response.data['Id'],
-                EventId: response.data['EventId'],
-                UserId: response.data['UserId'],
-                TimeEtched: extractDate(response.data['TimeEtched']),
-                ImageURL: response.data['ImageURL'],
-                Ratings: [response.data['Ratings']['Positive'],
-                    response.data['Ratings']['Negative']],
-                IsHidden: response.data['IsHidden']
-            }
-
-            return etching;
+            return extractEtchingShard(response.data);
         })
         .catch(handleError);
 }

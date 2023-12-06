@@ -1,5 +1,5 @@
-import { userSession, handleError, extractDate } from '../../lib/axios';
-import { etchingShard, eventHeader } from '../event/eventPigeon';
+import { userSession, handleError, extractDate, extractList } from '../../lib/axios';
+import { etchingShard, eventHeader, extractEtchingShard, extractEventHeader } from '../event/eventPigeon';
 
 const apiBaseUrl = '/feed';
 
@@ -20,34 +20,8 @@ export async function getUserFeed(options: feedOptions) {
             console.log('User Feed:', response.data);
 
             let depth: number = response.data['Depth'];
-
-            let headers: eventHeader[] = [];
-
-            for (const header of response.data['Headers'])
-            {
-                headers.push({
-                    Id: header['Id'],
-                    Name: header['EventId'],
-                    IsActive: header['IsActive'],
-                    LastActiveTime: extractDate(header['LastTimeActive'])
-                });
-            }
-
-            let etchings: etchingShard[] = [];
-
-            for (const etching of response.data['Etchings'])
-            {
-                etchings.push({
-                    Id: etching['id'],
-                    EventId: etching['EventId'],
-                    UserId: etching['UserId'],
-                    TimeEtched: extractDate(etching['TimeEtched']),
-                    ImageURL: etching['ImageURL'],
-                    Ratings: [etching['Ratings']['Positive'],
-                        etching['Ratings']['Negative']],
-                    IsHidden: etching['IsHidden']
-                });
-            }
+            let headers = extractList(response.data['Headers'], extractEventHeader);
+            let etchings = extractList(response.data['Etchings'], extractEtchingShard);
 
             return [ depth, headers, etchings ];
         })

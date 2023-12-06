@@ -49,6 +49,29 @@ export type userShard = {
     Character: character
 };
 
+export function extractUserShard(data: any) {
+    let user: userShard = {
+        Id: data['Id'],
+        PhoneNumber: data['PhoneNumber'],
+        Email: data['Email'],
+        Name: data['Name'],
+        DateOfBirth: extractDate(data['DateOfBirth']),
+        IsPhoneConfirmed: data['IsPhoneConfirmed'],
+        IsEmailConfirmed: data['IsEmailConfirmed'],
+        SecurityStamp: data['SecurityStamp'],
+        LockoutDate: data['LockoutDate'] ?
+            extractDate(data['LockoutDate']) : undefined,
+        AccessTries: data['AccessTries'],
+        AccountStatus: data['AccountStatus'],
+        JoinDate: extractDate(data['JoinDate']),
+        Reputation: data['Reputation'],
+        NumberOfFollowers: data['NumberOfFollowers'],
+        Character: extractCharacter(data['Character']),
+    }
+
+    return user;
+}
+
 /////////
 // Account login flow
 ////////////////////////
@@ -156,26 +179,7 @@ export async function getAccount() {
     .then((response: any) => {
         console.log('Account Details:', response.data);
         
-        let user: userShard = {
-            Id: response.data['Id'],
-            PhoneNumber: response.data['PhoneNumber'],
-            Email: response.data['Email'],
-            Name: response.data['Name'],
-            DateOfBirth: extractDate(response.data['DateOfBirth']),
-            IsPhoneConfirmed: response.data['IsPhoneConfirmed'],
-            IsEmailConfirmed: response.data['IsEmailConfirmed'],
-            SecurityStamp: response.data['SecurityStamp'],
-            LockoutDate: response.data['LockoutDate'] ?
-                extractDate(response.data['LockoutDate']) : undefined,
-            AccessTries: response.data['AccessTries'],
-            AccountStatus: response.data['AccountStatus'],
-            JoinDate: extractDate(response.data['JoinDate']),
-            Reputation: response.data['Reputation'],
-            NumberOfFollowers: response.data['NumberOfFollowers'],
-            Character: extractCharacter(response.data['Character']),
-        }
-
-        return user;
+        return extractUserShard(response.data);
     })
     .catch(handleError);
 }

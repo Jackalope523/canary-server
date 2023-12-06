@@ -1,6 +1,6 @@
-import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { extractCharacter } from '../auth/accountPigeon';
-import { etchingShard, eventShard, eventThinSlice } from '../event/eventPigeon';
+import { etchingShard, eventShard, eventThinSlice, extractEtchingShard, extractEventShard, extractEventThinSlice } from '../event/eventPigeon';
 
 const apiBaseUrl = '/profile';
 
@@ -10,6 +10,17 @@ export type userProfile = {
     Reputation: number,
     NumberOfFollowers: number
 };
+
+export function extractUserProfile(data: any) {
+    let profile: userProfile = {
+        Id: data['Id'],
+        Name: data['Name'],
+        Reputation: data['Reputation'],
+        NumberOfFollowers: data['NumberOfFollowers']
+    }
+
+    return profile;
+}
 
 export type userSilhouette = {
     Id: number,
@@ -39,15 +50,8 @@ export async function getUserProfile(targetIdentification: number) {
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}`)
         .then((response: any) => {
             console.log('User Profile:', response.data);
-            
-            let profile: userProfile = {
-                Id: response.data['Id'],
-                Name: response.data['Name'],
-                Reputation: response.data['Reputation'],
-                NumberOfFollowers: response.data['NumberOfFollowers']
-            }
 
-            return profile;
+            return extractUserProfile(response.data);
         })
         .catch(handleError);
 }
@@ -63,33 +67,8 @@ export async function getUserNest(targetIdentification: number) {
         .then((response: any) => {
             console.log('User Nest:', response.data);
             
-            let events: eventThinSlice[] = [];
-            let etchings: etchingShard[] = [];
-
-            for (const event of response.data['Events'])
-            {
-                events.push({
-                    Id: event['Id'],
-                    Host: extractUserSilhouette(event['Host']),
-                    Latitude: event['Latitude'],
-                    Longitude: event['Longitude']
-                });
-            }
-
-            for (const etching of response.data['Etchings'])
-            {
-                etchings.push({
-                    Id: etching['id'],
-                    EventId: etching['EventId'],
-                    UserId: etching['UserId'],
-                    TimeEtched: extractDate(etching['TimeEtched']),
-                    ImageURL: etching['ImageURL'],
-                    Ratings: [etching['Ratings']['Positive'],
-                        etching['Ratings']['Negative']],
-                    IsHidden: etching['IsHidden']
-                });
-
-            }
+            let events = extractList(response.data['Events'], extractEventThinSlice);
+            let etchings = extractList(response.data['Etchings'], extractEtchingShard);
 
             return [ events, etchings ];
         })
@@ -121,30 +100,7 @@ export async function getUserActivity(targetIdentification: number) {
         .then((response: any) => {
             console.log('User Activity:', response.data);
             
-            let events: eventShard[] = [];
-
-            for (const event of response.data)
-            {
-                events.push({
-                    Id: event['Id'],
-                    Host: extractUserSilhouette(event['Host']),
-                    Name: event['Name'],
-                    Description: event['Description'],
-                    StartTime: extractDate(event['StartTime']),
-                    Latitude: event['Latitude'],
-                    Longitude: event['Longitude'],
-                    TimeEnded: event['TimeEnded'] ?
-                        extractDate(event['TimeEnded']) : undefined,
-                    State: event['State'],
-                    GroupMinimum: event['GroupMinimum'],
-                    GroupMaximum: event['GroupMaximum'],
-                    Character: extractCharacter(event['Character']),
-                    Radius: event['Radius'],
-                    IsDynamic: event['IsDynamic']
-                });
-            }
-
-            return events;
+            return extractList(response.data, extractEventShard);
         })
         .catch(handleError);
 }
@@ -162,28 +118,7 @@ export async function getFriendActivity() {
             {
                 users.push(extractUserSilhouette(pair[0]));
 
-                let events: eventShard[] = [];
-
-                for (const event of response.data)
-                {
-                    events.push({
-                        Id: event['Id'],
-                        Host: extractUserSilhouette(event['Host']),
-                        Name: event['Name'],
-                        Description: event['Description'],
-                        StartTime: extractDate(event['StartTime']),
-                        Latitude: event['Latitude'],
-                        Longitude: event['Longitude'],
-                        TimeEnded: event['TimeEnded'] ?
-                            extractDate(event['TimeEnded']) : undefined,
-                        State: event['State'],
-                        GroupMinimum: event['GroupMinimum'],
-                        GroupMaximum: event['GroupMaximum'],
-                        Character: extractCharacter(event['Character']),
-                        Radius: event['Radius'],
-                        IsDynamic: event['IsDynamic']
-                    });
-                }
+                let events = extractList(pair[1], extractEventShard);
 
                 activity[pair[0]['Id']] = events;
             }
@@ -199,17 +134,7 @@ export async function getFollowedUsers() {
         .then((response: any) => {
             console.log('Followed Users:', response.data);
             
-            let users: userSilhouette[] = [];
-
-            for (const user of response.data)
-            {
-                users.push({
-                    Id: user['Id'],
-                    Name: user['Name']
-                });
-            }
-
-            return users;
+            return extractList(response.data, extractUserSilhouette);
         })
         .catch(handleError);
 }
@@ -248,17 +173,7 @@ export async function getBlockedUsers() {
         .then((response: any) => {
             console.log('Blocked Users:', response.data);
             
-            let users: userSilhouette[] = [];
-
-            for (const user of response.data)
-            {
-                users.push({
-                    Id: user['Id'],
-                    Name: user['Name']
-                });
-            }
-
-            return users;
+            return extractList(response.data, extractUserSilhouette);
         })
         .catch(handleError);
 }

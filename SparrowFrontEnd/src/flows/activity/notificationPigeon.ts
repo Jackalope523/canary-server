@@ -1,4 +1,4 @@
-import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { extractCharacter } from '../auth/accountPigeon';
 import { etchingShard, eventShard, eventThinSlice } from '../event/eventPigeon';
 
@@ -11,6 +11,17 @@ export type noteShard = {
     Action: string
 };
 
+export function extractNoteShard(data: any) {
+    let note: noteShard = {
+        NotifierId: data['NotifierId'],
+        Time: extractDate(data['Time']),
+        Message: data['Message'],
+        Action: data['Action']
+    }
+
+    return note;
+}
+
 ///////
 // Notification Flow
 //////////////////
@@ -19,19 +30,7 @@ export type noteShard = {
 export async function getNotes() {
     return await userSession.get(`${apiBaseUrl}`)
         .then((response: any) => {
-            let notes: noteShard[] = [];
-            
-            for (const note of response.data)
-            {
-                notes.push({
-                    NotifierId: response.data['NotifierId'],
-                    Time: extractDate(response.data['Time']),
-                    Message: response.data['Message'],
-                    Action: response.data['Action']
-                });
-            }
-
-            return notes;
+            return extractList(response.data, extractNoteShard);
         })
         .catch(handleError);
 }
