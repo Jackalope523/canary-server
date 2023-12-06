@@ -37,8 +37,7 @@ export function handleError(error: any) {
 export enum ratingType { 'Positive', 'Negative', 'Remove' };
 
 export function extractDate(data: any) {
-
-    return new Date;
+    return new Date(data);
 }
 
 export function extractList<T>(listData: any, extractingFunction: (data: any) => T) {
