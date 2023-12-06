@@ -139,7 +139,10 @@ namespace Core.Entities
             { throw new UndefinedBehaviourException($"Cannot Sync {nameof(T)} without synchronising function."); }
 
             if (syncTask == null || syncTask.IsCompleted)
-            { syncTask = syncFunction.Invoke(); }
+            { 
+                synced = false;
+                syncTask = syncFunction.Invoke();
+            }
             
             cachedValue = await syncTask;
             synced = true;

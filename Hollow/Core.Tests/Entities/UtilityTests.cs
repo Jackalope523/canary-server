@@ -1,9 +1,11 @@
-using Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Core.Entities;
+using Shared;
 using Xunit;
 
-namespace Tests
+namespace Core.Tests.Entities
 {
     public class GeoLocationTest
     {
@@ -59,5 +61,83 @@ namespace Tests
         {
             Assert.False(GeoLocation.AreInRange(pointA, pointB, range));
         }
+    }
+
+    public class DistanceTests
+    {
+		[Fact]
+		internal void Constructor_FromMetres_Correct()
+		{
+            Distance distance = new() { Metres = 1000 };
+
+			Assert.True(distance.Kilometres == 1);
+			Assert.True(distance.Metres == 1000);
+		}
+
+		[Fact]
+		internal void Constructor_FromKilometres_Correct()
+		{
+            Distance distance = new() { Kilometres = 1 };
+
+			Assert.True(distance.Kilometres == 1);
+			Assert.True(distance.Metres == 1000);
+		}
+	}
+
+    public class SyncedTests
+    {
+		[Fact]
+		internal async Task Constructor_ExistingValue_ProperlyInitialised()
+		{
+            Synced<int> syncedValue = new(0);
+
+            Assert.True((await syncedValue.Value()) == 0);
+		}
+
+		[Fact]
+		internal async Task Constructor_UnsyncedValue_ProperlyInitialised()
+		{
+            Synced<int> syncedValue = new(() => Task.FromResult(0));
+
+            Assert.True((await syncedValue.Value()) == 0);
+		}
+
+		[Fact]
+		internal async Task Constructor_NullFunction_Fails()
+		{
+            Synced<int> syncedValue = new(null);
+
+            await Assert.ThrowsAnyAsync<HollowException>(async () => await syncedValue.Value());
+		}
+
+		[Fact]
+		internal async Task Sync_UnsyncedValue_Syncs()
+		{
+            Synced<int> syncedValue = new(() => Task.FromResult(0));
+            _ = syncedValue.Sync();
+
+            Assert.Equal(0, await syncedValue.Value());
+		}
+
+		[Fact]
+		internal async Task Sync_SyncedValue_Resyncs()
+		{
+            Synced<int> syncedValue = new(() => { Task.Delay(500); return Task.FromResult(0); });
+            await syncedValue.Sync();
+
+            syncedValue.Set(1);
+            await syncedValue.Sync();
+
+            Assert.Equal(0, await syncedValue.Value());
+		}
+
+		[Fact]
+		internal async Task Set_Value_Correct()
+		{
+            Synced<int> syncedValue = new(0);
+            syncedValue.Set(1);
+
+            Assert.True((await syncedValue.Value()) == 1);
+		}
     }
 }

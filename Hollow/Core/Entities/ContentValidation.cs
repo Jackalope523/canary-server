@@ -61,7 +61,7 @@ namespace Core.Entities
 			if (string.IsNullOrEmpty(normalisedPhoneNumber) ||
 				!PhoneNumberUtil.IsViablePhoneNumber(normalisedPhoneNumber) ||
 				normalisedPhoneNumber.Length < 6)
-			{ return false; }
+			{ normalisedPhoneNumber = null; return false; }
 
 			// Normalise number
 			normalisedPhoneNumber = PhoneNumberUtil.Normalize(normalisedPhoneNumber);

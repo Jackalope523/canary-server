@@ -54,7 +54,8 @@ namespace Core.Entities
 		public int Openness { get; init; }
 
 		public float Magnitude => MathF.Sqrt(Extraversion * Extraversion + Athleticism * Athleticism +
-			Chaoticness * Chaoticness + Competitiveness * Competitiveness + NightOwl * NightOwl);
+			Chaoticness * Chaoticness + Competitiveness * Competitiveness +
+			Industriousness * Industriousness + NightOwl * NightOwl);
 
 		#endregion
 
