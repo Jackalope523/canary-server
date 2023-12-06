@@ -93,13 +93,19 @@ namespace Core.Entities
 
     public struct Synced<T>
     {
+		#region Variables
+
 		private T cachedValue;
         private bool synced;
 
         private Func<Task<T>> syncFunction;
         private Task<T> syncTask;
 
-        public Synced(Func<Task<T>> synchronisationFunction)
+		#endregion
+
+		#region Initialisation
+
+		public Synced(Func<Task<T>> synchronisationFunction)
         {
             cachedValue = default;
             synced = false;
@@ -115,7 +121,11 @@ namespace Core.Entities
             syncTask = null;
         }
 
-        public async Task<T> Value()
+		#endregion
+
+		#region Actions
+
+		public async Task<T> Value()
         {
             if (!synced)
             { await Sync(); }
@@ -141,9 +151,11 @@ namespace Core.Entities
             synced = true;
 		}
 
-        #region Dissimilation
+		#endregion
 
-        public static T operator +(Synced<T> a, T b)
+		#region Dissimilation
+
+		public static T operator +(Synced<T> a, T b)
             => ((dynamic)a.cachedValue) + ((dynamic)b);
 
 		public static T operator -(Synced<T> a, T b)

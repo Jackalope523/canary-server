@@ -19,7 +19,7 @@ namespace Core.Controls
 		protected IEventDatabase Events { get; private set; }
 		protected IEtchingDatabase Etchings { get; private set; }
 		protected IProfileDatabase Profiles { get; private set; }
-		protected IReportDatabase Reports { get; private set; }
+		protected IDisciplineDatabase Reports { get; private set; }
 		protected INotificationDatabase Notifications { get; private set; }
 
 		#endregion
@@ -34,7 +34,7 @@ namespace Core.Controls
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
 			Profiles = Terminal.ProfileDatabase;
-			Reports = Terminal.ReportDatabase;
+			Reports = Terminal.DisciplineDatabase;
 			Notifications = Terminal.NotificationDatabase;
         }
 

@@ -81,7 +81,7 @@ namespace Core.Entities
             => new(() => Terminal.EventDirector.RequestGuestHistoryAsync(this));
 
         public Synced<List<EventReport>> EventReports
-            => new(() => Terminal.ReportDirector.RequestEventReportsAsync(this));
+            => new(() => Terminal.DisciplineDirector.RequestEventReportsAsync(this));
 
         public Synced<List<Etching>> Etchings
             => new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));

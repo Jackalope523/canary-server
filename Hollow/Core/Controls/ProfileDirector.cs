@@ -189,9 +189,7 @@ namespace Core.Controls
         }
 
         internal async Task<(int Positive, int Negative)> RequestAllRatingsAsync(User user)
-        {
-            return await Profiles.GetUserRatingsAsync(user.Id);
-        }
+            => await Profiles.GetUserRatingsAsync(user.Id);
 
 		#endregion
 

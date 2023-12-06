@@ -9,11 +9,11 @@ using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
-	internal class ReportDirector : AbstractDirector, IReportOperations
+	internal class DisciplineDirector : AbstractDirector, IDisciplineOperations
 	{
 		#region Initialisation
 
-		public ReportDirector(CoreTerminal terminal) : base(terminal) { }
+		public DisciplineDirector(CoreTerminal terminal) : base(terminal) { }
 
 		#endregion
 
@@ -77,16 +77,18 @@ namespace Core.Controls
 
 		#region Favours
 
+        internal async Task<List<Penalty>> RequestPenaltiesForUserAsync(User user)
+            => await Reports.GetPenaltiesForUserAsync(user.Id);
+
+        internal async Task<bool> PenaliseUserAsync(User user, PenaltyType offense, DateTimeOffset timeOfPenalty)
+            => await Reports.PenaliseUserAsync(user.Id, offense, timeOfPenalty);
+
 		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
             RequestAllReportsAsync(User user)
-        {
-            return await Reports.GetReportsForUserAsync(user.Id);
-        }
+            => await Reports.GetReportsForUserAsync(user.Id);
 
         internal async Task<List<EventReport>> RequestEventReportsAsync(Event @event)
-        {
-            return await Reports.GetReportsForEventAsync(@event.Id);
-        }
+            => await Reports.GetReportsForEventAsync(@event.Id);
 
 		#endregion
 	}
