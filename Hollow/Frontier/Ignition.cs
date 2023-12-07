@@ -89,9 +89,9 @@ namespace Frontier
 				Repository.QueryStore.ProfileDatabaseAccess, Repository.QueryStore.ReportDatabaseAccess,
 				Repository.QueryStore.NotificationDatabaseAccess, pushNotifications);
 
-			foreach (var (DatabaseType, Instance) in terminal.Gates)
+			foreach (var (GateType, Instance) in terminal.Gates)
 			{
-				services.AddSingleton(DatabaseType, Instance);
+				services.AddSingleton(GateType, Instance);
 			}
 
 			

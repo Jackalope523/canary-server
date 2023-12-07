@@ -39,7 +39,7 @@ namespace Core.Boundaries
 		internal DisciplineDirector DisciplineDirector { get; private set; }
 		internal NotificationDirector NotificationDirector { get; private set; }
 
-		public List<(Type DatabaseType, object Instance)> Gates
+		public List<(Type GateType, object Instance)> Gates
 			=> new() { (typeof(IAccountOperations), AccountOperations),
 				(typeof(IEventOperations), EventOperations),
 				(typeof(IEtchingOperations), EtchingOperations),

@@ -1,0 +1,136 @@
+using System;
+using System.Drawing;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
+using Core.Boundaries;
+using Core.Entities;
+using Repository;
+using Xunit;
+using Xunit.Abstractions;
+using Shared;
+using NetTopologySuite.Utilities;
+using System.ComponentModel;
+using System.Collections.Concurrent;
+
+namespace Core.Tests.Entities
+{
+	public class TestEnvironment : IDisposable
+	{
+		private CoreTerminal terminal;
+
+		private ConcurrentBag<ulong> usersAdded = new();
+
+		private static int testUserIncrement = 0;
+		private string testUserPhoneNumberFormat = "000-000-{0}";
+		private string testUserEmailFormat = "email_{0}@test.com";
+		private string testUserName = "name";
+		private DateTimeOffset subjectDateOfBirth = new(new DateTime(0));
+		private DateTimeOffset testJoinDate = new(new DateTime(0));
+
+		private string testEventName = "event1";
+		private string testEventDescription = "The first of many.";
+		private DateTimeOffset testEventStartTime = new(new DateTime(0));
+		private GeoLocation testEventLocation = new() { Latitude = 10, Longitude = 10 };
+		private int testEventGroupMinimum = 0;
+		private int testEventGroupMaximum = 10;
+		private Distance testEventRadius = new() { Kilometres = 1 };
+		private bool testEventIsDynamic = false;
+
+		public TestEnvironment()
+		{
+			// Arrange Core
+			terminal = new(QueryStore.AccountDatabaseAccess, QueryStore.EventDatabaseAccess,
+				QueryStore.EtchingDatabaseAccess, QueryStore.ProfileDatabaseAccess,
+				QueryStore.ReportDatabaseAccess, QueryStore.NotificationDatabaseAccess,
+				new NotificationServiceStub());
+		}
+
+		internal User CreateTestUser()
+		{
+			var userIncrement = testUserIncrement++;
+
+			User userStub = new()
+			{
+				PhoneNumber = string.Format(testUserPhoneNumberFormat, userIncrement.ToString("D4")),
+				Email = string.Format(testUserEmailFormat, userIncrement.ToString("D4")),
+				Name = testUserName,
+				DateOfBirth = subjectDateOfBirth,
+				JoinDate = testJoinDate
+			};
+
+			return userStub;
+		}
+
+		internal async Task<User> GenerateTestUserAsync()
+		{
+			var userStub = CreateTestUser();
+
+			return await GenerateUserUnsafeAsync(userStub);
+		}
+
+		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
+		{
+			bool success = await terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
+				userStub.Name, userStub.DateOfBirth, CharacterVector.Default.ToCharacter());
+
+			if (!success)
+			{ throw new UnexpectedFailureException("User creation failed."); }
+
+			usersAdded.Add((await terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber)).Id);
+
+			return userStub;
+		}
+
+		internal Event CreateTestEvent(User host)
+		{
+			Event eventStub = new()
+			{
+				Name = testEventName,
+				Description = testEventDescription,
+				Host = host,
+				StartTime = testEventStartTime,
+				Location = testEventLocation,
+				GroupMinimum = testEventGroupMinimum,
+				GroupMaximum = testEventGroupMaximum,
+				Radius = testEventRadius,
+				IsDynamic = testEventIsDynamic
+			};
+
+			return eventStub;
+		}
+
+		internal async Task<Event> GenerateTestEventAsync(User host)
+		{
+			var eventStub = CreateTestEvent(host);
+
+			return await GenerateEventUnsafeAsync(eventStub, host);
+		}
+
+		internal async Task<Event> GenerateEventUnsafeAsync(Event eventStub, User host)
+		{
+			return new(await terminal.EventDatabase.CreateEventAsync(host.Id, eventStub.Name, eventStub.Description,
+				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
+				eventStub.GroupMinimum, eventStub.GroupMaximum, host.Character.ToCharacter(),
+				eventStub.Radius.Kilometres, eventStub.IsDynamic));
+		}
+
+		public async void Dispose()
+		{
+			GC.SuppressFinalize(this);
+
+			foreach (var userId in usersAdded)
+			{
+				_ = terminal.AccountDatabase.DeleteUserAsync(userId);
+			}
+		}
+	}
+
+	public class NotificationServiceStub : INotificationService
+	{
+		public Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message)
+		{
+			return Task.FromResult(0);
+		}
+	}
+}
