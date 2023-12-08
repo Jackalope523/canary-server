@@ -12,6 +12,7 @@ using Shared;
 using NetTopologySuite.Utilities;
 using System.ComponentModel;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Core.Tests.Entities
 {
@@ -34,6 +35,9 @@ namespace Core.Tests.Entities
 		private int testEventGroupMaximum = 10;
 		private Distance testEventRadius = new() { Kilometres = 1 };
 		private bool testEventIsDynamic = false;
+
+		private DateTimeOffset testEtchingTime = new(new DateTime(0));
+		private string testEtchingImageURL = "https://cdn.sparrow.com/101";
 
 		public TestEnvironment()
 		{
@@ -121,6 +125,33 @@ namespace Core.Tests.Entities
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, host.Character.ToCharacter(),
 				eventStub.Radius.Kilometres, eventStub.IsDynamic));
+		}
+
+		internal async Task<Event> GeneratePopulatedEventAsync(User host, params User[] guests)
+		{
+			var eventStub = await GenerateTestEventAsync(host);
+
+			foreach (var guest in guests)
+			{
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Guest);
+			}
+
+			return eventStub;
+		}
+
+		internal async Task<Etching> GenerateTestEtchingAsync(Event etchedEvent, User etcher)
+		{
+			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime, testEtchingImageURL);
+		}
+
+		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, Etching etching)
+		{
+			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, etching.TimeEtched, etching.ImageURL);
+		}
+
+		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched, string imageURL)
+		{
+			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched, imageURL);
 		}
 
 		public async void Dispose()
