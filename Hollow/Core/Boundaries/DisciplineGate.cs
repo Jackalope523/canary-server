@@ -30,11 +30,11 @@ namespace Core.Boundaries
 
         Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(ulong userId);
         Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(ulong userId);
-        Task<bool> ReportUserAsync(ulong userId, ulong eventId, ulong targetUserId,
+        Task<bool> ReportUserAsync(ulong userId, ulong eventId, ulong targetUserId, DateTimeOffset timeOfReport,
             UserReportType reportType, string reportDetails);
 
         Task<List<EventReport>> GetReportsForEventAsync(ulong eventId);
-        Task<bool> ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
+        Task<bool> ReportEventAsync(ulong userId, ulong eventId, ulong hostId, DateTimeOffset timeOfReport,
             EventReportType reportType, string reportDetails);
     }
 
