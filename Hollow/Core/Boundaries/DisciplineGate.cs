@@ -8,7 +8,7 @@ namespace Core.Boundaries
 	#region Schemas
 
     public enum PenaltyType
-    { }
+    { tmp }
 
     public record Penalty(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
 

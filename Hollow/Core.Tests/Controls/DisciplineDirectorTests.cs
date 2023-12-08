@@ -1,0 +1,114 @@
+using Core.Boundaries;
+using Core.Controls;
+using Core.Entities;
+using Shared;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
+
+namespace Core.Tests.Entities
+{
+    public class DisciplineDirectorTests : IAsyncLifetime
+    {
+        private TestEnvironment environment;
+		private DisciplineDirector director;
+
+		private User testUser;
+		private Event testEvent;
+
+        public DisciplineDirectorTests()
+        {
+            environment = new();
+			director = environment.Terminal.DisciplineDirector;
+        }
+
+		public async Task InitializeAsync()
+		{
+			testUser = await environment.GenerateTestUserAsync();
+			testEvent = await environment.GenerateTestEventAsync(testUser);
+		}
+
+		public Task DisposeAsync()
+		{
+			environment.Dispose();
+			return Task.CompletedTask;
+		}
+
+		[Fact]
+		public async Task ReportUserAsync_ValidUser_Succeeds()
+		{
+			// Arrange
+			var user = await environment.GenerateTestUserAsync();
+			var reportedUser = await environment.GenerateTestUserAsync();
+			UserReportType report = UserReportType.rude;
+			string reportDetails = "detailed report";
+
+			// Act
+			await director.ReportUserAsync(user.Id, reportedUser.Id, report, reportDetails);
+
+			// Assert
+			Assert.Single(await reportedUser.Reports);
+			Assert.Equal(report, (await reportedUser.Reports)[0].ReportType);
+			Assert.Equal(reportDetails, (await reportedUser.Reports)[0].ReportDetails);
+		}
+
+		[Fact]
+		public async Task ReportUserAsync_MultipleReports_Succeeds()
+		{
+			// Arrange
+			var user = await environment.GenerateTestUserAsync();
+			var reportedUser = await environment.GenerateTestUserAsync();
+			UserReportType report = UserReportType.rude;
+			string reportDetails = "detailed report";
+
+			// Act
+			await director.ReportUserAsync(user.Id, reportedUser.Id, report, reportDetails);
+			await director.ReportUserAsync(user.Id, reportedUser.Id, report, reportDetails);
+			await director.ReportUserAsync(user.Id, reportedUser.Id, report, reportDetails);
+
+			// Assert
+			Assert.Equal(3, (await user.Reports).Count);
+		}
+
+		[Fact]
+		public async Task ReportEventAsync_ValidEvent_Succeeds()
+		{
+			// Arrange
+			var user = await environment.GenerateTestUserAsync();
+			var reportedHost = await environment.GenerateTestUserAsync();
+			var reportedEvent = await environment.GenerateTestEventAsync(reportedHost);
+			EventReportType report = EventReportType.misleading;
+			string reportDetails = "detailed report";
+
+			// Act
+			await director.ReportEventAsync(user.Id, reportedEvent.Id, report, reportDetails);
+
+			// Assert
+			Assert.Single(await reportedEvent.EventReports);
+			Assert.Equal(report, (await reportedEvent.EventReports)[0].ReportType);
+			Assert.Equal(reportDetails, (await reportedEvent.EventReports)[0].ReportDetails);
+
+			Assert.Single(await reportedHost.EventReports);
+			Assert.Equal(report, (await reportedHost.EventReports)[0].ReportType);
+			Assert.Equal(reportDetails, (await reportedHost.EventReports)[0].ReportDetails);
+		}
+
+		[Fact]
+		public async Task PenaliseUserAsync_ValidUser_Succeeds()
+		{
+			// Arrange
+			var user = await environment.GenerateTestUserAsync();
+			PenaltyType penalty = PenaltyType.tmp;
+			DateTimeOffset timeOfPenalty = new DateTime(0);
+
+			// Act
+			await director.PenaliseUserAsync(user, penalty, timeOfPenalty);
+
+			// Assert
+			Assert.Single(await user.Penalties);
+			Assert.Equal(penalty, (await user.Penalties)[0].Offense);
+			Assert.Equal(timeOfPenalty, (await user.Penalties)[0].TimeOfPenalty);
+		}
+	}
+}
