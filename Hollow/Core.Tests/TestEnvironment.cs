@@ -42,7 +42,7 @@ namespace Core.Tests.Entities
 		public TestEnvironment()
 		{
 			// Arrange Core
-			Terminal = new(QueryStore.AccountDatabaseAccess, QueryStore.EventDatabaseAccess,
+			Terminal = CoreTerminal.CreateTerminal(QueryStore.AccountDatabaseAccess, QueryStore.EventDatabaseAccess,
 				QueryStore.EtchingDatabaseAccess, QueryStore.ProfileDatabaseAccess,
 				QueryStore.ReportDatabaseAccess, QueryStore.NotificationDatabaseAccess,
 				new NotificationServiceStub());

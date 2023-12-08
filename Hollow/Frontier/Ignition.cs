@@ -84,7 +84,7 @@ namespace Frontier
 			// Connections
 			////////////////
 
-			CoreTerminal terminal = new(Repository.QueryStore.AccountDatabaseAccess,
+			CoreTerminal terminal = CoreTerminal.CreateTerminal(Repository.QueryStore.AccountDatabaseAccess,
 				Repository.QueryStore.EventDatabaseAccess, Repository.QueryStore.EtchingDatabaseAccess,
 				Repository.QueryStore.ProfileDatabaseAccess, Repository.QueryStore.ReportDatabaseAccess,
 				Repository.QueryStore.NotificationDatabaseAccess, pushNotifications);

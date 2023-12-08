@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Core.Controls;
 
 namespace Core.Boundaries
@@ -9,6 +10,7 @@ namespace Core.Boundaries
 		#region Variables
 
 		public static CoreTerminal Terminal { get; private set; }
+		private static object initLock = new();
 
 		public IAccountDatabase AccountDatabase { get; init; }
 		public IEventDatabase EventDatabase { get; init; }
@@ -51,13 +53,28 @@ namespace Core.Boundaries
 
 		#region Initialisation
 
-		public CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
+		public static CoreTerminal CreateTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
 			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
 			INotificationService notificationService)
 		{
-			Terminal = this;
+			lock (initLock)
+			{
+				if (Terminal == null)
+				{
+					Terminal = new CoreTerminal(accountDatabase, eventDatabase, etchingDatabase, profileDatabase,
+					disciplineDatabase, notificationDatabase, notificationService);
+				}
+			
+				return Terminal;
+			}
+		}
 
+		private CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
+			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
+			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
+			INotificationService notificationService)
+		{
 			AccountDatabase = accountDatabase;
 			EventDatabase = eventDatabase;
 			EtchingDatabase = etchingDatabase;
