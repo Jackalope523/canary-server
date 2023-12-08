@@ -91,7 +91,7 @@ namespace Core.Tests.Entities
 		{
             Synced<int> syncedValue = new(0);
 
-            Assert.True((await syncedValue.Value()) == 0);
+            Assert.True((await syncedValue) == 0);
 		}
 
 		[Fact]
@@ -99,7 +99,7 @@ namespace Core.Tests.Entities
 		{
             Synced<int> syncedValue = new(() => Task.FromResult(0));
 
-            Assert.True((await syncedValue.Value()) == 0);
+            Assert.True((await syncedValue) == 0);
 		}
 
 		[Fact]
@@ -107,7 +107,7 @@ namespace Core.Tests.Entities
 		{
             Synced<int> syncedValue = new(null);
 
-            await Assert.ThrowsAnyAsync<HollowException>(async () => await syncedValue.Value());
+            await Assert.ThrowsAnyAsync<HollowException>(async () => await syncedValue);
 		}
 
 		[Fact]
@@ -116,19 +116,19 @@ namespace Core.Tests.Entities
             Synced<int> syncedValue = new(() => Task.FromResult(0));
             _ = syncedValue.Sync();
 
-            Assert.Equal(0, await syncedValue.Value());
+            Assert.Equal(0, await syncedValue);
 		}
 
 		[Fact]
 		internal async Task Sync_SyncedValue_Resyncs()
 		{
-            Synced<int> syncedValue = new(() => { Task.Delay(500); return Task.FromResult(0); });
+            Synced<int> syncedValue = new(() => { return Task.FromResult(0); });
             await syncedValue.Sync();
 
-            syncedValue.Set(1);
+            syncedValue.Set(2);
             await syncedValue.Sync();
 
-            Assert.Equal(0, await syncedValue.Value());
+            Assert.Equal(0, await syncedValue);
 		}
 
 		[Fact]
@@ -137,7 +137,7 @@ namespace Core.Tests.Entities
             Synced<int> syncedValue = new(0);
             syncedValue.Set(1);
 
-            Assert.True((await syncedValue.Value()) == 1);
+            Assert.True((await syncedValue) == 1);
 		}
     }
 }

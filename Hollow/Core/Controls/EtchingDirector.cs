@@ -31,7 +31,7 @@ namespace Core.Controls
             Try(await targetEvent.WasAttendedBy(user),
                 new InvalidEventException("User did not attend event."));
 
-            return await targetEvent.Etchings.Value();
+            return await targetEvent.Etchings;
         }
 
         public async Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL)

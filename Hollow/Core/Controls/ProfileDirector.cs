@@ -52,7 +52,7 @@ namespace Core.Controls
                 await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
-                nest.Events = (await targetUser.PastEvents.Value()).ConvertAll(e => e.ToEventThinSlice());
+                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventThinSlice());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
 
                 nest.Etchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
@@ -91,7 +91,7 @@ namespace Core.Controls
             ConcurrentDictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
             // Gather visible activity of each friend
-            (await user.Friends.Value()).AsParallel()
+            (await user.Friends).AsParallel()
                 .ForAll(async friend =>
                 {
                     var friendActivity = await GetUserActivity(friend);
@@ -201,9 +201,9 @@ namespace Core.Controls
             _ = user.CurrentEvent.Sync();
             
             // Gather all user event data
-            var upcomingActivity = await user.UpcomingEvents.Value();
+            var upcomingActivity = await user.UpcomingEvents;
 
-            upcomingActivity.Add(await user.CurrentEvent.Value());
+            upcomingActivity.Add(await user.CurrentEvent);
 
             return upcomingActivity
 				.ConvertAll(@event => @event.ToEventShard());

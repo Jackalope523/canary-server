@@ -136,8 +136,8 @@ namespace Core.Tests.Entities
 			User updatedUser = new(await director.GetUserAsync(user.Id));
 
 			// Assert
-			Assert.NotEqual(await user.LastKnownLocation.Value(),
-				await updatedUser.LastKnownLocation.Value());
+			Assert.NotEqual(await user.LastKnownLocation,
+				await updatedUser.LastKnownLocation);
 		}
 	}
 }

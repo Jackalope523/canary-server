@@ -93,7 +93,7 @@ namespace Core.Controls
 				new InvalidInformationException("Invalid event details provided."));
 
 			// Verify user has no conflict
-			var conflict = (await user.UpcomingEvents.Value()).Find(e => IsWithin(e.StartTime - eventStub.StartTime, HalfHour));
+			var conflict = (await user.UpcomingEvents).Find(e => IsWithin(e.StartTime - eventStub.StartTime, HalfHour));
 			if (conflict != null)
 			{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 
@@ -286,7 +286,7 @@ namespace Core.Controls
 			else
 			{
 				// Check if user has an upcoming conflict
-				var conflict = (await user.UpcomingEvents.Value()).Find(e => IsWithin(e.StartTime - targetEvent.StartTime, HalfHour));
+				var conflict = (await user.UpcomingEvents).Find(e => IsWithin(e.StartTime - targetEvent.StartTime, HalfHour));
 				if (conflict != null)
 				{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 			}
@@ -361,11 +361,11 @@ namespace Core.Controls
 					friend => friend.State.Equals(EventUserState.Watching)));
 
 				// Add visible users
-				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers.Value(),
+				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers,
 					user => !user.State.Equals(EventUserState.Watching)));
 
-				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
-				guestList.Watchers = (await targetEvent.Watching.Value()).Count;
+				guestList.GuestCount = (await targetEvent.Guests).Count;
+				guestList.Watchers = (await targetEvent.Watching).Count;
 			}
 			// Check if user is a guest
 			else if (await targetEvent.WasAttendedBy(user))
@@ -377,10 +377,10 @@ namespace Core.Controls
 					friend => friend.State.Equals(EventUserState.Watching) || friend.State.Equals(EventUserState.Incoming)));
 
 				// Add visible users
-				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers.Value(),
+				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers,
 					user => user.State.Equals(EventUserState.Guest) || user.State.Equals(EventUserState.Left)));
 
-				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
+				guestList.GuestCount = (await targetEvent.Guests).Count;
 			}
 			// Check if user can view event
 			else if (await targetEvent.IsVisibleTo(user))
@@ -391,7 +391,7 @@ namespace Core.Controls
 				guestList.Guests = SelectAsSilhouette(friends, friend => !friend.State.Equals(EventUserState.Watching));
 
 				// Add visible information
-				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
+				guestList.GuestCount = (await targetEvent.Guests).Count;
 			}
 			// User cannot recieve information about event
 			else
@@ -408,7 +408,7 @@ namespace Core.Controls
 			List<User> potentialUsers = new();
 
 			// Add all friends that can join event
-			foreach (var friend in await user.Friends.Value())
+			foreach (var friend in await user.Friends)
 			{
 				if (await @event.IsJoinableBy(friend))
 				{ potentialUsers.Add(friend); }
@@ -462,7 +462,7 @@ namespace Core.Controls
 			Events.SetUserStateAsync(targetUser.Id, @event.Id, EventUserState.Kicked);
 
 			// Hide target user's etchings from event
-			foreach (Etching etching in await @event.Etchings.Value())
+			foreach (Etching etching in await @event.Etchings)
 			{
 				if (targetUser.Etched(etching))
 				{ _ = Etchings.HideEtchingAsync(etching.Id); }

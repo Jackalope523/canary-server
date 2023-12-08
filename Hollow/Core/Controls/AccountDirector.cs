@@ -146,24 +146,24 @@ namespace Core.Controls
 
             // Position update
             _ = Accounts.UpdateRecentLocationAsync(user.Id,
-                (await user.LastKnownLocation.Value()).Latitude,
-                (await user.LastKnownLocation.Value()).Longitude,
-                (await user.LastKnownRadius.Value()).Metres);
+                (await user.LastKnownLocation).Latitude,
+                (await user.LastKnownLocation).Longitude,
+                (await user.LastKnownRadius).Metres);
             // Haunt update
             _ = Accounts.UpdateHauntAsync(user.Id,
-                (await user.Haunt.Value()).Latitude,
-                (await user.Haunt.Value()).Longitude,
-                (await user.HauntRadius.Value()).Metres,
-                await user.HauntStability.Value());
+                (await user.Haunt).Latitude,
+                (await user.Haunt).Longitude,
+                (await user.HauntRadius).Metres,
+                await user.HauntStability);
 
             var nextEvent = await user.NextEvent();
 
             // Check if user is at an event
             if (await userIsAtEvent)
             {
-                var currentEvent = await user.CurrentEvent.Value();
+                var currentEvent = await user.CurrentEvent;
                 // Check if user left the event radius
-                if (!GeoLocation.AreInRange(await user.LastKnownLocation.Value(), currentEvent.Location, currentEvent.Radius))
+                if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentEvent.Location, currentEvent.Radius))
                 {
                     // Check if user is a guest or the host
                     if (currentEvent.IsHostedBy(user))
@@ -181,8 +181,8 @@ namespace Core.Controls
                 else if (currentEvent.IsHostedBy(user) && currentEvent.IsDynamic)
                 {
                     // Update the position of the event
-                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { (nameof(EventShard.Latitude), (await user.LastKnownLocation.Value()).Latitude),
-                        (nameof(EventShard.Longitude), (await user.LastKnownLocation.Value()).Longitude) });
+                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { (nameof(EventShard.Latitude), (await user.LastKnownLocation).Latitude),
+                        (nameof(EventShard.Longitude), (await user.LastKnownLocation).Longitude) });
                 }
             }
             // Check if user is on their way to an event

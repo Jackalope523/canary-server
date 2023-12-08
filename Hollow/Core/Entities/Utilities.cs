@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -154,9 +155,12 @@ namespace Core.Entities
             synced = true;
 		}
 
-		#endregion
+        #endregion
 
-		#region Dissimilation
+        #region Dissimilation
+
+        public TaskAwaiter<T> GetAwaiter()
+            => Value().GetAwaiter();
 
 		public static T operator +(Synced<T> a, T b)
             => ((dynamic)a.cachedValue) + ((dynamic)b);

@@ -105,7 +105,7 @@ namespace Core.Entities
 
         public Synced<List<Penalty>> Penalties
             => new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
-        public Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync
+        private Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync
             => new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
         public Synced<List<UserReport>> Reports
             => new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
@@ -201,8 +201,8 @@ namespace Core.Entities
             _ = (Penalties.Sync(), Ratings.Sync());
 
             // Get all recent penalties
-            var penalties = (await Penalties.Value()).Where(penalty => HasYet(penalty.TimeOfPenalty + OneYear)).ToList();
-            var ratings = await Ratings.Value();
+            var penalties = (await Penalties).Where(penalty => HasYet(penalty.TimeOfPenalty + OneYear)).ToList();
+            var ratings = await Ratings;
             int ratingDiff = ratings.Postitive - ratings.Negative - penalties.Count/2;
             int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
 
@@ -221,7 +221,7 @@ namespace Core.Entities
 
         public async Task<Event> NextEvent()
         {
-            return (await UpcomingEvents.Value())[0];
+            return (await UpcomingEvents)[0];
         }
 
 		#endregion
@@ -231,7 +231,7 @@ namespace Core.Entities
         public async Task<bool> IsFriendsWith(User otherUser)
 		{
 			// Check if users are friends
-			if ((await Friends.Value()).Contains(otherUser))
+			if ((await Friends).Contains(otherUser))
             { return true; }
 
             return false;
@@ -240,7 +240,7 @@ namespace Core.Entities
         public async Task<bool> IsFollowing(User otherUser)
         {
 			// Check if user is following target
-			if ((await Following.Value()).Contains(otherUser))
+			if ((await Following).Contains(otherUser))
 			{ return false; }
 
             return true;
@@ -249,7 +249,7 @@ namespace Core.Entities
         public async Task<bool> IsBlocking(User otherUser)
         {
 			// Check if user is blocking target
-			if ((await Blocking.Value()).Contains(otherUser))
+			if ((await Blocking).Contains(otherUser))
 			{ return true; }
 
             return false;
@@ -258,7 +258,7 @@ namespace Core.Entities
 		public async Task<bool> IsBlockedBy(User otherUser)
 		{
 			// Check if user is blocked by target
-			if ((await BlockedBy.Value()).Contains(otherUser))
+			if ((await BlockedBy).Contains(otherUser))
 			{ return true; }
 
 			return false;
@@ -266,7 +266,7 @@ namespace Core.Entities
 
         public async Task<bool> IsAtEvent()
         {
-            if ((await CurrentEvent.Value()) == null)
+            if ((await CurrentEvent) == null)
             { return false; }
 
             return true;
@@ -307,8 +307,8 @@ namespace Core.Entities
 			{ return false; }
 
 			// Check if user or user's haunt is within a reasonable distance
-			if (!GeoLocation.AreInRange(await LastKnownLocation.Value(), @event.Location, @event.MaximumJoinDistance) &&
-				!GeoLocation.AreInRange(await Haunt.Value(), @event.Location, @event.MaximumJoinDistance))
+			if (!GeoLocation.AreInRange(await LastKnownLocation, @event.Location, @event.MaximumJoinDistance) &&
+				!GeoLocation.AreInRange(await Haunt, @event.Location, @event.MaximumJoinDistance))
 			{ return false; }
 
 			return true;
@@ -321,8 +321,8 @@ namespace Core.Entities
 
         public async Task<bool> CanReport()
         {
-            var recentReportCount = (await Reports.Value()).Count(report => After(report.ReportTime, Time - QuarterHour))
-                + (await EventReports.Value()).Count(report => After(report.ReportTime, Time - QuarterHour));
+            var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - QuarterHour))
+                + (await EventReports).Count(report => After(report.ReportTime, Time - QuarterHour));
 
             if (recentReportCount > 3)
             { return false; }
@@ -337,7 +337,7 @@ namespace Core.Entities
         public async Task HandleHaunt()
         {
             // Check if recent location is within haunt area
-            if (GeoLocation.DistanceBetween(await Haunt.Value(), await LastKnownLocation.Value()) < await HauntRadius.Value())
+            if (GeoLocation.DistanceBetween(await Haunt, await LastKnownLocation) < await HauntRadius)
             {
                 HauntStability.Set(HauntStability + 1);
             }
@@ -346,10 +346,10 @@ namespace Core.Entities
                 HauntStability.Set(HauntStability - 1);
 
                 // If our haunt is unstable, move it
-                if (await HauntStability.Value() < 0)
+                if (await HauntStability < 0)
                 {
                     HauntStability.Set(0);
-                    Haunt.Set(await LastKnownLocation.Value());
+                    Haunt.Set(await LastKnownLocation);
                 }
             }
         }
@@ -360,7 +360,7 @@ namespace Core.Entities
 		public async Task<UserAccountStatus> EventReported()
         {
 			// Check if there are enough reports
-			if ((await EventReports.Value()).Count < 4)
+			if ((await EventReports).Count < 4)
 			{ return AccountStatus; }
 
 			return UserAccountStatus.active_no_host;
@@ -369,15 +369,15 @@ namespace Core.Entities
         public async Task<UserAccountStatus> Reported()
         {
 			// Check if there are enough reports
-			if ((await Reports.Value()).Count < 4)
+			if ((await Reports).Count < 4)
 			{ return AccountStatus; }
 
 			// Check if there are enough reports
-			if ((await Reports.Value()).Count < 6)
+			if ((await Reports).Count < 6)
 			{ return UserAccountStatus.active_limited; }
             
 			// Check if there are enough reports
-			if ((await Reports.Value()).Count < 10)
+			if ((await Reports).Count < 10)
 			{ return UserAccountStatus.inactive_under_review; }
 
             return UserAccountStatus.blacklisted;
@@ -400,7 +400,7 @@ namespace Core.Entities
 
         public async Task NotifyFollowers(string title, string message)
         {
-            (await FollowedBy.Value()).ForEach(follower => _ = follower.Notify(title, message));
+            (await FollowedBy).ForEach(follower => _ = follower.Notify(title, message));
         }
 
 		#endregion
