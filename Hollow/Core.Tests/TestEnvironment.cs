@@ -17,9 +17,7 @@ namespace Core.Tests.Entities
 {
 	public class TestEnvironment : IDisposable
 	{
-		private CoreTerminal terminal;
-
-		private ConcurrentBag<ulong> usersAdded = new();
+		public CoreTerminal Terminal;
 
 		private static int testUserIncrement = 0;
 		private string testUserPhoneNumberFormat = "000-000-{0}";
@@ -40,10 +38,20 @@ namespace Core.Tests.Entities
 		public TestEnvironment()
 		{
 			// Arrange Core
-			terminal = new(QueryStore.AccountDatabaseAccess, QueryStore.EventDatabaseAccess,
+			Terminal = new(QueryStore.AccountDatabaseAccess, QueryStore.EventDatabaseAccess,
 				QueryStore.EtchingDatabaseAccess, QueryStore.ProfileDatabaseAccess,
 				QueryStore.ReportDatabaseAccess, QueryStore.NotificationDatabaseAccess,
 				new NotificationServiceStub());
+		}
+
+		internal User CreateUser(User user)
+		{
+			var userIncrement = testUserIncrement++;
+
+			User userStub = new(user.ToUserShard())
+				{ Id = (ulong) userIncrement };
+
+			return userStub;
 		}
 
 		internal User CreateTestUser()
@@ -71,15 +79,15 @@ namespace Core.Tests.Entities
 
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
 		{
-			bool success = await terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
+			bool success = await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
 				userStub.Name, userStub.DateOfBirth, CharacterVector.Default.ToCharacter());
 
 			if (!success)
 			{ throw new UnexpectedFailureException("User creation failed."); }
 
-			usersAdded.Add((await terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber)).Id);
+			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
 
-			return userStub;
+			return new(user);
 		}
 
 		internal Event CreateTestEvent(User host)
@@ -109,7 +117,7 @@ namespace Core.Tests.Entities
 
 		internal async Task<Event> GenerateEventUnsafeAsync(Event eventStub, User host)
 		{
-			return new(await terminal.EventDatabase.CreateEventAsync(host.Id, eventStub.Name, eventStub.Description,
+			return new(await Terminal.EventDatabase.CreateEventAsync(host.Id, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, host.Character.ToCharacter(),
 				eventStub.Radius.Kilometres, eventStub.IsDynamic));
@@ -119,17 +127,35 @@ namespace Core.Tests.Entities
 		{
 			GC.SuppressFinalize(this);
 
-			foreach (var userId in usersAdded)
+			for (int id = 0; id <= testUserIncrement; id++)
 			{
-				_ = terminal.AccountDatabase.DeleteUserAsync(userId);
+				_ = Terminal.AccountDatabase.DeleteUserAsync((ulong) id);
 			}
 		}
 	}
 
 	public class NotificationServiceStub : INotificationService
 	{
+		public class NotificationStub
+		{
+			public string Title { get; init; }
+			public string Message { get; init; }
+		}
+
+		public static ConcurrentDictionary<string, ConcurrentBag<NotificationStub>> messages = new();
+
 		public Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message)
 		{
+			ConcurrentBag<NotificationStub> userBag;
+			var exists = messages.TryGetValue(deviceToken, out userBag);
+
+			if (!exists)
+			{ 
+				userBag = new();
+				messages.TryAdd(deviceToken, userBag);
+			}
+
+			userBag.Add(new NotificationStub() { Title = title, Message = message });
 			return Task.FromResult(0);
 		}
 	}
