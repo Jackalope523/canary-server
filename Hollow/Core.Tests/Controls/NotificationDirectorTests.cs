@@ -38,7 +38,7 @@ namespace Core.Tests.Entities
 		//////////
 
 		[Fact]
-		internal async Task GetNotesAsync_ReturnsNotes()
+		public async Task GetNotesAsync_ReturnsNotes()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();
@@ -55,7 +55,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task PostNoteAsync_ValidUsers_Succeeds()
+		public async Task PostNoteAsync_ValidUsers_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();
@@ -72,7 +72,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task PostNoteAsync_BlockedUsers_Drops()
+		public async Task PostNoteAsync_BlockedUsers_Drops()
 		{
 			// Arrange
 			var userA = await environment.GenerateTestUserAsync();
@@ -93,7 +93,7 @@ namespace Core.Tests.Entities
 		///////////////////////
 
 		[Fact]
-		internal async Task SubscribeUserAsync_ValidUser_Succeeds()
+		public async Task SubscribeUserAsync_ValidUser_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();
@@ -107,7 +107,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task SubscribeUserAsync_SubscribedUser_Drops()
+		public async Task SubscribeUserAsync_SubscribedUser_Drops()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();
@@ -119,7 +119,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task UnsubscribeUserAsync_ValidUser_Succeeds()
+		public async Task UnsubscribeUserAsync_ValidUser_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();
@@ -134,7 +134,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task UnsubscribeUserAsync_UnsubscribedUser_Drops()
+		public async Task UnsubscribeUserAsync_UnsubscribedUser_Drops()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();
@@ -145,7 +145,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task NotifyUserAsync_SubscribedUser_Succeeds()
+		public async Task NotifyUserAsync_SubscribedUser_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();
@@ -169,7 +169,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task NotifyUserAsync_UnsubscribedUser_Drops()
+		public async Task NotifyUserAsync_UnsubscribedUser_Drops()
 		{
 			// Arrange
 			var user = await environment.GenerateTestUserAsync();

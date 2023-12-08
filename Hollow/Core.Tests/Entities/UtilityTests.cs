@@ -43,21 +43,21 @@ namespace Core.Tests.Entities
 
         [Theory]
         [MemberData(nameof(CityDistances))]
-        internal void Distance_TwoPoints_ReturnsDistance(GeoLocation pointA, GeoLocation pointB, Distance expectedDistance)
+        public void Distance_TwoPoints_ReturnsDistance(GeoLocation pointA, GeoLocation pointB, Distance expectedDistance)
         {
             Assert.Equal(expectedDistance.Kilometres, Math.Round(GeoLocation.DistanceBetween(pointA, pointB).Kilometres));
         }
 
         [Theory]
         [MemberData(nameof(CitiesInRange))]
-        internal void AreInRange_TwoPoints_ReturnsTrue(GeoLocation pointA, GeoLocation pointB, Distance range)
+        public void AreInRange_TwoPoints_ReturnsTrue(GeoLocation pointA, GeoLocation pointB, Distance range)
         {
             Assert.True(GeoLocation.AreInRange(pointA, pointB, range));
         }
 
         [Theory]
         [MemberData(nameof(CitiesNotInRange))]
-        internal void AreInRange_TwoPoints_ReturnsFalse(GeoLocation pointA, GeoLocation pointB, Distance range)
+        public void AreInRange_TwoPoints_ReturnsFalse(GeoLocation pointA, GeoLocation pointB, Distance range)
         {
             Assert.False(GeoLocation.AreInRange(pointA, pointB, range));
         }
@@ -66,7 +66,7 @@ namespace Core.Tests.Entities
     public class DistanceTests
     {
 		[Fact]
-		internal void Constructor_FromMetres_Correct()
+		public void Constructor_FromMetres_Correct()
 		{
             Distance distance = new() { Metres = 1000 };
 
@@ -75,7 +75,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal void Constructor_FromKilometres_Correct()
+		public void Constructor_FromKilometres_Correct()
 		{
             Distance distance = new() { Kilometres = 1 };
 
@@ -87,7 +87,7 @@ namespace Core.Tests.Entities
     public class SyncedTests
     {
 		[Fact]
-		internal async Task Constructor_ExistingValue_ProperlyInitialised()
+		public async Task Constructor_ExistingValue_ProperlyInitialised()
 		{
             Synced<int> syncedValue = new(0);
 
@@ -95,7 +95,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task Constructor_UnsyncedValue_ProperlyInitialised()
+		public async Task Constructor_UnsyncedValue_ProperlyInitialised()
 		{
             Synced<int> syncedValue = new(() => Task.FromResult(0));
 
@@ -103,7 +103,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task Constructor_NullFunction_Fails()
+		public async Task Constructor_NullFunction_Fails()
 		{
             Synced<int> syncedValue = new(null);
 
@@ -111,7 +111,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task Sync_UnsyncedValue_Syncs()
+		public async Task Sync_UnsyncedValue_Syncs()
 		{
             Synced<int> syncedValue = new(() => Task.FromResult(0));
             _ = syncedValue.Sync();
@@ -120,7 +120,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task Sync_SyncedValue_Resyncs()
+		public async Task Sync_SyncedValue_Resyncs()
 		{
             Synced<int> syncedValue = new(() => { return Task.FromResult(0); });
             await syncedValue.Sync();
@@ -132,7 +132,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		internal async Task Set_Value_Correct()
+		public async Task Set_Value_Correct()
 		{
             Synced<int> syncedValue = new(0);
             syncedValue.Set(1);
