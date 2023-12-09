@@ -75,20 +75,20 @@ export const Button: React.FC<ButtonProps> = ({
       btnActiveIconStyle = [globalStyles.textLight];
       break;
 
-    case ButtonType.PrimaryLight:
-      btnStyle = [buttonStyles.buttonPrimaryLight];
-      btnTextStyle = [globalStyles.textLight];
-      btnIconStyle = [globalStyles.textLight];
-      btnActiveStyle = [buttonStyles.buttonPrimaryLight];
+    case ButtonType.SecondaryDark:
+      btnStyle = [buttonStyles.buttonSecondaryDark];
+      btnTextStyle = [globalStyles.textDark];
+      btnIconStyle = [globalStyles.textDark];
+      btnActiveStyle = [buttonStyles.buttonSecondaryDarkSelected];
       btnActiveTextStyle = [globalStyles.textLight];
       btnActiveIconStyle = [globalStyles.textLight];
       break;
 
-    case ButtonType.Secondary:
-      btnStyle = [buttonStyles.buttonSecondary];
+    case ButtonType.SecondaryLight:
+      btnStyle = [buttonStyles.buttonSecondaryLight];
       btnTextStyle = [globalStyles.textDark];
       btnIconStyle = [globalStyles.textDark];
-      btnActiveStyle = [buttonStyles.buttonSecondary];
+      btnActiveStyle = [buttonStyles.buttonSecondaryLightSelected];
       btnActiveTextStyle = [globalStyles.textDark];
       btnActiveIconStyle = [globalStyles.textDark];
       break;
@@ -221,9 +221,24 @@ export const Button: React.FC<ButtonProps> = ({
 
   const [isPressed, setIsPressed] = React.useState(false);
 
+  const handlePressIn = () => {
+    if (self != null && status != null && changeState != null) {
+      if (status == self) changeState(-1);
+      else changeState(self);
+    } else {
+      setIsPressed(true);
+      if (onPress != null) {
+        onPress();
+      }
+    }
+  };
+
   return (
     <Pressable
-      onPress={() => setIsPressed(!isPressed)}
+      onPress={() => {
+        handlePressIn();
+        setIsPressed(!isPressed);
+      }}
       style={isPressed ? btnStyle : btnActiveStyle}
       disabled={disabled}>
       <Text style={isPressed ? btnTextStyle : btnActiveTextStyle}>
@@ -239,8 +254,8 @@ export const Button: React.FC<ButtonProps> = ({
 
 export enum ButtonType {
   PrimaryDark,
-  PrimaryLight,
-  Secondary,
+  SecondaryDark,
+  SecondaryLight,
   Tertiary,
   Success,
   Warning,
