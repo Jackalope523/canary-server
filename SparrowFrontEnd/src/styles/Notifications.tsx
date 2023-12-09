@@ -25,14 +25,4 @@ export const notificationStyles = StyleSheet.create({
     flexDirection: 'column',
     rowGap: Spacing.sm,
   },
-
-  //   notification: {
-  //     flexDirection: 'row',
-  //     columnGap: Spacing.md,
-
-  //     textWrapper: {
-  //       flexDirection: 'column',
-  //       rowGap: Spacing.sm,
-  //     },
-  //   },
 });
