@@ -8,8 +8,7 @@ import {
   ImageBackground,
   FlatList,
 } from 'react-native';
-
-import SearchBar from '../../components/molecules/SearchBar';
+import SearchBar from '../../components/discovery/SearchBar';
 import { Colors } from '../../styles/Colors';
 import { globalStyles } from '../../styles/Global';
 import { navigationStyles } from '../../styles/Navigation';
@@ -100,7 +99,7 @@ const DiscoveryScreen = () => {
   // Sort by
   const [sortState, setSortState] = React.useState(-1);
 
-  // TODO when SEARCH is CLOSED - hide SORT view and/or FILTER view - reset SEARCH
+  // TODO split up the page into components - implement the search bar from Discovery/SearchBar and Discovery Search in a different screen
 
   return (
     <View style={styles.mapWrapper}>

@@ -3,8 +3,13 @@ import { Colors } from './Colors';
 import { Spacing } from './Spacing';
 
 export const globalStyles = StyleSheet.create({
-  // Layout
-  // Containers
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Layout                                     ||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                   Containers                                   ||
+  // ! ||--------------------------------------------------------------------------------||
+
   // Used for navigation container, tab navigator
   mainContainer: {
     backgroundColor: Colors.sparrowSand,
@@ -16,7 +21,10 @@ export const globalStyles = StyleSheet.create({
     margin: 24,
   },
 
-  // Typography
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                   Typography                                   ||
+  // ! ||--------------------------------------------------------------------------------||
+
   // Base text
   baseText: {
     fontFamily: 'UncutSans-Regular',
@@ -136,8 +144,13 @@ export const globalStyles = StyleSheet.create({
     fontFamily: 'UncutSans-Bold',
   },
 
-  // Text
-  // Color variants
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                      Text                                      ||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                 Color variants                                 ||
+  // ! ||--------------------------------------------------------------------------------||
+
   // Dark
   textDark: {
     color: Colors.sparrowDark,
@@ -178,198 +191,19 @@ export const globalStyles = StyleSheet.create({
     color: Colors.turqoise300,
   },
 
-  // BUTTONS HAVE BEEN MOVED TO BUTTONS.TSX
-  // TODO delete the buttons code below and update the existing buttons
-  // Buttons
-  // Primary
-  //   buttonPrimary: {
-  //     backgroundColor: Colors.sparrowDarkBrown,
-  //     borderColor: Colors.sparrowDarkBrown,
-  //   },
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                  Illustrations                                 ||
+  // ! ||--------------------------------------------------------------------------------||
 
-  //   // Primary Light
-  //   buttonPrimaryLight: {
-  //     backgroundColor: Colors.sparrowBrown,
-  //     borderColor: Colors.sparrowBrown,
-  //   },
-
-  //   // Secondary
-  //   buttonSecondary: {
-  //     backgroundColor: Colors.sparrowSand,
-  //     borderColor: Colors.sparrowSand,
-
-  //     outline: {
-  //       borderWidth: 2,
-  //       borderRadius: 8,
-  //       borderColor: Colors.sparrowSand,
-  //     },
-  //   },
-
-  //   // Button Tertiary
-  //   buttonTertiary: {
-  //     backgroundColor: Colors.sparrowDark,
-  //     borderColor: Colors.sparrowDark,
-  //   },
-
-  //   // Success
-  //   buttonSuccess: {
-  //     backgroundColor: Colors.green400,
-  //     borderColor: Colors.green400,
-  //   },
-
-  //   // Warning
-  //   buttonWarning: {
-  //     backgroundColor: Colors.orange400,
-  //     borderColor: Colors.orange400,
-  //   },
-
-  //   // Error
-  //   buttonError: {
-  //     backgroundColor: Colors.red400,
-  //     borderColor: Colors.red400,
-  //   },
-
-  //   // Function
-  //   buttonFunction: {
-  //     backgroundColor: Colors.turqoise300,
-  //     borderColor: Colors.turqoise300,
-  //   },
-
-  //   // Layout
-  //   // Makes the button width the size of the contents
-  //   buttonContained: {
-  //     alignSelf: 'flex-start',
-  //   },
-
-  //   // Makes the button full-width
-  //   buttonFull: {
-  //     flex: 1,
-  //   },
-
-  //   // Icon buttons - buttons with icons
-  //   // These styles currently work in conjuction
-  //   iconButtonSmall: {
-  //     flexDirection: 'row',
-
-  //     // TODO going to use spacing.sm instead of md for now cause I think it looks better, update Figma later if this is the final setting
-  //     columnGap: Spacing.sm,
-  //   },
-
-  //   // TODO check and delete borderColor property if it's unused
-
-  //   // Sizes
-  //   // Large
-  //   textButtonLarge: {
-  //     alignItems: 'center',
-  //     justifyContent: 'center',
-  //     paddingVertical: 24,
-  //     paddingHorizontal: 32,
-  //     borderRadius: 8,
-  //     borderWidth: 2,
-  //     // borderColor: Colors.sparrowDarkBrown,
-
-  //     text: {
-  //       fontFamily: 'UncutSans-Medium',
-  //       fontSize: 18,
-  //     },
-  //   },
-
-  //   // Medium
-  //   textButtonMedium: {
-  //     alignItems: 'center',
-  //     justifyContent: 'center',
-  //     paddingVertical: 16,
-  //     paddingHorizontal: 24,
-  //     borderRadius: 8,
-  //     borderWidth: 2,
-  //     // borderColor: Colors.sparrowDarkBrown,
-
-  //     text: {
-  //       fontFamily: 'UncutSans-Medium',
-  //       fontSize: 18,
-  //     },
-  //   },
-
-  //   // Small
-  //   textButtonSmall: {
-  //     alignItems: 'center',
-  //     justifyContent: 'center',
-  //     paddingVertical: 8,
-  //     paddingHorizontal: 16,
-  //     borderWidth: 2,
-  //     // borderColor: Colors.sparrowDarkBrown,
-  //     borderRadius: 8,
-
-  //     text: {
-  //       fontFamily: 'UncutSans-Bold',
-  //       fontSize: 18,
-  //     },
-  //   },
-
-  //   // Extra small
-  //   textButtonExtraSmall: {
-  //     alignItems: 'center',
-  //     justifyContent: 'center',
-  //     paddingVertical: 8,
-  //     paddingHorizontal: 16,
-  //     borderRadius: 8,
-  //     borderWidth: 2,
-  //     // borderColor: Colors.sparrowDarkBrown,
-  //     columnGap: Spacing.sm,
-
-  //     text: {
-  //       fontFamily: 'UncutSans-Bold',
-  //       fontSize: 16,
-
-  //       uppercase: {
-  //         textTransform: 'uppercase',
-  //       },
-  //     },
-  //   },
-
-  //   // Button icons
-  //   // Small
-  //   buttonIconSmall: {
-  //     fontSize: 24,
-
-  //     // Fix for icon being cut off
-  //     height: 24,
-
-  //     light: {
-  //       color: Colors.sparrowSand,
-  //     },
-
-  //     dark: {
-  //       color: Colors.sparrowDarkBrown,
-  //     },
-  //   },
-
-  //   // Medium
-  //   buttonIconMedium: {
-  //     fontSize: 32,
-
-  //     // Fix for icon being cut off
-  //     height: 32,
-
-  //     light: {
-  //       color: Colors.sparrowSand,
-  //     },
-
-  //     dark: {
-  //       color: Colors.sparrowDarkBrown,
-  //     },
-  //   },
-
-  // Illustrations
-  illustration: {
+  // Large
+  illustrationLarge: {
     resizeMode: 'center',
+    height: 280,
+  },
 
-    large: {
-      height: 280,
-    },
-
-    medium: {
-      height: 200,
-    },
+  // Medium
+  illustrationMedium: {
+    resizeMode: 'center',
+    height: 200,
   },
 });

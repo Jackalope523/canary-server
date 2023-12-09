@@ -1,30 +1,38 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "./Colors";
-import { Spacing } from "./Spacing";
+import { StyleSheet } from 'react-native';
+import { Colors } from './Colors';
+import { Spacing } from './Spacing';
 
-// Notifications, messages, popups
+export const notificationStyles = StyleSheet.create({
+  // Notifications
+  // Notification indicator
+  notificationIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.sm,
 
-export const notificationStyles = StyleSheet.create ({
-    // Notifications
-    // Notification indicator
-    notificationIndicator: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        columnGap: Spacing.sm,
-
-        icon: {
-            color: Colors.sparrowDarkBrown,
-        },
+    icon: {
+      color: Colors.sparrowDarkBrown,
     },
+  },
 
-    // Notification
-    notification: {
-        flexDirection: 'row',
-        columnGap: Spacing.md,
+  // Notification
+  notification: {
+    flexDirection: 'row',
+    columnGap: Spacing.md,
+  },
 
-        textWrapper: {
-            flexDirection: 'column',
-            rowGap: Spacing.sm,
-        },
-    },
+  notificationTextWrapper: {
+    flexDirection: 'column',
+    rowGap: Spacing.sm,
+  },
+
+  //   notification: {
+  //     flexDirection: 'row',
+  //     columnGap: Spacing.md,
+
+  //     textWrapper: {
+  //       flexDirection: 'column',
+  //       rowGap: Spacing.sm,
+  //     },
+  //   },
 });

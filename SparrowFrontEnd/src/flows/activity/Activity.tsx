@@ -5,7 +5,7 @@ import { Colors } from '../../styles/Colors';
 import { Spacing } from '../../styles/Spacing';
 
 import EventCardMedium from '../../components/EventCardMedium';
-import NotificationIndicator from '../../components/molecules/NotificationIndicator';
+import NotificationIndicator from '../../components/activity/NotificationIndicator';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
