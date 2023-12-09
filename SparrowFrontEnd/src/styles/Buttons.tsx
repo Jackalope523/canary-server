@@ -10,14 +10,29 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  buttonPrimaryLight: {
+  buttonPrimaryDarkSelected: {
     backgroundColor: Colors.sparrowBrown,
     borderColor: Colors.sparrowBrown,
   },
 
-  buttonSecondary: {
-    backgroundColor: Colors.sparrowSand,
+  // Secondary
+  buttonSecondaryDark: {
     borderColor: Colors.sparrowDarkBrown,
+  },
+
+  // TODO keep selected or rename to active?
+  buttonSecondaryDarkSelected: {
+    backgroundColor: Colors.sparrowDarkBrown,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  buttonSecondaryLight: {
+    borderColor: Colors.sparrowSand,
+  },
+
+  buttonSecondaryLightSelected: {
+    backgroundColor: Colors.sparrowSand,
+    borderColor: Colors.sparrowSand,
   },
 
   // Button Tertiary
