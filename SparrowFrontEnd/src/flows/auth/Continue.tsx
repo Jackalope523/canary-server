@@ -6,26 +6,27 @@ import { Colors } from '../../styles/Colors';
 import { globalStyles } from '../../styles/Global';
 
 import { AuthStackParamList } from '../../components/atoms/types';
-import Button from '../../components/atoms/Button';
+import Button, {
+  ButtonType,
+  ButtonSize,
+  ButtonDisplay,
+} from '../../components/Button';
 
 type ContinueProps = StackScreenProps<AuthStackParamList, 'Continue'>;
 
-const ContinueScreen = ({route}: ContinueProps) => {
-    return(
-        <View>
-            <Text>{route.params.Message}</Text>
-            <Button
-                btnText={'Continue'}
-                btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonFull]}
-                btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
-                btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                onPress={route.params.Forward}
-                />
-        </View>
-    );
+const ContinueScreen = ({ route }: ContinueProps) => {
+  return (
+    <View>
+      <Text>{route.params.Message}</Text>
+      <Button
+        type={ButtonType.PrimaryDark}
+        size={ButtonSize.Large}
+        display={ButtonDisplay.Contained}
+        btnText="Continue"
+        onPress={route.params.Forward}
+      />
+    </View>
+  );
 };
 
-export default ContinueScreen
+export default ContinueScreen;
