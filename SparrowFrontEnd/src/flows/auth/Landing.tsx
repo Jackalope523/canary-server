@@ -3,9 +3,6 @@ import { View, Text } from 'react-native';
 import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Colors } from '../../styles/Colors';
-import { globalStyles } from '../../styles/Global';
-
 import Button, {
   ButtonType,
   ButtonSize,
@@ -48,69 +45,6 @@ const LandingScreen = ({ navigation }: LandingProps) => {
   return (
     <View>
       <Text>Sparrow</Text>
-      {/* <Button
-        btnText={'Sign up'}
-        btnIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        btnStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonPrimary,
-          globalStyles.buttonFull,
-        ]}
-        btnTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonFull,
-          globalStyles.buttonPrimaryLight,
-        ]}
-        btnActiveTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        onPress={signupButton}
-        disabled={!buttonEnabled}
-      />
-      <Button
-        btnText={'OR LOG IN'}
-        btnIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        btnStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonPrimary,
-          globalStyles.buttonFull,
-        ]}
-        btnTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonFull,
-          globalStyles.buttonPrimaryLight,
-        ]}
-        btnActiveTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        onPress={loginButton}
-        disabled={!buttonEnabled}
-      /> */}
-
       <Button
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}

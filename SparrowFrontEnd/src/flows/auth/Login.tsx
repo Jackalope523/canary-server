@@ -48,28 +48,6 @@ const LoginScreen = ({ navigation }: LoginProps) => {
         onChangeText={setPhoneNumber}
         keyboardType="phone-pad"
       />
-      {/* <Button
-                btnText={'Login'}
-                btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonFull]}
-                btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
-                btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                onPress={navigate}
-                disabled={!buttonEnabled}
-                />
-            <Button
-                btnText={'CAN\'T LOG IN?'}
-                btnIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                btnStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonPrimary, globalStyles.buttonFull]}
-                btnTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                btnActiveStyle={[globalStyles.textButtonExtraSmall, globalStyles.buttonFull, globalStyles.buttonPrimaryLight]}
-                btnActiveTextStyle={[globalStyles.textButtonExtraSmall.text, globalStyles.textLight]}
-                btnActiveIconStyle={[globalStyles.buttonIconSmall, globalStyles.buttonIconSmall.light]}
-                disabled={!buttonEnabled}
-                /> */}
-
       <Button
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
@@ -78,7 +56,6 @@ const LoginScreen = ({ navigation }: LoginProps) => {
         onPress={navigate}
         disabled={!buttonEnabled}
       />
-
       <Button
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}

@@ -65,38 +65,6 @@ const SignupScreen = ({ navigation }: SignupProps) => {
         timeZoneOffsetInMinutes={0}
         maximumDate={new Date()}
       />
-      {/* <Button
-        btnText={'Sign up'}
-        btnIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        btnStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonPrimary,
-          globalStyles.buttonFull,
-        ]}
-        btnTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonFull,
-          globalStyles.buttonPrimaryLight,
-        ]}
-        btnActiveTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        onPress={navigate}
-        disabled={!buttonEnabled}
-      /> */}
-
       <Button
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}

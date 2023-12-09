@@ -48,68 +48,6 @@ const VerifyScreen = ({ route }: VerifyProps) => {
         keyboardType="number-pad"
         maxLength={6}
       />
-      {/* <Button
-        btnText={'Verify & Continue'}
-        btnIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        btnStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonPrimary,
-          globalStyles.buttonFull,
-        ]}
-        btnTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonFull,
-          globalStyles.buttonPrimaryLight,
-        ]}
-        btnActiveTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        onPress={route.params.Forward}
-        disabled={!buttonEnabled}
-      />
-      <Button
-        btnText={"I DIDN'T RECEIVE A CODE"}
-        btnIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        btnStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonPrimary,
-          globalStyles.buttonFull,
-        ]}
-        btnTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonFull,
-          globalStyles.buttonPrimaryLight,
-        ]}
-        btnActiveTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        disabled={!buttonEnabled}
-      /> */}
-
       <Button
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
@@ -118,7 +56,6 @@ const VerifyScreen = ({ route }: VerifyProps) => {
         onPress={route.params.Forward}
         disabled={!buttonEnabled}
       />
-
       <Button
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
