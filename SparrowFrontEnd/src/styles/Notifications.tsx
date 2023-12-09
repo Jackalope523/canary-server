@@ -3,7 +3,10 @@ import { Colors } from './Colors';
 import { Spacing } from './Spacing';
 
 export const notificationStyles = StyleSheet.create({
-  // Notifications
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                  Notifications                                 ||
+  // ! ||--------------------------------------------------------------------------------||
+
   // Notification indicator
   notificationIndicator: {
     flexDirection: 'row',

@@ -2,8 +2,13 @@ import { StyleSheet } from 'react-native';
 import { Colors } from './Colors';
 
 export const avatarStyles = StyleSheet.create({
-  // Avatars
-  // Borders
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Avatars                                    ||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Borders                                    ||
+  // ! ||--------------------------------------------------------------------------------||
+
   avatarOnline: {
     borderWidth: 2,
     borderColor: Colors.green400,
@@ -24,7 +29,10 @@ export const avatarStyles = StyleSheet.create({
     borderColor: Colors.sand300,
   },
 
-  // Single avatar
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                  Single avatar                                 ||
+  // ! ||--------------------------------------------------------------------------------||
+
   // Square
 
   // Large
@@ -47,6 +55,4 @@ export const avatarStyles = StyleSheet.create({
     height: 24,
     borderRadius: 4,
   },
-
-  // Circle
 });

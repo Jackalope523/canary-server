@@ -26,7 +26,7 @@ const NotificationIndicator = () => {
           width={24}
           style={notificationStyles.notificationIndicator.icon}
         />
-        <View style={[labelStyles.numberLabel, labelStyles.numberLabel.dark]}>
+        <View style={[labelStyles.numberLabel, labelStyles.numberLabelPrimary]}>
           <Text
             style={[
               globalStyles.labelTextUppercase,

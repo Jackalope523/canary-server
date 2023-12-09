@@ -1,147 +1,149 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "./Colors";
-import { Spacing } from "./Spacing";
-
+import { StyleSheet } from 'react-native';
+import { Colors } from './Colors';
+import { Spacing } from './Spacing';
 
 export const navigationStyles = StyleSheet.create({
-    // Navigation
-    // Top navbar (header)
-    topNavbar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: Spacing.lg,
-        paddingVertical: 12,
-        backgroundColor: Colors.sparrowSand,
-        borderBottomWidth: 2,
-        borderColor: Colors.sparrowDarkBrown,
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                   Navigation                                   ||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                               Top navbar (header)                              ||
+  // ! ||--------------------------------------------------------------------------------||
 
-        icons: {
-            color: Colors.sparrowDarkBrown,
-        },
+  // Base
+  topNavbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 12,
+    backgroundColor: Colors.sparrowSand,
+    borderBottomWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
 
-        // Use as gap for icon on the left (usually the back arrow)
-        gapLeft: {
-            marginRight: Spacing.md,
-        },
-        
-        // Types
-        // Default with title
-        defaultTitled: {
-            columnGap: Spacing.md,
-        },
+  topNavbarIcon: {
+    color: Colors.sparrowDarkBrown,
+  },
 
-        // Favorite
-        favorite: {
-            justifyContent: 'space-between',
-        },
+  topNavbarGapLeft: {
+    marginRight: Spacing.md,
+  },
 
-        // Options
-        options: {
-            justifyContent: 'space-between',
-        },
+  // Types
+  // Default with title
+  topNavbarDefaultTitled: {
+    columnGap: Spacing.md,
+  },
 
-        // Edit
-        edit: {
-            justifyContent: 'space-between',
+  // Favorite
+  topNavbarFavorite: {
+    justifyContent: 'space-between',
+  },
 
-            wrapper: {
-                flexDirection: 'row',
-                columnGap: Spacing.md,
-            },
-        },
-    },
+  // Options
+  topNavbarOptions: {
+    justifyContent: 'space-between',
+  },
 
-    // Search
-    search: {
-        headerWrapper: {
-            // TODO replace azure400 with Sparrow Sand
-            backgroundColor: Colors.azure400,
-            borderBottomWidth: 2,
-            borderColor: Colors.sparrowDarkBrown,
+  // Edit
+  topNavbarEdit: {
+    justifyContent: 'space-between',
+  },
 
-            header: {
-                padding: 24,
-            },
-        },
-        
-        searchBarWrapper: {
-            flexDirection: 'row',
-            // columnGap: Spacing.sm,
-        
-            // alignItems: 'center',
-            // verticalAlign: 'baseline',
-            justifyContent: 'center',
+  topNavbarEditWrapper: {
+    flexDirection: 'row',
+    columnGap: Spacing.md,
+  },
 
-            searchBar: {
-                backgroundColor: Colors.sparrowSand,
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-                borderWidth: 2,
-                borderRadius: 8,
-                borderColor: Colors.sparrowDarkBrown,
-                flex: 1,
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Search                                     ||
+  // ! ||--------------------------------------------------------------------------------||
 
-                alignSelf: 'center',
-                alignItems: 'center',
-                columnGap: Spacing.md,
-                flexDirection: 'row',
+  searchHeaderWrapper: {
+    backgroundColor: Colors.sparrowSand,
+    borderBottomWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
 
-                textInput: {
-                    margin: 0,
-                    padding: 0,
-                    flex: 1,
+  searchHeader: {
+    padding: 24,
+  },
 
-                    fontFamily: 'UncutSans-Regular',
-                    fontSize: 16,
-                    fontWeight: 'regular',
-                },
-            },
-    
-            closeButtonWrapper: {
-                // TODO remove bgc later
-                backgroundColor: Colors.red400,
-                
-                // OG padding in prototype is 16 but that doesn't work well here so I'm using 10
-                // To make it more similar to OG padding, make paddingHorizontal: 16, paddingVertical: 10
-                padding: 8,
-            },
-        },
+  searchBarWrapper: {
+    flexDirection: 'row',
+    // columnGap: Spacing.sm,
 
-        searchOptionsWrapper: {
-            searchOptions: {
-                flexDirection: 'row',
-                columnGap: Spacing.md,
-                paddingTop: Spacing.md,
+    // alignItems: 'center',
+    // verticalAlign: 'baseline',
+    justifyContent: 'center',
+  },
 
-                // TODO remove bgc later
-                backgroundColor: Colors.fuchsia500,
-            },
-        },
+  searchBarWrapperCloseButtonWrapper: {
+    // TODO remove bgc later
+    backgroundColor: Colors.red400,
 
-        searchOptionsInnerContainer: {
-            backgroundColor: Colors.sparrowBrown,
-            height: '100%',
+    // OG padding in prototype is 16 but that doesn't work well here so I'm using 10
+    // To make it more similar to OG padding, make paddingHorizontal: 16, paddingVertical: 10
+    padding: 8,
+  },
 
-            section: {
-                rowGap: Spacing.md,
-                paddingTop: Spacing.lg,
+  searchBar: {
+    backgroundColor: Colors.sparrowSand,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: Colors.sparrowDarkBrown,
+    flex: 1,
 
-                content: {
-                    columnGap: Spacing.md,
-                },
-            },
-        },
+    alignSelf: 'center',
+    alignItems: 'center',
+    columnGap: Spacing.md,
+    flexDirection: 'row',
+  },
 
-        searchContent: {
-            marginHorizontal: 24,
-        },
-    },
+  searchBarTextInput: {
+    margin: 0,
+    padding: 0,
+    flex: 1,
 
-    // TEST
-    test: {
-        alignSelf: 'baseline',
-        verticalAlign: 'middle',
-        textAlign: 'center',
-        justifyContent: 'center'
-    },
+    fontFamily: 'UncutSans-Regular',
+    fontSize: 16,
+    fontWeight: 'regular',
+  },
+
+  searchOptions: {
+    flexDirection: 'row',
+    columnGap: Spacing.md,
+    paddingTop: Spacing.md,
+
+    // TODO remove bgc later
+    backgroundColor: Colors.fuchsia500,
+  },
+
+  searchOptionsInner: {
+    backgroundColor: Colors.sparrowBrown,
+    height: '100%',
+  },
+
+  searchOptionsInnerSection: {
+    rowGap: Spacing.md,
+    paddingTop: Spacing.lg,
+  },
+
+  searchOptionsInnerSectionContent: {
+    columnGap: Spacing.md,
+  },
+
+  searchContent: {
+    marginHorizontal: 24,
+  },
+
+  // TODO DELETE test later when it's not used anymore
+  test: {
+    alignSelf: 'baseline',
+    verticalAlign: 'middle',
+    textAlign: 'center',
+    justifyContent: 'center',
+  },
 });

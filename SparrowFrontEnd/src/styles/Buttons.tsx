@@ -3,7 +3,13 @@ import { Colors } from './Colors';
 import { Spacing } from './Spacing';
 
 export const buttonStyles = StyleSheet.create({
-  // Buttons
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Buttons                                    ||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                      Types                                     ||
+  // ! ||--------------------------------------------------------------------------------||
+
   // Primary
   buttonPrimaryDark: {
     backgroundColor: Colors.sparrowDarkBrown,
@@ -20,7 +26,6 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  // TODO keep selected or rename to active?
   buttonSecondaryDarkSelected: {
     backgroundColor: Colors.sparrowDarkBrown,
     borderColor: Colors.sparrowDarkBrown,
@@ -65,7 +70,10 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  // Layout
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Display                                    ||
+  // ! ||--------------------------------------------------------------------------------||
+
   // Makes the button width the size of the contents
   buttonContained: {
     alignSelf: 'flex-start',
@@ -136,6 +144,7 @@ export const buttonStyles = StyleSheet.create({
     columnGap: Spacing.sm,
   },
 
+  // TODO move to ICON STYLES file?
   // Button icons
   // Small
   buttonIconSmallLight: {

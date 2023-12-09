@@ -1,77 +1,86 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "./Colors";
+import { StyleSheet } from 'react-native';
+import { Colors } from './Colors';
 
-export const labelStyles = StyleSheet.create ({
-    // Labels
-    // Number label
-    numberLabel: {
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: 100,
+export const labelStyles = StyleSheet.create({
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Labels                                     ||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                  Number label                                  ||
+  // ! ||--------------------------------------------------------------------------------||
 
-        dark: {
-            backgroundColor: Colors.sparrowDarkBrown,
+  // Base
+  numberLabel: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 100,
+  },
 
-            text: {
-                color: Colors.sparrowSand,
-            },
-        },
+  // Primary
+  numberLabelPrimary: {
+    backgroundColor: Colors.sparrowDarkBrown,
+  },
 
-        outline: {
-            borderWidth: 2,
-            borderColor: Colors.sparrowDarkBrown,
+  numberLabelPrimaryText: {
+    color: Colors.sparrowSand,
+  },
 
-            text: {
-                color: Colors.sparrowDark,
-            },
-        },
-    },
+  // Secondary
+  numberLabelSecondary: {
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
 
-    // Text label
-    // Large
-    textLabelLarge: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 100,
+  numberLabelSecondaryText: {
+    color: Colors.sparrowDark,
+  },
 
-        rest: {
-            borderWidth: 2,
-            borderColor: Colors.sparrowDarkBrown,
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                   Text label                                   ||
+  // ! ||--------------------------------------------------------------------------------||
 
-            text: {
-                color: Colors.sparrowDark,
-            },
-        },
+  // Large
+  textLabelLarge: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 100,
+  },
 
-        selected: {
-            backgroundColor: Colors.sparrowDarkBrown,
+  textLabelLargeRest: {
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
 
-            text: {
-                color: Colors.sparrowSand,
-            },
-        },
-    },
+  textLabelLargeRestText: {
+    color: Colors.sparrowDark,
+  },
 
-    // Small
-    textLabelSmall: {
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderWidth: 2,
-        borderRadius: 100,
-        borderColor: Colors.sparrowDarkBrown,
+  textLabelLargeSelected: {
+    backgroundColor: Colors.sparrowDarkBrown,
+  },
 
-        // Label text
-        text: {
-            color: Colors.sparrowDark,
-        },
+  textLabelLargeSelectedText: {
+    color: Colors.sparrowSand,
+  },
 
-        you: {
-            backgroundColor: Colors.orange400,
-        },
+  // Small
+  textLabelSmall: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderWidth: 2,
+    borderRadius: 100,
+    borderColor: Colors.sparrowDarkBrown,
+  },
 
-        friend: {
-            backgroundColor: Colors.yellow400,
-        },
-    },
+  textLabelSmallText: {
+    color: Colors.sparrowDark,
+  },
 
+  textLabelSmallYou: {
+    backgroundColor: Colors.orange400,
+  },
+
+  textLabelSmallFriend: {
+    backgroundColor: Colors.yellow400,
+  },
 });
