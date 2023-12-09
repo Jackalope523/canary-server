@@ -17,6 +17,7 @@ import fontelloConfig from '../config.json';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
+// Types
 interface ButtonProps {
   onPress?: () => void;
   btnText?: string;
