@@ -39,6 +39,10 @@ namespace Core.Tests.Entities
 		private DateTimeOffset testEtchingTime = new(new DateTime(0));
 		private string testEtchingImageURL = "https://cdn.sparrow.com/101";
 
+		/////
+		// Set-up
+		///////////
+		
 		public TestEnvironment()
 		{
 			// Arrange Core
@@ -47,6 +51,10 @@ namespace Core.Tests.Entities
 				QueryStore.ReportDatabaseAccess, QueryStore.NotificationDatabaseAccess,
 				new NotificationServiceStub());
 		}
+
+		///////
+		// User Helpers
+		/////////////////
 
 		internal User CreateUser(User user)
 		{
@@ -94,6 +102,11 @@ namespace Core.Tests.Entities
 			return new(user);
 		}
 
+		internal async Task UpdateUserLocationAsync(User user, double latitude, double longitude, double radius = 1)
+		{
+			await Terminal.AccountDatabase.UpdateRecentLocationAsync(user.Id, latitude, longitude, radius);
+		}
+
 		internal async Task ForceFriendshipAsync(params User[] users)
 		{
 			foreach (var user in users)
@@ -121,6 +134,10 @@ namespace Core.Tests.Entities
 				}
 			}
 		}
+
+		////////
+		// Event Helpers
+		//////////////////
 
 		internal Event CreateTestEvent(User host)
 		{
@@ -167,6 +184,21 @@ namespace Core.Tests.Entities
 			return eventStub;
 		}
 
+		internal async Task AddUserToEventAsync(Event @event, User user, EventUserState state)
+		{
+			await Terminal.EventDatabase.SetUserStateAsync(user.Id, @event.Id, state);
+		}
+
+		internal async Task SetEventState(Event @event, EventState state)
+		{
+			await Terminal.EventDatabase.UpdateEventAsync(@event.Id, new() { (nameof(Event.State), state) });
+			@event.State = state;
+		}
+
+		/////////
+		// Etching Helpers
+		////////////////////
+
 		internal async Task<Etching> GenerateTestEtchingAsync(Event etchedEvent, User etcher)
 		{
 			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime, testEtchingImageURL);
@@ -181,6 +213,10 @@ namespace Core.Tests.Entities
 		{
 			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched, imageURL);
 		}
+
+		//////
+		// Clean-up
+		/////////////
 
 		public async void Dispose()
 		{

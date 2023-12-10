@@ -3,11 +3,22 @@ using Core.Boundaries;
 using System.Threading.Tasks;
 using Core.Entities;
 using Xunit;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Shared;
+using System.IO;
+using System.Collections.Concurrent;
 
 namespace Core.Tests.Entities
 {
     public class EventTests
 	{
+		private TestEnvironment environment;
+
+		public EventTests()
+		{
+			environment = new TestEnvironment();
+		}
+
 		///////
 		// Composition
 		////////////////
@@ -53,15 +64,23 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public void GetFriendsOf_ReturnsFriends()
+		public async Task GetFriendsOf_ReturnsFriends()
 		{
-			
-		}
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+			var friend1 = await environment.GenerateTestUserAsync();
+			var friend2 = await environment.GenerateTestUserAsync();
+			var randomGuest = await environment.GenerateTestUserAsync();
+			await environment.ForceFriendshipAsync(user, friend1, friend2);
 
-		[Fact]
-		public void GetFriendsOf_InvalidEvent_ReturnsFriends()
-		{
-			
+			var @event = await environment.GeneratePopulatedEventAsync(host, user, friend1, friend2, randomGuest);
+
+			// Act
+			var friends = await @event.GetFriendsOf(friend2);
+
+			// Assert
+			Assert.Equal(2, friends.Count);
 		}
 
 		/////
@@ -69,147 +88,437 @@ namespace Core.Tests.Entities
 		///////////
 
 		[Fact]
-		public void IsVisibleTo_Neutral_ReturnsTrue()
+		public async Task IsVisibleTo_Neutral_ReturnsTrue()
 		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = await @event.IsVisibleTo(user);
+
+			// Assert
+			Assert.True(result);
+		}
+
+		[Fact]
+		public async Task IsVisibleTo_Blocked_ReturnsFalse()
+		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+			await environment.ForceEnemiesAsync(host, user);
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = await @event.IsVisibleTo(user);
+
+			// Assert
+			Assert.False(result);
+		}
+
+		[Fact]
+		public async Task IsJoinableTo_Neutral_ReturnsTrue()
+		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = await @event.IsJoinableBy(user);
+
+			// Assert
+			Assert.True(result);
+		}
+
+		[Fact]
+		public async Task IsJoinableTo_Blocked_ReturnsFalse()
+		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+			await environment.ForceEnemiesAsync(host, user);
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = await @event.IsJoinableBy(user);
+
+			// Assert
+			Assert.False(result);
+		}
+
+		[Fact]
+		public async Task IsModifiableBy_Host_ReturnsTrue()
+		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = @event.IsModifiableBy(host);
+
+			// Assert
+			Assert.True(result);
+		}
+
+		[Fact]
+		public async Task IsModifiableBy_Guest_ReturnsFalse()
+		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var guest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GeneratePopulatedEventAsync(host, guest);
+
+			// Act
+			var result = @event.IsModifiableBy(guest);
+
+			// Assert
+			Assert.False(result);
 			
 		}
 
 		[Fact]
-		public void IsVisibleTo_Blocked_ReturnsFalse()
+		public async Task IsModifiableBy_Neutral_ReturnsFalse()
 		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = @event.IsModifiableBy(user);
+
+			// Assert
+			Assert.False(result);
 			
 		}
 
 		[Fact]
-		public void IsJoinableTo_Neutral_ReturnsTrue()
+		public async Task IsHostedBy_Host_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = @event.IsHostedBy(host);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void IsJoinableTo_Blocked_ReturnsFalse()
+		public async Task IsHostedBy_Guest_ReturnsFalse()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var guest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GeneratePopulatedEventAsync(host, guest);
+
+			// Act
+			var result = @event.IsHostedBy(guest);
+
+			// Assert
+			Assert.False(result);
 		}
 
 		[Fact]
-		public void IsModifiableBy_Host_ReturnsTrue()
+		public async Task IsHostedBy_Neutral_ReturnsFalse()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = @event.IsHostedBy(user);
+
+			// Assert
+			Assert.False(result);
 		}
 
 		[Fact]
-		public void IsModifiableBy_Neutral_ReturnsFalse()
+		public async Task HasUserRelationship_Host_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = await @event.HasUserRelationship(host);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void IsHostedBy_Host_ReturnsTrue()
+		public async Task HasUserRelationship_Watching_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var watchingUser = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, watchingUser, EventUserState.Watching);
+
+			// Act
+			var result = await @event.HasUserRelationship(watchingUser);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void IsHostedBy_Neutral_ReturnsFalse()
+		public async Task HasUserRelationship_Incoming_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var incomingGuest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, incomingGuest, EventUserState.Incoming);
+
+			// Act
+			var result = await @event.HasUserRelationship(incomingGuest);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasUserRelationship_Host_ReturnsTrue()
+		public async Task HasUserRelationship_ActiveGuest_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var guest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, guest, EventUserState.Guest);
+
+			// Act
+			var result = await @event.HasUserRelationship(guest);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasUserRelationship_Watching_ReturnsTrue()
+		public async Task HasUserRelationship_LeftGuest_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var leftGuest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, leftGuest, EventUserState.Left);
+
+			// Act
+			var result = await @event.HasUserRelationship(leftGuest);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasUserRelationship_Incoming_ReturnsTrue()
+		public async Task HasUserRelationship_KickedGuest_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var kickedGuest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, kickedGuest, EventUserState.Kicked);
+
+			// Act
+			var result = await @event.HasUserRelationship(kickedGuest);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasUserRelationship_Guest_ReturnsTrue()
+		public async Task HasUserRelationship_Neutral_ReturnsFalse()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = await @event.HasUserRelationship(user);
+
+			// Assert
+			Assert.False(result);
 		}
 
 		[Fact]
-		public void HasUserRelationship_LeftGuest_ReturnsTrue()
+		public async Task WasAttendedBy_ActiveGuest_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var guest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, guest, EventUserState.Guest);
+
+			// Act
+			var result = await @event.WasAttendedBy(guest);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasUserRelationship_KickedGuest_ReturnsTrue()
+		public async Task WasAttendedBy_LeftGuest_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var leftGuest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, leftGuest, EventUserState.Left);
+
+			// Act
+			var result = await @event.WasAttendedBy(leftGuest);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasUserRelationship_Neutral_ReturnsFalse()
+		public async Task WasAttendedBy_KickedGuest_ReturnsFalse()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var kickedGuest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, kickedGuest, EventUserState.Kicked);
+
+			// Act
+			var result = await @event.WasAttendedBy(kickedGuest);
+
+			// Assert
+			Assert.False(result);
 		}
 
 		[Fact]
-		public void WasAttendedBy_Guest_ReturnsTrue()
+		public async Task WasAttendedBy_Neutral_ReturnsFalse()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			var result = await @event.WasAttendedBy(user);
+
+			// Assert
+			Assert.False(result);
 		}
 
 		[Fact]
-		public void WasAttendedBy_LeftGuest_ReturnsTrue()
+		public async Task IsInRange_CloseUser_ReturnsTrue()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.UpdateUserLocationAsync(user,
+				@event.Location.Latitude,
+				@event.Location.Longitude);
+
+			// Act
+			var result = await @event.IsInRange(user);
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void WasAttendedBy_KickedGuest_ReturnsFalse()
+		public async Task IsInRange_FarUser_ReturnsFalse()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.UpdateUserLocationAsync(user,
+				@event.Location.Latitude + 15,
+				@event.Location.Longitude + 15);
+
+			// Act
+			var result = await @event.IsInRange(user);
+
+			// Assert
+			Assert.False(result);
 		}
 
 		[Fact]
-		public void WasAttendedBy_Neutral_ReturnsTrue()
+		public async Task IsStartable_Upcoming_ReturnsTrue()
 		{
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
 			
+			await environment.SetEventState(@event, EventState.upcoming);
+			await environment.UpdateUserLocationAsync(host,
+				@event.Location.Latitude,
+				@event.Location.Longitude);
+
+			// Act
+			var result = await @event.IsStartable();
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void IsInRange_CloseUser_ReturnsTrue()
+		public async Task IsStartable_Started_ReturnsFalse()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			await environment.SetEventState(@event, EventState.active_open);
+
+			// Act
+			var result = await @event.IsStartable();
+
+			// Assert
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void IsInRange_FarUser_ReturnsFalse()
+		public async Task IsStartable_HostFar_ReturnsFalse()
 		{
-			
-		}
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
 
-		[Fact]
-		public void IsStartable_Upcoming_ReturnsTrue()
-		{
-			
-		}
+			await environment.UpdateUserLocationAsync(host,
+				@event.Location.Latitude + 15,
+				@event.Location.Longitude + 15);
 
-		[Fact]
-		public void IsStartable_Started_ReturnsFalse()
-		{
-			
-		}
+			// Act
+			var result = await @event.IsStartable();
 
-		[Fact]
-		public void IsStartable_HostFar_ReturnsFalse()
-		{
-			
+			// Assert
+			Assert.False(result);
 		}
 
 		//////
@@ -217,27 +526,51 @@ namespace Core.Tests.Entities
 		////////////
 
 		[Fact]
-		public void Started_Succeeds()
+		public async Task Started_Succeeds()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			await @event.Started();
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
-		public void Ended_Succeeds()
+		public async Task Ended_Succeeds()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			await @event.Started();
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
-		public void Etched_Succeeds()
+		public async Task Etched_Succeeds()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			await @event.Started();
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
-		public void Reported_Succeeds()
+		public async Task Reported_Succeeds()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var @event = await environment.GenerateTestEventAsync(host);
+
+			// Act
+			await @event.Started();
+			// If no exception is thrown, the test is successful
 		}
 
 		//////
@@ -245,15 +578,79 @@ namespace Core.Tests.Entities
 		////////////
 
 		[Fact]
-		public void NotifyActive_Succeeds()
+		public async Task NotifyActive_Succeeds()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var incomingUser = await environment.GenerateTestUserAsync();
+			var activeGuest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, incomingUser, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, activeGuest, EventUserState.Guest);
+
+			string notificationTitle = "event title";
+			string notificationMessage = "message test";
+
+			// Act
+			await @event.NotifyActive(notificationTitle, notificationMessage);
+
+			// Assert
+			ConcurrentBag<NotificationServiceStub.NotificationStub> incomingUserMessages;
+			NotificationServiceStub.messages.TryGetValue(incomingUser.Id.ToString(), out incomingUserMessages);
+			Assert.Single(incomingUserMessages);
+
+			NotificationServiceStub.NotificationStub notification;
+			incomingUserMessages.TryTake(out notification);
+			Assert.Equal(notificationTitle, notification.Title);
+			Assert.Equal(notificationMessage, notification.Message);
+
+			ConcurrentBag<NotificationServiceStub.NotificationStub> incomingGuestMessages;
+			NotificationServiceStub.messages.TryGetValue(activeGuest.Id.ToString(), out incomingGuestMessages);
+			Assert.Single(incomingGuestMessages);
+
+			incomingGuestMessages.TryTake(out notification);
+			Assert.Equal(notificationTitle, notification.Title);
+			Assert.Equal(notificationMessage, notification.Message);
 		}
 
 		[Fact]
-		public void NotifyGuests_Succeeds()
+		public async Task NotifyGuests_Succeeds()
 		{
-			
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var incomingUser = await environment.GenerateTestUserAsync();
+			var activeGuest = await environment.GenerateTestUserAsync();
+			var leftGuest = await environment.GenerateTestUserAsync();
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			await environment.AddUserToEventAsync(@event, incomingUser, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, activeGuest, EventUserState.Guest);
+			await environment.AddUserToEventAsync(@event, leftGuest, EventUserState.Left);
+
+			string notificationTitle = "event title";
+			string notificationMessage = "message test";
+
+			// Act
+			await @event.NotifyGuests(notificationTitle, notificationMessage);
+
+			// Assert
+			ConcurrentBag<NotificationServiceStub.NotificationStub> incomingUserMessages;
+			NotificationServiceStub.messages.TryGetValue(incomingUser.Id.ToString(), out incomingUserMessages);
+			Assert.Empty(incomingUserMessages);
+
+			ConcurrentBag<NotificationServiceStub.NotificationStub> incomingGuestMessages;
+			NotificationServiceStub.messages.TryGetValue(activeGuest.Id.ToString(), out incomingGuestMessages);
+			Assert.Single(incomingGuestMessages);
+
+			NotificationServiceStub.NotificationStub notification;
+			incomingGuestMessages.TryTake(out notification);
+			Assert.Equal(notificationTitle, notification.Title);
+			Assert.Equal(notificationMessage, notification.Message);
+
+			ConcurrentBag<NotificationServiceStub.NotificationStub> leftGuestMessages;
+			NotificationServiceStub.messages.TryGetValue(incomingUser.Id.ToString(), out leftGuestMessages);
+			Assert.Empty(leftGuestMessages);
 		}
 	}
 }
