@@ -205,27 +205,27 @@ namespace Core.Tests.Entities
 		public async Task GetUserFeedAsync_ExcludingEvent_ReturnsFeed()
 		{
 			// Arrange
-			var hostA = await environment.GenerateTestUserAsync();
-			var hostB = await environment.GenerateTestUserAsync();
+			var host1 = await environment.GenerateTestUserAsync();
+			var host2 = await environment.GenerateTestUserAsync();
 			var friend = await environment.GenerateTestUserAsync();
-			await environment.ForceFriendshipAsync(hostA, hostB, friend);
+			await environment.ForceFriendshipAsync(host1, host2, friend);
 
-			var eventA = await environment.GenerateTestEventAsync(hostA);
-			var seenEtching = await environment.GenerateTestEtchingAsync(eventA, hostA);
+			var event1 = await environment.GenerateTestEventAsync(host1);
+			var seenEtching = await environment.GenerateTestEtchingAsync(event1, host1);
 
-			var eventB = await environment.GenerateTestEventAsync(hostB);
-			var unseenEtching = await environment.GenerateTestEtchingAsync(eventA, hostB);
+			var event2 = await environment.GenerateTestEventAsync(host2);
+			var unseenEtching = await environment.GenerateTestEtchingAsync(event1, host2);
 
 			// Act
-			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue, new() { eventA.Id });
+			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue, new() { event1.Id });
 
 			// Assert
 			Assert.Single(feedHeaders);
-			Assert.Equal(eventB.Id, feedHeaders[0].Id);
+			Assert.Equal(event2.Id, feedHeaders[0].Id);
 
 			Assert.Single(feedEtchings);
 			var serverSomeEtching = feedEtchings.Find(etching => etching.Id.Equals(unseenEtching.Id));
-			Assert.Equal(eventB.Id, serverSomeEtching.EventId);
+			Assert.Equal(event2.Id, serverSomeEtching.EventId);
 			Assert.Equal(unseenEtching.Id, serverSomeEtching.Id);
 		}
 	}

@@ -103,7 +103,21 @@ namespace Core.Tests.Entities
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDirector.FollowUserAsync(user.Id, otherUser.Id);
+					await Terminal.ProfileDatabase.FollowUserAsync(user.Id, otherUser.Id);
+				}
+			}
+		}
+
+		internal async Task ForceEnemiesAsync(params User[] users)
+		{
+			foreach (var user in users)
+			{
+				foreach (var otherUser in users)
+				{
+					if (user.Equals(otherUser))
+					{ continue; }
+
+					await Terminal.ProfileDatabase.BlockUserAsync(user.Id, otherUser.Id);
 				}
 			}
 		}
