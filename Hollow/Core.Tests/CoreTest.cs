@@ -8,22 +8,30 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-	public class CoreTest : IAsyncLifetime
+	public class CoreTest : IAsyncLifetime, IDisposable
 	{
+		private static int instanceCount = 0;
+		
 		protected readonly CoreEnvironment environment;
 
 		public CoreTest()
 		{
+			instanceCount++;
+
 			environment = new();
 		}
 
 		public async Task InitializeAsync()
 		{ }
 
-		public Task DisposeAsync()
+		public async Task DisposeAsync()
+		{ }
+
+		public void Dispose()
 		{
-			environment.Dispose();
-			return Task.CompletedTask;
+			GC.SuppressFinalize(this);
+			if (--instanceCount == 0)
+			{ environment.DisposeEnvironment(); }
 		}
 	}
 }

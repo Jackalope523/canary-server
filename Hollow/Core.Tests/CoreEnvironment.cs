@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace Core.Tests.Entities
 {
-	public class CoreEnvironment : IDisposable
+	public class CoreEnvironment
 	{
 		public CoreTerminal Terminal;
 
@@ -45,7 +45,7 @@ namespace Core.Tests.Entities
 		/////
 		// Set-up
 		///////////
-		
+
 		public CoreEnvironment()
 		{
 			// Arrange Core
@@ -58,16 +58,6 @@ namespace Core.Tests.Entities
 		///////
 		// User Helpers
 		/////////////////
-
-		internal User CreateUser(User user)
-		{
-			var userIncrement = uniqueUserIncrement++;
-
-			User userStub = new(user.ToUserShard())
-				{ Id = (ulong) userIncrement };
-
-			return userStub;
-		}
 
 		internal User CreateTestUser()
 		{
@@ -281,11 +271,11 @@ namespace Core.Tests.Entities
 		// Clean-up
 		/////////////
 
-		public async void Dispose()
+		public async void DisposeEnvironment()
 		{
-			GC.SuppressFinalize(this);
+			var executioner = GenerateUniqueUserAsync();
 
-			for (int id = 0; id <= uniqueUserIncrement; id++)
+			for (int id = 0; id <= executioner.Id; id++)
 			{
 				_ = Terminal.AccountDatabase.DeleteUserAsync((ulong) id);
 			}
