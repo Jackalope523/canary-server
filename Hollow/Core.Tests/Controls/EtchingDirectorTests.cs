@@ -179,7 +179,54 @@ namespace Core.Tests.Entities
 		[Fact]
 		public async Task GetUserFeedAsync_ReturnsFeed()
 		{
-			Assert.True(false); // Big TODO
+			// Arrange
+			var host = await environment.GenerateTestUserAsync();
+			var friend = await environment.GenerateTestUserAsync();
+			await environment.ForceFriendshipAsync(host, friend);
+
+			var @event = await environment.GenerateTestEventAsync(host);
+			var someEtching = await environment.GenerateTestEtchingAsync(@event, host);
+			var anotherEtching = await environment.GenerateTestEtchingAsync(@event, host);
+
+			// Act
+			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue);
+
+			// Assert
+			Assert.Single(feedHeaders);
+			Assert.Equal(@event.Id, feedHeaders[0].Id);
+
+			Assert.Equal(2, feedEtchings.Count);
+			var serverSomeEtching = feedEtchings.Find(etching => etching.Id.Equals(someEtching.Id));
+			Assert.Equal(@event.Id, serverSomeEtching.EventId);
+			Assert.Equal(someEtching.Id, serverSomeEtching.Id);
+		}
+
+		[Fact]
+		public async Task GetUserFeedAsync_ExcludingEvent_ReturnsFeed()
+		{
+			// Arrange
+			var hostA = await environment.GenerateTestUserAsync();
+			var hostB = await environment.GenerateTestUserAsync();
+			var friend = await environment.GenerateTestUserAsync();
+			await environment.ForceFriendshipAsync(hostA, hostB, friend);
+
+			var eventA = await environment.GenerateTestEventAsync(hostA);
+			var seenEtching = await environment.GenerateTestEtchingAsync(eventA, hostA);
+
+			var eventB = await environment.GenerateTestEventAsync(hostB);
+			var unseenEtching = await environment.GenerateTestEtchingAsync(eventA, hostB);
+
+			// Act
+			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue, new() { eventA.Id });
+
+			// Assert
+			Assert.Single(feedHeaders);
+			Assert.Equal(eventB.Id, feedHeaders[0].Id);
+
+			Assert.Single(feedEtchings);
+			var serverSomeEtching = feedEtchings.Find(etching => etching.Id.Equals(unseenEtching.Id));
+			Assert.Equal(eventB.Id, serverSomeEtching.EventId);
+			Assert.Equal(unseenEtching.Id, serverSomeEtching.Id);
 		}
 	}
 }

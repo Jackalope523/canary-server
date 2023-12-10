@@ -94,6 +94,20 @@ namespace Core.Tests.Entities
 			return new(user);
 		}
 
+		internal async Task ForceFriendshipAsync(params User[] users)
+		{
+			foreach (var user in users)
+			{
+				foreach (var otherUser in users)
+				{
+					if (user.Equals(otherUser))
+					{ continue; }
+
+					await Terminal.ProfileDirector.FollowUserAsync(user.Id, otherUser.Id);
+				}
+			}
+		}
+
 		internal Event CreateTestEvent(User host)
 		{
 			Event eventStub = new()
