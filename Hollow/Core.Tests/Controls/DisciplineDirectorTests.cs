@@ -9,38 +9,21 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-    public class DisciplineDirectorTests : IAsyncLifetime
+    public class DisciplineDirectorTests : CoreTest
     {
-        private TestEnvironment environment;
 		private DisciplineDirector director;
-
-		private User testUser;
-		private Event testEvent;
 
         public DisciplineDirectorTests()
         {
-            environment = new();
 			director = environment.Terminal.DisciplineDirector;
         }
-
-		public async Task InitializeAsync()
-		{
-			testUser = await environment.GenerateTestUserAsync();
-			testEvent = await environment.GenerateTestEventAsync(testUser);
-		}
-
-		public Task DisposeAsync()
-		{
-			environment.Dispose();
-			return Task.CompletedTask;
-		}
 
 		[Fact]
 		public async Task ReportUserAsync_ValidUser_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
-			var reportedUser = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var reportedUser = await environment.GenerateUniqueUserAsync();
 			UserReportType report = UserReportType.rude;
 			string reportDetails = "detailed report";
 
@@ -57,8 +40,8 @@ namespace Core.Tests.Entities
 		public async Task ReportUserAsync_MultipleReports_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
-			var reportedUser = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var reportedUser = await environment.GenerateUniqueUserAsync();
 			UserReportType report = UserReportType.rude;
 			string reportDetails = "detailed report";
 
@@ -75,9 +58,9 @@ namespace Core.Tests.Entities
 		public async Task ReportEventAsync_ValidEvent_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
-			var reportedHost = await environment.GenerateTestUserAsync();
-			var reportedEvent = await environment.GenerateTestEventAsync(reportedHost);
+			var user = await environment.GenerateUniqueUserAsync();
+			var reportedHost = await environment.GenerateUniqueUserAsync();
+			var reportedEvent = await environment.GenerateEventAsync(reportedHost);
 			EventReportType report = EventReportType.misleading;
 			string reportDetails = "detailed report";
 
@@ -98,7 +81,7 @@ namespace Core.Tests.Entities
 		public async Task PenaliseUserAsync_ValidUser_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			PenaltyType penalty = PenaltyType.tmp;
 			DateTimeOffset timeOfPenalty = new DateTime(0);
 

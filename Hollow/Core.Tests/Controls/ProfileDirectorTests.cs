@@ -8,31 +8,14 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-    public class ProfileDirectorTests : IAsyncLifetime
+    public class ProfileDirectorTests : CoreTest
     {
-        private TestEnvironment environment;
 		private ProfileDirector director;
-
-		private User testUser;
-		private Event testEvent;
 
         public ProfileDirectorTests()
         {
-            environment = new();
 			director = environment.Terminal.ProfileDirector;
         }
-
-		public async Task InitializeAsync()
-		{
-			testUser = await environment.GenerateTestUserAsync();
-			testEvent = await environment.GenerateTestEventAsync(testUser);
-		}
-
-		public Task DisposeAsync()
-		{
-			environment.Dispose();
-			return Task.CompletedTask;
-		}
 
 		[Fact]
 		public async Task GetUserProfileAsync_Self_ReturnsProfile()

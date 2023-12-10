@@ -8,38 +8,26 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-    public class AccountDirectorTests : IAsyncLifetime
+    public class AccountDirectorTests : CoreTest
     {
-        private TestEnvironment environment;
 		private AccountDirector director;
-
-		private User testUser;
 
         public AccountDirectorTests()
         {
-            environment = new();
 			director = environment.Terminal.AccountDirector;
         }
-
-		public async Task InitializeAsync()
-		{
-			testUser = await environment.GenerateTestUserAsync();
-		}
-
-		public Task DisposeAsync()
-		{
-			environment.Dispose();
-			return Task.CompletedTask;
-		}
 
 		[Fact]
 		public async Task GetUserAsync_ValidId_ReturnsUser()
 		{
+			// Arrange
+			var randomUser = await environment.GenerateUniqueUserAsync();
+
 			// Act
-			var user = await director.GetUserAsync(testUser.Id);
+			var user = await director.GetUserAsync(randomUser.Id);
 
 			// Assert
-			Assert.True(testUser.Equals(user));
+			Assert.True(randomUser.Equals(user));
 		}
 
 		[Fact]
@@ -55,11 +43,14 @@ namespace Core.Tests.Entities
 		[Fact]
 		public async Task GetUserAsync_ValidPhoneNumber_ReturnsUser()
 		{
+			// Arrange
+			var randomUser = await environment.GenerateUniqueUserAsync();
+
 			// Act
-			var user = await director.GetUserAsync(testUser.PhoneNumber);
+			var user = await director.GetUserAsync(randomUser.PhoneNumber);
 
 			// Assert
-			Assert.True(testUser.Equals(user));
+			Assert.True(randomUser.Equals(user));
 		}
 
 		[Fact]
@@ -87,9 +78,12 @@ namespace Core.Tests.Entities
 		[Fact]
 		public async Task CreateUserAsync_ExistingUser_ThrowsException()
 		{
+			// Arrange
+			var randomUser = await environment.GenerateUniqueUserAsync();
+
 			// Act
-			var userSync = director.CreateUserAsync(testUser.PhoneNumber,
-				testUser.Email, testUser.Name, testUser.DateOfBirth);
+			var userSync = director.CreateUserAsync(randomUser.PhoneNumber,
+				randomUser.Email, randomUser.Name, randomUser.DateOfBirth);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await userSync);
@@ -99,7 +93,7 @@ namespace Core.Tests.Entities
 		public async Task EditUserAsync_ValidInput_UpdatesUser()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			string newName = "Henry Old Boy";
 
 			// Act
@@ -114,7 +108,7 @@ namespace Core.Tests.Entities
 		public async Task DeleteUserAsync_ValidUser_DeletesUser()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
 			await director.DeleteUserAsync(user.Id);
@@ -127,7 +121,7 @@ namespace Core.Tests.Entities
 		public async Task UpdateUserLocationAsync_UpdatesLocation()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			await user.LastKnownLocation.Sync();
 			GeoLocation newLocation = new() { Latitude = -1, Longitude = -1 };
 

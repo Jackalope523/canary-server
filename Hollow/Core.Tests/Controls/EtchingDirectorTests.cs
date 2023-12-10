@@ -8,40 +8,23 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-    public class EtchingDirectorTests : IAsyncLifetime
+    public class EtchingDirectorTests : CoreTest
     {
-        private TestEnvironment environment;
 		private EtchingDirector director;
-
-		private User testUser;
-		private Event testEvent;
 
         public EtchingDirectorTests()
         {
-            environment = new();
 			director = environment.Terminal.EtchingDirector;
         }
-
-		public async Task InitializeAsync()
-		{
-			testUser = await environment.GenerateTestUserAsync();
-			testEvent = await environment.GenerateTestEventAsync(testUser);
-		}
-
-		public Task DisposeAsync()
-		{
-			environment.Dispose();
-			return Task.CompletedTask;
-		}
 
 		[Fact]
 		public async Task GetEventEtchingsAsync_HostedEvent_ReturnsEtchings()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var @event = await environment.GenerateTestEventAsync(host);
-			await environment.GenerateTestEtchingAsync(@event, host);
-			await environment.GenerateTestEtchingAsync(@event, host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host);
+			await environment.GenerateEtchingAsync(@event, host);
+			await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
 			var serverEtchings = await director.GetEventEtchingsAsync(host.Id, @event.Id);
@@ -54,11 +37,11 @@ namespace Core.Tests.Entities
 		public async Task GetEventEtchingsAsync_GuestAtEvent_ReturnsEtchings()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var guest = await environment.GenerateTestUserAsync();
-			var @event = await environment.GeneratePopulatedEventAsync(host, guest);
-			await environment.GenerateTestEtchingAsync(@event, host);
-			await environment.GenerateTestEtchingAsync(@event, host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var guest = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host, guest);
+			await environment.GenerateEtchingAsync(@event, host);
+			await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
 			var serverEtchings = await director.GetEventEtchingsAsync(guest.Id, @event.Id);
@@ -71,11 +54,11 @@ namespace Core.Tests.Entities
 		public async Task GetEventEtchingsAsync_InvalidEvent_Fails()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var sneakyUser = await environment.GenerateTestUserAsync();
-			var @event = await environment.GenerateTestEventAsync(host);
-			await environment.GenerateTestEtchingAsync(@event, host);
-			await environment.GenerateTestEtchingAsync(@event, host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var sneakyUser = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host);
+			await environment.GenerateEtchingAsync(@event, host);
+			await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
 			var serverEtchings = director.GetEventEtchingsAsync(sneakyUser.Id, @event.Id);
@@ -88,9 +71,9 @@ namespace Core.Tests.Entities
 		public async Task AddEtchingAsync_GuestAtEvent_Succeeds()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var guest = await environment.GenerateTestUserAsync();
-			var @event = await environment.GeneratePopulatedEventAsync(host, guest);
+			var host = await environment.GenerateUniqueUserAsync();
+			var guest = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host, guest);
 			string etchingImageURL = "https://cdn.sparrow.com/0";
 
 			// Act
@@ -106,9 +89,9 @@ namespace Core.Tests.Entities
 		public async Task AddEtchingAsync_InvalidEvent_Fails()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var sneakyUser = await environment.GenerateTestUserAsync();
-			var @event = await environment.GenerateTestEventAsync(host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var sneakyUser = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host);
 			string etchingImageURL = "https://cdn.sparrow.com/0";
 
 			// Act
@@ -122,9 +105,9 @@ namespace Core.Tests.Entities
 		public async Task RemoveEtchingAsync_OwnedEtching_Succeeds()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var @event = await environment.GenerateTestEventAsync(host);
-			var etching = await environment.GenerateTestEtchingAsync(@event, host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host);
+			var etching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
 			await director.RemoveEtchingAsync(host.Id, etching.Id);
@@ -138,10 +121,10 @@ namespace Core.Tests.Entities
 		public async Task RemoveEtchingAsync_UnownedEtching_Fails()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var sneakyUser = await environment.GenerateTestUserAsync();
-			var @event = await environment.GenerateTestEventAsync(host);
-			var etching = await environment.GenerateTestEtchingAsync(@event, host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var sneakyUser = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host);
+			var etching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
 			var removeEtchingSync = director.RemoveEtchingAsync(sneakyUser.Id, etching.Id);
@@ -154,11 +137,11 @@ namespace Core.Tests.Entities
 		public async Task RateEtchingAsync_ValidEtching_Succeeds()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var guest = await environment.GenerateTestUserAsync();
-			var @event = await environment.GeneratePopulatedEventAsync(host, guest);
-			var coolEtching = await environment.GenerateTestEtchingAsync(@event, host);
-			var uglyEtching = await environment.GenerateTestEtchingAsync(@event, host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var guest = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateEventAsync(host, guest);
+			var coolEtching = await environment.GenerateEtchingAsync(@event, host);
+			var uglyEtching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
 			await director.RateEtchingAsync(guest.Id, coolEtching.Id, UserRating.Positive);
@@ -180,13 +163,13 @@ namespace Core.Tests.Entities
 		public async Task GetUserFeedAsync_ReturnsFeed()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var friend = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host, friend);
 
-			var @event = await environment.GenerateTestEventAsync(host);
-			var someEtching = await environment.GenerateTestEtchingAsync(@event, host);
-			var anotherEtching = await environment.GenerateTestEtchingAsync(@event, host);
+			var @event = await environment.GenerateEventAsync(host);
+			var someEtching = await environment.GenerateEtchingAsync(@event, host);
+			var anotherEtching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
 			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue);
@@ -205,16 +188,16 @@ namespace Core.Tests.Entities
 		public async Task GetUserFeedAsync_ExcludingEvent_ReturnsFeed()
 		{
 			// Arrange
-			var host1 = await environment.GenerateTestUserAsync();
-			var host2 = await environment.GenerateTestUserAsync();
-			var friend = await environment.GenerateTestUserAsync();
+			var host1 = await environment.GenerateUniqueUserAsync();
+			var host2 = await environment.GenerateUniqueUserAsync();
+			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host1, host2, friend);
 
-			var event1 = await environment.GenerateTestEventAsync(host1);
-			var seenEtching = await environment.GenerateTestEtchingAsync(event1, host1);
+			var event1 = await environment.GenerateEventAsync(host1);
+			var seenEtching = await environment.GenerateEtchingAsync(event1, host1);
 
-			var event2 = await environment.GenerateTestEventAsync(host2);
-			var unseenEtching = await environment.GenerateTestEtchingAsync(event1, host2);
+			var event2 = await environment.GenerateEventAsync(host2);
+			var unseenEtching = await environment.GenerateEtchingAsync(event1, host2);
 
 			// Act
 			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue, new() { event1.Id });

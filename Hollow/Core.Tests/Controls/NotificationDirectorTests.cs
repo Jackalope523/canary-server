@@ -9,29 +9,14 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-    public class NotificationDirectorTests : IAsyncLifetime
+    public class NotificationDirectorTests : CoreTest
     {
-        private TestEnvironment environment;
 		private NotificationDirector director;
-
-		private User testUser;
 
         public NotificationDirectorTests()
         {
-            environment = new();
 			director = environment.Terminal.NotificationDirector;
         }
-
-		public async Task InitializeAsync()
-		{
-			testUser = await environment.GenerateTestUserAsync();
-		}
-
-		public Task DisposeAsync()
-		{
-			environment.Dispose();
-			return Task.CompletedTask;
-		}
 
 		/////
 		// Notes
@@ -41,13 +26,14 @@ namespace Core.Tests.Entities
 		public async Task GetNotesAsync_ReturnsNotes()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var noter = await environment.GenerateUniqueUserAsync();
 			string message = "message", action = "action";
 			int messageCount = 3;
 
 			// Act
 			for (int i = 0; i < messageCount; i++)
-			{ await environment.Terminal.NotificationDatabase.SaveNoteAsync(user.Id, testUser.Id, new DateTime(0), message, action); }
+			{ await environment.SaveNoteAsync(user, noter, message, action); }
 			
 			// Assert
 			var notes = await director.GetNotesAsync(user.Id);
@@ -58,11 +44,12 @@ namespace Core.Tests.Entities
 		public async Task PostNoteAsync_ValidUsers_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var noter = await environment.GenerateUniqueUserAsync();
 			string message = "message", action = "action";
 
 			// Act
-			await director.PostNoteAsync(user, testUser, message, action);
+			await director.PostNoteAsync(user, noter, message, action);
 
 			// Assert
 			var notes = await director.GetNotesAsync(user.Id);
@@ -75,9 +62,9 @@ namespace Core.Tests.Entities
 		public async Task PostNoteAsync_BlockedUsers_Drops()
 		{
 			// Arrange
-			var userA = await environment.GenerateTestUserAsync();
-			var userB = await environment.GenerateTestUserAsync();
-			await environment.Terminal.ProfileDirector.BlockUserAsync(userA.Id, userB.Id);
+			var userA = await environment.GenerateUniqueUserAsync();
+			var userB = await environment.GenerateUniqueUserAsync();
+			await environment.ForceEnemiesAsync(userA, userB);
 			string message = "message", action = "action";
 
 			// Act
@@ -96,13 +83,13 @@ namespace Core.Tests.Entities
 		public async Task SubscribeUserAsync_ValidUser_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
 			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
 
 			// Assert
-			var subscription = await environment.Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
+			var subscription = await environment.GetUserSubscriptionAsync(user);
 			Assert.False(string.IsNullOrEmpty(subscription.DeviceToken));
 		}
 
@@ -110,7 +97,7 @@ namespace Core.Tests.Entities
 		public async Task SubscribeUserAsync_SubscribedUser_Drops()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
 
 			// Act
@@ -122,14 +109,14 @@ namespace Core.Tests.Entities
 		public async Task UnsubscribeUserAsync_ValidUser_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
 
 			// Act
 			await director.UnsubscribeUserAsync(user.Id);
 
 			// Assert
-			var subscription = await environment.Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
+			var subscription = await environment.GetUserSubscriptionAsync(user);
 			Assert.True(string.IsNullOrEmpty(subscription.DeviceToken));
 		}
 
@@ -137,7 +124,7 @@ namespace Core.Tests.Entities
 		public async Task UnsubscribeUserAsync_UnsubscribedUser_Drops()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
 			await director.UnsubscribeUserAsync(user.Id);
@@ -148,7 +135,7 @@ namespace Core.Tests.Entities
 		public async Task NotifyUserAsync_SubscribedUser_Succeeds()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
 			string notificationTitle = "title", notificationBody = "body";
 
@@ -158,12 +145,10 @@ namespace Core.Tests.Entities
 			// Assert
 			Assert.True(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
 
-			ConcurrentBag<NotificationServiceStub.NotificationStub> userMessages;
-			NotificationServiceStub.messages.TryGetValue(user.Id.ToString(), out userMessages);
-			Assert.True(userMessages.Count == 1);
+			var userMessages = environment.GetUserMessages(user);
+			Assert.Single(userMessages);
 
-			NotificationServiceStub.NotificationStub notification;
-			userMessages.TryTake(out notification);
+			var notification = userMessages[0];
 			Assert.Equal(notificationTitle, notification.Title);
 			Assert.Equal(notificationBody, notification.Message);
 		}
@@ -172,7 +157,7 @@ namespace Core.Tests.Entities
 		public async Task NotifyUserAsync_UnsubscribedUser_Drops()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
 			await director.NotifyUserAsync(user, "", "");

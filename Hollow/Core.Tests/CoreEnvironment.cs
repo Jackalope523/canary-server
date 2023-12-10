@@ -13,37 +13,40 @@ using NetTopologySuite.Utilities;
 using System.ComponentModel;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace Core.Tests.Entities
 {
-	public class TestEnvironment : IDisposable
+	public class CoreEnvironment : IDisposable
 	{
 		public CoreTerminal Terminal;
 
-		private static int testUserIncrement = 0;
+		private static int uniqueUserIncrement = 0;
 		private string testUserPhoneNumberFormat = "000-000-{0}";
 		private string testUserEmailFormat = "email_{0}@test.com";
 		private string testUserName = "name";
 		private DateTimeOffset subjectDateOfBirth = new(new DateTime(0));
 		private DateTimeOffset testJoinDate = new(new DateTime(0));
 
+		private static double uniqueEventDegree = -89;
 		private string testEventName = "event1";
 		private string testEventDescription = "The first of many.";
-		private DateTimeOffset testEventStartTime = new(new DateTime(0));
-		private GeoLocation testEventLocation = new() { Latitude = 10, Longitude = 10 };
+		private DateTimeOffset testEventStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
+		private GeoLocation testEventLocation = new() { Latitude = 0, Longitude = 0 };
 		private int testEventGroupMinimum = 0;
 		private int testEventGroupMaximum = 10;
 		private Distance testEventRadius = new() { Kilometres = 1 };
 		private bool testEventIsDynamic = false;
 
-		private DateTimeOffset testEtchingTime = new(new DateTime(0));
+		private DateTimeOffset testEtchingTime = new(DateTime.UtcNow);
 		private string testEtchingImageURL = "https://cdn.sparrow.com/101";
 
 		/////
 		// Set-up
 		///////////
 		
-		public TestEnvironment()
+		public CoreEnvironment()
 		{
 			// Arrange Core
 			Terminal = CoreTerminal.CreateTerminal(QueryStore.AccountDatabaseAccess, QueryStore.EventDatabaseAccess,
@@ -58,7 +61,7 @@ namespace Core.Tests.Entities
 
 		internal User CreateUser(User user)
 		{
-			var userIncrement = testUserIncrement++;
+			var userIncrement = uniqueUserIncrement++;
 
 			User userStub = new(user.ToUserShard())
 				{ Id = (ulong) userIncrement };
@@ -68,7 +71,7 @@ namespace Core.Tests.Entities
 
 		internal User CreateTestUser()
 		{
-			var userIncrement = testUserIncrement++;
+			var userIncrement = uniqueUserIncrement++;
 
 			User userStub = new()
 			{
@@ -82,13 +85,6 @@ namespace Core.Tests.Entities
 			return userStub;
 		}
 
-		internal async Task<User> GenerateTestUserAsync()
-		{
-			var userStub = CreateTestUser();
-
-			return await GenerateUserUnsafeAsync(userStub);
-		}
-
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
 		{
 			bool success = await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
@@ -100,6 +96,13 @@ namespace Core.Tests.Entities
 			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
 
 			return new(user);
+		}
+
+		internal async Task<User> GenerateUniqueUserAsync()
+		{
+			var userStub = CreateTestUser();
+
+			return await GenerateUserUnsafeAsync(userStub);
 		}
 
 		internal async Task UpdateUserLocationAsync(User user, double latitude, double longitude, double radius = 1)
@@ -157,13 +160,6 @@ namespace Core.Tests.Entities
 			return eventStub;
 		}
 
-		internal async Task<Event> GenerateTestEventAsync(User host)
-		{
-			var eventStub = CreateTestEvent(host);
-
-			return await GenerateEventUnsafeAsync(eventStub, host);
-		}
-
 		internal async Task<Event> GenerateEventUnsafeAsync(Event eventStub, User host)
 		{
 			return new(await Terminal.EventDatabase.CreateEventAsync(host.Id, eventStub.Name, eventStub.Description,
@@ -172,9 +168,16 @@ namespace Core.Tests.Entities
 				eventStub.Radius.Kilometres, eventStub.IsDynamic));
 		}
 
-		internal async Task<Event> GeneratePopulatedEventAsync(User host, params User[] guests)
+		internal async Task<Event> GenerateEventAsync(User host)
 		{
-			var eventStub = await GenerateTestEventAsync(host);
+			var eventStub = CreateTestEvent(host);
+
+			return await GenerateEventUnsafeAsync(eventStub, host);
+		}
+
+		internal async Task<Event> GenerateEventAsync(User host, params User[] guests)
+		{
+			var eventStub = await GenerateEventAsync(host);
 
 			foreach (var guest in guests)
 			{
@@ -182,6 +185,45 @@ namespace Core.Tests.Entities
 			}
 
 			return eventStub;
+		}
+
+		internal async Task<Event> GenerateUniqueEventAsync(User host, params User[] guests)
+		{
+			var eventStub = CreateTestEvent(host);
+			eventStub.Location = new() { Latitude = uniqueEventDegree++, Longitude = uniqueEventDegree++ };
+
+			if (uniqueEventDegree > 80)
+			{ uniqueEventDegree = -89.5; }
+
+			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
+
+			foreach (var guest in guests)
+			{
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Guest);
+			}
+
+			return eventStub;
+		}
+
+		internal async Task<List<Event>> GenerateMultipleUniqueEventAsync(params User[] hosts)
+		{
+			double currentDegree = uniqueEventDegree++;
+			GeoLocation location = new() { Latitude = currentDegree, Longitude = currentDegree };
+
+			if (uniqueEventDegree > 80)
+			{ uniqueEventDegree = -89.5; }
+
+			List<Event> events = new();
+
+			foreach (var host in hosts)
+			{
+				var eventStub = CreateTestEvent(host);
+				eventStub.Location = location;
+
+				events.Add(await GenerateEventUnsafeAsync(eventStub, host));
+			}
+
+			return events;
 		}
 
 		internal async Task AddUserToEventAsync(Event @event, User user, EventUserState state)
@@ -199,7 +241,7 @@ namespace Core.Tests.Entities
 		// Etching Helpers
 		////////////////////
 
-		internal async Task<Etching> GenerateTestEtchingAsync(Event etchedEvent, User etcher)
+		internal async Task<Etching> GenerateEtchingAsync(Event etchedEvent, User etcher)
 		{
 			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime, testEtchingImageURL);
 		}
@@ -214,6 +256,27 @@ namespace Core.Tests.Entities
 			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched, imageURL);
 		}
 
+		///////////
+		// Notification Helpers
+		/////////////////////////
+		
+		internal async Task SaveNoteAsync(User user, User notifier, string message, string action)
+		{
+			await Terminal.NotificationDatabase.SaveNoteAsync(user.Id, notifier.Id, new DateTime(0), message, action);
+		}
+
+		internal async Task<(DeviceType DeviceType, string DeviceToken)> GetUserSubscriptionAsync(User user)
+		{
+			return await Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
+		}
+
+		internal List<NotificationServiceStub.NotificationStub> GetUserMessages(User user)
+		{
+			ConcurrentBag<NotificationServiceStub.NotificationStub> userMessages;
+			var exists = NotificationServiceStub.messages.TryGetValue(user.Id.ToString(), out userMessages);
+			return exists ? userMessages.ToList() : new();
+		}
+
 		//////
 		// Clean-up
 		/////////////
@@ -222,7 +285,7 @@ namespace Core.Tests.Entities
 		{
 			GC.SuppressFinalize(this);
 
-			for (int id = 0; id <= testUserIncrement; id++)
+			for (int id = 0; id <= uniqueUserIncrement; id++)
 			{
 				_ = Terminal.AccountDatabase.DeleteUserAsync((ulong) id);
 			}

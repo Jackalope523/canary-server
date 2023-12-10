@@ -6,9 +6,8 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-    public class UserTests
+    public class UserTests : CoreTest
     {
-
 		///////
 		// Composition
 		////////////////

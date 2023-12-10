@@ -8,53 +8,55 @@ using Xunit;
 
 namespace Core.Tests.Entities
 {
-    public class EventDirectorTests : IAsyncLifetime
+    public class EventDirectorTests : CoreTest
     {
-        private TestEnvironment environment;
 		private EventDirector director;
-
-		private User testUser;
-		private Event testEvent;
-
-		private DateTimeOffset testStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
 
         public EventDirectorTests()
         {
-            environment = new();
 			director = environment.Terminal.EventDirector;
         }
 
-		public async Task InitializeAsync()
+		[Fact]
+		public async Task GetEventInformationAsync_Host_ReturnsEvent()
 		{
-			testUser = await environment.GenerateTestUserAsync();
-			testEvent = await environment.GenerateTestEventAsync(testUser);
-		}
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
 
-		public Task DisposeAsync()
-		{
-			environment.Dispose();
-			return Task.CompletedTask;
+			var @event = await environment.GenerateEventAsync(host);
+
+			// Act
+			var returnedEvent = await director.GetEventInformationAsync(host.Id, @event.Id);
+
+			// Assert
+			Assert.True(@event.Equals(returnedEvent));
 		}
 
 		[Fact]
-		public async Task GetEventInformationAsync_ReturnsEvent()
+		public async Task GetEventInformationAsync_Neutral_ReturnsEvent()
 		{
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateEventAsync(host);
+
 			// Act
-			var @event = await director.GetEventInformationAsync(testUser.Id, testEvent.Id);
+			var returnedEvent = await director.GetEventInformationAsync(user.Id, @event.Id);
 
 			// Assert
-			Assert.True(testEvent.Equals(@event));
+			Assert.True(@event.Equals(returnedEvent));
 		}
 
 		[Fact]
 		public async Task GetEventInformationAsync_BlockedEvent_Fails()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var user = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @event = await environment.GenerateTestEventAsync(host);
+			var @event = await environment.GenerateEventAsync(host);
 
 			// Act
 			var returnedEvent = director.GetEventInformationAsync(user.Id, @event.Id);
@@ -67,10 +69,10 @@ namespace Core.Tests.Entities
 		public async Task GetEventsInAreaAsync_ReturnsEvent()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var user = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateTestEventAsync(host);
+			var @event = await environment.GenerateUniqueEventAsync(host);
 
 			// Act
 			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, @event.Location.Latitude, @event.Location.Longitude, 10);
@@ -83,15 +85,14 @@ namespace Core.Tests.Entities
 		public async Task GetEventsInAreaAsync_MultipleEvents_ReturnsEvents()
 		{
 			// Arrange
-			var host1 = await environment.GenerateTestUserAsync();
-			var host2 = await environment.GenerateTestUserAsync();
-			var user = await environment.GenerateTestUserAsync();
+			var host1 = await environment.GenerateUniqueUserAsync();
+			var host2 = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
-			var event1 = await environment.GenerateTestEventAsync(host1);
-			var event2 = await environment.GenerateTestEventAsync(host2);
+			var events = await environment.GenerateMultipleUniqueEventAsync(host1, host2);
 
 			// Act
-			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, event1.Location.Latitude, event1.Location.Longitude, 10);
+			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, events[0].Location.Latitude, events[0].Location.Longitude, 10);
 
 			// Assert
 			Assert.Equal(2, nearbyEvents.Count);
@@ -101,17 +102,14 @@ namespace Core.Tests.Entities
 		public async Task GetEventsInAreaAsync_FarEvent_ReturnsCloseEvent()
 		{
 			// Arrange
-			var host1 = await environment.GenerateTestUserAsync();
-			var host2 = await environment.GenerateTestUserAsync();
-			var user = await environment.GenerateTestUserAsync();
+			var host1 = await environment.GenerateUniqueUserAsync();
+			var host2 = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
-			var event1 = await environment.GenerateTestEventAsync(host1);
-			var event2 = environment.CreateTestEvent(host2);
-			event2.Location = new() { Latitude = 70, Longitude = 0 };
-			await environment.GenerateEventUnsafeAsync(event2, host2);
+			var events = await environment.GenerateMultipleUniqueEventAsync(host1, host2);
 
 			// Act
-			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, event1.Location.Latitude, event1.Location.Longitude, 1);
+			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, events[0].Location.Latitude, events[0].Location.Longitude, 1);
 
 			// Assert
 			Assert.Single(nearbyEvents);
@@ -121,11 +119,11 @@ namespace Core.Tests.Entities
 		public async Task GetEventsInAreaAsync_BlockedEvent_ReturnsNothing()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var user = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @event = await environment.GenerateTestEventAsync(host);
+			var @event = await environment.GenerateEventAsync(host);
 
 			// Act
 			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, @event.Location.Latitude, @event.Location.Longitude, 10);
@@ -138,7 +136,7 @@ namespace Core.Tests.Entities
 		public async Task GetEventsInAreaAsync_NoEvents_ReturnsNothing()
 		{
 			// Arrange
-			var user = await environment.GenerateTestUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
 			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, 90, 0, 1);
@@ -151,10 +149,10 @@ namespace Core.Tests.Entities
 		public async Task GetPersonalisedEventsInAreaAsync_ReturnsEvents()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var user = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateTestEventAsync(host);
+			var @event = await environment.GenerateEventAsync(host);
 
 			// Act
 			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, @event.Location.Latitude, @event.Location.Longitude, 10);
@@ -167,9 +165,9 @@ namespace Core.Tests.Entities
 		public async Task CreateEventAsync_ValidEvent_ReturnsEvent()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
 			var eventStub = environment.CreateTestEvent(host);
-			eventStub.StartTime = testStartTime;
+			eventStub.StartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
 
 			// Act
 			var returnedEvent = await director.CreateEventAsync(host.Id, eventStub.Name, eventStub.Description,
@@ -195,9 +193,9 @@ namespace Core.Tests.Entities
 		public async Task CreateEventAsync_InvalidEvent_Fails()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
 			var eventStub = environment.CreateTestEvent(host);
-			eventStub.StartTime = testStartTime + TimeSpan.FromDays(30);
+			eventStub.StartTime = new(DateTime.UtcNow + TimeSpan.FromDays(30));
 			eventStub.GroupMaximum = 3;
 			eventStub.GroupMinimum = 5;
 
@@ -215,7 +213,7 @@ namespace Core.Tests.Entities
 		public async Task CreateEventAsync_UserCannotHost_Fails()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
 			var eventStub = environment.CreateTestEvent(host);
 
 			// Act
@@ -232,8 +230,8 @@ namespace Core.Tests.Entities
 		public async Task CreateEventAsync_EventConflict_Fails()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var @event = environment.GenerateTestEventAsync(host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var @event = environment.GenerateEventAsync(host);
 			var conflictingEvent = environment.CreateTestEvent(host);
 
 			// Act
@@ -250,11 +248,11 @@ namespace Core.Tests.Entities
 		public async Task EditEventAsync_ValidInput_UpdatesEvent()
 		{
 			// Arrange
-			var host = await environment.GenerateTestUserAsync();
-			var eventStub = await environment.GenerateTestEventAsync(host);
+			var host = await environment.GenerateUniqueUserAsync();
+			var eventStub = await environment.GenerateEventAsync(host);
 			
 			string newDescription = "new description";
-			DateTimeOffset newStartTime = testStartTime;
+			DateTimeOffset newStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(2));
 			bool newIsOpen = false;
 
 			double newLatitude = 50, newLongitude = 50, newRadius = 3.14;
@@ -270,7 +268,7 @@ namespace Core.Tests.Entities
 				groupMinimum: newGroupMinimum, groupMaximum: newGroupMaximum);
 
 			// Assert
-			var returnedEvent = await director.GetEventInformationAsync(testUser.Id, testEvent.Id);
+			var returnedEvent = await director.GetEventInformationAsync(host.Id, eventStub.Id);
 
 			Assert.Equal(newDescription, returnedEvent.Description);
 			Assert.Equal(newStartTime, returnedEvent.StartTime);
