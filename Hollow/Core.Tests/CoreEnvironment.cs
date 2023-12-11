@@ -170,14 +170,45 @@ namespace Core.Tests.Entities
 			return await GenerateEventUnsafeAsync(eventStub, host);
 		}
 
-		internal async Task<Event> GenerateEventAsync(User host, params User[] guests)
+		internal async Task<Event> GenerateUpcomingEventAsync(User host, params User[] guests)
 		{
 			var eventStub = await GenerateEventAsync(host);
 
 			foreach (var guest in guests)
 			{
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Incoming);
+			}
+
+			return eventStub;
+		}
+
+		internal async Task<Event> GenerateOngoingEventAsync(User host, params User[] guests)
+		{
+			var eventStub = CreateTestEvent(host);
+			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
+
+			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
+
+			foreach (var guest in guests)
+			{
 				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Guest);
 			}
+
+			return eventStub;
+		}
+		internal async Task<Event> GenerateHistoricalEventAsync(User host, params User[] guests)
+		{
+			var eventStub = CreateTestEvent(host);
+			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
+
+			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
+
+			foreach (var guest in guests)
+			{
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Guest);
+			}
+
+			await Terminal.EventDatabase.EndEventAsync(eventStub.Id);
 
 			return eventStub;
 		}

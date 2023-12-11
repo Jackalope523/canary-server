@@ -39,7 +39,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host, guest);
+			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
 			await environment.GenerateEtchingAsync(@event, host);
 			await environment.GenerateEtchingAsync(@event, host);
 
@@ -73,7 +73,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host, guest);
+			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
 			string etchingImageURL = "https://cdn.sparrow.com/0";
 
 			// Act
@@ -139,7 +139,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host, guest);
+			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
 			var coolEtching = await environment.GenerateEtchingAsync(@event, host);
 			var uglyEtching = await environment.GenerateEtchingAsync(@event, host);
 

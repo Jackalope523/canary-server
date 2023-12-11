@@ -67,7 +67,7 @@ namespace Core.Tests.Entities
 			var randomGuest = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, friend1, friend2);
 
-			var @event = await environment.GenerateEventAsync(host, user, friend1, friend2, randomGuest);
+			var @event = await environment.GenerateUpcomingEventAsync(host, user, friend1, friend2, randomGuest);
 
 			// Act
 			var friends = await @event.GetFriendsOf(friend2);
@@ -166,7 +166,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateEventAsync(host, guest);
+			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
 
 			// Act
 			var result = @event.IsModifiableBy(guest);
@@ -215,7 +215,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateEventAsync(host, guest);
+			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
 
 			// Act
 			var result = @event.IsHostedBy(guest);
