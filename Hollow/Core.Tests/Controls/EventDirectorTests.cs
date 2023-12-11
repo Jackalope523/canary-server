@@ -3,6 +3,7 @@ using Core.Controls;
 using Core.Entities;
 using Shared;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -23,7 +24,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var returnedEvent = await director.GetEventInformationAsync(host.Id, @event.Id);
@@ -39,7 +40,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var returnedEvent = await director.GetEventInformationAsync(user.Id, @event.Id);
@@ -56,7 +57,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var returnedEvent = director.GetEventInformationAsync(user.Id, @event.Id);
@@ -123,7 +124,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, @event.Location.Latitude, @event.Location.Longitude, 10);
@@ -152,7 +153,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, @event.Location.Latitude, @event.Location.Longitude, 10);
@@ -231,7 +232,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = environment.GenerateEventAsync(host);
+			var @event = environment.GenerateUpcomingEventAsync(host);
 			var conflictingEvent = environment.CreateTestEvent(host);
 
 			// Act
@@ -249,7 +250,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var eventStub = await environment.GenerateEventAsync(host);
+			var eventStub = await environment.GenerateUpcomingEventAsync(host);
 			
 			string newDescription = "new description";
 			DateTimeOffset newStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(2));
@@ -286,103 +287,360 @@ namespace Core.Tests.Entities
 		[Fact]
 		public async Task StartEventAsync_StartsEvent()
 		{
-			Assert.True(false);
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = environment.CreateTestEvent(user);
+			@event.StartTime = DateTimeOffset.UtcNow;
+
+			@event = await environment.GenerateEventUnsafeAsync(@event, user);
+			await environment.UpdateUserLocationAsync(user, @event.Location.Latitude, @event.Location.Longitude);
+
+			// Act
+			await director.StartEventAsync(user.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task EndEventAsync_EndsEvent()
 		{
-			Assert.True(false);
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateOngoingEventAsync(user);
+
+			// Act
+			await director.EndEventAsync(user.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task WatchEventAsync_ValidEvent_Succeeds()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateUpcomingEventAsync(host);
+
+			// Act
+			await director.WatchEventAsync(user.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task WatchEventAsync_InvalidEvent_Fails()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GeneratePastEventAsync(host);
+
+			// Act
+			await director.WatchEventAsync(user.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task UnwatchEventAsync_Succeeds()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateUpcomingEventAsync(host);
+			await director.WatchEventAsync(user.Id, @event.Id);
+
+			// Act
+			await director.UnwatchEventAsync(user.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task JoinEventAsync_ValidEvent_Succeeds()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateUpcomingEventAsync(host);
+
+			// Act
+			await director.JoinEventAsync(user.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task JoinEventAsync_InvalidEvent_Fails()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GeneratePastEventAsync(host);
+
+			// Act
+			var join = director.WatchEventAsync(user.Id, @event.Id);
+
+			// Assert
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await join);
 		}
 
 		[Fact]
 		public async Task LeaveEventAsync_Succeeds()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateUpcomingEventAsync(host);
+			await director.JoinEventAsync(user.Id, @event.Id);
+
+			// Act
+			await director.LeaveEventAsync(user.Id, @event.Id);
+			// If no exception is thrown, the test is successful
+		}
+
+		[Fact]
+		public async Task GetGuestListAsync_HostingEvent_ReturnsUsers()
+		{
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+			var guest = await environment.GenerateUniqueUserAsync();
+			var left = await environment.GenerateUniqueUserAsync();
+			var incoming = await environment.GenerateUniqueUserAsync();
+			var watcher = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateOngoingEventAsync(user, guest);
+			await environment.AddUserToEventAsync(@event, left, EventUserState.Left);
+			await environment.AddUserToEventAsync(@event, incoming, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, watcher, EventUserState.Watching);
+
+			// Act
+			var (Watchers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @event.Id);
+
+			// Assert
+			Assert.Equal(1, Watchers);
+			Assert.Equal(2, GuestCount);
+
+			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventUserState.Guest)).Count());
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Left)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
 		}
 
 		[Fact]
 		public async Task GetGuestListAsync_GuestAtValidEvent_ReturnsGuests()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var left = await environment.GenerateUniqueUserAsync();
+			var incoming = await environment.GenerateUniqueUserAsync();
+			var incomingFriend = await environment.GenerateUniqueUserAsync();
+			var watcher = await environment.GenerateUniqueUserAsync();
+			var watchingFriend = await environment.GenerateUniqueUserAsync();
+
+			await environment.ForceFriendshipAsync(user, incomingFriend, watchingFriend);
+
+			var @event = await environment.GenerateOngoingEventAsync(host, user);
+			await environment.AddUserToEventAsync(@event, left, EventUserState.Left);
+			await environment.AddUserToEventAsync(@event, incoming, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, incomingFriend, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, watcher, EventUserState.Watching);
+			await environment.AddUserToEventAsync(@event, watchingFriend, EventUserState.Watching);
+
+			// Act
+			var (Watchers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @event.Id);
+
+			// Assert
+			Assert.Equal(1, Watchers);
+			Assert.Equal(2, GuestCount);
+
+			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventUserState.Guest)).Count());
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Left)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
 		}
 
 		[Fact]
 		public async Task GetGuestListAsync_ViewingValidEvent_ReturnsFriends()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var guestFriend = await environment.GenerateUniqueUserAsync();
+			var left = await environment.GenerateUniqueUserAsync();
+			var leftFriend = await environment.GenerateUniqueUserAsync();
+			var incoming = await environment.GenerateUniqueUserAsync();
+			var incomingFriend = await environment.GenerateUniqueUserAsync();
+			var watcher = await environment.GenerateUniqueUserAsync();
+			var watchingFriend = await environment.GenerateUniqueUserAsync();
+
+			await environment.ForceFriendshipAsync(user, guestFriend, leftFriend, incomingFriend, watchingFriend);
+
+			var @event = await environment.GenerateOngoingEventAsync(host, guestFriend);
+			await environment.AddUserToEventAsync(@event, left, EventUserState.Left);
+			await environment.AddUserToEventAsync(@event, leftFriend, EventUserState.Left);
+			await environment.AddUserToEventAsync(@event, incoming, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, incomingFriend, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, watcher, EventUserState.Watching);
+			await environment.AddUserToEventAsync(@event, watchingFriend, EventUserState.Watching);
+
+			// Act
+			var (Watchers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @event.Id);
+
+			// Assert
+			Assert.Equal(1, Watchers);
+			Assert.Equal(1, GuestCount);
+
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Guest)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Left)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
+		}
+
+		[Fact]
+		public async Task GetGuestListAsync_ViewingPastEvent_ReturnsFriends()
+		{
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var friend = await environment.GenerateUniqueUserAsync();
+			var stranger = await environment.GenerateUniqueUserAsync();
+
+			await environment.ForceFriendshipAsync(user, friend);
+
+			var @event = await environment.GeneratePastEventAsync(host, friend, stranger);
+
+			// Act
+			var (Watchers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @event.Id);
+
+			// Assert
+			Assert.Equal(0, Watchers);
+			Assert.Equal(1, GuestCount);
+
+			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Guest)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Left)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
 		}
 
 		[Fact]
 		public async Task GetGuestListAsync_InvalidEvent_Fails()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			await environment.ForceEnemiesAsync(user, host);
+
+			var @event = await environment.GenerateOngoingEventAsync(host);
+
+			// Act
+			var guestList = director.GetGuestListAsync(user.Id, @event.Id);
+
+			// Assert
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await guestList);
 		}
 
 		[Fact]
 		public async Task GetPotentialInviteesAsync_ValidEvent_ReturnsUsers()
 		{
-			Assert.True(false);
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var friend = await environment.GenerateUniqueUserAsync();
+			await environment.ForceFriendshipAsync(user, friend);
+
+			var @event = await environment.GenerateUpcomingEventAsync(host, user);
+
+			// Act
+			var invitees = await director.GetPotentialInviteesAsync(user.Id, @event.Id);
+
+			// Assert
+			Assert.Single(invitees);
 		}
 
 		[Fact]
 		public async Task InviteUserAsync_ValidFriendValidEvent_Succeeds()
 		{
-			Assert.True(false);
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var friend = await environment.GenerateUniqueUserAsync();
+			await environment.ForceFriendshipAsync(user, friend);
+
+			var @event = await environment.GenerateUpcomingEventAsync(host, user);
+
+			// Act
+			await director.InviteUserAsync(user.Id, friend.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task InviteUserAsync_ValidFriendInvalidEvent_Fails()
 		{
-			Assert.True(false);
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+			var host = await environment.GenerateUniqueUserAsync();
+			var friend = await environment.GenerateUniqueUserAsync();
+			await environment.ForceFriendshipAsync(user, friend);
+
+			var @event = await environment.GenerateUpcomingEventAsync(host);
+
+			// Act
+			var invite = director.InviteUserAsync(user.Id, friend.Id, @event.Id);
+
+			// Assert
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await invite);
 		}
 
 		[Fact]
 		public async Task InviteUserAsync_InvalidFriendValidEvent_Fails()
 		{
-			Assert.True(false);
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+			var stranger = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateUpcomingEventAsync(user);
+
+			// Act
+			var invite = director.InviteUserAsync(user.Id, stranger.Id, @event.Id);
+
+			// Assert
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await invite);
 		}
 
 		[Fact]
 		public async Task KickUserAsync_HostedEvent_Succeeds()
 		{
-			Assert.True(false);
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+			var stranger = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateOngoingEventAsync(user, stranger);
+
+			// Act
+			await director.KickUserAsync(user.Id, stranger.Id, @event.Id);
+			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
 		public async Task KickUserAsync_NotHostingEvent_Fails()
 		{
-			Assert.True(false);
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var user = await environment.GenerateUniqueUserAsync();
+			var stranger = await environment.GenerateUniqueUserAsync();
+
+			var @event = await environment.GenerateOngoingEventAsync(host, user, stranger);
+
+			// Act
+			var kick = director.KickUserAsync(user.Id, stranger.Id, @event.Id);
+
+			// Assert
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await kick);
 		}
 
 	}

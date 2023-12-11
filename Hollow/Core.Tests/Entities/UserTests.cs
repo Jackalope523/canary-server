@@ -101,7 +101,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(user);
+			var @event = await environment.GenerateUpcomingEventAsync(user);
 
 			// Act
 			var returnedEvent = await user.NextEvent();
@@ -281,7 +281,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var canView = await user.CanView(@event);
@@ -297,7 +297,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(user, host);
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var canView = await user.CanView(@event);
@@ -312,7 +312,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.active_limited);
 
 			// Act
@@ -330,7 +330,7 @@ namespace Core.Tests.Entities
 			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.active_limited);
 			
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			await environment.ForceFriendshipAsync(user, host);
 
 			// Act
@@ -346,7 +346,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
 			var canJoin = await user.CanJoin(@event);
@@ -361,7 +361,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateEventAsync(user);
+			var @event = await environment.GenerateUpcomingEventAsync(user);
 			var etching = await environment.GenerateEtchingAsync(@event, user);
 
 			// Act
@@ -378,7 +378,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			var etching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act

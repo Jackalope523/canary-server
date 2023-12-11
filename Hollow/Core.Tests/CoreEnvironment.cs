@@ -163,7 +163,7 @@ namespace Core.Tests.Entities
 				eventStub.Radius.Kilometres, eventStub.IsDynamic));
 		}
 
-		internal async Task<Event> GenerateEventAsync(User host)
+		internal async Task<Event> GenerateUpcomingEventAsync(User host)
 		{
 			var eventStub = CreateTestEvent(host);
 
@@ -172,7 +172,7 @@ namespace Core.Tests.Entities
 
 		internal async Task<Event> GenerateUpcomingEventAsync(User host, params User[] guests)
 		{
-			var eventStub = await GenerateEventAsync(host);
+			var eventStub = await GenerateUpcomingEventAsync(host);
 
 			foreach (var guest in guests)
 			{
@@ -196,7 +196,7 @@ namespace Core.Tests.Entities
 
 			return eventStub;
 		}
-		internal async Task<Event> GenerateHistoricalEventAsync(User host, params User[] guests)
+		internal async Task<Event> GeneratePastEventAsync(User host, params User[] guests)
 		{
 			var eventStub = CreateTestEvent(host);
 			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);

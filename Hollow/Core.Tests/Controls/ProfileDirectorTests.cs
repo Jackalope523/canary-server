@@ -81,9 +81,9 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var hostedEvent = await environment.GenerateHistoricalEventAsync(user);
-			var attendedEvent = await environment.GenerateHistoricalEventAsync(host, user);
-			var unattendedEvent = await environment.GenerateHistoricalEventAsync(host);
+			var hostedEvent = await environment.GeneratePastEventAsync(user);
+			var attendedEvent = await environment.GeneratePastEventAsync(host, user);
+			var unattendedEvent = await environment.GeneratePastEventAsync(host);
 			var ongoingEvent = await environment.GenerateUpcomingEventAsync(host, user);
 
 			var funLovingEtching = await environment.GenerateEtchingAsync(attendedEvent, user);
@@ -114,9 +114,9 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, friend);
 
-			var hostedEvent = await environment.GenerateHistoricalEventAsync(user, friend);
-			var mutuallyAttendedEvent = await environment.GenerateHistoricalEventAsync(host, user, friend);
-			var unattendedEvent = await environment.GenerateHistoricalEventAsync(friend);
+			var hostedEvent = await environment.GeneratePastEventAsync(user, friend);
+			var mutuallyAttendedEvent = await environment.GeneratePastEventAsync(host, user, friend);
+			var unattendedEvent = await environment.GeneratePastEventAsync(friend);
 			var ongoingEvent = await environment.GenerateUpcomingEventAsync(host, friend);
 
 			var userEtching = await environment.GenerateEtchingAsync(hostedEvent, user);
@@ -141,8 +141,8 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
-			var mutuallyAttendedEvent = await environment.GenerateHistoricalEventAsync(user, randomUser);
-			var unattendedEvent = await environment.GenerateHistoricalEventAsync(randomUser);
+			var mutuallyAttendedEvent = await environment.GeneratePastEventAsync(user, randomUser);
+			var unattendedEvent = await environment.GeneratePastEventAsync(randomUser);
 
 			var mutualEventEtching = await environment.GenerateEtchingAsync(mutuallyAttendedEvent, randomUser);
 			var unattendedEventEtching = await environment.GenerateEtchingAsync(unattendedEvent, randomUser);
@@ -178,7 +178,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var pastEvent = await environment.GenerateHistoricalEventAsync(user);
+			var pastEvent = await environment.GeneratePastEventAsync(user);
 			var ongoingEvent = await environment.GenerateOngoingEventAsync(user);
 			var upcomingEvent = await environment.GenerateUpcomingEventAsync(host, user);
 			var anotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(user);
@@ -199,7 +199,7 @@ namespace Core.Tests.Entities
 			var randomHost = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, friend);
 
-			var pastEvent = await environment.GenerateHistoricalEventAsync(friend);
+			var pastEvent = await environment.GeneratePastEventAsync(friend);
 			var ongoingEvent = await environment.GenerateOngoingEventAsync(friend);
 			var upcomingEvent = await environment.GenerateUpcomingEventAsync(user, friend);
 			var anotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(randomHost, friend);
@@ -251,7 +251,7 @@ namespace Core.Tests.Entities
 			var randomHost = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, activeFriend, sloadButChill);
 
-			var pastEvent = await environment.GenerateHistoricalEventAsync(activeFriend);
+			var pastEvent = await environment.GeneratePastEventAsync(activeFriend);
 			var ongoingEvent = await environment.GenerateOngoingEventAsync(activeFriend, sloadButChill);
 			var upcomingEvent = await environment.GenerateUpcomingEventAsync(user, activeFriend);
 			var anotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(randomHost, activeFriend);

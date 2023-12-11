@@ -22,7 +22,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			await environment.GenerateEtchingAsync(@event, host);
 			await environment.GenerateEtchingAsync(@event, host);
 
@@ -56,7 +56,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			await environment.GenerateEtchingAsync(@event, host);
 			await environment.GenerateEtchingAsync(@event, host);
 
@@ -91,7 +91,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			string etchingImageURL = "https://cdn.sparrow.com/0";
 
 			// Act
@@ -106,7 +106,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			var etching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
@@ -123,7 +123,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			var etching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
@@ -167,7 +167,7 @@ namespace Core.Tests.Entities
 			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host, friend);
 
-			var @event = await environment.GenerateEventAsync(host);
+			var @event = await environment.GenerateUpcomingEventAsync(host);
 			var someEtching = await environment.GenerateEtchingAsync(@event, host);
 			var anotherEtching = await environment.GenerateEtchingAsync(@event, host);
 
@@ -193,10 +193,10 @@ namespace Core.Tests.Entities
 			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host1, host2, friend);
 
-			var event1 = await environment.GenerateEventAsync(host1);
+			var event1 = await environment.GenerateUpcomingEventAsync(host1);
 			var seenEtching = await environment.GenerateEtchingAsync(event1, host1);
 
-			var event2 = await environment.GenerateEventAsync(host2);
+			var event2 = await environment.GenerateUpcomingEventAsync(host2);
 			var unseenEtching = await environment.GenerateEtchingAsync(event1, host2);
 
 			// Act

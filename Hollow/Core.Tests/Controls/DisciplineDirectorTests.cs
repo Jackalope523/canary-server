@@ -60,7 +60,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var reportedHost = await environment.GenerateUniqueUserAsync();
-			var reportedEvent = await environment.GenerateEventAsync(reportedHost);
+			var reportedEvent = await environment.GenerateUpcomingEventAsync(reportedHost);
 			EventReportType report = EventReportType.misleading;
 			string reportDetails = "detailed report";
 
