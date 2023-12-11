@@ -95,6 +95,11 @@ namespace Core.Tests.Entities
 			return await GenerateUserUnsafeAsync(userStub);
 		}
 
+		internal async Task UpdateUser(User user, string property, object value)
+		{
+			await Terminal.AccountDatabase.UpdateUserAsync(user.Id, new() { (property, value) });
+		}
+
 		internal async Task UpdateUserLocationAsync(User user, double latitude, double longitude, double radius = 1)
 		{
 			await Terminal.AccountDatabase.UpdateRecentLocationAsync(user.Id, latitude, longitude, radius);
@@ -253,6 +258,16 @@ namespace Core.Tests.Entities
 		internal async Task SaveNoteAsync(User user, User notifier, string message, string action)
 		{
 			await Terminal.NotificationDatabase.SaveNoteAsync(user.Id, notifier.Id, new DateTime(0), message, action);
+		}
+
+		internal async Task<List<Note>> GetNotesAsync(User user)
+		{
+			return await Terminal.NotificationDatabase.GetNotesAsync(user.Id);
+		}
+
+		internal async Task SubscribeUserAsync(User user, DeviceType deviceType, string deviceToken)
+		{
+			await Terminal.NotificationDatabase.SubscribeUserAsync(user.Id, deviceType, deviceToken);
 		}
 
 		internal async Task<(DeviceType DeviceType, string DeviceToken)> GetUserSubscriptionAsync(User user)

@@ -154,6 +154,26 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
+		public async Task NotifyUserAsync_MultipleNotifications_Succeeds()
+		{
+			// Arrange
+			var user = await environment.GenerateUniqueUserAsync();
+			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
+			string notificationTitle = "title", notificationBody = "body";
+
+			// Act
+			await director.NotifyUserAsync(user, notificationTitle, notificationBody);
+			await director.NotifyUserAsync(user, notificationTitle, notificationBody);
+			await director.NotifyUserAsync(user, notificationTitle, notificationBody);
+
+			// Assert
+			Assert.True(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
+
+			var userMessages = environment.GetUserMessages(user);
+			Assert.Equal(3, userMessages.Count);
+		}
+
+		[Fact]
 		public async Task NotifyUserAsync_UnsubscribedUser_Drops()
 		{
 			// Arrange

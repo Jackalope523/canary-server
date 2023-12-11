@@ -582,8 +582,9 @@ namespace Core.Tests.Entities
 			await environment.AddUserToEventAsync(@event, incomingUser, EventUserState.Incoming);
 			await environment.AddUserToEventAsync(@event, activeGuest, EventUserState.Guest);
 
-			string notificationTitle = "event title";
-			string notificationMessage = "message test";
+			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
+			await environment.SubscribeUserAsync(activeGuest, DeviceType.iOS, activeGuest.Id.ToString());
+			string notificationTitle = "event title", notificationMessage = "message test";
 
 			// Act
 			await @event.NotifyActive(notificationTitle, notificationMessage);
@@ -618,8 +619,10 @@ namespace Core.Tests.Entities
 			await environment.AddUserToEventAsync(@event, leftGuest, EventUserState.Left);
 			await environment.AddUserToEventAsync(@event, activeGuest, EventUserState.Guest);
 
-			string notificationTitle = "event title";
-			string notificationMessage = "message test";
+			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
+			await environment.SubscribeUserAsync(leftGuest, DeviceType.iOS, leftGuest.Id.ToString());
+			await environment.SubscribeUserAsync(activeGuest, DeviceType.iOS, activeGuest.Id.ToString());
+			string notificationTitle = "event title", notificationMessage = "message test";
 
 			// Act
 			await @event.NotifyGuests(notificationTitle, notificationMessage);
