@@ -1,4 +1,5 @@
 ﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
 namespace Repository
@@ -11,7 +12,7 @@ namespace Repository
         {
         }
 
-        public EventShard CreateEvent(Guid hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
+        public async Task<EventShard> CreateEventAsync(Guid hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character)
         {
             Event toCreate = new Event
             {
@@ -32,7 +33,7 @@ namespace Repository
 
             };
 
-            storeSentry.ExecuteWrite(ctx => ctx.Events.Add(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Events.Add(toCreate));
 
 
             return new EventShard
@@ -57,13 +58,13 @@ namespace Repository
                    toCreate.NightOwl,
                    toCreate.Openness));
         }
-        public EventShard FindCurrentEventForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).Single(); }
-        public List<EventShard> FindUpcomingEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watching); }
-        public List<EventShard> FindPastEventsForUser(Guid id) { return FindEventsBy(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
+        public async Task<EventShard> FindCurrentEventForUserAsync(Guid id) { return (await FindEventsByAsync(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend)).Single(); }
+        public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(Guid id) { return await FindEventsByAsync(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watching); }
+        public async Task<List<EventShard>> FindPastEventsForUserAsync(Guid id) { return await FindEventsByAsync(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
 
-        public EventShard FindEvent(Guid id)
+        public async Task<EventShard> FindEventAsync(Guid id)
         {
-            EventShard @event = storeSentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == id).Select(e => new EventShard
+            EventShard @event = await storeSentry.ExecuteReadAsync(ctx => ctx.Events.Where(e => e.Id == id).Select(e => new EventShard
                (
                    e.Id,
                    new UserSilhouette(e.HostId, null),
@@ -84,44 +85,35 @@ namespace Repository
                    e.Industriousness,
                    e.NightOwl,
                    e.Openness)
-               )).Single());
+               )).SingleAsync());
 
-            UserSilhouette host = storeSentry.ExecuteRead(ctx => ctx.Users.Where(u => u.Id == @event.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).Single()) ;
+            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == @event.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync()) ;
 
             return @event with {Host = host } ;
         }
 
-        public List<EventThinSlice> FindEvents(double latitude, double longitude, double distance)
+        public async Task<List<EventThinSlice>> FindEventsAsync(double latitude, double longitude, double distance)
         {
-            List<EventThinSlice> closestEvents;
-            Point userLocation = new Point(longitude, latitude);
-
-            closestEvents = storeSentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Location.Distance(userLocation) <= distance && !e.EndTime.HasValue).
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Events.Where(e => e.Location.Distance(new Point(longitude, latitude)) <= distance && !e.EndTime.HasValue).
                                 Join(ctx.Users, 
                                 e => e.HostId, 
                                 u => u.Id, 
                                 (e,u) => new EventThinSlice(e.Id, new UserSilhouette(u.Id, u.Name), e.Location.Y, e.Location.X)).
-                                ToList());
-
-            return closestEvents;
+                                ToListAsync());
         }
         
-        public List<UserSilhouette> GetGuestList(Guid id)
+        public async Task<List<UserSilhouette>> GetGuestListAsync(Guid id)
         {
-            List<UserSilhouette> guests;
-
-            guests = storeSentry.ExecuteRead(ctx => ctx.EventLinks.Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new UserSilhouette(l.Self.Id, l.Self.Name)).ToList());
-
-            return guests;
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.EventLinks.Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new UserSilhouette(l.Self.Id, l.Self.Name)).ToListAsync());
         }
 
-        public bool AddUserToEvent(Guid userId, Guid eventId) { return addLinkOperation(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
-        public bool RemoveUserFromEvent(Guid userId, Guid eventId) { return removeLinkOperation(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
+        public async Task<bool> AddUserToEventAsync(Guid userId, Guid eventId) { return await AddLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
+        public async Task<bool> RemoveUserFromEventAsync(Guid userId, Guid eventId) { return await RemoveLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
 
-        public bool UpdateEvent(Guid id, List<(string Property, object Value)> edits)
+        public async Task<bool> UpdateEventAsync(Guid id, List<(string Property, object Value)> edits)
         {
             Event e = new Event { Id = id };
-            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Events.Attach(e));
 
             foreach ((string Property, object Value) edit in edits)
             {
@@ -139,18 +131,18 @@ namespace Repository
                     default:
                         throw new Exception("No propertyName match found");
                 }
-                storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(edit.Property).IsModified = true);
+                await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(e).Property(edit.Property).IsModified = true);
             }
-            storeSentry.ExecuteWrite();
+            await storeSentry.ExecuteWriteAsync();
             return true;
         }
 
-        public bool EndEvent(Guid id)
+        public async Task<bool> EndEventAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(Guid id)
+        public Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(Guid id)
         {
             throw new NotImplementedException();
         }

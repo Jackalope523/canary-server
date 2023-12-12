@@ -13,79 +13,40 @@ namespace Repository
             storeSentry = sentry;
         }
 
-        // UTIL
-        protected UserShard FindUserBy(Func<User, bool> predicate)
+        // UTIL      
+        protected async Task<bool> AddLinkOperationAsync(Link link)
         {
-            UserShard user;
-            int numFollowers;
-
-            user = storeSentry.ExecuteRead(ctx => ctx.Users.Where(predicate).Select(u => new UserShard
-               (
-                   u.Id,
-                   u.PhoneNumber,
-                   u.Email,
-                   u.Name,
-                   u.DateOfBirth,
-                   u.IsPhoneConfirmed,
-                   u.IsEmailConfirmed,
-                   u.SecurityStamp,
-                   u.LockoutDate,
-                   u.AccessTries,
-                   u.AccountStatus,
-                   u.JoinDate,
-                   u.Reputation,
-                   -1,
-                   new Character(
-                   u.Extroversion,
-                   u.Athleticisme,
-                   u.Chaos,
-                   u.Competitiveness,
-                   u.Industriousness,
-                   u.NightOwl,
-                   u.Openness)
-               )).Single());
-
-            numFollowers = storeSentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).Count());
-
-            return user with { NumberOfFollowers = numFollowers };
-        }
-
-        protected bool addLinkOperation(Link link)
-        {
-            storeSentry.ExecuteWrite(ctx => ctx.Links.Add(link));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Links.Add(link));
             return true;
 
         }
-        protected bool removeLinkOperation(UserLink link)
+        protected async Task<bool> RemoveLinkOperationAsync(UserLink link)
         {
-            storeSentry.ExecuteWrite(ctx => ctx.UserLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
             return true;
         }
-        protected bool removeLinkOperation(EventLink link)
+        protected async Task<bool> RemoveLinkOperationAsync(EventLink link)
         {
-            storeSentry.ExecuteWrite(ctx => ctx.EventLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
             return true;
         }
-        protected bool removeLinkOperation(PostLink link)
+        protected async Task<bool> RemoveLinkOperationAsync(PostLink link)
         {
-            storeSentry.ExecuteWrite(ctx => ctx.PostLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.PostLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
             return true;
         }
        
-        protected List<UserSilhouette> getUsersBy(Func<UserLink, bool> predicate)
+        protected async Task<List<UserSilhouette>> GetUsersByAsync(Func<UserLink, bool> predicate)
         {
-            List<UserSilhouette> users;
-
-            users = storeSentry.ExecuteRead(ctx => ctx.UserLinks.Where(predicate).Select(l => new UserSilhouette(l.Other.Id, l.Other.Name)).ToList());
-            return users;
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => predicate(l)).Select(l => new UserSilhouette(l.Other.Id, l.Other.Name)).ToListAsync());
         }
 
-        protected List<Report> getReports(Func<Report, bool> predicate)
+        protected async Task<List<Report>> GetReportsAsync(Func<Report, bool> predicate)
         {
-            return storeSentry.ExecuteRead(ctx => ctx.Reports.Where(r => predicate(r)).ToList());
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Reports.Where(r => predicate(r)).ToListAsync());
         }
 
-        protected bool CreateReport(Guid userId, Guid eventId, Guid HostId, Report.ReportType reportType, DateTimeOffset filingDate, string reportDetails)
+        protected async Task<bool> CreateReportAsync(Guid userId, Guid eventId, Guid HostId, Report.ReportType reportType, DateTimeOffset filingDate, string reportDetails)
         {
             Report toCreate = new Report
             {
@@ -97,17 +58,15 @@ namespace Repository
                 Notes = reportDetails
             };
 
-            storeSentry.ExecuteWrite(ctx => ctx.Reports.Add(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Reports.Add(toCreate));
             return true;
         }
 
-        protected List<EventShard> FindEventsBy(Func<EventLink, bool> predicate)
+        protected async Task<List<EventShard>> FindEventsByAsync(Func<EventLink, bool> predicate)
         {
-            List<Guid> guids = new List<Guid>();
-            guids = storeSentry.ExecuteRead(ctx => ctx.EventLinks.Where(predicate).Select(l => l.OtherId).ToList());
+            List<Guid> guids = await storeSentry.ExecuteReadAsync(ctx => ctx.EventLinks.Where(l => predicate(l)).Select(l => l.OtherId).ToListAsync());
 
-            List<EventShard> events;
-            events = storeSentry.ExecuteRead(ctx=> ctx.Events.Where(e => guids.Contains(e.Id)).Select(e => new EventShard
+            List<EventShard> events = await storeSentry.ExecuteReadAsync(ctx=> ctx.Events.Where(e => guids.Contains(e.Id)).Select(e => new EventShard
                (
                    e.Id,
                    new UserSilhouette(e.HostId, e.Host.Name),
@@ -128,14 +87,14 @@ namespace Repository
                    e.Industriousness,
                    e.NightOwl,
                    e.Openness)
-               )).ToList());
+               )).ToListAsync());
 
             return events;
         }
 
-        protected int countRatings(Guid id, PostLink.PostLinkType type)
+        protected async Task<int> CountRatingsAsync(Guid id, PostLink.PostLinkType type)
         {
-            return storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.OtherId == id && l.Type == type).Count());
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == id && l.Type == type).CountAsync());
         }
     }
 }

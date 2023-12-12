@@ -21,7 +21,7 @@ namespace Core.Controls
             if (!await targetEvent.IsAttendedBy(user))
             { throw new InvalidEventException("User did not attend or is not attending event."); }
 
-            var eventEtchings = Etchings.GetEtchingsForEvent(eventID);
+            var eventEtchings = await Etchings.GetEtchingsForEventAsync(eventID);
 
             return eventEtchings;
         }
@@ -40,26 +40,26 @@ namespace Core.Controls
             { throw new InvalidEventException("Event has already ended."); }
 
             // Try to etching
-            var userEtching = Etchings.AddEtching(eventID, userID, DateTimeOffset.UtcNow, imageURL);
+            var userEtching = Etchings.AddEtchingAsync(eventID, userID, DateTimeOffset.UtcNow, imageURL);
 
-            return userEtching;
+            return await userEtching;
         }
 
         public async Task RemoveEtchingAsync(Guid userID, Guid etchingID)
         {
-            var eventEtching = Etchings.GetEtching(etchingID);
+            var eventEtching = await Etchings.GetEtchingAsync(etchingID);
 
             // Check if user can delete etching
             if (!eventEtching.UserId.Equals(userID))
             { throw new InvalidUserException("User cannot remove etching."); }
 
-            Etchings.RemoveEtching(etchingID);
+            Etchings.RemoveEtchingAsync(etchingID);
         }
 
         public async Task RateEtchingAsync(Guid userID, Guid etchingID, UserRating rating)
         {
             User user = new(userID);
-            var eventOfEtching = await GetEvent(Etchings.GetEtching(etchingID).EventId);
+            var eventOfEtching = await GetEvent((await Etchings.GetEtchingAsync(etchingID)).EventId);
 
             // Check if user can interact with etching
             if (!await eventOfEtching.IsAttendedBy(user))
@@ -68,11 +68,11 @@ namespace Core.Controls
             // Check if removing a rating
             if (rating != UserRating.Remove)
             {
-                Etchings.RateEtching(userID, etchingID, rating);
+                Etchings.RateEtchingAsync(userID, etchingID, rating);
             }
             else
             {
-                Etchings.RemoveEtchingRating(etchingID, userID);
+                Etchings.RemoveEtchingRatingAsync(etchingID, userID);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Core.Controls
 
             // Retrieve friend-populated event etchings after a specified time excluding previously viewed events
             DateTimeOffset depthCharge = DateTimeOffset.UtcNow - TimeSpan.FromDays(1 + depth);
-            var friendEtchings = Etchings.GenerateFeedForUser(user.Id, depthCharge, exclusionList);
+            var friendEtchings = await Etchings.GenerateFeedForUserAsync(user.Id, depthCharge, exclusionList);
 
             // Get the respective event headers for the etchings
             foreach (Etching etching in friendEtchings)
@@ -93,7 +93,7 @@ namespace Core.Controls
                 // Add event header if it does not yet exist
                 if (!eventHeaders.ContainsKey(etching.EventId))
                 {
-                    Event etchingEvent = new(Events.FindEvent(etching.EventId));
+                    Event etchingEvent = new(await Events.FindEventAsync(etching.EventId));
 
                     eventHeaders.Add(etching.EventId, etchingEvent.ToEventHeader(etching.TimeEtched));
                 }
@@ -113,7 +113,7 @@ namespace Core.Controls
 
         internal async Task<List<Etching>> GetEventEtchingsAsync(Guid eventID)
         {
-            return Etchings.GetEtchingsForEvent(eventID);
+            return await Etchings.GetEtchingsForEventAsync(eventID);
         }
     }
 }

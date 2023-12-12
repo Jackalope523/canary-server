@@ -10,18 +10,18 @@ namespace Core.Boundaries
 
     public interface IProfileDatabase
     {
-        List<UserSilhouette> GetFriends(Guid id);
-        List<UserSilhouette> GetFollowedUsers(Guid id);
-        List<UserSilhouette> GetBlockedUsers(Guid id);
+        Task<List<UserSilhouette>> GetFriendsAsync(Guid id);
+        Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid id);
+        Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid id);
 
-        bool FollowUser(Guid selfId, Guid targetId);
-        bool UnfollowUser(Guid selfId, Guid targetId);
-        bool BlockUser(Guid selfId, Guid targetId);
-        bool UnblockUser(Guid selfId, Guid targetId);
+        Task<bool> FollowUserAsync(Guid selfId, Guid targetId);
+        Task<bool> UnfollowUserAsync(Guid selfId, Guid targetId);
+        Task<bool> BlockUserAsync(Guid selfId, Guid targetId);
+        Task<bool> UnblockUserAsync(Guid selfId, Guid targetId);
 
-        bool RateUser(Guid selfId, Guid targetId, UserRating rating);
-        bool RemoveUserRating(Guid selfId, Guid targetId);
-        (int Positive, int Negative) GetUserRatings(Guid id);
+        Task<bool> RateUserAsync(Guid selfId, Guid targetId, UserRating rating);
+        Task<bool> RemoveUserRatingAsync(Guid selfId, Guid targetId);
+        Task<(int Positive, int Negative)> GetUserRatingsAsync(Guid id);
     }
 
 	public interface IProfileOperations

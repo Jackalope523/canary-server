@@ -11,9 +11,9 @@ namespace Repository
         {
         }
 
-        public (List<UserReport>, List<EventReport>) GetReportsByUser(Guid id)
+        public async Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(Guid id)
         {
-            List<Report> reports = getReports(r => r.SelfId == id);
+            List<Report> reports = await GetReportsAsync(r => r.SelfId == id);
             List<UserReport> userReportsToReturn = new List<UserReport>();
             List<EventReport> eventReportsToReturn = new List<EventReport>();
 
@@ -32,9 +32,9 @@ namespace Repository
             return (userReportsToReturn, eventReportsToReturn);
         }
 
-        public List<EventReport> GetReportsForEvent(Guid id)
+        public async Task<List<EventReport>> GetReportsForEventAsync(Guid id)
         {
-            List<Report> reports = getReports(r => r.EventId == id);
+            List<Report> reports = await GetReportsAsync(r => r.EventId == id);
             List<EventReport> toReturn = new List<EventReport>();
 
             foreach (Report report in reports)
@@ -45,18 +45,20 @@ namespace Repository
             return toReturn;
         }
 
-        public (List<UserReport>, List<EventReport>) GetReportsForUser(Guid id)
+        public async Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(Guid id)
         {
-            List<Report> userReports = getReports(r => r.OtherId == id);
-            List<Report> eventReports = getReports(r => r.OtherId == id && r.OtherId == r.Event.HostId);
+            Task<List<Report>> userReports = GetReportsAsync(r => r.OtherId == id);
+            Task<List<Report>> eventReports = GetReportsAsync(r => r.OtherId == id && r.OtherId == r.Event.HostId);
             List<UserReport> userReportsToReturn = new List<UserReport>();
             List<EventReport> eventReportsToReturn = new List<EventReport>();
 
-            foreach (Report report in userReports)
+            List<Report> a = await userReports;
+            List<Report> b = await eventReports;
+            foreach (Report report in a)
             {
                 userReportsToReturn.Add(new UserReport(report.Id, report.SelfId, report.OtherId, report.FilingDate, Report.ToUserReportType(report.Type), report.Notes));
             }
-            foreach (Report report in eventReports)
+            foreach (Report report in b)
             {
                 eventReportsToReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
 
@@ -65,15 +67,15 @@ namespace Repository
             return (userReportsToReturn, eventReportsToReturn);
         }
 
-        public bool ReportEvent(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails)
+        public async Task<bool> ReportEventAsync(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails)
         {
 
-            return CreateReport(userId, eventId, HostId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
+            return await CreateReportAsync(userId, eventId, HostId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
         }
 
-        public bool ReportUser(Guid selfId, Guid eventId, Guid targetId, UserReportType reportType, string reportDetails)
+        public async Task<bool> ReportUserAsync(Guid selfId, Guid eventId, Guid targetId, UserReportType reportType, string reportDetails)
         {
-            return CreateReport(selfId, eventId, targetId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
+            return await CreateReportAsync(selfId, eventId, targetId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
         }
     }
 }

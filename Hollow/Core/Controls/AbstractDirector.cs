@@ -33,7 +33,7 @@ namespace Core.Controls
 
         internal async Task<User> GetUser(Guid userID)
         {
-            User user = new(Accounts.FindUserById(userID));
+            User user = new(await Accounts.FindUserByIdAsync(userID));
 
             // Check if user account is locked
             if (user.IsLocked)
@@ -44,7 +44,7 @@ namespace Core.Controls
 
         internal async Task<Event> GetEvent(Guid eventID)
         {
-            return new(Events.FindEvent(eventID));
+            return new(await Events.FindEventAsync(eventID));
         }
     }
 }

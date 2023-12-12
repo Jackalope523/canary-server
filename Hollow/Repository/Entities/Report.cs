@@ -23,41 +23,27 @@ namespace Repository
       
         public static ReportType ToReportType(UserReportType type)
         {
-            switch (type)
+            return type switch
             {
-                case UserReportType.physical_assault:
-                    return ReportType.PhysicalAssault;
-                case UserReportType.rude:
-                    return ReportType.Rude;
-                case UserReportType.harassment:
-                    return ReportType.Harassment;
-                case UserReportType.violent_behaviour:
-                    return ReportType.ViolentBehaviour;
-                case UserReportType.sexual_assault:
-                    return ReportType.SexualAssault;
-                case UserReportType.hate_speech:
-                    return ReportType.HateSpeech;
-                default:
-                    return ReportType.PhysicalAssault;
-               
-                    
-            }
+                UserReportType.physical_assault => ReportType.PhysicalAssault,
+                UserReportType.rude => ReportType.Rude,
+                UserReportType.harassment => ReportType.Harassment,
+                UserReportType.violent_behaviour => ReportType.ViolentBehaviour,
+                UserReportType.sexual_assault => ReportType.SexualAssault,
+                UserReportType.hate_speech => ReportType.HateSpeech,
+                _ => ReportType.PhysicalAssault,
+            };
         }
         public static ReportType ToReportType(EventReportType type)
         {
-            switch (type)
+            return type switch
             {
-                case EventReportType.promotion:
-                    return ReportType.Promotion;
-                case EventReportType.spam:
-                    return ReportType.Spam;
-                case EventReportType.inappropriate:
-                    return ReportType.Inappropriate;
-                case EventReportType.misleading:
-                    return ReportType.Misleading;
-                default:
-                    return ReportType.PhysicalAssault;
-            }
+                EventReportType.promotion => ReportType.Promotion,
+                EventReportType.spam => ReportType.Spam,
+                EventReportType.inappropriate => ReportType.Inappropriate,
+                EventReportType.misleading => ReportType.Misleading,
+                _ => ReportType.PhysicalAssault,
+            };
         }
         public static UserReportType ToUserReportType(ReportType type)
         {

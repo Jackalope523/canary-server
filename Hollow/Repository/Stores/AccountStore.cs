@@ -1,4 +1,5 @@
 ﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
 namespace Repository
@@ -11,7 +12,7 @@ namespace Repository
         {
         }
 
-        public bool CreateUser(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
+        public async Task<bool> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
         {
             User toCreate = new User
             {
@@ -35,88 +36,187 @@ namespace Repository
                 Haunt = new Point(0, 0) { SRID = 4237 }
             };
 
-            storeSentry.ExecuteWrite(ctx => ctx.Users.Add(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
             return true;
         }
 
-        public bool DeleteUser(Guid id)
+        public async Task<bool> DeleteUserAsync(Guid id)
         {
-            storeSentry.ExecuteWrite(ctx => ctx.Users.Remove(new User { Id = id }));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Remove(new User { Id = id }));
             return true;
         }
 
-        public UserShard FindUserById(Guid id) { return FindUserBy(u => u.Id == id); }
-        public UserShard FindUserByPhoneNumber(string phoneNumber) { return FindUserBy(u => u.PhoneNumber == phoneNumber); }
-        public UserShard FindUserByEmail(string email) { return FindUserBy(u => u.NormalisedEmail == email); }
+        public async Task<UserShard> FindUserByIdAsync(Guid id) 
+        {            
+            int numFollowers;
 
-        public (double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(Guid id)
+            UserShard user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new UserShard
+               (
+                   u.Id,
+                   u.PhoneNumber,
+                   u.Email,
+                   u.Name,
+                   u.DateOfBirth,
+                   u.IsPhoneConfirmed,
+                   u.IsEmailConfirmed,
+                   u.SecurityStamp,
+                   u.LockoutDate,
+                   u.AccessTries,
+                   u.AccountStatus,
+                   u.JoinDate,
+                   u.Reputation,
+                   -1,
+                   new Character(
+                   u.Extroversion,
+                   u.Athleticisme,
+                   u.Chaos,
+                   u.Competitiveness,
+                   u.Industriousness,
+                   u.NightOwl,
+                   u.Openness)
+               )).SingleAsync());
+
+            numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
+
+            return user with { NumberOfFollowers = numFollowers };
+        }
+        public async Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber) 
+        { 
+            int numFollowers;
+
+            UserShard user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.PhoneNumber == phoneNumber).Select(u => new UserShard
+               (
+                   u.Id,
+                   u.PhoneNumber,
+                   u.Email,
+                   u.Name,
+                   u.DateOfBirth,
+                   u.IsPhoneConfirmed,
+                   u.IsEmailConfirmed,
+                   u.SecurityStamp,
+                   u.LockoutDate,
+                   u.AccessTries,
+                   u.AccountStatus,
+                   u.JoinDate,
+                   u.Reputation,
+                   -1,
+                   new Character(
+                   u.Extroversion,
+                   u.Athleticisme,
+                   u.Chaos,
+                   u.Competitiveness,
+                   u.Industriousness,
+                   u.NightOwl,
+                   u.Openness)
+               )).SingleAsync());
+
+            numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
+
+            return user with { NumberOfFollowers = numFollowers };
+        }
+        public async Task<UserShard> FindUserByEmailAsync(string email) 
+        { 
+            int numFollowers;
+
+            UserShard user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Email == email).Select(u => new UserShard
+               (
+                   u.Id,
+                   u.PhoneNumber,
+                   u.Email,
+                   u.Name,
+                   u.DateOfBirth,
+                   u.IsPhoneConfirmed,
+                   u.IsEmailConfirmed,
+                   u.SecurityStamp,
+                   u.LockoutDate,
+                   u.AccessTries,
+                   u.AccountStatus,
+                   u.JoinDate,
+                   u.Reputation,
+                   -1,
+                   new Character(
+                   u.Extroversion,
+                   u.Athleticisme,
+                   u.Chaos,
+                   u.Competitiveness,
+                   u.Industriousness,
+                   u.NightOwl,
+                   u.Openness)
+               )).SingleAsync());
+
+            numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
+
+            return user with { NumberOfFollowers = numFollowers };
+        }
+
+        public async Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(Guid id)
         {
-            var result = storeSentry.ExecuteRead(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight }).Single());
+            var result = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight }).SingleAsync());
             return (result.Y, result.X, result.HauntRadius, result.HauntWheight);
         }
-        public (double Latitude, double Longitude, double Radius) GetRecentUserLocation(Guid id)
+        public async Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(Guid id)
         {
-            var result = storeSentry.ExecuteRead(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius }).Single());
+            var result = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius }).SingleAsync());
             return (result.Y, result.X, result.CurrentRadius);
         }    
 
-        public bool UpdateUser(Guid id, List<(string Property, object Value)> edits)
+        public async Task<bool> UpdateUserAsync(Guid id, List<(string Property, object Value)> edits)
         {
             User u = new User { Id = id };
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Users.Attach(u));
 
-            foreach ((string Property, object Value) edit in edits)
+            foreach ((string Property, object Value) in edits)
             {
-                switch (edit.Property)
+                switch (Property)
                 {
                     case "PhoneNumber":
-                        u.PhoneNumber = (string)edit.Value;
+                        u.PhoneNumber = (string)Value;
                         break;
                     case "Email":
-                        u.Email = (string)edit.Value;
+                        u.Email = (string)Value;
                         break;
                     case "NormalisedEmail":
-                        u.NormalisedEmail = (string)edit.Value;
+                        u.NormalisedEmail = (string)Value;
                         break;
                     case "Name":
-                        u.Name = (string)edit.Value;
+                        u.Name = (string)Value;
                         break;
                     case "IsPhoneConfirmed":
-                        u.IsPhoneConfirmed = (bool)edit.Value;
+                        u.IsPhoneConfirmed = (bool)Value;
                         break;
                     case "IsEmailConfirmed":
-                        u.IsEmailConfirmed = (bool)edit.Value;
+                        u.IsEmailConfirmed = (bool)Value;
                         break;
                     case "SecurityStamp":
-                        u.SecurityStamp = (string)edit.Value;
+                        u.SecurityStamp = (string)Value;
                         break;
                     case "LockoutDate":
-                        u.LockoutDate = (DateTimeOffset?)edit.Value;
+                        u.LockoutDate = (DateTimeOffset?)Value;
                         break;
                     case "AccessTries":
-                        u.AccessTries = (int)edit.Value;
+                        u.AccessTries = (int)Value;
                         break;
                     case "AccountStatus":
-                        u.AccountStatus = (UserAccountStatus)edit.Value;
+                        u.AccountStatus = (UserAccountStatus)Value;
                         break;
                     case "Reputation":
-                        u.Reputation = (int)edit.Value;
+                        u.Reputation = (int)Value;
                         break;
                     default:
                         throw new Exception("No propertyName match found");
                 }
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(edit.Property).IsModified = true);
+                await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(Property).IsModified = true);
             }
-            storeSentry.ExecuteWrite();
+            await storeSentry.ExecuteWriteAsync();
             return true;
         }
 
-        public bool UpdateHaunt(Guid id, double latitude, double longitude, double radius, int stability)
+        public async Task<bool> UpdateHauntAsync(Guid id, double latitude, double longitude, double radius, int stability)
         {
             throw new NotImplementedException();
         }
 
-        public bool UpdateRecentLocation(Guid id, double latitude, double longitude, double radius)
+        public async Task<bool> UpdateRecentLocationAsync(Guid id, double latitude, double longitude, double radius)
         {
             throw new NotImplementedException();
         }

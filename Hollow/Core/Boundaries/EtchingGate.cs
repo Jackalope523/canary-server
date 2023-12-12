@@ -13,17 +13,14 @@ namespace Core.Boundaries
 
     public interface IEtchingDatabase
     {
-        List<Etching> GetEtchingsForEvent(Guid id);
-        List<Etching> GetEtchingsByUser(Guid id);
-        Etching GetEtching(Guid id);
-        Etching AddEtching(Guid eventId, Guid etcherId,
-            DateTimeOffset timeEtched, string imageURL);
-        bool RemoveEtching(Guid etchingId);
-
-        bool RateEtching(Guid etchingId, Guid voterId, UserRating rating);
-        bool RemoveEtchingRating(Guid etchingId, Guid voterId);
-
-        List<Etching> GenerateFeedForUser(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList);
+        Task<List<Etching>> GetEtchingsForEventAsync(Guid id);
+        Task<List<Etching>> GetEtchingsByUserAsync(Guid id);
+        Task<Etching> GetEtchingAsync(Guid id);
+        Task<Etching> AddEtchingAsync(Guid eventId, Guid etcherId, DateTimeOffset timeEtched, string imageURL);
+        Task<bool> RemoveEtchingAsync(Guid etchingId);
+        Task<bool> RateEtchingAsync(Guid etchingId, Guid voterId, UserRating rating);
+        Task<bool> RemoveEtchingRatingAsync(Guid etchingId, Guid voterId);
+        Task<List<Etching>> GenerateFeedForUserAsync(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList);
     }
 
     public interface IEtchingOperations

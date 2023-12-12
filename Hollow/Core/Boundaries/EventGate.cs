@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Threading.Tasks;
-using Core.Controls;
-using Shared;
+
 
 namespace Core.Boundaries
 {
@@ -14,23 +12,23 @@ namespace Core.Boundaries
 
 	public interface IEventDatabase
 	{
-        EventShard FindEvent(Guid id);
-		List<EventThinSlice> FindEvents(double latitude, double longitude, double distance);
-		EventShard FindCurrentEventForUser(Guid id);
-		List<EventShard> FindUpcomingEventsForUser(Guid id);
-		List<EventShard> FindPastEventsForUser(Guid id);
+        Task<EventShard> FindEventAsync(Guid id);
+		Task<List<EventThinSlice>> FindEventsAsync(double latitude, double longitude, double distance);
+		Task<EventShard> FindCurrentEventForUserAsync(Guid id);
+		Task<List<EventShard>> FindUpcomingEventsForUserAsync(Guid id);
+		Task<List<EventShard>> FindPastEventsForUserAsync(Guid id);
 
-		EventShard CreateEvent(Guid hostId, string name, string description,
+		Task<EventShard> CreateEventAsync(Guid hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character);
-		bool UpdateEvent(Guid id, List<(string Property, object Value)> edits);
-		bool EndEvent(Guid id);
+		Task<bool> UpdateEventAsync(Guid id, List<(string Property, object Value)> edits);
+        Task<bool> EndEventAsync(Guid id);
 
-		bool AddUserToEvent(Guid userId, Guid eventId);
-		bool RemoveUserFromEvent(Guid userId, Guid eventId);
+        Task<bool> AddUserToEventAsync(Guid userId, Guid eventId);
+        Task<bool> RemoveUserFromEventAsync(Guid userId, Guid eventId);
 
-		List<UserSilhouette> GetGuestList(Guid id);
-		List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> GetGuestHistory(Guid id);
+		Task<List<UserSilhouette>> GetGuestListAsync(Guid id);
+		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(Guid id);
 	}
 
 	public interface IEventOperations

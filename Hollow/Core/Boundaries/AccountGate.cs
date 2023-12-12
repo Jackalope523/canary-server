@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Core.Controls;
 using System.Threading.Tasks;
-using Core.Entities;
-using Shared;
 
 namespace Core.Boundaries
 {
@@ -20,19 +17,17 @@ namespace Core.Boundaries
 
 	public interface IAccountDatabase
 	{
-		UserShard FindUserById(Guid id);
-        UserShard FindUserByPhoneNumber(string phoneNumber);
-		UserShard FindUserByEmail(string normalisedEmail);
-        bool CreateUser(string phoneNumber, string email, string normalisedEmail,
+		Task<UserShard> FindUserByIdAsync(Guid id);
+        Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber);
+        Task<UserShard> FindUserByEmailAsync(string normalisedEmail);
+        Task<bool> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, Character character);
-		bool UpdateUser(Guid id, List<(string Property, object Value)> edits);
-        bool DeleteUser(Guid id);
-
-		(double Latitude, double Longitude, double Radius) GetRecentUserLocation(Guid id);
-		bool UpdateRecentLocation(Guid id, double latitude, double longitude, double radius);
-
-		(double Latitude, double Longitude, double Radius, int Stability) GetUserHaunt(Guid id);
-		bool UpdateHaunt(Guid id, double latitude, double longitude, double radius, int stability);
+        Task<bool> UpdateUserAsync(Guid id, List<(string Property, object Value)> edits);
+        Task<bool> DeleteUserAsync(Guid id);
+		Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(Guid id);
+        Task<bool> UpdateRecentLocationAsync(Guid id, double latitude, double longitude, double radius);
+		Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(Guid id);
+        Task<bool> UpdateHauntAsync(Guid id, double latitude, double longitude, double radius, int stability);
 	}
 
 	public interface IAccountOperations

@@ -1,4 +1,5 @@
 ﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
 using Shared;
 
 namespace Repository
@@ -11,22 +12,25 @@ namespace Repository
         {
         }
 
-        public Etching AddEtching(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
+        public async Task<Etching> AddEtchingAsync(Guid eventId, Guid posterId, DateTimeOffset timePosted, string imageURL)
         {
             Post toAdd = new Post { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
-            storeSentry.ExecuteWrite(ctx => ctx.Posts.Add(toAdd));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Add(toAdd));
             return new Etching(toAdd.Id, toAdd.EventId, toAdd.OwnerId, toAdd.PostedAt, toAdd.PhotoURL, new(0, 0));
         }
 
-        public List<Etching> GenerateFeedForUser(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList)
+        public async Task<List<Etching>> GenerateFeedForUserAsync(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList)
         {
             // Get List of Friends.
-            List<Guid> following = storeSentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.OtherId).ToList());
-            List<Guid> followingMe = storeSentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.SelfId).ToList());
-            List<Guid> friends = following.Intersect(followingMe).ToList();
+            Task<List<Guid>> following = storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.OtherId).ToListAsync());
+            Task<List<Guid>> followingMe = storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.SelfId).ToListAsync());
+
+            List <Guid> a = await following;
+            List<Guid> b = await followingMe;
+            List<Guid> friends = a.Intersect(b).ToList();
 
             // Get unseen posts by friends from certain depth.
-            List<Etching> friendPosts = storeSentry.ExecuteRead(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && p.PostedAt > depthCharge && p.PostedAt < DateTimeOffset.UtcNow).
+            List<Etching> friendPosts = await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && p.PostedAt > depthCharge && p.PostedAt < DateTimeOffset.UtcNow).
                Join(
                storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateUps = l.Count() })),
                p => p.Id,
@@ -38,7 +42,7 @@ namespace Repository
                p => p.Id,
                l => l.PostId,
                (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
-               )).ToList());
+               )).ToListAsync());
 
             // Compile unique list if events spanned by friend posts and a list of already loaded posts. 
             List<Guid> sitesToBeExplored = new List<Guid>();
@@ -50,7 +54,7 @@ namespace Repository
             }
 
             // Get remaining friend posts from same events as others even if outside time range. 
-            List<Etching> nettedPosts = storeSentry.ExecuteRead(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
+            List<Etching> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
                Join(
                storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateUps = l.Count() })),
                p => p.Id,
@@ -62,26 +66,28 @@ namespace Repository
                p => p.Id,
                l => l.PostId,
                (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
-               )).ToList());
+               )).ToListAsync());
 
             return friendPosts.Concat(nettedPosts).ToList();
         }
 
-        public Etching GetEtching(Guid id)
+        public async Task<Etching> GetEtchingAsync(Guid id)
         {
-            int Ups = countRatings(id, PostLink.PostLinkType.RateUp);
-            int Downs = countRatings(id, PostLink.PostLinkType.RateDown);
+            Task<int> Ups = CountRatingsAsync(id, PostLink.PostLinkType.RateUp);
+            Task<int> Downs = CountRatingsAsync(id, PostLink.PostLinkType.RateDown);
+            int u = await Ups;
+            int d = await Downs;
 
-            return storeSentry.ExecuteRead(ctx => ctx.
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.
                 Posts.
                 Where(p => p.Id == id).
-                Select(p => new Etching(p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, new(Ups, Downs))).Single());
+                Select(p => new Etching(p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, new(u, d))).SingleAsync());
         }
 
-        public List<Etching> GetEtchingsByUser(Guid id)
+        public async Task<List<Etching>> GetEtchingsByUserAsync(Guid id)
         {
 
-            return storeSentry.ExecuteRead(ctx => ctx.Posts.Where(p => p.OwnerId == id).
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => p.OwnerId == id).
                 Join(
                 storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateUps = l.Count() })),
                 p => p.Id,
@@ -93,32 +99,32 @@ namespace Repository
                 p => p.Id,
                 l => l.PostId,
                 (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
-                )).ToList());
+                )).ToListAsync());
         }
 
-        public bool RateEtching(Guid postId, Guid voterId, UserRating rating)
+        public async Task<bool> RateEtchingAsync(Guid postId, Guid voterId, UserRating rating)
         {
             PostLink.PostLinkType type;
             if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
             else type = PostLink.PostLinkType.RateDown;
 
-            return addLinkOperation(new PostLink { SelfId = voterId, OtherId = postId, Type = type });
+            return await AddLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId, Type = type });
         }
 
-        public bool RemoveEtching(Guid postId)
+        public async Task<bool> RemoveEtchingAsync(Guid postId)
         {
-            storeSentry.ExecuteWrite(ctx => ctx.Posts.Remove(new Post { Id = postId }));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Remove(new Post { Id = postId }));
             return true;
         }
 
-        public bool RemoveEtchingRating(Guid postId, Guid voterId)
+        public async Task<bool> RemoveEtchingRatingAsync(Guid postId, Guid voterId)
         {
-            return removeLinkOperation(new PostLink { SelfId = voterId, OtherId = postId });
+            return await RemoveLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId });
         }
 
-        public List<Etching> GetEtchingsForEvent(Guid id)
+        public async Task<List<Etching>> GetEtchingsForEventAsync(Guid id)
         {
-            return storeSentry.ExecuteRead(ctx => ctx.Posts.Where(p => p.EventId == id).
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => p.EventId == id).
                 Join(
                 storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateUps = l.Count() })),
                 p => p.Id,
@@ -130,7 +136,7 @@ namespace Repository
                 p => p.Id,
                 l => l.PostId,
                 (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns)
-                )).ToList());
+                )).ToListAsync());
         }
     }
 

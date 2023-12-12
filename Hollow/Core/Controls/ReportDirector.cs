@@ -14,9 +14,9 @@ namespace Core.Controls
         public async Task ReportUserAsync(Guid userID, Guid targetID,
             UserReportType reportType, string reportDetails)
         {
-            Event occuringEvent = new(Events.FindCurrentEventForUser(targetID));
+            Event occuringEvent = new(await Events.FindCurrentEventForUserAsync(targetID));
             
-            Reports.ReportUser(userID, occuringEvent.Id, targetID, reportType, reportDetails);
+            Reports.ReportUserAsync(userID, occuringEvent.Id, targetID, reportType, reportDetails);
 
             // Compute user's standing
             var user = await GetUser(targetID);
@@ -25,7 +25,7 @@ namespace Core.Controls
             // Check if host should be punished
             if (user.AccountStatus != status)
             {
-                Accounts.UpdateUser(targetID, new() { ("AccountStatus", status) });
+                Accounts.UpdateUserAsync(targetID, new() { ("AccountStatus", status) });
             }
         }
 
@@ -33,7 +33,7 @@ namespace Core.Controls
             EventReportType reportType, string reportDetails)
         {
             var targetEvent = await GetEvent(eventID);
-            Reports.ReportEvent(userID, eventID, hostId, reportType, reportDetails);
+            Reports.ReportEventAsync(userID, eventID, hostId, reportType, reportDetails);
 
             // Check if action is to be taken
             if (await targetEvent.Reported())
@@ -48,7 +48,7 @@ namespace Core.Controls
                 // Check if host should be punished
                 if (user.AccountStatus != status)
                 {
-                    Accounts.UpdateUser(user.Id, new() { ("AccountStatus", status) });
+                    Accounts.UpdateUserAsync(user.Id, new() { ("AccountStatus", status) });
                 }
             }
         }
@@ -56,12 +56,12 @@ namespace Core.Controls
         internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
             GetAllReportsAsync(Guid userID)
         {
-            return Reports.GetReportsForUser(userID);
+            return await Reports.GetReportsForUserAsync(userID);
         }
 
         internal async Task<List<EventReport>> GetEventReportsAsync(Guid eventID)
         {
-            return Reports.GetReportsForEvent(eventID);
+            return await Reports.GetReportsForEventAsync(eventID);
         }
     }
 }

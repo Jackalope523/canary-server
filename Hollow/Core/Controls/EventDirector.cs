@@ -30,7 +30,7 @@ namespace Core.Controls
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUser(userID);
-			var nearbyEvents = Events.FindEvents(latitude, longitude, distance);
+			var nearbyEvents = await Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove events from list that the user cannot access
 			await RemoveInaccessibleEventsAsync(user, nearbyEvents);
@@ -42,7 +42,7 @@ namespace Core.Controls
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUser(userID);
-			var nearbyEvents = Events.FindEvents(latitude, longitude, distance);
+			var nearbyEvents = await Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove inaccessible events and events with a large difference between event and user interest
 			await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
@@ -80,7 +80,7 @@ namespace Core.Controls
             { throw new InvalidInformationException("Invalid event details provided."); }
 
             // Try to create an event
-            var newEvent = Events.CreateEvent(userID, eventStub.Name, eventStub.Description,
+            var newEvent = await Events.CreateEventAsync(userID, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter());
 			return newEvent;
@@ -117,7 +117,7 @@ namespace Core.Controls
 			}
 
 			// Push update
-			Events.UpdateEvent(targetEvent.Id, edits);
+			Events.UpdateEventAsync(targetEvent.Id, edits);
 		}
 
 		public async Task JoinEventAsync(Guid userID, Guid eventID)
@@ -136,7 +136,7 @@ namespace Core.Controls
 			{ throw new InvalidEventException("Event is closed."); }
 
 			// Try to add user to the event
-			bool success = Events.AddUserToEvent(userID, eventID);
+			bool success = await Events.AddUserToEventAsync(userID, eventID);
 			if (!success)
 			{ throw new UnexpectedFailureException("Could not join event."); }
 		}
@@ -150,7 +150,7 @@ namespace Core.Controls
 			{ throw new InvalidUserException("Host cannot leave the event."); }
 
 			// Try to remove user from event
-			bool success = Events.RemoveUserFromEvent(userID, eventID);
+			bool success = await Events.RemoveUserFromEventAsync(userID, eventID);
             if (!success)
             { throw new UnexpectedFailureException("Could not leave event."); }
         }
@@ -164,18 +164,18 @@ namespace Core.Controls
 			{ throw new InvalidUserException("User does not have permissions to end event."); }
 
 			// Try to end to event
-			bool success = Events.EndEvent(eventID);
+			bool success = await Events.EndEventAsync(eventID);
             if (!success)
             { throw new UnexpectedFailureException("Could not end event."); }
 
 			// Update all participants' vectors
-			foreach (var guestDetails in Events.GetGuestHistory(targetEvent.Id))
+			foreach (var guestDetails in await Events.GetGuestHistoryAsync(targetEvent.Id))
 			{
 				User guest = new(guestDetails.User);
 
 				guest.CalculateCharacter(targetEvent, guestDetails.Left.Value - guestDetails.Joined);
 
-				Accounts.UpdateUser(guest.Id, new() { ("Character", guest.Character) });
+				Accounts.UpdateUserAsync(guest.Id, new() { ("Character", guest.Character) });
 			}
         }
 
@@ -187,7 +187,7 @@ namespace Core.Controls
 			if (!await targetEvent.IsAttendedBy(userID))
 			{
 				// Retrieve user's friends
-				var friends = Profiles.GetFriends(userID);
+				var friends = await Profiles.GetFriendsAsync(userID);
 				List<UserSilhouette> friendAttendees = new();
 
 				// Check if any friends are attending
@@ -211,7 +211,7 @@ namespace Core.Controls
 
 		internal async Task<List<UserSilhouette>> GetAttendeesInternalAsync(Guid eventID)
 		{
-			return Events.GetGuestList(eventID);
+			return await Events.GetGuestListAsync(eventID);
 		}
 
 		internal async Task<List<EventShard>>
@@ -261,7 +261,7 @@ namespace Core.Controls
 
 		internal async Task<EventShard> GetCurrentEventAsync(Guid userID)
 		{
-			return Events.FindCurrentEventForUser(userID);
+			return await Events.FindCurrentEventForUserAsync(userID);
 		}
 
 

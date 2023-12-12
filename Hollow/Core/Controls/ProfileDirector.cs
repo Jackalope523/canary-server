@@ -45,7 +45,7 @@ namespace Core.Controls
         public async Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(Guid userID)
         {
             var user = await GetUser(userID);
-            var friends = Profiles.GetFriends(userID);
+            var friends = await Profiles.GetFriendsAsync(userID);
 
             Dictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
@@ -62,61 +62,61 @@ namespace Core.Controls
 
         public async Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid userID)
         {
-            return Profiles.GetFollowedUsers(userID);
+            return await Profiles.GetFollowedUsersAsync(userID);
         }
 
         public async Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid userID)
         {
-            return Profiles.GetBlockedUsers(userID);
+            return await Profiles.GetBlockedUsersAsync(userID);
         }
 
         public async Task FollowUserAsync(Guid userID, Guid targetID)
         {
-            Profiles.FollowUser(userID, targetID);
+            Profiles.FollowUserAsync(userID, targetID);
         }
 
         public async Task UnfollowUserAsync(Guid userID, Guid targetID)
         {
-            Profiles.UnfollowUser(userID, targetID);
+            Profiles.UnfollowUserAsync(userID, targetID);
         }
 
         public async Task BlockUserAsync(Guid userID, Guid targetID)
         {
-            Profiles.BlockUser(userID, targetID);
+            Profiles.BlockUserAsync(userID, targetID);
         }
 
         public async Task UnblockUserAsync(Guid userID, Guid targetID)
         {
-            Profiles.UnblockUser(userID, targetID);
+            Profiles.UnblockUserAsync(userID, targetID);
         }
 
         public async Task RateUserAsync(Guid userID, Guid targetID, UserRating rating)
         {
             if (rating != UserRating.Remove)
             {
-                Profiles.RateUser(userID, targetID, rating);
+                Profiles.RateUserAsync(userID, targetID, rating);
             }
             else
             {
-                Profiles.RemoveUserRating(userID, targetID);
+                Profiles.RemoveUserRatingAsync(userID, targetID);
             }
 
             User targetUser = new(targetID);
             await targetUser.SyncReputation();
             targetUser.CalculateReputation();
-            Accounts.UpdateUser(targetID, new() { ("Reputation", targetUser.Reputation) });
+            Accounts.UpdateUserAsync(targetID, new() { ("Reputation", targetUser.Reputation) });
         }
 
         internal async Task<(int Positive, int Negative)> GetAllRatingsAsync(Guid userID)
         {
-            return Profiles.GetUserRatings(userID);
+            return await Profiles.GetUserRatingsAsync(userID);
         }
 
         private async Task<List<EventShard>> GetUserActivityInternalAsync(Guid userID)
         {
             // Gather all user event data
-            var upcomingActivity = Events.FindUpcomingEventsForUser(userID);
-            upcomingActivity.Add(Events.FindCurrentEventForUser(userID));
+            var upcomingActivity = await Events.FindUpcomingEventsForUserAsync(userID);
+            upcomingActivity.Add(await Events.FindCurrentEventForUserAsync(userID));
 
             return upcomingActivity.ToList();
         }

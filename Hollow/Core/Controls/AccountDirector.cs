@@ -48,7 +48,7 @@ namespace Core.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            bool success = Accounts.CreateUser(newUser.PhoneNumber, email, newUser.Email,
+            bool success = await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
                 newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
             if (!success)
             { throw new UnexpectedFailureException("User creation failed."); }
@@ -116,12 +116,12 @@ namespace Core.Controls
 			}
 
             // Push update
-            Accounts.UpdateUser(editUser.Id, edits);
+            Accounts.UpdateUserAsync(editUser.Id, edits);
 		}
 
         public async Task DeleteUserAsync(Guid userID)
         {
-            bool success = Accounts.DeleteUser(userID);
+            bool success = await Accounts.DeleteUserAsync(userID);
             if (!success)
             { throw new UnexpectedFailureException("User deletion failed."); }
         }
@@ -135,14 +135,14 @@ namespace Core.Controls
 
             await user.HandleHaunt();
 
-            Accounts.UpdateRecentLocation(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
-            Accounts.UpdateHaunt(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
+            Accounts.UpdateRecentLocationAsync(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
+            Accounts.UpdateHauntAsync(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
         }
 
 
         internal async Task<User> GetUser(string phoneNumber)
         {
-            User user = new(Accounts.FindUserByPhoneNumber(phoneNumber));
+            User user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
 
             // Check if user account is locked
             if (user.IsLocked)
@@ -154,13 +154,13 @@ namespace Core.Controls
         internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
             GetUserHauntAsync(Guid userID)
         {
-            return Accounts.GetUserHaunt(userID);
+            return await Accounts.GetUserHauntAsync(userID);
         }
 
         internal async Task<(double Latitude, double Longitude, double Radius)>
             GetLastKnownUserLocationAsync(Guid userID)
         {
-            return Accounts.GetRecentUserLocation(userID);
+            return await Accounts.GetRecentUserLocationAsync(userID);
         }
 
 
@@ -185,7 +185,7 @@ namespace Core.Controls
 			try
 			{
                 // Throws an exception if there is no user
-                Accounts.FindUserByEmail(normalisedEmail);
+                Accounts.FindUserByEmailAsync(normalisedEmail);
 				emailTaken = true;
 			}
 			catch { }

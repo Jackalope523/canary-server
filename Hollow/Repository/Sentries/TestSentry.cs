@@ -9,7 +9,7 @@ namespace Repository
         public TestSentry() 
         {
 
-        }      
+        }
 
         public override T ExecuteRead<T>(Func<QueryContext, T> read)
         {
@@ -20,16 +20,25 @@ namespace Repository
             }
         }
 
-        public override void ExecuteWrite(Action<QueryContext> write)
+        public async override Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
+        {
+            using (context = new TestContext())
+            {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                return await read.Invoke(context);
+            }
+        }
+
+        public async override Task ExecuteWriteAsync(Action<QueryContext> write)
         {
             using (context = new TestContext())
             {
                 write.Invoke(context);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 
-        public override void DiscussWrite(Action<QueryContext> write)
+        public async override Task DiscussWriteAsync(Action<QueryContext> write)
         {
             if (!activeDiscussion)
             {
@@ -39,10 +48,10 @@ namespace Repository
             write.Invoke(context);
         }
 
-        public override void ExecuteWrite()
+        public async override Task ExecuteWriteAsync()
         {
-            context.SaveChanges();
-            context.Dispose();
+            await context.SaveChangesAsync();
+            await context.DisposeAsync();
             activeDiscussion = false;
         }
     }
