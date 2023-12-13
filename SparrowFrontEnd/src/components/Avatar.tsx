@@ -1,6 +1,6 @@
 import { View, Text, ViewStyle } from 'react-native';
 import * as React from 'react';
-import { avatarStyles } from '../styles/Avatars';
+import { avatarStyles } from '../styles/AvatarStyles';
 
 interface AvatarProps {
   status?: AvatarStatus;

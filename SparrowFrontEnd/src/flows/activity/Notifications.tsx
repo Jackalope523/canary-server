@@ -18,7 +18,7 @@ import { navigationStyles } from '../../styles/Navigation';
 import { Spacing } from '../../styles/Spacing';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { avatarStyles } from '../../styles/Avatars';
+import { avatarStyles } from '../../styles/AvatarStyles';
 import { notificationStyles } from '../../styles/Notifications';
 import NoNotifications from '../../components/activity/notifications/NoNotifications';
 
