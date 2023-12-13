@@ -37,7 +37,7 @@ namespace Repository
                 Haunt = new Point(40.7128, -74.0060),
                 HauntRadius = 10.0 + produced,
                 HauntWheight = 5 + produced,
-                CurrentLocation = new Point(34.0522, -118.2437),
+                CurrentLocation = new Point(40.7128, -74.0060),
                 CurrentRadius = 15.0 + produced
             };
         }
