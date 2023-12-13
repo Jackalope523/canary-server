@@ -1,4 +1,5 @@
 ﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
 using Shared;
 
 namespace Repository
@@ -11,71 +12,120 @@ namespace Repository
         {
         }
 
-        public async Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(Guid id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>)> GetReportsByUserAsync(Guid id)
         {
-            List<Report> reports = await GetReportsAsync(r => r.SelfId == id);
-            List<UserReport> userReportsToReturn = new List<UserReport>();
-            List<EventReport> eventReportsToReturn = new List<EventReport>();
-
-            foreach (Report report in reports)
-            {
-                if (report.OtherId != report.Event.HostId)
-                {
-                    userReportsToReturn.Add(new UserReport(report.Id, report.SelfId, report.OtherId, report.FilingDate, Report.ToUserReportType(report.Type), report.Notes));
-                }
-                else
-                {
-                    eventReportsToReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
-                }
-
-            }
-            return (userReportsToReturn, eventReportsToReturn);
+            Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            UserReports.
+            Where(r => r.SelfId == id).
+            Select(r => new Core.Boundaries.UserReport
+            (
+                r.Id,
+                r.SelfId,
+                r.OtherId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
+            Task<List<Core.Boundaries.EventReport>> eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            EventReports.
+            Where(r => r.SelfId == id).
+            Select(r => new Core.Boundaries.EventReport
+            (
+                r.Id,
+                r.SelfId,
+                r.EventId,
+                r.OtherId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
+         
+            return (await userReportsToReturn, await eventReportsToReturn);
         }
 
-        public async Task<List<EventReport>> GetReportsForEventAsync(Guid id)
+        public async Task<List<Core.Boundaries.EventReport>> GetReportsForEventAsync(Guid id)
         {
-            List<Report> reports = await GetReportsAsync(r => r.EventId == id);
-            List<EventReport> toReturn = new List<EventReport>();
-
-            foreach (Report report in reports)
-            {
-                toReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
-            }
-
-            return toReturn;
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.
+            EventReports.
+            Where(r => r.EventId == id).
+            Select(r => new Core.Boundaries.EventReport
+            (
+                r.Id,
+                r.SelfId,
+                r.EventId,
+                r.OtherId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
         }
 
-        public async Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(Guid id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>)> GetReportsForUserAsync(Guid id)
         {
-            Task<List<Report>> userReports = GetReportsAsync(r => r.OtherId == id);
-            Task<List<Report>> eventReports = GetReportsAsync(r => r.OtherId == id && r.OtherId == r.Event.HostId);
-            List<UserReport> userReportsToReturn = new List<UserReport>();
-            List<EventReport> eventReportsToReturn = new List<EventReport>();
+            Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+             UserReports.
+             Where(r => r.OtherId == id).
+             Select(r => new Core.Boundaries.UserReport
+             (
+                 r.Id,
+                 r.SelfId,
+                 r.OtherId,
+                 r.FilingDate,
+                 r.Type,
+                 r.Notes
+             )).
+             ToListAsync());
+            Task<List<Core.Boundaries.EventReport>> eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            EventReports.
+            Where(r => r.OtherId == id).
+            Select(r => new Core.Boundaries.EventReport
+            (
+                r.Id,
+                r.SelfId,
+                r.EventId,
+                r.OtherId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
 
-            List<Report> a = await userReports;
-            List<Report> b = await eventReports;
-            foreach (Report report in a)
-            {
-                userReportsToReturn.Add(new UserReport(report.Id, report.SelfId, report.OtherId, report.FilingDate, Report.ToUserReportType(report.Type), report.Notes));
-            }
-            foreach (Report report in b)
-            {
-                eventReportsToReturn.Add(new EventReport(report.Id, report.SelfId, report.EventId, report.OtherId, report.FilingDate, Report.ToEventReportType(report.Type), report.Notes));
-
-            }
-
-            return (userReportsToReturn, eventReportsToReturn);
+            return (await userReportsToReturn, await eventReportsToReturn);
         }
 
         public async Task<bool> ReportEventAsync(Guid userId, Guid eventId, Guid HostId, EventReportType reportType, string reportDetails)
         {
+            EventReport toCreate = new EventReport
+            {
+                SelfId = userId,
+                OtherId = HostId,
+                EventId = eventId,
+                Type = reportType,
+                FilingDate = DateTime.UtcNow,
+                Notes = reportDetails
+            };
 
-            return await CreateReportAsync(userId, eventId, HostId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventReports.AddAsync(toCreate));
+            return true;
         }
 
         public async Task<bool> ReportUserAsync(Guid selfId, Guid eventId, Guid targetId, UserReportType reportType, string reportDetails)
         {
-            return await CreateReportAsync(selfId, eventId, targetId, Report.ToReportType(reportType), DateTimeOffset.Now, reportDetails);
-        }
+            UserReport toCreate = new UserReport
+            {
+                SelfId = selfId,
+                OtherId = targetId,
+                EventId = eventId,
+                Type = reportType,
+                FilingDate = DateTime.UtcNow,
+                Notes = reportDetails
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.AddAsync(toCreate));
+            return true;
+        }      
     }
 }

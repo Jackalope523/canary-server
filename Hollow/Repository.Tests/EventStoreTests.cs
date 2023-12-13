@@ -37,21 +37,37 @@ namespace Repository.Tests
         [Fact]
         public async Task CreateEventAsync_SUCCESS()
         {
-            store.CreateEvent(testHostId, testEventName, testEventDescription, testEventEventType, testEventStartTime, testEventLatitude, testEventLongitude, testEventGroupMinimum, testEventGroupMaximum);
+            await store.CreateEventAsync(
+                testEvent.HostId, 
+                testEvent.Name, 
+                testEvent.Description, 
+                testEvent.StartTime, 
+                testEvent.Location.Y, 
+                testEvent.Location.X, 
+                testEvent.GroupMinimum, 
+                testEvent.GroupMaximum,
+                new Character(
+                    testEvent.Extroversion,
+                    testEvent.Athleticisme,
+                    testEvent.Chaos,
+                    testEvent.Competitiveness,
+                    testEvent.Industriousness,
+                    testEvent.NightOwl,
+                    testEvent.Openness
+                    ));
 
-            Event created = sentry.GetContext().Events.First();
+            Event created = sentry.ExecuteRead(ctx => ctx.Events.First());
 
             Assert.NotNull(created);
-            Assert.Equal(testHostId, created.HostId);
-            Assert.Equal(testEventName, created.Name);
-            Assert.Equal(testEventDescription, created.Description);
-            Assert.Equal(testEventEventType, created.Type);
-            Assert.Equal(testEventStartTime, created.StartTime);
-            Assert.Equal(testEventLatitude, created.Location.Y);
-            Assert.Equal(testEventLongitude, created.Location.X);
-            Assert.Equal(testEventGroupMinimum, created.GroupMinimum);
-            Assert.Equal(testEventGroupMaximum, created.GroupMaximum);
-            Assert.Equal(testIsEventOpen, created.IsEventOpen);
+            Assert.Equal(testEvent.HostId, created.HostId);
+            Assert.Equal(testEvent.Name, created.Name);
+            Assert.Equal(testEvent.Description, created.Description);
+            Assert.Equal(testEvent.StartTime, created.StartTime);
+            Assert.Equal(testEvent.Location.Y, created.Location.Y);
+            Assert.Equal(testEvent.Location.X, created.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, created.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, created.GroupMaximum);
+            Assert.Equal(testEvent.IsOpen, created.IsOpen);
         }       
         [Fact]
         public async Task FindEventAsync_SUCCESS()
@@ -198,5 +214,4 @@ namespace Repository.Tests
             throw new NotImplementedException();
         }
     }
-}
 }

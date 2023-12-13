@@ -12,6 +12,8 @@ namespace Repository
         public DbSet<EventLink> EventLinks { get; set; }
         public DbSet<PostLink> PostLinks { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<UserReport> UserReports { get; set; }
+        public DbSet<EventReport> EventReports { get; set; }
         public DbSet<Post> Posts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,13 +22,11 @@ namespace Repository
                 .Property(u => u.AccountStatus)
                 .HasColumnName("AccountStatus");
 
-
             modelBuilder.Entity<Link>()
                 .HasDiscriminator<string>("link_type")
                 .HasValue<UserLink>("user")
                 .HasValue<EventLink>("event")
                 .HasValue<PostLink>("post");
-
 
             modelBuilder.Entity<UserLink>()
                 .Property(l => l.SelfId)
@@ -35,7 +35,6 @@ namespace Repository
             modelBuilder.Entity<UserLink>()
                 .Property(l => l.Type)
                 .HasColumnName("Type");
-
 
             modelBuilder.Entity<EventLink>()
                 .Property(l => l.SelfId)
@@ -57,7 +56,6 @@ namespace Repository
                 .Property(l => l.Type)
                 .HasColumnName("Type");
 
-
             modelBuilder.Entity<Link>()
                 .HasOne(a => a.Self)
                 .WithMany(b => b.Links);
@@ -67,6 +65,11 @@ namespace Repository
                 .WithMany(b => b.Links);
 
             modelBuilder.Entity<Report>()
+                .HasDiscriminator<string>("report_type")
+                .HasValue<UserReport>("user")
+                .HasValue<EventReport>("event");
+
+            modelBuilder.Entity<Report>()
                 .HasOne(r => r.Self)
                 .WithMany(u => u.ReporterList);
 
@@ -74,14 +77,9 @@ namespace Repository
                 .HasOne(r => r.Other)
                 .WithMany(u => u.ReporteeList);
 
-
             modelBuilder.Entity<Report>()
                .HasOne(r => r.Event)
                .WithMany(e => e.Reports);
-
-
-
-
 
             //SeedData(modelBuilder);
         }
