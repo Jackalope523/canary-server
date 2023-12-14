@@ -10,7 +10,11 @@ import {
   BottomTabParamList,
 } from '../../components/atoms/types';
 
-import Button from '../../components/atoms/Button';
+import Button, {
+  ButtonDisplay,
+  ButtonType,
+  ButtonSize,
+} from '../../components/Button';
 import { getAccount, userShard } from '../auth/accountPigeon';
 
 type ProfileProps = StackScreenProps<BottomTabParamList, 'Profile'>;
@@ -31,33 +35,10 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
   return (
     <View>
       <Button
-        btnText={'Settings'}
-        btnIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
-        btnStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonPrimary,
-          globalStyles.buttonFull,
-        ]}
-        btnTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveStyle={[
-          globalStyles.textButtonExtraSmall,
-          globalStyles.buttonFull,
-          globalStyles.buttonPrimaryLight,
-        ]}
-        btnActiveTextStyle={[
-          globalStyles.textButtonExtraSmall.text,
-          globalStyles.textLight,
-        ]}
-        btnActiveIconStyle={[
-          globalStyles.buttonIconSmall,
-          globalStyles.buttonIconSmall.light,
-        ]}
+        type={ButtonType.PrimaryDark}
+        size={ButtonSize.ExtraSmall}
+        display={ButtonDisplay.Contained}
+        btnText="Settings"
         onPress={() => navigation.navigate('Account')}
       />
       <Text>Profile</Text>
