@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from './Colors';
+import { Colors } from './ColorStyles';
 
 export const labelStyles = StyleSheet.create({
   // ! ||--------------------------------------------------------------------------------||

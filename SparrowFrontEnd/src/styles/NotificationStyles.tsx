@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from './Colors';
-import { Spacing } from './Spacing';
+import { Colors } from './ColorStyles';
+import { Spacing } from './SpacingStyles';
 
 export const notificationStyles = StyleSheet.create({
   // ! ||--------------------------------------------------------------------------------||
