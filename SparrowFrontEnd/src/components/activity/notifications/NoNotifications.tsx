@@ -16,7 +16,7 @@ const NoNotifications = () => {
   return (
     <View style={[styles.container, globalStyles.baseContainer]}>
       <Image
-        source={require('../../assets/illustrations/temp/not-found.png')}
+        source={require('../../../assets/illustrations/temp/not-found.png')}
         style={globalStyles.illustrationLarge}
       />
       <View style={styles.textWrapper}>
