@@ -141,7 +141,6 @@ export const buttonStyles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     // borderColor: Colors.sparrowDarkBrown,
-    columnGap: Spacing.sm,
   },
 
   // TODO move to ICON STYLES file?

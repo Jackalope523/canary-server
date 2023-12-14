@@ -87,8 +87,8 @@ export const Button: React.FC<ButtonProps> = ({
 
     case ButtonType.SecondaryLight:
       btnStyle = [buttonStyles.buttonSecondaryLight];
-      btnTextStyle = [globalStyles.textDark];
-      btnIconStyle = [globalStyles.textDark];
+      btnTextStyle = [globalStyles.textLight];
+      btnIconStyle = [globalStyles.textLight];
       btnActiveStyle = [buttonStyles.buttonSecondaryLightSelected];
       btnActiveTextStyle = [globalStyles.textDark];
       btnActiveIconStyle = [globalStyles.textDark];
@@ -240,9 +240,9 @@ export const Button: React.FC<ButtonProps> = ({
         handlePressIn();
         setIsPressed(!isPressed);
       }}
-      style={isPressed ? btnStyle : btnActiveStyle}
+      style={isPressed ? btnActiveStyle : btnStyle}
       disabled={disabled}>
-      <Text style={isPressed ? btnTextStyle : btnActiveTextStyle}>
+      <Text style={isPressed ? btnActiveTextStyle : btnTextStyle}>
         {btnText}
       </Text>
     </Pressable>
