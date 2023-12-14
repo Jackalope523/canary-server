@@ -31,6 +31,7 @@ import {
   GestureHandlerRootView,
   ScrollView,
 } from 'react-native-gesture-handler';
+import { buttonStyles } from '../../styles/ButtonStyles';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -110,30 +111,23 @@ const DiscoveryScreen = () => {
         <View>
           {/* Search */}
           {/* Search header */}
-          <View style={navigationStyles.search}>
+          <View>
             <View
               style={
                 searchContentVisible
-                  ? navigationStyles.search.headerWrapper
+                  ? navigationStyles.searchHeaderWrapper
                   : null
               }>
-              <View style={navigationStyles.search.headerWrapper.header}>
+              <View style={navigationStyles.searchHeader}>
                 {/* Search bar */}
-                <View style={navigationStyles.search.searchBarWrapper}>
-                  <View
-                    style={navigationStyles.search.searchBarWrapper.searchBar}>
+                <View style={navigationStyles.searchBarWrapper}>
+                  <View style={navigationStyles.searchBar}>
                     <Icon
                       name="search-outline"
-                      style={[
-                        globalStyles.buttonIconSmall,
-                        globalStyles.buttonIconSmall.dark,
-                      ]}
+                      style={buttonStyles.buttonIconSmallDark}
                     />
                     <TextInput
-                      style={
-                        navigationStyles.search.searchBarWrapper.searchBar
-                          .textInput
-                      }
+                      style={navigationStyles.searchBarTextInput}
                       color={Colors.sparrowDark}
                       onPressIn={toggleSearch}
                       placeholder="Search for events"
@@ -149,10 +143,7 @@ const DiscoveryScreen = () => {
                       <Pressable onPress={() => setSearchText('')}>
                         <Icon
                           name="close-fill"
-                          style={[
-                            globalStyles.buttonIconSmall,
-                            globalStyles.buttonIconSmall.dark,
-                          ]}
+                          style={buttonStyles.buttonIconSmallDark}
                         />
                       </Pressable>
                     ) : null}
@@ -163,17 +154,13 @@ const DiscoveryScreen = () => {
                       onPress={toggleClose}
                       style={
                         searchContentVisible
-                          ? navigationStyles.search.searchBarWrapper
-                              .closeButtonWrapper
+                          ? navigationStyles.searchBarWrapperCloseButtonWrapper
                           : null
                       }>
                       {/* TODO this icon isn't perfectly vertically aligned - fix that */}
                       <Icon
                         name="close-outline"
-                        style={[
-                          globalStyles.buttonIconMedium,
-                          globalStyles.buttonIconMedium.dark,
-                        ]}
+                        style={buttonStyles.buttonIconMediumDark}
                       />
                     </Pressable>
                   ) : null}
@@ -182,13 +169,9 @@ const DiscoveryScreen = () => {
                 {/* Search options */}
 
                 {searchContentVisible ? (
-                  <View style={navigationStyles.search.searchOptionsWrapper}>
+                  <View>
                     {/* TODO make FILTER and SORT buttons functional */}
-                    <View
-                      style={
-                        navigationStyles.search.searchOptionsWrapper
-                          .searchOptions
-                      }>
+                    <View style={navigationStyles.searchOptions}>
                       <Button
                         type={ButtonType.PrimaryDark}
                         size={ButtonSize.ExtraSmall}
@@ -219,11 +202,8 @@ const DiscoveryScreen = () => {
           {/* TODO if sort and filter doesn't overlay SearchFilter - hide SearchFilter when sort or filter is active/visible */}
           {/* TODO make only one open - sort or filter - both cant be open at once */}
           {activeComponent === 'filter' && searchContentVisible ? (
-            <View style={navigationStyles.search.searchOptionsInnerContainer}>
-              <View
-                style={
-                  navigationStyles.search.searchOptionsInnerContainer.section
-                }>
+            <View style={navigationStyles.searchOptionsInner}>
+              <View style={navigationStyles.searchOptionsInnerSection}>
                 <Text
                   style={[
                     globalStyles.headingTextThree,
@@ -308,10 +288,7 @@ const DiscoveryScreen = () => {
               </View>
 
               {/* TODO buttons need to change style when active (tapped and selected) */}
-              <View
-                style={
-                  navigationStyles.search.searchOptionsInnerContainer.section
-                }>
+              <View style={navigationStyles.searchOptionsInnerSection}>
                 <Text
                   style={[
                     globalStyles.headingTextThree,
@@ -361,10 +338,7 @@ const DiscoveryScreen = () => {
                   </ScrollView>
                 </GestureHandlerRootView>
               </View>
-              <View
-                style={
-                  navigationStyles.search.searchOptionsInnerContainer.section
-                }>
+              <View style={navigationStyles.searchOptionsInnerSection}>
                 <Text
                   style={[
                     globalStyles.headingTextThree,
@@ -374,14 +348,11 @@ const DiscoveryScreen = () => {
                   Distance
                 </Text>
               </View>
-              <View
-                style={
-                  navigationStyles.search.searchOptionsInnerContainer.section
-                }>
+              <View style={navigationStyles.searchOptionsInnerSection}>
                 {/* TODO confirm selection button is hidden/broken because of flex:1 from buttonFull style */}
                 <View style={styles.wrapper}>
                   <Button
-                    type={ButtonType.PrimaryLight}
+                    type={ButtonType.Success}
                     size={ButtonSize.Medium}
                     display={ButtonDisplay.Full}
                     btnText="Confirm selection"
@@ -393,11 +364,8 @@ const DiscoveryScreen = () => {
           ) : null}
 
           {activeComponent === 'sort' && searchContentVisible ? (
-            <View style={navigationStyles.search.searchOptionsInnerContainer}>
-              <View
-                style={
-                  navigationStyles.search.searchOptionsInnerContainer.section
-                }>
+            <View style={navigationStyles.searchOptionsInner}>
+              <View style={navigationStyles.searchOptionsInnerSection}>
                 <Text
                   style={[
                     globalStyles.headingTextThree,
@@ -448,7 +416,7 @@ const DiscoveryScreen = () => {
 
           {/* TODO probably have to enable it and disable filter or sort if there's text input in the textInput component */}
           {!activeComponent && searchContentVisible ? (
-            <View style={navigationStyles.search.searchContent}>
+            <View style={navigationStyles.searchContent}>
               <SearchFilter />
             </View>
           ) : null}

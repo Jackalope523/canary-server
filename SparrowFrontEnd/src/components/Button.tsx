@@ -71,7 +71,7 @@ export const Button: React.FC<ButtonProps> = ({
       btnStyle = [buttonStyles.buttonPrimaryDark];
       btnTextStyle = [globalStyles.textLight];
       btnIconStyle = [globalStyles.textLight];
-      btnActiveStyle = [buttonStyles.buttonPrimaryDark];
+      btnActiveStyle = [buttonStyles.buttonPrimaryDarkSelected];
       btnActiveTextStyle = [globalStyles.textLight];
       btnActiveIconStyle = [globalStyles.textLight];
       break;

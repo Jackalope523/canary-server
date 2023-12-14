@@ -161,7 +161,7 @@ export const buttonStyles = StyleSheet.create({
   },
 
   // Medium
-  buttonIconMedium: {
+  buttonIconMediumLight: {
     fontSize: 32,
     // Fix for icon being cut off
     height: 32,
