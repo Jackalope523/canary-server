@@ -7,9 +7,9 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { globalStyles } from '../styles/Global';
-import { buttonStyles } from '../styles/Buttons';
-import { Gap } from '../styles/Spacing';
+import { globalStyles } from '../styles/GlobalStyles';
+import { buttonStyles } from '../styles/ButtonStyles';
+import { Gap } from '../styles/SpacingStyles';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';

@@ -3,8 +3,8 @@ import { View, Text, TextInput } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import DatePicker from 'react-native-date-picker';
 
-import { Colors } from '../../styles/Colors';
-import { globalStyles } from '../../styles/Global';
+import { Colors } from '../../styles/ColorStyles';
+import { globalStyles } from '../../styles/GlobalStyles';
 
 import { AuthStackParamList } from '../../components/atoms/types';
 import Button, {

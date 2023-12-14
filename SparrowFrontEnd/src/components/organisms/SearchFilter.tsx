@@ -4,7 +4,7 @@ import * as React from 'react';
 import EventCardMedium from '../EventCardMedium';
 import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
 
-import { Spacing } from '../../styles/Spacing';
+import { Spacing } from '../../styles/SpacingStyles';
 
 //  TODO make search filter, search for events based on TEXT input from Discovery -> searchBar -> TextInput component.
 // TODO make FILTER and SORT buttons functional

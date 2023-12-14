@@ -9,10 +9,10 @@ import {
   FlatList,
 } from 'react-native';
 import SearchBar from '../../components/discovery/SearchBar';
-import { Colors } from '../../styles/Colors';
-import { globalStyles } from '../../styles/Global';
-import { navigationStyles } from '../../styles/Navigation';
-import { Spacing } from '../../styles/Spacing';
+import { Colors } from '../../styles/ColorStyles';
+import { globalStyles } from '../../styles/GlobalStyles';
+import { navigationStyles } from '../../styles/NavigationStyles';
+import { Spacing } from '../../styles/SpacingStyles';
 
 import Button, {
   ButtonType,

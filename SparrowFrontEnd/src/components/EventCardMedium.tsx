@@ -1,12 +1,12 @@
 import { ImageBackground, Text, View, Pressable } from 'react-native';
 import React, { useState } from 'react';
-import { cardStyles } from '../styles/Cards';
+import { cardStyles } from '../styles/CardStyles';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
-import { globalStyles } from '../styles/Global';
-import { Colors } from '../styles/Colors';
+import { globalStyles } from '../styles/GlobalStyles';
+import { Colors } from '../styles/ColorStyles';
 
 // !! THIS COMPONENT IS CURRENTLY NOT IN USE !!
 

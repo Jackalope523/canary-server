@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
-import { globalStyles } from '../../styles/Global';
-import { Colors } from '../../styles/Colors';
-import { Spacing } from '../../styles/Spacing';
+import { globalStyles } from '../../styles/GlobalStyles';
+import { Colors } from '../../styles/ColorStyles';
+import { Spacing } from '../../styles/SpacingStyles';
 
 import EventCardMedium from '../../components/EventCardMedium';
 import NotificationIndicator from '../../components/activity/NotificationIndicator';

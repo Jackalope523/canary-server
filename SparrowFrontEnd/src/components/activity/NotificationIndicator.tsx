@@ -1,9 +1,9 @@
 import { View, Text, Pressable, Platform } from 'react-native';
 import * as React from 'react';
-import { globalStyles } from '../../styles/Global';
-import { Colors } from '../../styles/Colors';
-import { notificationStyles } from '../../styles/Notifications';
-import { labelStyles } from '../../styles/Labels';
+import { globalStyles } from '../../styles/GlobalStyles';
+import { Colors } from '../../styles/ColorStyles';
+import { notificationStyles } from '../../styles/NotificationStyles';
+import { labelStyles } from '../../styles/LabelStyles';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';

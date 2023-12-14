@@ -1,8 +1,8 @@
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import * as React from 'react';
-import { globalStyles } from '../../../styles/Global';
-import { Spacing } from '../../../styles/Spacing';
-import { CustomDimensions } from '../../../styles/CustomDimensions';
+import { globalStyles } from '../../../styles/GlobalStyles';
+import { Spacing } from '../../../styles/SpacingStyles';
+import { CustomDimensions } from '../../../styles/CustomDimensionStyles';
 
 // TODO rename this file later when you come up with a better name
 

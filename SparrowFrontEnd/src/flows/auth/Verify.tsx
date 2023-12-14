@@ -2,8 +2,8 @@ import * as React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 
-import { Colors } from '../../styles/Colors';
-import { globalStyles } from '../../styles/Global';
+import { Colors } from '../../styles/ColorStyles';
+import { globalStyles } from '../../styles/GlobalStyles';
 
 import { AuthStackParamList } from '../../components/atoms/types';
 import Button, {

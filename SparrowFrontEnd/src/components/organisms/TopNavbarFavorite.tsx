@@ -4,7 +4,7 @@ import * as React from 'react';
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
-import { navigationStyles } from '../../styles/Navigation';
+import { navigationStyles } from '../../styles/NavigationStyles';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 

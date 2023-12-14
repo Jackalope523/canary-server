@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, { useState } from 'react';
-import { Colors } from '../../styles/Colors';
+import { Colors } from '../../styles/ColorStyles';
 import Slider from '@react-native-community/slider';
 
 type Props = {};

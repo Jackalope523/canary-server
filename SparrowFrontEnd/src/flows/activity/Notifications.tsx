@@ -12,14 +12,14 @@ import {
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
 
-import { globalStyles } from '../../styles/Global';
-import { Colors } from '../../styles/Colors';
-import { navigationStyles } from '../../styles/Navigation';
-import { Spacing } from '../../styles/Spacing';
+import { globalStyles } from '../../styles/GlobalStyles';
+import { Colors } from '../../styles/ColorStyles';
+import { navigationStyles } from '../../styles/NavigationStyles';
+import { Spacing } from '../../styles/SpacingStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { avatarStyles } from '../../styles/AvatarStyles';
-import { notificationStyles } from '../../styles/Notifications';
+import { notificationStyles } from '../../styles/NotificationStyles';
 import NoNotifications from '../../components/activity/notifications/NoNotifications';
 
 const Icon = createIconSetFromFontello(fontelloConfig);

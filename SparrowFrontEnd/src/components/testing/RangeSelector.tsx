@@ -7,7 +7,7 @@ import Animated, {
   useAnimatedProps,
   runOnJS,
 } from 'react-native-reanimated';
-import { Colors } from '../../styles/Colors';
+import { Colors } from '../../styles/ColorStyles';
 import {
   Gesture,
   GestureHandlerRootView,

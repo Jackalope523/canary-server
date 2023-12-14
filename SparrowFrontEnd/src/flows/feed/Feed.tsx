@@ -10,8 +10,8 @@ import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
 
 // Testing components
-import { Spacing } from '../../styles/Spacing';
-import { Colors } from '../../styles/Colors';
+import { Spacing } from '../../styles/SpacingStyles';
+import { Colors } from '../../styles/ColorStyles';
 
 import SingleValueSlider from '../../components/slider/SingleValueSlider';
 import Button, {
