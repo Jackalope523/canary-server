@@ -13,7 +13,7 @@
                 OtherId = location.HostId,
                 EventId = location.Id,
                 Type = Shared.EventReportType.misleading,
-                FilingDate = DateTimeOffset.Now,
+                FilingDate = DateTimeOffset.MinValue,
                 Notes = "Test Event Report " + created
             };          
         }

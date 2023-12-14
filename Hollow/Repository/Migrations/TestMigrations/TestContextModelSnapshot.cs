@@ -155,8 +155,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<Guid>("SelfId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("report_type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -167,6 +168,10 @@ namespace Repository.Migrations.TestMigrations
                     b.HasIndex("SelfId");
 
                     b.ToTable("Reports");
+
+                    b.HasDiscriminator<string>("report_type").HasValue("Report");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -300,6 +305,32 @@ namespace Repository.Migrations.TestMigrations
                         .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("INTEGER")
                         .HasColumnName("Type");
+
+                    b.HasDiscriminator().HasValue("user");
+                });
+
+            modelBuilder.Entity("Repository.EventReport", b =>
+                {
+                    b.HasBaseType("Repository.Report");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasDiscriminator().HasValue("event");
+                });
+
+            modelBuilder.Entity("Repository.UserReport", b =>
+                {
+                    b.HasBaseType("Repository.Report");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.ToTable("Reports", t =>
+                        {
+                            t.Property("Type")
+                                .HasColumnName("UserReport_Type");
+                        });
 
                     b.HasDiscriminator().HasValue("user");
                 });

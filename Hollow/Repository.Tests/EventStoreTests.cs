@@ -24,8 +24,7 @@ namespace Repository.Tests
             testUser = userFactory.Create();
             sentry.ExecuteWriteAsync(ctx => ctx.Users.Add(testUser));
 
-            testEvent = eventFactory.Create();
-            testEvent.HostId = testUser.Id;
+            testEvent = eventFactory.Create(testUser);
         }
         public void Dispose()
         {

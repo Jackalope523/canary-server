@@ -13,7 +13,7 @@
                 OtherId = reportee.Id,
                 EventId = location.Id,
                 Type = Shared.UserReportType.rude,
-                FilingDate = DateTimeOffset.Now,
+                FilingDate = DateTimeOffset.MinValue,
                 Notes = "Test User Report " + created
             };
         }

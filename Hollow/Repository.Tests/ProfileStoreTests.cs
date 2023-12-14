@@ -33,8 +33,7 @@ namespace Repository.Tests
             testUser = new UserFactory().Create();
             sentry.ExecuteWriteAsync(ctx => ctx.Users.Add(testUser));
 
-            testEvent = new EventFactory().Create();
-            testEvent.HostId = testUser.Id;
+            testEvent = new EventFactory().Create(testUser);
             sentry.ExecuteWriteAsync(ctx => ctx.Events.Add(testEvent));
         }
         public void Dispose()

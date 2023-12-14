@@ -6,12 +6,13 @@ namespace Repository
     {
         private int produced = 0;
 
-        public Event Create()
+        public Event Create(User host)
         {
             produced++;
             return new Event
             {
                 Name = "event" + produced,
+                HostId = host.Id,
                 Description = "This is event number " + produced + ".",
                 StartTime = DateTimeOffset.UtcNow.AddHours(produced),
                 GroupMinimum = 0 + produced,

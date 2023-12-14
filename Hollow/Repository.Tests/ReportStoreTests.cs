@@ -1,10 +1,9 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
 namespace Repository.Tests
 {
-    public class ReportStoreTests
+    public class ReportStoreTests : IDisposable
     {
         private static TestSentry sentry = new TestSentry();
         private static ReportStore reportStore = new ReportStore(sentry);
@@ -27,10 +26,13 @@ namespace Repository.Tests
             sentry.ExecuteWriteAsync(ctx => ctx.Users.AddAsync(subject2));
 
             EventFactory eventFactory = new EventFactory();
-            testEvent = eventFactory.Create();
-            testEvent.HostId = subject2.Id;
+            testEvent = eventFactory.Create(subject2);
 
             sentry.ExecuteWriteAsync(ctx => ctx.Events.AddAsync(testEvent));
+        }
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
 
         [Fact]
@@ -137,5 +139,7 @@ namespace Repository.Tests
             Assert.Equal(eventReport.Type, reports.Item2.First().ReportType);
             Assert.Equal(eventReport.Notes, reports.Item2.First().ReportDetails);
         }
+
+        
     }
 }

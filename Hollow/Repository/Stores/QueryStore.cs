@@ -45,23 +45,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx => ctx.Reports.Where(r => predicate(r)).ToListAsync());
         }
-
-        protected async Task<bool> CreateReportAsync(Guid userId, Guid eventId, Guid HostId, Report.ReportType reportType, DateTimeOffset filingDate, string reportDetails)
-        {
-            Report toCreate = new Report
-            {
-                SelfId = userId,
-                OtherId = HostId,
-                EventId = eventId,
-                Type = reportType,
-                FilingDate = filingDate,
-                Notes = reportDetails
-            };
-
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Reports.Add(toCreate));
-            return true;
-        }
-
+      
         protected async Task<List<EventShard>> FindEventsByAsync(Func<EventLink, bool> predicate)
         {
             List<Guid> guids = await storeSentry.ExecuteReadAsync(ctx => ctx.EventLinks.Where(l => predicate(l)).Select(l => l.OtherId).ToListAsync());
