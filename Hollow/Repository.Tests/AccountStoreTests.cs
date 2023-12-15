@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Core.Boundaries;
 using Xunit.Abstractions;
+using NetTopologySuite.Geometries;
 
 namespace Repository.Tests
 {
@@ -12,7 +13,7 @@ namespace Repository.Tests
 
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private User subject ;
+        private User subject;
 
         public AccountStoreTests(ITestOutputHelper testOutputHelper)
         {
@@ -58,6 +59,7 @@ namespace Repository.Tests
         public async Task DeleteUserAsync_SUCCESS()
         {
             await sentry.ExecuteWriteAsync(ctx => ctx.Users.Add(subject));
+
             await store.DeleteUserAsync(subject.Id);
 
             int numRecords = await sentry.ExecuteReadAsync(ctx => ctx.Users.CountAsync());
@@ -365,24 +367,82 @@ namespace Repository.Tests
             Assert.Equal(newReputation, updated.Reputation);
         }
         [Fact]
-        public async Task GetUserHauntAsync_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
-        [Fact]
-        public async Task GetRecentUserLocationAsync_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
-        [Fact]
         public async Task UpdateHauntAsync_SUCCESS()
         {
-            throw new NotImplementedException();
+            Point newHaunt = new Point(35.7128, -22.0060);
+            double newRadius = 35.7128;
+            int newStability = 12;
+
+            await sentry.ExecuteWriteAsync(ctx => ctx.Users.Add(subject));
+
+            await store.UpdateHauntAsync(subject.Id, newHaunt.Y, newHaunt.X, newRadius, newStability);
+
+            User updated = await sentry.ExecuteReadAsync(ctx => ctx.Users.FirstAsync());
+
+            Assert.NotNull(updated);
+            Assert.Equal(subject.Id, updated.Id);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Reputation, updated.Reputation);
+            Assert.NotEqual(subject.Haunt, updated.Haunt);
+            Assert.NotEqual(subject.HauntRadius, updated.HauntRadius);
+            Assert.NotEqual(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(newHaunt, updated.Haunt);
+            Assert.Equal(newRadius, updated.HauntRadius);
+            Assert.Equal(newStability, updated.HauntWheight);
         }
         [Fact]
         public async Task UpdateRecentLocationAsync_SUCCESS()
         {
-            throw new NotImplementedException();
+            Point newLocation = new Point(35.7128, -22.0060);
+            double newRadius = 35.7128;
+
+            await sentry.ExecuteWriteAsync(ctx => ctx.Users.Add(subject));
+
+            await store.UpdateRecentLocationAsync(subject.Id, newLocation.Y, newLocation.X, newRadius);
+
+            User updated = await sentry.ExecuteReadAsync(ctx => ctx.Users.FirstAsync());
+
+            Assert.NotNull(updated);
+            Assert.Equal(subject.Id, updated.Id);
+            Assert.Equal(subject.Email, updated.Email);
+            Assert.Equal(subject.NormalisedEmail, updated.NormalisedEmail);
+            Assert.Equal(subject.PhoneNumber, updated.PhoneNumber);
+            Assert.Equal(subject.Name, updated.Name);
+            Assert.Equal(subject.SecurityStamp, updated.SecurityStamp);
+            Assert.Equal(subject.DateOfBirth, updated.DateOfBirth);
+            Assert.Equal(subject.Reputation, updated.Reputation);
+            Assert.NotEqual(subject.CurrentLocation, updated.CurrentLocation);
+            Assert.NotEqual(subject.CurrentRadius, updated.CurrentRadius);
+            Assert.Equal(newLocation, updated.Haunt);
+            Assert.Equal(newRadius, updated.HauntRadius);
+        }
+        [Fact]
+        public async Task GetUserHauntAsync_SUCCESS()
+        {
+            await sentry.ExecuteWriteAsync(ctx => ctx.Users.AddAsync(subject));
+
+            (double latitude, double longitude, double radius, int stability) location = await store.GetUserHauntAsync(subject.Id);
+
+            Assert.Equal(subject.Haunt.Y, location.latitude);
+            Assert.Equal(subject.Haunt.Y, location.longitude);
+            Assert.Equal(subject.HauntRadius, location.radius);
+            Assert.Equal(subject.HauntWheight, location.stability);
+        }
+        [Fact]
+        public async Task GetRecentUserLocationAsync_SUCCESS()
+        {
+            await sentry.ExecuteWriteAsync(ctx => ctx.Users.AddAsync(subject));
+
+            (double latitude, double longitude, double radius) location = await store.GetRecentUserLocationAsync(subject.Id);
+
+            Assert.Equal(subject.Haunt.Y, location.latitude);
+            Assert.Equal(subject.Haunt.Y, location.longitude);
+            Assert.Equal(subject.HauntRadius, location.radius);
         }
     }
 }

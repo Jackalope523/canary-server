@@ -1,7 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using Shared;
-using System.Linq;
 
 namespace Repository
 {

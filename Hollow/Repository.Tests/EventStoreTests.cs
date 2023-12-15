@@ -248,6 +248,7 @@ namespace Repository.Tests
         public async Task RemoveUserFromEventAsync_SUCCESS() 
         {
             EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Attend);
+            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.AddAsync(link));
 
             await store.RemoveUserFromEventAsync(testUser.Id, testEvent.Id);
 

@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using Xunit.Abstractions;
 
 namespace Repository.Tests
@@ -8,7 +9,6 @@ namespace Repository.Tests
     {
         private static TestSentry sentry = new TestSentry();
         private static ProfileStore profileStore = new ProfileStore(sentry);
-        private static EventStore store = new EventStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -113,62 +113,66 @@ namespace Repository.Tests
         [Fact]
         public async Task RemoveUserRatingAsync_SUCCESS()
         {
-            throw new NotImplementedException();
+            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.RateUp);
+            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
+
+            await profileStore.RemoveUserRatingAsync(testUser.Id, testEvent.Id);
+
+            int count = await sentry.ExecuteReadAsync(ctx => ctx.UserLinks.CountAsync());
+
+            Assert.Equal(0, count);
         }
         [Fact]
         public async Task GetFollowedUsersAsync_SUCCESS() 
         {
-            throw new NotImplementedException();
+            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Follow);
+            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
+
+            UserSilhouette user = (await profileStore.GetFollowedUsersAsync(subject1.Id)).First();
+
+            Assert.NotNull(user);
+            Assert.Equal(subject2.Id, user.Id);
+            Assert.Equal(subject2.Name, user.Name);
         }
         [Fact]
         public async Task GetBlockedUsersAsync_SUCCESS() 
         {
-            throw new NotImplementedException();
+            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Block);
+            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
+
+            UserSilhouette user = (await profileStore.GetFollowedUsersAsync(subject1.Id)).First();
+
+            Assert.NotNull(user);
+            Assert.Equal(subject2.Id, user.Id);
+            Assert.Equal(subject2.Name, user.Name);
         }
         [Fact]
         public async Task GetUserRatingsAsync_SUCCESS()
         {
-            throw new NotImplementedException();
+            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.RateUp);
+            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
+
+            UserSilhouette user = (await profileStore.GetFollowedUsersAsync(subject1.Id)).First();
+
+            Assert.NotNull(user);
+            Assert.Equal(subject2.Id, user.Id);
+            Assert.Equal(subject2.Name, user.Name);
         }
         [Fact]
         public async Task GetFriendsAsync_SUCCESS()
         {
-            throw new NotImplementedException();
+            UserLinkFactory factory = new UserLinkFactory();
+            UserLink link1 = factory.Create(subject1, subject2, UserLink.UserLinkType.Follow);
+            UserLink link2 = factory.Create(subject2, subject1, UserLink.UserLinkType.Follow);
+
+            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link1));
+            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link2));
+
+            UserSilhouette user = (await profileStore.GetFriendsAsync(subject1.Id)).First();
+
+            Assert.NotNull(user);
+            Assert.Equal(subject2.Id, user.Id);
+            Assert.Equal(subject2.Name, user.Name);
         }
-
-        [Fact]
-        public async Task GetGuestListAsync_SUCCESS()
-        {
-            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, OtherId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
-
-            List<UserSilhouette> guestList = await store.GetGuestListAsync(testEvent.Id);
-
-            Assert.Single(guestList);
-            Assert.Equal(testUser.Id, guestList.First().Id);
-            Assert.Equal(testUser.Name, guestList.First().Name);
-        }
-        [Fact]
-        public async Task AddUserToEventAsync_SUCCESS()
-        {
-            await store.AddUserToEventAsync(testUser.Id, testEvent.Id);
-
-            EventLink link = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.FirstAsync());
-
-            Assert.NotNull(link);
-            Assert.Equal(testUser.Id, link.SelfId);
-            Assert.Equal(testEvent.Id, link.OtherId);
-            Assert.Equal(EventLink.EventLinkType.Attend, link.Type);
-        }
-        [Fact]
-        public async Task RemoveUserFromEventAsync_SUCCESS()
-        {
-            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Add(new EventLink { SelfId = testUser.Id, OtherId = testEvent.Id, Type = EventLink.EventLinkType.Attend }));
-
-            await store.RemoveUserFromEventAsync(testUser.Id, testEvent.Id);
-
-            int count = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.CountAsync());
-
-            Assert.Equal(0, count);
-        }   
     }
 }

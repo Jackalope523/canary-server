@@ -5,7 +5,6 @@ namespace Repository
 {
     public abstract class QueryStore
     {
-
         protected Sentry storeSentry;
 
         public QueryStore(Sentry sentry)
