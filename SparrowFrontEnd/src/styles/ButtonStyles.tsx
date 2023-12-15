@@ -18,7 +18,12 @@ export const buttonStyles = StyleSheet.create({
 
   buttonPrimaryDarkSelected: {
     backgroundColor: Colors.sparrowBrown,
-    borderColor: Colors.sparrowBrown,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  buttonPrimaryDarkDisasbled: {
+    backgroundColor: Colors.sand200,
+    borderColor: Colors.sand300,
   },
 
   // Secondary
@@ -40,10 +45,31 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.sparrowSand,
   },
 
+  /*
+  
+  Used for both Dark and Light Secondary buttons
+
+  */
+
+  buttonSecondaryDisabled: {
+    backgroundColor: Colors.sand100,
+    borderColor: Colors.sand300,
+  },
+
   // Button Tertiary
   buttonTertiary: {
     backgroundColor: Colors.sparrowBrown,
     borderColor: Colors.sparrowBrown,
+  },
+
+  buttonTertiarySelected: {
+    backgroundColor: Colors.sparrowDarkBrown,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  buttonTertiaryDisabled: {
+    backgroundColor: Colors.sand200,
+    borderColor: Colors.sand300,
   },
 
   // Success
@@ -52,10 +78,20 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
+  buttonSuccessDisabled: {
+    backgroundColor: Colors.green100,
+    borderColor: Colors.green300,
+  },
+
   // Warning
   buttonWarning: {
     backgroundColor: Colors.orange400,
     borderColor: Colors.sparrowDarkBrown,
+  },
+
+  buttonWarningDisabled: {
+    backgroundColor: Colors.orange100,
+    borderColor: Colors.orange300,
   },
 
   // Error
@@ -64,10 +100,20 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
+  buttonErrorDisabled: {
+    backgroundColor: Colors.red100,
+    borderColor: Colors.red300,
+  },
+
   // Function
   buttonFunction: {
     backgroundColor: Colors.turqoise300,
     borderColor: Colors.sparrowDarkBrown,
+  },
+
+  buttonFunctionDisabled: {
+    backgroundColor: Colors.turqoise100,
+    borderColor: Colors.turqoise300,
   },
 
   // ! ||--------------------------------------------------------------------------------||
