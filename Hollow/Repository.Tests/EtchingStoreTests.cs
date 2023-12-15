@@ -1,10 +1,6 @@
-﻿
-
-using Core.Boundaries;
+﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Policy;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Repository.Tests
 {

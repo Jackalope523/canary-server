@@ -138,8 +138,6 @@ namespace Repository.Tests
             Assert.Equal(eventReport.FilingDate, reports.Item2.First().ReportTime);
             Assert.Equal(eventReport.Type, reports.Item2.First().ReportType);
             Assert.Equal(eventReport.Notes, reports.Item2.First().ReportDetails);
-        }
-
-        
+        }      
     }
 }

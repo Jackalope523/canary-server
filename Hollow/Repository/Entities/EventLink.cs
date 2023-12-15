@@ -6,7 +6,7 @@
 
         internal Event Event { get; init; }
         public EventLinkType Type { get; set; }
-        internal DateTimeOffset Time { get; init; }
+        public DateTimeOffset Time { get; init; }
 
     }
 }

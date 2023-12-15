@@ -2,6 +2,7 @@
 using Core.Boundaries;
 using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Repository.Tests
 {
@@ -9,8 +10,6 @@ namespace Repository.Tests
     {
         private static TestSentry sentry = new TestSentry();
         private static EventStore store = new EventStore(sentry);
-        private static UserFactory userFactory = new UserFactory();
-        private static EventFactory eventFactory = new EventFactory();
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -21,10 +20,10 @@ namespace Repository.Tests
         {
             _testOutputHelper = testOutputHelper;
 
-            testUser = userFactory.Create();
+            testUser = new UserFactory().Create();
             sentry.ExecuteWriteAsync(ctx => ctx.Users.Add(testUser));
 
-            testEvent = eventFactory.Create(testUser);
+            testEvent = new EventFactory().Create(testUser);
         }
         public void Dispose()
         {
@@ -180,37 +179,107 @@ namespace Repository.Tests
         [Fact]
         public async Task FindCurrentEventForUserAsync_SUCCESS() 
         {
-            throw new NotImplementedException();
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Present);
+            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.AddAsync(link));
+
+            EventShard @event = await store.FindCurrentEventForUserAsync(testUser.Id);
+
+            Assert.NotNull(@event);
+            Assert.Equal(testEvent.HostId, @event.Host.Id);
+            Assert.Equal(testEvent.Name, @event.Name);
+            Assert.Equal(testEvent.Description, @event.Description);
+            Assert.Equal(testEvent.StartTime, @event.StartTime);
+            Assert.Equal(testEvent.Location.Y, @event.Latitude);
+            Assert.Equal(testEvent.Location.X, @event.Longitude);
+            Assert.Equal(testEvent.GroupMinimum, @event.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, @event.GroupMaximum);
+            Assert.Equal(testEvent.IsOpen, @event.IsOpen);
         }
         [Fact]
         public async Task FindUpcomingEventsForUserAsync_SUCCESS() 
         {
-            throw new NotImplementedException();
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Attend);
+            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.AddAsync(link));
+
+            EventShard @event = (await store.FindUpcomingEventsForUserAsync(testUser.Id)).First();
+
+            Assert.NotNull(@event);
+            Assert.Equal(testEvent.HostId, @event.Host.Id);
+            Assert.Equal(testEvent.Name, @event.Name);
+            Assert.Equal(testEvent.Description, @event.Description);
+            Assert.Equal(testEvent.StartTime, @event.StartTime);
+            Assert.Equal(testEvent.Location.Y, @event.Latitude);
+            Assert.Equal(testEvent.Location.X, @event.Longitude);
+            Assert.Equal(testEvent.GroupMinimum, @event.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, @event.GroupMaximum);
+            Assert.Equal(testEvent.IsOpen, @event.IsOpen);
         }
         [Fact]
         public async Task FindPastEventsForUserAsync_SUCCESS() 
         {
-            throw new NotImplementedException();
-        }
-        [Fact]
-        public async Task GetGuestListAsync_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Left);
+            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.AddAsync(link));
+
+            EventShard @event = (await store.FindPastEventsForUserAsync(testUser.Id)).First();
+
+            Assert.NotNull(@event);
+            Assert.Equal(testEvent.HostId, @event.Host.Id);
+            Assert.Equal(testEvent.Name, @event.Name);
+            Assert.Equal(testEvent.Description, @event.Description);
+            Assert.Equal(testEvent.StartTime, @event.StartTime);
+            Assert.Equal(testEvent.Location.Y, @event.Latitude);
+            Assert.Equal(testEvent.Location.X, @event.Longitude);
+            Assert.Equal(testEvent.GroupMinimum, @event.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, @event.GroupMaximum);
+            Assert.Equal(testEvent.IsOpen, @event.IsOpen);
+        }   
         [Fact]
         public async Task AddUserToEventAsync_SUCCESS() 
         {
-            throw new NotImplementedException();
+            await store.AddUserToEventAsync(testUser.Id, testEvent.Id);
+
+            EventLink link = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.SingleAsync());
+
+            Assert.Equal(testUser.Id, link.SelfId);
+            Assert.Equal(testEvent.Id, link.OtherId);
+            Assert.Equal(EventLink.EventLinkType.Attend, link.Type);
         }
         [Fact]
         public async Task RemoveUserFromEventAsync_SUCCESS() 
         {
-            throw new NotImplementedException();
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Attend);
+
+            await store.RemoveUserFromEventAsync(testUser.Id, testEvent.Id);
+
+            int count = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.CountAsync());
+
+            Assert.Equal(0, count);
         }
         [Fact]
         public async Task GetGuestHistoryAsync_SUCCESS()
         {
-            throw new NotImplementedException();
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Left);
+            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.AddAsync(link));
+
+            (DateTimeOffset, DateTimeOffset?, UserSilhouette) guest = (await store.GetGuestHistoryAsync(testEvent.Id)).First();
+
+            Assert.NotNull(guest.Item2);
+            Assert.NotNull(guest.Item3);
+            Assert.Equal(DateTimeOffset.MinValue, guest.Item1);
+            Assert.Equal(testUser.Id, guest.Item3.Id);
+            Assert.Equal(testUser.Name, guest.Item3.Name);
+        }
+        [Fact]
+        public async Task GetGuestListAsync_SUCCESS()
+        {
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Attend);
+            await sentry.ExecuteWriteAsync(ctx => ctx.EventLinks.AddAsync(link));
+
+            UserSilhouette user = (await store.GetGuestListAsync(testEvent.Id)).First();
+
+            Assert.NotNull(user);
+            Assert.Equal(testUser.Id, user.Id);
+            Assert.Equal(testUser.Name, user.Name);
         }
     }
 }
