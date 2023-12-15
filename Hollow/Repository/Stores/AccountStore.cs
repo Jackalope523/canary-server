@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NetTopologySuite.Geometries;
 
 namespace Repository
@@ -213,12 +214,27 @@ namespace Repository
 
         public async Task<bool> UpdateHauntAsync(Guid id, double latitude, double longitude, double radius, int stability)
         {
-            throw new NotImplementedException();
+            User u = new User { Id = id, Haunt = new Point(longitude, latitude) , HauntRadius = radius, HauntWheight = stability };
+
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Users.Attach(u));
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true);
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true);
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true);
+            await storeSentry.ExecuteWriteAsync();
+
+            return true;
         }
 
         public async Task<bool> UpdateRecentLocationAsync(Guid id, double latitude, double longitude, double radius)
         {
-            throw new NotImplementedException();
+            User u = new User { Id = id, CurrentLocation = new Point(longitude, latitude), CurrentRadius = radius };
+
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Users.Attach(u));
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);
+            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true);
+            await storeSentry.ExecuteWriteAsync();
+
+            return true;
         }
 
 
