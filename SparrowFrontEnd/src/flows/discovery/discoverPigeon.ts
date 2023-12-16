@@ -1,6 +1,5 @@
-import { userSession, handleError } from '../../lib/axios';
-import { eventShard, eventThinSlice } from '../event/eventPigeon';
-import { extractUserSilhouette } from '../profile/profilePigeon';
+import { userSession, handleError, extractList } from '../../lib/axios';
+import { eventShard, eventThinSlice, extractEventThinSlice } from '../event/eventPigeon';
 
 const apiBaseUrl = '/discover';
 
@@ -10,19 +9,7 @@ export async function getPersonalizedEvents(latitude: number, longitude: number,
         .then((response: any) => {
             console.log('Personalized Events:', response.data);
 
-            let events: eventThinSlice[] = [];
-
-            for (const event of response.data)
-            {
-                events.push({
-                    Id: event['Id'],
-                    Host: extractUserSilhouette(event['Host']),
-                    Latitude: event['Latitude'],
-                    Longitude: event['Longitude']
-                });
-            }
-
-            return events;
+            return extractList(response.data, extractEventThinSlice);
         })
         .catch(handleError);
 }
@@ -33,19 +20,7 @@ export async function getAllEvents(latitude: number, longitude: number, distance
         .then((response: any) => {
             console.log('All Events:', response.data);
             
-            let events: eventThinSlice[] = [];
-
-            for (const event of response.data)
-            {
-                events.push({
-                    Id: event['Id'],
-                    Host: extractUserSilhouette(event['Host']),
-                    Latitude: event['Latitude'],
-                    Longitude: event['Longitude']
-                });
-            }
-
-            return events;
+            return extractList(response.data, extractEventThinSlice);
         })
         .catch(handleError);
 }

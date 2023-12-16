@@ -1,18 +1,29 @@
-import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { extractCharacter } from '../auth/accountPigeon';
-import { eventShard } from '../event/eventPigeon';
+import { etchingShard, eventShard, eventThinSlice, extractEtchingShard, extractEventShard, extractEventThinSlice } from '../event/eventPigeon';
 
 const apiBaseUrl = '/profile';
 
 export type userProfile = {
-    Id: string,
+    Id: number,
     Name: string,
     Reputation: number,
     NumberOfFollowers: number
 };
 
+export function extractUserProfile(data: any) {
+    let profile: userProfile = {
+        Id: data['Id'],
+        Name: data['Name'],
+        Reputation: data['Reputation'],
+        NumberOfFollowers: data['NumberOfFollowers']
+    }
+
+    return profile;
+}
+
 export type userSilhouette = {
-    Id: string,
+    Id: number,
     Name: string
 };
 
@@ -25,12 +36,12 @@ export function extractUserSilhouette(data: any) {
     return silhouette;
 }
 
-//////////////////
-// Profile Flow //
+///////
+// Profile Flow
 //////////////////
 
 // Get user profile
-export async function getUserProfile(targetIdentification: string) {
+export async function getUserProfile(targetIdentification: number) {
     if (!targetIdentification) {
         console.log('Target identification is missing.');
         return Promise.reject();
@@ -39,21 +50,33 @@ export async function getUserProfile(targetIdentification: string) {
     return await userSession.get(`${apiBaseUrl}/${targetIdentification}`)
         .then((response: any) => {
             console.log('User Profile:', response.data);
-            
-            let profile: userProfile = {
-                Id: response.data['Id'],
-                Name: response.data['Name'],
-                Reputation: response.data['Reputation'],
-                NumberOfFollowers: response.data['NumberOfFollowers']
-            }
 
-            return profile;
+            return extractUserProfile(response.data);
+        })
+        .catch(handleError);
+}
+
+// Get user nest
+export async function getUserNest(targetIdentification: number) {
+    if (!targetIdentification) {
+        console.log('Target identification is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.get(`${apiBaseUrl}/${targetIdentification}/nest`)
+        .then((response: any) => {
+            console.log('User Nest:', response.data);
+            
+            let events = extractList(response.data['Events'], extractEventThinSlice);
+            let etchings = extractList(response.data['Etchings'], extractEtchingShard);
+
+            return [ events, etchings ];
         })
         .catch(handleError);
 }
 
 // Rate a user
-export async function rateUser(targetIdentification: string, rating: ratingType) {
+export async function rateUser(targetIdentification: number, rating: ratingType) {
     if (!targetIdentification || !rating) {
         console.log('Target identification or rating is missing.');
         return Promise.reject();
@@ -67,7 +90,7 @@ export async function rateUser(targetIdentification: string, rating: ratingType)
 }
 
 // Get user activity
-export async function getUserActivity(targetIdentification: string) {
+export async function getUserActivity(targetIdentification: number) {
     if (!targetIdentification) {
         console.log('Target identification is missing.');
         return Promise.reject();
@@ -77,28 +100,7 @@ export async function getUserActivity(targetIdentification: string) {
         .then((response: any) => {
             console.log('User Activity:', response.data);
             
-            let events: eventShard[] = [];
-
-            for (const event of response.data)
-            {
-                events.push({
-                    Id: event['Id'],
-                    Host: extractUserSilhouette(event['Host']),
-                    Name: event['Name'],
-                    Description: event['Description'],
-                    StartTime: extractDate(event['StartTime']),
-                    Latitude: event['Latitude'],
-                    Longitude: event['Longitude'],
-                    TimeEnded: event['TimeEnded'] ?
-                        extractDate(event['TimeEnded']) : undefined,
-                    IsOpen: event['IsOpen'],
-                    GroupMinimum: event['GroupMinimum'],
-                    GroupMaximum: event['GroupMaximum'],
-                    Character: extractCharacter(event['Character'])
-                });
-            }
-
-            return events;
+            return extractList(response.data, extractEventShard);
         })
         .catch(handleError);
 }
@@ -110,32 +112,13 @@ export async function getFriendActivity() {
             console.log('Friend Activity:', response.data);
             
             let users: userSilhouette[] = [];
-            let activity: { [id: string]: eventShard[] } = {};
+            let activity: { [id: number]: eventShard[] } = {};
 
             for (const pair of response.data)
             {
                 users.push(extractUserSilhouette(pair[0]));
 
-                let events: eventShard[] = [];
-
-                for (const event of response.data)
-                {
-                    events.push({
-                        Id: event['Id'],
-                        Host: extractUserSilhouette(event['Host']),
-                        Name: event['Name'],
-                        Description: event['Description'],
-                        StartTime: extractDate(event['StartTime']),
-                        Latitude: event['Latitude'],
-                        Longitude: event['Longitude'],
-                        TimeEnded: event['TimeEnded'] ?
-                            extractDate(event['TimeEnded']) : undefined,
-                        IsOpen: event['IsOpen'],
-                        GroupMinimum: event['GroupMinimum'],
-                        GroupMaximum: event['GroupMaximum'],
-                        Character: extractCharacter(event['Character'])
-                    });
-                }
+                let events = extractList(pair[1], extractEventShard);
 
                 activity[pair[0]['Id']] = events;
             }
@@ -151,23 +134,13 @@ export async function getFollowedUsers() {
         .then((response: any) => {
             console.log('Followed Users:', response.data);
             
-            let users: userSilhouette[] = [];
-
-            for (const user of response.data)
-            {
-                users.push({
-                    Id: user['Id'],
-                    Name: user['Name']
-                });
-            }
-
-            return users;
+            return extractList(response.data, extractUserSilhouette);
         })
         .catch(handleError);
 }
 
 // Follow a user
-export async function followUser(targetID: string) {
+export async function followUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -181,7 +154,7 @@ export async function followUser(targetID: string) {
 }
 
 // Unfollow a user
-export async function unfollowUser(targetID: string) {
+export async function unfollowUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -200,23 +173,13 @@ export async function getBlockedUsers() {
         .then((response: any) => {
             console.log('Blocked Users:', response.data);
             
-            let users: userSilhouette[] = [];
-
-            for (const user of response.data)
-            {
-                users.push({
-                    Id: user['Id'],
-                    Name: user['Name']
-                });
-            }
-
-            return users;
+            return extractList(response.data, extractUserSilhouette);
         })
         .catch(handleError);
 }
 
 // Block a user
-export async function blockUser(targetID: string) {
+export async function blockUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -230,7 +193,7 @@ export async function blockUser(targetID: string) {
 }
 
 // Unblock a user
-export async function unblockUser(targetID: string) {
+export async function unblockUser(targetID: number) {
     if (!targetID) {
         console.log('Target ID is missing.');
         return Promise.reject();
@@ -252,7 +215,7 @@ export type userReport = {
 };
 
 // Report a user
-export async function reportUser(targetID: string, report: userReport) {
+export async function reportUser(targetID: number, report: userReport) {
     if (!targetID || !report) {
         console.log('Target ID or report is missing.');
         return Promise.reject();

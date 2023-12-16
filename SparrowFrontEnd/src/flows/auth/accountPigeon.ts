@@ -32,7 +32,7 @@ export function extractCharacter(data: any) {
 }
 
 export type userShard = {
-    Id: string,
+    Id: number,
     PhoneNumber: string,
     Email: string,
     Name: string,
@@ -49,8 +49,31 @@ export type userShard = {
     Character: character
 };
 
-////////////////////////
-// Account login flow //
+export function extractUserShard(data: any) {
+    let user: userShard = {
+        Id: data['Id'],
+        PhoneNumber: data['PhoneNumber'],
+        Email: data['Email'],
+        Name: data['Name'],
+        DateOfBirth: extractDate(data['DateOfBirth']),
+        IsPhoneConfirmed: data['IsPhoneConfirmed'],
+        IsEmailConfirmed: data['IsEmailConfirmed'],
+        SecurityStamp: data['SecurityStamp'],
+        LockoutDate: data['LockoutDate'] ?
+            extractDate(data['LockoutDate']) : undefined,
+        AccessTries: data['AccessTries'],
+        AccountStatus: data['AccountStatus'],
+        JoinDate: extractDate(data['JoinDate']),
+        Reputation: data['Reputation'],
+        NumberOfFollowers: data['NumberOfFollowers'],
+        Character: extractCharacter(data['Character']),
+    }
+
+    return user;
+}
+
+/////////
+// Account login flow
 ////////////////////////
 
 export type accountCredentials = {
@@ -119,9 +142,14 @@ export async function verify(credentials: accountCredentials) {
     .catch(handleError);
 }
 
-// Logout
-export async function logout() {
-    return await axios.post(`${apiBaseUrl}/logout`)
+// Resend email verification
+export async function resendEmailVerification(email: string) {
+    if (!email) {
+        console.log('Email is missing.');
+        return Promise.reject();
+    }
+
+    return await axios.post(`${apiBaseUrl}/email`, email)
     .then((response: any) => {
         console.log(response.data);
         console.log(response.status);
@@ -130,8 +158,19 @@ export async function logout() {
     .catch(handleError);
 }
 
-//////////////////////
-// Account use flow //
+// Logout
+export async function logout() {
+    return await axios.get(`${apiBaseUrl}/logout`)
+    .then((response: any) => {
+        console.log(response.data);
+        console.log(response.status);
+        console.log(response.headers);
+    })
+    .catch(handleError);
+}
+
+////////
+// Account use flow
 //////////////////////
 
 // Get account details
@@ -140,26 +179,7 @@ export async function getAccount() {
     .then((response: any) => {
         console.log('Account Details:', response.data);
         
-        let user: userShard = {
-            Id: response.data['Id'],
-            PhoneNumber: response.data['PhoneNumber'],
-            Email: response.data['Email'],
-            Name: response.data['Name'],
-            DateOfBirth: extractDate(response.data['DateOfBirth']),
-            IsPhoneConfirmed: response.data['IsPhoneConfirmed'],
-            IsEmailConfirmed: response.data['IsEmailConfirmed'],
-            SecurityStamp: response.data['SecurityStamp'],
-            LockoutDate: response.data['LockoutDate'] ?
-                extractDate(response.data['LockoutDate']) : undefined,
-            AccessTries: response.data['AccessTries'],
-            AccountStatus: response.data['AccountStatus'],
-            JoinDate: extractDate(response.data['JoinDate']),
-            Reputation: response.data['Reputation'],
-            NumberOfFollowers: response.data['NumberOfFollowers'],
-            Character: extractCharacter(response.data['Character']),
-        }
-
-        return user;
+        return extractUserShard(response.data);
     })
     .catch(handleError);
 }
