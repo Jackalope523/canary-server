@@ -1,19 +1,24 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-
-// Testing components
-import {Spacing} from '../../styles/Spacing';
-import {Colors} from '../../styles/Colors';
-import RangeSelector from '../../components/atoms/testing/RangeSelector';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import {
+  GestureHandlerRootView,
+  ScrollView,
+} from 'react-native-gesture-handler';
 
 // Icons font
-import {createIconSetFromFontello} from 'react-native-vector-icons';
+import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
 
-import SingleValueSelector from '../../components/atoms/testing/SingleValueSelector';
-import RangeSlider from '../../components/atoms/testing/RangeSlider';
-import SingleValueSlider from '../../components/atoms/SingleValueSlider';
+// Testing components
+import { Spacing } from '../../styles/SpacingStyles';
+import { Colors } from '../../styles/ColorStyles';
+
+import SingleValueSlider from '../../components/slider/SingleValueSlider';
+import Button, {
+  ButtonDisplay,
+  ButtonSize,
+  ButtonType,
+} from '../../components/Button';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -36,9 +41,82 @@ const FeedScreen = () => {
   const [maxValue, setMaxValue] = useState(MAX_DEFAULT);
 
   return (
-    <View style={styles.container}>
-      <SingleValueSlider />
-    </View>
+    <ScrollView>
+      <View style={styles.container}>
+        <SingleValueSlider />
+
+        <Text>Button Contained</Text>
+        <Button
+          type={ButtonType.PrimaryDark}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Contained}
+          btnText="I MADE A BUTTON!"
+          btnIcon="settings-outline"
+        />
+        <Button
+          type={ButtonType.SecondaryDark}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Contained}
+          btnText="Another one"
+        />
+        <Button
+          type={ButtonType.Tertiary}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Contained}
+          btnText="Another one"
+        />
+        <Button
+          type={ButtonType.Success}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Contained}
+          btnText="Another one"
+        />
+        <Button
+          type={ButtonType.Warning}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Contained}
+          btnText="Another one"
+        />
+        <Button
+          type={ButtonType.Error}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Contained}
+          btnText="Another one"
+        />
+        <Button
+          type={ButtonType.Function}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Contained}
+          btnText="Another one"
+        />
+
+        <Text>Button Full</Text>
+        <Button
+          type={ButtonType.Success}
+          size={ButtonSize.Small}
+          display={ButtonDisplay.Full}
+          btnText="Small Button"
+        />
+        <Button
+          type={ButtonType.Success}
+          size={ButtonSize.Medium}
+          display={ButtonDisplay.Full}
+          btnText="Medium Button"
+        />
+        <Button
+          type={ButtonType.Success}
+          size={ButtonSize.Large}
+          display={ButtonDisplay.Full}
+          btnText="Large Button"
+        />
+        <Button
+          type={ButtonType.Success}
+          size={ButtonSize.ExtraSmall}
+          display={ButtonDisplay.Full}
+          btnText="Extra Small Button"
+        />
+      </View>
+    </ScrollView>
     // <GestureHandlerRootView style={{flex: 1}}>
     //   <View style={styles.container}>
     //     <View style={styles.contentContainer}>
@@ -111,7 +189,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderRadius: 5,
   },
-  colorBlack: {color: 'black'},
+  colorBlack: { color: 'black' },
 
   // TEMP. styles
   // container: {

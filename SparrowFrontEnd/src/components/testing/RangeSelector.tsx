@@ -1,13 +1,13 @@
-import {StyleSheet, Text, View, Dimensions, TextInput} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TextInput } from 'react-native';
 import * as React from 'react';
 import Animated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   useAnimatedProps,
-  runOnJS
+  runOnJS,
 } from 'react-native-reanimated';
-import {Colors} from '../../../styles/Colors';
+import { Colors } from '../../styles/ColorStyles';
 import {
   Gesture,
   GestureHandlerRootView,
@@ -23,7 +23,7 @@ const THUMBSIZE = 18;
 const MAXWIDTH = SCREENWIDTH - THUMBSIZE / 2 + 6;
 const SLIDERWIDTH = SCREENWIDTH - 24 * 4;
 
-const RangeSelector = ({min, max, steps, onValueChange}) => {
+const RangeSelector = ({ min, max, steps, onValueChange }) => {
   const position = useSharedValue(0);
   const position2 = useSharedValue(SLIDERWIDTH);
 
@@ -60,7 +60,7 @@ const RangeSelector = ({min, max, steps, onValueChange}) => {
           Math.floor(position2.value / (SLIDERWIDTH / ((max - min) / steps))) *
             steps,
       });
-    }
+    },
   });
 
   const gestureHandler2 = useAnimatedGestureHandler({
@@ -93,21 +93,21 @@ const RangeSelector = ({min, max, steps, onValueChange}) => {
           Math.floor(position2.value / (SLIDERWIDTH / ((max - min) / steps))) *
             steps,
       });
-    }
+    },
   });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{translateX: position.value}],
+    transform: [{ translateX: position.value }],
     zIndex: zIndex.value,
   }));
 
   const animatedStyle2 = useAnimatedStyle(() => ({
-    transform: [{translateX: position2.value}],
+    transform: [{ translateX: position2.value }],
     zIndex: zIndex2.value,
   }));
 
   const sliderStyle = useAnimatedStyle(() => ({
-    transform: [{translateX: position.value}],
+    transform: [{ translateX: position.value }],
     width: position2.value - position.value,
   }));
 
@@ -115,18 +115,26 @@ const RangeSelector = ({min, max, steps, onValueChange}) => {
 
   const minLabelText = useAnimatedProps(() => {
     return {
-      text: `$${min + Math.floor(position.value / (SLIDERWIDTH / ((max - min) / steps))) * steps}`
+      text: `$${
+        min +
+        Math.floor(position.value / (SLIDERWIDTH / ((max - min) / steps))) *
+          steps
+      }`,
     };
   });
 
   const maxLabelText = useAnimatedProps(() => {
     return {
-      text: `$${min + Math.floor(position2.value / (SLIDERWIDTH / ((max - min) / steps))) * steps}`
+      text: `$${
+        min +
+        Math.floor(position2.value / (SLIDERWIDTH / ((max - min) / steps))) *
+          steps
+      }`,
     };
   });
 
   return (
-    <GestureHandlerRootView style={[styles.container, {width: SLIDERWIDTH}]}>
+    <GestureHandlerRootView style={[styles.container, { width: SLIDERWIDTH }]}>
       <View style={[styles.sliderBack]} />
       <Animated.View style={[styles.sliderFront, sliderStyle]} />
       <PanGestureHandler onGestureEvent={gestureHandler}>
@@ -134,22 +142,22 @@ const RangeSelector = ({min, max, steps, onValueChange}) => {
           <View style={styles.label}>
             <AnimatedTextInput
               style={styles.labelText}
-              defaultValue='0'
+              defaultValue="0"
               animatedProps={minLabelText}
               editable={false}
-              />
+            />
           </View>
         </Animated.View>
       </PanGestureHandler>
       <PanGestureHandler onGestureEvent={gestureHandler2}>
-      <Animated.View style={[styles.thumb, animatedStyle2]}>
+        <Animated.View style={[styles.thumb, animatedStyle2]}>
           <View style={styles.label}>
             <AnimatedTextInput
               style={styles.labelText}
-              defaultValue='0'
+              defaultValue="0"
               animatedProps={maxLabelText}
               editable={false}
-              />
+            />
           </View>
         </Animated.View>
       </PanGestureHandler>

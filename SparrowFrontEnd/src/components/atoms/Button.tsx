@@ -5,6 +5,20 @@ import * as React from 'react'
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
 
+/*
+
+
+
+
+This is replaced by the Button component in the components folder
+and will be deleted shortly
+
+TODO delete this file and update buttons with the new buttons
+
+
+
+*/
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 interface ButtonProps {
