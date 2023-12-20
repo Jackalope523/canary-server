@@ -1,6 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { Colors } from './ColorStyles';
 import { Spacing } from './SpacingStyles';
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export const globalStyles = StyleSheet.create({
   // ! ||--------------------------------------------------------------------------------||
@@ -120,8 +123,16 @@ export const globalStyles = StyleSheet.create({
   },
 
   buttonTextThree: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'UncutSans-Bold',
+    // lineHeight: 24,
+    // letterSpacing: 2.2,
+  },
+
+  buttonTextFour: {
+    fontSize: 14,
+    fontFamily: 'UncutSans-Bold',
+    textTransform: 'uppercase',
     // lineHeight: 24,
     // letterSpacing: 2.2,
   },
@@ -205,5 +216,12 @@ export const globalStyles = StyleSheet.create({
   illustrationMedium: {
     resizeMode: 'center',
     height: 200,
+  },
+
+  // Full
+  illustrationFull: {
+    maxWidth: windowWidth - Spacing.lg * 2,
+    maxHeight: windowWidth,
+    aspectRatio: 1,
   },
 });
