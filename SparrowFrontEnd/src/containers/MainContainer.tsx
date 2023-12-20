@@ -74,7 +74,9 @@ export default MainContainer;
 
 function Authentication() {
   return (
-    <AuthStack.Navigator initialRouteName="Landing">
+    <AuthStack.Navigator
+      initialRouteName="Landing"
+      screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Landing" component={LandingScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Signup" component={SignupScreen} />
