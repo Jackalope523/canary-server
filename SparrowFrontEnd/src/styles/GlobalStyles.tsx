@@ -225,6 +225,11 @@ export const globalStyles = StyleSheet.create({
     color: Colors.turqoise300,
   },
 
+  // Disabled
+  textDisabled: {
+    color: Colors.sand400,
+  },
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                  Illustrations                                 ||
   // ! ||--------------------------------------------------------------------------------||

@@ -91,7 +91,12 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   return (
     <View style={styles.wrapper}>
       <View style={styles.labelWrapper}>
-        <Text style={[globalStyles.labelTextTwoAsTyped, globalStyles.textDark]}>
+        <Text
+          style={[
+            globalStyles.labelTextTwoAsTyped,
+            globalStyles.textDark,
+            disabled && globalStyles.textDisabled,
+          ]}>
           {label}
         </Text>
         {required && (
@@ -100,6 +105,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
               globalStyles.labelTextTwoAsTyped,
               globalStyles.textError,
               styles.labelRequired,
+              disabled && globalStyles.textDisabled,
             ]}>
             {' '}
             *
@@ -111,6 +117,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
               globalStyles.labelTextTwoItalic,
               globalStyles.textDark,
               styles.labelRecommended,
+              disabled && globalStyles.textDisabled,
             ]}>
             {' '}
             (recommended)
