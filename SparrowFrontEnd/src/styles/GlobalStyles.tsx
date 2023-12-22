@@ -138,21 +138,44 @@ export const globalStyles = StyleSheet.create({
   },
 
   // Label text
-  labelTextAsTyped: {
+  // One
+  labelTextOneAsTyped: {
     fontSize: 16,
     fontFamily: 'UncutSans-Bold',
   },
 
-  labelTextUppercase: {
+  labelTextOneUppercase: {
     fontSize: 16,
     textTransform: 'uppercase',
     fontFamily: 'UncutSans-Bold',
   },
 
-  labelTextTitleCase: {
+  labelTextOneTitleCase: {
     fontSize: 16,
     textTransform: 'capitalize',
     fontFamily: 'UncutSans-Bold',
+  },
+
+  labelTextOneItalic: {
+    fontSize: 16,
+    fontFamily: 'UncutSans-BoldItalic',
+  },
+
+  // Two
+  labelTextTwoAsTyped: {
+    fontSize: 14,
+    fontFamily: 'UncutSans-Semibold',
+  },
+
+  labelTextTwoUppercase: {
+    fontSize: 14,
+    textTransform: 'uppercase',
+    fontFamily: 'UncutSans-Semibold',
+  },
+
+  labelTextTwoItalic: {
+    fontSize: 14,
+    fontFamily: 'UncutSans-SemiboldItalic',
   },
 
   // ! ||--------------------------------------------------------------------------------||
