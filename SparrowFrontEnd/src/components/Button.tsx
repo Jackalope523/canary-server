@@ -220,6 +220,8 @@ export const Button: React.FC<ButtonProps> = ({
   // TODO button needs to reset state back to rest (isPressed = false), when the user has
   // left the screen / doesn't see the button anymore.
 
+  // TODO add button icon toggle
+
   const [isPressed, setIsPressed] = React.useState(false);
 
   const handlePressIn = () => {
