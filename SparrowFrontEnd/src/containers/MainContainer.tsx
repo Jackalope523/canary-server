@@ -43,6 +43,7 @@ import {
 } from '../components/atoms/types';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// TODO setup top navbars for all necessary screens
 // TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 
