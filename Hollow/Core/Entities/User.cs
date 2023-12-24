@@ -1,17 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Controls;
+using Microsoft.Extensions.Hosting;
 using Shared;
+
+using static Core.Entities.Psijic;
 
 namespace Core.Entities
 {
+    using static CoreTerminal;
+
     internal class User
     {
-		public Guid Id { get; init; }
+
+		#region Variables
+
+        //////
+        // Constants
+        //////////////
+
+        public const int MaximumReputation = 100;
+        public const int ReputationPopulation = 20;
+        public const float ReputationIntensity = 2.2f;
+
+        ///////
+        // Properties
+        ///////////////
+		
+        public ulong Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
@@ -19,12 +40,7 @@ namespace Core.Entities
 
         public int NumberOfFollowers { get; set; }
         public DateTimeOffset JoinDate { get; init; }
-
         public int Reputation { get; set; }
-        public (int Postitive, int Negative) Ratings { get; set; }
-        public const int MaximumReputation = 100;
-        public const int ReputationPopulation = 20;
-        public const float ReputationIntensity = 2.2f;
 
         public bool IsPhoneConfirmed { get; set; }
         public bool IsEmailConfirmed { get; set; }
@@ -38,32 +54,69 @@ namespace Core.Entities
             AccountStatus == UserAccountStatus.active_no_host;
         public bool CanAttendFriends => CanAttend ||
             AccountStatus == UserAccountStatus.active_limited;
-		public bool CanHost => AccountStatus == UserAccountStatus.active;
+        public bool CanHost => AccountStatus == UserAccountStatus.active;
         public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
-
-        public GeoLocation LastKnownLocation { get; set; }
-        public Distance LastKnownRadius { get; set; }
-        public GeoLocation Haunt { get; set; }
-        public Distance HauntRadius { get; set; }
-        public int HauntStability { get; set; }
-
-        public Event CurrentEvent { get; set; }
-        public bool IsAtEvent => CurrentEvent != null;
-
-        public List<UserSilhouette> Following { get; set; }
-        public List<UserSilhouette> Blocking { get; set; }
 
         public CharacterVector Character { get; set; }
 
-        public List<UserReport> Reports { get; set; }
-        public List<EventReport> EventReports { get; set; }
+        ////////
+        // Synced Properties
+        //////////////////////
 
-        public User() { }
+        public Synced<(int Postitive, int Negative)> Ratings
+            => new(() => Terminal.ProfileDirector.RequestAllRatingsAsync(this));
 
-        public User(Guid userID)
-        {
-            Id = userID;
-        }
+        private Synced<(GeoLocation Location, Distance Radius)> LocationSync
+            => new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
+		public Synced<GeoLocation> LastKnownLocation
+            => new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
+        public Synced<Distance> LastKnownRadius
+            => new(async () => (await LocationSync.Value().ConfigureAwait(false)).Radius);
+
+        private Synced<(GeoLocation Location, Distance Radius, int Stability)> HauntSync
+            => new(() => Terminal.AccountDirector.RequestUserHauntAsync(this));
+        public Synced<GeoLocation> Haunt
+            => new(async () => (await HauntSync.Value().ConfigureAwait(false)).Location);
+        public Synced<Distance> HauntRadius
+            => new(async () => (await HauntSync.Value().ConfigureAwait(false)).Radius);
+        public Synced<int> HauntStability
+            => new(async () => (await HauntSync.Value().ConfigureAwait(false)).Stability);
+
+        public Synced<Event> CurrentEvent
+            => new(() => Terminal.EventDirector.RequestCurrentEventForUserAsync(this));
+        public Synced<List<Event>> PastEvents
+            => new(() => Terminal.EventDirector.RequestPastEventsForUserAsync(this));
+        public Synced<List<Event>> UpcomingEvents
+            => new(() => Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this));
+
+        public Synced<List<User>> Friends
+			=> new(() => Terminal.ProfileDirector.RequestFriendsAsync(this));
+		public Synced<List<User>> Following
+            => new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));
+        public Synced<List<User>> FollowedBy
+            => new(() => Terminal.ProfileDirector.RequestFollowersAsync(this));
+        public Synced<List<User>> Blocking
+            => new(() => Terminal.ProfileDirector.RequestBlockedUsersAsync(this));
+        public Synced<List<User>> BlockedBy
+            => new(() => Terminal.ProfileDirector.RequestUsersBlockingAsync(this));
+
+        public Synced<List<Note>> Notes
+            => new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
+
+        public Synced<List<Penalty>> Penalties
+            => new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
+        public Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync
+            => new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
+        public Synced<List<UserReport>> Reports
+            => new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
+        public Synced<List<EventReport>> EventReports
+            => new(async () => (await ReportsSync.Value().ConfigureAwait(false)).EventReports);
+
+		#endregion
+
+		#region Initialisation & Extraction
+
+		public User() { }
 
         public User(UserShard fromUser)
         {
@@ -97,7 +150,7 @@ namespace Core.Entities
             NumberOfFollowers = fromUser.NumberOfFollowers;
         }
 
-        public UserShard ToThinUser()
+        public UserShard ToUserShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
@@ -105,72 +158,31 @@ namespace Core.Entities
                 JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }
 
-        public UserSilhouette ToThinnerUser()
+        public UserSilhouette ToUserSilhouette()
         {
             return new(Id, Name);
         }
 
-        public UserProfile ToThinProfile()
+        public UserProfile ToUserProfile()
         {
             return new(Id, Name, Reputation, NumberOfFollowers);
         }
 
-        public async Task SyncLocation()
-        {
-            try
-            {
-                var userLocation = await CoreTerminal.Terminal.AccountDirector.GetLastKnownUserLocationAsync(Id);
-                LastKnownLocation = new() { Latitude = userLocation.Latitude, Longitude = userLocation.Longitude };
-                LastKnownRadius = new() { Metres = userLocation.Radius };
-            }
-            catch { }
-        }
+		#endregion
 
-        public async Task SyncHaunt()
-        {
-            try
-            {
-                var userHaunt = await CoreTerminal.Terminal.AccountDirector.GetUserHauntAsync(Id);
-                Haunt = new() { Latitude = userHaunt.Latitude, Longitude = userHaunt.Longitude };
-                HauntRadius = new() { Metres = userHaunt.Radius };
-                HauntStability = userHaunt.Stability;
-            }
-            catch { }
+		#region Composition
 
-        }
-
-        public async Task SyncCurrentEvent()
+		public bool ValidateAndNormalise()
         {
-            try
-            {
-                CurrentEvent = new(await CoreTerminal.Terminal.EventDirector.GetCurrentEventAsync(Id));
-            }
-            catch { }
-        }
-
-        public async Task SyncReputation()
-        {
-            Ratings = await CoreTerminal.Terminal.ProfileDirector.GetAllRatingsAsync(Id);
-        }
-
-        public async Task SyncReports()
-        {
-            var reports = await CoreTerminal.Terminal.ReportDirector.GetAllReportsAsync(Id);
-            Reports = reports.UserReports;
-            EventReports = reports.EventReports;
-        }
-
-        public bool ValidateAndNormalise()
-        {
-            // Verify Phone Number
+            // Verify phone number
             if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
 
-            // Verify Email if it exists
+            // Verify email if it exists
             if (!string.IsNullOrEmpty(Email) &&
                 !ContentValidation.IsEmailValid(Email)) { return false; }
 
-            // Verify User age
-            if (DateOfBirth + TimeSpan.FromDays(365 * 18) > DateTimeOffset.UtcNow) { return false; }
+            // Verify user age
+            if (HasAlready(DateOfBirth + (OneYear * 18))) { return false; }
 
             // Normalise
             Email = string.IsNullOrEmpty(Email) ? Email : Email.ToLower();
@@ -184,73 +196,14 @@ namespace Core.Entities
             SecurityStamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(20));
         }
 
-        public async Task HandleHaunt()
+		public async Task CalculateReputation()
         {
-            await SyncHaunt();
+            _ = (Penalties.Sync(), Ratings.Sync());
 
-            // Check if recent location is within haunt area
-            if (GeoLocation.DistanceBetween(Haunt, LastKnownLocation) < HauntRadius)
-            {
-                HauntStability += 1;
-            }
-            else
-            {
-                HauntStability -= 1;
-
-                // If our haunt is unstable, move it
-                if (HauntStability < 0)
-                {
-                    HauntStability = 0;
-                    Haunt = LastKnownLocation;
-                }
-            }
-        }
-
-        public async Task<bool> IsFriendsWith(Guid userID)
-            => await IsFriendsWith(new User(userID));
-
-        public async Task<bool> IsFriendsWith(User otherUser)
-        {
-            // Check if both users are following eachother
-            if (await IsFollowing(otherUser) && await otherUser.IsFollowing(this))
-            { return true; }
-
-            return false;
-        }
-
-        public async Task<bool> IsFollowing(Guid userID)
-            => await IsFollowing(new User(userID));
-		
-        public async Task<bool> IsFollowing(User otherUser)
-        {
-            // Set if null
-            Following ??= await CoreTerminal.Terminal.ProfileDirector.GetFollowedUsersAsync(otherUser.Id);
-
-			// Check if user is following target
-			if (Following.Find(x => x.Id == otherUser.Id) != null)
-			{ return false; }
-
-            return true;
-        }
-
-        public async Task<bool> IsBlocking(Guid userID)
-            => await IsBlocking(new User(userID));
-
-        public async Task<bool> IsBlocking(User otherUser)
-        {
-            // Set if null
-            Blocking ??= await CoreTerminal.Terminal.ProfileDirector.GetBlockedUsersAsync(otherUser.Id);
-
-			// Check if user is following target
-			if (Blocking.Find(x => x.Id == otherUser.Id) != null)
-			{ return false; }
-
-            return true;
-        }
-
-        public void CalculateReputation()
-        {
-            int ratingDiff = Ratings.Postitive - Ratings.Negative;
+            // Get all recent penalties
+            var penalties = (await Penalties.Value()).Where(penalty => HasYet(penalty.TimeOfPenalty + OneYear)).ToList();
+            var ratings = await Ratings.Value();
+            int ratingDiff = ratings.Postitive - ratings.Negative - penalties.Count/2;
             int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
 
             float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
@@ -266,12 +219,148 @@ namespace Core.Entities
             Character.MoveTowards(eventAttended.Character, modifier);
         }
 
-        public async Task<UserAccountStatus> EventReported()
+        public async Task<Event> NextEvent()
         {
-            await SyncReports();
+            return (await UpcomingEvents.Value())[0];
+        }
 
+		#endregion
+
+		#region Checks
+
+        public async Task<bool> IsFriendsWith(User otherUser)
+		{
+			// Check if users are friends
+			if ((await Friends.Value()).Contains(otherUser))
+            { return true; }
+
+            return false;
+        }
+
+        public async Task<bool> IsFollowing(User otherUser)
+        {
+			// Check if user is following target
+			if ((await Following.Value()).Contains(otherUser))
+			{ return false; }
+
+            return true;
+        }
+
+        public async Task<bool> IsBlocking(User otherUser)
+        {
+			// Check if user is blocking target
+			if ((await Blocking.Value()).Contains(otherUser))
+			{ return true; }
+
+            return false;
+        }
+
+		public async Task<bool> IsBlockedBy(User otherUser)
+		{
+			// Check if user is blocked by target
+			if ((await BlockedBy.Value()).Contains(otherUser))
+			{ return true; }
+
+			return false;
+		}
+
+        public async Task<bool> IsAtEvent()
+        {
+            if ((await CurrentEvent.Value()) == null)
+            { return false; }
+
+            return true;
+        }
+
+		public async Task<bool> CanView(Event @event)
+		{
+			// Note: This is efficient with multiple events. For multiple users, see Event.IsVisibleTo
+
+			// Check if user account is locked
+			if (IsLocked)
+			{ return false; }
+
+			// Check if user's account is limited
+			if (!CanAttend)
+			{
+                // User cannot join normal events
+                // Check if user can join friend events and Host is friends with the user
+				if (!CanAttendFriends || !await IsFriendsWith(@event.Host))
+				{ return false; }
+			}
+
+            // Check if user is blocked by or blocking event host
+            if (await IsBlockedBy(@event.Host) || await IsBlocking(@event.Host))
+			{ return false; }
+
+			return true;
+		}
+
+		public async Task<bool> CanJoin(Event @event)
+		{
+			// Check if event is joinable
+			if (@event.IsOpen)
+			{ return false; }
+
+			// Check if user can see event
+			if (!await CanView(@event))
+			{ return false; }
+
+			// Check if user or user's haunt is within a reasonable distance
+			if (!GeoLocation.AreInRange(await LastKnownLocation.Value(), @event.Location, @event.MaximumJoinDistance) &&
+				!GeoLocation.AreInRange(await Haunt.Value(), @event.Location, @event.MaximumJoinDistance))
+			{ return false; }
+
+			return true;
+		}
+
+		public bool Etched(Etching etching)
+        {
+            return etching.UserId.Equals(Id);
+		}
+
+        public async Task<bool> CanReport()
+        {
+            var recentReportCount = (await Reports.Value()).Count(report => After(report.ReportTime, Time - QuarterHour))
+                + (await EventReports.Value()).Count(report => After(report.ReportTime, Time - QuarterHour));
+
+            if (recentReportCount > 3)
+            { return false; }
+
+            return true;
+        }
+
+		#endregion
+
+		#region Effects
+        
+        public async Task HandleHaunt()
+        {
+            // Check if recent location is within haunt area
+            if (GeoLocation.DistanceBetween(await Haunt.Value(), await LastKnownLocation.Value()) < await HauntRadius.Value())
+            {
+                HauntStability.Set(HauntStability + 1);
+            }
+            else
+            {
+                HauntStability.Set(HauntStability - 1);
+
+                // If our haunt is unstable, move it
+                if (await HauntStability.Value() < 0)
+                {
+                    HauntStability.Set(0);
+                    Haunt.Set(await LastKnownLocation.Value());
+                }
+            }
+        }
+
+        public async Task Penalised()
+            => await CalculateReputation();
+
+		public async Task<UserAccountStatus> EventReported()
+        {
 			// Check if there are enough reports
-			if (EventReports.Count < 4)
+			if ((await EventReports.Value()).Count < 4)
 			{ return AccountStatus; }
 
 			return UserAccountStatus.active_no_host;
@@ -279,21 +368,55 @@ namespace Core.Entities
 
         public async Task<UserAccountStatus> Reported()
         {
-            await SyncReports();
-
 			// Check if there are enough reports
-			if (Reports.Count < 4)
+			if ((await Reports.Value()).Count < 4)
 			{ return AccountStatus; }
 
 			// Check if there are enough reports
-			if (Reports.Count < 6)
+			if ((await Reports.Value()).Count < 6)
 			{ return UserAccountStatus.active_limited; }
             
 			// Check if there are enough reports
-			if (Reports.Count < 10)
+			if ((await Reports.Value()).Count < 10)
 			{ return UserAccountStatus.inactive_under_review; }
 
             return UserAccountStatus.blacklisted;
         }
-    }
+
+		#endregion
+
+		#region Actions
+
+        public async Task PostNote(User notifier, string message, string action)
+        {
+            await Terminal.NotificationDirector.PostNoteAsync(this, notifier,
+                message, action);
+        }
+
+		public async Task Notify(string title, string message)
+        {
+            await Terminal.NotificationDirector.NotifyUserAsync(this, title, message);
+        }
+
+        public async Task NotifyFollowers(string title, string message)
+        {
+            (await FollowedBy.Value()).ForEach(follower => _ = follower.Notify(title, message));
+        }
+
+		#endregion
+
+		#region Dissimilation
+
+		public override bool Equals(object obj)
+		{
+			return obj is User other && Id.Equals(other.Id);
+		}
+
+		public override int GetHashCode()
+		{
+			return Id.GetHashCode();
+		}
+
+		#endregion
+	}
 }

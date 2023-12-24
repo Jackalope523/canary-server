@@ -52,8 +52,10 @@ namespace Repository.Tests.Tests
                     testEvent.Competitiveness,
                     testEvent.Industriousness,
                     testEvent.NightOwl,
-                    testEvent.Openness
-                    ));
+                    testEvent.Openness),
+                testEvent.Radius,
+                testEvent.IsDynamic
+                );
 
             Event created = sentry.ExecuteRead(ctx => ctx.Events.First());
 
@@ -66,7 +68,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEvent.Location.X, created.Location.X);
             Assert.Equal(testEvent.GroupMinimum, created.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, created.GroupMaximum);
-            Assert.Equal(testEvent.IsOpen, created.IsOpen);
+            Assert.Equal(testEvent.State, created.State);
         }
         [Fact]
         public async Task FindEventAsync_SUCCESS()
@@ -142,7 +144,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEvent.Location.X, updated.Location.X);
             Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
-            Assert.True(updated.IsOpen);
+            Assert.Equal(testEvent.State, updated.State);
         }
         [Fact]
         public async Task EndEventAsync_SUCCESS()
@@ -184,7 +186,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEvent.Location.X, @event.Longitude);
             Assert.Equal(testEvent.GroupMinimum, @event.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, @event.GroupMaximum);
-            Assert.Equal(testEvent.IsOpen, @event.IsOpen);
+            Assert.Equal(testEvent.State, @event.State);
         }
         [Fact]
         public async Task FindUpcomingEventsForUserAsync_SUCCESS()
@@ -203,7 +205,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEvent.Location.X, @event.Longitude);
             Assert.Equal(testEvent.GroupMinimum, @event.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, @event.GroupMaximum);
-            Assert.Equal(testEvent.IsOpen, @event.IsOpen);
+            Assert.Equal(testEvent.State, @event.State);
         }
         [Fact]
         public async Task FindPastEventsForUserAsync_SUCCESS()
@@ -222,7 +224,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEvent.Location.X, @event.Longitude);
             Assert.Equal(testEvent.GroupMinimum, @event.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, @event.GroupMaximum);
-            Assert.Equal(testEvent.IsOpen, @event.IsOpen);
+            Assert.Equal(testEvent.State, @event.State);
         }
         [Fact]
         public async Task AddUserToEventAsync_SUCCESS()
@@ -236,12 +238,12 @@ namespace Repository.Tests.Tests
             Assert.Equal(EventLink.EventLinkType.Attend, link.Type);
         }
         [Fact]
-        public async Task RemoveUserFromEventAsync_SUCCESS()
+        public async Task RemoveUserAsync_SUCCESS()
         {
             EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventLink.EventLinkType.Attend);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
-            await store.RemoveUserFromEventAsync(testUser.Id, testEvent.Id);
+            await store.RemoveUserAsync(testUser.Id, testEvent.Id);
 
             int count = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.CountAsync());
 

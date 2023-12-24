@@ -2,46 +2,95 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Immutable;
 using Shared;
 using Core.Boundaries;
-using Core.Controls;
+
+using static Core.Entities.Arbiter;
+using static Core.Entities.Psijic;
 
 namespace Core.Entities
 {
+    using static CoreTerminal;
+
     internal class Event
     {
-        #region Variables
+		#region Variables
 
-        public const int MaximumNameLength = 50;
+		//////
+		// Constants
+		//////////////
+
+		public const int MaximumNameLength = 50;
         public const int MaximumDescLength = 400;
 
-        public Guid Id { get; init; }
+        public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
+        public readonly Distance GuestDistance = new() { Metres = 75 };
+        public readonly TimeSpan MaximumEtchingLateness = OneDay;
+
+        public static Event None
+            => new() { Id = 0 };
+
+		///////
+		// Properties
+		///////////////
+
+		public ulong Id { get; init; }
         public User Host { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public CharacterVector Character { get; set; }
-        public DateTimeOffset StartTime { get; init; }
+        public DateTimeOffset StartTime { get; set; }
         public GeoLocation Location { get; set; }
-        public DateTimeOffset? EndTime { get; init; }
-        public bool IsOpen { get; set; }
+        public Distance Radius { get; set; }
+        public bool IsDynamic { get; set; }
+        public DateTimeOffset? EndTime { get; set; }
+        public EventState State { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
 
-        public List<UserSilhouette> Attendees { get; set; }
+        public bool IsWaiting
+            => State.Equals(EventState.upcoming) &&
+                HasAlready(StartTime);
+        public bool IsOpen
+            => State.Equals(EventState.upcoming) ||
+                State.Equals(EventState.active_open);
+        public bool IsOngoing
+            => State.Equals(EventState.active_open) ||
+                State.Equals(EventState.active_closed);
+        public bool IsActive
+            => !EndTime.HasValue ||
+                HasYet(EndTime.Value + MaximumEtchingLateness);
 
-		public List<EventReport> EventReports { get; set; }
+		////////
+		// Synced Properties
+		//////////////////////
 
-        public List<Etching> EventEtchings { get; set; }
+		public Synced<List<(User User, EventUserState State)>> AllUsers
+            => new(() => Terminal.EventDirector.RequestAllUsersFromEventAsync(this));
+        public Synced<List<User>> Watching
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User));
+		public Synced<List<User>> Incoming
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Incoming)).ConvertAll(user => user.User));
+        public Synced<List<User>> Guests
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Guest)).ConvertAll(user => user.User));
+        public Synced<List<User>> Left
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Left)).ConvertAll(user => user.User));
+        public Synced<List<User>> Kicked
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventUserState.Kicked)).ConvertAll(user => user.User));
+        public Synced<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>> GuestHistory
+            => new(() => Terminal.EventDirector.RequestGuestHistoryAsync(this));
+
+        public Synced<List<EventReport>> EventReports
+            => new(() => Terminal.DisciplineDirector.RequestEventReportsAsync(this));
+
+        public Synced<List<Etching>> Etchings
+            => new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));
 
 		#endregion
 
-		public Event() { }
+		#region Initialisation & Extraction
 
-        public Event(Guid eventID)
-        {
-            Id = eventID;
-        }
+		public Event() { }
 
         public Event(EventShard fromEvent)
         {
@@ -53,10 +102,12 @@ namespace Core.Entities
             Location = new()
                 { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
             EndTime = fromEvent.TimeEnded;
-            IsOpen = fromEvent.IsOpen;
+            State = fromEvent.State;
             GroupMinimum = fromEvent.GroupMinimum;
             GroupMaximum = fromEvent.GroupMaximum;
             Character = new(fromEvent.Character);
+            Radius = new() { Kilometres = fromEvent.Radius };
+            IsDynamic = fromEvent.IsDynamic;
         }
 
         public Event(EventThinSlice fromEvent)
@@ -67,41 +118,36 @@ namespace Core.Entities
                 { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
         }
 
-        public EventShard ToThinEvent()
+        public EventShard ToEventShard()
         {
-            return new(Id, Host.ToThinnerUser(), Name, Description,
+            return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
-                IsOpen, GroupMinimum, GroupMaximum, Character.ToCharacter());
+                State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
+                Radius.Kilometres, IsDynamic);
         }
 
-        public EventThinSlice ToThinnerEvent()
+        public EventThinSlice ToEventThinSlice()
         {
-            return new(Id, Host.ToThinnerUser(), Location.Latitude, Location.Longitude);
+            return new(Id, Host.ToUserSilhouette(), Location.Latitude, Location.Longitude);
         }
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Name, EndTime.HasValue, lastActiveTime);
+            return new(Id, Name, IsActive, lastActiveTime);
         }
 
-		public async Task SyncReports()
-		{
-			EventReports = await CoreTerminal.Terminal.ReportDirector.GetEventReportsAsync(Id);
-		}
+		#endregion
 
-        public async Task SyncEtchings()
-        {
-            EventEtchings = await CoreTerminal.Terminal.EtchingDirector.GetEventEtchingsAsync(Id);
-        }
+		#region Composition
 
-        public bool ValidateAndNormalise()
+		public bool ValidateAndNormalise()
         { 
             // Sanitise User content
             Name = ContentValidation.NormaliseText(Name[..MaximumNameLength]);
             Description = ContentValidation.NormaliseText(Description[..MaximumDescLength]);
 
             // Verify Event is within a reasonable time
-            if (StartTime > DateTimeOffset.UtcNow + TimeSpan.FromDays(7)) { return false; }
+            if (After(StartTime, Time + OneWeek)) { return false; }
 
             // Verify group bounds
             if (GroupMaximum != 0 &&
@@ -111,10 +157,31 @@ namespace Core.Entities
             return true;
         }
 
-		public async Task<bool> IsVisibleTo(User user)
+        public async Task<List<(User User, EventUserState State)>> GetFriendsOf(User user)
         {
-            // Check if user account is locked
-            if (user.IsLocked)
+            List<(User User, EventUserState State)> friends = new();
+
+            foreach (var userDetails in await AllUsers.Value())
+            {
+                if (await user.IsFriendsWith(userDetails.User))
+                {
+                    friends.Add(userDetails);
+                }
+            }
+
+            return friends;
+        }
+
+		#endregion
+
+		#region Checks
+
+		public async Task<bool> IsVisibleTo(User user)
+		{
+			// Note: This is efficient with multiple users. For multiple events, see User.CanView
+
+			// Check if user account is locked
+			if (user.IsLocked)
             { return false; }
 
 			// Check if user's account is limited
@@ -126,45 +193,172 @@ namespace Core.Entities
 				{ return false; }
 			}
 
-			// Check if user is blocked by event host
-			if (await Host.IsBlocking(user))
+			// Check if user is blocked by or blocking event host
+			if (await Host.IsBlockedBy(user) || await Host.IsBlocking(user))
 			{ return false; }
 
 			return true;
 		}
 
-        public async Task<bool> IsModifiableBy(Guid userID)
-            => await IsModifiableBy(new User(userID));
+        public async Task<bool> IsJoinableBy(User user)
+        {
+            // Check if event is joinable
+            if (IsOpen)
+            { return false; }
 
-        public async Task<bool> IsModifiableBy(User user)
+            // Check if user can see event
+            if (!await IsVisibleTo(user))
+            { return false; }
+
+            // Check if user is kicked from event
+            if ((await Kicked.Value()).Contains(user))
+            { return false; }
+
+            // Check if user or user's haunt is within a reasonable distance
+            if (!GeoLocation.AreInRange(await user.LastKnownLocation.Value(), Location, MaximumJoinDistance) &&
+                !GeoLocation.AreInRange(await user.Haunt.Value(), Location, MaximumJoinDistance))
+            { return false; }
+
+            return true;
+        }
+
+        public bool IsModifiableBy(User user)
         {
 			// Check if user is event host
-			if (Host.Id == user.Id)
+			if (Host.Id.Equals(user.Id))
 			{ return true; }
 
 			return false;
         }
 
-        public async Task<bool> IsAttendedBy(Guid userID)
-            => await IsAttendedBy(new User(userID));
-
-        public async Task<bool> IsAttendedBy(User user)
+        public bool IsHostedBy(User user)
         {
-            Attendees ??= await CoreTerminal.Terminal.EventDirector.GetAttendeesInternalAsync(Id);
+			// Check if user is event host
+			if (Host.Id.Equals(user.Id))
+			{ return true; }
 
-            // Check if user is on the guest list
-            return Attendees.Find(x => x.Id == user.Id) != null;
+			return false;
+        }
+
+        public async Task<bool> HasUserRelationship(User user)
+        {
+            // Check if user has interacted with event
+            return (await AllUsers.Value()).FindAll(x => x.User.Id == user.Id).Count == 1;
+        }
+
+        public async Task<bool> WasAttendedBy(User user)
+        {
+            // Check if user is or was on the guest list
+            return (await Guests.Value()).Contains(user) || (await Left.Value()).Contains(user);
 		}
 
-        public async Task<bool> Reported()
-        {
-            await SyncReports();
+        public async Task<bool> IsInRange(User user)
+            => GeoLocation.AreInRange(Location, await user.LastKnownLocation.Value(), GuestDistance);
 
-            // Check if there are enough reports
-            if (EventReports.Count < 3)
+        public async Task<bool> IsStartable()
+        {
+            // Check if event has not yet started
+            if (!IsWaiting)
+            { return false; }
+
+            // Check if host is within range
+            if (!await IsInRange(Host))
             { return false; }
 
             return true;
         }
-    }
+
+		#endregion
+
+		#region Effects
+
+        public async Task Started()
+        {
+            _ = NotifyActive($"{Name}", "Event is active!");
+        }
+
+        public async Task<List<User>> Ended()
+        {
+            List<User> updatedGuests = new();
+
+            // Update all participants' vectors and notify
+			foreach ((var joined, var left, var guest) in await GuestHistory.Value())
+			{
+				guest.CalculateCharacter(this, left.Value - joined);
+
+                updatedGuests.Add(guest);
+
+				// Notify of event ending
+				_ = guest.Notify($"{Name}", $"Event has concluded.");
+			}
+
+            return updatedGuests;
+		}
+
+        public async Task Etched(User user)
+        {
+            // Verify user can etch into the event
+            Try(await WasAttendedBy(user),
+                new InvalidEventException("User did not attend event."));
+
+            // Verify etching is not before event starting or user is host
+            Try(HasAlready(StartTime) || IsModifiableBy(user),
+                new InvalidEventException("Event has yet to start."));
+
+            // Verify etching is added before event is closed
+            Try(IsActive,
+                new InvalidEventException("Event has already ended."));
+		}
+
+		public async Task<bool> Reported()
+        {
+            // Check if there are enough reports
+            if ((await EventReports.Value()).Count < 3)
+            { return false; }
+
+            return true;
+        }
+
+        #endregion
+
+        #region Actions
+
+        public async Task NotifyActive(string title, string message)
+        {
+            foreach (var user in (await Incoming.Value()).Concat(await Guests.Value()))
+            {
+                if (IsHostedBy(user))
+                { continue; }
+
+                _ = user.Notify(title, message);
+            }
+        }
+
+        public async Task NotifyGuests(string title, string message)
+        {
+            foreach (var guest in await Guests.Value())
+            {
+                if (IsHostedBy(guest))
+                { continue; }
+
+                _ = guest.Notify(title, message);
+            }
+        }
+
+		#endregion
+
+		#region Dissimilation
+
+		public override bool Equals(object obj)
+		{
+			return obj is Event other && Id.Equals(other.Id);
+		}
+
+		public override int GetHashCode()
+		{
+			return Id.GetHashCode();
+		}
+
+		#endregion
+	}
 }

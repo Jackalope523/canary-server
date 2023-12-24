@@ -1,9 +1,23 @@
 import { StyleSheet, Text, Pressable, StyleProp, ViewStyle, TextStyle } from 'react-native'
-import React from 'react'
+import * as React from 'react'
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
+
+/*
+
+
+
+
+This is replaced by the Button component in the components folder
+and will be deleted shortly
+
+TODO delete this file and update buttons with the new buttons
+
+
+
+*/
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -24,14 +38,15 @@ interface ButtonProps {
 
   self?:number;
   status?:number;
-  changeState?:(myNumber:number)=>void
+  changeState?:(myNumber:number)=>void;
 
+  disabled?: boolean;
 }
 
 // TODO conditional button styling
 //  1. change styles to Active styles when button is pressed/selected
 
-const Button: React.FC<ButtonProps> = ({onPress, btnText, btnStyle, btnTextStyle, btnIcon, btnIconStyle, btnActiveStyle, btnActiveTextStyle, btnActiveIconStyle, self,status,changeState}) => {
+const Button: React.FC<ButtonProps> = ({onPress, btnText, btnStyle, btnTextStyle, btnIcon, btnIconStyle, btnActiveStyle, btnActiveTextStyle, btnActiveIconStyle, self,status,changeState,disabled}) => {
   const [isPressed, setIsPressed] = React.useState(false);
    
   const handlePressIn = () => {
@@ -53,7 +68,8 @@ const Button: React.FC<ButtonProps> = ({onPress, btnText, btnStyle, btnTextStyle
   return (
     <Pressable
       onPress={(handlePressIn)}
-      style={[(self == status) || isPressed ? btnActiveStyle : btnStyle, styles.btnBase]}>
+      style={[(self == status) || isPressed ? btnActiveStyle : btnStyle, styles.btnBase]}
+      disabled={disabled}>
       {btnIcon && <Icon style={btnIconStyle} name={btnIcon} /> }
         <Text style={(self == status) || isPressed ? btnActiveTextStyle : btnTextStyle}>{btnText}</Text>
     </Pressable>

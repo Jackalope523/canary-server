@@ -2,10 +2,10 @@
 {
     public abstract class Link
     {
-        public Guid Id { get; init; }
-        public Guid SelfId { get; init; }
+        public ulong Id { get; init; }
+        public ulong SelfId { get; init; }
         internal User Self { get; init; }
-        public Guid OtherId { get; init; }
+        public ulong OtherId { get; init; }
         public DateTimeOffset Time { get; init; }
 
     }

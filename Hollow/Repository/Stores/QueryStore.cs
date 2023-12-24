@@ -33,37 +33,7 @@ namespace Repository
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.PostLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
             return true;
-        }
-                        
-        protected async Task<List<EventShard>> FindEventsByAsync(Func<EventLink, bool> predicate)
-        {
-            List<Guid> guids = await storeSentry.ExecuteReadAsync(ctx => ctx.EventLinks.Where(l => predicate(l)).Select(l => l.OtherId).ToListAsync());
-
-            List<EventShard> events = await storeSentry.ExecuteReadAsync(ctx=> ctx.Events.Where(e => guids.Contains(e.Id)).Select(e => new EventShard
-               (
-                   e.Id,
-                   new UserSilhouette(e.HostId, e.Host.Name),
-                   e.Name,
-                   e.Description,
-                   e.StartTime,
-                   e.Location.Y,
-                   e.Location.X,
-                   e.EndTime,
-                   e.IsOpen,
-                   e.GroupMinimum,
-                   e.GroupMaximum,
-                   new Character(
-                   e.Extroversion,
-                   e.Athleticisme,
-                   e.Chaos,
-                   e.Competitiveness,
-                   e.Industriousness,
-                   e.NightOwl,
-                   e.Openness)
-               )).ToListAsync());
-
-            return events;
-        }
+        }       
     }
 }
 

@@ -1,53 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Threading.Tasks;
-
+using Core.Controls;
+using Shared;
 
 namespace Core.Boundaries
 {
-	public record EventShard(Guid Id, UserSilhouette Host, string Name, string Description,
+	#region Schemas
+
+	public enum EventState
+	{ upcoming, active_open, active_closed, ended }
+
+	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-		bool IsOpen, int GroupMinimum, int GroupMaximum, Character Character);
-	public record EventThinSlice(Guid Id, UserSilhouette Host, double Latitude, double Longitude);
+		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
+		double Radius, bool IsDynamic);
+	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
+
+	#endregion
+
+	#region Gates
 
 	public interface IEventDatabase
 	{
-        Task<EventShard> FindEventAsync(Guid id);
+        Task<EventShard> FindEventAsync(ulong eventId);
 		Task<List<EventThinSlice>> FindEventsAsync(double latitude, double longitude, double distance);
-		Task<EventShard> FindCurrentEventForUserAsync(Guid id);
-		Task<List<EventShard>> FindUpcomingEventsForUserAsync(Guid id);
-		Task<List<EventShard>> FindPastEventsForUserAsync(Guid id);
+		Task<EventShard> FindCurrentEventForUserAsync(ulong userId);
+		Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong userId);
+		Task<List<EventShard>> FindPastEventsForUserAsync(ulong userId);
+		Task<List<EventShard>> FindEventsByUserAsync(ulong userId);
 
-		Task<EventShard> CreateEventAsync(Guid hostId, string name, string description,
+		Task<EventShard> CreateEventAsync(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int groupMinimum, int groupMaximum, Character character);
-		Task<bool> UpdateEventAsync(Guid id, List<(string Property, object Value)> edits);
-        Task<bool> EndEventAsync(Guid id);
+			int groupMinimum, int groupMaximum, Character character,
+			double Radius, bool isDynamic);
+		Task<bool> UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
+		Task<bool> EndEventAsync(ulong eventId);
 
-        Task<bool> AddUserToEventAsync(Guid userId, Guid eventId);
-        Task<bool> RemoveUserFromEventAsync(Guid userId, Guid eventId);
+		Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId);
+		Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState);
+		Task<bool> RemoveUserAsync(ulong userId, ulong eventId);
 
-		Task<List<UserSilhouette>> GetGuestListAsync(Guid id);
-		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(Guid id);
+		Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId);
+		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong eventId);
 	}
 
 	public interface IEventOperations
 	{
-		Task<EventShard> GetEventInformationAsync(Guid userID, Guid eventID);
-		Task<List<EventThinSlice>> GetEventsInAreaAsync(Guid userID,
+		Task<EventShard> GetEventInformationAsync(ulong userId, ulong eventId);
+		Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance);
-		Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(Guid userID,
+		Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance);
 
-		Task<EventShard> CreateEventAsync(Guid userID, string eventName, string eventDescription,
+		Task<EventShard> CreateEventAsync(ulong userId, string eventName, string eventDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
-			int? groupMinimum, int? groupMaximum);
-		Task EditEventAsync(Guid userID, Guid eventID,
-			string eventDescription = "", bool? isOpen = null);
-		Task JoinEventAsync(Guid userID, Guid eventID);
-		Task LeaveEventAsync(Guid userID, Guid eventID);
-		Task EndEventAsync(Guid userID, Guid eventID);
+			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum);
+		Task EditEventAsync(ulong userId, ulong eventId,
+			string eventDescription = "", bool? isOpen = null,
+			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null,
+			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
+		Task StartEventAsync(ulong userId, ulong eventId);
+		Task EndEventAsync(ulong userId, ulong eventId);
 
-		Task<List<UserSilhouette>> GetAttendeesAsync(Guid userID, Guid eventID);
+		Task WatchEventAsync(ulong userId, ulong eventId);
+		Task UnwatchEventAsync(ulong userId, ulong eventId);
+		Task JoinEventAsync(ulong userId, ulong eventId);
+		Task LeaveEventAsync(ulong userId, ulong eventId);
+
+		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
+			GetGuestListAsync(ulong userId, ulong eventId);
+		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId);
+		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId);
+		Task KickUserAsync(ulong hostId, ulong targetId, ulong eventId);
 	}
+
+	#endregion
 }

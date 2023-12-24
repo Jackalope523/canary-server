@@ -122,4 +122,14 @@ dependencies {
     }
 }
 
+// Fix for java.lang.UnsatisfiedLinkError for libreanimated
+project.ext.react = [
+    enableHermes: true,
+    bundleInDebug: true,
+]
+
+project.ext.reanimated = [
+    buildFromSource: true,
+]
+
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

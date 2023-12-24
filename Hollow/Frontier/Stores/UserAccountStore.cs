@@ -42,7 +42,7 @@ namespace Frontier.Stores
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await accounts.GetUserAsync(GetGUID(userId));
+			return await accounts.GetUserAsync(GetId(userId));
 		}
 
 		public async Task<UserShard> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
@@ -249,14 +249,14 @@ namespace Frontier.Stores
 			GC.SuppressFinalize(this);
 		}
 
-		private Guid GetGUID(string id)
+		private ulong GetId(string id)
 		{
-			if (!Guid.TryParse(id, out Guid guid))
+			if (!ulong.TryParse(id, out ulong parsedId))
 			{
-				throw new ArgumentException("Not a valid GUID.", nameof(id));
+				throw new ArgumentException("Not a valid ulong.", nameof(id));
 			}
 
-			return guid;
+			return parsedId;
 		}
 	}
 }

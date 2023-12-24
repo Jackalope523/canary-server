@@ -13,23 +13,23 @@ namespace Repository
         {
         }
 
-        public async Task<bool> FollowUserAsync(Guid selfId, Guid targetId) 
+        public async Task<bool> FollowUserAsync(ulong selfId, ulong targetId) 
         { 
             return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); 
         }
-        public async Task<bool> UnfollowUserAsync(Guid selfId, Guid targetId) 
+        public async Task<bool> UnfollowUserAsync(ulong selfId, ulong targetId) 
         { 
             return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); 
         }
-        public async Task<bool> BlockUserAsync(Guid selfId, Guid targetId) 
+        public async Task<bool> BlockUserAsync(ulong selfId, ulong targetId) 
         { 
             return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); 
         }
-        public async Task<bool> UnblockUserAsync(Guid selfId, Guid targetId) 
+        public async Task<bool> UnblockUserAsync(ulong selfId, ulong targetId) 
         { 
             return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); 
         }
-        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid id) 
+        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).
@@ -41,7 +41,7 @@ namespace Repository
                  ).
              ToListAsync());
         }
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid id) 
+        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block).
@@ -53,7 +53,7 @@ namespace Repository
                 ).
             ToListAsync());
         }
-        public async Task<List<UserSilhouette>> GetFriendsAsync(Guid id)
+        public async Task<List<UserSilhouette>> GetFriendsAsync(ulong id)
         {
             Task<List<UserSilhouette>> following = storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).
@@ -78,7 +78,7 @@ namespace Repository
             return (await following).Intersect(await followingMe).ToList();
         }
 
-        public async Task<(int Positive, int Negative)> GetUserRatingsAsync(Guid id)
+        public async Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong id)
         {
             Task<int> up = storeSentry.ExecuteReadAsync(ctx =>
             ctx.UserLinks.
@@ -93,7 +93,7 @@ namespace Repository
             return (await up, await down);
         }
 
-        public async Task<bool> RateUserAsync(Guid selfId, Guid targetId, UserRating rating)
+        public async Task<bool> RateUserAsync(ulong selfId, ulong targetId, UserRating rating)
         {
             UserLink.UserLinkType type;
             if (rating.Equals(UserRating.Positive)) type = UserLink.UserLinkType.RateUp;
@@ -102,7 +102,7 @@ namespace Repository
             return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = type });
         }
 
-        public async Task<bool> RemoveUserRatingAsync(Guid selfId, Guid targetId)
+        public async Task<bool> RemoveUserRatingAsync(ulong selfId, ulong targetId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => 
             ctx.UserLinks.
@@ -111,6 +111,16 @@ namespace Repository
             (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).
             ExecuteDelete());
             return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId });
+        }
+
+        public Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

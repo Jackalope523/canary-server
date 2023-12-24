@@ -11,7 +11,7 @@ namespace Core.Entities
         public IList<Participant> ActiveParticipants => GetActiveParticipants();
 
 
-        private Dictionary<Guid, LinkedList<ParticipantAction>> log;
+        private Dictionary<ulong, LinkedList<ParticipantAction>> log;
 
         private IList<Participant> cachedActiveParticipants;
         private bool participantsIsStale = true;
@@ -19,28 +19,28 @@ namespace Core.Entities
 
         public ParticipantLog()
         {
-            log = new Dictionary<Guid, LinkedList<ParticipantAction>>();
+            log = new Dictionary<ulong, LinkedList<ParticipantAction>>();
         }
 
-        public void AddParticipant(Guid participantID)
+        public void AddParticipant(ulong participantId)
         {
             participantsIsStale = true;
 
-            if (!log.ContainsKey(participantID))
+            if (!log.ContainsKey(participantId))
             {
-                log.Add(participantID, new LinkedList<ParticipantAction>());
+                log.Add(participantId, new LinkedList<ParticipantAction>());
             }
 
-            log[participantID].AddLast(new ParticipantAction(PerformedAction.Joined));
+            log[participantId].AddLast(new ParticipantAction(PerformedAction.Joined));
         }
 
-        public void RemoveParticipant(Guid participantID)
+        public void RemoveParticipant(ulong participantId)
         {
             participantsIsStale = true;
 
-            if (log.ContainsKey(participantID))
+            if (log.ContainsKey(participantId))
             {
-                log[participantID].AddLast(new ParticipantAction(PerformedAction.Left));
+                log[participantId].AddLast(new ParticipantAction(PerformedAction.Left));
             }
             else
             {
@@ -55,7 +55,7 @@ namespace Core.Entities
 
             var currentTime = DateTime.Now;
 
-            foreach (Guid participant in log.Keys)
+            foreach (ulong participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -74,7 +74,7 @@ namespace Core.Entities
 
             var currentTime = DateTime.Now;
 
-            foreach (Guid participant in log.Keys)
+            foreach (ulong participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -105,7 +105,7 @@ namespace Core.Entities
 
             List<Participant> activeParticipants = new List<Participant>();
 
-            foreach (Guid participant in log.Keys)
+            foreach (ulong participant in log.Keys)
             {
                 ParticipantAction lastAction = log[participant].Last.Value;
 
@@ -124,24 +124,24 @@ namespace Core.Entities
 
     internal readonly struct Participant : IComparable<Participant>
     {
-        public Guid ID { get; }
+        public ulong Id { get; }
         public DateTime JoinedTime { get; }
 
-        public Participant(Guid userID)
+        public Participant(ulong userId)
         {
-            ID = userID;
+            Id = userId;
             JoinedTime = DateTime.UtcNow;
         }
 
-        public Participant(Guid userID, DateTime timeJoined)
+        public Participant(ulong userId, DateTime timeJoined)
         {
-            ID = userID;
+            Id = userId;
             JoinedTime = timeJoined;
         }
 
         public int CompareTo(Participant other)
         {
-            return ID.CompareTo(other.ID);
+            return Id.CompareTo(other.Id);
         }
     }
 

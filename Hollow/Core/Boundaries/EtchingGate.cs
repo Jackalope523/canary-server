@@ -5,34 +5,46 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
-    public record EventHeader(Guid Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
+	#region Schemas
 
-    public record Etching(Guid Id, Guid EventId, Guid UserId,
+	public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
+
+    public record Etching(ulong Id, ulong EventId, ulong UserId,
         DateTimeOffset TimeEtched, string ImageURL,
-        (int Positive, int Negative) Ratings);
+        (int Positive, int Negative) Ratings, bool IsHidden);
 
-    public interface IEtchingDatabase
+	#endregion
+
+	#region Gates
+
+	public interface IEtchingDatabase
     {
-        Task<List<Etching>> GetEtchingsForEventAsync(Guid id);
-        Task<List<Etching>> GetEtchingsByUserAsync(Guid id);
-        Task<Etching> GetEtchingAsync(Guid id);
-        Task<Etching> AddEtchingAsync(Guid eventId, Guid etcherId, DateTimeOffset timeEtched, string imageURL);
-        Task<bool> RemoveEtchingAsync(Guid etchingId);
-        Task<bool> RateEtchingAsync(Guid etchingId, Guid voterId, UserRating rating);
-        Task<bool> RemoveEtchingRatingAsync(Guid etchingId, Guid voterId);
-        Task<List<Etching>> GenerateFeedForUserAsync(Guid id, DateTimeOffset depthCharge, List<Guid> exclusionList);
+        Task<List<Etching>> GetEtchingsForEventAsync(ulong eventId);
+        Task<List<Etching>> GetEtchingsByUserAsync(ulong userId);
+        Task<Etching> GetEtchingAsync(ulong etchingId);
+        Task<Etching> AddEtchingAsync(ulong eventId, ulong etcherId,
+            DateTimeOffset timeEtched, string imageURL);
+		Task<bool> RemoveEtchingAsync(ulong etchingId);
+		Task<bool> HideEtchingAsync(ulong etchingId);
+
+		Task<bool> RateEtchingAsync(ulong etchingId, ulong voterId, UserRating rating);
+		Task<bool> RemoveEtchingRatingAsync(ulong etchingId, ulong voterId);
+
+        Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, List<ulong> exclusionList);
     }
 
     public interface IEtchingOperations
     {
-        Task<List<Etching>> GetEventEtchingsAsync(Guid userID, Guid eventID);
-        Task<Etching> AddEtchingAsync(Guid userID, Guid eventID, string imageURL);
-        Task RemoveEtchingAsync(Guid userID, Guid etchingID);
-        Task RateEtchingAsync(Guid userID, Guid etchingID, UserRating rating);
+        Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId);
+        Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL);
+        Task RemoveEtchingAsync(ulong userId, ulong etchingId);
+        Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating);
 
         Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
-            GetUserFeedAsync(Guid userID, int depth,
-            List<Guid> exclusionList = null);
+            GetUserFeedAsync(ulong userId, int depth,
+            List<ulong> exclusionList = null);
     }
+
+	#endregion
 }
 

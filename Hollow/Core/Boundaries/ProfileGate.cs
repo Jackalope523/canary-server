@@ -5,41 +5,53 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
-    public record UserProfile(Guid Id, string Name, int Reputation, int NumberOfFollowers);
-    public record UserSilhouette(Guid Id, string Name);
+	#region Schemas
 
-    public interface IProfileDatabase
+	public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
+    public record UserSilhouette(ulong Id, string Name);
+
+	#endregion
+
+	#region Gates
+
+	public interface IProfileDatabase
     {
-        Task<List<UserSilhouette>> GetFriendsAsync(Guid id);
-        Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid id);
-        Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid id);
+        Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
+		Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId);
+        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId);
 
-        Task<bool> FollowUserAsync(Guid selfId, Guid targetId);
-        Task<bool> UnfollowUserAsync(Guid selfId, Guid targetId);
-        Task<bool> BlockUserAsync(Guid selfId, Guid targetId);
-        Task<bool> UnblockUserAsync(Guid selfId, Guid targetId);
+        Task<bool> FollowUserAsync(ulong userId, ulong targetUserId);
+		Task<bool> UnfollowUserAsync(ulong userId, ulong targetUserId);
+		Task<bool> BlockUserAsync(ulong userId, ulong targetUserId);
+		Task<bool> UnblockUserAsync(ulong userId, ulong targetUserId);
 
-        Task<bool> RateUserAsync(Guid selfId, Guid targetId, UserRating rating);
-        Task<bool> RemoveUserRatingAsync(Guid selfId, Guid targetId);
-        Task<(int Positive, int Negative)> GetUserRatingsAsync(Guid id);
+		Task<bool> RateUserAsync(ulong userId, ulong targetUserId, UserRating rating);
+		Task<bool> RemoveUserRatingAsync(ulong userId, ulong targetUserId);
+		Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong userId);
     }
 
 	public interface IProfileOperations
     {
-        Task<UserProfile> GetUserProfileAsync(Guid userID, Guid targetID);
+        Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId);
+        Task<(List<EventThinSlice> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId);
 
-        Task<List<EventShard>> GetUserActivityAsync(Guid userID, Guid targetID);
-        Task<Dictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(Guid userID);
+        Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId);
+        Task<IDictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId);
 
-        Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid userID);
-        Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid userID);
+        Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
+        Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
 
-        Task FollowUserAsync(Guid userID, Guid targetID);
-        Task UnfollowUserAsync(Guid userID, Guid targetID);
-        Task BlockUserAsync(Guid userID, Guid targetID);
-        Task UnblockUserAsync(Guid userID, Guid targetID);
+        Task FollowUserAsync(ulong userId, ulong targetId);
+        Task UnfollowUserAsync(ulong userId, ulong targetId);
+        Task BlockUserAsync(ulong userId, ulong targetId);
+        Task UnblockUserAsync(ulong userId, ulong targetId);
 
-        Task RateUserAsync(Guid userID, Guid targetID, UserRating rating);
+        Task RateUserAsync(ulong userId, ulong targetId, UserRating rating);
     }
+
+	#endregion
 }
 

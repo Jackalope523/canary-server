@@ -5,47 +5,65 @@ using Core.Boundaries;
 using Core.Entities;
 using Shared;
 
+using static Core.Entities.Arbiter;
+
 namespace Core.Controls
 {
 	internal abstract class AbstractDirector
 	{
+		#region Variables
+
 		protected CoreTerminal Terminal { get; init; }
 
 		protected IAccountDatabase Accounts { get; private set; }
 		protected IEventDatabase Events { get; private set; }
 		protected IEtchingDatabase Etchings { get; private set; }
 		protected IProfileDatabase Profiles { get; private set; }
-		protected IReportDatabase Reports { get; private set; }
+		protected IDisciplineDatabase Reports { get; private set; }
+		protected INotificationDatabase Notifications { get; private set; }
+
+		#endregion
+
+		#region Initialisation
 
 		public AbstractDirector(CoreTerminal terminal)
 		{
 			Terminal = terminal;
-		}
-
-		internal void Bridge()
-		{
+			
 			Accounts = Terminal.AccountDatabase;
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
 			Profiles = Terminal.ProfileDatabase;
-			Reports = Terminal.ReportDatabase;
+			Reports = Terminal.DisciplineDatabase;
+			Notifications = Terminal.NotificationDatabase;
         }
 
-        internal async Task<User> GetUser(Guid userID)
-        {
-            User user = new(await Accounts.FindUserByIdAsync(userID));
+		#endregion
 
-            // Check if user account is locked
-            if (user.IsLocked)
-            { throw new InvalidUserException("User account is locked."); }
+		#region Tools
+
+		protected async Task<User> GetUserAsync(ulong userId)
+        {
+            User user = new(await Accounts.FindUserByIdAsync(userId));
+
+			// Fail if user account is locked
+			Fail(user.IsLocked,
+				new InvalidUserException("User account is locked."));
 
             return user;
         }
 
-        internal async Task<Event> GetEvent(Guid eventID)
+		protected async Task<User> GetUserUnsafeAsync(ulong userId)
         {
-            return new(await Events.FindEventAsync(eventID));
+            return new(await Accounts.FindUserByIdAsync(userId));
         }
-    }
+
+        protected async Task<Event> GetEventAsync(ulong eventId)
+        {
+            return new(await Events.FindEventAsync(eventId));
+        }
+
+		#endregion
+	}
 }
 

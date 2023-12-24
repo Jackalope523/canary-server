@@ -5,22 +5,34 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shared;
 
+using static Core.Entities.Arbiter;
+using static Core.Entities.Artificer;
+using static Core.Entities.Psijic;
+
 namespace Core.Controls
 {
     internal class AccountDirector : AbstractDirector, IAccountOperations
     {
-        public AccountDirector(CoreTerminal terminal) : base(terminal) { }
+		#region Initialisation
 
-        public async Task<UserShard> GetUserAsync(Guid userID)
+		public AccountDirector(CoreTerminal terminal) : base(terminal) { }
+
+		#endregion
+
+		#region Operations
+
+		public async Task<UserShard> GetUserAsync(ulong userId)
         {
-            return (await GetUser(userID)).ToThinUser();
+            return (await base.GetUserAsync(userId)).ToUserShard();
         }
 
         public async Task<UserShard> GetUserAsync(string phoneNumber)
 		{
-            if (!ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber))
-            { throw new ArgumentException($"{nameof(phoneNumber)} must be a valid phone number."); }
-            return (await GetUser(normalisedPhoneNumber)).ToThinUser();
+            // Verify phone number is valid
+            Try(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
+                new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
+
+            return (await GetUser(normalisedPhoneNumber)).ToUserShard();
 		}
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
@@ -32,15 +44,14 @@ namespace Core.Controls
                 Email = email,
                 Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTimeOffset.UtcNow
+                JoinDate = Time
             };
 
             // Validate and normalise user
-            bool valid = newUser.ValidateAndNormalise();
-            if (!valid)
-            { throw new InvalidInformationException("Invalid account details provided."); }
+            Try(newUser.ValidateAndNormalise(),
+                new InvalidInformationException("Invalid account details provided."));
 
-            // Check if phone number is in use
+            // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
 
             // Check if email is in use
@@ -48,123 +59,190 @@ namespace Core.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            bool success = await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
-                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
-            if (!success)
-            { throw new UnexpectedFailureException("User creation failed."); }
+            Try(await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
+                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter()),
+                new UnexpectedFailureException("User creation failed."));
         }
 
-        public async Task EditUserAsync(Guid userID,
+        public async Task EditUserAsync(ulong userId,
             string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
         {
             // Throws if user not found or locked
-            User editUser = await GetUser(userID);
+            var user = await base.GetUserAsync(userId);
             
             // Check unique details changed to avoid errors
-            bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && editUser.PhoneNumber != phoneNumber;
-            bool emailChanged = !string.IsNullOrEmpty(email) && editUser.Email != email;
+            bool phoneNumberChanged = !string.IsNullOrEmpty(phoneNumber) && user.PhoneNumber != phoneNumber;
+            bool emailChanged = !string.IsNullOrEmpty(email) && user.Email != email;
+            bool nameChanged = !string.IsNullOrEmpty(name);
 
             // Modify user for validation
-            editUser.PhoneNumber = string.IsNullOrEmpty(phoneNumber) ? editUser.PhoneNumber : phoneNumber;
-            editUser.Email = string.IsNullOrEmpty(email) ? editUser.Email : email;
-            editUser.Name = string.IsNullOrEmpty(name) ? editUser.Name : name;
+            user.PhoneNumber = phoneNumberChanged ? phoneNumber : user.PhoneNumber;
+            user.Email = emailChanged ? email : user.Email;
+            user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
-            if ((phoneNumberChanged || emailChanged) && !editUser.ValidateAndNormalise())
-            { throw new InvalidInformationException("Invalid details provided."); }
+            Try(user.ValidateAndNormalise(),
+                new InvalidInformationException("Invalid details provided."));
 
             List<(string Property, object Value)> edits = new();
 
-            // Track individual edits
+            // Gather individual edits
 			if (phoneNumberChanged)
             {
-                await ThrowIfPhoneNumberTaken(editUser.PhoneNumber);
-                edits.Add(("PhoneNumber", editUser.PhoneNumber));
+                await ThrowIfPhoneNumberTaken(user.PhoneNumber);
+                edits.Add((nameof(UserShard.PhoneNumber), user.PhoneNumber));
 			}
 			if (emailChanged)
 			{
-                await ThrowIfEmailTaken(editUser.Email);
-                edits.Add(("Email", email));
-                edits.Add(("NormalisedEmail", editUser.Email));
+                await ThrowIfEmailTaken(user.Email);
+                edits.Add((nameof(UserShard.Email), email));
+                edits.Add(("NormalisedEmail", user.Email));
 			}
-			if (!string.IsNullOrEmpty(name))
+			if (nameChanged)
 			{
-                edits.Add(("Name", editUser.Name));
+                edits.Add((nameof(UserShard.Name), user.Name));
 			}
-            // Internal attributes
-			if (isPhoneNumberConfirmed.HasValue)
+            // Internal attributes for account store
+			if (IsNotNull(isPhoneNumberConfirmed))
 			{
-                edits.Add(("IsPhoneConfirmed", isPhoneNumberConfirmed.Value));
+                edits.Add((nameof(UserShard.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
 			}
-			if (isEmailConfirmed.HasValue)
+			if (IsNotNull(isEmailConfirmed))
 			{
-                edits.Add(("IsEmailConfirmed", isEmailConfirmed.Value));
+                edits.Add((nameof(UserShard.IsEmailConfirmed), isEmailConfirmed.Value));
 			}
 			if (!string.IsNullOrEmpty(securityStamp))
 			{
-                edits.Add(("SecurityStamp", securityStamp));
+                edits.Add((nameof(UserShard.SecurityStamp), securityStamp));
 			}
-			if (lockoutDate.HasValue)
+			if (IsNotNull(lockoutDate))
 			{
-                edits.Add(("LockoutDate", lockoutDate.Value));
+                edits.Add((nameof(UserShard.LockoutDate), lockoutDate.Value));
 			}
-			if (accessTries.HasValue)
+			if (IsNotNull(accessTries))
 			{
-                edits.Add(("AccessTries", accessTries.Value));
+                edits.Add((nameof(UserShard.AccessTries), accessTries.Value));
 			}
 
             // Push update
-            Accounts.UpdateUserAsync(editUser.Id, edits);
+            _ = Accounts.UpdateUserAsync(user.Id, edits);
 		}
 
-        public async Task DeleteUserAsync(Guid userID)
+        public async Task DeleteUserAsync(ulong userId)
         {
-            bool success = await Accounts.DeleteUserAsync(userID);
-            if (!success)
-            { throw new UnexpectedFailureException("User deletion failed."); }
+            Try(await Accounts.DeleteUserAsync(userId),
+                new UnexpectedFailureException("User deletion failed."));
         }
 
-        public async Task UpdateUserLocationAsync(Guid userID, double latitude, double longitude)
+        public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
 		{
-			var user = await GetUser(userID);
-            await user.SyncLocation();
+			var user = await base.GetUserAsync(userId);
+            var userIsAtEvent = user.IsAtEvent();
 
-            user.LastKnownLocation = new() { Latitude = latitude, Longitude = longitude };
-
+            user.LastKnownLocation.Set(new() { Latitude = latitude, Longitude = longitude });
             await user.HandleHaunt();
 
-            Accounts.UpdateRecentLocationAsync(user.Id, user.LastKnownLocation.Latitude, user.LastKnownLocation.Longitude, user.LastKnownRadius.Metres);
-            Accounts.UpdateHauntAsync(user.Id, user.Haunt.Latitude, user.Haunt.Longitude, user.HauntRadius.Metres, user.HauntStability);
+            // Position update
+            _ = Accounts.UpdateRecentLocationAsync(user.Id,
+                (await user.LastKnownLocation.Value()).Latitude,
+                (await user.LastKnownLocation.Value()).Longitude,
+                (await user.LastKnownRadius.Value()).Metres);
+            // Haunt update
+            _ = Accounts.UpdateHauntAsync(user.Id,
+                (await user.Haunt.Value()).Latitude,
+                (await user.Haunt.Value()).Longitude,
+                (await user.HauntRadius.Value()).Metres,
+                await user.HauntStability.Value());
+
+            var nextEvent = await user.NextEvent();
+
+            // Check if user is at an event
+            if (await userIsAtEvent)
+            {
+                var currentEvent = await user.CurrentEvent.Value();
+                // Check if user left the event radius
+                if (!GeoLocation.AreInRange(await user.LastKnownLocation.Value(), currentEvent.Location, currentEvent.Radius))
+                {
+                    // Check if user is a guest or the host
+                    if (currentEvent.IsHostedBy(user))
+                    {
+                        // End the event if user is the host
+                        await Terminal.EventDirector.EndEventAsync(user.Id, currentEvent.Id);
+                    }
+                    else
+                    {
+                        // Leave the event if user is a guest
+                        await Terminal.EventDirector.LeaveEventAsync(user.Id, currentEvent.Id);
+                    }
+                }
+                // Check if user is the host
+                else if (currentEvent.IsHostedBy(user) && currentEvent.IsDynamic)
+                {
+                    // Update the position of the event
+                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { (nameof(EventShard.Latitude), (await user.LastKnownLocation.Value()).Latitude),
+                        (nameof(EventShard.Longitude), (await user.LastKnownLocation.Value()).Longitude) });
+                }
+            }
+            // Check if user is on their way to an event
+            else if (!await userIsAtEvent &&
+                nextEvent != null)
+            {
+                // Check if user is close enough to be a guest
+                if (await nextEvent.IsInRange(user))
+                {
+                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventUserState.Guest);
+
+                    // Check if user is host and can start event
+                    if (nextEvent.IsWaiting &&
+                        nextEvent.IsHostedBy(user))
+                    {
+                        await Terminal.EventDirector.StartEventAsync(user.Id, nextEvent.Id);
+                    }
+                }
+            }
         }
 
+		#endregion
 
-        internal async Task<User> GetUser(string phoneNumber)
+		#region Favours
+
+        internal async Task UpdateAllAsync(List<User> users, Func<User,List<(string Property, object Value)>> edits)
+        {
+            users.ForEach(user => Accounts.UpdateUserAsync(user.Id, edits(user)));
+		}
+
+        internal async Task<(GeoLocation Location, Distance Radius, int Stability)>
+            RequestUserHauntAsync(User user)
+        {
+            var result = await Accounts.GetUserHauntAsync(user.Id);
+            return (new() { Latitude = result.Latitude, Longitude = result.Longitude }, new() { Metres = result.Radius }, result.Stability);
+        }
+
+        internal async Task<(GeoLocation Location, Distance Radius)>
+            RequestLastKnownUserLocationAsync(User user)
+        {
+            var result = await Accounts.GetRecentUserLocationAsync(user.Id);
+            return (new() { Latitude = result.Latitude, Longitude = result.Longitude }, new() { Metres = result.Radius });
+        }
+
+		#endregion
+
+		#region Tools
+
+		private async Task<User> GetUser(string phoneNumber)
         {
             User user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
 
             // Check if user account is locked
-            if (user.IsLocked)
-            { throw new InvalidUserException("User account is locked."); }
+            Fail(user.IsLocked,
+                new InvalidUserException("User account is locked."));
 
             return user;
         }
 
-        internal async Task<(double Latitude, double Longitude, double Radius, int Stability)>
-            GetUserHauntAsync(Guid userID)
-        {
-            return await Accounts.GetUserHauntAsync(userID);
-        }
-
-        internal async Task<(double Latitude, double Longitude, double Radius)>
-            GetLastKnownUserLocationAsync(Guid userID)
-        {
-            return await Accounts.GetRecentUserLocationAsync(userID);
-        }
-
-
-        private async Task ThrowIfPhoneNumberTaken(string phoneNumber)
+		private async Task ThrowIfPhoneNumberTaken(string phoneNumber)
         {
 			bool numberTaken = false;
 			try
@@ -175,8 +253,8 @@ namespace Core.Controls
 			}
 			catch { }
 
-			if (numberTaken)
-			{ throw new InvalidUserException("Phone Number already registered."); }
+            Fail(numberTaken,
+                new InvalidUserException("Phone Number already registered."));
 		}
 
         private async Task ThrowIfEmailTaken(string normalisedEmail)
@@ -185,13 +263,15 @@ namespace Core.Controls
 			try
 			{
                 // Throws an exception if there is no user
-                Accounts.FindUserByEmailAsync(normalisedEmail);
+                await Accounts.FindUserByEmailAsync(normalisedEmail);
 				emailTaken = true;
 			}
 			catch { }
 
-			if (emailTaken)
-			{ throw new InvalidUserException("Email already registered."); }
+			Fail(emailTaken,
+                new InvalidUserException("Email already registered."));
         }
-    }
+
+		#endregion
+	}
 }

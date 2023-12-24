@@ -5,7 +5,7 @@ namespace Repository
 {
     public class User
     {
-        public Guid Id { get; init; } = DefaultId;
+        public ulong Id { get; init; } = DefaultId;
         public string PhoneNumber { get; set; } = DefaultPhoneNumber;
         public string Email { get; set; } = DefaultEmail;
         public string NormalisedEmail { get; set; } = DefaultNormalisedEmail;
@@ -43,7 +43,7 @@ namespace Repository
         internal List<Post> Posts { get; set; }
 
         // Default Values
-        public static Guid DefaultId { get; set; } = Guid.Empty;
+        public static ulong DefaultId { get; set; } = ulong.MinValue;
         public static string DefaultPhoneNumber { get; set; } = "000-000-0000";
         public static string DefaultEmail { get; set; } = "JohnDoe@Test.com";
         public static string DefaultNormalisedEmail { get; set; } = "johndoe@test.com";

@@ -37,13 +37,13 @@ namespace Repository
             return true;
         }
 
-        public async Task<bool> DeleteUserAsync(Guid id)
+        public async Task<bool> DeleteUserAsync(ulong id)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Remove(new User { Id = id }));
             return true;
         }
 
-        public async Task<UserShard> FindUserByIdAsync(Guid id) 
+        public async Task<UserShard> FindUserByIdAsync(ulong id) 
         {            
             int numFollowers;
             UserShard user;
@@ -167,7 +167,7 @@ namespace Repository
             return user with { NumberOfFollowers = numFollowers };
         }
 
-        public async Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(Guid id)
+        public async Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(ulong id)
         {
             try
             {
@@ -179,7 +179,7 @@ namespace Repository
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
         }
-        public async Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(Guid id)
+        public async Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(ulong id)
         {       
             try
             {
@@ -197,7 +197,7 @@ namespace Repository
             }                 
         }    
 
-        public async Task<bool> UpdateUserAsync(Guid id, List<(string Property, object Value)> edits)
+        public async Task<bool> UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)
         {                   
             User u = new User { Id = id };
 
@@ -249,7 +249,7 @@ namespace Repository
             return true;
         }
 
-        public async Task<bool> UpdateHauntAsync(Guid id, double latitude, double longitude, double radius, int stability)
+        public async Task<bool> UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
         {
             User u = new User { Id = id, Haunt = new Point(longitude, latitude) , HauntRadius = radius, HauntWheight = stability };
 
@@ -262,7 +262,7 @@ namespace Repository
             return true;
         }
 
-        public async Task<bool> UpdateRecentLocationAsync(Guid id, double latitude, double longitude, double radius)
+        public async Task<bool> UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
         {
             User u = new User { Id = id, CurrentLocation = new Point(longitude, latitude), CurrentRadius = radius };
 

@@ -6,7 +6,7 @@ namespace Repository.Tests.Tests
     public class ReportStoreTests : IDisposable
     {
         private static TestSentry sentry = new TestSentry();
-        private static ReportStore reportStore = new ReportStore(sentry);
+        private static DisciplineStore reportStore = new DisciplineStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;
 

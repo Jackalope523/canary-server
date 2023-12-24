@@ -1,4 +1,5 @@
 ﻿using PhoneNumbers;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,20 +8,32 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+using static Core.Entities.Arbiter;
+
 namespace Core.Entities
 {
 	internal static class ContentValidation
 	{
+		#region Variables
+
 		private static TextFilter filter;
 		private static List<string> DisallowedPhrases = new()
 		#region Disallowed Phrases List
 		{ "crack", "cocaine" };
 		#endregion
 
+		#endregion
+
+		#region Initialiation
+
 		static ContentValidation()
 		{
 			filter = new TextFilter(DisallowedPhrases);
 		}
+
+		#endregion
+
+		#region Operations
 
 		public static bool IsEmailValid(string email)
 		{
@@ -45,30 +58,42 @@ namespace Core.Entities
 			normalisedPhoneNumber = PhoneNumberUtil.ExtractPossibleNumber(phoneNumber);
 
 			// Check if phone number is valid
-			if (string.IsNullOrEmpty(normalisedPhoneNumber)) { return false; }
-			if (!PhoneNumberUtil.IsViablePhoneNumber(normalisedPhoneNumber)) { return false; }
+			if (string.IsNullOrEmpty(normalisedPhoneNumber) ||
+				!PhoneNumberUtil.IsViablePhoneNumber(normalisedPhoneNumber) ||
+				normalisedPhoneNumber.Length < 6)
+			{ return false; }
 
 			// Normalise number
 			normalisedPhoneNumber = PhoneNumberUtil.Normalize(normalisedPhoneNumber);
 			return true;
 		}
+
+		#endregion
 	}
 
 	internal class TextFilter
 	{
+		#region Variables
+
 		public IList<string> CensoredWords { get; private set; }
 
+		#endregion
+
+		#region Initialisation
 
 		public TextFilter(IEnumerable<string> censoredWords)
 		{
 			CensoredWords = new List<string>(censoredWords);
 		}
 
+		#endregion
+
+		#region Operations
+
 		public string CensorText(string text)
 		{
-			if (string.IsNullOrEmpty(text))
-			{ throw new ArgumentNullException(nameof(text)); }
-				
+			Fail(string.IsNullOrEmpty(text),
+				new InvalidInformationException($"{nameof(text)} cannot be null or empty."));
 
 			string censoredText = text;
 
@@ -101,7 +126,11 @@ namespace Core.Entities
 			return text;
         }
 
-		private static string StarCensoredMatch(Match m)
+		#endregion
+
+		#region Tools
+
+		private string StarCensoredMatch(Match m)
 		{
 			string word = m.Captures[0].Value;
 
@@ -126,5 +155,7 @@ namespace Core.Entities
 
 			return regexPattern;
 		}
+
+		#endregion
 	}
 }

@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using Core.Boundaries;
+using NetTopologySuite.Geometries;
 
 namespace Repository
 {
@@ -17,8 +18,10 @@ namespace Repository
                 StartTime = DateTimeOffset.UtcNow.AddHours(produced),
                 GroupMinimum = 0 + produced,
                 GroupMaximum = 10 + produced,
-                IsOpen = false,
+                State = EventState.active_open,
                 Location = new Point(34.0522, -118.2437),
+                Radius = 10.0,
+                IsDynamic = false,
 
                 Extroversion = 8 + produced,
                 Athleticisme = 2 + produced,
