@@ -10,7 +10,7 @@ namespace Repository.Tests
                 SelfId = user.Id,
                 OtherId = @event.Id,
                 Type = type,
-                Time = DateTimeOffset.MinValue
+                Time = DateTimeOffset.MinValue,
             };
         }
     }

@@ -1,5 +1,7 @@
 ﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
 using Shared;
+using System.Net;
 
 namespace Repository
 {
@@ -11,37 +13,84 @@ namespace Repository
         {
         }
 
-        public async Task<bool> FollowUserAsync(Guid selfId, Guid targetId) { return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); }
-        public async Task<bool> UnfollowUserAsync(Guid selfId, Guid targetId) { return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); }
-        public async Task<bool> BlockUserAsync(Guid selfId, Guid targetId) { return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); }
-        public async Task<bool> UnblockUserAsync(Guid selfId, Guid targetId) { return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); }
-
-
-        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid id) { return await GetUsersByAsync(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow); }
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid id) { return await GetUsersByAsync(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block); }
+        public async Task<bool> FollowUserAsync(Guid selfId, Guid targetId) 
+        { 
+            return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); 
+        }
+        public async Task<bool> UnfollowUserAsync(Guid selfId, Guid targetId) 
+        { 
+            return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); 
+        }
+        public async Task<bool> BlockUserAsync(Guid selfId, Guid targetId) 
+        { 
+            return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); 
+        }
+        public async Task<bool> UnblockUserAsync(Guid selfId, Guid targetId) 
+        { 
+            return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); 
+        }
+        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(Guid id) 
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).
+             Join(
+                 ctx.Users,
+                 l => l.OtherId,
+                 u => u.Id,
+                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 ).
+             ToListAsync());
+        }
+        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(Guid id) 
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block).
+            Join(
+                ctx.Users, 
+                l => l.OtherId, 
+                u => u.Id, 
+                (l,u) => new UserSilhouette(u.Id, u.Name)
+                ).
+            ToListAsync());
+        }
         public async Task<List<UserSilhouette>> GetFriendsAsync(Guid id)
         {
-            Task<List<UserSilhouette>> following = GetUsersByAsync(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow);
-            Task<List<UserSilhouette>> followingMe = GetUsersByAsync(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow);
-            List<UserSilhouette> a = await following;
-            List<UserSilhouette> b = await followingMe;
-            return a.Intersect(b).ToList();
+            Task<List<UserSilhouette>> following = storeSentry.ExecuteReadAsync(ctx =>
+             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).
+             Join(
+                 ctx.Users,
+                 l => l.OtherId,
+                 u => u.Id,
+                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 ).
+             ToListAsync());
+
+            Task<List<UserSilhouette>> followingMe = storeSentry.ExecuteReadAsync(ctx =>
+             ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow).
+             Join(
+                 ctx.Users,
+                 l => l.SelfId,
+                 u => u.Id,
+                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 ).
+             ToListAsync());
+
+            return (await following).Intersect(await followingMe).ToList();
         }
 
         public async Task<(int Positive, int Negative)> GetUserRatingsAsync(Guid id)
         {
-            List<UserLink.UserLinkType> ratings;
-            ratings = await storeSentry.ExecuteReadAsync(async ctx => ctx.UserLinks.Where(l => l.OtherId == id && (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).Select(l => l.Type).ToList());
+            Task<int> up = storeSentry.ExecuteReadAsync(ctx =>
+            ctx.UserLinks.
+            Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.RateUp).
+            CountAsync());
 
-            int up = 0;
-            int down = 0;
-            foreach (UserLink.UserLinkType rating in ratings)
-            {
-                if (rating == UserLink.UserLinkType.RateUp) up++;
-                else down--;
-            }
+            Task<int> down = storeSentry.ExecuteReadAsync(ctx =>
+            ctx.UserLinks.
+            Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.RateDown).
+            CountAsync()); ;
 
-            return (up, down);
+            return (await up, await down);
         }
 
         public async Task<bool> RateUserAsync(Guid selfId, Guid targetId, UserRating rating)
@@ -55,6 +104,12 @@ namespace Repository
 
         public async Task<bool> RemoveUserRatingAsync(Guid selfId, Guid targetId)
         {
+            await storeSentry.ExecuteWriteAsync(ctx => 
+            ctx.UserLinks.
+            Where(l => 
+            l.SelfId == selfId && l.OtherId == targetId && 
+            (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).
+            ExecuteDelete());
             return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId });
         }
     }

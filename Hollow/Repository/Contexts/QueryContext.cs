@@ -55,15 +55,7 @@ namespace Repository
             modelBuilder.Entity<PostLink>()
                 .Property(l => l.Type)
                 .HasColumnName("Type");
-
-            modelBuilder.Entity<Link>()
-                .HasOne(a => a.Self)
-                .WithMany(b => b.Links);
-
-            modelBuilder.Entity<EventLink>()
-                .HasOne(a => a.Event)
-                .WithMany(b => b.Links);
-
+           
             modelBuilder.Entity<Report>()
                 .HasDiscriminator<string>("report_type")
                 .HasValue<UserReport>("user")

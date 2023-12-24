@@ -10,6 +10,7 @@ namespace Repository.Tests
                 SelfId = user.Id,
                 OtherId = etching.Id,
                 Type = PostLink.PostLinkType.RateUp,
+                Time = DateTimeOffset.MinValue
             };
         }
     }

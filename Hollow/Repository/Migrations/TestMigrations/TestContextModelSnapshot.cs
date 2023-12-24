@@ -77,7 +77,7 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Link", b =>
@@ -94,15 +94,16 @@ namespace Repository.Migrations.TestMigrations
                         .HasColumnType("TEXT")
                         .HasColumnName("SelfId");
 
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("link_type")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SelfId");
-
-                    b.ToTable("Links");
+                    b.ToTable("Links", (string)null);
 
                     b.HasDiscriminator<string>("link_type").HasValue("Link");
 
@@ -130,7 +131,7 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Report", b =>
@@ -167,7 +168,7 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("Reports");
+                    b.ToTable("Reports", (string)null);
 
                     b.HasDiscriminator<string>("report_type").HasValue("Report");
 
@@ -265,22 +266,17 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Repository.EventLink", b =>
                 {
                     b.HasBaseType("Repository.Link");
 
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Type")
                         .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("INTEGER")
                         .HasColumnName("Type");
-
-                    b.HasIndex("EventId");
 
                     b.HasDiscriminator().HasValue("event");
                 });
@@ -326,24 +322,13 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.ToTable("Reports", t =>
+                    b.ToTable("Reports", null, t =>
                         {
                             t.Property("Type")
                                 .HasColumnName("UserReport_Type");
                         });
 
                     b.HasDiscriminator().HasValue("user");
-                });
-
-            modelBuilder.Entity("Repository.Link", b =>
-                {
-                    b.HasOne("Repository.User", "Self")
-                        .WithMany("Links")
-                        .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Self");
                 });
 
             modelBuilder.Entity("Repository.Report", b =>
@@ -373,28 +358,13 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("Self");
                 });
 
-            modelBuilder.Entity("Repository.EventLink", b =>
-                {
-                    b.HasOne("Repository.Event", "Event")
-                        .WithMany("Links")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
             modelBuilder.Entity("Repository.Event", b =>
                 {
-                    b.Navigation("Links");
-
                     b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
                 {
-                    b.Navigation("Links");
-
                     b.Navigation("ReporteeList");
 
                     b.Navigation("ReporterList");

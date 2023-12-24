@@ -6,6 +6,7 @@
         public Guid SelfId { get; init; }
         internal User Self { get; init; }
         public Guid OtherId { get; init; }
+        public DateTimeOffset Time { get; init; }
 
     }
 }

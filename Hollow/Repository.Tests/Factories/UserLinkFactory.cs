@@ -9,7 +9,8 @@ namespace Repository.Tests
             {
                 SelfId = self.Id,
                 OtherId = other.Id,
-                Type = type
+                Type = type,
+                Time = DateTimeOffset.MinValue
             };
         }
     }

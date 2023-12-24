@@ -108,7 +108,7 @@ namespace Repository
                 Notes = reportDetails
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventReports.AddAsync(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(toCreate));
             return true;
         }
 
@@ -124,7 +124,7 @@ namespace Repository
                 Notes = reportDetails
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.AddAsync(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(toCreate));
             return true;
         }      
     }

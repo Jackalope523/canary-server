@@ -1,6 +1,5 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NetTopologySuite.Geometries;
 
 namespace Repository
@@ -22,19 +21,15 @@ namespace Repository
                 NormalisedEmail = normalisedEmail,
                 Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTimeOffset.UtcNow,
-                Reputation = 100,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                AccountStatus = UserAccountStatus.active,
+                JoinDate = DateTimeOffset.Now,
+                Reputation = 50,
                 Extroversion = character.Extraversion,
                 Athleticisme = character.Athleticism,
                 Openness = character.Openness,
                 Chaos = character.Chaoticness,
                 Competitiveness = character.Competitiveness,
                 Industriousness = character.Industriousness,
-                NightOwl = character.NightOwl,
-                CurrentLocation = new Point(0, 0) { SRID = 4237 },
-                Haunt = new Point(0, 0) { SRID = 4237 }
+                NightOwl = character.NightOwl,              
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
@@ -164,7 +159,7 @@ namespace Repository
         public async Task<bool> UpdateUserAsync(Guid id, List<(string Property, object Value)> edits)
         {
             User u = new User { Id = id };
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Users.Attach(u));
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
 
             foreach ((string Property, object Value) in edits)
             {
@@ -206,7 +201,7 @@ namespace Repository
                     default:
                         throw new Exception("No propertyName match found");
                 }
-                await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(Property).IsModified = true);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(Property).IsModified = true);
             }
             await storeSentry.ExecuteWriteAsync();
             return true;
@@ -216,10 +211,10 @@ namespace Repository
         {
             User u = new User { Id = id, Haunt = new Point(longitude, latitude) , HauntRadius = radius, HauntWheight = stability };
 
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Users.Attach(u));
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true);
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true);
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true);
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true);
             await storeSentry.ExecuteWriteAsync();
 
             return true;
@@ -229,9 +224,9 @@ namespace Repository
         {
             User u = new User { Id = id, CurrentLocation = new Point(longitude, latitude), CurrentRadius = radius };
 
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Users.Attach(u));
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true);
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true);
             await storeSentry.ExecuteWriteAsync();
 
             return true;

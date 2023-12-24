@@ -1,6 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using System.Collections.Generic;
 
 namespace Repository
 {
@@ -34,12 +35,13 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Events.Add(toCreate));
+            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync());
 
 
             return new EventShard
                 (
                    toCreate.Id,
-                   new UserSilhouette(toCreate.Host.Id, toCreate.Host.Name),
+                   host,
                    toCreate.Name,
                    toCreate.Description,
                    toCreate.StartTime,
@@ -58,9 +60,114 @@ namespace Repository
                    toCreate.NightOwl,
                    toCreate.Openness));
         }
-        public async Task<EventShard> FindCurrentEventForUserAsync(Guid id) { return (await FindEventsByAsync(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend)).Single(); }
-        public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(Guid id) { return await FindEventsByAsync(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Watching); }
-        public async Task<List<EventShard>> FindPastEventsForUserAsync(Guid id) { return await FindEventsByAsync(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left); }
+        public async Task<EventShard> FindCurrentEventForUserAsync(Guid id) 
+        {
+            Guid currentEventId = await storeSentry.ExecuteReadAsync(ctx => 
+            ctx.EventLinks.
+            Where(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Present).
+            Select(l => l.OtherId).
+            SingleAsync());
+
+            EventShard @event = await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Events.
+            Where(e => e.Id == currentEventId).
+            Select(e => new EventShard
+               (
+                   e.Id,
+                   new UserSilhouette(e.HostId, null),
+                   e.Name,
+                   e.Description,
+                   e.StartTime,
+                   e.Location.Y,
+                   e.Location.X,
+                   e.EndTime,
+                   e.IsOpen,
+                   e.GroupMinimum,
+                   e.GroupMaximum,
+                   new Character(
+                   e.Extroversion,
+                   e.Athleticisme,
+                   e.Chaos,
+                   e.Competitiveness,
+                   e.Industriousness,
+                   e.NightOwl,
+                   e.Openness
+                ))).SingleAsync());
+
+            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Users.
+            Where(u => u.Id == @event.Host.Id).
+            Select(u => new UserSilhouette(u.Id, u.Name)).
+            SingleAsync());
+
+            return @event with { Host = host };
+        }
+        public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(Guid id) 
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).
+            Join(
+                ctx.Events,
+                l => l.OtherId,
+                e => e.Id,
+                (l,e) => new EventShard
+                (
+                   e.Id,
+                   new UserSilhouette(e.HostId, e.Host.Name),
+                   e.Name,
+                   e.Description,
+                   e.StartTime,
+                   e.Location.Y,
+                   e.Location.X,
+                   e.EndTime,
+                   e.IsOpen,
+                   e.GroupMinimum,
+                   e.GroupMaximum,
+                   new Character(
+                   e.Extroversion,
+                   e.Athleticisme,
+                   e.Chaos,
+                   e.Competitiveness,
+                   e.Industriousness,
+                   e.NightOwl,
+                   e.Openness)
+                )).
+            ToListAsync());
+        }
+        public async Task<List<EventShard>> FindPastEventsForUserAsync(Guid id) 
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+           ctx.EventLinks.
+           Where(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left).
+           Join(
+               ctx.Events,
+               l => l.OtherId,
+               e => e.Id,
+               (l, e) => new EventShard
+               (
+                  e.Id,
+                  new UserSilhouette(e.HostId, e.Host.Name),
+                  e.Name,
+                  e.Description,
+                  e.StartTime,
+                  e.Location.Y,
+                  e.Location.X,
+                  e.EndTime,
+                  e.IsOpen,
+                  e.GroupMinimum,
+                  e.GroupMaximum,
+                  new Character(
+                  e.Extroversion,
+                  e.Athleticisme,
+                  e.Chaos,
+                  e.Competitiveness,
+                  e.Industriousness,
+                  e.NightOwl,
+                  e.Openness)
+               )).
+           ToListAsync());
+        }
 
         public async Task<EventShard> FindEventAsync(Guid id)
         {
@@ -104,16 +211,31 @@ namespace Repository
         
         public async Task<List<UserSilhouette>> GetGuestListAsync(Guid id)
         {
-            return await storeSentry.ExecuteReadAsync(ctx => ctx.EventLinks.Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Attend).Select(l => new UserSilhouette(l.Self.Id, l.Self.Name)).ToListAsync());
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Attend).
+            Join(
+                ctx.Users,
+                l => l.SelfId,
+                u => u.Id,
+                (_,u) => new UserSilhouette(u.Id, u.Name)
+                ).
+            ToListAsync());
         }
 
-        public async Task<bool> AddUserToEventAsync(Guid userId, Guid eventId) { return await AddLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
-        public async Task<bool> RemoveUserFromEventAsync(Guid userId, Guid eventId) { return await RemoveLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); }
+        public async Task<bool> AddUserToEventAsync(Guid userId, Guid eventId) 
+        { 
+            return await AddLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); 
+        }
+        public async Task<bool> RemoveUserFromEventAsync(Guid userId, Guid eventId) 
+        { 
+            return await RemoveLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); 
+        }
 
         public async Task<bool> UpdateEventAsync(Guid id, List<(string Property, object Value)> edits)
         {
             Event e = new Event { Id = id };
-            await storeSentry.DiscussWriteAsync(ctx => ctx.Events.Attach(e));
+            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
 
             foreach ((string Property, object Value) edit in edits)
             {
@@ -131,7 +253,7 @@ namespace Repository
                     default:
                         throw new Exception("No propertyName match found");
                 }
-                await storeSentry.DiscussWriteAsync(ctx => ctx.Entry(e).Property(edit.Property).IsModified = true);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(edit.Property).IsModified = true);
             }
             await storeSentry.ExecuteWriteAsync();
             return true;
@@ -142,9 +264,54 @@ namespace Repository
             throw new NotImplementedException();
         }
 
-        public Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(Guid id)
+        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var arrivalTimes = storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Present).
+            Join(
+                ctx.Users,
+                l => l.SelfId,
+                u => u.Id,
+                (l, u) => new { l.Time, u.Id, u.Name }
+                ).
+            ToListAsync());
+   
+            var departureTimes = storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Left).
+            Join(
+                ctx.Users,
+                l => l.SelfId,
+                u => u.Id,
+                (l, u) => new { l.Time, u.Id }
+                ).
+            ToListAsync());
+
+            Dictionary<Guid, DateTimeOffset> organizedDepartureTimes = new();
+            foreach (var v in await departureTimes)
+            {
+                organizedDepartureTimes.Add(v.Id, v.Time);
+            }
+
+            List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> toReturn = new();
+            foreach (var v in await arrivalTimes)
+            {
+                DateTimeOffset? departureTime;
+                try
+                {
+                    departureTime = organizedDepartureTimes[v.Id];
+                }
+                catch (KeyNotFoundException)
+                {
+                    departureTime = null;
+                }
+
+                toReturn.Add((v.Time, departureTime, new UserSilhouette(v.Id, v.Name)));
+            }
+
+            return toReturn;
         }
     }
 }
+

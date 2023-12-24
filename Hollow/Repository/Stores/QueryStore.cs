@@ -34,17 +34,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.PostLinks.Where(l => l.SelfId == link.SelfId && l.OtherId == link.OtherId && l.Type == link.Type).ExecuteDelete());
             return true;
         }
-       
-        protected async Task<List<UserSilhouette>> GetUsersByAsync(Func<UserLink, bool> predicate)
-        {
-            return await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => predicate(l)).Select(l => new UserSilhouette(l.Other.Id, l.Other.Name)).ToListAsync());
-        }
-
-        protected async Task<List<Report>> GetReportsAsync(Func<Report, bool> predicate)
-        {
-            return await storeSentry.ExecuteReadAsync(ctx => ctx.Reports.Where(r => predicate(r)).ToListAsync());
-        }
-      
+                        
         protected async Task<List<EventShard>> FindEventsByAsync(Func<EventLink, bool> predicate)
         {
             List<Guid> guids = await storeSentry.ExecuteReadAsync(ctx => ctx.EventLinks.Where(l => predicate(l)).Select(l => l.OtherId).ToListAsync());
@@ -73,11 +63,6 @@ namespace Repository
                )).ToListAsync());
 
             return events;
-        }
-
-        protected async Task<int> CountRatingsAsync(Guid id, PostLink.PostLinkType type)
-        {
-            return await storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == id && l.Type == type).CountAsync());
         }
     }
 }
