@@ -38,6 +38,38 @@ namespace Shared
         {
         }
     }
+    public class UserNotFoundException : Exception
+    {
+        public UserNotFoundException()
+        {
+        }
+
+        public UserNotFoundException(string message)
+            : base(message)
+        {
+        }
+
+        public UserNotFoundException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    public class InvalidInputException : Exception
+    {
+        public InvalidInputException()
+        {
+        }
+
+        public InvalidInputException(string message)
+            : base(message)
+        {
+        }
+
+        public InvalidInputException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
     #endregion
 
     #region Accounts

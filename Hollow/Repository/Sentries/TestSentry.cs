@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+
 namespace Repository
 {
     public class TestSentry : Sentry
@@ -35,7 +36,7 @@ namespace Repository
             activeDiscussion = false;
         }
         public override void ExecuteWrite(Action<QueryContext> write)
-        {
+        {         
             using (context = new TestContext())
             {
                 write.Invoke(context);

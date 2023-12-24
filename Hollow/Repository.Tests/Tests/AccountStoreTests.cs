@@ -2,6 +2,7 @@
 using Core.Boundaries;
 using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
+using Shared;
 
 namespace Repository.Tests.Tests
 {
@@ -73,7 +74,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(User.DefaultHauntRadius, created.HauntRadius);
             Assert.Equal(User.DefaultCurrentLocation, created.CurrentLocation);
             Assert.Equal(User.DefaultCurrentRadius, created.CurrentRadius);
-        }
+        }       
 
         [Fact]
         public async Task DeleteUserAsync_SUCCESS()
@@ -83,7 +84,7 @@ namespace Repository.Tests.Tests
             int numRecords = await sentry.ExecuteReadAsync(ctx => ctx.Users.CountAsync());
 
             Assert.Equal(0, numRecords);
-        }
+        }     
 
         [Fact]
         public async Task FindUserByIdAsync_SUCCESS()
@@ -113,7 +114,14 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.NightOwl, found.Character.NightOwl);
             Assert.Equal(subject.Openness, found.Character.Openness);
         }
-    
+        [Fact]
+        public async Task FindUserByIdAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.FindUserByIdAsync(Guid.Empty);
+
+            await Assert.ThrowsAsync<UserNotFoundException>(action);
+        }     
+
         [Fact]
         public async Task FindUserByPhoneNumberAsync_SUCCESS()
         {
@@ -143,6 +151,14 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.Openness, found.Character.Openness);
         }
         [Fact]
+        public async Task FindUserByPhoneNumberAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.FindUserByPhoneNumberAsync("");
+
+            await Assert.ThrowsAsync<UserNotFoundException>(action);
+        }
+
+        [Fact]
         public async Task FindUserByEmailAsync_SUCCESS()
         {
             UserShard found = await store.FindUserByEmailAsync(subject.Email);
@@ -170,6 +186,14 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.NightOwl, found.Character.NightOwl);
             Assert.Equal(subject.Openness, found.Character.Openness);
         }
+        [Fact]
+        public async Task FindUserByEmailAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.FindUserByEmailAsync("");
+
+            await Assert.ThrowsAsync<UserNotFoundException>(action);     
+        }
+
         [Fact]
         public async Task UpdateUserAsync_PhoneNumber()
         {
@@ -213,7 +237,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
-        }
+        }        
         [Fact]
         public async Task UpdateUserAsync_Email()
         {
@@ -651,6 +675,15 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
         }
+        /*
+        [Fact]
+        public async Task UpdateUserAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.UpdateUserAsync(Guid.Empty, new List<(string, object)>());
+
+            await Assert.ThrowsAsync<UserNotFoundException>(action);
+        }
+        */
         [Fact]
         public async Task UpdateHauntAsync_SUCCESS()
         {
@@ -696,6 +729,15 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
         }
+        /*
+        [Fact]
+        public async Task UpdateHauntAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.UpdateHauntAsync(Guid.Empty, 0.0, 0.0, 0, 0);
+
+            await Assert.ThrowsAsync<UserNotFoundException>(action);
+        }
+        */
         [Fact]
         public async Task UpdateRecentLocationAsync_SUCCESS()
         {
@@ -739,6 +781,14 @@ namespace Repository.Tests.Tests
             Assert.Equal(newLocation, updated.CurrentLocation);
             Assert.Equal(newRadius, updated.CurrentRadius);
         }
+        /*
+        [Fact]
+        public async Task UpdateRecentLocationAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.UpdateRecentLocationAsync(Guid.Empty, 0.0, 0.0, 0);
+            await Assert.ThrowsAsync<UserNotFoundException>(action);
+        }
+        */
         [Fact]
         public async Task GetUserHauntAsync_SUCCESS()
         {
@@ -750,6 +800,13 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.HauntWheight, stability);
         }
         [Fact]
+        public async Task GetUserHauntAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.GetUserHauntAsync(Guid.Empty);
+            await Assert.ThrowsAsync<UserNotFoundException>(action);
+        }
+
+        [Fact]
         public async Task GetRecentUserLocationAsync_SUCCESS()
         {
             (double latitude, double longitude, double radius) = await store.GetRecentUserLocationAsync(subject.Id);
@@ -758,5 +815,12 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.Haunt.X, longitude);
             Assert.Equal(subject.CurrentRadius, radius);
         }
+        [Fact]
+        public async Task GetRecentUserLocationAsync_UserNotFound()
+        {
+            Func<Task> action = async () => await store.GetRecentUserLocationAsync(Guid.Empty);
+            await Assert.ThrowsAsync<UserNotFoundException>(action);
+        }
+
     }
 }

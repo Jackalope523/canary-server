@@ -1,6 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using Shared;
 
 namespace Repository
 {
@@ -45,8 +46,10 @@ namespace Repository
         public async Task<UserShard> FindUserByIdAsync(Guid id) 
         {            
             int numFollowers;
-
-            UserShard user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new UserShard
+            UserShard user;
+            try 
+            {
+               user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new UserShard
                (
                    u.Id,
                    u.PhoneNumber,
@@ -71,7 +74,12 @@ namespace Repository
                    u.NightOwl,
                    u.Openness)
                )).SingleAsync());
-
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
+            }
+            
             numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
 
             return user with { NumberOfFollowers = numFollowers };
@@ -79,33 +87,40 @@ namespace Repository
         public async Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber) 
         { 
             int numFollowers;
-
-            UserShard user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.PhoneNumber == phoneNumber).Select(u => new UserShard
-               (
-                   u.Id,
-                   u.PhoneNumber,
-                   u.Email,
-                   u.Name,
-                   u.DateOfBirth,
-                   u.IsPhoneConfirmed,
-                   u.IsEmailConfirmed,
-                   u.SecurityStamp,
-                   u.LockoutDate,
-                   u.AccessTries,
-                   u.AccountStatus,
-                   u.JoinDate,
-                   u.Reputation,
-                   -1,
-                   new Character(
-                   u.Extroversion,
-                   u.Athleticisme,
-                   u.Chaos,
-                   u.Competitiveness,
-                   u.Industriousness,
-                   u.NightOwl,
-                   u.Openness)
-               )).SingleAsync());
-
+            UserShard user;
+            try
+            {
+              user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.PhoneNumber == phoneNumber).Select(u => new UserShard
+              (
+                  u.Id,
+                  u.PhoneNumber,
+                  u.Email,
+                  u.Name,
+                  u.DateOfBirth,
+                  u.IsPhoneConfirmed,
+                  u.IsEmailConfirmed,
+                  u.SecurityStamp,
+                  u.LockoutDate,
+                  u.AccessTries,
+                  u.AccountStatus,
+                  u.JoinDate,
+                  u.Reputation,
+                  -1,
+                  new Character(
+                  u.Extroversion,
+                  u.Athleticisme,
+                  u.Chaos,
+                  u.Competitiveness,
+                  u.Industriousness,
+                  u.NightOwl,
+                  u.Openness)
+              )).SingleAsync());
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
+            }
+         
             numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
 
             return user with { NumberOfFollowers = numFollowers };
@@ -113,32 +128,39 @@ namespace Repository
         public async Task<UserShard> FindUserByEmailAsync(string email) 
         { 
             int numFollowers;
-
-            UserShard user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Email == email).Select(u => new UserShard
-               (
-                   u.Id,
-                   u.PhoneNumber,
-                   u.Email,
-                   u.Name,
-                   u.DateOfBirth,
-                   u.IsPhoneConfirmed,
-                   u.IsEmailConfirmed,
-                   u.SecurityStamp,
-                   u.LockoutDate,
-                   u.AccessTries,
-                   u.AccountStatus,
-                   u.JoinDate,
-                   u.Reputation,
-                   -1,
-                   new Character(
-                   u.Extroversion,
-                   u.Athleticisme,
-                   u.Chaos,
-                   u.Competitiveness,
-                   u.Industriousness,
-                   u.NightOwl,
-                   u.Openness)
-               )).SingleAsync());
+            UserShard user;
+            try
+            {
+              user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Email == email).Select(u => new UserShard
+              (
+                  u.Id,
+                  u.PhoneNumber,
+                  u.Email,
+                  u.Name,
+                  u.DateOfBirth,
+                  u.IsPhoneConfirmed,
+                  u.IsEmailConfirmed,
+                  u.SecurityStamp,
+                  u.LockoutDate,
+                  u.AccessTries,
+                  u.AccountStatus,
+                  u.JoinDate,
+                  u.Reputation,
+                  -1,
+                  new Character(
+                  u.Extroversion,
+                  u.Athleticisme,
+                  u.Chaos,
+                  u.Competitiveness,
+                  u.Industriousness,
+                  u.NightOwl,
+                  u.Openness)
+              )).SingleAsync());
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
+            }
 
             numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
 
@@ -147,18 +169,38 @@ namespace Repository
 
         public async Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(Guid id)
         {
-            var result = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight }).SingleAsync());
-            return (result.Y, result.X, result.HauntRadius, result.HauntWheight);
+            try
+            {
+                var result = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight }).SingleAsync());
+                return (result.Y, result.X, result.HauntRadius, result.HauntWheight);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
+            }
         }
         public async Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(Guid id)
-        {
-            var result = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius }).SingleAsync());
-            return (result.Y, result.X, result.CurrentRadius);
+        {       
+            try
+            {
+                var result = await storeSentry.ExecuteReadAsync(ctx =>
+                            ctx.Users.
+                            Where(u => u.Id == id).
+                            Select(u => new { u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius }).
+                            SingleAsync());
+
+                return (result.Y, result.X, result.CurrentRadius);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
+            }                 
         }    
 
         public async Task<bool> UpdateUserAsync(Guid id, List<(string Property, object Value)> edits)
-        {
+        {                   
             User u = new User { Id = id };
+
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
 
             foreach ((string Property, object Value) in edits)
@@ -199,7 +241,7 @@ namespace Repository
                         u.Reputation = (int)Value;
                         break;
                     default:
-                        throw new Exception("No propertyName match found");
+                        throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
                 }
                 storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(Property).IsModified = true);
             }
