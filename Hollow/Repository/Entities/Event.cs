@@ -1,24 +1,25 @@
 ﻿using NetTopologySuite.Geometries;
 using Core.Boundaries;
 
-namespace Repository.Entities
+namespace Repository
 {
     public class Event
     {
-        public Guid Id { get; set; }
+        public ulong Id { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; }
         public DateTimeOffset StartTime { get; set; }
-        public Guid HostId { get; set; }
+        public ulong HostId { get; set; }
         internal User Host { get; set; }
         public Point Location { get; set; } // X = Longitude Y = Latitude
 
-        public bool IsEventOpen { get; set; }
+        public EventState State { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public DateTimeOffset? EndTime { get; set; }
+        public double Radius { get; set; }
+        public bool IsDynamic { get; set; }
 
         // Vector
         public int Extroversion { get; init; }
@@ -33,12 +34,5 @@ namespace Repository.Entities
         internal List<EventLink> Links { get; set; }
         internal List<Report> Reports { get; set; }
         internal List<Post> Posts { get; set; }
-
-
-
-        public EventThinSlice ToThinnerEvent()
-        {
-            return new(Id, Host.ToThinnerUser(), Type, Location.Y, Location.X);
-        }
     }
 }

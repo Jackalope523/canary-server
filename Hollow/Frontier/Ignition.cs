@@ -84,10 +84,10 @@ namespace Frontier
 			// Connections
 			////////////////
 
-			CoreTerminal terminal = new(Repository.QueryStore.AccountDatabaseAccess,
-				Repository.QueryStore.EventDatabaseAccess, Repository.QueryStore.EtchingDatabaseAccess,
-				Repository.QueryStore.ProfileDatabaseAccess, Repository.QueryStore.ReportDatabaseAccess,
-				Repository.QueryStore.NotificationDatabaseAccess, pushNotifications);
+			CoreTerminal terminal = new(Repository.AccountStore.AccountDatabaseAccess,
+				Repository.EventStore.EventDatabaseAccess, Repository.EtchingStore.EtchingDatabaseAccess,
+				Repository.ProfileStore.ProfileDatabaseAccess, Repository.DisciplineStore.ReportDatabaseAccess,
+				Repository.NotificationStore.Access, pushNotifications);
 
 			foreach (var (DatabaseType, Instance) in terminal.Gates)
 			{

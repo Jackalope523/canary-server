@@ -90,7 +90,7 @@ namespace Shared
         {
         }
     }
-
+    [Serializable]
     public class ExcessiveRadiusException : HollowFailureException
     {
         public ExcessiveRadiusException()
@@ -107,8 +107,41 @@ namespace Shared
         {
         }
     }
+    [Serializable]
+    public class UserNotFoundException : HollowFailureException
+    {
+        public UserNotFoundException()
+        {
+        }
 
-	#endregion
+        public UserNotFoundException(string message)
+            : base(message)
+        {
+        }
+
+        public UserNotFoundException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    [Serializable]
+    public class InvalidInputException : HollowFailureException
+    {
+        public InvalidInputException()
+        {
+        }
+
+        public InvalidInputException(string message)
+            : base(message)
+        {
+        }
+
+        public InvalidInputException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    #endregion
 
 
 	#region Core
