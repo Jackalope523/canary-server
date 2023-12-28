@@ -1,5 +1,4 @@
-﻿
-namespace Repository
+﻿namespace Repository
 {
     public class Post
     {

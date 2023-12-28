@@ -1,7 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using Shared;
-using System.Net;
 
 namespace Repository
 {
@@ -113,14 +112,26 @@ namespace Repository
             return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId });
         }
 
-        public Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx => 
+            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Follow).
+            Join(ctx.Users,
+            l => l.SelfId,
+            u => u.Id,
+            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            ToListAsync());
         }
 
-        public Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx => 
+            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Block).
+            Join(ctx.Users,
+            l => l.SelfId,
+            u => u.Id,
+            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            ToListAsync());
         }
     }
 }

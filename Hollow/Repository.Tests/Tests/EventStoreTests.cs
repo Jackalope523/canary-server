@@ -126,10 +126,10 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateEventAsync_Status()
         {
-            bool newStatus = true;
+            EventState newState = EventState.active_open;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add(("IsOpen", newStatus));
+            updates.Add(("State", newState));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 

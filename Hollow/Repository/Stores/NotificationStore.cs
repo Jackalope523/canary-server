@@ -1,5 +1,4 @@
-﻿
-using Core.Boundaries;
+﻿using Core.Boundaries;
 using Shared;
 
 namespace Repository

@@ -15,7 +15,7 @@ namespace Repository
 
         public async Task<EventShard> CreateEventAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character, double radius, bool isDynamic)
         {
-            Event toCreate = new Event
+            Event toCreate = new()
             {
                 HostId = hostId,
                 Name = name,
@@ -247,7 +247,7 @@ namespace Repository
 
         public async Task<bool> UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
         {
-            Event e = new Event { Id = id };
+            Event e = new() { Id = id };
             storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
 
             foreach ((string Property, object Value) in edits)

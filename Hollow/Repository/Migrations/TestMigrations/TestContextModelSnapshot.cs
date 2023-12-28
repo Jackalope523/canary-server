@@ -20,9 +20,9 @@ namespace Repository.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Event", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Athleticisme")
                         .HasColumnType("INTEGER");
@@ -49,13 +49,13 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("GroupMinimum")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("HostId")
-                        .HasColumnType("TEXT");
+                    b.Property<ulong>("HostId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Industriousness")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsOpen")
+                    b.Property<bool>("IsDynamic")
                         .HasColumnType("INTEGER");
 
                     b.Property<Point>("Location")
@@ -72,26 +72,32 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Openness")
                         .HasColumnType("INTEGER");
 
+                    b.Property<double>("Radius")
+                        .HasColumnType("REAL");
+
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("State")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Repository.Link", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("OtherId")
-                        .HasColumnType("TEXT")
+                    b.Property<ulong>("OtherId")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("OtherId");
 
-                    b.Property<Guid>("SelfId")
-                        .HasColumnType("TEXT")
+                    b.Property<ulong>("SelfId")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("SelfId");
 
                     b.Property<DateTimeOffset>("Time")
@@ -103,7 +109,7 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Links", (string)null);
+                    b.ToTable("Links");
 
                     b.HasDiscriminator<string>("link_type").HasValue("Link");
 
@@ -112,15 +118,18 @@ namespace Repository.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Post", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("TEXT");
+                    b.Property<ulong>("EventId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("TEXT");
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("OwnerId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PhotoURL")
                         .IsRequired()
@@ -131,17 +140,17 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Repository.Report", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("TEXT");
+                    b.Property<ulong>("EventId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("TEXT");
@@ -150,11 +159,11 @@ namespace Repository.Migrations.TestMigrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("OtherId")
-                        .HasColumnType("TEXT");
+                    b.Property<ulong>("OtherId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("SelfId")
-                        .HasColumnType("TEXT");
+                    b.Property<ulong>("SelfId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("report_type")
                         .IsRequired()
@@ -168,7 +177,7 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("Reports", (string)null);
+                    b.ToTable("Reports");
 
                     b.HasDiscriminator<string>("report_type").HasValue("Report");
 
@@ -177,9 +186,9 @@ namespace Repository.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("AccessTries")
                         .HasColumnType("INTEGER");
@@ -266,7 +275,7 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Repository.EventLink", b =>
@@ -322,7 +331,7 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.ToTable("Reports", null, t =>
+                    b.ToTable("Reports", t =>
                         {
                             t.Property("Type")
                                 .HasColumnName("UserReport_Type");
