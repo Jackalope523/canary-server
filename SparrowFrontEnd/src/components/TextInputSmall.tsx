@@ -15,6 +15,8 @@ import { Colors } from '../styles/ColorStyles';
 
 // In FIGMA: Design System -> Input fields and selectors -> Text Input (label)
 
+// TODO clear text isn't clearing text, just unselecting the text input
+
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
