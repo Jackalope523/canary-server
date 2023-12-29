@@ -188,6 +188,20 @@ export const globalStyles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 
+  // Alignment
+
+  textAlignCenter: {
+    textAlign: 'center',
+  },
+
+  textAlignRight: {
+    textAlign: 'right',
+  },
+
+  textAlignLeft: {
+    textAlign: 'left',
+  },
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                 Color variants                                 ||
   // ! ||--------------------------------------------------------------------------------||

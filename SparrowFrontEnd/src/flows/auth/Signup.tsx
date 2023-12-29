@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { View, Text, TextInput, StyleSheet, Linking } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Linking,
+  Image,
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import DatePicker from 'react-native-date-picker';
 
@@ -55,12 +62,17 @@ const SignupScreen = ({ navigation }: SignupProps) => {
 
   return (
     <ScrollView
-      style={globalStyles.baseContainer}
+      contentContainerStyle={[styles.container, globalStyles.baseContainer]}
       overScrollMode="never"
       showsVerticalScrollIndicator={false}>
+      <Image
+        source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
+        style={[globalStyles.illustrationMedium, styles.image]}
+        resizeMode="contain"
+      />
       <View style={styles.inputSection}>
         <TextInputSmall
-          label="Name"
+          label="First name"
           value={Name}
           onChangeText={setName}
           inputMode="text"
@@ -76,7 +88,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           recommended
           description="We recommend binding an email address to your account in case you change your phone number."
         />
-        <TextInputSmall
+        {/* <TextInputSmall
           label="Date of Birth"
           value={DateOfBirth}
           onChangeText={setDateOfBirth}
@@ -85,7 +97,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           maxLength={8}
           required
           description="You must be 18 years or older to use Sparrow. Your date of birth will not be visible to other users."
-        />
+        /> */}
       </View>
       <View style={styles.checkboxSection}>
         <Checkbox text="I am 18 years or older" onPress={null} />
@@ -131,12 +143,22 @@ const SignupScreen = ({ navigation }: SignupProps) => {
 // ! ||                                     Styles                                     ||
 // ! ||--------------------------------------------------------------------------------||
 const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 48,
+  },
+
+  image: {
+    marginBottom: Spacing.xl,
+  },
+
   inputSection: {
     rowGap: Spacing.sm,
   },
 
   checkboxSection: {
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.lg,
     rowGap: Spacing.md,
   },
 
