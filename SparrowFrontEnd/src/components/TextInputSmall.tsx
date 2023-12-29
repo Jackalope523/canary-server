@@ -9,7 +9,6 @@ import Animated, {
   SharedValue,
 } from 'react-native-reanimated';
 
-import { inputStyles } from '../styles/InputStyles';
 import { globalStyles } from '../styles/GlobalStyles';
 import { Spacing } from '../styles/SpacingStyles';
 import { Colors } from '../styles/ColorStyles';
@@ -36,6 +35,16 @@ interface TextInputSmallProps {
   onChangeText?: (text: string | date) => void;
 
   autoComplete?: 'tel' | 'email';
+  inputMode?:
+    | 'none'
+    | 'text'
+    | 'decimal'
+    | 'numeric'
+    | 'tel'
+    | 'search'
+    | 'email'
+    | 'url';
+  maxLength?: number;
 }
 
 export const TextInputSmall: React.FC<TextInputSmallProps> = ({
@@ -46,6 +55,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   disabled = false,
   placeholder,
   autoComplete,
+  inputMode,
+  maxLength,
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Text input                                   ||
@@ -143,6 +154,9 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           autoComplete={autoComplete}
           selectionColor={Colors.sparrowDarkBrown}
           editable={!disabled}
+          inputMode={inputMode}
+          maxLength={maxLength}
+          returnKeyType="done"
         />
         {isFocused && (
           <Pressable onPress={() => setText('')}>
