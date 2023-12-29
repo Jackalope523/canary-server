@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Linking } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import DatePicker from 'react-native-date-picker';
 
@@ -16,6 +16,12 @@ import Button, {
 import { signup } from './accountPigeon';
 import TextInputSmall from '../../components/TextInputSmall';
 import { Spacing } from '../../styles/SpacingStyles';
+import Checkbox from '../../components/Checkbox';
+import Hyperlink from '../../components/Hyperlink';
+import { ScrollView } from 'react-native-gesture-handler';
+
+// TODO insert hyperlinks for terms of service and privacy policy
+// TODO setup checkbox onPress events
 
 type SignupProps = StackScreenProps<AuthStackParamList, 'Signup'>;
 
@@ -48,12 +54,16 @@ const SignupScreen = ({ navigation }: SignupProps) => {
   }
 
   return (
-    <View style={globalStyles.baseContainer}>
+    <ScrollView
+      style={globalStyles.baseContainer}
+      overScrollMode="never"
+      showsVerticalScrollIndicator={false}>
       <View style={styles.inputSection}>
         <TextInputSmall
           label="Name"
           value={Name}
           onChangeText={setName}
+          inputMode="text"
           required
           description="Your name will be public and visible to all users."
         />
@@ -62,6 +72,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           value={Email}
           onChangeText={setEmail}
           autoComplete="email"
+          inputMode="email"
           recommended
           description="We recommend binding an email address to your account in case you change your phone number."
         />
@@ -70,15 +81,31 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           value={DateOfBirth}
           onChangeText={setDateOfBirth}
           placeholder="MM/DD/YYYY"
+          inputMode="numeric"
+          maxLength={8}
           required
           description="You must be 18 years or older to use Sparrow. Your date of birth will not be visible to other users."
         />
-        <TextInputSmall
-          label="Disabled example"
-          placeholder="MM/DD/YYYY"
-          recommended
-          disabled
-        />
+      </View>
+      <View style={styles.checkboxSection}>
+        <Checkbox text="I am 18 years or older" onPress={null} />
+        <Checkbox text="I agree to Sparrow's Terms of Service" onPress={null} />
+        <View style={styles.checkboxInnerSection}>
+          <Checkbox text="I agree to Sparrow's Privacy Policy" onPress={null} />
+          <Text style={globalStyles.textDark}>
+            You can go over Sparrow's{' '}
+            <Hyperlink
+              text="Terms of service"
+              onPress={() => Linking.openURL('http://google.com')}
+            />{' '}
+            and{' '}
+            <Hyperlink
+              text="Privacy Policy"
+              onPress={() => Linking.openURL('http://google.com')}
+            />{' '}
+            on our official website.
+          </Text>
+        </View>
       </View>
       {/* <Text>Date of Birth</Text>
       <DatePicker
@@ -96,7 +123,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
         onPress={navigate}
         disabled={!buttonEnabled}
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -105,6 +132,15 @@ const SignupScreen = ({ navigation }: SignupProps) => {
 // ! ||--------------------------------------------------------------------------------||
 const styles = StyleSheet.create({
   inputSection: {
+    rowGap: Spacing.sm,
+  },
+
+  checkboxSection: {
+    paddingVertical: Spacing.md,
+    rowGap: Spacing.md,
+  },
+
+  checkboxInnerSection: {
     rowGap: Spacing.sm,
   },
 });
