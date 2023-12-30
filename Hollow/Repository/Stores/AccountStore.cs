@@ -15,7 +15,7 @@ namespace Repository
 
         public async Task<bool> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
         {
-            User toCreate = new User
+            User toCreate = new()
             {
                 PhoneNumber = phoneNumber,
                 Email = email,
@@ -264,7 +264,7 @@ namespace Repository
 
         public async Task<bool> UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
         {
-            User u = new User { Id = id, CurrentLocation = new Point(longitude, latitude), CurrentRadius = radius };
+            User u = new() { Id = id, CurrentLocation = new Point(longitude, latitude), CurrentRadius = radius };
 
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);
@@ -273,7 +273,5 @@ namespace Repository
 
             return true;
         }
-
-
     }
 }

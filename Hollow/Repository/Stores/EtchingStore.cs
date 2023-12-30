@@ -1,6 +1,5 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Shared;
 
 namespace Repository
@@ -165,6 +164,4 @@ namespace Repository
             return true;
         }
     }
-
-
 }

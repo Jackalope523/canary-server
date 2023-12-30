@@ -6,7 +6,7 @@ namespace Shared
     { Positive, Negative, Remove }
 
     public enum EventUserState
-    { Watching, Incoming, Guest, Left, Kicked }
+    { Watching, Guest, Incoming, Present, Left, Kicked }
 
     public enum DeviceType
     { iOS, Android }

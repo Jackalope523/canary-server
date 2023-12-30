@@ -98,7 +98,7 @@ namespace Repository
 
         public async Task<bool> ReportEventAsync(ulong userId, ulong eventId, ulong HostId, EventReportType reportType, string reportDetails)
         {
-            EventReport toCreate = new EventReport
+            EventReport toCreate = new()
             {
                 SelfId = userId,
                 OtherId = HostId,
@@ -114,7 +114,7 @@ namespace Repository
 
         public async Task<bool> ReportUserAsync(ulong selfId, ulong eventId, ulong targetId, UserReportType reportType, string reportDetails)
         {
-            UserReport toCreate = new UserReport
+            UserReport toCreate = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
@@ -128,14 +128,14 @@ namespace Repository
             return true;
         }
 
-        public Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<bool> PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
+        {
+            throw new NotImplementedException();
+        }      
     }
 }

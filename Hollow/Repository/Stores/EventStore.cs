@@ -69,7 +69,7 @@ namespace Repository
         {
             ulong currentEventId = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.EventLinks.
-            Where(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Present).
+            Where(l => l.SelfId == id && l.Type == EventUserState.Present).
             Select(l => l.OtherId).
             SingleAsync());
 
@@ -113,7 +113,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Attend).
+            Where(l => l.SelfId == id && l.Type == EventUserState.Guest).
             Join(
                 ctx.Events,
                 l => l.OtherId,
@@ -148,7 +148,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.EventLinks.
-           Where(l => l.SelfId == id && l.Type == EventLink.EventLinkType.Left).
+           Where(l => l.SelfId == id && l.Type == EventUserState.Left).
            Join(
                ctx.Events,
                l => l.OtherId,
@@ -179,7 +179,6 @@ namespace Repository
                )).
            ToListAsync());
         }
-
         public async Task<EventShard> FindEventAsync(ulong id)
         {
             EventShard @event = await storeSentry.ExecuteReadAsync(ctx => ctx.Events.Where(e => e.Id == id).Select(e => new EventShard
@@ -211,7 +210,6 @@ namespace Repository
 
             return @event with {Host = host } ;
         }
-
         public async Task<List<EventThinSlice>> FindEventsAsync(double latitude, double longitude, double distance)
         {
             return await storeSentry.ExecuteReadAsync(ctx => ctx.Events.Where(e => e.Location.Distance(new Point(longitude, latitude)) <= distance && !e.EndTime.HasValue).
@@ -220,13 +218,12 @@ namespace Repository
                                 u => u.Id, 
                                 (e,u) => new EventThinSlice(e.Id, new UserSilhouette(u.Id, u.Name), e.Location.Y, e.Location.X)).
                                 ToListAsync());
-        }
-        
+        }     
         public async Task<List<UserSilhouette>> GetGuestListAsync(ulong id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Attend).
+            Where(l => l.OtherId == id && l.Type == EventUserState.Guest).
             Join(
                 ctx.Users,
                 l => l.SelfId,
@@ -234,17 +231,16 @@ namespace Repository
                 (_,u) => new UserSilhouette(u.Id, u.Name)
                 ).
             ToListAsync());
-        }
-
-        public async Task<bool> AddUserToEventAsync(ulong userId, ulong eventId) 
-        { 
-            return await AddLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); 
-        }
+        }    
         public async Task<bool> RemoveUserAsync(ulong userId, ulong eventId) 
         { 
-            return await RemoveLinkOperationAsync(new EventLink { SelfId = userId, OtherId = eventId, Type = EventLink.EventLinkType.Attend }); 
-        }
+            await storeSentry.ExecuteWriteAsync(ctx => 
+            ctx.EventLinks.
+            Where(l => l.SelfId == userId && l.OtherId == eventId).
+            ExecuteDeleteAsync());
 
+            return true;
+        }
         public async Task<bool> UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
         {
             Event e = new() { Id = id };
@@ -270,13 +266,12 @@ namespace Repository
             }
             await storeSentry.ExecuteWriteAsync();
             return true;
-        }
-     
+        }   
         public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong id)
         {
             var arrivalTimes = storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Present).
+            Where(l => l.OtherId == id && l.Type == EventUserState.Present).
             Join(
                 ctx.Users,
                 l => l.SelfId,
@@ -287,7 +282,7 @@ namespace Repository
    
             var departureTimes = storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && l.Type == EventLink.EventLinkType.Left).
+            Where(l => l.OtherId == id && l.Type == EventUserState.Left).
             Join(
                 ctx.Users,
                 l => l.SelfId,
@@ -319,30 +314,94 @@ namespace Repository
             }
 
             return toReturn;
+        }      
+        public async Task<List<EventShard>> FindEventsByUserAsync(ulong userId)
+        {
+           return await storeSentry.ExecuteReadAsync(ctx =>
+           ctx.Events.
+           Where(e => e.HostId == userId).
+           Join(ctx.Users,
+           e => e.HostId,
+           u => u.Id,
+           (e, u) => new EventShard(
+               e.Id, 
+               new UserSilhouette(u.Id, u.Name), 
+               e.Name, 
+               e.Description, 
+               e.StartTime, 
+               e.Location.Y, 
+               e.Location.X, 
+               e.EndTime, 
+               e.State, 
+               e.GroupMinimum, 
+               e.GroupMaximum, 
+               new Character(
+                   e.Extroversion,
+                   e.Athleticisme, 
+                   e.Chaos, 
+                   e.Competitiveness,
+                   e.Industriousness, 
+                   e.NightOwl,
+                   e.Openness
+                   ), 
+               e.Radius, 
+               e.IsDynamic)).
+           ToListAsync());
+        }      
+        public async Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.SelfId == userId && l.OtherId == eventId).
+            Select(l => l.Type).
+            SingleAsync());
         }
+        public async Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.EventLinks.
+                Add(new EventLink { SelfId = userId, OtherId = eventId, Type = userState }
+                ));
 
+            return true;           
+        }
+        public async Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId)
+        {
+            var users = await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.OtherId == eventId).
+            Join(
+                ctx.Users,
+                l => l.SelfId,
+                u => u.Id,
+                (l, u) => new { u.Id, u.Name, l.Type }
+                ).
+            ToListAsync());
+
+            List<(UserSilhouette User, EventUserState State)> toReturn = new();
+            for (int i = 0; i < users.Count; i++)
+            {
+                toReturn.Add((new UserSilhouette(users[i].Id, users[i].Name), users[i].Type));
+            }
+            return toReturn;
+        }
         public async Task<bool> EndEventAsync(ulong id)
         {
-            throw new NotImplementedException();
-        }
+            await storeSentry.ExecuteWriteAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.Type == EventUserState.Present).
+            ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Type, EventUserState.Left)));
 
-        public Task<List<EventShard>> FindEventsByUserAsync(ulong userId)
-        {
-            throw new NotImplementedException();
-        }
-        
-        public Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId)
-        {
-            throw new NotImplementedException();
-        }
+            await storeSentry.ExecuteWriteAsync(ctx =>
+            ctx.EventLinks.
+            Where(l =>
+            l.Type == EventUserState.Watching &&
+            l.Type == EventUserState.Guest &&
+            l.Type == EventUserState.Incoming).
+            ExecuteDeleteAsync()
+            );
 
-        public Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId)
-        {
-            throw new NotImplementedException();
+            return true;
         }
     }
 }

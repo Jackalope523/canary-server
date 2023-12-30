@@ -1,9 +1,10 @@
-﻿
+﻿using Shared;
+
 namespace Repository.Tests
 {
     internal class EventLinkFactory
     {      
-        public EventLink Create(User user, Event @event, EventLink.EventLinkType type)
+        public EventLink Create(User user, Event @event, EventUserState type)
         {
             return new EventLink
             {
