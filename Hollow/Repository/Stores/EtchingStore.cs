@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Shared;
 
 namespace Repository
@@ -14,7 +15,7 @@ namespace Repository
 
         public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted, string imageURL)
         {
-            Post toAdd = new Post { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
+            Post toAdd = new() { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Add(toAdd));
             return new Etching ( toAdd.Id, toAdd.EventId, toAdd.OwnerId, toAdd.PostedAt, toAdd.PhotoURL, new(0, 0), toAdd.IsHidden );
         }
@@ -154,9 +155,14 @@ namespace Repository
 
             return etchings;
         }
-        public Task<bool> HideEtchingAsync(ulong etchingId)
+        public async Task<bool> HideEtchingAsync(ulong etchingId)
         {
-            throw new NotImplementedException();
+            Post p = new() { Id = etchingId, IsHidden = true };
+            storeSentry.DiscussWrite(ctx => ctx.Posts.Attach(p));
+            storeSentry.DiscussWrite(ctx => ctx.Entry(p).Property(nameof(p.IsHidden)).IsModified = true);           
+            await storeSentry.ExecuteWriteAsync();
+
+            return true;
         }
     }
 
