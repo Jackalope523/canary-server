@@ -20,7 +20,7 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 // Types
 interface TextButtonProps {
   onPress?: () => void;
-  btnText?: string;
+  text?: string;
 
   type?: TextButtonType;
   variant?: TextButtonVariant;
@@ -32,7 +32,7 @@ interface TextButtonProps {
 
 export const TextButton: React.FC<TextButtonProps> = ({
   onPress = null,
-  btnText = 'NULL',
+  text = 'NULL',
   btnTextStyle = [],
   disabled = null,
   type = null,
@@ -92,7 +92,7 @@ export const TextButton: React.FC<TextButtonProps> = ({
 
   return (
     <Pressable onPress={onPress} disabled={disabled}>
-      <Text style={btnTextStyle}>{btnText}</Text>
+      <Text style={btnTextStyle}>{text}</Text>
     </Pressable>
   );
 };
