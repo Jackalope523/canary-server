@@ -31,8 +31,8 @@ namespace Repository
         public int NightOwl { get; init; }
 
         // Navigation Properties
-        internal List<EventLink> Links { get; set; }
-        internal List<Report> Reports { get; set; }
-        internal List<Post> Posts { get; set; }
+        public List<EventLink> Links { get; set; }
+        public List<Report> Reports { get; set; }
+        public List<Post> Posts { get; set; }
     }
 }

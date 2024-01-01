@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Repository.Entities;
 
 namespace Repository
 {
@@ -14,6 +15,8 @@ namespace Repository
         public DbSet<UserReport> UserReports { get; set; }
         public DbSet<EventReport> EventReports { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Penalty> Penalties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,12 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
 namespace Repository.Tests.Tests
 {
-    public class ReportStoreTests : IDisposable
+    public class DisciplineStoreTests : IDisposable
     {
         private static TestSentry sentry = new TestSentry();
-        private static DisciplineStore reportStore = new DisciplineStore(sentry);
+        private static DisciplineStore store = new DisciplineStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -14,7 +15,7 @@ namespace Repository.Tests.Tests
         private User subject2;
         private Event testEvent;
 
-        public ReportStoreTests(ITestOutputHelper testOutputHelper)
+        public DisciplineStoreTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
@@ -46,7 +47,7 @@ namespace Repository.Tests.Tests
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
             await sentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(eventReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>) reports = await reportStore.GetReportsByUserAsync(subject1.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>) reports = await store.GetReportsByUserAsync(subject1.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);
@@ -70,7 +71,7 @@ namespace Repository.Tests.Tests
             string notes = "Test";
             Shared.UserReportType type = Shared.UserReportType.rude;
 
-            await reportStore.ReportUserAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
+            await store.ReportUserAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
 
             UserReport created = await sentry.ExecuteReadAsync(ctx => ctx.UserReports.FirstAsync());
 
@@ -87,7 +88,7 @@ namespace Repository.Tests.Tests
             string notes = "Test";
             Shared.EventReportType type = Shared.EventReportType.inappropriate;
 
-            await reportStore.ReportEventAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
+            await store.ReportEventAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
 
             EventReport created = await sentry.ExecuteReadAsync(ctx => ctx.EventReports.FirstAsync());
 
@@ -104,7 +105,7 @@ namespace Repository.Tests.Tests
             EventReport eventReport = new EventReportFactory().Create(subject1, testEvent);
             await sentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(eventReport));
 
-            List<Core.Boundaries.EventReport> reports = await reportStore.GetReportsForEventAsync(testEvent.Id);
+            List<Core.Boundaries.EventReport> reports = await store.GetReportsForEventAsync(testEvent.Id);
 
             Assert.NotNull(reports);
             Assert.Equal(eventReport.SelfId, reports.First().ReportingUserId);
@@ -123,7 +124,7 @@ namespace Repository.Tests.Tests
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
             await sentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(eventReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>) reports = await reportStore.GetReportsForUserAsync(subject2.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>) reports = await store.GetReportsForUserAsync(subject2.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);
@@ -140,6 +141,30 @@ namespace Repository.Tests.Tests
             Assert.Equal(eventReport.FilingDate, reports.Item2.First().ReportTime);
             Assert.Equal(eventReport.Type, reports.Item2.First().ReportType);
             Assert.Equal(eventReport.Notes, reports.Item2.First().ReportDetails);
+        }
+        [Fact]
+        public async Task PenaliseUserAsync_SUCCESS()
+        {
+            await store.PenaliseUserAsync(subject1.Id, PenaltyType.Unreliable, DateTimeOffset.MinValue);
+
+            Entities.Penalty penalty = sentry.ExecuteRead(ctx => ctx.Penalties.Single());
+
+            Assert.NotNull(penalty);
+            Assert.Equal(subject1.Id, penalty.PenalizedId);
+            Assert.Equal(DateTimeOffset.MinValue, penalty.Time);
+            Assert.Equal(PenaltyType.Unreliable, penalty.Type);
+        }
+        [Fact]
+        public async Task GetPenaltiesForUserAsync_SUCCESS()
+        {
+            Entities.Penalty penalty = new PenaltyFactory().Create(subject1);
+            sentry.ExecuteWrite(ctx => ctx.Penalties.Add(penalty));
+
+            Penalty found = (await store.GetPenaltiesForUserAsync(subject1.Id)).Single();
+
+            Assert.NotNull(found);
+            Assert.Equal(DateTimeOffset.MinValue, found.TimeOfPenalty);
+            Assert.Equal(PenaltyType.Unreliable, found.Offense);
         }
     }
 }

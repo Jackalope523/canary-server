@@ -128,14 +128,25 @@ namespace Repository
             return true;
         }
 
-        public Task<bool> PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
+        public async Task<bool> PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
         {
-            throw new NotImplementedException();
+            Entities.Penalty toAdd = new() 
+            {
+                PenalizedId = userId,
+                Type = offense, 
+                Time = timeOfPenalty 
+            };
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Penalties.Add(toAdd));
+            return true;
         }
 
-        public Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
+        public async Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Penalties.
+            Where(p => p.PenalizedId == userId).
+            Select(p => new Penalty(p.Type, p.Time)).
+            ToListAsync());
         }      
     }
 }

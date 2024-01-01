@@ -4,7 +4,7 @@
     {
         public enum UserLinkType { Follow, Block, RateUp, RateDown }
 
-        internal User Other { get; init; }
+        public User Other { get; init; }
         public UserLinkType Type { get; set; }
     }
 }

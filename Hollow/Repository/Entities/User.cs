@@ -1,5 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using Core.Boundaries;
+using Repository.Entities;
 
 namespace Repository
 {
@@ -37,10 +38,12 @@ namespace Repository
         public double CurrentRadius { get; set; } = DefaultCurrentRadius;
 
         // Navigation Properties
-        internal List<Link> Links { get; set; }
-        internal List<Report> ReporterList { get; set; }
-        internal List<Report> ReporteeList { get; set; }
-        internal List<Post> Posts { get; set; }
+        public List<Link> Links { get; set; }
+        public List<Report> ReporterList { get; set; }
+        public List<Report> ReporteeList { get; set; }
+        public List<Post> Posts { get; set; }
+        public List<Notification> Notifications { get; set; }
+        public List<Entities.Penalty> Penalties { get; set; }
 
         // Default Values
         public static ulong DefaultId { get; set; } = ulong.MinValue;
