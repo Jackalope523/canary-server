@@ -206,6 +206,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Competitiveness")
                         .HasColumnType("INTEGER");
 
+                    b.Property<ulong?>("CurrentEvent")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Point>("CurrentLocation")
                         .IsRequired()
                         .HasColumnType("POINT");

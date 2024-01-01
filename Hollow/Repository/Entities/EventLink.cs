@@ -1,10 +1,10 @@
-﻿namespace Repository
+﻿using Shared;
+
+namespace Repository
 {
     public class EventLink : Link
     {
-        public enum EventLinkType { Watching, Attend, Present, Left }
-
         internal Event Event { get; init; }
-        public EventLinkType Type { get; set; }
+        public EventUserState Type { get; set; }
     }
 }

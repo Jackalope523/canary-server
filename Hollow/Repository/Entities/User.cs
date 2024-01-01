@@ -19,7 +19,7 @@ namespace Repository
         public DateTimeOffset? LockoutDate { get; set; } = DefaultLockoutDate;
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
-
+        public ulong? CurrentEvent { get; set; } = DefaultCurrentEvent;
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
         public int Athleticisme { get; init; } = DefaultAthleticisme;
@@ -57,6 +57,7 @@ namespace Repository
         public static DateTimeOffset? DefaultLockoutDate { get; set; } = DateTimeOffset.MaxValue;
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.active;
+        public static ulong? DefaultCurrentEvent { get; set; } = null;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;

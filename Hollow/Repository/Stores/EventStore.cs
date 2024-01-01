@@ -1,6 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Utilities;
 using Shared;
 
 namespace Repository
@@ -67,47 +68,53 @@ namespace Repository
         }
         public async Task<EventShard> FindCurrentEventForUserAsync(ulong id) 
         {
-            ulong currentEventId = await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.EventLinks.
-            Where(l => l.SelfId == id && l.Type == EventUserState.Present).
-            Select(l => l.OtherId).
-            SingleAsync());
-
-            EventShard @event = await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.Events.
-            Where(e => e.Id == currentEventId).
-            Select(e => new EventShard
-               (
-                   e.Id,
-                   new UserSilhouette(e.HostId, null),
-                   e.Name,
-                   e.Description,
-                   e.StartTime,
-                   e.Location.Y,
-                   e.Location.X,
-                   e.EndTime,
-                   e.State,
-                   e.GroupMinimum,
-                   e.GroupMaximum,
-                   new Character(
-                   e.Extroversion,
-                   e.Athleticisme,
-                   e.Chaos,
-                   e.Competitiveness,
-                   e.Industriousness,
-                   e.NightOwl,
-                   e.Openness),
-                   e.Radius,
-                   e.IsDynamic
-                   )).SingleAsync());
-
-            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx =>
+            ulong? currentEvent = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Users.
-            Where(u => u.Id == @event.Host.Id).
-            Select(u => new UserSilhouette(u.Id, u.Name)).
+            Where(u => u.Id == id).
+            Select(u => u.CurrentEvent).
             SingleAsync());
 
-            return @event with { Host = host };
+            EventShard? @event = null;
+            if (currentEvent != null)
+            {
+                @event = await storeSentry.ExecuteReadAsync(ctx =>
+                    ctx.Events.
+                    Where(e => e.Id == currentEvent).
+                    Select(e => new EventShard
+                    (
+                        e.Id,
+                        new UserSilhouette(e.HostId, null),
+                        e.Name,
+                        e.Description,
+                        e.StartTime,
+                        e.Location.Y,
+                        e.Location.X,
+                        e.EndTime,
+                        e.State,
+                        e.GroupMinimum,
+                        e.GroupMaximum,
+                        new Character(
+                        e.Extroversion,
+                        e.Athleticisme,
+                        e.Chaos,
+                        e.Competitiveness,
+                        e.Industriousness,
+                        e.NightOwl,
+                        e.Openness),
+                        e.Radius,
+                        e.IsDynamic
+                        )).SingleAsync());
+
+                UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Users.
+                Where(u => u.Id == @event.Host.Id).
+                Select(u => new UserSilhouette(u.Id, u.Name)).
+                SingleAsync());
+
+
+                @event =  @event with { Host = host };
+            }
+            return @event;          
         }
         public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong id) 
         {
@@ -181,7 +188,10 @@ namespace Repository
         }
         public async Task<EventShard> FindEventAsync(ulong id)
         {
-            EventShard @event = await storeSentry.ExecuteReadAsync(ctx => ctx.Events.Where(e => e.Id == id).Select(e => new EventShard
+            EventShard @event = await storeSentry.ExecuteReadAsync(ctx => 
+            ctx.Events.
+            Where(e => e.Id == id).
+            Select(e => new EventShard
                (
                    e.Id,
                    new UserSilhouette(e.HostId, null),
@@ -255,10 +265,7 @@ namespace Repository
                         break;
                     case "State":
                         e.State = (EventState)Value;
-                        break;
-                    case "EndTime":
-                        e.EndTime = (DateTimeOffset?)Value;
-                        break;
+                        break;                  
                     default:
                         throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
                 }
@@ -269,48 +276,43 @@ namespace Repository
         }   
         public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong id)
         {
-            var arrivalTimes = storeSentry.ExecuteReadAsync(ctx =>
+            var times = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && l.Type == EventUserState.Present).
+            Where(l => l.OtherId == id && (l.Type == EventUserState.Arrived || l.Type == EventUserState.Left)).
             Join(
                 ctx.Users,
                 l => l.SelfId,
                 u => u.Id,
-                (l, u) => new { l.Time, u.Id, u.Name }
-                ).
-            ToListAsync());
-   
-            var departureTimes = storeSentry.ExecuteReadAsync(ctx =>
-            ctx.EventLinks.
-            Where(l => l.OtherId == id && l.Type == EventUserState.Left).
-            Join(
-                ctx.Users,
-                l => l.SelfId,
-                u => u.Id,
-                (l, u) => new { l.Time, u.Id }
+                (l,u) => new { u.Id, u.Name, l.Time, l.Type }
                 ).
             ToListAsync());
 
-            Dictionary<ulong, DateTimeOffset> organizedDepartureTimes = new();
-            foreach (var v in await departureTimes)
+            Dictionary<ulong,List<(string, DateTimeOffset, EventUserState)>> history = new();
+            foreach (var item in times)
             {
-                organizedDepartureTimes.Add(v.Id, v.Time);
+                if (!history.ContainsKey(item.Id)) history.Add(item.Id, new());
+                history[item.Id].Add((item.Name, item.Time, item.Type));               
             }
 
             List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> toReturn = new();
-            foreach (var v in await arrivalTimes)
+            ulong userId;
+            string userName;
+            DateTimeOffset arrivalTime;
+            DateTimeOffset? departureTime;
+            foreach ( var entry in history)
             {
-                DateTimeOffset? departureTime;
-                try
-                {
-                    departureTime = organizedDepartureTimes[v.Id];
-                }
-                catch (KeyNotFoundException)
-                {
-                    departureTime = null;
-                }
+                entry.Value.Sort((x,y) => DateTimeOffset.Compare(x.Item2, y.Item2));
 
-                toReturn.Add((v.Time, departureTime, new UserSilhouette(v.Id, v.Name)));
+                (string Name, DateTimeOffset Time, EventUserState State) first = entry.Value.First();
+                (string Name, DateTimeOffset Time, EventUserState State) last = entry.Value.Last();
+
+                userId = entry.Key;
+                userName = first.Name;
+                arrivalTime = first.Time;
+                if (last.State == EventUserState.Left) departureTime = last.Time;
+                else departureTime = null;
+                
+                toReturn.Add((arrivalTime, departureTime, new UserSilhouette(userId, userName)));
             }
 
             return toReturn;
@@ -350,11 +352,15 @@ namespace Repository
         }      
         public async Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId)
         {
-            return await storeSentry.ExecuteReadAsync(ctx =>
+            var states = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
             Where(l => l.SelfId == userId && l.OtherId == eventId).
-            Select(l => l.Type).
-            SingleAsync());
+            Select(l => new { l.Type, l.Time }).
+            ToListAsync());
+
+            states.Sort((x,y) => DateTimeOffset.Compare(x.Time, y.Time));
+
+            return states.Last().Type;
         }
         public async Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState)
         {
@@ -363,6 +369,22 @@ namespace Repository
                 Add(new EventLink { SelfId = userId, OtherId = eventId, Type = userState }
                 ));
 
+            if (userState == EventUserState.Arrived)
+            {              
+                User u = new User { Id = userId, CurrentEvent = eventId };
+                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
+                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
+                await storeSentry.ExecuteWriteAsync();
+
+            }
+            else if (userState == EventUserState.Left || userState == EventUserState.Kicked)
+            {
+                User u = new User { Id = userId, CurrentEvent = null };
+                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
+                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
+                await storeSentry.ExecuteWriteAsync();
+            }
+            
             return true;           
         }
         public async Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId)
@@ -374,33 +396,53 @@ namespace Repository
                 ctx.Users,
                 l => l.SelfId,
                 u => u.Id,
-                (l, u) => new { u.Id, u.Name, l.Type }
+                (l, u) => new { u.Id, u.Name, l.Time, l.Type }
                 ).
             ToListAsync());
 
-            List<(UserSilhouette User, EventUserState State)> toReturn = new();
-            for (int i = 0; i < users.Count; i++)
+            Dictionary<ulong, List<(string, DateTimeOffset, EventUserState)>> history = new();
+            foreach (var item in users)
             {
-                toReturn.Add((new UserSilhouette(users[i].Id, users[i].Name), users[i].Type));
+                if (!history.ContainsKey(item.Id)) history.Add(item.Id, new());
+                history[item.Id].Add((item.Name, item.Time, item.Type));
+            }
+
+            List<(UserSilhouette User, EventUserState State)> toReturn = new();
+            ulong userId;
+            string userName;
+            EventUserState userState;
+            foreach (var entry in history)
+            {
+                entry.Value.Sort((x, y) => DateTimeOffset.Compare(x.Item2, y.Item2));
+
+                userId = entry.Key;
+                userName = entry.Value.Last().Item1;
+                userState = entry.Value.Last().Item3;
+
+                toReturn.Add((new UserSilhouette(userId, userName), userState));
             }
             return toReturn;
         }
         public async Task<bool> EndEventAsync(ulong id)
         {
-            await storeSentry.ExecuteWriteAsync(ctx =>
-            ctx.EventLinks.
-            Where(l => l.Type == EventUserState.Present).
-            ExecuteUpdateAsync(setters => setters.SetProperty(b => b.Type, EventUserState.Left)));
+            List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
+            ctx.Users.
+            Where(u => u.CurrentEvent == id).
+            Select(u => u.Id).
+            ToListAsync());
 
-            await storeSentry.ExecuteWriteAsync(ctx =>
-            ctx.EventLinks.
-            Where(l =>
-            l.Type == EventUserState.Watching &&
-            l.Type == EventUserState.Guest &&
-            l.Type == EventUserState.Incoming).
-            ExecuteDeleteAsync()
-            );
+            List<Task<bool>> tasks = new();
+            foreach (ulong guest in guests)
+            {
+                tasks.Add(SetUserStateAsync(guest, id, EventUserState.Left));
+            }
+            await Task.WhenAll(tasks);
 
+            Event e = new Event { Id = id, EndTime = DateTimeOffset.UtcNow };
+            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
+            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true);
+            await storeSentry.ExecuteWriteAsync();
+          
             return true;
         }
     }
