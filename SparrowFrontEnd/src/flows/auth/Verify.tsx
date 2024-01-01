@@ -52,7 +52,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
         display={ButtonDisplay.Contained}
-        btnText={'Verify & Continue'}
+        text={'Verify & Continue'}
         onPress={route.params.Forward}
         disabled={!buttonEnabled}
       />
@@ -60,7 +60,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
         display={ButtonDisplay.Contained}
-        btnText={"I didn't receive a code"}
+        text={"I didn't receive a code"}
         disabled={!buttonEnabled}
       />
     </View>

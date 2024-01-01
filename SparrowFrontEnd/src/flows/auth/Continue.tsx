@@ -19,7 +19,7 @@ const ContinueScreen = ({ route }: ContinueProps) => {
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
         display={ButtonDisplay.Contained}
-        btnText="Continue"
+        text="Continue"
         onPress={route.params.Forward}
       />
     </View>

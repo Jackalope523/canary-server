@@ -176,8 +176,8 @@ const DiscoveryScreen = () => {
                         type={ButtonType.PrimaryDark}
                         size={ButtonSize.ExtraSmall}
                         display={ButtonDisplay.Full}
-                        btnText="Filter"
-                        btnIcon="filter-fill"
+                        text="Filter"
+                        icon="filter-fill"
                         onPress={toggleFilter}
                       />
 
@@ -185,8 +185,8 @@ const DiscoveryScreen = () => {
                         type={ButtonType.PrimaryDark}
                         size={ButtonSize.ExtraSmall}
                         display={ButtonDisplay.Full}
-                        btnText="Sort"
-                        btnIcon="sort-outline"
+                        text="Sort"
+                        icon="sort-outline"
                         onPress={toggleSort}
                       />
                     </View>
@@ -222,7 +222,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Today"
+                      text="Today"
                       onPress={null}
                       self={1}
                       status={dateState}
@@ -233,7 +233,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Tomorrow"
+                      text="Tomorrow"
                       onPress={null}
                       self={2}
                       status={dateState}
@@ -244,7 +244,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="This week"
+                      text="This week"
                       onPress={null}
                       self={3}
                       status={dateState}
@@ -255,7 +255,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="This weekend"
+                      text="This weekend"
                       onPress={null}
                       self={4}
                       status={dateState}
@@ -266,7 +266,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Next week"
+                      text="Next week"
                       onPress={null}
                       self={5}
                       status={dateState}
@@ -277,7 +277,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Next weekend"
+                      text="Next weekend"
                       onPress={null}
                       self={6}
                       status={dateState}
@@ -307,7 +307,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Cozy"
+                      text="Cozy"
                       onPress={null}
                       self={1}
                       status={sizeState}
@@ -318,7 +318,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Thriving"
+                      text="Thriving"
                       onPress={null}
                       self={2}
                       status={sizeState}
@@ -329,7 +329,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Bombastic"
+                      text="Bombastic"
                       onPress={null}
                       self={3}
                       status={sizeState}
@@ -355,7 +355,7 @@ const DiscoveryScreen = () => {
                     type={ButtonType.Success}
                     size={ButtonSize.Medium}
                     display={ButtonDisplay.Full}
-                    btnText="Confirm selection"
+                    text="Confirm selection"
                     onPress={null}
                   />
                 </View>
@@ -380,7 +380,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Most popular"
+                      text="Most popular"
                       onPress={null}
                       self={1}
                       status={sortState}
@@ -391,7 +391,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Closest"
+                      text="Closest"
                       onPress={null}
                       self={2}
                       status={sortState}
@@ -402,7 +402,7 @@ const DiscoveryScreen = () => {
                       type={ButtonType.SecondaryLight}
                       size={ButtonSize.ExtraSmall}
                       display={ButtonDisplay.Contained}
-                      btnText="Most recent"
+                      text="Most recent"
                       onPress={null}
                       self={3}
                       status={sortState}
@@ -427,7 +427,7 @@ const DiscoveryScreen = () => {
                 type={ButtonType.PrimaryDark}
                 size={ButtonSize.ExtraSmall}
                 display={ButtonDisplay.Contained}
-                btnText="Create Event"
+                text="Create Event"
                 onPress={null}
               />
             </View>

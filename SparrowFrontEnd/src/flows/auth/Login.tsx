@@ -52,7 +52,7 @@ const LoginScreen = ({ navigation }: LoginProps) => {
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
         display={ButtonDisplay.Contained}
-        btnText={'Login'}
+        text={'Login'}
         onPress={navigate}
         disabled={!buttonEnabled}
       />
@@ -60,7 +60,7 @@ const LoginScreen = ({ navigation }: LoginProps) => {
         type={ButtonType.PrimaryDark}
         size={ButtonSize.Large}
         display={ButtonDisplay.Contained}
-        btnText={"Can't log in?"}
+        text={"Can't log in?"}
         disabled={!buttonEnabled}
       />
     </View>

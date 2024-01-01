@@ -66,14 +66,14 @@ const LandingScreen = ({ navigation }: LandingProps) => {
           type={ButtonType.Success}
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
-          btnText={'Sign up'}
+          text={'Sign up'}
           onPress={signupButton}
           disabled={!buttonEnabled}
         />
         <TextButton
           type={TextButtonType.Dark}
           variant={TextButtonVariant.Three}
-          btnText="Or log in"
+          text="Or log in"
           onPress={loginButton}
           disabled={!buttonEnabled}
         />
