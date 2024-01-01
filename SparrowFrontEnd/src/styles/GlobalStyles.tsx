@@ -247,8 +247,9 @@ export const globalStyles = StyleSheet.create({
   },
 
   // Disabled
+  // TODO test usability, this was previously sand400
   textDisabled: {
-    color: Colors.sand400,
+    color: Colors.sand300,
   },
 
   // ! ||--------------------------------------------------------------------------------||
