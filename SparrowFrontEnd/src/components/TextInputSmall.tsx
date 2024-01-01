@@ -27,6 +27,8 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 // ! ||                                     Types                                      ||
 // ! ||--------------------------------------------------------------------------------||
 interface TextInputSmallProps {
+  type?: InputType;
+
   label?: string;
   description?: string;
   recommended?: boolean;
@@ -50,6 +52,7 @@ interface TextInputSmallProps {
 }
 
 export const TextInputSmall: React.FC<TextInputSmallProps> = ({
+  type = null,
   label,
   description,
   recommended = false,
@@ -101,9 +104,58 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
     });
   }, [isFocused]);
 
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                   Validation                                   ||
+  // ! ||--------------------------------------------------------------------------------||
+
+  const [error, setError] = React.useState('');
+
+  const validateInput = () => {
+    let errors = '';
+
+    switch (type) {
+      // First name
+      // TODO update first name regex if necessary
+      case InputType.FirstName:
+        const firstNameRegex = /^[a-zA-Z'-]+$/;
+
+        if (text.length === 0) {
+          setError('First name field cannot be empty.');
+        } else if (!firstNameRegex.test(text)) {
+          setError('First name can only contain letters.');
+        } else {
+          return Object.keys(errors).length === 0;
+        }
+        break;
+
+      // Email
+      // TODO update email regex if necessary
+      case InputType.Email:
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(text)) {
+          setError('Please enter a valid email address.');
+        } else {
+          return Object.keys(errors).length === 0;
+        }
+        break;
+
+      // Default
+      default:
+        return Object.keys(errors).length === 0;
+    }
+  };
+
+  const handleSubmit = () => {
+    if (validateInput()) {
+      console.log('Submitted', text);
+      setError('');
+    }
+  };
+
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.labelWrapper}>
+    <View style={styles.container}>
+      <View style={styles.labelContainer}>
         <Text
           style={[
             globalStyles.labelTextTwoAsTyped,
@@ -140,12 +192,13 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 
       <Animated.View
         style={[
-          styles.inputWrapper,
-          styles.inputWrapperEnabled,
+          styles.inputContainer,
+          styles.inputContainerEnabled,
           animatedInputStyle,
-          disabled && styles.inputWrapperDisabled,
+          disabled && styles.inputContainerDisabled,
         ]}>
         <TextInput
+          type={type}
           value={text}
           onChangeText={setText}
           onFocus={() => setIsFocused(true)}
@@ -159,6 +212,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           inputMode={inputMode}
           maxLength={maxLength}
           returnKeyType="done"
+          onSubmitEditing={handleSubmit}
+          testID="input"
         />
         {isFocused && (
           <Pressable onPress={() => setText('')}>
@@ -182,10 +237,31 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
             globalStyles.bodyTextTwo,
             globalStyles.textDark,
             styles.description,
-          ]}>
+          ]}
+          testID="error">
           {description}
         </Text>
       )}
+
+      {/* TODO used for Jest testing - remove later or make it work with TextInput's onSubmitEditing  */}
+      {/* <Pressable onPress={handleSubmit} testID="button">
+        <Text>Submit</Text>
+      </Pressable> */}
+
+      {error ? (
+        <View style={styles.errorContainer}>
+          <Icon
+            name="error-fill"
+            size={24}
+            height={24}
+            width={24}
+            style={styles.iconError}
+          />
+          <Text style={[globalStyles.bodyTextTwo, globalStyles.textError]}>
+            {error}
+          </Text>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -194,13 +270,14 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 // ! ||                                     Styles                                     ||
 // ! ||--------------------------------------------------------------------------------||
 const styles = StyleSheet.create({
-  wrapper: {
+  container: {
     rowGap: Spacing.xs,
+    width: '100%',
   },
 
-  labelWrapper: {
+  labelContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
   },
 
   labelRecommended: {
@@ -216,7 +293,7 @@ const styles = StyleSheet.create({
     // textAlign: 'center',
   },
 
-  inputWrapper: {
+  inputContainer: {
     // borderColor: Colors.sparrowDarkBrown,
     borderRadius: 8,
     backgroundColor: Colors.sparrowSand,
@@ -225,13 +302,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     height: 56,
+    width: '100%',
   },
 
-  inputWrapperEnabled: {
+  inputContainerEnabled: {
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  inputWrapperDisabled: {
+  inputContainerDisabled: {
     borderColor: Colors.sand300,
   },
 
@@ -245,6 +323,23 @@ const styles = StyleSheet.create({
     color: Colors.sparrowDark,
     flex: 0,
   },
+
+  iconError: {
+    color: Colors.red400,
+    flex: 0,
+  },
+
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: Spacing.xs,
+    columnGap: Spacing.sm,
+  },
 });
+
+export enum InputType {
+  FirstName,
+  Email,
+}
 
 export default TextInputSmall;
