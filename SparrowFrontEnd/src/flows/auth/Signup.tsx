@@ -28,6 +28,7 @@ import { Spacing } from '../../styles/SpacingStyles';
 import Checkbox from '../../components/Checkbox';
 import Hyperlink from '../../components/Hyperlink';
 import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
+import KeyboardAwareContainer from '../../components/testing/KeyboardAwareContainer';
 
 // TODO insert hyperlinks for terms of service and privacy policy
 // TODO setup checkbox onPress events
@@ -101,6 +102,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
   return (
     <KeyboardAvoidingContainer>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={[styles.container, globalStyles.baseContainer]}
         overScrollMode="never"
         showsVerticalScrollIndicator={false}>
@@ -141,29 +143,29 @@ const SignupScreen = ({ navigation }: SignupProps) => {
         /> */}
         </View>
         <View style={styles.checkboxSection}>
-          <Checkbox
-            text="I agree to Sparrow's Terms of Service"
-            onPress={() => setAgreesToTerms(!agreesToTerms)}
-          />
           <View style={styles.checkboxInnerSection}>
+            <Checkbox
+              text="I agree to Sparrow's Terms of Service"
+              onPress={() => setAgreesToTerms(!agreesToTerms)}
+            />
             <Checkbox
               text="I agree to Sparrow's Privacy Policy"
               onPress={() => setAgreesToPrivacy(!agreesToPrivacy)}
             />
-            <Text style={globalStyles.textDark}>
-              You can go over Sparrow's{' '}
-              <Hyperlink
-                text="Terms of service"
-                onPress={() => Linking.openURL('http://google.com')}
-              />{' '}
-              and{' '}
-              <Hyperlink
-                text="Privacy Policy"
-                onPress={() => Linking.openURL('http://google.com')}
-              />{' '}
-              on our official website.
-            </Text>
           </View>
+          <Text style={globalStyles.textDark}>
+            You can go over Sparrow's{' '}
+            <Hyperlink
+              text="Terms of service"
+              onPress={() => Linking.openURL('http://google.com')}
+            />{' '}
+            and{' '}
+            <Hyperlink
+              text="Privacy Policy"
+              onPress={() => Linking.openURL('http://google.com')}
+            />{' '}
+            on our official website.
+          </Text>
         </View>
         {/* <Text>Date of Birth</Text>
       <DatePicker
@@ -192,6 +194,8 @@ const SignupScreen = ({ navigation }: SignupProps) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+
+    // TODO Might have to use justifyContent: 'flex-end' instead for KeyboardAvoidingContainer to work
     justifyContent: 'center',
     paddingBottom: 48,
   },
@@ -206,11 +210,11 @@ const styles = StyleSheet.create({
 
   checkboxSection: {
     paddingVertical: Spacing.lg,
-    rowGap: Spacing.md,
+    rowGap: Spacing.sm,
   },
 
   checkboxInnerSection: {
-    rowGap: Spacing.sm,
+    rowGap: Spacing.md,
   },
 });
 

@@ -5,9 +5,14 @@ import {
   Platform,
   ScrollView,
   StatusBar,
+  Keyboard,
 } from 'react-native';
 import React from 'react';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+
 import { Spacing } from '../styles/SpacingStyles';
+import { Colors } from '../styles/ColorStyles';
+import { scrollTo } from 'react-native-reanimated';
 
 interface KeyboardAvoidingContainerProps {
   children: React.ReactNode;
@@ -16,12 +21,22 @@ interface KeyboardAvoidingContainerProps {
 export const KeyboardAvoidingContainer: React.FC<
   KeyboardAvoidingContainerProps
 > = ({ children }) => {
+  // TODO Scroll to selected input field on focus
+
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={styles.container}
+        style={{ flex: 1 }}
+        // keyboardVerticalOffset={50}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        {children}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            overScrollMode="never"
+            showsVerticalScrollIndicator={false}>
+            {children}
+          </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -30,5 +45,7 @@ export const KeyboardAvoidingContainer: React.FC<
 export default KeyboardAvoidingContainer;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    flex: 1,
+  },
 });
