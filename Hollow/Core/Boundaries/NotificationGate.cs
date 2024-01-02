@@ -12,6 +12,8 @@ namespace Core.Boundaries
 	public record Note(ulong NotifierId, DateTimeOffset Time,
 		string Message, string Action);
 
+	public record DeviceSilhouette(DeviceType DeviceType, string DeviceToken);
+
     #endregion
 
     #region Gates
@@ -19,10 +21,10 @@ namespace Core.Boundaries
     public interface INotificationDatabase
 	{
 		Task<List<Note>> GetNotesAsync(ulong userId);
-		Task<bool> SaveNoteAsync(ulong userId, ulong notifierId, DateTimeOffset time,
+		Task<bool> SaveNoteAsync(ulong notifierId, ulong recipientId, DateTimeOffset time,
 			string message, string action);
 
-		Task<(DeviceType DeviceType, string DeviceToken)> GetUserSubscriptionAsync(ulong userId);
+		Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId);
 		Task<bool> SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
 		Task<bool> UnsubscribeUserAsync(ulong userId);
 	}

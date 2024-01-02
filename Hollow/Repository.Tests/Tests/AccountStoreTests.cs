@@ -11,12 +11,15 @@ namespace Repository.Tests.Tests
         private readonly ITestOutputHelper _testOutputHelper;
 
         private static readonly TestSentry sentry = new();
-        private static readonly AccountStore store = new(sentry);    
-        private static readonly User subject = new UserFactory().Create();
+        private static readonly AccountStore store = new(sentry);  
+        
+        private User subject;
 
         public AccountStoreTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
+
+            subject = new UserFactory().Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
         }
         public void Dispose()

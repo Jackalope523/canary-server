@@ -1,4 +1,6 @@
 ﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
+using Repository.Entities;
 using Shared;
 
 namespace Repository
@@ -11,29 +13,56 @@ namespace Repository
         {
         }
 
-        public Task<List<Note>> GetNotesAsync(ulong userId)
+        public async Task<List<Core.Boundaries.Note>> GetNotesAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Notes.
+            Where(n => n.NotifierId == userId).
+            Select(n => new Core.Boundaries.Note(n.NotifierId, n.Time, n.Message, n.Action)).
+            ToListAsync());
         }
-
-        public Task<(DeviceType DeviceType, string DeviceToken)> GetUserSubscriptionAsync(ulong userId)
+        public async Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId)
         {
-            throw new NotImplementedException();
+           return await storeSentry.ExecuteReadAsync(ctx =>
+           ctx.Subscriptions.
+           Where(s => s.UserId == userId).
+           Select(s => new DeviceSilhouette(s.DeviceType, s.DeviceToken)).
+           SingleAsync());
+
         }
-
-        public Task<bool> SaveNoteAsync(ulong userId, ulong notifierId, DateTimeOffset time, string message, string action)
+        public async Task<bool> SaveNoteAsync(ulong notifierId, ulong recipientId, DateTimeOffset time, string message, string action)
         {
-            throw new NotImplementedException();
+            Entities.Note toAdd = new() 
+            {  
+                NotifierId = notifierId, 
+                RecipientId = recipientId,
+                Time = time, 
+                Message = message, 
+                Action =  action, 
+                Read = false
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Notes.Add(toAdd));
+
+            return true;
         }
-
-        public Task<bool> SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
+        public async Task<bool> SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
         {
-            throw new NotImplementedException();
+            Subscription toAdd = new()
+            {
+                UserId = userId,
+                DeviceType = deviceType,
+                DeviceToken = deviceToken
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Add(toAdd));
+
+            return true;
         }
-
-        public Task<bool> UnsubscribeUserAsync(ulong userId)
+        public async Task<bool> UnsubscribeUserAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Where(s => s.UserId == userId).ExecuteDeleteAsync());
+            return true;
         }
     }
 }

@@ -42,7 +42,8 @@ namespace Repository
         public List<Report> ReporterList { get; set; }
         public List<Report> ReporteeList { get; set; }
         public List<Post> Posts { get; set; }
-        public List<Notification> Notifications { get; set; }
+        public List<Entities.Note> Notes { get; set; }
+        public List<Subscription> Subscriptions { get; set; }
         public List<Entities.Penalty> Penalties { get; set; }
 
         // Default Values

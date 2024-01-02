@@ -41,6 +41,5 @@ namespace Repository
                 CurrentRadius = 15.0 + produced
             };
         }
-
     }
 }
