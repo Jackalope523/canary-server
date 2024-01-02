@@ -53,13 +53,19 @@ namespace Core.Controls
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-			var userSettings = await Notifications.GetUserSubscriptionAsync(user.Id);
+			DeviceSilhouette userSettings;
 
-			// Check if user is subscribed
-			if  (userSettings == (null, null))
-			{ return; }
-
-			await Terminal.NotificationService.PushNotification(userSettings.DeviceType, userSettings.DeviceToken, title, message);
+            // Check if user is subscribed
+            try
+            {
+				userSettings = await Notifications.GetUserSubscriptionAsync(user.Id);
+            }
+			catch (InvalidOperationException)
+			{
+				return;
+			}
+				
+            await Terminal.NotificationService.PushNotification(userSettings.DeviceType, userSettings.DeviceToken, title, message);
 		}
 
 		#endregion

@@ -18,6 +18,87 @@ namespace Repository.Migrations.TestMigrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
 
+            modelBuilder.Entity("Repository.Entities.Note", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("NotifierId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("RecipientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong?>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notes");
+                });
+
+            modelBuilder.Entity("Repository.Entities.Penalty", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("PenalizedId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PenalizedId");
+
+                    b.ToTable("Penalties");
+                });
+
+            modelBuilder.Entity("Repository.Entities.Subscription", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DeviceToken")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DeviceType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Subscriptions");
+                });
+
             modelBuilder.Entity("Repository.Event", b =>
                 {
                     b.Property<ulong>("Id")
@@ -109,6 +190,8 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SelfId");
+
                     b.ToTable("Links");
 
                     b.HasDiscriminator<string>("link_type").HasValue("Link");
@@ -139,6 +222,10 @@ namespace Repository.Migrations.TestMigrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Posts");
                 });
@@ -285,10 +372,15 @@ namespace Repository.Migrations.TestMigrations
                 {
                     b.HasBaseType("Repository.Link");
 
+                    b.Property<ulong>("EventId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Type")
                         .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("INTEGER")
                         .HasColumnName("Type");
+
+                    b.HasIndex("EventId");
 
                     b.HasDiscriminator().HasValue("event");
                 });
@@ -297,10 +389,15 @@ namespace Repository.Migrations.TestMigrations
                 {
                     b.HasBaseType("Repository.Link");
 
+                    b.Property<ulong>("PostId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Type")
                         .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("INTEGER")
                         .HasColumnName("Type");
+
+                    b.HasIndex("PostId");
 
                     b.HasDiscriminator().HasValue("post");
                 });
@@ -313,6 +410,8 @@ namespace Repository.Migrations.TestMigrations
                         .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("INTEGER")
                         .HasColumnName("Type");
+
+                    b.HasIndex("OtherId");
 
                     b.HasDiscriminator().HasValue("user");
                 });
@@ -343,6 +442,63 @@ namespace Repository.Migrations.TestMigrations
                     b.HasDiscriminator().HasValue("user");
                 });
 
+            modelBuilder.Entity("Repository.Entities.Note", b =>
+                {
+                    b.HasOne("Repository.User", null)
+                        .WithMany("Notes")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Repository.Entities.Penalty", b =>
+                {
+                    b.HasOne("Repository.User", "Penalized")
+                        .WithMany("Penalties")
+                        .HasForeignKey("PenalizedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Penalized");
+                });
+
+            modelBuilder.Entity("Repository.Entities.Subscription", b =>
+                {
+                    b.HasOne("Repository.User", null)
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Repository.Link", b =>
+                {
+                    b.HasOne("Repository.User", "Self")
+                        .WithMany("Links")
+                        .HasForeignKey("SelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Self");
+                });
+
+            modelBuilder.Entity("Repository.Post", b =>
+                {
+                    b.HasOne("Repository.Event", "Event")
+                        .WithMany("Posts")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "Owner")
+                        .WithMany("Posts")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Owner");
+                });
+
             modelBuilder.Entity("Repository.Report", b =>
                 {
                     b.HasOne("Repository.Event", "Event")
@@ -370,16 +526,63 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("Self");
                 });
 
+            modelBuilder.Entity("Repository.EventLink", b =>
+                {
+                    b.HasOne("Repository.Event", "Event")
+                        .WithMany("Links")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Repository.PostLink", b =>
+                {
+                    b.HasOne("Repository.Post", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Repository.UserLink", b =>
+                {
+                    b.HasOne("Repository.User", "Other")
+                        .WithMany()
+                        .HasForeignKey("OtherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Other");
+                });
+
             modelBuilder.Entity("Repository.Event", b =>
                 {
+                    b.Navigation("Links");
+
+                    b.Navigation("Posts");
+
                     b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
                 {
+                    b.Navigation("Links");
+
+                    b.Navigation("Notes");
+
+                    b.Navigation("Penalties");
+
+                    b.Navigation("Posts");
+
                     b.Navigation("ReporteeList");
 
                     b.Navigation("ReporterList");
+
+                    b.Navigation("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

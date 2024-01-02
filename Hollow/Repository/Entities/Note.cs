@@ -6,9 +6,9 @@ namespace Repository.Entities
         public ulong Id { get; set; }
        
         public ulong NotifierId { get; set; }
-        public User Notifier { get; set; }
+        internal User Notifier { get; set; }
         public ulong RecipientId { get; set; }
-        public User Recipient { get; set; }
+        internal User Recipient { get; set; }
         public DateTimeOffset Time { get; set; }
         public string Message { get; set; }
         public string Action { get; set; }

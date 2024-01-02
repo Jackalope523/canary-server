@@ -7,7 +7,7 @@ namespace Repository.Entities
         public ulong Id { get; set; }
 
         public ulong UserId { get; set; }
-        public User User { get; set; }
+        internal User User { get; set; }
         public DeviceType DeviceType { get; set; }
         public string DeviceToken { get; set; }
     }
