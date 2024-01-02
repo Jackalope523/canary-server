@@ -104,6 +104,11 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
     });
   }, [isFocused]);
 
+  // On press
+  const clearButtonPress = () => {
+    setText('');
+  };
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Validation                                   ||
   // ! ||--------------------------------------------------------------------------------||
@@ -133,7 +138,9 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
       case InputType.Email:
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!emailRegex.test(text)) {
+        if (text.length === 0) {
+          setError('Email field cannot be empty.');
+        } else if (!emailRegex.test(text)) {
           setError('Please enter a valid email address.');
         } else {
           return Object.keys(errors).length === 0;
@@ -216,7 +223,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           testID="input"
         />
         {isFocused && (
-          <Pressable onPress={() => setText('')}>
+          <Pressable onPress={clearButtonPress}>
             <Animated.View style={animatedIconStyle}>
               <Icon
                 name="close-outline"
