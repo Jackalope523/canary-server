@@ -196,8 +196,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     // TODO Might have to use justifyContent: 'flex-end' instead for KeyboardAvoidingContainer to work
-    justifyContent: 'center',
-    paddingBottom: 48,
+    // justifyContent: 'center',
+    justifyContent: 'flex-end',
+    // paddingBottom: 48,
+
+    flex: 1,
   },
 
   image: {
@@ -211,6 +214,7 @@ const styles = StyleSheet.create({
   checkboxSection: {
     paddingVertical: Spacing.lg,
     rowGap: Spacing.sm,
+    alignSelf: 'stretch',
   },
 
   checkboxInnerSection: {

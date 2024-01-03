@@ -16,9 +16,10 @@ export const KeyboardAwareContainer: React.FC<KeyboardAwareContainerProps> = ({
 }) => {
   return (
     <KeyboardAwareScrollView
+      resetScrollToCoords={{ x: 0, y: 0 }}
       scrollEnabled={true}
       // keyboardShouldPersistTaps="handled"
-      contentContainerStyle={[styles.container, globalStyles.baseContainer]}
+      // contentContainerStyle={[styles.container, globalStyles.baseContainer]}
       overScrollMode="never"
       showsVerticalScrollIndicator={false}>
       {children}
@@ -34,6 +35,6 @@ const styles = StyleSheet.create({
 
     // TODO Might have to use justifyContent: 'flex-end' instead for KeyboardAvoidingContainer to work
     // justifyContent: 'center',
-    paddingBottom: 48,
+    // paddingBottom: 48,
   },
 });

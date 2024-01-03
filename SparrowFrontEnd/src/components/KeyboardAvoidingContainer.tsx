@@ -26,7 +26,7 @@ export const KeyboardAvoidingContainer: React.FC<
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.keyboardAvoidingContainer}
         // keyboardVerticalOffset={50}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -47,5 +47,10 @@ export default KeyboardAvoidingContainer;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+
+  keyboardAvoidingContainer: {
+    flex: 1,
+    backgroundColor: Colors.fuchsia200,
   },
 });

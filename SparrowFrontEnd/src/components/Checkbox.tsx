@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
     borderWidth: 2,
     borderRadius: 8,
+    alignSelf: 'stretch',
   },
 
   containerSelected: {
