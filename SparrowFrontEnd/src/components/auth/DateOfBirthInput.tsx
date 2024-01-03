@@ -26,6 +26,7 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({}) => {
         value={Day}
         onChangeText={setDay}
         inputMode="numeric"
+        maxLength={2}
       />
       <TextInputSmall
         type={InputType.Year}
@@ -33,6 +34,7 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({}) => {
         value={Year}
         onChangeText={setYear}
         inputMode="numeric"
+        maxLength={4}
       />
     </View>
   );
@@ -44,6 +46,6 @@ const styles = StyleSheet.create({
   container: {
     maxWidth: '100%',
     flexDirection: 'row',
-    rowGap: Spacing.md,
+    columnGap: Spacing.md,
   },
 });

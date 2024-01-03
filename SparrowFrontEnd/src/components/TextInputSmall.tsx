@@ -118,6 +118,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   const validateInput = () => {
     let errors = '';
 
+    // TODO maxLength property doesn't work
     switch (type) {
       // First name
       // TODO update first name regex if necessary
@@ -162,18 +163,25 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 
       // Year
       case InputType.Year:
-        const yearRegex = /^\d{1,4}$/;
+        const yearRegex = /^\d{4}$/;
+        const currentYear = new Date().getFullYear();
+        const maxAge = 150;
+        const minAge = 18;
+        const minYear = currentYear - maxAge;
+        const maxYear = currentYear - minAge;
+        maxLength = 4;
 
+        // TODO make minYear and maxYear work
         if (!yearRegex.test(text)) {
           setError('Invalid.');
         } else {
           return Object.keys(errors).length === 0;
         }
-
         break;
 
       // Default
       default:
+        maxLength = undefined;
         return Object.keys(errors).length === 0;
     }
   };

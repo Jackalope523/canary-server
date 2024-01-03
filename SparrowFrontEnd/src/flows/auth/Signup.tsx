@@ -119,6 +119,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
             value={Name}
             onChangeText={setName}
             inputMode="text"
+            maxLength={256}
             required
             description="Your name will be public and visible to all users."
           />
@@ -129,6 +130,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
             onChangeText={setEmail}
             autoComplete="email"
             inputMode="email"
+            maxLength={256}
             recommended
             description="We recommend binding an email address to your account in case you change your phone number."
           />
