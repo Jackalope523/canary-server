@@ -29,6 +29,7 @@ import Checkbox from '../../components/Checkbox';
 import Hyperlink from '../../components/Hyperlink';
 import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
 import KeyboardAwareContainer from '../../components/testing/KeyboardAwareContainer';
+import DateOfBirthInput from '../../components/auth/DateOfBirthInput';
 
 // TODO insert hyperlinks for terms of service and privacy policy
 // TODO setup checkbox onPress events
@@ -141,6 +142,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           required
           description="You must be 18 years or older to use Sparrow. Your date of birth will not be visible to other users."
         /> */}
+          <DateOfBirthInput />
         </View>
         <View style={styles.checkboxSection}>
           <View style={styles.checkboxInnerSection}>
@@ -193,7 +195,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
 // ! ||--------------------------------------------------------------------------------||
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    // alignItems: 'center',
 
     // TODO Might have to use justifyContent: 'flex-end' instead for KeyboardAvoidingContainer to work
     // justifyContent: 'center',
@@ -205,6 +207,7 @@ const styles = StyleSheet.create({
 
   image: {
     marginBottom: Spacing.xl,
+    alignSelf: 'center',
   },
 
   inputSection: {

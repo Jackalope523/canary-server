@@ -147,6 +147,31 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         }
         break;
 
+      // Used for an external date of birth component
+      // Day
+      // TODO use a more accurate regex range according to selected month, probably already got something on the backend
+      case InputType.Day:
+        const dayRegex = /^[1-31]{1,2}$/;
+
+        if (!dayRegex.test(text)) {
+          setError('Invalid.');
+        } else {
+          return Object.keys(errors).length === 0;
+        }
+        break;
+
+      // Year
+      case InputType.Year:
+        const yearRegex = /^\d{1,4}$/;
+
+        if (!yearRegex.test(text)) {
+          setError('Invalid.');
+        } else {
+          return Object.keys(errors).length === 0;
+        }
+
+        break;
+
       // Default
       default:
         return Object.keys(errors).length === 0;
@@ -279,7 +304,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 const styles = StyleSheet.create({
   container: {
     rowGap: Spacing.xs,
-    width: '100%',
+    // width: '100%',
+    flex: 1,
   },
 
   labelContainer: {
@@ -347,6 +373,8 @@ const styles = StyleSheet.create({
 export enum InputType {
   FirstName,
   Email,
+  Day,
+  Year,
 }
 
 export default TextInputSmall;
