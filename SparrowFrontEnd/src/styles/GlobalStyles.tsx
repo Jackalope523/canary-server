@@ -252,6 +252,11 @@ export const globalStyles = StyleSheet.create({
     color: Colors.sand300,
   },
 
+  // Placeholder
+  textPlaceholder: {
+    color: Colors.sand400,
+  },
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                  Illustrations                                 ||
   // ! ||--------------------------------------------------------------------------------||
