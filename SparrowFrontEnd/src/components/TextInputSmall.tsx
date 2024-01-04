@@ -249,7 +249,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           onChangeText={setText}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          style={styles.input}
+          style={[styles.input, globalStyles.bodyTextOne]}
           placeholder={placeholder}
           placeholderTextColor={Colors.sand400}
           autoComplete={autoComplete}
