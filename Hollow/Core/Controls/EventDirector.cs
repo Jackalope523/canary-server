@@ -186,8 +186,7 @@ namespace Core.Controls
 			}
 
 			// Push update
-			Try(await Events.UpdateEventAsync(targetEvent.Id, edits),
-				new UnexpectedFailureException("Failed to edit event."));
+			await Events.UpdateEventAsync(targetEvent.Id, edits);
 
 			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
 		}
@@ -207,8 +206,7 @@ namespace Core.Controls
 				new InvalidEventException("Event cannot be started."));
 
 			// Try to start event
-			Try(await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.active_open) }),
-				new UnexpectedFailureException("Could not start event."));
+			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.active_open) });
 
 			await targetEvent.Started();
 		}
@@ -223,8 +221,7 @@ namespace Core.Controls
 				new InvalidUserException("User does not have permissions to end event."));
 
 			// Try to end to event
-			Try(await Events.EndEventAsync(eventId),
-				new UnexpectedFailureException("Could not end event."));
+			await Events.EndEventAsync(eventId);
 
 			var participants = await targetEvent.Ended();
 
@@ -247,8 +244,7 @@ namespace Core.Controls
 			if (!userIntention.HasValue)
 			{
 				// Try to add user to the event
-				Try(await Events.SetUserStateAsync(userId, eventId, EventUserState.Watching),
-					new UnexpectedFailureException("Could not watch event."));
+				await Events.SetUserStateAsync(userId, eventId, EventUserState.Watching);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not watch event, user currently {userIntention.Value} event."); }
@@ -263,8 +259,7 @@ namespace Core.Controls
 				userIntention.Value.Equals(EventUserState.Watching))
 			{
 				// Try to remove user from event
-				Try(await Events.RemoveUserAsync(userId, eventId),
-					new UnexpectedFailureException("Could not unwatch event."));
+				await Events.RemoveUserAsync(userId, eventId);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not unwatch event, user currently {userIntention.Value} event."); }
@@ -290,23 +285,18 @@ namespace Core.Controls
 				if (conflict != null)
 				{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 			}
-
-			bool success;
-
 			// Check if event is active and user is already there
 			if (HasAlready(targetEvent.StartTime) &&
 				await targetEvent.IsInRange(user))
 			{
 				// Try to add user to the event
-				success = await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Guest);
+				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Guest);
 			}
 			else
 			{
 				// Try to add user to the event
-				success = await Events.SetUserStateAsync(userId, eventId, EventUserState.Incoming);
-			}
-
-			Try(success, new UnexpectedFailureException("Could not join event."));
+				await Events.SetUserStateAsync(userId, eventId, EventUserState.Incoming);
+			}			
 
 			// Notify host if event has already started
 			if (HasAlready(targetEvent.StartTime))
@@ -329,14 +319,12 @@ namespace Core.Controls
 			if (userIntention.Equals(EventUserState.Guest))
 			{
 				// Try to remove user from event
-				Try(await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Left),
-					new UnexpectedFailureException("Could not leave event."));
+				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Left);
 			}
 			else if (userIntention.Equals(EventUserState.Incoming))
 			{
 				// Try to remove user from event
-				Try(await Events.RemoveUserAsync(user.Id, targetEvent.Id),
-					new UnexpectedFailureException("Could not unattend event."));
+				await Events.RemoveUserAsync(user.Id, targetEvent.Id);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not leave event, user currently {userIntention.Value} event."); }

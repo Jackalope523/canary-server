@@ -35,12 +35,12 @@ namespace Core.Boundaries
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character,
 			double Radius, bool isDynamic);
-		Task<bool> UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
-		Task<bool> EndEventAsync(ulong eventId);
+		Task UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
+		Task EndEventAsync(ulong eventId);
 
 		Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId);
-		Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState);
-		Task<bool> RemoveUserAsync(ulong userId, ulong eventId);
+		Task SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState);
+		Task RemoveUserAsync(ulong userId, ulong eventId);
 
 		Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId);
 		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong eventId);

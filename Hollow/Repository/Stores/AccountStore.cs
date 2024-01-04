@@ -13,7 +13,7 @@ namespace Repository
         {
         }
 
-        public async Task<bool> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
+        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
         {
             User toCreate = new()
             {
@@ -34,13 +34,11 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
-            return true;
         }
 
-        public async Task<bool> DeleteUserAsync(ulong id)
+        public async Task DeleteUserAsync(ulong id)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Remove(new User { Id = id }));
-            return true;
         }
 
         public async Task<UserShard> FindUserByIdAsync(ulong id) 
@@ -167,29 +165,31 @@ namespace Repository
             return user with { NumberOfFollowers = numFollowers };
         }
 
-        public async Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(ulong id)
+        public async Task<Haunt> GetUserHauntAsync(ulong id)
         {
             try
             {
-                var result = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new { u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight }).SingleAsync());
-                return (result.Y, result.X, result.HauntRadius, result.HauntWheight);
+                return await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Users.
+                Where(u => u.Id == id).
+                Select(u => new Haunt(u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight)).
+                SingleAsync());
             }
             catch (InvalidOperationException ex)
             {
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
         }
-        public async Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(ulong id)
+        public async Task<RecentLocation> GetRecentUserLocationAsync(ulong id)
         {       
             try
             {
-                var result = await storeSentry.ExecuteReadAsync(ctx =>
+                return await storeSentry.ExecuteReadAsync(ctx =>
                             ctx.Users.
                             Where(u => u.Id == id).
-                            Select(u => new { u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius }).
+                            Select(u => new RecentLocation(u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius)).
                             SingleAsync());
 
-                return (result.Y, result.X, result.CurrentRadius);
             }
             catch (InvalidOperationException ex)
             {
@@ -197,9 +197,9 @@ namespace Repository
             }                 
         }    
 
-        public async Task<bool> UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)
+        public async Task UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)
         {                   
-            User u = new User { Id = id };
+            User u = new() { Id = id };
 
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
 
@@ -246,23 +246,20 @@ namespace Repository
                 storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(Property).IsModified = true);
             }
             await storeSentry.ExecuteWriteAsync();
-            return true;
         }
 
-        public async Task<bool> UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
+        public async Task UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
         {
-            User u = new User { Id = id, Haunt = new Point(longitude, latitude) , HauntRadius = radius, HauntWheight = stability };
+            User u = new() { Id = id, Haunt = new Point(longitude, latitude) , HauntRadius = radius, HauntWheight = stability };
 
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true);
             await storeSentry.ExecuteWriteAsync();
-
-            return true;
         }
 
-        public async Task<bool> UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
+        public async Task UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
         {
             User u = new() { Id = id, CurrentLocation = new Point(longitude, latitude), CurrentRadius = radius };
 
@@ -270,8 +267,6 @@ namespace Repository
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true);
             await storeSentry.ExecuteWriteAsync();
-
-            return true;
         }
     }
 }

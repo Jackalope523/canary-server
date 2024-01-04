@@ -1,7 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Utilities;
 using Shared;
 
 namespace Repository
@@ -242,16 +241,14 @@ namespace Repository
                 ).
             ToListAsync());
         }    
-        public async Task<bool> RemoveUserAsync(ulong userId, ulong eventId) 
+        public async Task RemoveUserAsync(ulong userId, ulong eventId) 
         { 
             await storeSentry.ExecuteWriteAsync(ctx => 
             ctx.EventLinks.
             Where(l => l.SelfId == userId && l.OtherId == eventId).
             ExecuteDeleteAsync());
-
-            return true;
         }
-        public async Task<bool> UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
+        public async Task UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
         {
             Event e = new() { Id = id };
             storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
@@ -272,7 +269,6 @@ namespace Repository
                 storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(Property).IsModified = true);
             }
             await storeSentry.ExecuteWriteAsync();
-            return true;
         }   
         public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong id)
         {
@@ -303,13 +299,13 @@ namespace Repository
             {
                 entry.Value.Sort((x,y) => DateTimeOffset.Compare(x.Item2, y.Item2));
 
-                (string Name, DateTimeOffset Time, EventUserState State) first = entry.Value.First();
-                (string Name, DateTimeOffset Time, EventUserState State) last = entry.Value.Last();
+                (string firstName, DateTimeOffset firstTime, _) = entry.Value.First();
+                (_, DateTimeOffset lastTime, EventUserState lastState) = entry.Value.Last();
 
                 userId = entry.Key;
-                userName = first.Name;
-                arrivalTime = first.Time;
-                if (last.State == EventUserState.Left) departureTime = last.Time;
+                userName = firstName;
+                arrivalTime = firstTime;
+                if (lastState == EventUserState.Left) departureTime = lastTime;
                 else departureTime = null;
                 
                 toReturn.Add((arrivalTime, departureTime, new UserSilhouette(userId, userName)));
@@ -362,7 +358,7 @@ namespace Repository
 
             return states.Last().Type;
         }
-        public async Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState)
+        public async Task SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.EventLinks.
@@ -371,7 +367,7 @@ namespace Repository
 
             if (userState == EventUserState.Arrived)
             {              
-                User u = new User { Id = userId, CurrentEvent = eventId };
+                User u = new() { Id = userId, CurrentEvent = eventId };
                 storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
                 storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
                 await storeSentry.ExecuteWriteAsync();
@@ -379,13 +375,11 @@ namespace Repository
             }
             else if (userState == EventUserState.Left || userState == EventUserState.Kicked)
             {
-                User u = new User { Id = userId, CurrentEvent = null };
+                User u = new() { Id = userId, CurrentEvent = null };
                 storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
                 storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
                 await storeSentry.ExecuteWriteAsync();
-            }
-            
-            return true;           
+            }                       
         }
         public async Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId)
         {
@@ -423,7 +417,7 @@ namespace Repository
             }
             return toReturn;
         }
-        public async Task<bool> EndEventAsync(ulong id)
+        public async Task EndEventAsync(ulong id)
         {
             List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Users.
@@ -431,19 +425,17 @@ namespace Repository
             Select(u => u.Id).
             ToListAsync());
 
-            List<Task<bool>> tasks = new();
+            List<Task> tasks = new();
             foreach (ulong guest in guests)
             {
                 tasks.Add(SetUserStateAsync(guest, id, EventUserState.Left));
             }
             await Task.WhenAll(tasks);
 
-            Event e = new Event { Id = id, EndTime = DateTimeOffset.UtcNow };
+            Event e = new() { Id = id, EndTime = DateTimeOffset.UtcNow };
             storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
             storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true);
-            await storeSentry.ExecuteWriteAsync();
-          
-            return true;
+            await storeSentry.ExecuteWriteAsync();         
         }
     }
 }

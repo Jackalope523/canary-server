@@ -21,12 +21,12 @@ namespace Core.Boundaries
     public interface INotificationDatabase
 	{
 		Task<List<Note>> GetNotesAsync(ulong userId);
-		Task<bool> SaveNoteAsync(ulong notifierId, ulong recipientId, DateTimeOffset time,
+		Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time,
 			string message, string action);
 
 		Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId);
-		Task<bool> SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
-		Task<bool> UnsubscribeUserAsync(ulong userId);
+		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
+		Task UnsubscribeUserAsync(ulong userId);
 	}
 
 	public interface INotificationOperations

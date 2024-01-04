@@ -109,24 +109,23 @@ namespace Repository
             return etchings;
         }
 
-        public async Task<bool> RateEtchingAsync(ulong postId, ulong voterId, UserRating rating)
+        public async Task RateEtchingAsync(ulong postId, ulong voterId, UserRating rating)
         {
             PostLink.PostLinkType type;
             if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
             else type = PostLink.PostLinkType.RateDown;
 
-            return await AddLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId, Type = type });
+            await AddLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId, Type = type });
         }
 
-        public async Task<bool> RemoveEtchingAsync(ulong postId)
+        public async Task RemoveEtchingAsync(ulong postId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Remove(new Post { Id = postId }));
-            return true;
         }
 
-        public async Task<bool> RemoveEtchingRatingAsync(ulong postId, ulong voterId)
+        public async Task RemoveEtchingRatingAsync(ulong postId, ulong voterId)
         {
-            return await RemoveLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId });
+            await RemoveLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId });
         }
 
         public async Task<List<Etching>> GetEtchingsForEventAsync(ulong id)
@@ -154,14 +153,12 @@ namespace Repository
 
             return etchings;
         }
-        public async Task<bool> HideEtchingAsync(ulong etchingId)
+        public async Task HideEtchingAsync(ulong etchingId)
         {
             Post p = new() { Id = etchingId, IsHidden = true };
             storeSentry.DiscussWrite(ctx => ctx.Posts.Attach(p));
             storeSentry.DiscussWrite(ctx => ctx.Entry(p).Property(nameof(p.IsHidden)).IsModified = true);           
             await storeSentry.ExecuteWriteAsync();
-
-            return true;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Repository
            SingleAsync());
 
         }
-        public async Task<bool> SaveNoteAsync(ulong notifierId, ulong recipientId, DateTimeOffset time, string message, string action)
+        public async Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, string message, string action)
         {
             Entities.Note toAdd = new() 
             {  
@@ -43,10 +43,8 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Notes.Add(toAdd));
-
-            return true;
         }
-        public async Task<bool> SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
+        public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
         {
             Subscription toAdd = new()
             {
@@ -56,13 +54,10 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Add(toAdd));
-
-            return true;
         }
-        public async Task<bool> UnsubscribeUserAsync(ulong userId)
+        public async Task UnsubscribeUserAsync(ulong userId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Where(s => s.UserId == userId).ExecuteDeleteAsync());
-            return true;
         }
     }
 }
