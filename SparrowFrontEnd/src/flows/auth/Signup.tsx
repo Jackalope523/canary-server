@@ -31,8 +31,7 @@ import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContaine
 import KeyboardAwareContainer from '../../components/testing/KeyboardAwareContainer';
 import DateOfBirthInput from '../../components/auth/DateOfBirthInput';
 
-// TODO insert hyperlinks for terms of service and privacy policy
-// TODO setup checkbox onPress events
+// TODO when all fields marked with a asterisk are filled out correctly, button should be enabled
 
 type SignupProps = StackScreenProps<AuthStackParamList, 'Signup'>;
 
@@ -42,45 +41,47 @@ const SignupScreen = ({ navigation }: SignupProps) => {
   const [Name, setName] = React.useState('');
   const [DateOfBirth, setDateOfBirth] = React.useState(new Date());
 
-  const [isButtonEnabled, setButtonEnabled] = React.useState(true);
+  /* 
+  
+  START NEW CODE
 
-  // TODO when all fields marked with a asterisk are filled out correctly, button should be enabled
-  // TODO add proper validation for all fields
-  const [isFormValid, setIsFormValid] = React.useState(false);
+  */
 
-  const [agreesToTerms, setAgreesToTerms] = React.useState(false);
-  const [agreesToPrivacy, setAgreesToPrivacy] = React.useState(false);
+  const [isButtonEnabled, setButtonEnabled] = React.useState(false);
 
   // const validateForm = () => {
-  //   const isNameValid = Name.length > 0;
-  //   const areCheckboxesChecked = agreesToTerms && agreesToPrivacy;
-
-  //   setIsFormValid(isNameValid && areCheckboxesChecked);
+  //   if (isValid && isChecked === true) {
+  //     setButtonEnabled(true);
+  //   } else {
+  //     setButtonEnabled(false);
+  //   }
   // };
 
-  // React.useEffect(() => {
-  //   validateForm();
-  // }, [Name, agreesToTerms, agreesToPrivacy]);
+  /*
+  
+  END NEW CODE
+  
+  */
 
-  function handleSignup() {
-    const validateForm = () => {
-      const isNameValid = Name.length > 0;
-      const areCheckboxesChecked = agreesToTerms && agreesToPrivacy;
+  // const [isFormValid, setIsFormValid] = React.useState(false);
 
-      setIsFormValid(isNameValid && areCheckboxesChecked);
-    };
+  // const [agreesToTerms, setAgreesToTerms] = React.useState(false);
+  // const [agreesToPrivacy, setAgreesToPrivacy] = React.useState(false);
 
-    React.useEffect(() => {
-      validateForm();
-    }, [Name, agreesToTerms, agreesToPrivacy]);
-
-    signup({ PhoneNumber, Email, Name, DateOfBirth })
-      .then(navigate)
-      .finally(() => setButtonEnabled(true));
-  }
+  // CHRISTOPHE'S CODE + MY OLD CODE
 
   // function handleSignup() {
-  //   setButtonEnabled(false);
+  //   const validateForm = () => {
+  //     if (isValid && isChecked === true) {
+  //       setButtonEnabled(true);
+  //     } else {
+  //       setButtonEnabled(false);
+  //     }
+  //   };
+
+  //   React.useEffect(() => {
+  //     validateForm();
+  //   }, [Name, agreesToTerms, agreesToPrivacy]);
 
   //   signup({ PhoneNumber, Email, Name, DateOfBirth })
   //     .then(navigate)
@@ -150,11 +151,11 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           <View style={styles.checkboxInnerSection}>
             <Checkbox
               text="I agree to Sparrow's Terms of Service"
-              onPress={() => setAgreesToTerms(!agreesToTerms)}
+              onPress={() => {}}
             />
             <Checkbox
               text="I agree to Sparrow's Privacy Policy"
-              onPress={() => setAgreesToPrivacy(!agreesToPrivacy)}
+              onPress={() => {}}
             />
           </View>
           <Text style={globalStyles.textDark}>
@@ -185,7 +186,8 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           display={ButtonDisplay.Full}
           text={'Continue'}
           onPress={navigate}
-          disabled={!isFormValid}
+          // disabled
+          disabled={!isButtonEnabled}
         />
       </ScrollView>
     </KeyboardAvoidingContainer>

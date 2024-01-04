@@ -112,13 +112,14 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Validation                                   ||
   // ! ||--------------------------------------------------------------------------------||
-
+  const [isValid, setIsValid] = React.useState(false);
   const [error, setError] = React.useState('');
+
+  // TODO remove error message when the user inputs the right value after failure
 
   const validateInput = () => {
     let errors = '';
 
-    // TODO maxLength property doesn't work
     switch (type) {
       // First name
       // TODO update first name regex if necessary
@@ -130,7 +131,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         } else if (!firstNameRegex.test(text)) {
           setError('First name can only contain letters.');
         } else {
-          return Object.keys(errors).length === 0;
+          Object.keys(errors).length === 0;
+          setIsValid(true);
         }
         break;
 
@@ -144,7 +146,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         } else if (!emailRegex.test(text)) {
           setError('Please enter a valid email address.');
         } else {
-          return Object.keys(errors).length === 0;
+          Object.keys(errors).length === 0;
+          setIsValid(true);
         }
         break;
 
@@ -157,7 +160,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         if (!dayRegex.test(text)) {
           setError('Invalid.');
         } else {
-          return Object.keys(errors).length === 0;
+          Object.keys(errors).length === 0;
+          setIsValid(true);
         }
         break;
 
@@ -175,14 +179,16 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         if (!yearRegex.test(text)) {
           setError('Invalid.');
         } else {
-          return Object.keys(errors).length === 0;
+          Object.keys(errors).length === 0;
+          setIsValid(true);
         }
         break;
 
       // Default
       default:
         maxLength = undefined;
-        return Object.keys(errors).length === 0;
+        Object.keys(errors).length === 0;
+        setIsValid(true);
     }
   };
 
