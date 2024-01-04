@@ -51,6 +51,6 @@ const styles = StyleSheet.create({
 
   keyboardAvoidingContainer: {
     flex: 1,
-    backgroundColor: Colors.fuchsia200,
+    // backgroundColor: Colors.fuchsia200,
   },
 });
