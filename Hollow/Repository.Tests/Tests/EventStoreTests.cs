@@ -127,7 +127,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateEventAsync_Status()
         {
-            EventState newState = EventState.active_open;
+            EventState newState = EventState.Open;
 
             List<(string, object)> updates = new List<(string, object)>();
             updates.Add(("State", newState));

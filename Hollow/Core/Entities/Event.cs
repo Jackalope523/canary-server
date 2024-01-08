@@ -49,14 +49,14 @@ namespace Core.Entities
         public int GroupMaximum { get; set; }
 
         public bool IsWaiting
-            => State.Equals(EventState.upcoming) &&
+            => State.Equals(EventState.Upcoming) &&
                 HasAlready(StartTime);
         public bool IsOpen
-            => State.Equals(EventState.upcoming) ||
-                State.Equals(EventState.active_open);
+            => State.Equals(EventState.Upcoming) ||
+                State.Equals(EventState.Open);
         public bool IsOngoing
-            => State.Equals(EventState.active_open) ||
-                State.Equals(EventState.active_closed);
+            => State.Equals(EventState.Open) ||
+                State.Equals(EventState.Sealed);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumEtchingLateness);

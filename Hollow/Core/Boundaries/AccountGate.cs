@@ -7,7 +7,7 @@ namespace Core.Boundaries
 	#region Schemas
 
 	public enum UserAccountStatus
-	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }
+	{ Active, Impotent, Limited, Suspended, Blacklisted }
 
 	public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,

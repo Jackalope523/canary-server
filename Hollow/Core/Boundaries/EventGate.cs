@@ -10,7 +10,7 @@ namespace Core.Boundaries
 	#region Schemas
 
 	public enum EventState
-	{ upcoming, active_open, active_closed, ended }
+	{ Upcoming, Open, Sealed, Ended }
 
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,

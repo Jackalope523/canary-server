@@ -24,7 +24,7 @@ namespace Repository
                 SecurityStamp = "stamp" + produced,
                 LockoutDate = DateTimeOffset.Now.AddDays(-365),
                 AccessTries = 3 + produced,
-                AccountStatus = UserAccountStatus.active,              
+                AccountStatus = UserAccountStatus.Active,              
 
                 Extroversion = 5 + produced,
                 Athleticisme = 7 + produced,

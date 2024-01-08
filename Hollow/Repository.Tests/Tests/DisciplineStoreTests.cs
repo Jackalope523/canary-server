@@ -69,7 +69,7 @@ namespace Repository.Tests.Tests
         public async Task ReportUserAsync_SUCCESS()
         {
             string notes = "Test";
-            Shared.UserReportType type = Shared.UserReportType.rude;
+            Shared.UserReportType type = Shared.UserReportType.Rude;
 
             await store.ReportUserAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
 
@@ -86,7 +86,7 @@ namespace Repository.Tests.Tests
         public async Task ReportEventAsync_SUCCESS()
         {
             string notes = "Test";
-            Shared.EventReportType type = Shared.EventReportType.inappropriate;
+            Shared.EventReportType type = Shared.EventReportType.Inappropriate;
 
             await store.ReportEventAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
 

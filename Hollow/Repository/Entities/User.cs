@@ -60,7 +60,7 @@ namespace Repository
         public static string DefaultSecurityStamp { get; set; } = "ijhbzdfsoiuh9ui239";
         public static DateTimeOffset? DefaultLockoutDate { get; set; } = DateTimeOffset.MaxValue;
         public static int DefaultAccessTries { get; set; } = 3;
-        public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.active;
+        public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
         public static ulong? DefaultCurrentEvent { get; set; } = null;
 
         // Vector

@@ -18,7 +18,7 @@ namespace Repository
                 StartTime = DateTimeOffset.UtcNow.AddHours(produced),
                 GroupMinimum = 0 + produced,
                 GroupMaximum = 10 + produced,
-                State = EventState.active_open,
+                State = EventState.Open,
                 Location = new Point(34.0522, -118.2437),
                 Radius = 10.0,
                 IsDynamic = false,

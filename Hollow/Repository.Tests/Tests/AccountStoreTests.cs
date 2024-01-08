@@ -593,7 +593,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateUserAsync_AccountStatus()
         {
-            UserAccountStatus newAccountStatus = UserAccountStatus.blacklisted;
+            UserAccountStatus newAccountStatus = UserAccountStatus.Blacklisted;
 
             List<(string, object)> updates = new List<(string, object)>();
             updates.Add(("AccountStatus", newAccountStatus));

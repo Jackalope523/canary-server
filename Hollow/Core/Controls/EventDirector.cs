@@ -135,7 +135,7 @@ namespace Core.Controls
 			Event editedEvent = new(targetEvent.ToEventShard())
 			{
 				Description = eventDescription,
-				State = IsNull(isOpen) ? targetEvent.State : (isOpen.Value ? EventState.active_open : EventState.active_closed),
+				State = IsNull(isOpen) ? targetEvent.State : (isOpen.Value ? EventState.Open : EventState.Sealed),
 				StartTime = startTime ?? targetEvent.StartTime,
 				Location = AreNull(latitude, longitude) ? targetEvent.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
 				Radius = IsNull(radius) ? targetEvent.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
@@ -206,7 +206,7 @@ namespace Core.Controls
 				new InvalidEventException("Event cannot be started."));
 
 			// Try to start event
-			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.active_open) });
+			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.Open) });
 
 			await targetEvent.Started();
 		}
