@@ -119,7 +119,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.SelfId == id && l.Type == EventUserState.Guest).
+            Where(l => l.SelfId == id && l.Type == EventBond.Guest).
             Join(
                 ctx.Events,
                 l => l.OtherId,
@@ -154,7 +154,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.EventLinks.
-           Where(l => l.SelfId == id && l.Type == EventUserState.Left).
+           Where(l => l.SelfId == id && l.Type == EventBond.Left).
            Join(
                ctx.Events,
                l => l.OtherId,
@@ -232,7 +232,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && l.Type == EventUserState.Guest).
+            Where(l => l.OtherId == id && l.Type == EventBond.Guest).
             Join(
                 ctx.Users,
                 l => l.SelfId,
@@ -274,7 +274,7 @@ namespace Repository
         {
             var times = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && (l.Type == EventUserState.Arrived || l.Type == EventUserState.Left)).
+            Where(l => l.OtherId == id && (l.Type == EventBond.Arrived || l.Type == EventBond.Left)).
             Join(
                 ctx.Users,
                 l => l.SelfId,
@@ -283,7 +283,7 @@ namespace Repository
                 ).
             ToListAsync());
 
-            Dictionary<ulong,List<(string, DateTimeOffset, EventUserState)>> history = new();
+            Dictionary<ulong,List<(string, DateTimeOffset, EventBond)>> history = new();
             foreach (var item in times)
             {
                 if (!history.ContainsKey(item.Id)) history.Add(item.Id, new());
@@ -300,12 +300,12 @@ namespace Repository
                 entry.Value.Sort((x,y) => DateTimeOffset.Compare(x.Item2, y.Item2));
 
                 (string firstName, DateTimeOffset firstTime, _) = entry.Value.First();
-                (_, DateTimeOffset lastTime, EventUserState lastState) = entry.Value.Last();
+                (_, DateTimeOffset lastTime, EventBond lastState) = entry.Value.Last();
 
                 userId = entry.Key;
                 userName = firstName;
                 arrivalTime = firstTime;
-                if (lastState == EventUserState.Left) departureTime = lastTime;
+                if (lastState == EventBond.Left) departureTime = lastTime;
                 else departureTime = null;
                 
                 toReturn.Add((arrivalTime, departureTime, new UserSilhouette(userId, userName)));
@@ -346,7 +346,7 @@ namespace Repository
                e.IsDynamic)).
            ToListAsync());
         }      
-        public async Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId)
+        public async Task<EventBond?> GetUserStateAsync(ulong userId, ulong eventId)
         {
             var states = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
@@ -358,14 +358,14 @@ namespace Repository
 
             return states.Last().Type;
         }
-        public async Task SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState)
+        public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.EventLinks.
                 Add(new EventLink { SelfId = userId, OtherId = eventId, Type = userState }
                 ));
 
-            if (userState == EventUserState.Arrived)
+            if (userState == EventBond.Arrived)
             {              
                 User u = new() { Id = userId, CurrentEvent = eventId };
                 storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
@@ -373,7 +373,7 @@ namespace Repository
                 await storeSentry.ExecuteWriteAsync();
 
             }
-            else if (userState == EventUserState.Left || userState == EventUserState.Kicked)
+            else if (userState == EventBond.Left || userState == EventBond.Kicked)
             {
                 User u = new() { Id = userId, CurrentEvent = null };
                 storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
@@ -381,7 +381,7 @@ namespace Repository
                 await storeSentry.ExecuteWriteAsync();
             }                       
         }
-        public async Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId)
+        public async Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId)
         {
             var users = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
@@ -394,17 +394,17 @@ namespace Repository
                 ).
             ToListAsync());
 
-            Dictionary<ulong, List<(string, DateTimeOffset, EventUserState)>> history = new();
+            Dictionary<ulong, List<(string, DateTimeOffset, EventBond)>> history = new();
             foreach (var item in users)
             {
                 if (!history.ContainsKey(item.Id)) history.Add(item.Id, new());
                 history[item.Id].Add((item.Name, item.Time, item.Type));
             }
 
-            List<(UserSilhouette User, EventUserState State)> toReturn = new();
+            List<(UserSilhouette User, EventBond State)> toReturn = new();
             ulong userId;
             string userName;
-            EventUserState userState;
+            EventBond userState;
             foreach (var entry in history)
             {
                 entry.Value.Sort((x, y) => DateTimeOffset.Compare(x.Item2, y.Item2));
@@ -428,7 +428,7 @@ namespace Repository
             List<Task> tasks = new();
             foreach (ulong guest in guests)
             {
-                tasks.Add(SetUserStateAsync(guest, id, EventUserState.Left));
+                tasks.Add(SetUserStateAsync(guest, id, EventBond.Left));
             }
             await Task.WhenAll(tasks);
 

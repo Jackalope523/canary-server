@@ -38,11 +38,11 @@ namespace Core.Boundaries
 		Task UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
 		Task EndEventAsync(ulong eventId);
 
-		Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId);
-		Task SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState);
+		Task<EventBond?> GetUserStateAsync(ulong userId, ulong eventId);
+		Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState);
 		Task RemoveUserAsync(ulong userId, ulong eventId);
 
-		Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId);
+		Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId);
 		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong eventId);
 	}
 
@@ -69,7 +69,7 @@ namespace Core.Boundaries
 		Task JoinEventAsync(ulong userId, ulong eventId);
 		Task LeaveEventAsync(ulong userId, ulong eventId);
 
-		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
+		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)>
 			GetGuestListAsync(ulong userId, ulong eventId);
 		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId);

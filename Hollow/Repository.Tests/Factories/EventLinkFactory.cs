@@ -5,7 +5,7 @@ namespace Repository.Tests
     internal class EventLinkFactory
     {
         int created = 0;
-        public EventLink Create(User user, Event @event, EventUserState type)
+        public EventLink Create(User user, Event @event, EventBond type)
         {
             created++;
             return new EventLink
@@ -16,7 +16,7 @@ namespace Repository.Tests
                 Time = DateTimeOffset.MinValue.AddHours(created)
             };
         }
-        public EventLink Create(User user, Event @event, EventUserState type, DateTimeOffset time)
+        public EventLink Create(User user, Event @event, EventBond type, DateTimeOffset time)
         {
             created++;
             return new EventLink

@@ -190,7 +190,7 @@ namespace Core.Controls
                 // Check if user is close enough to be a guest
                 if (await nextEvent.IsInRange(user))
                 {
-                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventUserState.Guest);
+                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived);
 
                     // Check if user is host and can start event
                     if (nextEvent.IsWaiting &&

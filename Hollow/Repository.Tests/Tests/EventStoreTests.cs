@@ -150,7 +150,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task FindCurrentEventForUserAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Arrived);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Arrived);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentEvent, testEvent.Id)));
 
@@ -170,7 +170,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task FindUpcomingEventsForUserAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Guest);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
             EventShard @event = (await store.FindUpcomingEventsForUserAsync(testUser.Id)).First();
@@ -189,7 +189,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task FindPastEventsForUserAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Left);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Left);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
             EventShard @event = (await store.FindPastEventsForUserAsync(testUser.Id)).First();
@@ -208,7 +208,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task RemoveUserAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Guest);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
             await store.RemoveUserAsync(testUser.Id, testEvent.Id);
@@ -221,8 +221,8 @@ namespace Repository.Tests.Tests
         public async Task GetGuestHistoryAsync_Left()
         {
             EventLinkFactory factory = new EventLinkFactory();
-            EventLink arrivalLink = factory.Create(testUser, testEvent, EventUserState.Arrived, DateTimeOffset.MinValue);
-            EventLink departureLink = factory.Create(testUser, testEvent, EventUserState.Left, DateTimeOffset.MaxValue);
+            EventLink arrivalLink = factory.Create(testUser, testEvent, EventBond.Arrived, DateTimeOffset.MinValue);
+            EventLink departureLink = factory.Create(testUser, testEvent, EventBond.Left, DateTimeOffset.MaxValue);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(arrivalLink));
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(departureLink));
 
@@ -237,7 +237,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task GetGuestHistoryAsync_NotLeft()
         {
-            EventLink arrivalLink = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Arrived, DateTimeOffset.MinValue);
+            EventLink arrivalLink = new EventLinkFactory().Create(testUser, testEvent, EventBond.Arrived, DateTimeOffset.MinValue);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(arrivalLink));
 
             (DateTimeOffset, DateTimeOffset?, UserSilhouette) guest = (await store.GetGuestHistoryAsync(testEvent.Id)).First();
@@ -251,7 +251,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task GetGuestListAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Guest);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
             UserSilhouette user = (await store.GetGuestListAsync(testEvent.Id)).Single();
@@ -263,7 +263,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task EndEventAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Arrived, DateTimeOffset.MinValue);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Arrived, DateTimeOffset.MinValue);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentEvent, testEvent.Id)));
 
@@ -277,11 +277,11 @@ namespace Repository.Tests.Tests
             Assert.Equal(DateTimeOffset.MinValue, links.First().Time);
             Assert.Equal(testUser.Id, links.First().SelfId);
             Assert.Equal(testEvent.Id, links.First().OtherId);
-            Assert.Equal(EventUserState.Arrived, links.First().Type);
+            Assert.Equal(EventBond.Arrived, links.First().Type);
 
             Assert.Equal(testUser.Id, links.Last().SelfId);
             Assert.Equal(testEvent.Id, links.Last().OtherId);
-            Assert.Equal(EventUserState.Left, links.Last().Type);
+            Assert.Equal(EventBond.Left, links.Last().Type);
 
             Assert.NotNull(ended);
             Assert.Equal(testUser.Id, ended.HostId);
@@ -313,36 +313,36 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task GetUserStateAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Incoming);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
-            EventUserState? state = await store.GetUserStateAsync(testUser.Id, testEvent.Id);
+            EventBond? state = await store.GetUserStateAsync(testUser.Id, testEvent.Id);
 
-            Assert.Equal(EventUserState.Incoming, state);
+            Assert.Equal(EventBond.Guest, state);
         }
         [Fact]
         public async Task SetUserStateAsync_SUCCESS()
         {
-            await store.SetUserStateAsync(testUser.Id, testEvent.Id, EventUserState.Incoming);
+            await store.SetUserStateAsync(testUser.Id, testEvent.Id, EventBond.Guest);
 
             EventLink link = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.SingleAsync());
 
             Assert.NotNull(link);
             Assert.Equal(testUser.Id, link.SelfId);
             Assert.Equal(testEvent.Id, link.OtherId);
-            Assert.Equal(EventUserState.Incoming, link.Type);
+            Assert.Equal(EventBond.Guest, link.Type);
         }
         [Fact]
         public async Task GetAllUsersAsync_SUCCESS()
         {
-            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventUserState.Watching, DateTimeOffset.MinValue);
+            EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Watching, DateTimeOffset.MinValue);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
-            (UserSilhouette User, EventUserState State) = (await store.GetAllUsersAsync(testEvent.Id)).Single();
+            (UserSilhouette User, EventBond State) = (await store.GetAllUsersAsync(testEvent.Id)).Single();
 
             Assert.Equal(testUser.Id, User.Id);
             Assert.Equal(testUser.Name, User.Name);
-            Assert.Equal(EventUserState.Watching, State);
+            Assert.Equal(EventBond.Watching, State);
         }
     }
 }
