@@ -1,4 +1,5 @@
 ﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using NetTopologySuite.Geometries;
 
 namespace Repository
@@ -6,7 +7,7 @@ namespace Repository
     internal class EventFactory
     {
         private int produced = 0;
-
+        private readonly CoordinateFactory innerFactory = new();
         public Event Create(User host)
         {
             produced++;
@@ -19,7 +20,7 @@ namespace Repository
                 GroupMinimum = 0 + produced,
                 GroupMaximum = 10 + produced,
                 State = EventState.Open,
-                Location = new Point(34.0522, -118.2437),
+                Location = innerFactory.Create(34.052, -118.243),
                 Radius = 10.0,
                 IsDynamic = false,
 

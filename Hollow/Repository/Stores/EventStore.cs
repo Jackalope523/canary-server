@@ -7,7 +7,7 @@ namespace Repository
 {
     public class EventStore : QueryStore, IEventDatabase
     {
-        public static IEventDatabase EventDatabaseAccess => new EventStore(new TestSentry());
+        public static IEventDatabase EventDatabaseAccess => new EventStore(new AzureSentry());
 
         public EventStore(Sentry sentry) : base(sentry)
         {
@@ -21,7 +21,7 @@ namespace Repository
                 Name = name,
                 Description = description,
                 StartTime = startTime,
-                Location = new Point(longitude, latitude),
+                Location = new CoordinateFactory().Create(longitude, latitude),
                 GroupMinimum = groupMinimum,
                 GroupMaximum = groupMaximum,
                 Radius = radius,

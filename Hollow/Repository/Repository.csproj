@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Migrations\AzureMigrations\" />
     <Folder Include="Migrations\TestMigrations\" />
   </ItemGroup>
 

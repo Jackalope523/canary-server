@@ -72,11 +72,23 @@ namespace Repository
         public static int DefaultIndustriousness { get; set; } = 50;
         public static int DefaultNightOwl { get; set; } = 50;
 
-        //Geolocation: X = Longitude Y = Latitude
-        public static Point DefaultHaunt { get; set; } = new Point(40.7128, -74.0060);
+
+        private static CoordinateFactory factory = new();
+
+
+        //Geolocation: X = Longitude Y = Latitude     
+        public static Point DefaultHaunt { get; set; } = factory.Create(40.712, -74.006);
         public static double DefaultHauntRadius { get; set; } = 10;
         public static int DefaultHauntWheight { get; set; } = 0;
-        public static Point DefaultCurrentLocation { get; set; } = new Point(40.7128, -74.0060);
+        public static Point DefaultCurrentLocation { get; set; } = factory.Create(40.712, -74.006);
         public static double DefaultCurrentRadius { get; set; } = 10;
+
+        public User()
+        {
+            
+            DefaultHaunt = factory.Create(7.540, 53.483);
+            DefaultCurrentLocation = factory.Create(7.544, 53.483);
+        }
+        
     }
 }

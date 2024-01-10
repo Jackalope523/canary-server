@@ -10,7 +10,7 @@ namespace Repository.Tests.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static readonly TestSentry sentry = new();
+        private static readonly AzureSentry sentry = new();
         private static readonly AccountStore store = new(sentry);  
         
         private User subject;
@@ -122,7 +122,7 @@ namespace Repository.Tests.Tests
         {
             Func<Task> action = async () => await store.FindUserByIdAsync(ulong.MaxValue);
 
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }     
 
         [Fact]
@@ -158,7 +158,7 @@ namespace Repository.Tests.Tests
         {
             Func<Task> action = async () => await store.FindUserByPhoneNumberAsync("");
 
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace Repository.Tests.Tests
         {
             Func<Task> action = async () => await store.FindUserByEmailAsync("");
 
-            await Assert.ThrowsAsync<UserNotFoundException>(action);     
+            await Assert.ThrowsAsync<DatabaseReadException>(action);     
         }
 
         [Fact]
@@ -690,7 +690,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateHauntAsync_SUCCESS()
         {
-            Point newHaunt = new Point(35.7128, -22.0060);
+            Point newHaunt = new CoordinateFactory().Create(35.712, -22.006);
             double newRadius = 35.7128;
             int newStability = 12;
 
@@ -744,7 +744,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateRecentLocationAsync_SUCCESS()
         {
-            Point newLocation = new Point(35.7128, -22.0060);
+            Point newLocation = new CoordinateFactory().Create(35.718, -22.060);
             double newRadius = 35.7128;
 
             await store.UpdateRecentLocationAsync(subject.Id, newLocation.Y, newLocation.X, newRadius);
@@ -806,7 +806,7 @@ namespace Repository.Tests.Tests
         public async Task GetUserHauntAsync_UserNotFound()
         {
             Func<Task> action = async () => await store.GetUserHauntAsync(ulong.MaxValue);
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
         [Fact]
@@ -822,7 +822,7 @@ namespace Repository.Tests.Tests
         public async Task GetRecentUserLocationAsync_UserNotFound()
         {
             Func<Task> action = async () => await store.GetRecentUserLocationAsync(ulong.MaxValue);
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
     }

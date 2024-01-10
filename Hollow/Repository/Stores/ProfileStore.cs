@@ -6,7 +6,7 @@ namespace Repository
 {
     public class ProfileStore : QueryStore, IProfileDatabase
     {
-        public static IProfileDatabase ProfileDatabaseAccess => new ProfileStore(new TestSentry());
+        public static IProfileDatabase ProfileDatabaseAccess => new ProfileStore(new AzureSentry());
 
         public ProfileStore(Sentry sentry) : base(sentry)
         {

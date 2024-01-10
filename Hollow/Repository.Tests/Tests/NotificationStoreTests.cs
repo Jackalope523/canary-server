@@ -10,7 +10,7 @@ namespace Repository.Tests.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static TestSentry sentry = new TestSentry();
+        private static AzureSentry sentry = new();
         private static NotificationStore store = new NotificationStore(sentry);
 
         private User subject1;
@@ -68,7 +68,7 @@ namespace Repository.Tests.Tests
             string message = "message";
             string action = "action";
 
-            await store.SaveNoteAsync(subject1.Id, subject2.Id, DateTimeOffset.MinValue, message, action);
+            await store.SaveNoteAsync(subject2.Id, subject1.Id, DateTimeOffset.MinValue, message, action);
 
             Entities.Note saved = sentry.ExecuteRead(ctx => ctx.Notes.Single());
 

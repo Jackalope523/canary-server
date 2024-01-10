@@ -21,6 +21,16 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<User>().Property(u => u.Haunt)
+            .HasSrid(4326);
+
+            modelBuilder.Entity<User>().Property(u => u.CurrentLocation)
+            .HasSrid(4326);
+
+            modelBuilder.Entity<Event>().Property(e => e.Location)
+            .HasSrid(4326);
+
             modelBuilder.Entity<User>()
                 .Property(u => u.AccountStatus)
                 .HasColumnName("AccountStatus");

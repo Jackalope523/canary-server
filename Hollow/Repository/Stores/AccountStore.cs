@@ -7,7 +7,7 @@ namespace Repository
 {
     public class AccountStore : QueryStore, IAccountDatabase
     {
-        public static IAccountDatabase AccountDatabaseAccess => new AccountStore(new TestSentry());
+        public static IAccountDatabase AccountDatabaseAccess => new AccountStore(new AzureSentry());
 
         public AccountStore(Sentry sentry) : base(sentry)
         {
@@ -250,7 +250,8 @@ namespace Repository
 
         public async Task UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
         {
-            User u = new() { Id = id, Haunt = new Point(longitude, latitude) , HauntRadius = radius, HauntWheight = stability };
+            Point newHaunt = new CoordinateFactory().Create(longitude, latitude);
+            User u = new() { Id = id, Haunt = newHaunt , HauntRadius = radius, HauntWheight = stability };
 
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true);
@@ -261,7 +262,8 @@ namespace Repository
 
         public async Task UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
         {
-            User u = new() { Id = id, CurrentLocation = new Point(longitude, latitude), CurrentRadius = radius };
+            Point newCurrentLocation = new CoordinateFactory().Create(longitude, latitude);
+            User u = new() { Id = id, CurrentLocation = newCurrentLocation, CurrentRadius = radius };
 
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);

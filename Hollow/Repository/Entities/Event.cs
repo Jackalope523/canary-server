@@ -11,7 +11,7 @@ namespace Repository
         public string Description { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public ulong HostId { get; set; }
-        internal User Host { get; set; }
+        internal User Host { get; set; } 
         public Point Location { get; set; } // X = Longitude Y = Latitude
 
         public EventState State { get; set; }

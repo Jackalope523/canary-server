@@ -141,7 +141,8 @@ namespace Repository.Migrations.TestMigrations
 
                     b.Property<Point>("Location")
                         .IsRequired()
-                        .HasColumnType("POINT");
+                        .HasColumnType("POINT")
+                        .HasAnnotation("Sqlite:Srid", 4326);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -298,7 +299,8 @@ namespace Repository.Migrations.TestMigrations
 
                     b.Property<Point>("CurrentLocation")
                         .IsRequired()
-                        .HasColumnType("POINT");
+                        .HasColumnType("POINT")
+                        .HasAnnotation("Sqlite:Srid", 4326);
 
                     b.Property<double>("CurrentRadius")
                         .HasColumnType("REAL");
@@ -315,7 +317,8 @@ namespace Repository.Migrations.TestMigrations
 
                     b.Property<Point>("Haunt")
                         .IsRequired()
-                        .HasColumnType("POINT");
+                        .HasColumnType("POINT")
+                        .HasAnnotation("Sqlite:Srid", 4326);
 
                     b.Property<double>("HauntRadius")
                         .HasColumnType("REAL");
