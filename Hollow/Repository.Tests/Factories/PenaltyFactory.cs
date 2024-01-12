@@ -11,7 +11,7 @@ namespace Repository
             {
                 PenalizedId = user.Id,
                 Type = PenaltyType.Unreliable,
-                Time = DateTime.MinValue,
+                Time = DateTimeOffset.MinValue,
             };
         }
     }

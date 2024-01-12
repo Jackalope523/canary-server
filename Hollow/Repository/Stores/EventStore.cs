@@ -119,10 +119,10 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.SelfId == id && l.Type == EventBond.Guest).
+            Where(l => l.UserId == id && l.Type == EventBond.Guest).
             Join(
                 ctx.Events,
-                l => l.OtherId,
+                l => l.EventId,
                 e => e.Id,
                 (l,e) => new EventShard
                 (
@@ -154,10 +154,10 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.EventLinks.
-           Where(l => l.SelfId == id && l.Type == EventBond.Left).
+           Where(l => l.UserId == id && l.Type == EventBond.Left).
            Join(
                ctx.Events,
-               l => l.OtherId,
+               l => l.EventId,
                e => e.Id,
                (l, e) => new EventShard
                (
@@ -232,10 +232,10 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && l.Type == EventBond.Guest).
+            Where(l => l.EventId == id && l.Type == EventBond.Guest).
             Join(
                 ctx.Users,
-                l => l.SelfId,
+                l => l.UserId,
                 u => u.Id,
                 (_,u) => new UserSilhouette(u.Id, u.Name)
                 ).
@@ -245,7 +245,7 @@ namespace Repository
         { 
             await storeSentry.ExecuteWriteAsync(ctx => 
             ctx.EventLinks.
-            Where(l => l.SelfId == userId && l.OtherId == eventId).
+            Where(l => l.UserId == userId && l.EventId == eventId).
             ExecuteDeleteAsync());
         }
         public async Task UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
@@ -274,10 +274,10 @@ namespace Repository
         {
             var times = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == id && (l.Type == EventBond.Arrived || l.Type == EventBond.Left)).
+            Where(l => l.EventId == id && (l.Type == EventBond.Arrived || l.Type == EventBond.Left)).
             Join(
                 ctx.Users,
-                l => l.SelfId,
+                l => l.UserId,
                 u => u.Id,
                 (l,u) => new { u.Id, u.Name, l.Time, l.Type }
                 ).
@@ -350,7 +350,7 @@ namespace Repository
         {
             var states = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.SelfId == userId && l.OtherId == eventId).
+            Where(l => l.UserId == userId && l.EventId == eventId).
             Select(l => new { l.Type, l.Time }).
             ToListAsync());
 
@@ -362,7 +362,7 @@ namespace Repository
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.EventLinks.
-                Add(new EventLink { SelfId = userId, OtherId = eventId, Type = userState }
+                Add(new EventLink { UserId = userId, EventId = eventId, Type = userState }
                 ));
 
             if (userState == EventBond.Arrived)
@@ -385,10 +385,10 @@ namespace Repository
         {
             var users = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.OtherId == eventId).
+            Where(l => l.EventId == eventId).
             Join(
                 ctx.Users,
-                l => l.SelfId,
+                l => l.UserId,
                 u => u.Id,
                 (l, u) => new { u.Id, u.Name, l.Time, l.Type }
                 ).

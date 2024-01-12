@@ -33,6 +33,7 @@ namespace Repository.Tests.Tests
         }
         public void Dispose()
         {
+            sentry.ExecuteWrite(ctx => ctx.Penalties.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Reports.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());

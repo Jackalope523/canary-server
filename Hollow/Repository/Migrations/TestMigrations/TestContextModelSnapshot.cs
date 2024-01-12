@@ -168,36 +168,31 @@ namespace Repository.Migrations.TestMigrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("Repository.Link", b =>
+            modelBuilder.Entity("Repository.EventLink", b =>
                 {
                     b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("OtherId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("OtherId");
-
-                    b.Property<ulong>("SelfId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("SelfId");
+                    b.Property<ulong>("EventId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("link_type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SelfId");
+                    b.HasIndex("EventId");
 
-                    b.ToTable("Links");
+                    b.HasIndex("UserId");
 
-                    b.HasDiscriminator<string>("link_type").HasValue("Link");
-
-                    b.UseTphMappingStrategy();
+                    b.ToTable("EventLinks");
                 });
 
             modelBuilder.Entity("Repository.Post", b =>
@@ -229,6 +224,33 @@ namespace Repository.Migrations.TestMigrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Repository.PostLink", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("PostId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PostLinks");
                 });
 
             modelBuilder.Entity("Repository.Report", b =>
@@ -282,8 +304,7 @@ namespace Repository.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AccountStatus")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("AccountStatus");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Athleticisme")
                         .HasColumnType("INTEGER");
@@ -371,52 +392,31 @@ namespace Repository.Migrations.TestMigrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Repository.EventLink", b =>
-                {
-                    b.HasBaseType("Repository.Link");
-
-                    b.Property<ulong>("EventId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Type")
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("Type");
-
-                    b.HasIndex("EventId");
-
-                    b.HasDiscriminator().HasValue("event");
-                });
-
-            modelBuilder.Entity("Repository.PostLink", b =>
-                {
-                    b.HasBaseType("Repository.Link");
-
-                    b.Property<ulong>("PostId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Type")
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("Type");
-
-                    b.HasIndex("PostId");
-
-                    b.HasDiscriminator().HasValue("post");
-                });
-
             modelBuilder.Entity("Repository.UserLink", b =>
                 {
-                    b.HasBaseType("Repository.Link");
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("OtherId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("SelfId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("Type");
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("OtherId");
 
-                    b.HasDiscriminator().HasValue("user");
+                    b.HasIndex("SelfId");
+
+                    b.ToTable("UserLinks");
                 });
 
             modelBuilder.Entity("Repository.EventReport", b =>
@@ -472,15 +472,23 @@ namespace Repository.Migrations.TestMigrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Repository.Link", b =>
+            modelBuilder.Entity("Repository.EventLink", b =>
                 {
-                    b.HasOne("Repository.User", "Self")
+                    b.HasOne("Repository.Event", "Event")
                         .WithMany("Links")
-                        .HasForeignKey("SelfId")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Self");
+                    b.HasOne("Repository.User", "User")
+                        .WithMany("EventLinks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Post", b =>
@@ -500,6 +508,25 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("Event");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Repository.PostLink", b =>
+                {
+                    b.HasOne("Repository.Post", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany("PostLinks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Report", b =>
@@ -529,37 +556,23 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("Self");
                 });
 
-            modelBuilder.Entity("Repository.EventLink", b =>
-                {
-                    b.HasOne("Repository.Event", "Event")
-                        .WithMany("Links")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
-            modelBuilder.Entity("Repository.PostLink", b =>
-                {
-                    b.HasOne("Repository.Post", "Post")
-                        .WithMany()
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-                });
-
             modelBuilder.Entity("Repository.UserLink", b =>
                 {
                     b.HasOne("Repository.User", "Other")
-                        .WithMany()
+                        .WithMany("UserLinks")
                         .HasForeignKey("OtherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Repository.User", "Self")
+                        .WithMany()
+                        .HasForeignKey("SelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Other");
+
+                    b.Navigation("Self");
                 });
 
             modelBuilder.Entity("Repository.Event", b =>
@@ -573,11 +586,13 @@ namespace Repository.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.User", b =>
                 {
-                    b.Navigation("Links");
+                    b.Navigation("EventLinks");
 
                     b.Navigation("Notes");
 
                     b.Navigation("Penalties");
+
+                    b.Navigation("PostLinks");
 
                     b.Navigation("Posts");
 
@@ -586,6 +601,8 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("ReporterList");
 
                     b.Navigation("Subscriptions");
+
+                    b.Navigation("UserLinks");
                 });
 #pragma warning restore 612, 618
         }

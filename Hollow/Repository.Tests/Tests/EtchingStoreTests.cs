@@ -119,8 +119,8 @@ namespace Repository.Tests.Tests
 
             PostLink created = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.FirstAsync());
 
-            Assert.Equal(subject.Id, created.SelfId);
-            Assert.Equal(testEtching.Id, created.OtherId);
+            Assert.Equal(subject.Id, created.UserId);
+            Assert.Equal(testEtching.Id, created.PostId);
             Assert.Equal(rating, created.Type);
         }
         [Fact]

@@ -7,8 +7,8 @@ namespace Repository.Tests
         {
             return new PostLink
             {
-                SelfId = user.Id,
-                OtherId = etching.Id,
+                UserId = user.Id,
+                PostId = etching.Id,
                 Type = PostLink.PostLinkType.RateUp,
                 Time = DateTimeOffset.MinValue
             };

@@ -134,7 +134,7 @@ namespace Repository
                 await context.DisposeAsync();
             }
         }
-        public async override Task ExecuteWriteAsync(Func<QueryContext, Task> write)
+        public async override Task ExecuteWriteAsync(Func<QueryContext,Task> write)
         {
             RefreshContext();
             try
@@ -150,6 +150,6 @@ namespace Repository
             {
                 await context.DisposeAsync();
             }
-        }
+        }      
     }
 }

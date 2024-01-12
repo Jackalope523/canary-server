@@ -13,7 +13,8 @@ namespace Repository.Tests
                 OwnerId = owner.Id,
                 EventId = location.Id,
                 PostedAt = DateTime.MinValue,
-                PhotoURL = "URL " + created
+                PhotoURL = "URL " + created,
+                IsHidden = false
             };
         }
     }

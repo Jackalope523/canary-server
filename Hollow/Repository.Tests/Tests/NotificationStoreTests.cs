@@ -10,7 +10,7 @@ namespace Repository.Tests.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static AzureSentry sentry = new();
+        private static TestSentry sentry = new();
         private static NotificationStore store = new NotificationStore(sentry);
 
         private User subject1;

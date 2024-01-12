@@ -10,8 +10,8 @@ namespace Repository.Tests
             created++;
             return new EventLink
             {
-                SelfId = user.Id,
-                OtherId = @event.Id,
+                UserId = user.Id,
+                EventId = @event.Id,
                 Type = type,
                 Time = DateTimeOffset.MinValue.AddHours(created)
             };
@@ -21,8 +21,8 @@ namespace Repository.Tests
             created++;
             return new EventLink
             {
-                SelfId = user.Id,
-                OtherId = @event.Id,
+                UserId = user.Id,
+                EventId = @event.Id,
                 Type = type,
                 Time = time
             };

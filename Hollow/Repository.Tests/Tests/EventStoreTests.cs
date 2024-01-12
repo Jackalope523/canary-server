@@ -275,12 +275,12 @@ namespace Repository.Tests.Tests
             Event ended = await sentry.ExecuteReadAsync(ctx => ctx.Events.SingleAsync());
 
             Assert.Equal(DateTimeOffset.MinValue, links.First().Time);
-            Assert.Equal(testUser.Id, links.First().SelfId);
-            Assert.Equal(testEvent.Id, links.First().OtherId);
+            Assert.Equal(testUser.Id, links.First().UserId);
+            Assert.Equal(testEvent.Id, links.First().EventId);
             Assert.Equal(EventBond.Arrived, links.First().Type);
 
-            Assert.Equal(testUser.Id, links.Last().SelfId);
-            Assert.Equal(testEvent.Id, links.Last().OtherId);
+            Assert.Equal(testUser.Id, links.Last().UserId);
+            Assert.Equal(testEvent.Id, links.Last().EventId);
             Assert.Equal(EventBond.Left, links.Last().Type);
 
             Assert.NotNull(ended);
@@ -328,8 +328,8 @@ namespace Repository.Tests.Tests
             EventLink link = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.SingleAsync());
 
             Assert.NotNull(link);
-            Assert.Equal(testUser.Id, link.SelfId);
-            Assert.Equal(testEvent.Id, link.OtherId);
+            Assert.Equal(testUser.Id, link.UserId);
+            Assert.Equal(testEvent.Id, link.EventId);
             Assert.Equal(EventBond.Guest, link.Type);
         }
         [Fact]

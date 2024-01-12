@@ -1,20 +1,28 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using Shared;
+using System;
 
 namespace Repository
 {
     public class EtchingStore : QueryStore, IEtchingDatabase
     {
         public static IEtchingDatabase EtchingDatabaseAccess => new EtchingStore(new AzureSentry());
-
+     
+       
         public EtchingStore(Sentry sentry) : base(sentry)
         {
         }
 
         public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted, string imageURL)
         {
-            Post toAdd = new() { EventId = eventId, OwnerId = posterId, PostedAt = timePosted, PhotoURL = imageURL };
+            Post toAdd = new() 
+            { 
+                EventId = eventId, 
+                OwnerId = posterId, 
+                PostedAt = timePosted, 
+                PhotoURL = imageURL 
+            };
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Add(toAdd));
             return new Etching ( toAdd.Id, toAdd.EventId, toAdd.OwnerId, toAdd.PostedAt, toAdd.PhotoURL, new(0, 0), toAdd.IsHidden );
         }
@@ -32,13 +40,13 @@ namespace Repository
             // Get unseen posts by friends from certain depth.
             List<Etching> friendPosts = await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && p.PostedAt > depthCharge && p.PostedAt < DateTimeOffset.UtcNow).
                Join(
-               storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateUps = l.Count() })),
+               storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() })),
                p => p.Id,
                l => l.PostId,
                (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, p.IsHidden, l.RateUps }
                ).
                Join(
-               storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateDowns = l.Count() })),
+               storeSentry.ExecuteRead(ctx => ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() })),
                p => p.Id,
                l => l.PostId,
                (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns), a.IsHidden)             
@@ -56,13 +64,13 @@ namespace Repository
             // Get remaining friend posts from same events as others even if outside time range. 
             List<Etching> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
                Join(
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
+               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
                p => p.Id,
                l => l.PostId,
                (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, p.IsHidden, l.RateUps }
                ).
                Join(
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.OtherId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
+               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
                p => p.Id,
                l => l.PostId,
                (a, b) => new Etching(a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, new(a.RateUps, b.RateDowns), a.IsHidden)
@@ -73,8 +81,8 @@ namespace Repository
 
         public async Task<Etching> GetEtchingAsync(ulong id)
         {
-            int ups = await storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == id && l.Type == PostLink.PostLinkType.RateUp).CountAsync());
-            int downs = await storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == id && l.Type == PostLink.PostLinkType.RateDown).CountAsync());
+            int ups = await storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == id && l.Type == PostLink.PostLinkType.RateUp).CountAsync());
+            int downs = await storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == id && l.Type == PostLink.PostLinkType.RateDown).CountAsync());
 
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Posts.
@@ -94,8 +102,8 @@ namespace Repository
             List<Task<int>> negativeRatings = new(etchings.Count);
             for (int i = 0; i < etchings.Count; i++)
             {
-                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateUp).CountAsync()));
-                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateDown).CountAsync()));
+                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateUp).CountAsync()));
+                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateDown).CountAsync()));
             }
 
             int[] ups = await Task.WhenAll(positiveRatings);
@@ -115,7 +123,15 @@ namespace Repository
             if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
             else type = PostLink.PostLinkType.RateDown;
 
-            await AddLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId, Type = type });
+            PostLink toAdd = new()
+            {
+                UserId = voterId,
+                PostId = postId,
+                Time = DateTimeOffset.UtcNow,
+                Type = type
+            };          
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.PostLinks.Add(toAdd));                
         }
 
         public async Task RemoveEtchingAsync(ulong postId)
@@ -125,7 +141,13 @@ namespace Repository
 
         public async Task RemoveEtchingRatingAsync(ulong postId, ulong voterId)
         {
-            await RemoveLinkOperationAsync(new PostLink { SelfId = voterId, OtherId = postId });
+            Func<QueryContext, Task> query = EF.CompileAsyncQuery(
+                (QueryContext ctx) =>
+                ctx.PostLinks.
+                Where(l => l.UserId == voterId && l.PostId == postId).
+                ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(query);
         }
 
         public async Task<List<Etching>> GetEtchingsForEventAsync(ulong id)
@@ -139,8 +161,8 @@ namespace Repository
             List<Task<int>> negativeRatings = new(etchings.Count);
             for (int i = 0; i < etchings.Count; i++)
             {            
-                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateUp).CountAsync()));
-                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.OtherId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateDown).CountAsync()));
+                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateUp).CountAsync()));
+                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == etchings[i].Id && l.Type == PostLink.PostLinkType.RateDown).CountAsync()));
             }
 
             int[] ups = await Task.WhenAll(positiveRatings);
