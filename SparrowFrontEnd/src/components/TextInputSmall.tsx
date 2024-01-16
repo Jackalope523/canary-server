@@ -67,6 +67,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||                                   Text input                                   ||
   // ! ||--------------------------------------------------------------------------------||
   const [isFocused, setIsFocused] = React.useState(false);
+  const textInput : React.MutableRefObject<TextInput|undefined> = React.useRef();
+  let locked : React.MutableRefObject<boolean> = React.useRef(false);
 
   // Animations
   const bw = useSharedValue(0);
@@ -83,6 +85,18 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
       duration: 200,
     });
   }, [isFocused]);
+
+  const customOnFocus = () => 
+  {
+    setIsFocused(true);
+    locked.current = false;
+  }
+  
+  const customOnBlur = () => 
+  {     
+    locked.current ?  textInput.current?.focus() : setIsFocused(false);
+    locked.current = false;
+  }
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                Clear text button                               ||
@@ -107,6 +121,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // On press
   const clearButtonPress = () => {
     setText('');
+    locked.current = true;
   };
 
   // ! ||--------------------------------------------------------------------------------||
@@ -244,11 +259,12 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           disabled && styles.inputContainerDisabled,
         ]}>
         <TextInput
+          ref={textInput}
           type={type}
           value={text}
           onChangeText={setText}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={customOnFocus}
+          onBlur={customOnBlur}
           style={[styles.input, globalStyles.bodyTextOne]}
           placeholder={placeholder}
           placeholderTextColor={Colors.sand400}
