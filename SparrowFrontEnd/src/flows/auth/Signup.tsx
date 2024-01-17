@@ -30,6 +30,7 @@ import Hyperlink from '../../components/Hyperlink';
 import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
 import KeyboardAwareContainer from '../../components/testing/KeyboardAwareContainer';
 import DateOfBirthInput from '../../components/auth/DateOfBirthInput';
+import ExampleScreen from '../../components/testing/ExampleScreen';
 
 // TODO when all fields marked with a asterisk are filled out correctly, button should be enabled
 
