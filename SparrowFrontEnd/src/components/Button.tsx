@@ -19,7 +19,7 @@ import fontelloConfig from '../config.json';
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // Types
-interface ButtonProps {
+export interface ButtonProps {
   onPress?: () => void;
   text?: string;
   icon?: string;
@@ -48,6 +48,11 @@ interface ButtonProps {
   btnDisabledStyle?: ViewStyle[];
   btnDisabledTextStyle?: TextStyle[];
   btnDisabledIconStyle?: TextStyle[];
+
+  // Exclusive Button Support
+  id? : number;
+  current?: number;
+  setCurrent?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -70,6 +75,9 @@ export const Button: React.FC<ButtonProps> = ({
   size = null,
   display = null,
   icon = false,
+  id = -1, 
+  current = -1,
+  setCurrent = null
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Type                                      ||
@@ -350,17 +358,17 @@ export const Button: React.FC<ButtonProps> = ({
 
   // TODO button needs to reset state back to rest (isPressed = false), when the user has
   // left the screen / doesn't see the button anymore.
-
-  const [isPressed, setIsPressed] = React.useState(false);
-
+  
   const handlePressIn = () => {
     if (self != null && status != null && changeState != null) {
       if (status == self) changeState(-1);
       else changeState(self);
     } else {
-      setIsPressed(true);
       if (onPress != null) {
         onPress();
+      }
+      if (setCurrent != null && current != id ) {
+        setCurrent(id);
       }
     }
   };
@@ -369,10 +377,9 @@ export const Button: React.FC<ButtonProps> = ({
     <Pressable
       onPress={() => {
         handlePressIn();
-        setIsPressed(!isPressed);
       }}
       style={
-        disabled ? btnDisabledStyle : isPressed ? btnActiveStyle : btnStyle
+        disabled ? btnDisabledStyle : current == id ? btnActiveStyle : btnStyle
       }
       disabled={disabled}>
       <View style={styles.btnBase}>
@@ -385,7 +392,7 @@ export const Button: React.FC<ButtonProps> = ({
             style={
               disabled
                 ? btnDisabledIconStyle
-                : isPressed
+                : current == id
                 ? btnActiveIconStyle
                 : btnIconStyle
             }
@@ -395,7 +402,7 @@ export const Button: React.FC<ButtonProps> = ({
           style={
             disabled
               ? btnDisabledTextStyle
-              : isPressed
+              : current == id
               ? btnActiveTextStyle
               : btnTextStyle
           }>
