@@ -114,6 +114,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           style={[globalStyles.illustrationMedium, styles.image]}
           resizeMode="contain"
         />
+
         <View style={styles.inputSection}>
           <TextInputSmall
             type={InputType.FirstName}

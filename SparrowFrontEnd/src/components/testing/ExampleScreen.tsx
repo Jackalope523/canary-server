@@ -6,14 +6,26 @@ import { globalStyles } from '../../styles/GlobalStyles';
 import Button, { ButtonDisplay, ButtonSize, ButtonType } from '../Button';
 import ButtonGroup from '../ButtonGroup';
 
+// Input fields
+import DateOfBirthInput from '../auth/DateOfBirthInput';
+import DateOfBirthInput2 from '../auth/DateOfBirthInput2';
+
 const ExampleScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={[globalStyles.displayTextTwo, globalStyles.textDark]}>
-        Examples
-      </Text>
+
+      {/* Header */}
+
+      <View style={styles.header}>
+        <Text style={[globalStyles.displayTextTwo, globalStyles.textDark]}>
+          Examples
+        </Text>
+        <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>Keep sections you don't want to test commented out for better visibility.</Text>
+      </View>
+
       {/* Buttons */}
-      <View style={styles.container}>
+
+      {/* <View style={styles.container}>
         <Button
           type={ButtonType.Warning}
           size={ButtonSize.Medium}
@@ -33,7 +45,15 @@ const ExampleScreen = () => {
           buttonText={['One', 'Two', 'Three']}
           onSelect={(item) => console.log(item)}
         />
+      </View> */}
+
+      {/* Input fields */}
+
+      <View style={styles.container}>
+        <DateOfBirthInput />
+        <DateOfBirthInput2 />
       </View>
+
     </View>
   );
 };
@@ -44,5 +64,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     gap: 16,
+    paddingBottom: 24,
+  },
+
+  header: {
+    paddingBottom: 8,
   },
 });

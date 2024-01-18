@@ -31,6 +31,7 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({}) => {
         onChangeText={setDay}
         inputMode="numeric"
         maxLength={2}
+        clearButton={false}
       />
       <Dropdown
         label="Month"
@@ -45,6 +46,7 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({}) => {
         onChangeText={setYear}
         inputMode="numeric"
         maxLength={4}
+        clearButton={false}
       />
     </View>
   );
