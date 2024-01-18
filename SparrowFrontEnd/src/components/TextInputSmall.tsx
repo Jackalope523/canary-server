@@ -35,6 +35,7 @@ interface TextInputSmallProps {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  clearButton?: boolean;
   value?: string | date;
   onChangeText?: (text: string | date) => void;
 
@@ -58,6 +59,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   recommended = false,
   required = false,
   disabled = false,
+  clearButton = true,
   placeholder,
   autoComplete,
   inputMode,
@@ -277,7 +279,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           onSubmitEditing={handleSubmit}
           testID="input"
         />
-        {isFocused && (
+
+        {clearButton && isFocused && (
           <Pressable onPress={clearButtonPress}>
             <Animated.View style={animatedIconStyle}>
               <Icon
