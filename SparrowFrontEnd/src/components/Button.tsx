@@ -367,6 +367,9 @@ export const Button: React.FC<ButtonProps> = ({
       if (onPress != null) {
         onPress();
       }
+      if (setCurrent != null && current == id) {
+        setCurrent(-1);
+      }
       if (setCurrent != null && current != id ) {
         setCurrent(id);
       }
