@@ -18,6 +18,7 @@ import TextButton, {
   TextButtonVariant,
 } from '../../components/TextButton';
 import { Spacing } from '../../styles/SpacingStyles';
+import TextInputSmall from '../../components/TextInputSmall';
 
 type LandingProps = StackScreenProps<AuthStackParamList, 'Landing'>;
 

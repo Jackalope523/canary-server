@@ -159,7 +159,6 @@ export const buttonStyles = StyleSheet.create({
 
   // Makes the button full-width
   buttonFull: {
-    // flex: 1,
     alignSelf: 'stretch',
   },
 

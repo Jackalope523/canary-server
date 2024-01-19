@@ -168,6 +168,21 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         }
         break;
 
+      // Phone number
+      // TODO update phone number regex if necessary
+      case InputType.PhoneNumber:
+        const phoneNumberRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
+
+        if (text.length === 0) {
+          setError('Phone number field cannot be empty.');
+        } else if (!phoneNumberRegex.test(text)) {
+          setError('Please enter a valid phone number.');
+        } else {
+          Object.keys(errors).length === 0;
+          setIsValid(true);
+        }
+        break;
+
       // Used for an external date of birth component
       // Day
       // TODO use a more accurate regex range according to selected month, probably already got something on the backend
@@ -406,6 +421,7 @@ const styles = StyleSheet.create({
 export enum InputType {
   FirstName,
   Email,
+  PhoneNumber,
   Day,
   Year,
 }
