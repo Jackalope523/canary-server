@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
-import {ScrollView, ScrollViewProps} from 'react-native';
+import {ScrollView, ScrollViewProps, FlatList, View} from 'react-native';
 import Button, {ButtonProps} from './Button';
+import {Spacing} from '../styles/SpacingStyles'
 
 interface ExclusiveButtonScrollProps {
     props?: ScrollViewProps;
@@ -18,29 +19,23 @@ export const ExclusiveButtonGroup: React.FC<ExclusiveButtonScrollProps> =
     const [current, setCurrent] = useState(-1);
 
    return  (
-    <ScrollView 
-        horizontal={props?.horizontal}
-        overScrollMode={props?.overScrollMode}
-        showsHorizontalScrollIndicator={props?.showsHorizontalScrollIndicator}
-        contentContainerStyle={props?.contentContainerStyle}
-    >
-        {
-            buttons.map(
-                (button) =>  
-                    <Button
-                      id ={button.id}
-                      current = {current}
-                      setCurrent = {setCurrent}
-                      type={button.type}
-                      size={button.size}
-                      display={button.display}
-                      text={button.text}
-                      icon={button.icon}
-                      onPress={button.onPress}
-                    />
-                    )
-        }
-    </ScrollView> 
+    <FlatList
+    horizontal = {true}
+    ItemSeparatorComponent={() => <View style={{paddingRight: Spacing.md}}/>}
+    data = {buttons}
+    renderItem={ ({item}) =>  
+        <Button
+        id ={item.id}
+        current = {current}
+        setCurrent = {setCurrent}
+        type={item.type}
+        size={item.size}
+        display={item.display}
+        text={item.text}
+        icon={item.icon}
+        onPress={item.onPress}/>
+    }
+    />
     );
 };
 
