@@ -3,13 +3,10 @@ import {
   StyleSheet,
   Text,
   Pressable,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
   View,
+  GestureResponderEvent,
 } from 'react-native';
 import { globalStyles } from '../styles/GlobalStyles';
-import { buttonStyles } from '../styles/ButtonStyles';
 import { Spacing } from '../styles/SpacingStyles';
 
 // Icons font
@@ -21,8 +18,9 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 
 // Types
 interface RadioButtonProps {
-  onPress?: () => void;
-  text?: string;
+  onPress: (item: string | GestureResponderEvent) => void;
+
+  buttonText: string[] | React.ReactNode;
 }
 
 /*
@@ -35,69 +33,70 @@ TODO animate:
 */
 
 export const RadioButton: React.FC<RadioButtonProps> = ({
-  onPress = null,
-  text,
+  onPress,
+  buttonText,
 }) => {
-  const [isSelected, setIsSelected] = React.useState(false);
+  /*
 
-  const TEMPDATA = [
-    {
-      id: 1,
-      name: 'Accounting',
-    },
-    {
-      id: 2,
-      name: 'Art',
-    },
-    {
-      id: 3,
-      name: 'Biology',
-    },
-    {
-      id: 4,
-      name: 'Chemistry',
-    },
-  ];
+  TODO disable the CONTINUE button until a selection is made;
+  can maybe use this logic - selectedId >= 0 === true
+  
+  -1 for no default selection which should disable the CONTINUE button
+  0 for first item as default selection
+
+  */
+
+  const [selectedId, setSelectedId] = React.useState(-1);
+
+  const handleTap = (item: string | GestureResponderEvent, id: number) => {
+    setSelectedId(id);
+    onPress(item);
+
+    console.log(`Button pressed: ${item}, ID: ${id}`);
+
+    // setSelectedId(1);
+    // onSelect(item);
+  };
+
+  // TODO replace view with flatlist
 
   return (
-    // <View style={styles.container}>
-    <View>
-      {TEMPDATA.map(() => (
+    <View style={styles.container}>
+      {buttonText.map((buttonLabel, index) => (
         <Pressable
-          onPress={() => {
-            setIsSelected(!isSelected);
-          }}
+          onPress={(item) => handleTap(item, index)}
+          key={index}
           style={
-            isSelected ? [styles.button, styles.buttonSelected] : styles.button
+            index === selectedId
+              ? [styles.button, styles.buttonSelected]
+              : [styles.button]
           }>
           <View
             style={
-              isSelected
+              index === selectedId
                 ? [styles.radioRest, styles.radioSelected]
-                : styles.radioRest
+                : [styles.radioRest]
             }
           />
           <Text
             style={
-              isSelected
+              index === selectedId
                 ? [globalStyles.buttonTextTwo, globalStyles.textLight]
                 : [globalStyles.buttonTextTwo, globalStyles.textDark]
             }>
-            {text}
+            {buttonLabel}
           </Text>
         </Pressable>
       ))}
     </View>
-    // </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    gap: Spacing.md,
 
-    alignItems: 'center',
-    justifyContent: 'center',
+    // flex: 1,
   },
 
   button: {
@@ -123,7 +122,7 @@ const styles = StyleSheet.create({
     width: 18,
     borderColor: Colors.sparrowDarkBrown,
     borderWidth: 2,
-    borderRadius: 9, // OR 18
+    borderRadius: 18 / 2,
   },
 
   radioSelected: {
