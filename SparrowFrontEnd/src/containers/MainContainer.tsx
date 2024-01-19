@@ -28,6 +28,7 @@ import ContinueScreen from '../flows/auth/Continue';
 // Survey
 import IntroScreen from '../flows/auth/survey/Intro';
 import Q1Screen from '../flows/auth/survey/Q1';
+import Q2Screen from '../flows/auth/survey/Q2';
 
 // Main
 import ActivityScreen from '../flows/activity/Activity';
@@ -103,6 +104,7 @@ function Survey() {
       screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Intro" component={IntroScreen} />
       <AuthStack.Screen name="Q1" component={Q1Screen} />
+      <AuthStack.Screen name="Q2" component={Q2Screen} />
     </AuthStack.Navigator>
   );
 }

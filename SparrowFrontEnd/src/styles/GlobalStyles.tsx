@@ -150,7 +150,7 @@ export const globalStyles = StyleSheet.create({
     fontFamily: 'UncutSans-Bold',
   },
 
-  labelTextOneTitleCase: {
+  labelTextOneTitlecase: {
     fontSize: 16,
     textTransform: 'capitalize',
     fontFamily: 'UncutSans-Bold',
@@ -182,7 +182,7 @@ export const globalStyles = StyleSheet.create({
   // ! ||                                      Text                                      ||
   // ! ||--------------------------------------------------------------------------------||
 
-  // Hyperlinks
+  // Hyperlink
   hyperlink: {
     color: Colors.red500,
     textDecorationLine: 'underline',
@@ -255,6 +255,72 @@ export const globalStyles = StyleSheet.create({
   // Placeholder
   textPlaceholder: {
     color: Colors.sand400,
+  },
+
+  // ! ||--------------------------------------------------------------------------------||
+
+  // Highlights
+
+  // Dark
+  highlightDark: {
+    color: Colors.sparrowDark,
+    fontFamily: 'UncutSans-Bold',
+  },
+
+  // Light
+  highlightLight: {
+    color: Colors.sparrowSand,
+    fontFamily: 'UncutSans-Bold',
+  },
+
+  // Yellow
+  highlightYellow: {
+    color: Colors.yellow500,
+  },
+
+  // Orange
+  highlightOrange: {
+    color: Colors.orange500,
+  },
+
+  // Red
+  highlightRed: {
+    color: Colors.red500,
+  },
+
+  // Rose
+  highlightRose: {
+    color: Colors.rose500,
+  },
+
+  // Fuchsia
+  highlightFuchsia: {
+    color: Colors.fuchsia500,
+  },
+
+  // Lavender
+  highlightLavender: {
+    color: Colors.lavender500,
+  },
+
+  // Green
+  highlightGreen: {
+    color: Colors.green500,
+  },
+
+  // Turqoise
+  highlightTurqoise: {
+    color: Colors.turqoise500,
+  },
+
+  // Picton
+  highlightPicton: {
+    color: Colors.picton500,
+  },
+
+  // Azure
+  highlightAzure: {
+    color: Colors.azure500,
   },
 
   // ! ||--------------------------------------------------------------------------------||

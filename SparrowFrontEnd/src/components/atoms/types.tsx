@@ -25,6 +25,7 @@ export type AuthStackParamList = {
   Main: undefined;
   Intro: undefined;
   Q1: undefined;
+  Q2: undefined;
 };
 
 export type BottomTabParamList = {

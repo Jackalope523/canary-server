@@ -14,19 +14,15 @@ import Highlight, {
 } from '../../../components/Highlight';
 
 // Props
-interface Q1Props {
+interface Q2Props {
   navigation: StackNavigationProp<AuthStackParamList>;
 
   // onPress: (item: string | GestureResponderEvent) => void;
   // buttonText: string[];
 }
 
-const Q1Screen: React.FC<Q1Props> = () => {
+const Q2Screen: React.FC<Q2Props> = () => {
   // const [buttonEnabled, setButtonEnabled] = React.useState(true);
-
-  // function signupButton() {
-  // navigation.navigate('Q1');
-  // }
 
   // TODO <Pressable> text button may need to be made into a component named TextButton or something alike
   return (
@@ -34,19 +30,30 @@ const Q1Screen: React.FC<Q1Props> = () => {
       <RadioSurveyScreen
         title={
           <>
-            My ideal
-            <Highlight type={HighlightType.Orange}>hangout group</Highlight>
-            consists of...
+            Which activity sounds more
+            <Highlight
+              type={HighlightType.Fuchsia}
+              size={HighlightSize.HeadingTextTwo}>
+              fun to you
+            </Highlight>
+            ?
           </>
         }
-        options={['1-3 people', '3-6 people', '6-9 people', '9+ people']}
-        navigateTo={'Q2'}
+        options={[
+          'Going on a group hike',
+          'Playing basketball',
+          'Playing a board game with a small group',
+          'Partying',
+          'Wine tasting',
+        ]}
+        // TODO replace with Q3
+        navigateTo={'Q1'}
       />
     </View>
   );
 };
 
-export default Q1Screen;
+export default Q2Screen;
 
 const styles = StyleSheet.create({
   container: {

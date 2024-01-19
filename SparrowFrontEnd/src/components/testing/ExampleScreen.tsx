@@ -58,7 +58,16 @@ const ExampleScreen = () => {
       </View> */}
 
       {/* Selectors */}
-      <RadioButton onPress={() => {}} text={'Radio button one'} />
+      {/* <View style={styles.container}>
+        <RadioButton
+          onPress={(item) => console.log(item)}
+          buttonText={[
+            'Radio button one',
+            'Radio button two',
+            'Radio button three',
+          ]}
+        />
+      </View> */}
     </View>
   );
 };

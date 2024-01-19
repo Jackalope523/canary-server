@@ -22,13 +22,17 @@ import TextInputSmall from '../../../components/TextInputSmall';
 
 // EXAMPLE SCREEN
 import ExampleScreen from '../../../components/testing/ExampleScreen';
+import Highlight, { HighlightType } from '../../../components/Highlight';
 
 type IntroProps = StackScreenProps<AuthStackParamList, 'Intro'>;
 
 const IntroScreen = ({ navigation }: IntroProps) => {
   const [buttonEnabled, setButtonEnabled] = React.useState(true);
 
-  function signupButton() {
+  // TODO replace with user's name
+  let name = 'User';
+
+  function continueButton() {
     navigation.navigate('Q1');
   }
 
@@ -36,28 +40,38 @@ const IntroScreen = ({ navigation }: IntroProps) => {
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
       <View style={styles.contentWrapper}>
-        <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-          INTRO SCREEN
-        </Text>
+        <View style={styles.headerWrapper}>
+          <Text style={[globalStyles.headingTextOne, globalStyles.textDark]}>
+            Let's get to know
+            <>
+              <Highlight type={HighlightType.Fuchsia}>{name}</Highlight>
+            </>
+          </Text>
+        </View>
 
-        <ExampleScreen />
+        {/* <ExampleScreen /> */}
 
         {/* <Image
           source={require('../../../assets/illustrations/temp/illustration-placeholder.png')}
           style={globalStyles.illustrationFull}
           resizeMode="contain"
         /> */}
+        <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+          To personalize Sparrow to match your interests, we need to learn more
+          about you. It won't take more than
+          <Highlight type={HighlightType.Dark}>2 minutes</Highlight>.
+        </Text>
       </View>
-      {/* <View style={styles.buttonWrapper}>
+      <View style={styles.buttonWrapper}>
         <Button
           type={ButtonType.Success}
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
-          text={'TEXT HERE'}
-          onPress={signupButton}
+          text={'Begin quiz'}
+          onPress={continueButton}
           disabled={!buttonEnabled}
         />
-      </View> */}
+      </View>
     </View>
   );
 };
@@ -74,6 +88,10 @@ const styles = StyleSheet.create({
   contentWrapper: {
     alignItems: 'center',
     rowGap: Spacing.lg,
+  },
+
+  headerWrapper: {
+    alignItems: 'center',
   },
 
   buttonWrapper: {
