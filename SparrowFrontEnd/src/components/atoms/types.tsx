@@ -13,6 +13,7 @@ export type AppStackParamList = {
   Auth: undefined;
   Main: undefined;
   Account: undefined;
+  Survey: undefined;
 };
 
 export type AuthStackParamList = {
@@ -22,6 +23,8 @@ export type AuthStackParamList = {
   Verify: { PhoneNumber: string; Forward: () => void };
   Continue: { Message: string; Forward: () => void };
   Main: undefined;
+  Intro: undefined;
+  Q1: undefined;
 };
 
 export type BottomTabParamList = {
