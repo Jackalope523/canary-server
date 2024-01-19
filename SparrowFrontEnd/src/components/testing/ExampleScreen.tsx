@@ -9,18 +9,21 @@ import ButtonGroup from '../ButtonGroup';
 // Input fields
 import DateOfBirthInput from '../auth/DateOfBirthInput';
 import DateOfBirthInput2 from '../auth/DateOfBirthInput2';
+import RadioButton from '../RadioButton';
 
 const ExampleScreen = () => {
   return (
     <View style={styles.container}>
-
       {/* Header */}
 
       <View style={styles.header}>
         <Text style={[globalStyles.displayTextTwo, globalStyles.textDark]}>
           Examples
         </Text>
-        <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>Keep sections you don't want to test commented out for better visibility.</Text>
+        <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+          Keep sections you don't want to test commented out for better
+          visibility.
+        </Text>
       </View>
 
       {/* Buttons */}
@@ -49,11 +52,13 @@ const ExampleScreen = () => {
 
       {/* Input fields */}
 
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <DateOfBirthInput />
         <DateOfBirthInput2 />
-      </View>
+      </View> */}
 
+      {/* Selectors */}
+      <RadioButton onPress={() => {}} text={'Radio button one'} />
     </View>
   );
 };
