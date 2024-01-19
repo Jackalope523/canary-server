@@ -58,6 +58,7 @@ const DiscoveryScreen = () => {
   // Toggle search close button
   const toggleClose = () => {
     setSearchContentVisible(false);
+    setActiveComponent(null);
     setSearchText('');
   };
 
@@ -69,7 +70,6 @@ const DiscoveryScreen = () => {
 
   const toggleFilter = () => {
     // setFilterVisible(!filterVisible);
-
     if (activeComponent === 'filter') {
       setActiveComponent(null);
     } else {
@@ -341,7 +341,7 @@ const DiscoveryScreen = () => {
                           text: "Thriving",
                           self: 2,
                           status: sizeState,
-                      changeState: setSizeState
+                          changeState: setSizeState
                         },
                         {
                           id: 3,
@@ -459,8 +459,6 @@ const DiscoveryScreen = () => {
   );
 };
 
-export default DiscoveryScreen;
-
 const styles = StyleSheet.create({
   sortContentWrapper: {
     paddingHorizontal: Spacing.lg,
@@ -496,3 +494,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
   },
 });
+
+export default DiscoveryScreen;
