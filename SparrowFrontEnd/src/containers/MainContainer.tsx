@@ -25,10 +25,14 @@ import SignupScreen from '../flows/auth/Signup';
 import VerifyScreen from '../flows/auth/Verify';
 import ContinueScreen from '../flows/auth/Continue';
 
-// Survey
+// Quiz
 import IntroScreen from '../flows/auth/survey/Intro';
 import Q1Screen from '../flows/auth/survey/Q1';
 import Q2Screen from '../flows/auth/survey/Q2';
+import Q3Screen from '../flows/auth/survey/Q3';
+import Q4Screen from '../flows/auth/survey/Q4';
+import Q5Screen from '../flows/auth/survey/Q5';
+import Q6Screen from '../flows/auth/survey/Q6';
 
 // Main
 import ActivityScreen from '../flows/activity/Activity';
@@ -105,6 +109,10 @@ function Survey() {
       <AuthStack.Screen name="Intro" component={IntroScreen} />
       <AuthStack.Screen name="Q1" component={Q1Screen} />
       <AuthStack.Screen name="Q2" component={Q2Screen} />
+      <AuthStack.Screen name="Q3" component={Q3Screen} />
+      <AuthStack.Screen name="Q4" component={Q4Screen} />
+      <AuthStack.Screen name="Q5" component={Q5Screen} />
+      <AuthStack.Screen name="Q6" component={Q6Screen} />
     </AuthStack.Navigator>
   );
 }

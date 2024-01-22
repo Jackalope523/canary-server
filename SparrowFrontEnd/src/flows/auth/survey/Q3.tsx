@@ -1,41 +1,38 @@
 import * as React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../../../components/atoms/types';
 
 import RadioSurveyScreen from '../../../components/survey/RadioSurveyScreen';
 import Highlight, { HighlightType } from '../../../components/Highlight';
+import CheckboxSurveyScreen from '../../../components/survey/CheckboxSurveyScreen';
+import ExampleScreen from '../../../components/testing/ExampleScreen';
 
 // Props
-interface Q2Props {
+interface Q3Props {
   navigation: StackNavigationProp<AuthStackParamList>;
 }
 
-const Q2Screen: React.FC<Q2Props> = ({ navigation }) => {
+const Q3Screen: React.FC<Q3Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <RadioSurveyScreen
+      <CheckboxSurveyScreen
         title={
           <>
-            Which activity sounds more
-            <Highlight type={HighlightType.Fuchsia}>fun to you</Highlight>?
+            My ideal
+            <Highlight type={HighlightType.Fuchsia}>event</Highlight>
+            is
           </>
         }
-        options={[
-          'Going on a group hike',
-          'Playing basketball',
-          'Playing a board game with a small group',
-          'Partying',
-          'Wine tasting',
-        ]}
+        options={['Action-packed', 'Relaxing', 'Competitive', 'Cooperative']}
         navigation={navigation}
-        navigateTo="Q3"
+        navigateTo="Q4"
       />
     </View>
   );
 };
 
-export default Q2Screen;
+export default Q3Screen;
 
 const styles = StyleSheet.create({
   container: {

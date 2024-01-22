@@ -27,6 +27,10 @@ export type AuthStackParamList = {
   RadioSurvey: undefined;
   Q1: undefined;
   Q2: undefined;
+  Q3: undefined;
+  Q4: undefined;
+  Q5: undefined;
+  Q6: undefined;
 };
 
 export type BottomTabParamList = {

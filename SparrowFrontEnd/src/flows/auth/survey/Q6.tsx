@@ -7,35 +7,35 @@ import RadioSurveyScreen from '../../../components/survey/RadioSurveyScreen';
 import Highlight, { HighlightType } from '../../../components/Highlight';
 
 // Props
-interface Q2Props {
+interface Q6Props {
   navigation: StackNavigationProp<AuthStackParamList>;
 }
 
-const Q2Screen: React.FC<Q2Props> = ({ navigation }) => {
+const Q6Screen: React.FC<Q6Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <RadioSurveyScreen
         title={
           <>
-            Which activity sounds more
-            <Highlight type={HighlightType.Fuchsia}>fun to you</Highlight>?
+            How likely are you to try
+            <Highlight type={HighlightType.Green}>new experiences</Highlight>?
           </>
         }
         options={[
-          'Going on a group hike',
-          'Playing basketball',
-          'Playing a board game with a small group',
-          'Partying',
-          'Wine tasting',
+          'Extremely likely',
+          'Somewhat likely',
+          'Neutral',
+          'Somewhat unlikely',
+          'Extremely unlikely',
         ]}
         navigation={navigation}
-        navigateTo="Q3"
+        navigateTo="Activity"
       />
     </View>
   );
 };
 
-export default Q2Screen;
+export default Q6Screen;
 
 const styles = StyleSheet.create({
   container: {
