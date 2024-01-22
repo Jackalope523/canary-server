@@ -29,7 +29,7 @@ const Q6Screen: React.FC<Q6Props> = ({ navigation }) => {
           'Extremely unlikely',
         ]}
         navigation={navigation}
-        navigateTo="Activity"
+        navigateTo={navigation.replace('Main')}
       />
     </View>
   );
