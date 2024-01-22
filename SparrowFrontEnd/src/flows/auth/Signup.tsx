@@ -152,11 +152,10 @@ const SignupScreen = ({ navigation }: SignupProps) => {
         <View style={styles.checkboxSection}>
           <View style={styles.checkboxInnerSection}>
             <Checkbox
-              text="I agree to Sparrow's Terms of Service"
-              onPress={() => {}}
-            />
-            <Checkbox
-              text="I agree to Sparrow's Privacy Policy"
+              text={[
+                "I agree to Sparrow's Terms of Service",
+                "I agree to Sparrow's Privacy Policy",
+              ]}
               onPress={() => {}}
             />
           </View>

@@ -58,7 +58,7 @@ const ExampleScreen = () => {
       </View> */}
 
       {/* Selectors */}
-      {/* <View style={styles.container}>
+      <View style={styles.container}>
         <RadioButton
           onPress={(item) => console.log(item)}
           buttonText={[
@@ -67,7 +67,7 @@ const ExampleScreen = () => {
             'Radio button three',
           ]}
         />
-      </View> */}
+      </View>
     </View>
   );
 };
