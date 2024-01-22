@@ -1,24 +1,20 @@
 import * as React from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthStackParamList } from '../../../components/atoms/types';
+
+import { getAccount } from '.././accountPigeon';
+import { initialiseAxiosSession } from '../../../lib/axios';
 
 import Button, {
   ButtonType,
   ButtonSize,
   ButtonDisplay,
 } from '../../../components/Button';
-import { AuthStackParamList } from '../../../components/atoms/types';
 
-import { getAccount } from '.././accountPigeon';
-import { initialiseAxiosSession } from '../../../lib/axios';
 import { globalStyles } from '../../../styles/GlobalStyles';
-import TextButton, {
-  TextButtonType,
-  TextButtonVariant,
-} from '../../../components/TextButton';
 import { Spacing } from '../../../styles/SpacingStyles';
-import TextInputSmall from '../../../components/TextInputSmall';
 
 // EXAMPLE SCREEN
 import ExampleScreen from '../../../components/testing/ExampleScreen';
@@ -39,9 +35,14 @@ const IntroScreen = ({ navigation }: IntroProps) => {
   // TODO <Pressable> text button may need to be made into a component named TextButton or something alike
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
-      <View style={styles.contentWrapper}>
-        <View style={styles.headerWrapper}>
-          <Text style={[globalStyles.headingTextOne, globalStyles.textDark]}>
+      <View style={styles.contentContainer}>
+        <View style={styles.headerContainer}>
+          <Text
+            style={[
+              globalStyles.headingTextOne,
+              globalStyles.textDark,
+              styles.text,
+            ]}>
             Let's get to know
             <>
               <Highlight type={HighlightType.Fuchsia}>{name}</Highlight>
@@ -51,18 +52,24 @@ const IntroScreen = ({ navigation }: IntroProps) => {
 
         {/* <ExampleScreen /> */}
 
-        {/* <Image
+        <Image
           source={require('../../../assets/illustrations/temp/illustration-placeholder.png')}
-          style={globalStyles.illustrationFull}
+          style={globalStyles.illustrationMedium}
           resizeMode="contain"
-        /> */}
-        <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+        />
+      </View>
+
+      <View style={styles.bottomContainer}>
+        <Text
+          style={[
+            globalStyles.bodyTextOne,
+            globalStyles.textDark,
+            styles.text,
+          ]}>
           To personalize Sparrow to match your interests, we need to learn more
           about you. It won't take more than
           <Highlight type={HighlightType.Dark}>2 minutes</Highlight>.
         </Text>
-      </View>
-      <View style={styles.buttonWrapper}>
         <Button
           type={ButtonType.Success}
           size={ButtonSize.Medium}
@@ -85,18 +92,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  contentWrapper: {
+  text: {
+    textAlign: 'center',
+  },
+
+  contentContainer: {
     alignItems: 'center',
     rowGap: Spacing.lg,
   },
 
-  headerWrapper: {
-    alignItems: 'center',
+  headerContainer: {},
+
+  bottomContainer: {
+    // alignItems: 'center',
+    width: '100%',
+    rowGap: Spacing.lg,
   },
 
-  buttonWrapper: {
-    alignItems: 'center',
-    width: '100%',
-    rowGap: Spacing.md,
-  },
+  // buttonContainer: {
+  //   alignItems: 'center',
+  //   width: '100%',
+  //   rowGap: Spacing.md,
+  // },
 });

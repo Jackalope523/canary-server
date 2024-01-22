@@ -1,34 +1,17 @@
 import * as React from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
-import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, StyleSheet } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../../../components/atoms/types';
 
-import { getAccount } from '.././accountPigeon';
-import { initialiseAxiosSession } from '../../../lib/axios';
-
 import RadioSurveyScreen from '../../../components/survey/RadioSurveyScreen';
-import Highlight, {
-  HighlightSize,
-  HighlightType,
-} from '../../../components/Highlight';
+import Highlight, { HighlightType } from '../../../components/Highlight';
 
 // Props
 interface Q1Props {
   navigation: StackNavigationProp<AuthStackParamList>;
-
-  // onPress: (item: string | GestureResponderEvent) => void;
-  // buttonText: string[];
 }
 
-const Q1Screen: React.FC<Q1Props> = () => {
-  // const [buttonEnabled, setButtonEnabled] = React.useState(true);
-
-  // function signupButton() {
-  // navigation.navigate('Q1');
-  // }
-
-  // TODO <Pressable> text button may need to be made into a component named TextButton or something alike
+const Q1Screen: React.FC<Q1Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <RadioSurveyScreen
@@ -40,7 +23,8 @@ const Q1Screen: React.FC<Q1Props> = () => {
           </>
         }
         options={['1-3 people', '3-6 people', '6-9 people', '9+ people']}
-        navigateTo={'Q2'}
+        navigation={navigation}
+        navigateTo="Q2"
       />
     </View>
   );

@@ -1,26 +1,21 @@
 import * as React from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
-import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import Button, { ButtonType, ButtonSize, ButtonDisplay } from '../Button';
+import { View, Text, StyleSheet } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../atoms/types';
 
-import { getAccount } from '../../flows/auth/accountPigeon';
-import { initialiseAxiosSession } from '../../lib/axios';
-import { globalStyles } from '../../styles/GlobalStyles';
-import TextButton, { TextButtonType, TextButtonVariant } from '../TextButton';
-import { Spacing } from '../../styles/SpacingStyles';
-import TextInputSmall from '../TextInputSmall';
+import Button, { ButtonType, ButtonSize, ButtonDisplay } from '../Button';
 import RadioButton from '../RadioButton';
+
+import { globalStyles } from '../../styles/GlobalStyles';
+import { Spacing } from '../../styles/SpacingStyles';
 import { Colors } from '../../styles/ColorStyles';
-import Highlight, { HighlightSize, HighlightType } from '../Highlight';
 
 // interface RadioSurveyScreenProps extends StackScreenProps<AuthStackParamList, 'Q2'> {}
 
 // Types
 interface RadioSurveyScreenProps {
   navigation: StackNavigationProp<AuthStackParamList>;
+  // navigation?: StackNavigationProp<any>;
   // navigateTo: [screen: string];
 
   navigateTo: any;

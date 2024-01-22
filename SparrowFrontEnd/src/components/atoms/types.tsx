@@ -24,6 +24,7 @@ export type AuthStackParamList = {
   Continue: { Message: string; Forward: () => void };
   Main: undefined;
   Intro: undefined;
+  RadioSurvey: undefined;
   Q1: undefined;
   Q2: undefined;
 };
