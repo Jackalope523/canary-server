@@ -20,7 +20,7 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 interface RadioButtonProps {
   onPress: (item: string | GestureResponderEvent) => void;
 
-  buttonText: string[] | React.ReactNode;
+  text: string[] | React.ReactNode;
 }
 
 /*
@@ -32,10 +32,7 @@ TODO animate:
 
 */
 
-export const RadioButton: React.FC<RadioButtonProps> = ({
-  onPress,
-  buttonText,
-}) => {
+export const RadioButton: React.FC<RadioButtonProps> = ({ onPress, text }) => {
   /*
 
   TODO disable the CONTINUE button until a selection is made;
@@ -62,7 +59,7 @@ export const RadioButton: React.FC<RadioButtonProps> = ({
 
   return (
     <View style={styles.container}>
-      {buttonText.map((buttonLabel, index) => (
+      {text?.map((label: string, index: any) => (
         <Pressable
           onPress={(item) => handleTap(item, index)}
           key={index}
@@ -84,7 +81,7 @@ export const RadioButton: React.FC<RadioButtonProps> = ({
                 ? [globalStyles.buttonTextTwo, globalStyles.textLight]
                 : [globalStyles.buttonTextTwo, globalStyles.textDark]
             }>
-            {buttonLabel}
+            {label}
           </Text>
         </Pressable>
       ))}

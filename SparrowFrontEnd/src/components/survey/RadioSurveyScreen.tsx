@@ -51,10 +51,7 @@ const RadioSurveyScreen: React.FC<RadioSurveyScreenProps> = ({
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.radioContainer}>
-          <RadioButton
-            onPress={(item) => console.log(item)}
-            buttonText={options}
-          />
+          <RadioButton onPress={(item) => console.log(item)} text={options} />
         </View>
         <View style={styles.buttonContainer}>
           <Button
