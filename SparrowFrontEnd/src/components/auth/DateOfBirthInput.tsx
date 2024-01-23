@@ -24,30 +24,34 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({}) => {
 
   return (
     <View style={styles.container}>
-      <TextInputSmall
-        type={InputType.Day}
-        label="Day"
-        value={Day}
-        onChangeText={setDay}
-        inputMode="numeric"
-        maxLength={2}
-        clearButton={false}
-      />
+      <View style={{ flex: 1 }}>
+        <TextInputSmall
+          type={InputType.Day}
+          label="Day"
+          value={Day}
+          onChangeText={setDay}
+          inputMode="numeric"
+          maxLength={2}
+          clearButton={false}
+        />
+      </View>
       <Dropdown
         label="Month"
         data={MONTHS}
         dropdownContentAlignment={styles.dropdownContentAlignment}
         containerFlexValue={styles.containerFlexValue}
       />
-      <TextInputSmall
-        type={InputType.Year}
-        label="Year"
-        value={Year}
-        onChangeText={setYear}
-        inputMode="numeric"
-        maxLength={4}
-        clearButton={false}
-      />
+      <View style={{ flex: 1 }}>
+        <TextInputSmall
+          type={InputType.Year}
+          label="Year"
+          value={Year}
+          onChangeText={setYear}
+          inputMode="numeric"
+          maxLength={4}
+          clearButton={false}
+        />
+      </View>
     </View>
   );
 };
