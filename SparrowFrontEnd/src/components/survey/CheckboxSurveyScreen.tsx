@@ -33,7 +33,7 @@ const CheckboxSurveyScreen: React.FC<CheckboxSurveyScreenProps> = ({
   options,
   title = 'NULL',
 }) => {
-  const [buttonEnabled, setButtonEnabled] = React.useState(true);
+  const [buttonEnabled, setButtonEnabled] = React.useState(false);
 
   // TODO set navigate to next QUESTION screen
   // TODO fix TS error
@@ -56,7 +56,7 @@ const CheckboxSurveyScreen: React.FC<CheckboxSurveyScreenProps> = ({
             buttonText={options}
           /> */}
 
-          <Checkbox text={options} onPress={(item) => console.log(item)} />
+          <Checkbox text={options} onPress={() => setButtonEnabled(true)} />
         </View>
         <View style={styles.buttonContainer}>
           <Button
