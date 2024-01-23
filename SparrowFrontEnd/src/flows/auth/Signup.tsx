@@ -137,16 +137,6 @@ const SignupScreen = ({ navigation }: SignupProps) => {
             recommended
             description="We recommend binding an email address to your account in case you change your phone number."
           />
-          {/* <TextInputSmall
-          label="Date of Birth"
-          value={DateOfBirth}
-          onChangeText={setDateOfBirth}
-          placeholder="MM/DD/YYYY"
-          inputMode="numeric"
-          maxLength={8}
-          required
-          description="You must be 18 years or older to use Sparrow. Your date of birth will not be visible to other users."
-        /> */}
           <DateOfBirthInput />
         </View>
         <View style={styles.checkboxSection}>
@@ -173,21 +163,12 @@ const SignupScreen = ({ navigation }: SignupProps) => {
             on our official website.
           </Text>
         </View>
-        {/* <Text>Date of Birth</Text>
-      <DatePicker
-        date={DateOfBirth}
-        onDateChange={setDateOfBirth}
-        mode="date"
-        timeZoneOffsetInMinutes={0}
-        maximumDate={new Date()}
-      /> */}
         <Button
           type={ButtonType.Success}
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
           text={'Continue'}
           onPress={navigate}
-          // disabled
           disabled={!isButtonEnabled}
         />
       </ScrollView>
@@ -200,12 +181,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
 // ! ||--------------------------------------------------------------------------------||
 const styles = StyleSheet.create({
   container: {
-    // alignItems: 'center',
-
-    // TODO Might have to use justifyContent: 'flex-end' instead for KeyboardAvoidingContainer to work
-    // justifyContent: 'center',
     justifyContent: 'flex-end',
-    // paddingBottom: 48,
 
     flex: 1,
   },
