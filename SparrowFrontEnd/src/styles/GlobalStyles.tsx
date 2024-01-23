@@ -329,12 +329,14 @@ export const globalStyles = StyleSheet.create({
 
   // Large
   illustrationLarge: {
+    alignSelf: 'center',
     resizeMode: 'center',
     height: 280,
   },
 
   // Medium
   illustrationMedium: {
+    alignSelf: 'center',
     resizeMode: 'center',
     height: 200,
   },
