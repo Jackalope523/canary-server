@@ -19,6 +19,7 @@ import TextButton, {
   TextButtonType,
   TextButtonVariant,
 } from '../../components/TextButton';
+import ExampleScreen from '../../components/testing/ExampleScreen';
 
 type VerifyProps = StackScreenProps<AuthStackParamList, 'Verify'>;
 
@@ -70,7 +71,11 @@ const VerifyScreen = ({ route }: VerifyProps) => {
         disabled={!buttonEnabled}
       /> */}
 
-      <View style={styles.headerContainer}>
+      <ExampleScreen />
+
+      {/* TODO uncomment starting from what's below */}
+
+      {/* <View style={styles.headerContainer}>
         <Image
           source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
           style={globalStyles.illustrationLarge}
@@ -102,9 +107,9 @@ const VerifyScreen = ({ route }: VerifyProps) => {
             type={TextButtonType.Dark}
             variant={TextButtonVariant.Three}
             onPress={null}
-          />
-        </View>
-      </View>
+          /> */}
+      {/* </View>
+      </View> */}
     </View>
   );
 };
