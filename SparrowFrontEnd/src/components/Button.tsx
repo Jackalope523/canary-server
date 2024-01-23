@@ -50,7 +50,7 @@ export interface ButtonProps {
   btnDisabledIconStyle?: TextStyle[];
 
   // Exclusive Button Support
-  id? : number;
+  id?: number;
   current?: number;
   setCurrent?: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -75,9 +75,9 @@ export const Button: React.FC<ButtonProps> = ({
   size = null,
   display = null,
   icon = false,
-  id = -1, 
+  id = -1,
   current = -1,
-  setCurrent = null
+  setCurrent = null,
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Type                                      ||
@@ -358,7 +358,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   // TODO button needs to reset state back to rest (isPressed = false), when the user has
   // left the screen / doesn't see the button anymore.
-  
+
   const handlePressIn = () => {
     if (self != null && status != null && changeState != null) {
       if (status == self) changeState(-1);
@@ -370,7 +370,7 @@ export const Button: React.FC<ButtonProps> = ({
       if (setCurrent != null && current == id) {
         setCurrent(-1);
       }
-      if (setCurrent != null && current != id ) {
+      if (setCurrent != null && current != id) {
         setCurrent(id);
       }
     }
