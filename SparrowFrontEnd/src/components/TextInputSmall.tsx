@@ -37,7 +37,7 @@ interface TextInputSmallProps {
   disabled?: boolean;
   clearButton?: boolean;
   value?: string | date;
-  onChangeText?: (text: string | date) => void;
+  onChangeText: React.Dispatch<React.SetStateAction<string>>;
 
   autoComplete?: 'tel' | 'email';
   inputMode?:
@@ -64,6 +64,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   autoComplete,
   inputMode,
   maxLength,
+  onChangeText
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Text input                                   ||
@@ -95,10 +96,19 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   }
   
   const customOnBlur = () => 
-  {     
+  {    
+    handleSubmit();
     locked.current ?  textInput.current?.focus() : setIsFocused(false);
     locked.current = false;
   }
+
+  const handleSubmit = () => {
+    validateInput();
+    if (isValid) {
+      setError('');
+      onChangeText(text);
+    }
+  };
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                Clear text button                               ||
@@ -123,8 +133,10 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // On press
   const clearButtonPress = () => {
     setText('');
+    onChangeText(text);
     locked.current = true;
   };
+
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Validation                                   ||
@@ -224,13 +236,6 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
     }
   };
 
-  const handleSubmit = () => {
-    if (validateInput()) {
-      console.log('Submitted', text);
-      setError('');
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.labelContainer}>
@@ -279,7 +284,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           ref={textInput}
           type={type}
           value={text}
-          onChangeText={setText}
+          onChangeText={(val) => setText(val)}
           onFocus={customOnFocus}
           onBlur={customOnBlur}
           style={[styles.input, globalStyles.bodyTextOne]}

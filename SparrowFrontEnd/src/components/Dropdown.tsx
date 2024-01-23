@@ -36,6 +36,8 @@ interface DropdownProps {
   initialValue?: string;
   data: any[];
 
+  onTextChange: React.Dispatch<React.SetStateAction<string>>;
+
   // Use for aligning the dropdown content with alignSelf
   dropdownContentAlignment?: StyleProp<ViewStyle>;
 
@@ -57,6 +59,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   data,
   dropdownContentAlignment,
   containerFlexValue,
+  onTextChange
 }) => {
   // Selection
   // const [selected, setSelected] = React.useState(initialValue);
@@ -158,6 +161,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   style={styles.dropdownItem}
                   onPress={() => {
                     setSelected(item);
+                    onTextChange(item);
                     setIsFocused(false);
                   }}>
                   <Text
