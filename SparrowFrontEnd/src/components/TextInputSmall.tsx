@@ -69,8 +69,9 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||                                   Text input                                   ||
   // ! ||--------------------------------------------------------------------------------||
   const [isFocused, setIsFocused] = React.useState(false);
-  const textInput : React.MutableRefObject<TextInput|undefined> = React.useRef();
-  let locked : React.MutableRefObject<boolean> = React.useRef(false);
+  const textInput: React.MutableRefObject<TextInput | undefined> =
+    React.useRef();
+  let locked: React.MutableRefObject<boolean> = React.useRef(false);
 
   // Animations
   const bw = useSharedValue(0);
@@ -88,17 +89,15 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
     });
   }, [isFocused]);
 
-  const customOnFocus = () => 
-  {
+  const customOnFocus = () => {
     setIsFocused(true);
     locked.current = false;
-  }
-  
-  const customOnBlur = () => 
-  {     
-    locked.current ?  textInput.current?.focus() : setIsFocused(false);
+  };
+
+  const customOnBlur = () => {
+    locked.current ? textInput.current?.focus() : setIsFocused(false);
     locked.current = false;
-  }
+  };
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                Clear text button                               ||
@@ -353,7 +352,7 @@ const styles = StyleSheet.create({
   container: {
     rowGap: Spacing.xs,
     // width: '100%',
-    flex: 1,
+    // flex: 1,
   },
 
   labelContainer: {

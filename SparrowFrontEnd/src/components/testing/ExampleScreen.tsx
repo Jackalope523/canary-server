@@ -10,8 +10,13 @@ import ButtonGroup from '../ButtonGroup';
 import DateOfBirthInput from '../auth/DateOfBirthInput';
 import DateOfBirthInput2 from '../auth/DateOfBirthInput2';
 import RadioButton from '../RadioButton';
+import OTPInputV1 from './OTPInputV1';
 
 const ExampleScreen = () => {
+  const [code, setCode] = React.useState('');
+  const [isPinReady, setIsPinReady] = React.useState(false);
+  const MAX_CODE_LENGTH = 4;
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -52,20 +57,20 @@ const ExampleScreen = () => {
 
       {/* Input fields */}
 
-      {/* <View style={styles.container}>
-        <DateOfBirthInput />
-        <DateOfBirthInput2 />
-      </View> */}
-
-      {/* Selectors */}
       <View style={styles.container}>
-        <RadioButton
-          onPress={(item) => console.log(item)}
-          buttonText={[
-            'Radio button one',
-            'Radio button two',
-            'Radio button three',
-          ]}
+        {/* <DateOfBirthInput />
+        <DateOfBirthInput2 /> */}
+        {/* <OTPInputV1
+          setIsPinReady={setIsPinReady}
+          code={code}
+          setCode={setCode}
+          maxLength={MAX_CODE_LENGTH}
+        /> */}
+        <OTPInputV1
+          setIsPinReady={setIsPinReady}
+          code={code}
+          setCode={setCode}
+          maxLength={MAX_CODE_LENGTH}
         />
       </View>
     </View>
