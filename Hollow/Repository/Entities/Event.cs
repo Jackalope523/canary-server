@@ -11,7 +11,7 @@ namespace Repository
         public string Description { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public ulong HostId { get; set; }
-        internal User Host { get; set; }
+        internal User Host { get; set; } 
         public Point Location { get; set; } // X = Longitude Y = Latitude
 
         public EventState State { get; set; }
@@ -31,8 +31,8 @@ namespace Repository
         public int NightOwl { get; init; }
 
         // Navigation Properties
-        internal List<EventLink> Links { get; set; }
-        internal List<Report> Reports { get; set; }
-        internal List<Post> Posts { get; set; }
+        public List<EventLink> Links { get; set; }
+        public List<Report> Reports { get; set; }
+        public List<Post> Posts { get; set; }
     }
 }

@@ -24,11 +24,11 @@ namespace Core.Boundaries
         Task<Etching> GetEtchingAsync(ulong etchingId);
         Task<Etching> AddEtchingAsync(ulong eventId, ulong etcherId,
             DateTimeOffset timeEtched, string imageURL);
-		Task<bool> RemoveEtchingAsync(ulong etchingId);
-		Task<bool> HideEtchingAsync(ulong etchingId);
+		Task RemoveEtchingAsync(ulong etchingId);
+		Task HideEtchingAsync(ulong etchingId);
 
-		Task<bool> RateEtchingAsync(ulong etchingId, ulong voterId, UserRating rating);
-		Task<bool> RemoveEtchingRatingAsync(ulong etchingId, ulong voterId);
+		Task RateEtchingAsync(ulong etchingId, ulong voterId, UserRating rating);
+		Task RemoveEtchingRatingAsync(ulong etchingId, ulong voterId);
 
         Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, List<ulong> exclusionList);
     }

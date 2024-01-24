@@ -1,11 +1,11 @@
 ﻿using Core.Boundaries;
-using NetTopologySuite.Geometries;
 
 namespace Repository
 {
     internal class UserFactory
     {
         private int produced = 0;
+        private CoordinateFactory internalFactory = new();
 
         public User Create()
         {
@@ -24,7 +24,7 @@ namespace Repository
                 SecurityStamp = "stamp" + produced,
                 LockoutDate = DateTimeOffset.Now.AddDays(-365),
                 AccessTries = 3 + produced,
-                AccountStatus = UserAccountStatus.active,
+                AccountStatus = UserAccountStatus.Active,              
 
                 Extroversion = 5 + produced,
                 Athleticisme = 7 + produced,
@@ -34,13 +34,12 @@ namespace Repository
                 Industriousness = 1 + produced,
                 NightOwl = 9 + produced,
 
-                Haunt = new Point(40.7128, -74.0060),
+                Haunt = internalFactory.Create(40.712, -74.006),
                 HauntRadius = 10.0 + produced,
                 HauntWheight = 5 + produced,
-                CurrentLocation = new Point(40.7128, -74.0060),
+                CurrentLocation = internalFactory.Create(40.712, -74.006),
                 CurrentRadius = 15.0 + produced
             };
         }
-
     }
 }

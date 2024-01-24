@@ -1,17 +1,32 @@
-﻿
+﻿using Shared;
+
 namespace Repository.Tests
 {
     internal class EventLinkFactory
-    {      
-        public EventLink Create(User user, Event @event, EventLink.EventLinkType type)
+    {
+        int created = 0;
+        public EventLink Create(User user, Event @event, EventBond type)
         {
+            created++;
             return new EventLink
             {
-                SelfId = user.Id,
-                OtherId = @event.Id,
+                UserId = user.Id,
+                EventId = @event.Id,
                 Type = type,
-                Time = DateTimeOffset.MinValue,
+                Time = DateTimeOffset.MinValue.AddHours(created)
             };
         }
+        public EventLink Create(User user, Event @event, EventBond type, DateTimeOffset time)
+        {
+            created++;
+            return new EventLink
+            {
+                UserId = user.Id,
+                EventId = @event.Id,
+                Type = type,
+                Time = time
+            };
+        }
+
     }
 }

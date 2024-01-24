@@ -59,9 +59,8 @@ namespace Core.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            Try(await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
-                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter()),
-                new UnexpectedFailureException("User creation failed."));
+            await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
+                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
         }
 
         public async Task EditUserAsync(ulong userId,
@@ -132,8 +131,7 @@ namespace Core.Controls
 
         public async Task DeleteUserAsync(ulong userId)
         {
-            Try(await Accounts.DeleteUserAsync(userId),
-                new UnexpectedFailureException("User deletion failed."));
+            await Accounts.DeleteUserAsync(userId);
         }
 
         public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
@@ -192,7 +190,7 @@ namespace Core.Controls
                 // Check if user is close enough to be a guest
                 if (await nextEvent.IsInRange(user))
                 {
-                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventUserState.Guest);
+                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived);
 
                     // Check if user is host and can start event
                     if (nextEvent.IsWaiting &&

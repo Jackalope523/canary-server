@@ -12,7 +12,7 @@
                 SelfId = reporter.Id,
                 OtherId = location.HostId,
                 EventId = location.Id,
-                Type = Shared.EventReportType.misleading,
+                Type = Shared.EventReportType.Misleading,
                 FilingDate = DateTimeOffset.MinValue,
                 Notes = "Test Event Report " + created
             };          

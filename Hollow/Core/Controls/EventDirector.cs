@@ -135,7 +135,7 @@ namespace Core.Controls
 			Event editedEvent = new(targetEvent.ToEventShard())
 			{
 				Description = eventDescription,
-				State = IsNull(isOpen) ? targetEvent.State : (isOpen.Value ? EventState.active_open : EventState.active_closed),
+				State = IsNull(isOpen) ? targetEvent.State : (isOpen.Value ? EventState.Open : EventState.Sealed),
 				StartTime = startTime ?? targetEvent.StartTime,
 				Location = AreNull(latitude, longitude) ? targetEvent.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
 				Radius = IsNull(radius) ? targetEvent.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
@@ -186,8 +186,7 @@ namespace Core.Controls
 			}
 
 			// Push update
-			Try(await Events.UpdateEventAsync(targetEvent.Id, edits),
-				new UnexpectedFailureException("Failed to edit event."));
+			await Events.UpdateEventAsync(targetEvent.Id, edits);
 
 			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
 		}
@@ -207,8 +206,7 @@ namespace Core.Controls
 				new InvalidEventException("Event cannot be started."));
 
 			// Try to start event
-			Try(await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.active_open) }),
-				new UnexpectedFailureException("Could not start event."));
+			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.Open) });
 
 			await targetEvent.Started();
 		}
@@ -223,8 +221,7 @@ namespace Core.Controls
 				new InvalidUserException("User does not have permissions to end event."));
 
 			// Try to end to event
-			Try(await Events.EndEventAsync(eventId),
-				new UnexpectedFailureException("Could not end event."));
+			await Events.EndEventAsync(eventId);
 
 			var participants = await targetEvent.Ended();
 
@@ -247,8 +244,7 @@ namespace Core.Controls
 			if (!userIntention.HasValue)
 			{
 				// Try to add user to the event
-				Try(await Events.SetUserStateAsync(userId, eventId, EventUserState.Watching),
-					new UnexpectedFailureException("Could not watch event."));
+				await Events.SetUserStateAsync(userId, eventId, EventBond.Watching);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not watch event, user currently {userIntention.Value} event."); }
@@ -260,11 +256,10 @@ namespace Core.Controls
 
 			// Ensure correct state transition
 			if (userIntention.HasValue &&
-				userIntention.Value.Equals(EventUserState.Watching))
+				userIntention.Value.Equals(EventBond.Watching))
 			{
 				// Try to remove user from event
-				Try(await Events.RemoveUserAsync(userId, eventId),
-					new UnexpectedFailureException("Could not unwatch event."));
+				await Events.RemoveUserAsync(userId, eventId);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not unwatch event, user currently {userIntention.Value} event."); }
@@ -290,23 +285,18 @@ namespace Core.Controls
 				if (conflict != null)
 				{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 			}
-
-			bool success;
-
 			// Check if event is active and user is already there
 			if (HasAlready(targetEvent.StartTime) &&
 				await targetEvent.IsInRange(user))
 			{
 				// Try to add user to the event
-				success = await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Guest);
+				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Arrived);
 			}
 			else
 			{
 				// Try to add user to the event
-				success = await Events.SetUserStateAsync(userId, eventId, EventUserState.Incoming);
-			}
-
-			Try(success, new UnexpectedFailureException("Could not join event."));
+				await Events.SetUserStateAsync(userId, eventId, EventBond.Guest);
+			}			
 
 			// Notify host if event has already started
 			if (HasAlready(targetEvent.StartTime))
@@ -325,30 +315,28 @@ namespace Core.Controls
 			// Get the user's current status
 			var userIntention = await Events.GetUserStateAsync(user.Id, targetEvent.Id);
 			
-			// Check if user is guest or incoming
-			if (userIntention.Equals(EventUserState.Guest))
+			// Check if user is guest or arrived
+			if (userIntention.Equals(EventBond.Arrived))
 			{
 				// Try to remove user from event
-				Try(await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventUserState.Left),
-					new UnexpectedFailureException("Could not leave event."));
+				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Left);
 			}
-			else if (userIntention.Equals(EventUserState.Incoming))
+			else if (userIntention.Equals(EventBond.Guest))
 			{
 				// Try to remove user from event
-				Try(await Events.RemoveUserAsync(user.Id, targetEvent.Id),
-					new UnexpectedFailureException("Could not unattend event."));
+				await Events.RemoveUserAsync(user.Id, targetEvent.Id);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not leave event, user currently {userIntention.Value} event."); }
 		}
 
-		public async Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
+		public async Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)>
 			GetGuestListAsync(ulong userId, ulong eventId)
 		{
 			var user = await GetUserAsync(userId);
 			var targetEvent = await GetEventAsync(eventId);
 
-			(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)
+			(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)
 				guestList = new(0, 0, new());
 
 			// Check if user is host
@@ -358,13 +346,13 @@ namespace Core.Controls
 				var friends = await targetEvent.GetFriendsOf(user);
 
 				guestList.Guests.AddRange(SelectAsSilhouette(friends,
-					friend => friend.State.Equals(EventUserState.Watching)));
+					friend => friend.State.Equals(EventBond.Watching)));
 
 				// Add visible users
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers.Value(),
-					user => !user.State.Equals(EventUserState.Watching)));
+					user => !user.State.Equals(EventBond.Watching)));
 
-				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
+				guestList.GuestCount = (await targetEvent.Arrived.Value()).Count;
 				guestList.Watchers = (await targetEvent.Watching.Value()).Count;
 			}
 			// Check if user is a guest
@@ -374,13 +362,13 @@ namespace Core.Controls
 				var friends = await targetEvent.GetFriendsOf(user);
 
 				guestList.Guests.AddRange(SelectAsSilhouette(friends,
-					friend => friend.State.Equals(EventUserState.Watching) || friend.State.Equals(EventUserState.Incoming)));
+					friend => friend.State.Equals(EventBond.Watching) || friend.State.Equals(EventBond.Guest)));
 
 				// Add visible users
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers.Value(),
-					user => user.State.Equals(EventUserState.Guest) || user.State.Equals(EventUserState.Left)));
+					user => user.State.Equals(EventBond.Arrived) || user.State.Equals(EventBond.Left)));
 
-				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
+				guestList.GuestCount = (await targetEvent.Arrived.Value()).Count;
 			}
 			// Check if user can view event
 			else if (await targetEvent.IsVisibleTo(user))
@@ -388,10 +376,10 @@ namespace Core.Controls
 				// Retrieve user's friends that will be, are, or were attending
 				var friends = await targetEvent.GetFriendsOf(user);
 
-				guestList.Guests = SelectAsSilhouette(friends, friend => !friend.State.Equals(EventUserState.Watching));
+				guestList.Guests = SelectAsSilhouette(friends, friend => !friend.State.Equals(EventBond.Watching));
 
 				// Add visible information
-				guestList.GuestCount = (await targetEvent.Guests.Value()).Count;
+				guestList.GuestCount = (await targetEvent.Arrived.Value()).Count;
 			}
 			// User cannot recieve information about event
 			else
@@ -426,7 +414,7 @@ namespace Core.Controls
 
 			// Verify inviter has relationship with event
 			Try(await @event.HasUserRelationship(inviter),
-				new InvalidEventException("User must be watching, incoming, or at event to invite."));
+				new InvalidEventException("User must be watching, a guest, or arrived at event to invite."));
 
 			// Verify that the invitee can join the event
 			Try(await @event.IsJoinableBy(invitee),
@@ -459,7 +447,7 @@ namespace Core.Controls
 				new InvalidUserException("Host cannot kick themself."));
 
 			// Kick target user from event
-			Events.SetUserStateAsync(targetUser.Id, @event.Id, EventUserState.Kicked);
+			Events.SetUserStateAsync(targetUser.Id, @event.Id, EventBond.Kicked);
 
 			// Hide target user's etchings from event
 			foreach (Etching etching in await @event.Etchings.Value())
@@ -488,7 +476,7 @@ namespace Core.Controls
 				.ConvertAll(@event => new Event(@event));
 		}
 		
-		internal async Task<List<(User User, EventUserState State)>> RequestAllUsersFromEventAsync(Event @event)
+		internal async Task<List<(User User, EventBond State)>> RequestAllUsersFromEventAsync(Event @event)
 		{
 			return (await Events.GetAllUsersAsync(@event.Id))
 				.ConvertAll(userDetails => (new User(userDetails.User), userDetails.State));
@@ -556,8 +544,8 @@ namespace Core.Controls
 				new InvalidUserException("User is currently attending an event."));
 		}
 
-		private List<(UserSilhouette User, EventUserState State)>
-			SelectAsSilhouette(List<(User User, EventUserState State)> users, Func<(User User, EventUserState State), bool> predicate)
+		private List<(UserSilhouette User, EventBond State)>
+			SelectAsSilhouette(List<(User User, EventBond State)> users, Func<(User User, EventBond State), bool> predicate)
 		{
 			return users.Where(predicate).ToList().ConvertAll(userDetails => (userDetails.User.ToUserSilhouette(), userDetails.State));
 		}

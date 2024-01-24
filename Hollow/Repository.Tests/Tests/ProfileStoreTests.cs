@@ -149,10 +149,34 @@ namespace Repository.Tests.Tests
             UserLink link1 = factory.Create(subject1, subject2, UserLink.UserLinkType.Follow);
             UserLink link2 = factory.Create(subject2, subject1, UserLink.UserLinkType.Follow);
 
-            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(link1));
-            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(link2));
+            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
+            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
             UserSilhouette user = (await profileStore.GetFriendsAsync(subject1.Id)).First();
+
+            Assert.NotNull(user);
+            Assert.Equal(subject2.Id, user.Id);
+            Assert.Equal(subject2.Name, user.Name);
+        }
+        [Fact]
+        public async Task GetUsersFollowingAsync_SUCCESS()
+        {
+            UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Follow);
+            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
+
+            UserSilhouette user = (await profileStore.GetUsersFollowingAsync(subject1.Id)).First();
+
+            Assert.NotNull(user);
+            Assert.Equal(subject2.Id, user.Id);
+            Assert.Equal(subject2.Name, user.Name);
+        }
+        [Fact]
+        public async Task GetUsersBlockingAsync_SUCCESS()
+        {
+            UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Block);
+            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
+
+            UserSilhouette user = (await profileStore.GetUsersBlockingAsync(subject1.Id)).First();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);

@@ -1,40 +1,63 @@
-﻿
-using Core.Boundaries;
+﻿using Core.Boundaries;
+using Microsoft.EntityFrameworkCore;
+using Repository.Entities;
 using Shared;
 
 namespace Repository
 {
     public class NotificationStore : QueryStore, INotificationDatabase
     {
-        public static INotificationDatabase Access => new NotificationStore(new TestSentry());
+        public static INotificationDatabase Access => new NotificationStore(new AzureSentry());
 
         public NotificationStore(Sentry sentry) : base(sentry)
         {
         }
 
-        public Task<List<Note>> GetNotesAsync(ulong userId)
+        public async Task<List<Core.Boundaries.Note>> GetNotesAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Notes.
+            Where(n => n.NotifierId == userId).
+            Select(n => new Core.Boundaries.Note(n.NotifierId, n.Time, n.Message, n.Action)).
+            ToListAsync());
         }
-
-        public Task<(DeviceType DeviceType, string DeviceToken)> GetUserSubscriptionAsync(ulong userId)
+        public async Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId)
         {
-            throw new NotImplementedException();
+           return await storeSentry.ExecuteReadAsync(ctx =>
+           ctx.Subscriptions.
+           Where(s => s.UserId == userId).
+           Select(s => new DeviceSilhouette(s.DeviceType, s.DeviceToken)).
+           SingleAsync());
+
         }
-
-        public Task<bool> SaveNoteAsync(ulong userId, ulong notifierId, DateTimeOffset time, string message, string action)
+        public async Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, string message, string action)
         {
-            throw new NotImplementedException();
+            Entities.Note toAdd = new() 
+            {  
+                NotifierId = notifierId, 
+                RecipientId = recipientId,
+                Time = time, 
+                Message = message, 
+                Action =  action, 
+                Read = false
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Notes.Add(toAdd));
         }
-
-        public Task<bool> SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
+        public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
         {
-            throw new NotImplementedException();
+            Subscription toAdd = new()
+            {
+                UserId = userId,
+                DeviceType = deviceType,
+                DeviceToken = deviceToken
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Add(toAdd));
         }
-
-        public Task<bool> UnsubscribeUserAsync(ulong userId)
+        public async Task UnsubscribeUserAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Where(s => s.UserId == userId).ExecuteDeleteAsync());
         }
     }
 }

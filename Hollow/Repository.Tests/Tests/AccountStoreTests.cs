@@ -11,12 +11,15 @@ namespace Repository.Tests.Tests
         private readonly ITestOutputHelper _testOutputHelper;
 
         private static readonly TestSentry sentry = new();
-        private static readonly AccountStore store = new(sentry);    
-        private static readonly User subject = new UserFactory().Create();
+        private static readonly AccountStore store = new(sentry);  
+        
+        private User subject;
 
         public AccountStoreTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
+
+            subject = new UserFactory().Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
         }
         public void Dispose()
@@ -119,7 +122,7 @@ namespace Repository.Tests.Tests
         {
             Func<Task> action = async () => await store.FindUserByIdAsync(ulong.MaxValue);
 
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }     
 
         [Fact]
@@ -155,7 +158,7 @@ namespace Repository.Tests.Tests
         {
             Func<Task> action = async () => await store.FindUserByPhoneNumberAsync("");
 
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
         [Fact]
@@ -191,7 +194,7 @@ namespace Repository.Tests.Tests
         {
             Func<Task> action = async () => await store.FindUserByEmailAsync("");
 
-            await Assert.ThrowsAsync<UserNotFoundException>(action);     
+            await Assert.ThrowsAsync<DatabaseReadException>(action);     
         }
 
         [Fact]
@@ -590,7 +593,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateUserAsync_AccountStatus()
         {
-            UserAccountStatus newAccountStatus = UserAccountStatus.blacklisted;
+            UserAccountStatus newAccountStatus = UserAccountStatus.Blacklisted;
 
             List<(string, object)> updates = new List<(string, object)>();
             updates.Add(("AccountStatus", newAccountStatus));
@@ -687,7 +690,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateHauntAsync_SUCCESS()
         {
-            Point newHaunt = new Point(35.7128, -22.0060);
+            Point newHaunt = new CoordinateFactory().Create(35.712, -22.006);
             double newRadius = 35.7128;
             int newStability = 12;
 
@@ -741,7 +744,7 @@ namespace Repository.Tests.Tests
         [Fact]
         public async Task UpdateRecentLocationAsync_SUCCESS()
         {
-            Point newLocation = new Point(35.7128, -22.0060);
+            Point newLocation = new CoordinateFactory().Create(35.718, -22.060);
             double newRadius = 35.7128;
 
             await store.UpdateRecentLocationAsync(subject.Id, newLocation.Y, newLocation.X, newRadius);
@@ -803,7 +806,7 @@ namespace Repository.Tests.Tests
         public async Task GetUserHauntAsync_UserNotFound()
         {
             Func<Task> action = async () => await store.GetUserHauntAsync(ulong.MaxValue);
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
         [Fact]
@@ -819,7 +822,7 @@ namespace Repository.Tests.Tests
         public async Task GetRecentUserLocationAsync_UserNotFound()
         {
             Func<Task> action = async () => await store.GetRecentUserLocationAsync(ulong.MaxValue);
-            await Assert.ThrowsAsync<UserNotFoundException>(action);
+            await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
     }

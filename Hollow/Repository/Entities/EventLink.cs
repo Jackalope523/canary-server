@@ -1,10 +1,15 @@
-﻿namespace Repository
-{
-    public class EventLink : Link
-    {
-        public enum EventLinkType { Watching, Attend, Present, Left }
+﻿using Shared;
 
-        internal Event Event { get; init; }
-        public EventLinkType Type { get; set; }
+namespace Repository
+{
+    public class EventLink
+    {
+        public ulong Id { get; init; }
+        public ulong UserId { get; init; }
+        public User User { get; init; }
+        public ulong EventId { get; init; }
+        public Event Event { get; init; }
+        public DateTimeOffset Time { get; init; }
+        public EventBond Type { get; set; }
     }
 }

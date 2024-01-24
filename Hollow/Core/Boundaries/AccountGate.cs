@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Core.Controls;
 using System.Threading.Tasks;
-using Core.Entities;
-using Shared;
 
 namespace Core.Boundaries
 {
 	#region Schemas
 
 	public enum UserAccountStatus
-	{ active, active_no_host, active_limited, inactive_under_review, blacklisted }
+	{ Active, Impotent, Limited, Suspended, Blacklisted }
 
 	public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
@@ -20,25 +17,29 @@ namespace Core.Boundaries
 	public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
 
-	#endregion
+    public record RecentLocation(double Latitude, double Longitude, double Radius);
+    public record Haunt(double Latitude, double Longitude, double Radius, int Stability);
+	
 
-	#region Gates
+    #endregion
 
-	public interface IAccountDatabase
+    #region Gates
+
+    public interface IAccountDatabase
 	{
 		Task<UserShard> FindUserByIdAsync(ulong userId);
         Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<UserShard> FindUserByEmailAsync(string normalisedEmail);
-		Task<bool> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
+		Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, Character character);
-		Task<bool> UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
-		Task<bool> DeleteUserAsync(ulong userId);
+		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
+		Task DeleteUserAsync(ulong userId);
 
-		Task<(double Latitude, double Longitude, double Radius)> GetRecentUserLocationAsync(ulong userId);
-		Task<bool> UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius);
+		Task<RecentLocation> GetRecentUserLocationAsync(ulong userId);
+		Task UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius);
 
-		Task<(double Latitude, double Longitude, double Radius, int Stability)> GetUserHauntAsync(ulong userId);
-		Task<bool> UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability);
+		Task<Haunt> GetUserHauntAsync(ulong userId);
+		Task UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability);
 	}
 
 	public interface IAccountOperations

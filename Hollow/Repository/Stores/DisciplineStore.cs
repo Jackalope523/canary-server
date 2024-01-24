@@ -6,7 +6,7 @@ namespace Repository
 {
     public class DisciplineStore : QueryStore, IDisciplineDatabase
     {
-        public static IDisciplineDatabase ReportDatabaseAccess => new DisciplineStore(new TestSentry());
+        public static IDisciplineDatabase ReportDatabaseAccess => new DisciplineStore(new AzureSentry());
 
         public DisciplineStore(Sentry sentry) : base(sentry)
         {
@@ -27,6 +27,7 @@ namespace Repository
                 r.Notes
             )).
             ToListAsync());
+
             Task<List<Core.Boundaries.EventReport>> eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             EventReports.
             Where(r => r.SelfId == id).
@@ -77,7 +78,8 @@ namespace Repository
                  r.Type,
                  r.Notes
              )).
-             ToListAsync());
+            ToListAsync());
+
             Task<List<Core.Boundaries.EventReport>> eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             EventReports.
             Where(r => r.OtherId == id).
@@ -96,9 +98,9 @@ namespace Repository
             return (await userReportsToReturn, await eventReportsToReturn);
         }
 
-        public async Task<bool> ReportEventAsync(ulong userId, ulong eventId, ulong HostId, EventReportType reportType, string reportDetails)
+        public async Task ReportEventAsync(ulong userId, ulong eventId, ulong HostId, EventReportType reportType, string reportDetails)
         {
-            EventReport toCreate = new EventReport
+            EventReport toCreate = new()
             {
                 SelfId = userId,
                 OtherId = HostId,
@@ -109,12 +111,11 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(toCreate));
-            return true;
         }
 
-        public async Task<bool> ReportUserAsync(ulong selfId, ulong eventId, ulong targetId, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(ulong selfId, ulong eventId, ulong targetId, UserReportType reportType, string reportDetails)
         {
-            UserReport toCreate = new UserReport
+            UserReport toCreate = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
@@ -125,17 +126,26 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(toCreate));
-            return true;
         }
 
-        public Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
+        public async Task PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
         {
-            throw new NotImplementedException();
+            Entities.Penalty toAdd = new() 
+            {
+                PenalizedId = userId,
+                Type = offense, 
+                Time = timeOfPenalty 
+            };
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Penalties.Add(toAdd));
         }
 
-        public Task<bool> PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
+        public async Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
         {
-            throw new NotImplementedException();
-        }
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Penalties.
+            Where(p => p.PenalizedId == userId).
+            Select(p => new Penalty(p.Type, p.Time)).
+            ToListAsync());
+        }      
     }
 }

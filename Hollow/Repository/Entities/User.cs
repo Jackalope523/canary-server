@@ -1,5 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using Core.Boundaries;
+using Repository.Entities;
 
 namespace Repository
 {
@@ -19,7 +20,7 @@ namespace Repository
         public DateTimeOffset? LockoutDate { get; set; } = DefaultLockoutDate;
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
-
+        public ulong? CurrentEvent { get; set; } = DefaultCurrentEvent;
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
         public int Athleticisme { get; init; } = DefaultAthleticisme;
@@ -37,10 +38,15 @@ namespace Repository
         public double CurrentRadius { get; set; } = DefaultCurrentRadius;
 
         // Navigation Properties
-        internal List<Link> Links { get; set; }
-        internal List<Report> ReporterList { get; set; }
-        internal List<Report> ReporteeList { get; set; }
-        internal List<Post> Posts { get; set; }
+        public List<UserLink> UserLinks { get; set; }
+        public List<EventLink> EventLinks { get; set; }
+        public List<PostLink> PostLinks { get; set; }
+        public List<Report> ReporterList { get; set; }
+        public List<Report> ReporteeList { get; set; }
+        public List<Post> Posts { get; set; }
+        public List<Entities.Note> Notes { get; set; }
+        public List<Subscription> Subscriptions { get; set; }
+        public List<Entities.Penalty> Penalties { get; set; }
 
         // Default Values
         public static ulong DefaultId { get; set; } = ulong.MinValue;
@@ -56,7 +62,8 @@ namespace Repository
         public static string DefaultSecurityStamp { get; set; } = "ijhbzdfsoiuh9ui239";
         public static DateTimeOffset? DefaultLockoutDate { get; set; } = DateTimeOffset.MaxValue;
         public static int DefaultAccessTries { get; set; } = 3;
-        public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.active;
+        public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
+        public static ulong? DefaultCurrentEvent { get; set; } = null;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;
@@ -67,11 +74,23 @@ namespace Repository
         public static int DefaultIndustriousness { get; set; } = 50;
         public static int DefaultNightOwl { get; set; } = 50;
 
-        //Geolocation: X = Longitude Y = Latitude
-        public static Point DefaultHaunt { get; set; } = new Point(40.7128, -74.0060);
+
+        private static CoordinateFactory factory = new();
+
+
+        //Geolocation: X = Longitude Y = Latitude     
+        public static Point DefaultHaunt { get; set; } = factory.Create(40.712, -74.006);
         public static double DefaultHauntRadius { get; set; } = 10;
         public static int DefaultHauntWheight { get; set; } = 0;
-        public static Point DefaultCurrentLocation { get; set; } = new Point(40.7128, -74.0060);
+        public static Point DefaultCurrentLocation { get; set; } = factory.Create(40.712, -74.006);
         public static double DefaultCurrentRadius { get; set; } = 10;
+
+        public User()
+        {
+            
+            DefaultHaunt = factory.Create(7.540, 53.483);
+            DefaultCurrentLocation = factory.Create(7.544, 53.483);
+        }
+        
     }
 }

@@ -74,7 +74,7 @@ namespace Shared
 	#region Repository
 
 	[Serializable]
-    public class InsufficientRadiusException : HollowFailureException
+    public class InsufficientRadiusException : HollowException
     {
         public InsufficientRadiusException()
         {
@@ -91,7 +91,7 @@ namespace Shared
         }
     }
     [Serializable]
-    public class ExcessiveRadiusException : HollowFailureException
+    public class ExcessiveRadiusException : HollowException
     {
         public ExcessiveRadiusException()
         {
@@ -141,12 +141,55 @@ namespace Shared
         {
         }
     }
+
+    [Serializable]
+    public class DatabaseWriteException : HollowFailureException
+    {
+        private static readonly string defaultMessage = "An unexpected error occured while writing to the database.";
+
+        public DatabaseWriteException()
+        {
+        }
+        public DatabaseWriteException(string message)
+            : base(message)
+        {
+        }
+        public DatabaseWriteException(Exception inner)
+           : base(defaultMessage, inner)
+        {
+        }
+        public DatabaseWriteException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    [Serializable]
+    public class DatabaseReadException : HollowFailureException
+    {
+        private static readonly string defaultMessage = "An unexpected error occured while reading from the database.";
+        public DatabaseReadException()
+        {
+        }
+
+        public DatabaseReadException(string message)
+            : base(message)
+        {
+        }
+        public DatabaseReadException(Exception inner)
+            : base(defaultMessage, inner)
+        {
+        }
+        public DatabaseReadException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
     #endregion
 
 
-	#region Core
+    #region Core
 
-	[Serializable]
+    [Serializable]
 	public class InvalidUserException : UserErrorException
 	{
 		public InvalidUserException()

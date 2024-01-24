@@ -46,6 +46,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEvent.Id, created.EventId);
             Assert.Equal(postTime, created.PostedAt);
             Assert.Equal(url, created.PhotoURL);
+            Assert.False(created.IsHidden);
         }
         [Fact]
         public async Task RemoveEtchingAsync_SUCCESS()
@@ -72,6 +73,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
+            Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task GetEtchingsByUserAsync_SUCCESS()
@@ -89,6 +91,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
+            Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task GetEtchingsForEventAsync_SUCCESS()
@@ -103,6 +106,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
+            Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task RateEtchingAsync_SUCCESS()
@@ -115,8 +119,8 @@ namespace Repository.Tests.Tests
 
             PostLink created = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.FirstAsync());
 
-            Assert.Equal(subject.Id, created.SelfId);
-            Assert.Equal(testEtching.Id, created.OtherId);
+            Assert.Equal(subject.Id, created.UserId);
+            Assert.Equal(testEtching.Id, created.PostId);
             Assert.Equal(rating, created.Type);
         }
         [Fact]
@@ -138,6 +142,24 @@ namespace Repository.Tests.Tests
         public async Task GenerateFeedForUserAsync_SUCCESS()
         {
             throw new NotImplementedException();
+        }
+        [Fact]
+        public async Task HideEtchingAsync_SUCCESS()
+        {
+            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
+
+            await etchingStore.HideEtchingAsync(testEtching.Id);
+
+            Etching retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
+
+            Assert.NotNull(retrieved);
+            Assert.Equal(testEtching.OwnerId, retrieved.UserId);
+            Assert.Equal(testEtching.EventId, retrieved.EventId);
+            Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
+            Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
+            Assert.NotEqual(testEtching.IsHidden, retrieved.IsHidden);
+            Assert.True(retrieved.IsHidden);
         }
     }
 }

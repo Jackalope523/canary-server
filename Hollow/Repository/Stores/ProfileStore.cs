@@ -1,33 +1,57 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using Shared;
-using System.Net;
 
 namespace Repository
 {
     public class ProfileStore : QueryStore, IProfileDatabase
     {
-        public static IProfileDatabase ProfileDatabaseAccess => new ProfileStore(new TestSentry());
+        public static IProfileDatabase ProfileDatabaseAccess => new ProfileStore(new AzureSentry());
+      
+        private static readonly Func<QueryContext, ulong, ulong, UserLink.UserLinkType, Task> RemoveLinkOperation =
+            EF.CompileAsyncQuery(
+                (QueryContext ctx, ulong selfId, ulong otherId, UserLink.UserLinkType type) =>
+                ctx.UserLinks
+                .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
+                .ExecuteDelete());
 
         public ProfileStore(Sentry sentry) : base(sentry)
         {
         }
+        
+        public async Task FollowUserAsync(ulong selfId, ulong targetId) 
+        {
+            UserLink toAdd = new()
+            {
+                SelfId = selfId,
+                OtherId = targetId,
+                Time = DateTimeOffset.UtcNow,
+                Type = UserLink.UserLinkType.Follow
+            };
 
-        public async Task<bool> FollowUserAsync(ulong selfId, ulong targetId) 
-        { 
-            return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); 
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
         }
-        public async Task<bool> UnfollowUserAsync(ulong selfId, ulong targetId) 
-        { 
-            return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Follow }); 
+        public async Task UnfollowUserAsync(ulong selfId, ulong targetId) 
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Follow));
         }
-        public async Task<bool> BlockUserAsync(ulong selfId, ulong targetId) 
-        { 
-            return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); 
+        public async Task BlockUserAsync(ulong selfId, ulong targetId) 
+        {
+            UserLink toAdd = new()
+            {
+                SelfId = selfId,
+                OtherId = targetId,
+                Time = DateTimeOffset.UtcNow,
+                Type = UserLink.UserLinkType.Block
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));      
         }
-        public async Task<bool> UnblockUserAsync(ulong selfId, ulong targetId) 
-        { 
-            return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = UserLink.UserLinkType.Block }); 
+        public async Task UnblockUserAsync(ulong selfId, ulong targetId) 
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Block));
         }
         public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong id) 
         {
@@ -93,16 +117,24 @@ namespace Repository
             return (await up, await down);
         }
 
-        public async Task<bool> RateUserAsync(ulong selfId, ulong targetId, UserRating rating)
+        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating)
         {
             UserLink.UserLinkType type;
             if (rating.Equals(UserRating.Positive)) type = UserLink.UserLinkType.RateUp;
             else type = UserLink.UserLinkType.RateDown;
 
-            return await AddLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId, Type = type });
+            UserLink toAdd = new()
+            {
+                SelfId = selfId,
+                OtherId = targetId,
+                Time = DateTimeOffset.UtcNow,
+                Type = type
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
         }
 
-        public async Task<bool> RemoveUserRatingAsync(ulong selfId, ulong targetId)
+        public async Task RemoveUserRatingAsync(ulong selfId, ulong targetId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => 
             ctx.UserLinks.
@@ -110,17 +142,28 @@ namespace Repository
             l.SelfId == selfId && l.OtherId == targetId && 
             (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).
             ExecuteDelete());
-            return await RemoveLinkOperationAsync(new UserLink { SelfId = selfId, OtherId = targetId });
         }
 
-        public Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx => 
+            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Follow).
+            Join(ctx.Users,
+            l => l.SelfId,
+            u => u.Id,
+            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            ToListAsync());
         }
 
-        public Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx => 
+            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Block).
+            Join(ctx.Users,
+            l => l.SelfId,
+            u => u.Id,
+            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            ToListAsync());
         }
     }
 }

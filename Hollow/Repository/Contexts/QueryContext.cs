@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Repository.Entities;
 
 namespace Repository
 {
@@ -6,7 +7,6 @@ namespace Repository
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }
-        public DbSet<Link> Links { get; set; }
         public DbSet<UserLink> UserLinks { get; set; }
         public DbSet<EventLink> EventLinks { get; set; }
         public DbSet<PostLink> PostLinks { get; set; }
@@ -14,47 +14,21 @@ namespace Repository
         public DbSet<UserReport> UserReports { get; set; }
         public DbSet<EventReport> EventReports { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Note> Notes { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<Penalty> Penalties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
-                .Property(u => u.AccountStatus)
-                .HasColumnName("AccountStatus");
+            modelBuilder.Entity<User>().Property(u => u.Haunt)
+            .HasSrid(4326);
 
-            modelBuilder.Entity<Link>()
-                .HasDiscriminator<string>("link_type")
-                .HasValue<UserLink>("user")
-                .HasValue<EventLink>("event")
-                .HasValue<PostLink>("post");
+            modelBuilder.Entity<User>().Property(u => u.CurrentLocation)
+            .HasSrid(4326);
 
-            modelBuilder.Entity<UserLink>()
-                .Property(l => l.SelfId)
-                .HasColumnName("SelfId");
-
-            modelBuilder.Entity<UserLink>()
-                .Property(l => l.Type)
-                .HasColumnName("Type");
-
-            modelBuilder.Entity<EventLink>()
-                .Property(l => l.SelfId)
-                .HasColumnName("SelfId");
-
-            modelBuilder.Entity<EventLink>()
-                .Property(l => l.OtherId)
-                .HasColumnName("OtherId");
-
-            modelBuilder.Entity<EventLink>()
-                .Property(l => l.Type)
-                .HasColumnName("Type");
-
-            modelBuilder.Entity<PostLink>()
-                .Property(l => l.SelfId)
-                .HasColumnName("SelfId");
-
-            modelBuilder.Entity<PostLink>()
-                .Property(l => l.Type)
-                .HasColumnName("Type");
-           
+            modelBuilder.Entity<Event>().Property(e => e.Location)
+            .HasSrid(4326);         
+                    
             modelBuilder.Entity<Report>()
                 .HasDiscriminator<string>("report_type")
                 .HasValue<UserReport>("user")
@@ -72,7 +46,18 @@ namespace Repository
                .HasOne(r => r.Event)
                .WithMany(e => e.Reports);
 
-            //SeedData(modelBuilder);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.UserLinks)
+                .WithOne(l => l.Other);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.EventLinks)
+                .WithOne(l => l.User);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.PostLinks)
+                .WithOne(l => l.User);          
         }       
     }
 }
