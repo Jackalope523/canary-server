@@ -21,9 +21,9 @@ fails after user testing. This input is pretty solid UX-wise and should fit on a
 // ! ||--------------------------------------------------------------------------------||
 // ! ||                                     Types                                      ||
 // ! ||--------------------------------------------------------------------------------||
-interface DateOfBirthInput2Props {}
+interface DateOfBirthInputV2Props {}
 
-export const DateOfBirthInput2: React.FC<DateOfBirthInput2Props> = ({}) => {
+export const DateOfBirthInputV2: React.FC<DateOfBirthInputV2Props> = ({}) => {
   const [Day, setDay] = React.useState('');
   const [Year, setYear] = React.useState('');
 
@@ -31,43 +31,53 @@ export const DateOfBirthInput2: React.FC<DateOfBirthInput2Props> = ({}) => {
 
   return (
     <View style={styles.container}>
-      <TextInputSmall
-        type={InputType.Day}
-        label="Day"
-        value={Day}
-        onChangeText={setDay}
-        inputMode="numeric"
-        maxLength={2}
-        clearButton={false}
-      />
+      <View style={styles.inputWrapper}>
+        <TextInputSmall
+          type={InputType.Day}
+          label="Day"
+          value={Day}
+          onChangeText={setDay}
+          inputMode="numeric"
+          maxLength={2}
+          clearButton={false}
+        />
+      </View>
 
       {/* TODO replace with Month instead of Day as an input type */}
-      <TextInputSmall
-        type={InputType.Day}
-        label="Month"
-        value={Day}
-        onChangeText={setDay}
-        inputMode="numeric"
-        maxLength={2}
-        clearButton={false}
-      />
+      <View style={styles.inputWrapper}>
+        <TextInputSmall
+          type={InputType.Day}
+          label="Month"
+          value={Day}
+          onChangeText={setDay}
+          inputMode="numeric"
+          maxLength={2}
+          clearButton={false}
+        />
+      </View>
 
-      <TextInputSmall
-        type={InputType.Year}
-        label="Year"
-        value={Year}
-        onChangeText={setYear}
-        inputMode="numeric"
-        maxLength={4}
-        clearButton={false}
-      />
+      <View style={styles.inputWrapper}>
+        <TextInputSmall
+          type={InputType.Year}
+          label="Year"
+          value={Year}
+          onChangeText={setYear}
+          inputMode="numeric"
+          maxLength={4}
+          clearButton={false}
+        />
+      </View>
     </View>
   );
 };
 
-export default DateOfBirthInput2;
+export default DateOfBirthInputV2;
 
 const styles = StyleSheet.create({
+  inputWrapper: {
+    flex: 1,
+  },
+
   container: {
     maxWidth: '100%',
     flexDirection: 'row',

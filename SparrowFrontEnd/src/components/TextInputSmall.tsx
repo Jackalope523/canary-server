@@ -64,7 +64,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   autoComplete,
   inputMode,
   maxLength,
-  onChangeText
+  onChangeText,
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Text input                                   ||
@@ -93,22 +93,20 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   const customOnFocus = () => {
     setIsFocused(true);
     locked.current = false;
-  }
-  
-  const customOnBlur = () => 
-  {    
+  };
+
+  const customOnBlur = () => {
     handleSubmit();
-    locked.current ?  textInput.current?.focus() : setIsFocused(false);
+    locked.current ? textInput.current?.focus() : setIsFocused(false);
     locked.current = false;
-  }
+  };
 
   const handleSubmit = () => {
     validateInput();
     if (isValid) {
       onChangeText(text);
       setError('');
-    }
-    else {
+    } else {
       onChangeText('');
     }
   };
@@ -134,12 +132,12 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   }, [isFocused]);
 
   // On press
+  // TODO stop keyboard from abruptly closing and opening when pressing the clear button
   const clearButtonPress = () => {
     setText('');
     onChangeText(text);
     locked.current = true;
   };
-
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Validation                                   ||

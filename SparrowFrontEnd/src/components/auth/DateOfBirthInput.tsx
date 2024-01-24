@@ -23,8 +23,8 @@ interface DateOfBirthInputProps {
 export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
   onDayChangeText,
   onMonthChangeText,
-  onYearChangeText
-  }) => {
+  onYearChangeText,
+}) => {
   // TODO for the DAY and YEAR text inputs, might want to disable the clear text button
 
   return (

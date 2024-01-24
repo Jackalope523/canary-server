@@ -8,9 +8,10 @@ import ButtonGroup from '../ButtonGroup';
 
 // Input fields
 import DateOfBirthInput from '../auth/DateOfBirthInput';
-import DateOfBirthInput2 from '../auth/DateOfBirthInput2';
+import DateOfBirthInputV2 from '../auth/DateOfBirthInputV2';
 import RadioButton from '../RadioButton';
 import OTPInputV1 from './OTPInputV1';
+import TextInputSmall, { InputType } from '../TextInputSmall';
 
 const ExampleScreen = () => {
   const [code, setCode] = React.useState('');
@@ -58,8 +59,8 @@ const ExampleScreen = () => {
       {/* Input fields */}
 
       <View style={styles.container}>
-        {/* <DateOfBirthInput />
-        <DateOfBirthInput2 /> */}
+        {/* <DateOfBirthInput /> */}
+        <DateOfBirthInputV2 />
         {/* <OTPInputV1
           setIsPinReady={setIsPinReady}
           code={code}
@@ -71,6 +72,16 @@ const ExampleScreen = () => {
           code={code}
           setCode={setCode}
           maxLength={MAX_CODE_LENGTH}
+        />
+
+        <TextInputSmall
+          type={InputType.Email}
+          label="Date of birth"
+          value={null}
+          onChangeText={null}
+          inputMode="numeric"
+          maxLength={256}
+          required
         />
       </View>
     </View>
