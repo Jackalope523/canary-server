@@ -40,7 +40,11 @@ const SignupScreen = ({ navigation }: SignupProps) => {
   const [PhoneNumber, setPhoneNumber] = React.useState('');
   const [Email, setEmail] = React.useState('');
   const [Name, setName] = React.useState('');
-  const [DateOfBirth, setDateOfBirth] = React.useState(new Date());
+  const [Day, setDay] = React.useState('');
+  const [Month, setMonth] = React.useState('');
+  const [Year, setYear] = React.useState('');
+  const [termsOfServiceAgreed, setTermsOfServiceAgreed] = React.useState(false);
+  const [privacyPolicyAgreed, setPrivacyPolicyAgreed] = React.useState(false);
 
   /* 
   
@@ -101,7 +105,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
       },
     });
   }
-
+  
   return (
     <KeyboardAvoidingContainer>
       <ScrollView
@@ -137,16 +141,35 @@ const SignupScreen = ({ navigation }: SignupProps) => {
             recommended
             description="We recommend binding an email address to your account in case you change your phone number."
           />
-          <DateOfBirthInput />
+          {/* <TextInputSmall
+          label="Date of Birth"
+          value={DateOfBirth}
+          onChangeText={setDateOfBirth}
+          placeholder="MM/DD/YYYY"
+          inputMode="numeric"
+          maxLength={8}
+          required
+          description="You must be 18 years or older to use Sparrow. Your date of birth will not be visible to other users."
+        /> */}
+        <DateOfBirthInput 
+        onDayChangeText={setDay}
+        onMonthChangeText={setMonth}
+        onYearChangeText={setYear}
+        />
         </View>
         <View style={styles.checkboxSection}>
           <View style={styles.checkboxInnerSection}>
             <Checkbox
               text={[
                 "I agree to Sparrow's Terms of Service",
+              ]}
+              onPress={() => {setTermsOfServiceAgreed(!termsOfServiceAgreed)}}
+            />
+            <Checkbox
+              text={[
                 "I agree to Sparrow's Privacy Policy",
               ]}
-              onPress={() => {}}
+              onPress={() => {setPrivacyPolicyAgreed(!privacyPolicyAgreed)}}
             />
           </View>
           <Text style={globalStyles.textDark}>
@@ -169,7 +192,16 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           display={ButtonDisplay.Full}
           text={'Continue'}
           onPress={navigate}
-          disabled={!isButtonEnabled}
+          // disabled
+          disabled={
+            Name === "" || 
+            Email === "" || 
+            Day === "" || 
+            Month === "" || 
+            Year === "" || 
+            !termsOfServiceAgreed || 
+            !privacyPolicyAgreed
+          }
         />
       </ScrollView>
     </KeyboardAvoidingContainer>
