@@ -25,7 +25,7 @@ const RadioSurveyScreen: React.FC<RadioSurveyScreenProps> = ({
   options,
   title = 'NULL',
 }) => {
-  const [buttonEnabled, setButtonEnabled] = React.useState(true);
+  const [buttonEnabled, setButtonEnabled] = React.useState(false);
 
   function continueButton() {
     navigation.navigate(navigateTo);
@@ -40,7 +40,7 @@ const RadioSurveyScreen: React.FC<RadioSurveyScreenProps> = ({
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.radioContainer}>
-          <RadioButton onPress={(item) => console.log(item)} text={options} />
+          <RadioButton onPress={() => setButtonEnabled(true)} text={options} />
         </View>
         <View style={styles.buttonContainer}>
           <Button

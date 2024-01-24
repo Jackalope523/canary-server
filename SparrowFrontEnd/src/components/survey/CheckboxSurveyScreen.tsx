@@ -25,7 +25,7 @@ const CheckboxSurveyScreen: React.FC<CheckboxSurveyScreenProps> = ({
   options,
   title = 'NULL',
 }) => {
-  const [buttonEnabled, setButtonEnabled] = React.useState(true);
+  const [buttonEnabled, setButtonEnabled] = React.useState(false);
 
   function continueButton() {
     navigation.navigate(navigateTo);
@@ -40,7 +40,12 @@ const CheckboxSurveyScreen: React.FC<CheckboxSurveyScreenProps> = ({
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.CheckboxContainer}>
-          <Checkbox text={options} onPress={(item) => console.log(item)} />
+          {/* <CheckboxButton
+            onPress={(item) => console.log(item)}
+            buttonText={options}
+          /> */}
+
+          <Checkbox text={options} onPress={() => setButtonEnabled(true)} />
         </View>
         <View style={styles.buttonContainer}>
           <Button
