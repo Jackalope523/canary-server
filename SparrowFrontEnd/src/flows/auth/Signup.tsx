@@ -106,6 +106,14 @@ const SignupScreen = ({ navigation }: SignupProps) => {
     });
   }
 
+  console.log(Name === "");
+  console.log(Email === "");
+  console.log(Day === "");
+  console.log(Month === "");
+  console.log(Year === "");
+  console.log(!termsOfServiceAgreed);
+  console.log(!privacyPolicyAgreed);
+  
   return (
     <KeyboardAvoidingContainer>
       <ScrollView

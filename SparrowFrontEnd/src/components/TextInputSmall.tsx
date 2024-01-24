@@ -105,11 +105,10 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   const handleSubmit = () => {
     validateInput();
     if (isValid) {
-      setError('');
       onChangeText(text);
+      setError('');
     }
     else {
-      setError(error);
       onChangeText('');
     }
   };
@@ -145,7 +144,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Validation                                   ||
   // ! ||--------------------------------------------------------------------------------||
-  const [isValid, setIsValid] = React.useState(false);
+  //const [isValid, setIsValid] = React.useState(false);
+  let isValid = false;
   const [error, setError] = React.useState('');
 
   // TODO remove error message when the user inputs the right value after failure
@@ -165,7 +165,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           setError('First name can only contain letters.');
         } else {
           Object.keys(errors).length === 0;
-          setIsValid(true);
+          isValid = true;
         }
         break;
 
@@ -180,7 +180,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           setError('Please enter a valid email address.');
         } else {
           Object.keys(errors).length === 0;
-          setIsValid(true);
+          isValid = true;
         }
         break;
 
@@ -195,7 +195,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           setError('Please enter a valid phone number.');
         } else {
           Object.keys(errors).length === 0;
-          setIsValid(true);
+          isValid = true;
         }
         break;
 
@@ -209,7 +209,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           setError('Invalid.');
         } else {
           Object.keys(errors).length === 0;
-          setIsValid(true);
+          isValid = true;
         }
         break;
 
@@ -228,7 +228,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           setError('Invalid.');
         } else {
           Object.keys(errors).length === 0;
-          setIsValid(true);
+          isValid = true;
         }
         break;
 
@@ -236,7 +236,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
       default:
         maxLength = undefined;
         Object.keys(errors).length === 0;
-        setIsValid(true);
+        isValid = true;
     }
   };
 
