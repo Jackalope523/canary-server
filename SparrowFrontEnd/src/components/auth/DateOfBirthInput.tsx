@@ -33,8 +33,7 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
         <TextInputSmall
           type={InputType.Day}
           label="Day"
-          value={Day}
-          onChangeText={setDay}
+          onChangeText={onDayChangeText}
           inputMode="numeric"
           maxLength={2}
           clearButton={false}
@@ -51,8 +50,7 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
         <TextInputSmall
           type={InputType.Year}
           label="Year"
-          value={Year}
-          onChangeText={setYear}
+          onChangeText={onYearChangeText}
           inputMode="numeric"
           maxLength={4}
           clearButton={false}
