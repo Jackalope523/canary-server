@@ -10,21 +10,13 @@ import { globalStyles } from '../../styles/GlobalStyles';
 import { Spacing } from '../../styles/SpacingStyles';
 import { Colors } from '../../styles/ColorStyles';
 
-// interface RadioSurveyScreenProps extends StackScreenProps<AuthStackParamList, 'Q2'> {}
-
 // Types
 interface RadioSurveyScreenProps {
   navigation: StackNavigationProp<AuthStackParamList>;
-  // navigation?: StackNavigationProp<any>;
-  // navigateTo: [screen: string];
-
   navigateTo: any;
 
   title?: string | React.ReactNode;
   options?: string[];
-
-  // onPress: (item: string | GestureResponderEvent) => void;
-  // buttonText: string[];;
 }
 
 const RadioSurveyScreen: React.FC<RadioSurveyScreenProps> = ({
@@ -35,13 +27,10 @@ const RadioSurveyScreen: React.FC<RadioSurveyScreenProps> = ({
 }) => {
   const [buttonEnabled, setButtonEnabled] = React.useState(true);
 
-  // TODO set navigate to next QUESTION screen
-  // TODO fix TS error
   function continueButton() {
     navigation.navigate(navigateTo);
   }
 
-  // TODO <Pressable> text button may need to be made into a component named TextButton or something alike
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
       <View style={styles.headerContainer}>
@@ -74,8 +63,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-
-    // alignItems: 'center',
   },
 
   contentContainer: {

@@ -194,14 +194,6 @@ const SignupScreen = ({ navigation }: SignupProps) => {
             on our official website.
           </Text>
         </View>
-        {/* <Text>Date of Birth</Text>
-      <DatePicker
-        date={DateOfBirth}
-        onDateChange={setDateOfBirth}
-        mode="date"
-        timeZoneOffsetInMinutes={0}
-        maximumDate={new Date()}
-      /> */}
         <Button
           type={ButtonType.Success}
           size={ButtonSize.Medium}
@@ -229,12 +221,7 @@ const SignupScreen = ({ navigation }: SignupProps) => {
 // ! ||--------------------------------------------------------------------------------||
 const styles = StyleSheet.create({
   container: {
-    // alignItems: 'center',
-
-    // TODO Might have to use justifyContent: 'flex-end' instead for KeyboardAvoidingContainer to work
-    // justifyContent: 'center',
     justifyContent: 'flex-end',
-    // paddingBottom: 48,
 
     flex: 1,
   },
