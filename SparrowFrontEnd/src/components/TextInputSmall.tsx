@@ -108,6 +108,10 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
       setError('');
       onChangeText(text);
     }
+    else {
+      setError(error);
+      onChangeText('');
+    }
   };
 
   // ! ||--------------------------------------------------------------------------------||
