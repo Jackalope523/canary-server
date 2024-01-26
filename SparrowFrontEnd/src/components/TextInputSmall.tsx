@@ -70,9 +70,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||                                   Text input                                   ||
   // ! ||--------------------------------------------------------------------------------||
   const [isFocused, setIsFocused] = React.useState(false);
-  const textInput: React.MutableRefObject<TextInput | undefined> =
-    React.useRef();
-  let locked: React.MutableRefObject<boolean> = React.useRef(false);
+  const textInput: React.MutableRefObject<TextInput | undefined> = React.useRef();
+  const locked: React.MutableRefObject<boolean> = React.useRef(false);
 
   // Animations
   const bw = useSharedValue(0);
@@ -103,9 +102,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 
   const handleSubmit = () => {
     validateInput();
-    if (isValid) {
+    if (error === '') {
       onChangeText(text);
-      setError('');
     } else {
       onChangeText('');
     }
@@ -142,18 +140,13 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Validation                                   ||
   // ! ||--------------------------------------------------------------------------------||
-  //const [isValid, setIsValid] = React.useState(false);
-  let isValid = false;
   const [error, setError] = React.useState('');
 
-  // TODO remove error message when the user inputs the right value after failure
-
   const validateInput = () => {
-    let errors = '';
+    
+    let isValid = false;
 
     switch (type) {
-      // First name
-      // TODO update first name regex if necessary
       case InputType.FirstName:
         const firstNameRegex = /^[a-zA-Z'-]+$/;
 
@@ -162,13 +155,10 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         } else if (!firstNameRegex.test(text)) {
           setError('First name can only contain letters.');
         } else {
-          Object.keys(errors).length === 0;
           isValid = true;
         }
         break;
 
-      // Email
-      // TODO update email regex if necessary
       case InputType.Email:
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -177,13 +167,10 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         } else if (!emailRegex.test(text)) {
           setError('Please enter a valid email address.');
         } else {
-          Object.keys(errors).length === 0;
           isValid = true;
         }
         break;
 
-      // Phone number
-      // TODO update phone number regex if necessary
       case InputType.PhoneNumber:
         const phoneNumberRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
 
@@ -192,40 +179,33 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         } else if (!phoneNumberRegex.test(text)) {
           setError('Please enter a valid phone number.');
         } else {
-          Object.keys(errors).length === 0;
           isValid = true;
         }
         break;
 
-      // Used for an external date of birth component
-      // Day
-      // TODO use a more accurate regex range according to selected month, probably already got something on the backend
       case InputType.Day:
         const dayRegex = /^[1-31]{1,2}$/;
 
         if (!dayRegex.test(text)) {
           setError('Invalid.');
         } else {
-          Object.keys(errors).length === 0;
           isValid = true;
         }
         break;
 
-      // Year
       case InputType.Year:
         const yearRegex = /^\d{4}$/;
+
         const currentYear = new Date().getFullYear();
-        const maxAge = 150;
+        const maxAge = 100;
         const minAge = 18;
         const minYear = currentYear - maxAge;
         const maxYear = currentYear - minAge;
-        maxLength = 4;
 
-        // TODO make minYear and maxYear work
-        if (!yearRegex.test(text)) {
+        if (!yearRegex.test(text) || (parseInt(text) < minYear || parseInt(text) > maxYear)) {
           setError('Invalid.');
-        } else {
-          Object.keys(errors).length === 0;
+        }
+        else {
           isValid = true;
         }
         break;
@@ -233,9 +213,10 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
       // Default
       default:
         maxLength = undefined;
-        Object.keys(errors).length === 0;
-        isValid = true;
+        isValid = false;
     }
+
+    if (isValid) setError(''); 
   };
 
   return (
