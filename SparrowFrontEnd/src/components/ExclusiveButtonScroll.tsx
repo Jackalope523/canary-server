@@ -21,6 +21,7 @@ export const ExclusiveButtonGroup: React.FC<ExclusiveButtonScrollProps> =
    return  (
     <FlatList
     horizontal = {true}
+    showsHorizontalScrollIndicator = {false}
     ItemSeparatorComponent={() => <View style={{paddingRight: Spacing.md}}/>}
     data = {buttons}
     renderItem={ ({item}) =>  

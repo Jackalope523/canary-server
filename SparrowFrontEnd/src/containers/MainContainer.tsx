@@ -73,7 +73,7 @@ function MainContainer() {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Auth"
+          initialRouteName="Main"
           screenOptions={{ headerShown: false }}>
           <AppStack.Screen name="Auth" component={Authentication} />
           <AppStack.Screen name="Survey" component={Survey} />
