@@ -20,6 +20,7 @@ import TextButton, {
   TextButtonVariant,
 } from '../../components/TextButton';
 import ExampleScreen from '../../components/testing/ExampleScreen';
+import OTPInputV2 from '../../components/testing/OTPInputV2';
 
 type VerifyProps = StackScreenProps<AuthStackParamList, 'Verify'>;
 
@@ -40,76 +41,46 @@ const VerifyScreen = ({ route }: VerifyProps) => {
 
   return (
     <View style={[styles.container, globalStyles.baseContainer]}>
-      {/* <Text>
-        Enter the 6-digit code we sent to your number ending in
-        {route.params.PhoneNumber.substring(
-          route.params.PhoneNumber.length - 4,
-        )}
-        .
-      </Text>
-      <Text style={{ color: Colors.red400 }}>{errorText}</Text>
-      <TextInput
-        value={Code}
-        onChangeText={setCode}
-        placeholder="000000"
-        keyboardType="number-pad"
-        maxLength={6}
-      />
-      <Button
-        type={ButtonType.PrimaryDark}
-        size={ButtonSize.Large}
-        display={ButtonDisplay.Contained}
-        text={'Verify & Continue'}
-        onPress={route.params.Forward}
-        disabled={!buttonEnabled}
-      />
-      <Button
-        type={ButtonType.PrimaryDark}
-        size={ButtonSize.Large}
-        display={ButtonDisplay.Contained}
-        text={"I didn't receive a code"}
-        disabled={!buttonEnabled}
-      /> */}
-
-      <ExampleScreen />
-
-      {/* TODO uncomment starting from what's below */}
-
-      {/* <View style={styles.headerContainer}>
+      <View style={styles.contentContainer}>
         <Image
           source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
-          style={globalStyles.illustrationLarge}
+          style={[globalStyles.illustrationLarge, styles.illustration]}
           resizeMode="contain"
         />
-      </View>
-
-      <View style={styles.contentContainer}>
         <Text
           style={[
             globalStyles.bodyTextOne,
             globalStyles.textDark,
-            { textAlign: 'center' },
+            styles.text,
           ]}>
-          Enter the 4-digit code we sent to your number ending with 404.
+          Enter the 4-digit code we sent to your number ending in
+          {route.params.PhoneNumber.substring(
+            route.params.PhoneNumber.length - 4,
+          )}
+          .
         </Text>
-        <View style={styles.buttonContainer}>
-          <Button
-            type={ButtonType.Success}
-            size={ButtonSize.Medium}
-            display={ButtonDisplay.Full}
-            text={'Verify & Continue'}
-            onPress={null}
-            disabled={!buttonEnabled}
-          />
 
-          <TextButton
-            text="I haven't received a code"
-            type={TextButtonType.Dark}
-            variant={TextButtonVariant.Three}
-            onPress={null}
-          /> */}
-      {/* </View>
-      </View> */}
+        <OTPInputV2 length={4} onChange={() => null} />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          type={ButtonType.Success}
+          size={ButtonSize.Medium}
+          display={ButtonDisplay.Full}
+          text={'Verify & Continue'}
+          onPress={route.params.Forward}
+          disabled={!buttonEnabled}
+        />
+
+        <TextButton
+          text="I haven't received a code"
+          type={TextButtonType.Dark}
+          variant={TextButtonVariant.Three}
+          onPress={null}
+          disabled={!buttonEnabled}
+        />
+      </View>
     </View>
   );
 };
@@ -123,10 +94,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  headerContainer: {},
-
   contentContainer: {
+    alignItems: 'center',
     rowGap: Spacing.lg,
+  },
+
+  illustration: {
+    marginBottom: Spacing.sm,
+  },
+
+  text: {
+    textAlign: 'center',
+    // paddingBottom: Spacing.lg,
   },
 
   buttonContainer: {

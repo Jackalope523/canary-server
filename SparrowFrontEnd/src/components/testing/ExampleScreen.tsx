@@ -12,6 +12,8 @@ import DateOfBirthInputV2 from '../auth/DateOfBirthInputV2';
 import RadioButton from '../RadioButton';
 import OTPInputV1 from './OTPInputV1';
 import TextInputSmall, { InputType } from '../TextInputSmall';
+import OTPInputV2 from './OTPInputV2';
+import OTPInputV3 from './OTPInputV3';
 
 const ExampleScreen = () => {
   const [code, setCode] = React.useState('');
@@ -74,11 +76,15 @@ const ExampleScreen = () => {
           maxLength={MAX_CODE_LENGTH}
         />
 
+        <OTPInputV2 length={4} onChange={() => null} />
+
         <TextInputSmall
           type={InputType.Email}
           label="Date of birth"
           value={null}
-          onChangeText={null}
+          onChangeText={() => {
+            null;
+          }}
           inputMode="numeric"
           maxLength={256}
           required

@@ -65,7 +65,11 @@ export const OTPInputV1: React.FC<OTPInputV1Props> = ({
     // ! ||--------------------------------------------------------------------------------||
     // ! ||                                   Animations                                   ||
     // ! ||--------------------------------------------------------------------------------||
-    // TODO fix animations not working, probably because of the overlayed TextInput or Pressable components
+    const textInput: React.MutableRefObject<TextInput | undefined> =
+      React.useRef();
+    let locked: React.MutableRefObject<boolean> = React.useRef(false);
+
+    // Animations
     const bw = useSharedValue(0);
 
     const animatedInputStyle = useAnimatedStyle(() => {
@@ -75,10 +79,11 @@ export const OTPInputV1: React.FC<OTPInputV1Props> = ({
     });
 
     React.useEffect(() => {
-      bw.value = withTiming(isInputContainerFocused && isDigitFocused ? 4 : 2, {
+      bw.value = withTiming(isFocused ? 4 : 2, {
+        // TODO create an AnimationStyles file (maybe?) - to organize animation values
         duration: 200,
       });
-    }, [isInputContainerFocused, isDigitFocused]);
+    }, [isFocused]);
 
     return (
       <Animated.View

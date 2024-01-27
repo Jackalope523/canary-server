@@ -388,6 +388,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+
+    // TODO FIX: possibly what's messing up the input's width - BUG: text getting cut off
     paddingHorizontal: 16,
     height: 56,
     width: '100%',
