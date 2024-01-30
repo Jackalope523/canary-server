@@ -57,6 +57,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // TODO setup top navbars for all necessary screens
 // TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
+import { StyleSheet } from 'react-native';
 
 // v1.0.1
 
@@ -73,8 +74,11 @@ function MainContainer() {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Main"
-          screenOptions={{ headerShown: false }}>
+          initialRouteName="Auth"
+          screenOptions={{
+            headerShown: false,
+            cardStyle: styles.cardContainer,
+          }}>
           <AppStack.Screen name="Auth" component={Authentication} />
           <AppStack.Screen name="Survey" component={Survey} />
           <AppStack.Screen name="Main" component={Main} />
@@ -91,7 +95,10 @@ function Authentication() {
   return (
     <AuthStack.Navigator
       initialRouteName="Landing"
-      screenOptions={{ headerShown: false }}>
+      screenOptions={{
+        headerShown: false,
+        cardStyle: styles.cardContainer,
+      }}>
       <AuthStack.Screen name="Landing" component={LandingScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Signup" component={SignupScreen} />
@@ -105,7 +112,10 @@ function Survey() {
   return (
     <AuthStack.Navigator
       initialRouteName="Intro"
-      screenOptions={{ headerShown: false }}>
+      screenOptions={{
+        headerShown: false,
+        cardStyle: styles.cardContainer,
+      }}>
       <AuthStack.Screen name="Intro" component={IntroScreen} />
       <AuthStack.Screen name="Q1" component={Q1Screen} />
       <AuthStack.Screen name="Q2" component={Q2Screen} />
@@ -124,7 +134,7 @@ function Main() {
     <Tab.Navigator
       sceneContainerStyle={globalStyles.mainContainer}
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName;
           let rn = route.name;
 
@@ -179,6 +189,8 @@ function ActivityStackScreen() {
       screenOptions={() => ({
         headerShown: false,
 
+        cardStyle: styles.cardContainer,
+
         headerTitleStyle: {
           fontSize: 16,
           color: Colors.sparrowDark,
@@ -222,70 +234,19 @@ function Account() {
   return (
     <AccountStack.Navigator
       initialRouteName="Account"
-      screenOptions={{ headerShown: true }}>
+      screenOptions={{
+        headerShown: true,
+        cardStyle: styles.cardContainer,
+      }}>
       <AccountStack.Screen name="Account" component={AccountScreen} />
     </AccountStack.Navigator>
   );
 }
 
-// ------- END ------------
-
-// v1.0.0
-
-// const Tab = createBottomTabNavigator<BottomTabParamList>();
-
-// // TODO If possible, set the tab navigator horizontal margin to 24, probably with tabBarStyle
-
-// const MainContainer = () => {
-//     return (
-//         <SafeAreaProvider>
-//             <NavigationContainer>
-//                 <Tab.Navigator
-//                     sceneContainerStyle={globalStyles.mainContainer}
-//                     screenOptions={({route}) => ({
-
-//                         tabBarIcon: ({focused, color, size}) => {
-//                             let iconName;
-//                             let rn = route.name;
-
-//                             if (rn === 'Activity') {
-//                                 iconName = focused ? 'activity-fill' : 'activity-fill'
-//                             } else if (rn === 'Discovery') {
-//                                 iconName = focused ? 'discovery-fill' : 'discovery-fill'
-//                             } else if (rn === 'Feed') {
-//                                 iconName = focused ? 'feed-fill' : 'feed-fill'
-//                             } else if (rn === 'Account') {
-//                                 iconName = focused ? 'account-fill' : 'account-fill'
-//                             }
-
-//                             return <Icon name={iconName} size={size} color={color}/>
-
-//                         },
-
-//                         tabBarActiveTintColor: Colors.turqoise400,
-//                         tabBarInactiveTintColor: Colors.sparrowBrown,
-//                         tabBarShowLabel: false,
-
-//                         tabBarStyle: {
-//                             height: 50,
-//                             backgroundColor: Colors.sparrowSand,
-//                             borderTopWidth: 2,
-//                             borderTopColor: Colors.sparrowDarkBrown,
-//                             paddingHorizontal: 0,
-//                         },
-
-//                         headerShown: false,
-//                     })}>
-
-//                     <Tab.Screen name='Activity' component={ActivityScreen}/>
-//                     <Tab.Screen name='Discovery' component={DiscoveryScreen}/>
-//                     <Tab.Screen name='Feed' component={FeedScreen}/>
-//                     <Tab.Screen name='Account' component={AccountScreen}/>
-
-//                 </Tab.Navigator>
-//             </NavigationContainer>
-//         </SafeAreaProvider>
-//     );
-// };
-
-// export default MainContainer
+const styles = StyleSheet.create({
+  cardContainer: {
+    backgroundColor: Colors.sparrowSand,
+    // TESTING ONLY
+    // backgroundColor: Colors.fuchsia300,
+  },
+});
