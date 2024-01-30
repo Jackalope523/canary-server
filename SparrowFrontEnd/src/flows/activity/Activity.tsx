@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
@@ -6,34 +6,13 @@ import { Spacing } from '../../styles/SpacingStyles';
 
 import EventCardMedium from '../../components/EventCardMedium';
 import NotificationIndicator from '../../components/activity/NotificationIndicator';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
-
-const Icon = createIconSetFromFontello(fontelloConfig);
+import { ButtonDisplay, ButtonSize, ButtonType } from '../../components/Button';
+import ExclusiveButtonView from '../../components/ExclusiveButtonView';
 
 // Sample data
 import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
-import ExclusiveButtonView from '../../components/ExclusiveButtonView';
-import ExclusiveButtonScroll2 from '../../components/ExclusiveButtonScrollV2';
-import { ButtonDisplay, ButtonSize, ButtonType } from '../../components/Button';
 
 const ActivityScreen = () => {
-  // If textWrapper text exceeds 2 lines, align items to flex-start
-  // Doesn't work with some text, not the ideal solution - fix later
-  // Not ideal but I can just assign a % of space for the icon and the rest for the text
-
-  // TODO Ideally this would not be needed if the location text would only take up 1 line. If it takes up more it starts looking worse.
-  // Maybe make it end with ... if it exceeds 1 line
-  const [isTextOverflowing, setIsTextOverflowing] = useState(false);
-
-  const handleTextLayout = (event) => {
-    const { lines } = event.nativeEvent;
-
-    setIsTextOverflowing(lines.length > 2);
-  };
-
   return (
     <ScrollView
       style={styles.mainContainer}
