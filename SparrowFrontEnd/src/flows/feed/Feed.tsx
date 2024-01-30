@@ -20,6 +20,15 @@ import Button, {
   ButtonType,
 } from '../../components/Button';
 
+/*
+
+TODO [!!!] IMPORTANT
+
+Before beginning work on the Feed screen:
+1. Add a cardStyle to the Feed Screen in MainContainer.tsx to fix the background color
+
+*/
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 const FeedScreen = () => {
