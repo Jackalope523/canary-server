@@ -39,11 +39,10 @@ import ActivityScreen from '../flows/activity/Activity';
 import DiscoveryScreen from '../flows/discovery/Discovery';
 import FeedScreen from '../flows/feed/Feed';
 import DiscoverySearchScreen from '../flows/discovery/DiscoverySearch';
-
 import NotificationsScreen from '../flows/activity/Notifications';
-
 import AccountScreen from '../flows/profile/Account';
 import ProfileScreen from '../flows/profile/Profile';
+import TestScreen from '../flows/testing/Testing';
 
 // More imports
 import {
@@ -74,7 +73,7 @@ function MainContainer() {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Auth"
+          initialRouteName="Testing"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
@@ -83,6 +82,8 @@ function MainContainer() {
           <AppStack.Screen name="Survey" component={Survey} />
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
+
+          <AppStack.Screen name="Testing" component={TestScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
