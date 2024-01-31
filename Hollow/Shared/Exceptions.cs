@@ -68,12 +68,29 @@ namespace Shared
             : base(message, innerException) { }
     }
 
-	#endregion
+    #endregion
 
 
-	#region Repository
+    #region Repository
 
-	[Serializable]
+    [Serializable]
+    public class UndefinedHarborStateException : HollowFailureException
+    {
+        public UndefinedHarborStateException()
+        {
+        }
+
+        public UndefinedHarborStateException(string message)
+            : base(message)
+        {
+        }
+
+        public UndefinedHarborStateException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    [Serializable]
     public class InsufficientRadiusException : HollowException
     {
         public InsufficientRadiusException()

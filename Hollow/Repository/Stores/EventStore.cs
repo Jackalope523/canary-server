@@ -7,8 +7,6 @@ namespace Repository
 {
     public class EventStore : QueryStore, IEventDatabase
     {
-        public static IEventDatabase EventDatabaseAccess => new EventStore(new AzureSentry());
-
         public EventStore(Sentry sentry) : base(sentry)
         {
         }

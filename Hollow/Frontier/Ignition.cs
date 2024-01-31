@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
+using Repository;
 
 namespace Frontier
 {
@@ -84,10 +85,16 @@ namespace Frontier
 			// Connections
 			////////////////
 
-			CoreTerminal terminal = new(Repository.AccountStore.AccountDatabaseAccess,
-				Repository.EventStore.EventDatabaseAccess, Repository.EtchingStore.EtchingDatabaseAccess,
-				Repository.ProfileStore.ProfileDatabaseAccess, Repository.DisciplineStore.ReportDatabaseAccess,
-				Repository.NotificationStore.Access, pushNotifications);
+			Harbor harbor = new(Harbor.HarborState.Production);
+
+			CoreTerminal terminal = new(
+				harbor.AccountDatabaseAccess,
+				harbor.EventDatabaseAccess, 
+				harbor.EtchingDatabaseAccess,
+				harbor.ProfileDatabaseAccess, 
+				harbor.ReportDatabaseAccess,
+                harbor.NotificationDatabaseAccess, 
+				pushNotifications);
 
 			foreach (var (DatabaseType, Instance) in terminal.Gates)
 			{
