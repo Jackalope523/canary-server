@@ -5,9 +5,7 @@ using Shared;
 namespace Repository
 {
     public class ProfileStore : QueryStore, IProfileDatabase
-    {
-        public static IProfileDatabase ProfileDatabaseAccess => new ProfileStore(new AzureSentry());
-      
+    {     
         private static readonly Func<QueryContext, ulong, ulong, UserLink.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
                 (QueryContext ctx, ulong selfId, ulong otherId, UserLink.UserLinkType type) =>

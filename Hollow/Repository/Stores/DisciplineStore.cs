@@ -6,8 +6,6 @@ namespace Repository
 {
     public class DisciplineStore : QueryStore, IDisciplineDatabase
     {
-        public static IDisciplineDatabase ReportDatabaseAccess => new DisciplineStore(new AzureSentry());
-
         public DisciplineStore(Sentry sentry) : base(sentry)
         {
         }
