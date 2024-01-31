@@ -7,8 +7,6 @@ namespace Repository
 {
     public class NotificationStore : QueryStore, INotificationDatabase
     {
-        public static INotificationDatabase Access => new NotificationStore(new AzureSentry());
-
         public NotificationStore(Sentry sentry) : base(sentry)
         {
         }

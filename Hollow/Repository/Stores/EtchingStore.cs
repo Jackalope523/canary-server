@@ -6,10 +6,7 @@ using System;
 namespace Repository
 {
     public class EtchingStore : QueryStore, IEtchingDatabase
-    {
-        public static IEtchingDatabase EtchingDatabaseAccess => new EtchingStore(new AzureSentry());
-     
-       
+    {   
         public EtchingStore(Sentry sentry) : base(sentry)
         {
         }

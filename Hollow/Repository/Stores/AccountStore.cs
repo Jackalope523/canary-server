@@ -7,8 +7,6 @@ namespace Repository
 {
     public class AccountStore : QueryStore, IAccountDatabase
     {
-        public static IAccountDatabase AccountDatabaseAccess => new AccountStore(new AzureSentry());
-
         public AccountStore(Sentry sentry) : base(sentry)
         {
         }
