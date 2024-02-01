@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Core.Boundaries;
 using Core.Entities;
-using Repository;
 using Xunit;
 using Xunit.Abstractions;
 using Shared;
@@ -48,10 +47,16 @@ namespace Core.Tests.Entities
 
 		public CoreEnvironment()
 		{
-			// Arrange Core
-			Terminal = CoreTerminal.CreateTerminal(QueryStore.AccountDatabaseAccess, QueryStore.EventDatabaseAccess,
-				QueryStore.EtchingDatabaseAccess, QueryStore.ProfileDatabaseAccess,
-				QueryStore.ReportDatabaseAccess, QueryStore.NotificationDatabaseAccess,
+            // Arrange Core
+			Repository.Harbor harbor = new(Repository.Harbor.Flag.Development);
+
+            Terminal = CoreTerminal.CreateTerminal(
+                harbor.AccountDatabaseAccess,
+                harbor.EventDatabaseAccess,
+                harbor.EtchingDatabaseAccess,
+                harbor.ProfileDatabaseAccess,
+                harbor.ReportDatabaseAccess,
+                harbor.NotificationDatabaseAccess,
 				new NotificationServiceStub());
 		}
 
@@ -77,11 +82,8 @@ namespace Core.Tests.Entities
 
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
 		{
-			bool success = await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
+			await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
 				userStub.Name, userStub.DateOfBirth, CharacterVector.Default.ToCharacter());
-
-			if (!success)
-			{ throw new UnexpectedFailureException("User creation failed."); }
 
 			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
 
@@ -176,7 +178,7 @@ namespace Core.Tests.Entities
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Incoming);
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Guest);
 			}
 
 			return eventStub;
@@ -191,7 +193,7 @@ namespace Core.Tests.Entities
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Guest);
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived);
 			}
 
 			return eventStub;
@@ -205,7 +207,7 @@ namespace Core.Tests.Entities
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Guest);
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived);
 			}
 
 			await Terminal.EventDatabase.EndEventAsync(eventStub.Id);
@@ -225,7 +227,7 @@ namespace Core.Tests.Entities
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventUserState.Guest);
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived);
 			}
 
 			return eventStub;
@@ -252,7 +254,7 @@ namespace Core.Tests.Entities
 			return events;
 		}
 
-		internal async Task AddUserToEventAsync(Event @event, User user, EventUserState state)
+		internal async Task AddUserToEventAsync(Event @event, User user, EventBond state)
 		{
 			await Terminal.EventDatabase.SetUserStateAsync(user.Id, @event.Id, state);
 		}
@@ -301,7 +303,7 @@ namespace Core.Tests.Entities
 			await Terminal.NotificationDatabase.SubscribeUserAsync(user.Id, deviceType, deviceToken);
 		}
 
-		internal async Task<(DeviceType DeviceType, string DeviceToken)> GetUserSubscriptionAsync(User user)
+		internal async Task<DeviceSilhouette> GetUserSubscriptionAsync(User user)
 		{
 			return await Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
 		}

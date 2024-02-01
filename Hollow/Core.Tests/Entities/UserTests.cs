@@ -253,7 +253,7 @@ namespace Core.Tests.Entities
 			var @event = environment.CreateTestEvent(host);
 			@event.StartTime = DateTime.Now;
 			await environment.GenerateEventUnsafeAsync(@event, host);
-			await environment.AddUserToEventAsync(@event, user, Shared.EventUserState.Guest);
+			await environment.AddUserToEventAsync(@event, user, EventBond.Arrived);
 
 			// Act
 			var isAtEvent = await user.IsAtEvent();
@@ -313,7 +313,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.active_limited);
+			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.Limited);
 
 			// Act
 			var canView = await user.CanView(@event);
@@ -327,7 +327,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.active_limited);
+			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.Limited);
 			
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);

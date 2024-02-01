@@ -263,7 +263,7 @@ namespace Core.Tests.Entities
 			var watchingUser = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, watchingUser, EventUserState.Watching);
+			await environment.AddUserToEventAsync(@event, watchingUser, EventBond.Watching);
 
 			// Act
 			var result = await @event.HasUserRelationship(watchingUser);
@@ -280,7 +280,7 @@ namespace Core.Tests.Entities
 			var incomingGuest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, incomingGuest, EventUserState.Incoming);
+			await environment.AddUserToEventAsync(@event, incomingGuest, EventBond.Guest);
 
 			// Act
 			var result = await @event.HasUserRelationship(incomingGuest);
@@ -297,7 +297,7 @@ namespace Core.Tests.Entities
 			var guest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, guest, EventUserState.Guest);
+			await environment.AddUserToEventAsync(@event, guest, EventBond.Arrived);
 
 			// Act
 			var result = await @event.HasUserRelationship(guest);
@@ -314,7 +314,7 @@ namespace Core.Tests.Entities
 			var leftGuest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, leftGuest, EventUserState.Left);
+			await environment.AddUserToEventAsync(@event, leftGuest, EventBond.Left);
 
 			// Act
 			var result = await @event.HasUserRelationship(leftGuest);
@@ -331,7 +331,7 @@ namespace Core.Tests.Entities
 			var kickedGuest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, kickedGuest, EventUserState.Kicked);
+			await environment.AddUserToEventAsync(@event, kickedGuest, EventBond.Kicked);
 
 			// Act
 			var result = await @event.HasUserRelationship(kickedGuest);
@@ -364,7 +364,7 @@ namespace Core.Tests.Entities
 			var guest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, guest, EventUserState.Guest);
+			await environment.AddUserToEventAsync(@event, guest, EventBond.Arrived);
 
 			// Act
 			var result = await @event.WasAttendedBy(guest);
@@ -381,7 +381,7 @@ namespace Core.Tests.Entities
 			var leftGuest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, leftGuest, EventUserState.Left);
+			await environment.AddUserToEventAsync(@event, leftGuest, EventBond.Left);
 
 			// Act
 			var result = await @event.WasAttendedBy(leftGuest);
@@ -398,7 +398,7 @@ namespace Core.Tests.Entities
 			var kickedGuest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, kickedGuest, EventUserState.Kicked);
+			await environment.AddUserToEventAsync(@event, kickedGuest, EventBond.Kicked);
 
 			// Act
 			var result = await @event.WasAttendedBy(kickedGuest);
@@ -468,7 +468,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
 			
-			await environment.SetEventState(@event, EventState.upcoming);
+			await environment.SetEventState(@event, EventState.Upcoming);
 			await environment.UpdateUserLocationAsync(host,
 				@event.Location.Latitude,
 				@event.Location.Longitude);
@@ -487,7 +487,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
 
-			await environment.SetEventState(@event, EventState.active_open);
+			await environment.SetEventState(@event, EventState.Open);
 
 			// Act
 			var result = await @event.IsStartable();
@@ -579,8 +579,8 @@ namespace Core.Tests.Entities
 			var activeGuest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, incomingUser, EventUserState.Incoming);
-			await environment.AddUserToEventAsync(@event, activeGuest, EventUserState.Guest);
+			await environment.AddUserToEventAsync(@event, incomingUser, EventBond.Guest);
+			await environment.AddUserToEventAsync(@event, activeGuest, EventBond.Arrived);
 
 			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
 			await environment.SubscribeUserAsync(activeGuest, DeviceType.iOS, activeGuest.Id.ToString());
@@ -615,9 +615,9 @@ namespace Core.Tests.Entities
 			var activeGuest = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, incomingUser, EventUserState.Incoming);
-			await environment.AddUserToEventAsync(@event, leftGuest, EventUserState.Left);
-			await environment.AddUserToEventAsync(@event, activeGuest, EventUserState.Guest);
+			await environment.AddUserToEventAsync(@event, incomingUser, EventBond.Guest);
+			await environment.AddUserToEventAsync(@event, leftGuest, EventBond.Left);
+			await environment.AddUserToEventAsync(@event, activeGuest, EventBond.Arrived);
 
 			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
 			await environment.SubscribeUserAsync(leftGuest, DeviceType.iOS, leftGuest.Id.ToString());

@@ -24,7 +24,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var reportedUser = await environment.GenerateUniqueUserAsync();
-			UserReportType report = UserReportType.rude;
+			UserReportType report = UserReportType.Rude;
 			string reportDetails = "detailed report";
 
 			// Act
@@ -42,7 +42,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var reportedUser = await environment.GenerateUniqueUserAsync();
-			UserReportType report = UserReportType.rude;
+			UserReportType report = UserReportType.Rude;
 			string reportDetails = "detailed report";
 
 			// Act
@@ -61,7 +61,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var reportedHost = await environment.GenerateUniqueUserAsync();
 			var reportedEvent = await environment.GenerateUpcomingEventAsync(reportedHost);
-			EventReportType report = EventReportType.misleading;
+			EventReportType report = EventReportType.Misleading;
 			string reportDetails = "detailed report";
 
 			// Act
@@ -82,7 +82,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			PenaltyType penalty = PenaltyType.tmp;
+			PenaltyType penalty = PenaltyType.Unreliable;
 			DateTimeOffset timeOfPenalty = new DateTime(0);
 
 			// Act

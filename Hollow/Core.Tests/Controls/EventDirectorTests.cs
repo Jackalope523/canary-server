@@ -413,9 +413,9 @@ namespace Core.Tests.Entities
 			var watcher = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateOngoingEventAsync(user, guest);
-			await environment.AddUserToEventAsync(@event, left, EventUserState.Left);
-			await environment.AddUserToEventAsync(@event, incoming, EventUserState.Incoming);
-			await environment.AddUserToEventAsync(@event, watcher, EventUserState.Watching);
+			await environment.AddUserToEventAsync(@event, left, EventBond.Left);
+			await environment.AddUserToEventAsync(@event, incoming, EventBond.Guest);
+			await environment.AddUserToEventAsync(@event, watcher, EventBond.Watching);
 
 			// Act
 			var (Watchers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @event.Id);
@@ -424,10 +424,10 @@ namespace Core.Tests.Entities
 			Assert.Equal(1, Watchers);
 			Assert.Equal(2, GuestCount);
 
-			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventUserState.Guest)).Count());
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Left)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
+			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventBond.Arrived)).Count());
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Guest)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Watching)));
 		}
 
 		[Fact]
@@ -445,11 +445,11 @@ namespace Core.Tests.Entities
 			await environment.ForceFriendshipAsync(user, incomingFriend, watchingFriend);
 
 			var @event = await environment.GenerateOngoingEventAsync(host, user);
-			await environment.AddUserToEventAsync(@event, left, EventUserState.Left);
-			await environment.AddUserToEventAsync(@event, incoming, EventUserState.Incoming);
-			await environment.AddUserToEventAsync(@event, incomingFriend, EventUserState.Incoming);
-			await environment.AddUserToEventAsync(@event, watcher, EventUserState.Watching);
-			await environment.AddUserToEventAsync(@event, watchingFriend, EventUserState.Watching);
+			await environment.AddUserToEventAsync(@event, left, EventBond.Left);
+			await environment.AddUserToEventAsync(@event, incoming, EventBond.Guest);
+			await environment.AddUserToEventAsync(@event, incomingFriend, EventBond.Guest);
+			await environment.AddUserToEventAsync(@event, watcher, EventBond.Watching);
+			await environment.AddUserToEventAsync(@event, watchingFriend, EventBond.Watching);
 
 			// Act
 			var (Watchers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @event.Id);
@@ -458,10 +458,10 @@ namespace Core.Tests.Entities
 			Assert.Equal(1, Watchers);
 			Assert.Equal(2, GuestCount);
 
-			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventUserState.Guest)).Count());
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Left)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
+			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventBond.Arrived)).Count());
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Guest)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Watching)));
 		}
 
 		[Fact]
@@ -481,12 +481,12 @@ namespace Core.Tests.Entities
 			await environment.ForceFriendshipAsync(user, guestFriend, leftFriend, incomingFriend, watchingFriend);
 
 			var @event = await environment.GenerateOngoingEventAsync(host, guestFriend);
-			await environment.AddUserToEventAsync(@event, left, EventUserState.Left);
-			await environment.AddUserToEventAsync(@event, leftFriend, EventUserState.Left);
-			await environment.AddUserToEventAsync(@event, incoming, EventUserState.Incoming);
-			await environment.AddUserToEventAsync(@event, incomingFriend, EventUserState.Incoming);
-			await environment.AddUserToEventAsync(@event, watcher, EventUserState.Watching);
-			await environment.AddUserToEventAsync(@event, watchingFriend, EventUserState.Watching);
+			await environment.AddUserToEventAsync(@event, left, EventBond.Left);
+			await environment.AddUserToEventAsync(@event, leftFriend, EventBond.Left);
+			await environment.AddUserToEventAsync(@event, incoming, EventBond.Guest);
+			await environment.AddUserToEventAsync(@event, incomingFriend, EventBond.Guest);
+			await environment.AddUserToEventAsync(@event, watcher, EventBond.Watching);
+			await environment.AddUserToEventAsync(@event, watchingFriend, EventBond.Watching);
 
 			// Act
 			var (Watchers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @event.Id);
@@ -495,10 +495,10 @@ namespace Core.Tests.Entities
 			Assert.Equal(1, Watchers);
 			Assert.Equal(1, GuestCount);
 
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Guest)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Left)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Guest)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Watching)));
 		}
 
 		[Fact]
@@ -521,10 +521,10 @@ namespace Core.Tests.Entities
 			Assert.Equal(0, Watchers);
 			Assert.Equal(1, GuestCount);
 
-			Assert.Single(Guests.Where(user => user.State.Equals(EventUserState.Guest)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Left)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Incoming)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventUserState.Watching)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Left)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Guest)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Watching)));
 		}
 
 		[Fact]
