@@ -5,9 +5,19 @@ import { Spacing } from '../../styles/SpacingStyles';
 
 import HeaderDefaultTitled from '../../components/headers/HeaderDefaultTitled';
 import HeaderFlagAttendee from '../../components/headers/HeaderFlagAttendee';
-import Mask1 from '../../components/testing/masking/mask1';
+import Mask1 from '../../components/testing/animations/mask1';
 import { Colors } from '../../styles/ColorStyles';
-import Mask2 from '../../components/testing/masking/mask2';
+import Mask2 from '../../components/testing/animations/mask2';
+import Mask3 from '../../components/testing/animations/mask3';
+import CircleGrowth from '../../components/testing/animations/circleGrowth';
+import Mask4 from '../../components/testing/animations/mask4';
+import Header4 from '../../components/testing/animations/header4';
+import Header5 from '../../components/testing/animations/header5';
+import Button2, {
+  ButtonDisplay,
+  ButtonSize,
+  ButtonType,
+} from '../../components/testing/animations/Button2';
 
 const TestScreen = () => {
   return (
@@ -25,9 +35,14 @@ const TestScreen = () => {
 
       {/* --- START TESTING CODE BELOW --- */}
       {/* <HeaderDefaultTitled title="Titled" /> */}
-      <HeaderFlagAttendee />
-      {/* <Mask1 /> */}
-      <Mask2 />
+      {/* <HeaderFlagAttendee /> */}
+      <Header4 />
+      <Button2
+        text="Example button"
+        type={ButtonType.Success}
+        size={ButtonSize.Medium}
+        display={ButtonDisplay.Contained}
+      />
     </View>
   );
 };
