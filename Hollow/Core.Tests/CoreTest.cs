@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Core.Tests.Entities
+namespace Core.Tests
 {
 	public class CoreTest : IAsyncLifetime, IDisposable
 	{

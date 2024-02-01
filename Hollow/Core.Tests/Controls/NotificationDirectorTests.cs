@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Core.Tests.Entities
+namespace Core.Tests.Controls
 {
     public class NotificationDirectorTests : CoreTest
     {

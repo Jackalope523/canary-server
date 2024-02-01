@@ -15,7 +15,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-namespace Core.Tests.Entities
+namespace Core.Tests
 {
 	public class CoreEnvironment
 	{
