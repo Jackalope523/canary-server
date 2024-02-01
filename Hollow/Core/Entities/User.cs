@@ -50,12 +50,12 @@ namespace Core.Entities
         public int AccessTries { get; set; }
 
         public UserAccountStatus AccountStatus { get; set; }
-        public bool CanAttend => AccountStatus == UserAccountStatus.active ||
-            AccountStatus == UserAccountStatus.active_no_host;
+        public bool CanAttend => AccountStatus == UserAccountStatus.Active ||
+            AccountStatus == UserAccountStatus.Impotent;
         public bool CanAttendFriends => CanAttend ||
-            AccountStatus == UserAccountStatus.active_limited;
-        public bool CanHost => AccountStatus == UserAccountStatus.active;
-        public bool IsLocked => AccountStatus == UserAccountStatus.blacklisted;
+            AccountStatus == UserAccountStatus.Limited;
+        public bool CanHost => AccountStatus == UserAccountStatus.Active;
+        public bool IsLocked => AccountStatus == UserAccountStatus.Blacklisted;
 
         public CharacterVector Character { get; set; }
 
@@ -363,7 +363,7 @@ namespace Core.Entities
 			if ((await EventReports).Count < 4)
 			{ return AccountStatus; }
 
-			return UserAccountStatus.active_no_host;
+			return UserAccountStatus.Impotent;
         }
 
         public async Task<UserAccountStatus> Reported()
@@ -373,14 +373,14 @@ namespace Core.Entities
 			{ return AccountStatus; }
 
 			// Check if there are enough reports
-			if ((await Reports).Count < 6)
-			{ return UserAccountStatus.active_limited; }
+			if ((await Reports.Value()).Count < 6)
+			{ return UserAccountStatus.Limited; }
             
 			// Check if there are enough reports
-			if ((await Reports).Count < 10)
-			{ return UserAccountStatus.inactive_under_review; }
+			if ((await Reports.Value()).Count < 10)
+			{ return UserAccountStatus.Suspended; }
 
-            return UserAccountStatus.blacklisted;
+            return UserAccountStatus.Blacklisted;
         }
 
 		#endregion

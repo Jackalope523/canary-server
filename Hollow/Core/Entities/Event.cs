@@ -24,7 +24,7 @@ namespace Core.Entities
         public const int MaximumDescLength = 400;
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
-        public readonly Distance GuestDistance = new() { Metres = 75 };
+        public readonly Distance ArrivalDistance = new() { Metres = 75 };
         public readonly TimeSpan MaximumEtchingLateness = OneDay;
 
         public static Event None
@@ -49,14 +49,14 @@ namespace Core.Entities
         public int GroupMaximum { get; set; }
 
         public bool IsWaiting
-            => State.Equals(EventState.upcoming) &&
+            => State.Equals(EventState.Upcoming) &&
                 HasAlready(StartTime);
         public bool IsOpen
-            => State.Equals(EventState.upcoming) ||
-                State.Equals(EventState.active_open);
+            => State.Equals(EventState.Upcoming) ||
+                State.Equals(EventState.Open);
         public bool IsOngoing
-            => State.Equals(EventState.active_open) ||
-                State.Equals(EventState.active_closed);
+            => State.Equals(EventState.Open) ||
+                State.Equals(EventState.Sealed);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumEtchingLateness);
@@ -65,18 +65,19 @@ namespace Core.Entities
 		// Synced Properties
 		//////////////////////
 
-		public Synced<List<(User User, EventUserState State)>> AllUsers
+		public Synced<List<(User User, EventBond State)>> AllUsers
             => new(() => Terminal.EventDirector.RequestAllUsersFromEventAsync(this));
         public Synced<List<User>> Watching
-            => new(async () => (await AllUsers).FindAll(user => user.State.Equals(EventUserState.Watching)).ConvertAll(user => user.User));
-		public Synced<List<User>> Incoming
-            => new(async () => (await AllUsers).FindAll(user => user.State.Equals(EventUserState.Incoming)).ConvertAll(user => user.User));
-        public Synced<List<User>> Guests
-            => new(async () => (await AllUsers).FindAll(user => user.State.Equals(EventUserState.Guest)).ConvertAll(user => user.User));
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Watching)).ConvertAll(user => user.User));
+		public Synced<List<User>> Guests
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Guest)).ConvertAll(user => user.User));
+        public Synced<List<User>> Arrived
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Arrived)).ConvertAll(user => user.User));
         public Synced<List<User>> Left
-            => new(async () => (await AllUsers).FindAll(user => user.State.Equals(EventUserState.Left)).ConvertAll(user => user.User));
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Left)).ConvertAll(user => user.User));
         public Synced<List<User>> Kicked
-            => new(async () => (await AllUsers).FindAll(user => user.State.Equals(EventUserState.Kicked)).ConvertAll(user => user.User));
+            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Kicked)).ConvertAll(user => user.User));
+
         public Synced<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>> GuestHistory
             => new(() => Terminal.EventDirector.RequestGuestHistoryAsync(this));
 
@@ -157,9 +158,9 @@ namespace Core.Entities
             return true;
         }
 
-        public async Task<List<(User User, EventUserState State)>> GetFriendsOf(User user)
+        public async Task<List<(User User, EventBond State)>> GetFriendsOf(User user)
         {
-            List<(User User, EventUserState State)> friends = new();
+            List<(User User, EventBond State)> friends = new();
 
             foreach (var userDetails in await AllUsers)
             {
@@ -249,11 +250,11 @@ namespace Core.Entities
         public async Task<bool> WasAttendedBy(User user)
         {
             // Check if user is or was on the guest list
-            return (await Guests).Contains(user) || (await Left).Contains(user);
+            return (await Arrived).Contains(user) || (await Left).Contains(user);
 		}
-
+        
         public async Task<bool> IsInRange(User user)
-            => GeoLocation.AreInRange(Location, await user.LastKnownLocation, GuestDistance);
+            => GeoLocation.AreInRange(Location, await user.LastKnownLocation, ArrivalDistance);
 
         public async Task<bool> IsStartable()
         {
@@ -325,7 +326,7 @@ namespace Core.Entities
 
         public async Task NotifyActive(string title, string message)
         {
-            foreach (var user in (await Incoming).Concat(await Guests))
+            foreach (var user in (await Guests).Concat(await Arrived))
             {
                 if (IsHostedBy(user))
                 { continue; }
@@ -336,7 +337,7 @@ namespace Core.Entities
 
         public async Task NotifyGuests(string title, string message)
         {
-            foreach (var guest in await Guests)
+            foreach (var guest in await Arrived)
             {
                 if (IsHostedBy(guest))
                 { continue; }

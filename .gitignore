@@ -350,7 +350,8 @@ MigrationBackup/
 .ionide/
 
 #EF Core Garbage
-ProjectSparrow/Repository/Migrations/
+Hollow/Repository/Migrations/
+Hollow/Repository/TestDB.db
 
 #Apple's gift from God
 .DS_Store

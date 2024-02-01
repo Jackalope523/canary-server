@@ -1,13 +1,15 @@
-﻿namespace Repository.Entities
+﻿using Shared;
+
+namespace Repository
 {
-    public class EventLink : Link
+    public class EventLink
     {
-        public enum EventLinkType { Attend, Watch, Left }
-
-        public Guid EventId { get; init; }
-        internal Event Event { get; init; }
-        public EventLinkType Type { get; set; }
-        internal DateTimeOffset Time { get; init; }
-
+        public ulong Id { get; init; }
+        public ulong UserId { get; init; }
+        public User User { get; init; }
+        public ulong EventId { get; init; }
+        public Event Event { get; init; }
+        public DateTimeOffset Time { get; init; }
+        public EventBond Type { get; set; }
     }
 }

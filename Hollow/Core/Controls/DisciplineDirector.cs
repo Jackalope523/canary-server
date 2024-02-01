@@ -81,7 +81,7 @@ namespace Core.Controls
         internal async Task<List<Penalty>> RequestPenaltiesForUserAsync(User user)
             => await Reports.GetPenaltiesForUserAsync(user.Id);
 
-        internal async Task<bool> PenaliseUserAsync(User user, PenaltyType offense, DateTimeOffset timeOfPenalty)
+        internal async Task PenaliseUserAsync(User user, PenaltyType offense, DateTimeOffset timeOfPenalty)
             => await Reports.PenaliseUserAsync(user.Id, offense, timeOfPenalty);
 
 		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>

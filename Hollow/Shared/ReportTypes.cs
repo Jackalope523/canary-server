@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Shared
 {
 	public enum EventReportType
-	{ inappropriate, spam, misleading, promotion }
+	{ Inappropriate, Spam, Misleading, Promotion }
 	
 	public enum UserReportType
-	{ rude, hate_speech, harassment, violent_behaviour,
-		physical_assault, sexual_assault }
+	{ Rude, HateSpeech, Harassment,
+		Violent, Assault }
 }

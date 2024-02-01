@@ -68,13 +68,30 @@ namespace Shared
             : base(message, innerException) { }
     }
 
-	#endregion
+    #endregion
 
 
-	#region Repository
+    #region Repository
 
-	[Serializable]
-    public class InsufficientRadiusException : HollowFailureException
+    [Serializable]
+    public class UndefinedHarborStateException : HollowFailureException
+    {
+        public UndefinedHarborStateException()
+        {
+        }
+
+        public UndefinedHarborStateException(string message)
+            : base(message)
+        {
+        }
+
+        public UndefinedHarborStateException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    [Serializable]
+    public class InsufficientRadiusException : HollowException
     {
         public InsufficientRadiusException()
         {
@@ -90,8 +107,8 @@ namespace Shared
         {
         }
     }
-
-    public class ExcessiveRadiusException : HollowFailureException
+    [Serializable]
+    public class ExcessiveRadiusException : HollowException
     {
         public ExcessiveRadiusException()
         {
@@ -107,13 +124,89 @@ namespace Shared
         {
         }
     }
+    [Serializable]
+    public class UserNotFoundException : HollowFailureException
+    {
+        public UserNotFoundException()
+        {
+        }
 
-	#endregion
+        public UserNotFoundException(string message)
+            : base(message)
+        {
+        }
+
+        public UserNotFoundException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    [Serializable]
+    public class InvalidInputException : HollowFailureException
+    {
+        public InvalidInputException()
+        {
+        }
+
+        public InvalidInputException(string message)
+            : base(message)
+        {
+        }
+
+        public InvalidInputException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+
+    [Serializable]
+    public class DatabaseWriteException : HollowFailureException
+    {
+        private static readonly string defaultMessage = "An unexpected error occured while writing to the database.";
+
+        public DatabaseWriteException()
+        {
+        }
+        public DatabaseWriteException(string message)
+            : base(message)
+        {
+        }
+        public DatabaseWriteException(Exception inner)
+           : base(defaultMessage, inner)
+        {
+        }
+        public DatabaseWriteException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    [Serializable]
+    public class DatabaseReadException : HollowFailureException
+    {
+        private static readonly string defaultMessage = "An unexpected error occured while reading from the database.";
+        public DatabaseReadException()
+        {
+        }
+
+        public DatabaseReadException(string message)
+            : base(message)
+        {
+        }
+        public DatabaseReadException(Exception inner)
+            : base(defaultMessage, inner)
+        {
+        }
+        public DatabaseReadException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    #endregion
 
 
-	#region Core
+    #region Core
 
-	[Serializable]
+    [Serializable]
 	public class InvalidUserException : UserErrorException
 	{
 		public InvalidUserException()

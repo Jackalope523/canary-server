@@ -1,11 +1,13 @@
-import { userSession, handleError, ratingType, extractDate } from '../../lib/axios';
+import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { character, extractCharacter } from '../auth/accountPigeon';
 import { extractUserSilhouette, userSilhouette } from '../profile/profilePigeon';
 
 const apiBaseUrl = '/event';
 
+export enum eventState { upcoming, active_open, active_closed, ended };
+
 export type eventShard = {
-    Id: string,
+    Id: number,
     Host: userSilhouette,
     Name: string,
     Description: string,
@@ -13,41 +15,103 @@ export type eventShard = {
     Latitude: number,
     Longitude: number,
     TimeEnded?: Date,
-    IsOpen: boolean,
+    State: eventState,
     GroupMinimum: number,
     GroupMaximum: number,
-    Character: character
+    Character: character,
+    Radius: number,
+    IsDynamic: boolean
 };
 
+export function extractEventShard(data: any) {
+    let event: eventShard = {
+        Id: data['Id'],
+        Host: extractUserSilhouette(data['Host']),
+        Name: data['Name'],
+        Description: data['Description'],
+        StartTime: extractDate(data['StartTime']),
+        Latitude: data['Latitude'],
+        Longitude: data['Longitude'],
+        TimeEnded: data['TimeEnded'] ?
+            extractDate(data['TimeEnded']) : undefined,
+        State: data['State'],
+        GroupMinimum: data['GroupMinimum'],
+        GroupMaximum: data['GroupMaximum'],
+        Character: extractCharacter(data['Character']),
+        Radius: data['Radius'],
+        IsDynamic: data['IsDynamic']
+    }
+
+    return event;
+}
+
 export type eventThinSlice = {
-    Id: string,
+    Id: number,
     Host: userSilhouette,
     Latitude: number,
     Longitude: number
 };
 
+export function extractEventThinSlice(data: any) {
+    let event: eventThinSlice = {
+        Id: data['Id'],
+        Host: extractUserSilhouette(data['Host']),
+        Latitude: data['Latitude'],
+        Longitude: data['Longitude']
+    };
+
+    return event;
+}
+
 export type eventHeader = {
-    Id: string,
+    Id: number,
     Name: string,
     IsActive: string,
     LastActiveTime: Date
 }
 
+export function extractEventHeader(data: any) {
+    let header: eventHeader = {
+        Id: data['Id'],
+        Name: data['EventId'],
+        IsActive: data['IsActive'],
+        LastActiveTime: extractDate(data['LastTimeActive'])
+    };
+
+    return header;
+}
+
 export type etchingShard = {
-    Id: string,
-    EventId: string,
-    UserId: string,
+    Id: number,
+    EventId: number,
+    UserId: number,
     TimeEtched: Date,
     ImageURL: string,
-    Ratings: [Positive: number, Negative: number]
+    Ratings: [Positive: number, Negative: number],
+    IsHidden: boolean
 };
 
-////////////////
-// Event Flow //
+export function extractEtchingShard(data: any) {
+    let etching: etchingShard = {
+        Id: data['id'],
+        EventId: data['EventId'],
+        UserId: data['UserId'],
+        TimeEtched: extractDate(data['TimeEtched']),
+        ImageURL: data['ImageURL'],
+        Ratings: [data['Ratings']['Positive'],
+            data['Ratings']['Negative']],
+        IsHidden: data['IsHidden']
+    };
+
+    return etching;
+}
+
+//////
+// Event Flow
 ////////////////
 
 // Get event details
-export async function getEvent(eventID: string) {
+export async function getEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -57,23 +121,7 @@ export async function getEvent(eventID: string) {
         .then((response: any) => {
             console.log('Event Details:', response.data);
 
-            let event: eventShard = {
-                Id: response.data['Id'],
-                Host: extractUserSilhouette(response.data['Host']),
-                Name: response.data['Name'],
-                Description: response.data['Description'],
-                StartTime: extractDate(response.data['StartTime']),
-                Latitude: response.data['Latitude'],
-                Longitude: response.data['Longitude'],
-                TimeEnded: response.data['TimeEnded'] ?
-                    extractDate(response.data['TimeEnded']) : undefined,
-                IsOpen: response.data['IsOpen'],
-                GroupMinimum: response.data['GroupMinimum'],
-                GroupMaximum: response.data['GroupMaximum'],
-                Character: extractCharacter(response.data['Character'])
-            }
-
-            return event;
+            return extractEventShard(response.data);
         })
         .catch(handleError);
 }
@@ -84,8 +132,11 @@ export type eventCreationDetails = {
     Latitude: number,
     Longitude: number,
     StartTime: Date,
+    Radius: number,
+    IsDynamic: boolean,
     GroupMinimum?: number,
-    GroupMaximum?: number
+    GroupMaximum?: number,
+    IsOpen?: boolean
 };
 
 // Create event
@@ -101,34 +152,13 @@ export async function createEvent(details: eventCreationDetails) {
         .then((response: any) => {
             console.log('Event Created:', response.data);
 
-            let event: eventShard = {
-                Id: response.data['Id'],
-                Host: response.data['Host'],
-                Name: response.data['Name'],
-                Description: response.data['Description'],
-                StartTime: extractDate(response.data['StartTime']),
-                Latitude: response.data['Latitude'],
-                Longitude: response.data['Longitude'],
-                TimeEnded: response.data['TimeEnded'] ?
-                    extractDate(response.data['TimeEnded']) : undefined,
-                IsOpen: response.data['IsOpen'],
-                GroupMinimum: response.data['GroupMinimum'],
-                GroupMaximum: response.data['GroupMaximum'],
-                Character: extractCharacter(response.data['Character'])
-            }
-
-            return event;
+            return extractEventShard(response.data);
         })
         .catch(handleError);
 }
 
-export type eventEditDetails = {
-    EventDescription: string,
-    EventIsOpen?: boolean
-};
-
 // Edit event
-export async function editEvent(eventID: string, details: eventEditDetails) {
+export async function editEvent(eventID: number, details: eventCreationDetails) {
     if (!eventID || !details) {
         console.log('EventID or Details are missing.');
         return Promise.reject();
@@ -141,8 +171,22 @@ export async function editEvent(eventID: string, details: eventEditDetails) {
         .catch(handleError);
 }
 
+// Start event
+export async function startEvent(eventID: number) {
+    if (!eventID) {
+        console.log('EventID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.get(`${apiBaseUrl}/${eventID}/start`)
+        .then(() => {
+            console.log('Event Started Successfully');
+        })
+        .catch(handleError);
+}
+
 // End event
-export async function endEvent(eventID: string) {
+export async function endEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -155,8 +199,36 @@ export async function endEvent(eventID: string) {
         .catch(handleError);
 }
 
+// Watch event
+export async function watchEvent(eventID: number) {
+    if (!eventID) {
+        console.log('EventID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.post(`${apiBaseUrl}/${eventID}/watch`)
+        .then(() => {
+            console.log('Joined Event Successfully');
+        })
+        .catch(handleError);
+}
+
+// Unwatch event
+export async function unwatchEvent(eventID: number) {
+    if (!eventID) {
+        console.log('EventID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.put(`${apiBaseUrl}/${eventID}/watch`)
+        .then(() => {
+            console.log('Joined Event Successfully');
+        })
+        .catch(handleError);
+}
+
 // Join event
-export async function joinEvent(eventID: string) {
+export async function joinEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -170,7 +242,7 @@ export async function joinEvent(eventID: string) {
 }
 
 // Leave event
-export async function leaveEvent(eventID: string) {
+export async function leaveEvent(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -183,8 +255,64 @@ export async function leaveEvent(eventID: string) {
         .catch(handleError);
 }
 
-/////////////////
-// Report Flow //
+// Get the guest list for an event
+export async function getGuestList(eventID: number) {
+    if (!eventID) {
+        console.log('EventID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.get(`${apiBaseUrl}/${eventID}/guests`)
+    .then((response: any) => {
+        return extractList(response.data, extractUserSilhouette);
+    })
+        .catch(handleError);
+}
+
+// Get a list of users who may be invited to an event
+export async function getPotentialInvitees(eventID: number) {
+    if (!eventID) {
+        console.log('EventID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.get(`${apiBaseUrl}/${eventID}/invite`)
+        .then((response: any) => {
+            return extractList(response.data, extractUserSilhouette);
+        })
+        .catch(handleError);
+}
+
+// Invite user to event
+export async function inviteUser(eventID: number, targetID: number) {
+    if (!eventID || !targetID) {
+        console.log('EventID or TargetID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.post(`${apiBaseUrl}/${eventID}/invite`, { targetID })
+        .then(() => {
+            console.log('Invited User Successfully');
+        })
+        .catch(handleError);
+}
+
+// Kick user from event
+export async function kickUser(eventID: number, targetID: number) {
+    if (!eventID || !targetID) {
+        console.log('EventID or TargetID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.put(`${apiBaseUrl}/${eventID}/guests`, { targetID })
+        .then(() => {
+            console.log('Kicked User Successfully');
+        })
+        .catch(handleError);
+}
+
+///////
+// Report Flow
 /////////////////
 
 export enum eventReportType { inappropriate, spam, misleading, promotion };
@@ -195,7 +323,7 @@ export type eventReport = {
 };
 
 // Report event
-export async function reportEvent(eventID: string, hostID: string, report: eventReport) {
+export async function reportEvent(eventID: number, hostID: number, report: eventReport) {
     if (!eventID || !hostID || !report) {
         console.log('EventID, HostID, or Report are missing.');
         return Promise.reject();
@@ -208,12 +336,12 @@ export async function reportEvent(eventID: string, hostID: string, report: event
         .catch(handleError);
 }
 
-//////////////////
-// Etching Flow //
+////////
+// Etching Flow
 //////////////////
 
 // Get event etchings
-export async function getEventEtchings(eventID: string) {
+export async function getEventEtchings(eventID: number) {
     if (!eventID) {
         console.log('EventID is missing.');
         return Promise.reject();
@@ -223,22 +351,7 @@ export async function getEventEtchings(eventID: string) {
         .then((response: any) => {
             console.log('Event Etchings:', response.data);
 
-            let etchings: etchingShard[] = [];
-
-            for (const etching of response.data)
-            {
-                etchings.push({
-                    Id: etching['id'],
-                    EventId: etching['EventId'],
-                    UserId: etching['UserId'],
-                    TimeEtched: extractDate(etching['TimeEtched']),
-                    ImageURL: etching['ImageURL'],
-                    Ratings: [etching['Ratings']['Positive'],
-                        etching['Ratings']['Negative']]
-                });
-            }
-
-            return etchings;
+            return extractList(response.data, extractEtchingShard);
         })
         .catch(handleError);
 }
@@ -248,7 +361,7 @@ export type eventEtching = {
 };
 
 // Add etching to event
-export async function etchIntoEvent(eventID: string, etching: eventEtching) {
+export async function etchIntoEvent(eventID: number, etching: eventEtching) {
     if (!eventID || !etching) {
         console.log('EventID or Etching are missing.');
         return Promise.reject();
@@ -258,23 +371,13 @@ export async function etchIntoEvent(eventID: string, etching: eventEtching) {
         .then((response: any) => {
             console.log('Etching Added to Event:', response.data);
 
-            let etching: etchingShard = {
-                Id: response.data['Id'],
-                EventId: response.data['EventId'],
-                UserId: response.data['UserId'],
-                TimeEtched: extractDate(response.data['TimeEtched']),
-                ImageURL: response.data['ImageURL'],
-                Ratings: [response.data['Ratings']['Positive'],
-                    response.data['Ratings']['Negative']]
-            }
-
-            return etching;
+            return extractEtchingShard(response.data);
         })
         .catch(handleError);
 }
 
 // Remove etching
-export async function removeEtching(eventID: string, etchingID: string) {
+export async function removeEtching(eventID: number, etchingID: number) {
     if (!eventID || !etchingID) {
         console.log('EventID or EtchingID are missing.');
         return Promise.reject();
@@ -288,9 +391,9 @@ export async function removeEtching(eventID: string, etchingID: string) {
 }
 
 // Rate etching
-export async function rateEtching(eventID: string, etchingID: string, rating: ratingType) {
+export async function rateEtching(eventID: number, etchingID: number, rating: ratingType) {
     if (!eventID || !etchingID || !rating) {
-        console.log('EventID, EtchingID, or Details are missing.');
+        console.log('EventID, EtchingID, or Rating is missing.');
         return Promise.reject();
     }
 

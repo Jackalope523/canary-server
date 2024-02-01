@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Repository.Entities
+﻿namespace Repository
 {
-    public class PostLink : Link
+    public class PostLink
     {
         public enum PostLinkType { RateUp, RateDown }
 
-        public Guid PostId { get; init; }
-        internal Post Post { get; init; }
+        public ulong Id { get; init; }
+        public ulong UserId { get; init; }
+        public User User { get; init; }
+        public ulong PostId { get; init; }
+        public Post Post { get; init; }
+        public DateTimeOffset Time { get; init; }
         public PostLinkType Type { get; set; }
     }
 }
