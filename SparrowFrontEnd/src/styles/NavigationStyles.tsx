@@ -11,7 +11,7 @@ export const navigationStyles = StyleSheet.create({
   // ! ||--------------------------------------------------------------------------------||
 
   // Base
-  topNavbar: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
@@ -21,38 +21,62 @@ export const navigationStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  topNavbarIcon: {
+  headerIcon: {
     color: Colors.sparrowDarkBrown,
   },
 
-  topNavbarGapLeft: {
+  headerGapLeft: {
     marginRight: Spacing.md,
   },
 
   // Types
   // Default with title
-  topNavbarDefaultTitled: {
+  headerDefaultTitled: {
     columnGap: Spacing.md,
   },
 
   // Favorite
-  topNavbarFavorite: {
+  headerFavorite: {
     justifyContent: 'space-between',
   },
 
   // Options
-  topNavbarOptions: {
+  headerOptions: {
     justifyContent: 'space-between',
   },
 
   // Edit
-  topNavbarEdit: {
+  headerEdit: {
     justifyContent: 'space-between',
   },
 
-  topNavbarEditWrapper: {
+  headerEditLeft: {
     flexDirection: 'row',
+    alignItems: 'center',
     columnGap: Spacing.md,
+  },
+
+  // Flags
+  flag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 12,
+    borderBottomWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  flagLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.md,
+  },
+
+  flagRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.sm,
   },
 
   // ! ||--------------------------------------------------------------------------------||

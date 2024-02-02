@@ -2,22 +2,22 @@ import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Spacing } from '../../styles/SpacingStyles';
-
-import HeaderDefaultTitled from '../../components/headers/HeaderDefaultTitled';
-import HeaderFlagAttendee from '../../components/headers/HeaderFlagAttendee';
-import Mask1 from '../../components/testing/animations/mask1';
-import { Colors } from '../../styles/ColorStyles';
-import Mask2 from '../../components/testing/animations/mask2';
-import Mask3 from '../../components/testing/animations/mask3';
-import CircleGrowth from '../../components/testing/animations/circleGrowth';
-import Mask4 from '../../components/testing/animations/mask4';
-import Header4 from '../../components/testing/animations/header4';
-import Header5 from '../../components/testing/animations/header5';
 import Button2, {
   ButtonDisplay,
   ButtonSize,
   ButtonType,
 } from '../../components/testing/animations/Button2';
+import HeaderDefaultTitled from '../../components/HeaderDefaultTitled';
+import HeaderFlagAttendee, {
+  ANType,
+  APType,
+} from '../../components/HeaderFlagAttendee';
+import HeaderFlagHost, {
+  HNType,
+  HPType,
+} from '../../components/HeaderFlagHost';
+import HeaderEditTitled from '../../components/HeaderEditTitled';
+import HeaderOptions from '../../components/HeaderOptions';
 
 const TestScreen = () => {
   return (
@@ -34,9 +34,22 @@ const TestScreen = () => {
       </View>
 
       {/* --- START TESTING CODE BELOW --- */}
-      {/* <HeaderDefaultTitled title="Titled" /> */}
-      {/* <HeaderFlagAttendee /> */}
-      <Header4 />
+
+      <HeaderOptions title="Options" />
+      <HeaderEditTitled title="Selected titled" />
+      <HeaderDefaultTitled title="Testing" />
+      <HeaderFlagAttendee
+        title="Attendee header"
+        previousType={APType.StartingSoon}
+        nextType={ANType.Live}
+      />
+      <HeaderFlagHost
+        title="Host header"
+        previousType={HPType.StartingSoon}
+        nextType={HNType.Live}
+      />
+
+      {/* <Header4 previousType={PType.StartingSoon} nextType={NType.Live} /> */}
       <Button2
         text="Example button"
         type={ButtonType.Success}

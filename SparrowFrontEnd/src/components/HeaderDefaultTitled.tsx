@@ -1,12 +1,12 @@
 import { Pressable, Text, View } from 'react-native';
 import React from 'react';
 
-import { navigationStyles } from '../../styles/NavigationStyles';
+import { navigationStyles } from '../styles/NavigationStyles';
 
 // Icons font
 import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
-import { globalStyles } from '../../styles/GlobalStyles';
+import fontelloConfig from '../config.json';
+import { globalStyles } from '../styles/GlobalStyles';
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 interface HeaderDefaultTitledProps {
@@ -16,17 +16,15 @@ interface HeaderDefaultTitledProps {
 const HeaderDefaultTitled: React.FC<HeaderDefaultTitledProps> = ({ title }) => {
   return (
     <View
-      style={[
-        navigationStyles.topNavbar,
-        navigationStyles.topNavbarDefaultTitled,
-      ]}>
+      style={[navigationStyles.header, navigationStyles.headerDefaultTitled]}>
+      {/* TODO onPress -> navigate to the previous screen */}
       <Pressable onPress={null}>
         <Icon
           name="arrow-back-outline"
           size={24}
           height={24}
           width={24}
-          style={navigationStyles.topNavbarIcon}
+          style={navigationStyles.headerIcon}
         />
       </Pressable>
       <Text style={[globalStyles.textDark, globalStyles.headingTextFive]}>

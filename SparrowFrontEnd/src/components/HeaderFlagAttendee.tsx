@@ -1,13 +1,14 @@
 import {
   Button,
   Dimensions,
+  Pressable,
   StyleSheet,
   Text,
   View,
   ViewStyle,
 } from 'react-native';
 import React from 'react';
-import { Colors } from '../../../styles/ColorStyles';
+import { Colors } from '../styles/ColorStyles';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -15,6 +16,11 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import MaskedView from '@react-native-masked-view/masked-view';
+import { navigationStyles } from '../styles/NavigationStyles';
+
+import { createIconSetFromFontello } from 'react-native-vector-icons';
+import fontelloConfig from '../config.json';
+import { globalStyles } from '../styles/GlobalStyles';
 
 /* --- DEV NOTES --- */
 /*
@@ -23,17 +29,20 @@ import MaskedView from '@react-native-masked-view/masked-view';
 
 */
 
-type Props = {
-  // buttonIndex: number;
-  // mode?: 'startingLate' | 'startingSoon' | 'live' | 'terminated';
+// Icons font
+const Icon = createIconSetFromFontello(fontelloConfig);
 
-  previousType: PType;
-  nextType: NType;
+type Props = {
+  title: string;
+
+  previousType: APType;
+  nextType: ANType;
   previousTypeStyle: ViewStyle[];
   nextTypeStyle: ViewStyle[];
 };
 
-const Header4: React.FC<Props> = ({
+const HeaderFlagAttendee: React.FC<Props> = ({
+  title,
   previousType,
   nextType,
   previousTypeStyle,
@@ -85,37 +94,37 @@ const Header4: React.FC<Props> = ({
   */
 
   switch (previousType) {
-    case PType.StartingLate:
-      previousTypeStyle = [styles.flagLate];
+    case APType.StartingLate:
+      previousTypeStyle = [styles.flagStartingLate];
       break;
 
-    case PType.StartingSoon:
-      previousTypeStyle = [styles.flagSoon];
+    case APType.StartingSoon:
+      previousTypeStyle = [styles.flagStartingSoon];
       break;
 
-    case PType.Live:
+    case APType.Live:
       previousTypeStyle = [styles.flagLive];
       break;
 
-    case PType.Terminated:
+    case APType.Terminated:
       previousTypeStyle = [styles.flagTerminated];
       break;
   }
 
   switch (nextType) {
-    case NType.StartingLate:
-      nextTypeStyle = [styles.flagLate];
+    case ANType.StartingLate:
+      nextTypeStyle = [styles.flagStartingLate];
       break;
 
-    case NType.StartingSoon:
-      nextTypeStyle = [styles.flagSoon];
+    case ANType.StartingSoon:
+      nextTypeStyle = [styles.flagStartingSoon];
       break;
 
-    case NType.Live:
+    case ANType.Live:
       nextTypeStyle = [styles.flagLive];
       break;
 
-    case NType.Terminated:
+    case ANType.Terminated:
       nextTypeStyle = [styles.flagTerminated];
       break;
   }
@@ -135,31 +144,83 @@ const Header4: React.FC<Props> = ({
           <View style={[styles.bg, styles.background, nextTypeStyle]} />
         </MaskedView>
 
-        <View style={styles.content}>
-          <Text style={{ color: 'red' }}>Example title</Text>
+        {/* Content */}
+        <View style={navigationStyles.flag}>
+          <View style={navigationStyles.flagLeft}>
+            {/* TODO onPress -> navigate back one screen */}
+            <Pressable onPress={null}>
+              <Icon
+                name="arrow-back-outline"
+                size={24}
+                height={24}
+                width={24}
+                style={navigationStyles.headerIcon}
+              />
+            </Pressable>
+            <Text style={[globalStyles.textDark, globalStyles.headingTextFive]}>
+              {title}
+            </Text>
+          </View>
+
+          {/* TODO if the event is terminated, HIDE flagRight VIEW */}
+          <View style={navigationStyles.flagRight}>
+            {/* TODO replace favorite-outline with watch icon */}
+            {/* TODO onPress -> watch event */}
+            <Pressable onPress={null}>
+              <Icon
+                name="favorite-outline"
+                size={24}
+                height={24}
+                width={24}
+                style={navigationStyles.headerIcon}
+              />
+            </Pressable>
+            {/* TODO onPress -> navigate to event share screen */}
+            <Pressable onPress={null}>
+              <Icon
+                name="share-outline"
+                size={24}
+                height={24}
+                width={24}
+                style={navigationStyles.headerIcon}
+              />
+            </Pressable>
+            {/* TODO onPress -> open options dropdown menu */}
+            <Pressable onPress={null}>
+              <Icon
+                name="kebab-fill"
+                size={24}
+                height={24}
+                width={24}
+                style={navigationStyles.headerIcon}
+              />
+            </Pressable>
+          </View>
         </View>
 
         {/* Foreground */}
         <View style={[styles.bg, styles.foreground, previousTypeStyle]} />
       </View>
 
-      <View style={styles.buttons}>
+      {/* TODO remove after logic has been implemented; this is for testing purposes */}
+      <View>
         <Button title="Animate" onPress={handlePress} />
       </View>
     </View>
   );
 };
 
-export default Header4;
+export default HeaderFlagAttendee;
 
-export enum PType {
+// APTYPE - ATTENDEE PREVIOUS TYPE
+export enum APType {
   StartingLate,
   StartingSoon,
   Live,
   Terminated,
 }
 
-export enum NType {
+export enum ANType {
   StartingLate,
   StartingSoon,
   Live,
@@ -168,29 +229,15 @@ export enum NType {
 
 const styles = StyleSheet.create({
   base: {
-    gap: 32,
-  },
-
-  buttons: {
     gap: 8,
   },
 
   mask: {
     backgroundColor: 'black',
     alignSelf: 'center',
-
-    // TODO replace this with a calculation based on the height of the header
-    // top: 60,
-
     height: 20,
     width: 20,
     borderRadius: 20,
-  },
-
-  // previously wrapped around animated.view mask
-  maskContainer: {
-    backgroundColor: 'transparent',
-    // flex: 1,
   },
 
   bg: {
@@ -208,12 +255,8 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    // height: 48,
-    // width: '100%',
-
     borderColor: 'red',
     borderWidth: 2,
-
     justifyContent: 'center',
   },
 
@@ -223,11 +266,11 @@ const styles = StyleSheet.create({
   },
 
   // Flag types
-  flagLate: {
+  flagStartingLate: {
     backgroundColor: Colors.azure400,
   },
 
-  flagSoon: {
+  flagStartingSoon: {
     backgroundColor: Colors.orange400,
   },
 
