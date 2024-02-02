@@ -13,7 +13,6 @@ using System.ComponentModel;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace Core.Tests
 {
@@ -21,9 +20,12 @@ namespace Core.Tests
 	{
 		public CoreTerminal Terminal;
 
-		private static int uniqueUserIncrement = 0;
-		private string testUserPhoneNumberFormat = "000-000-{0}";
-		private string testUserEmailFormat = "email_{0}@test.com";
+		private int instance;
+
+		private static ConcurrentBag<ulong> generatedUserIds = new();
+		private static ulong uniqueUserIncrement = 0;
+		private string testUserPhoneNumberFormat = "000-{0}-{1}";
+		private string testUserEmailFormat = "email_{0}_{1}@test.com";
 		private string testUserName = "name";
 		private DateTimeOffset subjectDateOfBirth = new(new DateTime(0));
 		private DateTimeOffset testJoinDate = new(new DateTime(0));
@@ -45,13 +47,15 @@ namespace Core.Tests
 		// Set-up
 		///////////
 
-		public CoreEnvironment()
+		public CoreEnvironment(int instanceNumber)
 		{
+			instance = instanceNumber;
+
             // Arrange Core
 			Repository.Harbor harbor = new(Repository.Harbor.Flag.Development);
 
             Terminal = CoreTerminal.CreateTerminal(
-                harbor.AccountDatabaseAccess,
+                new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
                 harbor.ProfileDatabaseAccess,
@@ -70,8 +74,8 @@ namespace Core.Tests
 
 			User userStub = new()
 			{
-				PhoneNumber = string.Format(testUserPhoneNumberFormat, userIncrement.ToString("D4")),
-				Email = string.Format(testUserEmailFormat, userIncrement.ToString("D4")),
+				PhoneNumber = string.Format(testUserPhoneNumberFormat, instance.ToString("D3"), userIncrement.ToString("D4")),
+				Email = string.Format(testUserEmailFormat, instance.ToString("D3"), userIncrement.ToString("D4")),
 				Name = testUserName,
 				DateOfBirth = subjectDateOfBirth,
 				JoinDate = testJoinDate
@@ -321,14 +325,82 @@ namespace Core.Tests
 
 		public async void DisposeEnvironment()
 		{
-			var executioner = GenerateUniqueUserAsync();
-
-			for (int id = 0; id <= executioner.Id; id++)
+			// Delete all users generated in this environment
+            foreach (ulong id in generatedUserIds)
 			{
-				_ = Terminal.AccountDatabase.DeleteUserAsync((ulong) id);
+				try
+				{
+					await Terminal.AccountDatabase.DeleteUserAsync(id);
+				}
+				catch { }
 			}
 		}
 	}
+
+	public class UserHook : IAccountDatabase
+	{
+		private IAccountDatabase accounts;
+		private ConcurrentBag<ulong> generatedUserIds;
+
+		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<ulong> userIdList)
+		{
+			accounts = accountDatabase;
+			generatedUserIds = userIdList;
+		}
+
+        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
+        {
+			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, character);
+
+			var createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
+			generatedUserIds.Add(createdUser.Id);
+        }
+
+        public async Task DeleteUserAsync(ulong userId)
+        {
+			await accounts.DeleteUserAsync(userId);
+        }
+
+        public async Task<UserShard> FindUserByEmailAsync(string normalisedEmail)
+        {
+			return await accounts.FindUserByEmailAsync(normalisedEmail);
+        }
+
+        public async Task<UserShard> FindUserByIdAsync(ulong userId)
+        {
+			return await accounts.FindUserByIdAsync(userId);
+        }
+
+        public async Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber)
+        {
+			return await accounts.FindUserByPhoneNumberAsync(phoneNumber);
+        }
+
+        public async Task<RecentLocation> GetRecentUserLocationAsync(ulong userId)
+        {
+			return await accounts.GetRecentUserLocationAsync(userId);
+        }
+
+        public async Task<Haunt> GetUserHauntAsync(ulong userId)
+        {
+			return await accounts.GetUserHauntAsync(userId);
+        }
+
+        public async Task UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability)
+        {
+			await accounts.UpdateHauntAsync(userId, latitude, longitude, radius, stability);
+        }
+
+        public async Task UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius)
+        {
+			await accounts.UpdateRecentLocationAsync(userId, latitude, longitude, radius);
+        }
+
+        public async Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits)
+        {
+			await accounts.UpdateUserAsync(userId, edits);
+        }
+    }
 
 	public class NotificationServiceStub : INotificationService
 	{

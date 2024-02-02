@@ -16,9 +16,7 @@ namespace Core.Tests
 
 		public CoreTest()
 		{
-			instanceCount++;
-
-			environment = new();
+			environment = new(instanceCount++);
 		}
 
 		public async Task InitializeAsync()
@@ -30,8 +28,8 @@ namespace Core.Tests
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);
-			if (--instanceCount == 0)
-			{ environment.DisposeEnvironment(); }
+			environment.DisposeEnvironment();
+			--instanceCount;
 		}
 	}
 }
