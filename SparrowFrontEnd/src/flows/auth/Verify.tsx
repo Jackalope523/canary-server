@@ -25,7 +25,10 @@ import OTPInputV2 from '../../components/testing/OTPInputV2';
 type VerifyProps = StackScreenProps<AuthStackParamList, 'Verify'>;
 
 const VerifyScreen = ({ route }: VerifyProps) => {
-  const [Code, setCode] = React.useState('');
+  const codeLength = 4;
+  const [code, setCode] = React.useState('');
+  const [codeReady, setCodeReady] = React.useState(false);
+  
   const [errorText, setErrorText] = React.useState('');
   const [buttonEnabled, setButtonEnabled] = React.useState(true);
 
@@ -33,7 +36,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
     setButtonEnabled(false);
     setErrorText('');
 
-    verify({ PhoneNumber: route.params.PhoneNumber, Code })
+    verify({ PhoneNumber: route.params.PhoneNumber, Code: code })
       .then(route.params.Forward)
       .catch(() => setErrorText('Incorrect code'))
       .finally(() => setButtonEnabled(true));
@@ -70,7 +73,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
           display={ButtonDisplay.Full}
           text={'Verify & Continue'}
           onPress={route.params.Forward}
-          disabled={!buttonEnabled}
+          disabled={!codeReady}
         />
 
         <TextButton
@@ -78,7 +81,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
           type={TextButtonType.Dark}
           variant={TextButtonVariant.Three}
           onPress={null}
-          disabled={!buttonEnabled}
+          disabled={!codeReady}
         />
       </View>
     </View>
