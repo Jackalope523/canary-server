@@ -248,8 +248,10 @@ namespace Repository
         }
         public async Task UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             Event e = new() { Id = id };
-            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
+            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
 
             foreach ((string Property, object Value) in edits)
             {
@@ -264,9 +266,9 @@ namespace Repository
                     default:
                         throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
                 }
-                storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(Property).IsModified = true);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(Property).IsModified = true, currentDiscussion);
             }
-            await storeSentry.ExecuteWriteAsync();
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }   
         public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong id)
         {
@@ -358,26 +360,25 @@ namespace Repository
         }
         public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.EventLinks.
                 Add(new EventLink { UserId = userId, EventId = eventId, Type = userState }
                 ));
 
-            if (userState == EventBond.Arrived)
-            {              
-                User u = new() { Id = userId, CurrentEvent = eventId };
-                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
-                await storeSentry.ExecuteWriteAsync();
-
-            }
-            else if (userState == EventBond.Left || userState == EventBond.Kicked)
+            User u;         
+            if (userState == EventBond.Left || userState == EventBond.Kicked)
             {
-                User u = new() { Id = userId, CurrentEvent = null };
-                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
-                await storeSentry.ExecuteWriteAsync();
-            }                       
+                u = new() { Id = userId, CurrentEvent = null };         
+            }
+            else
+            {
+                u = new() { Id = userId, CurrentEvent = eventId };
+            }
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
         public async Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId)
         {
@@ -417,6 +418,8 @@ namespace Repository
         }
         public async Task EndEventAsync(ulong id)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Users.
             Where(u => u.CurrentEvent == id).
@@ -431,9 +434,9 @@ namespace Repository
             await Task.WhenAll(tasks);
 
             Event e = new() { Id = id, EndTime = DateTimeOffset.UtcNow };
-            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
-            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true);
-            await storeSentry.ExecuteWriteAsync();         
+            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);         
         }
     }
 }

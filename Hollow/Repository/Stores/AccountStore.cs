@@ -196,10 +196,12 @@ namespace Repository
         }    
 
         public async Task UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)
-        {                   
+        {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             User u = new() { Id = id };
 
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
 
             foreach ((string Property, object Value) in edits)
             {
@@ -241,32 +243,36 @@ namespace Repository
                     default:
                         throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
                 }
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(Property).IsModified = true);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(Property).IsModified = true, currentDiscussion);
             }
-            await storeSentry.ExecuteWriteAsync();
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
         public async Task UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             Point newHaunt = new CoordinateFactory().Create(longitude, latitude);
             User u = new() { Id = id, Haunt = newHaunt , HauntRadius = radius, HauntWheight = stability };
 
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true);
-            await storeSentry.ExecuteWriteAsync();
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
         public async Task UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             Point newCurrentLocation = new CoordinateFactory().Create(longitude, latitude);
             User u = new() { Id = id, CurrentLocation = newCurrentLocation, CurrentRadius = radius };
 
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true);
-            await storeSentry.ExecuteWriteAsync();
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
     }
 }

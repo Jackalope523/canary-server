@@ -174,10 +174,12 @@ namespace Repository
         }
         public async Task HideEtchingAsync(ulong etchingId)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             Post p = new() { Id = etchingId, IsHidden = true };
-            storeSentry.DiscussWrite(ctx => ctx.Posts.Attach(p));
-            storeSentry.DiscussWrite(ctx => ctx.Entry(p).Property(nameof(p.IsHidden)).IsModified = true);           
-            await storeSentry.ExecuteWriteAsync();
+            storeSentry.DiscussWrite(ctx => ctx.Posts.Attach(p), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(p).Property(nameof(p.IsHidden)).IsModified = true, currentDiscussion);           
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
     }
 }

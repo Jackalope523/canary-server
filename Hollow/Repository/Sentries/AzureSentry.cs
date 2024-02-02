@@ -10,145 +10,144 @@ namespace Repository
 
         }
 
-        protected override void RefreshContext()
-        {
-            context = new AzureContext();
-        }
-
         public override T ExecuteRead<T>(Func<QueryContext, T> read)
         {
-            RefreshContext();
-            try
+            using (TestContext context = new())
             {
-                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-                return read.Invoke(context);
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseReadException(ex);
-            }
-            finally
-            {
-                context.Dispose();
-            }
-        }
-        public override void DiscussWrite(Action<QueryContext> write)
-        {
-            try
-            {
-                if (!activeDiscussion)
+                try
                 {
-                    activeDiscussion = true;
-                    RefreshContext();
+                    context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                    return read.Invoke(context);
                 }
-                write.Invoke(context);
-            }
-            catch (Exception ex)
-            {
-                context.DisposeAsync();
-                activeDiscussion = false;
-                throw new DatabaseWriteException(ex);
-            }
-        }
-        public override void ExecuteWrite()
-        {
-            try
-            {
-                context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseWriteException(ex);
-            }
-            finally
-            {
-                context.Dispose();
-                activeDiscussion = false;
+                catch (Exception ex)
+                {
+                    throw new DatabaseReadException(ex);
+                }
+                finally
+                {
+                    context.Dispose();
+                }
             }
         }
+
         public override void ExecuteWrite(Action<QueryContext> write)
         {
-            RefreshContext();
-            try
+            using (TestContext context = new())
             {
-                write.Invoke(context);
-                context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseWriteException(ex);
-            }
-            finally
-            {
-                context.Dispose();
+                try
+                {
+                    write.Invoke(context);
+                    context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    throw new DatabaseWriteException(ex);
+                }
+                finally
+                {
+                    context.Dispose();
+                }
             }
         }
 
         public async override Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
         {
-            RefreshContext();
-            try
+            using (TestContext context = new())
             {
-                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-                return await read.Invoke(context);
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseReadException(ex);
-            }
-            finally
-            {
-                await context.DisposeAsync();
-            }
-        }
-        public async override Task ExecuteWriteAsync()
-        {
-            try
-            {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseWriteException(ex);
-            }
-            finally
-            {
-                await context.DisposeAsync();
-                activeDiscussion = false;
+                try
+                {
+                    context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                    return await read.Invoke(context);
+                }
+                catch (Exception ex)
+                {
+                    throw new DatabaseReadException(ex);
+                }
+                finally
+                {
+                    await context.DisposeAsync();
+                }
             }
         }
+
         public async override Task ExecuteWriteAsync(Action<QueryContext> write)
         {
-            RefreshContext();
-            try
+            using (TestContext context = new())
             {
-                write.Invoke(context);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseWriteException(ex);
-            }
-            finally
-            {
-                await context.DisposeAsync();
+                try
+                {
+                    write.Invoke(context);
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new DatabaseWriteException(ex);
+                }
+                finally
+                {
+                    await context.DisposeAsync();
+                }
             }
         }
-        public async override Task ExecuteWriteAsync(Func<QueryContext,Task> write)
+        public async override Task ExecuteWriteAsync(Func<QueryContext, Task> write)
         {
-            RefreshContext();
+            using (TestContext context = new())
+            {
+                try
+                {
+                    await write.Invoke(context);
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new DatabaseWriteException(ex);
+                }
+                finally
+                {
+                    await context.DisposeAsync();
+                }
+            }
+        }
+
+        public override Discussion BeginDiscussion()
+        {
+            return new Discussion(new TestContext());
+        }
+
+        public override void DiscussWrite(Action<QueryContext> write, Discussion discussion)
+        {
             try
             {
-                await write.Invoke(context);
-                await context.SaveChangesAsync();
+                write.Invoke(discussion.SharedContext);
+            }
+            catch (Exception ex)
+            {
+                discussion.EndNow();
+                throw new DatabaseWriteException(ex);
+            }
+        }
+
+        public override void EndDiscussion(Discussion toEnd)
+        {
+            try
+            {
+                toEnd.End();
             }
             catch (Exception ex)
             {
                 throw new DatabaseWriteException(ex);
             }
-            finally
+        }
+
+        public async override Task EndDiscussionAsync(Discussion toEnd)
+        {
+            try
             {
-                await context.DisposeAsync();
+                await toEnd.EndAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseWriteException(ex);
             }
         }
     }
