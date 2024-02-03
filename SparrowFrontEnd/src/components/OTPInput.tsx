@@ -3,6 +3,7 @@ import { View, Pressable, TextInput, Text, StyleSheet } from 'react-native';
 import { Spacing } from '../styles/SpacingStyles';
 import { Colors } from '../styles/ColorStyles';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { character } from '../flows/auth/accountPigeon';
 
 interface OTPInputProps 
 {
@@ -22,8 +23,8 @@ const OTPInput: React.FC<OTPInputProps> =
     }
 ) => 
 {  
-    const codeDigitsArray = new Array(codeLength).fill(-1);
-    const textInputRef = useRef();
+    const codeDigitsArray : Array<number> = new Array(codeLength).fill(-1);
+    const textInputRef : React.MutableRefObject<TextInput | undefined> = useRef();
     const [isFocused, setIsFocused] = useState(false);
 
     useEffect(() => 
@@ -45,15 +46,15 @@ const OTPInput: React.FC<OTPInputProps> =
 
     const toCodeDigitInput = (_value : number, index : number) => 
     {
-        let digit;
+        let digit : string;
         if (parseInt(code[index]) !== -1) digit = code[index];
         else digit = ' ';
         
-        const isCurrentDigit = index === code.length;
-        const isLastDigit = index === codeLength - 1;
-        const isCodeFull = index === codeLength;
+        const isCurrentDigit : boolean = index === code.length;
+        const isLastDigit : boolean  = index === codeLength - 1;
+        const isCodeFull : boolean = index === codeLength;
 
-        const isDigitFocused = isCurrentDigit || (isLastDigit && isCodeFull);
+        const isDigitFocused : boolean = isCurrentDigit || (isLastDigit && isCodeFull);
 
         // Animation___________________________________________________
         const bw = useSharedValue(2);
