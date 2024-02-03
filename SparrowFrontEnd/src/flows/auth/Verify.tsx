@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, TextInput, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, Pressable, Keyboard, KeyboardAvoidingView } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import { Colors } from '../../styles/ColorStyles';
@@ -21,6 +21,7 @@ import TextButton, {
 } from '../../components/TextButton';
 import ExampleScreen from '../../components/testing/ExampleScreen';
 import OTPInputV2 from '../../components/testing/OTPInputV2';
+import OTPInput from '../../components/OTPInput';
 
 type VerifyProps = StackScreenProps<AuthStackParamList, 'Verify'>;
 
@@ -29,6 +30,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
   const [code, setCode] = React.useState('');
   const [codeReady, setCodeReady] = React.useState(false);
   
+  // Verification________________________________________________
   const [errorText, setErrorText] = React.useState('');
   const [buttonEnabled, setButtonEnabled] = React.useState(true);
 
@@ -41,9 +43,10 @@ const VerifyScreen = ({ route }: VerifyProps) => {
       .catch(() => setErrorText('Incorrect code'))
       .finally(() => setButtonEnabled(true));
   }
+  //_____________________________________________________________
 
   return (
-    <View style={[styles.container, globalStyles.baseContainer]}>
+    <Pressable style={[styles.container, globalStyles.baseContainer]} onPress={Keyboard.dismiss}>
       <View style={styles.contentContainer}>
         <Image
           source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
@@ -63,7 +66,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
           .
         </Text>
 
-        <OTPInputV2 length={4} onChange={() => null} />
+        <OTPInput codeLength = {codeLength} code = {code} setCode = {setCode} setCodeReady = {setCodeReady}/>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -80,11 +83,10 @@ const VerifyScreen = ({ route }: VerifyProps) => {
           text="I haven't received a code"
           type={TextButtonType.Dark}
           variant={TextButtonVariant.Three}
-          onPress={null}
           disabled={!codeReady}
         />
       </View>
-    </View>
+    </Pressable>
   );
 };
 

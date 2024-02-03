@@ -1,8 +1,8 @@
-import React from 'react';
-import { Pressable, TextInput, Text, StyleSheet } from 'react-native';
-import { View } from 'react-native-reanimated/lib/typescript/Animated';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Pressable, TextInput, Text, StyleSheet } from 'react-native';
 import { Spacing } from '../styles/SpacingStyles';
 import { Colors } from '../styles/ColorStyles';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 interface OTPInputProps 
 {
@@ -21,10 +21,16 @@ const OTPInput: React.FC<OTPInputProps> =
         setCodeReady
     }
 ) => 
-{
-    const textInputRef : React.MutableRefObject<TextInput | undefined> = React.useRef();
+{  
+    const codeDigitsArray = new Array(codeLength).fill(-1);
+    const textInputRef = useRef();
+    const [isFocused, setIsFocused] = useState(false);
 
-    const [isFocused, setIsFocused] = React.useState(false);
+    useEffect(() => 
+    {
+        setCodeReady(code.length === codeLength);
+        return () => setCodeReady(false);
+    }, [code]);
 
     const handleOnPress = () => 
     {
@@ -37,46 +43,62 @@ const OTPInput: React.FC<OTPInputProps> =
         setIsFocused(false);
     };
 
-    const codeDigitsArray = new Array(codeLength).fill(-1);
-
     const toCodeDigitInput = (_value : number, index : number) => 
     {
-        const emptyInputChar = ' ';
-        const digit = code[index] || emptyInputChar;
+        let digit;
+        if (parseInt(code[index]) !== -1) digit = code[index];
+        else digit = ' ';
+        
+        const isCurrentDigit = index === code.length;
+        const isLastDigit = index === codeLength - 1;
+        const isCodeFull = index === codeLength;
+
+        const isDigitFocused = isCurrentDigit || (isLastDigit && isCodeFull);
+
+        // Animation___________________________________________________
+        const bw = useSharedValue(2);
+        const animatedInputStyle = useAnimatedStyle(() => {
+        return {
+             borderWidth: bw.value,
+        };
+        });
+
+        bw.value = withTiming( isFocused && isDigitFocused ? 4 : 2, {
+            duration: 200,
+          });
+        //_____________________________________________________________
 
         return (
-            <View key = {index}>
-                <Text>{digit}</Text>
-            </View>
+            <Animated.View key = {index} style={[styles.inputContainer, animatedInputStyle]}>
+                <Text style = {styles.text}>{digit}</Text>
+            </Animated.View>
         );
     };
 
     return (
     <View>
-        <Pressable onPress={handleOnPress}>
+        <Pressable onPress={handleOnPress} style = {styles.container}>
             {codeDigitsArray.map(toCodeDigitInput)}
         </Pressable>
         <TextInput 
             ref = {textInputRef}
+            style = {styles.hiddenTextInput}
             value = {code}
             maxLength={codeLength}
             keyboardType='number-pad'
             returnKeyType='done'
             textContentType='oneTimeCode'
             onBlur={handleOnBlur}
+            onChangeText={setCode}
         />
     </View>
     );
 }
 
 const styles = StyleSheet.create({
-    // TEMP. STYLES
     container: {
       flexDirection: 'row',
       columnGap: Spacing.sm,
-  
-      // width: '100%',
-      // justifyContent: 'space-between',
     },
   
     inputContainer: {
@@ -84,14 +106,20 @@ const styles = StyleSheet.create({
       backgroundColor: Colors.sparrowSand,
       alignItems: 'center',
       justifyContent: 'center',
-      // paddingHorizontal: 16,
-      // paddingVertical: 4,
       height: 58,
       width: 58,
       borderColor: Colors.sparrowDarkBrown,
-      // flexDirection: 'row',
-      // justifyContent: 'space-between',
     },
+
+    hiddenTextInput: {
+        height: 0,
+        width: 0,
+        opacity: 0,
+    },
+
+    text: {
+        color: Colors.sparrowDarkBrown
+    }
   });
 
 export default OTPInput;
