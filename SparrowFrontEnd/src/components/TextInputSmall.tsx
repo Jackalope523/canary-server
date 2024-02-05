@@ -17,11 +17,9 @@ import { Colors } from '../styles/ColorStyles';
 
 // TODO clear text isn't clearing text, just unselecting the text input
 
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
-
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import CloseOutline from '../assets/icons/close-outline.svg';
+import ErrorFill from '../assets/icons/error-fill.svg';
 
 // ! ||--------------------------------------------------------------------------------||
 // ! ||                                     Types                                      ||
@@ -70,7 +68,8 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||                                   Text input                                   ||
   // ! ||--------------------------------------------------------------------------------||
   const [isFocused, setIsFocused] = React.useState(false);
-  const textInput: React.MutableRefObject<TextInput | undefined> = React.useRef();
+  const textInput: React.MutableRefObject<TextInput | undefined> =
+    React.useRef();
   const locked: React.MutableRefObject<boolean> = React.useRef(false);
 
   // Animations
@@ -143,7 +142,6 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   const [error, setError] = React.useState('');
 
   const validateInput = () => {
-    
     let isValid = false;
 
     switch (type) {
@@ -202,10 +200,13 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         const minYear = currentYear - maxAge;
         const maxYear = currentYear - minAge;
 
-        if (!yearRegex.test(text) || (parseInt(text) < minYear || parseInt(text) > maxYear)) {
+        if (
+          !yearRegex.test(text) ||
+          parseInt(text) < minYear ||
+          parseInt(text) > maxYear
+        ) {
           setError('Invalid.');
-        }
-        else {
+        } else {
           isValid = true;
         }
         break;
@@ -216,7 +217,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         isValid = false;
     }
 
-    if (isValid) setError(''); 
+    if (isValid) setError('');
   };
 
   return (
@@ -286,11 +287,10 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         {clearButton && isFocused && (
           <Pressable onPress={clearButtonPress}>
             <Animated.View style={animatedIconStyle}>
-              <Icon
-                name="close-outline"
-                size={24}
+              <CloseOutline
                 height={24}
                 width={24}
+                fill={Colors.sparrowDarkBrown}
                 style={styles.icon}
               />
             </Animated.View>
@@ -318,12 +318,11 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 
       {error ? (
         <View style={styles.errorContainer}>
-          <Icon
-            name="error-fill"
-            size={24}
-            height={24}
+          <ErrorFill
             width={24}
-            style={styles.iconError}
+            height={24}
+            fill={Colors.sparrowDarkBrown}
+            style={styles.icon}
           />
           <Text style={[globalStyles.bodyTextTwo, globalStyles.textError]}>
             {error}
@@ -391,12 +390,6 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    color: Colors.sparrowDark,
-    flex: 0,
-  },
-
-  iconError: {
-    color: Colors.red400,
     flex: 0,
   },
 

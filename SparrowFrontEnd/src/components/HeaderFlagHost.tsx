@@ -17,9 +17,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { navigationStyles } from '../styles/NavigationStyles';
-
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
 import { globalStyles } from '../styles/GlobalStyles';
 
 /* --- DEV NOTES --- */
@@ -29,8 +26,9 @@ import { globalStyles } from '../styles/GlobalStyles';
 
 */
 
-// Icons font
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import ArrowBack from '../assets/icons/arrow-back-outline.svg';
+import EditOutline from '../assets/icons/edit-outline.svg';
 
 type Props = {
   title: string;
@@ -149,12 +147,10 @@ const HeaderFlagHost: React.FC<Props> = ({
           <View style={navigationStyles.flagLeft}>
             {/* TODO onPress -> navigate to the previous screen */}
             <Pressable onPress={null}>
-              <Icon
-                name="arrow-back-outline"
-                size={24}
-                height={24}
+              <ArrowBack
                 width={24}
-                style={navigationStyles.headerIcon}
+                height={24}
+                fill={Colors.sparrowDarkBrown}
               />
             </Pressable>
             <Text style={[globalStyles.textDark, globalStyles.headingTextFive]}>
@@ -166,12 +162,10 @@ const HeaderFlagHost: React.FC<Props> = ({
           {/* TODO onPress -> navigate to edit event screen */}
           {/* TODO replace favorite-outline with watch icon */}
           <Pressable onPress={null}>
-            <Icon
-              name="edit-outline"
-              size={24}
-              height={24}
+            <EditOutline
               width={24}
-              style={navigationStyles.headerIcon}
+              height={24}
+              fill={Colors.sparrowDarkBrown}
             />
           </Pressable>
         </View>

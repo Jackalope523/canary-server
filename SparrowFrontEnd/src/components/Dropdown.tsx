@@ -45,12 +45,8 @@ interface DropdownProps {
   containerFlexValue?: StyleProp<ViewStyle>;
 }
 
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
-import { CustomDimensions } from '../styles/CustomDimensionStyles';
-
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icon
+import ChevronOutline from '../assets/icons/chevron-outline.svg';
 
 export const Dropdown: React.FC<DropdownProps> = ({
   label,
@@ -59,7 +55,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   data,
   dropdownContentAlignment,
   containerFlexValue,
-  onTextChange
+  onTextChange,
 }) => {
   // Selection
   // const [selected, setSelected] = React.useState(initialValue);
@@ -113,11 +109,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
           <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
             {selected}
           </Text>
-          <Icon
-            name="chevron-outline"
-            size={24}
+          <ChevronOutline
             height={24}
             width={24}
+            fill={Colors.sparrowDarkBrown}
             style={styles.icon}
           />
 
@@ -243,7 +238,6 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    color: Colors.sparrowDark,
     flex: 0,
   },
 

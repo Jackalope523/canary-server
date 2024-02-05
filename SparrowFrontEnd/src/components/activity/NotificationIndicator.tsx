@@ -1,17 +1,16 @@
 import { View, Text, Pressable, Platform } from 'react-native';
 import * as React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StackParamList } from '../atoms/types';
+
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
 import { notificationStyles } from '../../styles/NotificationStyles';
 import { labelStyles } from '../../styles/LabelStyles';
 
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
-const Icon = createIconSetFromFontello(fontelloConfig);
-
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+// Icons
+import NotificationOutline from '../../assets/icons/notification-outline-v2.svg';
 
 const NotificationIndicator = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
@@ -19,17 +18,15 @@ const NotificationIndicator = () => {
   return (
     <Pressable onPress={() => navigation.navigate('Notifications')}>
       <View style={notificationStyles.notificationIndicator}>
-        <Icon
-          name="notification-outline-alt"
-          size={24}
+        <NotificationOutline
           height={24}
           width={24}
-          style={notificationStyles.notificationIndicator.icon}
+          fill={Colors.sparrowDarkBrown}
         />
         <View style={[labelStyles.numberLabel, labelStyles.numberLabelPrimary]}>
           <Text
             style={[
-              globalStyles.labelTextUppercase,
+              globalStyles.labelTextOneUppercase,
               { color: Colors.sparrowSand },
             ]}>
             12

@@ -8,13 +8,10 @@ import {
 } from 'react-native';
 import { globalStyles } from '../styles/GlobalStyles';
 import { Spacing } from '../styles/SpacingStyles';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
 import { Colors } from '../styles/ColorStyles';
 
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import CheckOutline from '../assets/icons/check-outline.svg';
 
 // Types
 interface CheckboxGroupProps {
@@ -68,10 +65,10 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
                 ? [styles.checkboxRest, styles.checkboxSelected]
                 : styles.checkboxRest
             }>
-            <Icon
-              name="check-outline"
-              size={20}
-              color={Colors.sparrowDarkBrown}
+            <CheckOutline
+              height={24}
+              width={24}
+              fill={Colors.sparrowDarkBrown}
               style={{ display: selectedIds.includes(index) ? 'flex' : 'none' }}
             />
           </View>

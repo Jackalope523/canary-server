@@ -17,9 +17,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { navigationStyles } from '../styles/NavigationStyles';
-
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
 import { globalStyles } from '../styles/GlobalStyles';
 
 /* --- DEV NOTES --- */
@@ -29,8 +26,11 @@ import { globalStyles } from '../styles/GlobalStyles';
 
 */
 
-// Icons font
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import ArrowBack from '../assets/icons/arrow-back-outline.svg';
+import FavoriteOutline from '../assets/icons/favorite-outline.svg';
+import ShareOutline from '../assets/icons/share-outline.svg';
+import KebabFill from '../assets/icons/kebab-fill.svg';
 
 type Props = {
   title: string;
@@ -149,12 +149,10 @@ const HeaderFlagAttendee: React.FC<Props> = ({
           <View style={navigationStyles.flagLeft}>
             {/* TODO onPress -> navigate back one screen */}
             <Pressable onPress={null}>
-              <Icon
-                name="arrow-back-outline"
-                size={24}
-                height={24}
+              <ArrowBack
                 width={24}
-                style={navigationStyles.headerIcon}
+                height={24}
+                fill={Colors.sparrowDarkBrown}
               />
             </Pressable>
             <Text style={[globalStyles.textDark, globalStyles.headingTextFive]}>
@@ -167,32 +165,26 @@ const HeaderFlagAttendee: React.FC<Props> = ({
             {/* TODO replace favorite-outline with watch icon */}
             {/* TODO onPress -> watch event */}
             <Pressable onPress={null}>
-              <Icon
-                name="favorite-outline"
-                size={24}
-                height={24}
+              <FavoriteOutline
                 width={24}
-                style={navigationStyles.headerIcon}
+                height={24}
+                fill={Colors.sparrowDarkBrown}
               />
             </Pressable>
             {/* TODO onPress -> navigate to event share screen */}
             <Pressable onPress={null}>
-              <Icon
-                name="share-outline"
-                size={24}
-                height={24}
+              <ShareOutline
                 width={24}
-                style={navigationStyles.headerIcon}
+                height={24}
+                fill={Colors.sparrowDarkBrown}
               />
             </Pressable>
             {/* TODO onPress -> open options dropdown menu */}
             <Pressable onPress={null}>
-              <Icon
-                name="kebab-fill"
-                size={24}
-                height={24}
+              <KebabFill
                 width={24}
-                style={navigationStyles.headerIcon}
+                height={24}
+                fill={Colors.sparrowDarkBrown}
               />
             </Pressable>
           </View>

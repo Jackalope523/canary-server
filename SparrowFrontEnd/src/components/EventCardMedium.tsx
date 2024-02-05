@@ -17,6 +17,12 @@ const bgImage = {
   uri: 'https://images.unsplash.com/photo-1562519819-016930ada31b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80',
 };
 
+// Icons
+import DateOutline from '../assets/icons/date-outline.svg';
+import TimeOutline from '../assets/icons/time-outline.svg';
+import AccountOutline from '../assets/icons/account-outline.svg';
+import LocationOutline from '../assets/icons/location-outline.svg';
+
 // INFO
 // ImageBackground source - {item.uri}
 // Text onTextLayout - {handleTextLayout}
@@ -59,12 +65,10 @@ export const EventCardMedium: React.FC<EventCardMediumProps> = ({
             <View style={cardStyles.eventCardMediumTopWrapper}>
               <View style={cardStyles.eventCardMediumContentInner}>
                 <View style={cardStyles.eventCardMediumTextWrapper}>
-                  <Icon
-                    name="date-outline"
-                    size={24}
+                  <DateOutline
                     height={24}
                     width={24}
-                    style={cardStyles.eventCardMediumIcon}
+                    fill={Colors.sparrowDarkBrown}
                   />
                   <Text
                     style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
@@ -72,12 +76,10 @@ export const EventCardMedium: React.FC<EventCardMediumProps> = ({
                   </Text>
                 </View>
                 <View style={cardStyles.eventCardMediumTextWrapper}>
-                  <Icon
-                    name="time-outline"
-                    size={24}
+                  <TimeOutline
                     height={24}
                     width={24}
-                    style={cardStyles.eventCardMediumIcon}
+                    fill={Colors.sparrowDarkBrown}
                   />
                   <Text
                     style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
@@ -87,12 +89,10 @@ export const EventCardMedium: React.FC<EventCardMediumProps> = ({
               </View>
               <View style={cardStyles.eventCardMediumContentInner}>
                 <View style={cardStyles.eventCardMediumTextWrapper}>
-                  <Icon
-                    name="account-outline"
-                    size={24}
+                  <AccountOutline
                     height={24}
                     width={24}
-                    style={cardStyles.eventCardMediumIcon}
+                    fill={Colors.sparrowDarkBrown}
                   />
                   <Text
                     style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
@@ -116,12 +116,10 @@ export const EventCardMedium: React.FC<EventCardMediumProps> = ({
                   cardStyles.eventCardMediumTextWrapper,
                   cardStyles.eventCardMediumTextWrapperCenter,
                 ]}>
-                <Icon
-                  name="location-outline"
-                  size={24}
+                <LocationOutline
                   height={24}
                   width={24}
-                  style={cardStyles.eventCardMediumIcon}
+                  fill={Colors.sparrowDarkBrown}
                 />
                 <Text
                   numberOfLines={1}

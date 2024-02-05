@@ -8,21 +8,17 @@ import {
   Image,
 } from 'react-native';
 
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
-
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
 import { navigationStyles } from '../../styles/NavigationStyles';
 import { Spacing } from '../../styles/SpacingStyles';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { avatarStyles } from '../../styles/AvatarStyles';
 import { notificationStyles } from '../../styles/NotificationStyles';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
 import NoNotifications from '../../components/activity/notifications/NoNotifications';
 
-const Icon = createIconSetFromFontello(fontelloConfig);
+import ArrowBack from '../../assets/icons/arrow-back-outline.svg';
 
 const NotificationsScreen = ({ navigation }) => {
   const eventInviteText = ' has invited you to an event.';
@@ -81,12 +77,10 @@ const NotificationsScreen = ({ navigation }) => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <Icon
-          size={24}
+        <ArrowBack
           height={24}
           width={24}
-          style={navigationStyles.topNavbar.icons}
-          name="arrow-back-outline"
+          fill={Colors.sparrowDarkBrown}
           onPress={() => navigation.goBack()}
         />
       ),

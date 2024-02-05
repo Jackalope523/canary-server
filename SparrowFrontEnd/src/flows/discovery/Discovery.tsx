@@ -22,10 +22,6 @@ import Button, {
 import EventCardMedium from '../../components/EventCardMedium';
 import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
 import SearchFilter from '../../components/organisms/SearchFilter';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   GestureHandlerRootView,
@@ -35,7 +31,10 @@ import { buttonStyles } from '../../styles/ButtonStyles';
 import ExclusiveButtonView from '../../components/ExclusiveButtonView';
 import ExclusiveButtonScroll from '../../components/ExclusiveButtonScroll';
 
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import SearchOutline from '../../assets/icons/search-outline.svg';
+import CloseOutline from '../../assets/icons/close-outline.svg';
+import CloseFill from '../../assets/icons/close-fill.svg';
 
 // TEMP. map image - replace with actual working map
 const tempMapImage = require('../../assets/images/temp/temp-map.png');
@@ -124,9 +123,10 @@ const DiscoveryScreen = () => {
                 {/* Search bar */}
                 <View style={navigationStyles.searchBarWrapper}>
                   <View style={navigationStyles.searchBar}>
-                    <Icon
-                      name="search-outline"
-                      style={buttonStyles.buttonIconSmallDark}
+                    <SearchOutline
+                      height={24}
+                      width={24}
+                      fill={Colors.sparrowDarkBrown}
                     />
                     <TextInput
                       style={navigationStyles.searchBarTextInput}
@@ -143,9 +143,10 @@ const DiscoveryScreen = () => {
                     />
                     {isTextInputFocused && searchText ? (
                       <Pressable onPress={() => setSearchText('')}>
-                        <Icon
-                          name="close-fill"
-                          style={buttonStyles.buttonIconSmallDark}
+                        <CloseFill
+                          height={24}
+                          width={24}
+                          fill={Colors.sparrowDarkBrown}
                         />
                       </Pressable>
                     ) : null}
@@ -159,10 +160,10 @@ const DiscoveryScreen = () => {
                           ? navigationStyles.searchBarWrapperCloseButtonWrapper
                           : null
                       }>
-                      {/* TODO this icon isn't perfectly vertically aligned - fix that */}
-                      <Icon
-                        name="close-outline"
-                        style={buttonStyles.buttonIconMediumDark}
+                      <CloseOutline
+                        height={24}
+                        width={24}
+                        fill={Colors.sparrowDarkBrown}
                       />
                     </Pressable>
                   ) : null}
@@ -173,31 +174,29 @@ const DiscoveryScreen = () => {
                 {searchContentVisible ? (
                   <View>
                     {/* TODO make FILTER and SORT buttons functional */}
-                    <ExclusiveButtonView 
-                    groupStyle = {navigationStyles.searchOptions}  
-                    buttons = 
-                    {
-                      [
+                    <ExclusiveButtonView
+                      groupStyle={navigationStyles.searchOptions}
+                      buttons={[
                         {
                           id: 1,
                           type: ButtonType.PrimaryDark,
                           size: ButtonSize.ExtraSmall,
                           display: ButtonDisplay.Full,
-                          text: "Filter",
-                          icon: "filter-fill",
-                          onPress: toggleFilter
+                          text: 'Filter',
+                          icon: 'filter-fill',
+                          onPress: toggleFilter,
                         },
                         {
                           id: 2,
                           type: ButtonType.PrimaryDark,
                           size: ButtonSize.ExtraSmall,
                           display: ButtonDisplay.Full,
-                          text: "Sort",
-                          icon: "sort-outline",
-                          onPress: toggleSort
-                        }
-                      ]
-                    }/>                        
+                          text: 'Sort',
+                          icon: 'sort-outline',
+                          onPress: toggleSort,
+                        },
+                      ]}
+                    />
                     {/* TODO fix last 2 events not visible */}
                     {/* Potential not-ideal fix = screen height - (searchBarWrapper height + filterSort height) */}
                     {/* TODO maybe add an opacity 0 to opacity 100 gradient at the top */}
@@ -221,81 +220,76 @@ const DiscoveryScreen = () => {
                   Date
                 </Text>
                 <GestureHandlerRootView>
-                <ExclusiveButtonScroll 
-                    props = 
-                    {
+                  <ExclusiveButtonScroll
+                    props={{
+                      horizontal: true,
+                      overScrollMode: 'never',
+                      showsHorizontalScrollIndicator: false,
+                      contentContainerStyle: { paddingHorizontal: Spacing.lg },
+                    }}
+                    buttons={[
                       {
-                        horizontal: true,
-                        overScrollMode: "never",
-                        showsHorizontalScrollIndicator: false,
-                        contentContainerStyle: {paddingHorizontal: Spacing.lg}, 
-                      }  
-                    } 
-                    buttons = 
-                    {
-                      [
-                        {
-                          id: 1,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Today",
-                          self: 1,
-                          status: dateState,
-                          changeState: setDateState,
-                        },
-                        {
-                          id: 2,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Tomorrow",
-                          self: 2,
-                          status: dateState,
-                          changeState: setDateState
-                        },
-                        {
-                          id: 3,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "This week",
-                          self: 3,
-                          status: dateState,
-                          changeState: setDateState
-                        },
-                        {
-                          id: 4,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "This weekend",
-                          self: 4,
-                          status: dateState,
-                          changeState: setDateState
-                        },
-                        {
-                          id: 5,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Next week",
-                          self: 5,
-                          status: dateState,
-                          changeState: setDateState,
-                        },
-                        {
-                          id: 6,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Next weekend",
-                          self: 6,
-                          status: dateState,
-                          changeState: setDateState
-                        }
-                      ]
-                    }/>                         
+                        id: 1,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Today',
+                        self: 1,
+                        status: dateState,
+                        changeState: setDateState,
+                      },
+                      {
+                        id: 2,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Tomorrow',
+                        self: 2,
+                        status: dateState,
+                        changeState: setDateState,
+                      },
+                      {
+                        id: 3,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'This week',
+                        self: 3,
+                        status: dateState,
+                        changeState: setDateState,
+                      },
+                      {
+                        id: 4,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'This weekend',
+                        self: 4,
+                        status: dateState,
+                        changeState: setDateState,
+                      },
+                      {
+                        id: 5,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Next week',
+                        self: 5,
+                        status: dateState,
+                        changeState: setDateState,
+                      },
+                      {
+                        id: 6,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Next weekend',
+                        self: 6,
+                        status: dateState,
+                        changeState: setDateState,
+                      },
+                    ]}
+                  />
                 </GestureHandlerRootView>
               </View>
 
@@ -311,50 +305,44 @@ const DiscoveryScreen = () => {
                 </Text>
                 <GestureHandlerRootView>
                   <ExclusiveButtonScroll
-                    props = 
-                    {
+                    props={{
+                      horizontal: true,
+                      overScrollMode: 'never',
+                      showsHorizontalScrollIndicator: false,
+                      contentContainerStyle: { paddingHorizontal: Spacing.lg },
+                    }}
+                    buttons={[
                       {
-                        horizontal: true,
-                        overScrollMode: "never",
-                        showsHorizontalScrollIndicator: false,
-                        contentContainerStyle: {paddingHorizontal: Spacing.lg}
-                      }
-                    }
-                    buttons = 
-                    {
-                      [
-                        {
-                          id: 1,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Cozy",
-                          self: 1,
-                          status: sizeState,
-                          changeState: setSizeState
-                        },
-                        {
-                          id: 2,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Thriving",
-                          self: 2,
-                          status: sizeState,
-                          changeState: setSizeState
-                        },
-                        {
-                          id: 3,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Bombastic",
-                          self: 3,
-                          status: sizeState,
-                          changeState: setSizeState,
-                        }
-                      ]
-                    }
+                        id: 1,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Cozy',
+                        self: 1,
+                        status: sizeState,
+                        changeState: setSizeState,
+                      },
+                      {
+                        id: 2,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Thriving',
+                        self: 2,
+                        status: sizeState,
+                        changeState: setSizeState,
+                      },
+                      {
+                        id: 3,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Bombastic',
+                        self: 3,
+                        status: sizeState,
+                        changeState: setSizeState,
+                      },
+                    ]}
                   />
                 </GestureHandlerRootView>
               </View>
@@ -394,43 +382,41 @@ const DiscoveryScreen = () => {
                   Sort by
                 </Text>
                 <GestureHandlerRootView>
-                <ExclusiveButtonView 
-                    groupStyle = {styles.sortContentWrapper}  
-                    buttons = 
-                    {
-                      [
-                        {
-                          id: 1,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Most popular",
-                          self: 1,
-                          status: sortState,
-                          changeState: setSortState,
-                        },
-                        {
-                          id: 2,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Closest",
-                          self: 2,
-                          status: sortState,
-                          changeState: setSortState
-                        },
-                        {
-                          id: 3,
-                          type: ButtonType.SecondaryLight,
-                          size: ButtonSize.ExtraSmall,
-                          display: ButtonDisplay.Contained,
-                          text: "Most recent",
-                          self: 3,
-                          status: sortState,
-                          changeState: setSortState,
-                        }
-                      ]
-                    }/>                     
+                  <ExclusiveButtonView
+                    groupStyle={styles.sortContentWrapper}
+                    buttons={[
+                      {
+                        id: 1,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Most popular',
+                        self: 1,
+                        status: sortState,
+                        changeState: setSortState,
+                      },
+                      {
+                        id: 2,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Closest',
+                        self: 2,
+                        status: sortState,
+                        changeState: setSortState,
+                      },
+                      {
+                        id: 3,
+                        type: ButtonType.SecondaryLight,
+                        size: ButtonSize.ExtraSmall,
+                        display: ButtonDisplay.Contained,
+                        text: 'Most recent',
+                        self: 3,
+                        status: sortState,
+                        changeState: setSortState,
+                      },
+                    ]}
+                  />
                 </GestureHandlerRootView>
               </View>
             </View>
