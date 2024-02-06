@@ -63,62 +63,71 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
-        public Synced<(int Postitive, int Negative)> Ratings
-            => new(() => Terminal.ProfileDirector.RequestAllRatingsAsync(this));
+        public Synced<(int Postitive, int Negative)> Ratings { get; }
 
-        private Synced<(GeoLocation Location, Distance Radius)> LocationSync
-            => new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
-		public Synced<GeoLocation> LastKnownLocation
-            => new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
-        public Synced<Distance> LastKnownRadius
-            => new(async () => (await LocationSync.Value().ConfigureAwait(false)).Radius);
+        private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
+		public Synced<GeoLocation> LastKnownLocation { get; }
+        public Synced<Distance> LastKnownRadius { get; }
 
-        private Synced<(GeoLocation Location, Distance Radius, int Stability)> HauntSync
-            => new(() => Terminal.AccountDirector.RequestUserHauntAsync(this));
-        public Synced<GeoLocation> Haunt
-            => new(async () => (await HauntSync.Value().ConfigureAwait(false)).Location);
-        public Synced<Distance> HauntRadius
-            => new(async () => (await HauntSync.Value().ConfigureAwait(false)).Radius);
-        public Synced<int> HauntStability
-            => new(async () => (await HauntSync.Value().ConfigureAwait(false)).Stability);
+        private Synced<(GeoLocation Location, Distance Radius, int Stability)> HauntSync { get; }
+        public Synced<GeoLocation> Haunt { get; }
+        public Synced<Distance> HauntRadius { get; }
+        public Synced<int> HauntStability { get; }
 
-        public Synced<Event> CurrentEvent
-            => new(() => Terminal.EventDirector.RequestCurrentEventForUserAsync(this));
-        public Synced<List<Event>> PastEvents
-            => new(() => Terminal.EventDirector.RequestPastEventsForUserAsync(this));
-        public Synced<List<Event>> UpcomingEvents
-            => new(() => Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this));
+        public Synced<Event> CurrentEvent { get; }
+        public Synced<List<Event>> PastEvents { get; }
+        public Synced<List<Event>> UpcomingEvents { get; }
 
-        public Synced<List<User>> Friends
-			=> new(() => Terminal.ProfileDirector.RequestFriendsAsync(this));
-		public Synced<List<User>> Following
-            => new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));
-        public Synced<List<User>> FollowedBy
-            => new(() => Terminal.ProfileDirector.RequestFollowersAsync(this));
-        public Synced<List<User>> Blocking
-            => new(() => Terminal.ProfileDirector.RequestBlockedUsersAsync(this));
-        public Synced<List<User>> BlockedBy
-            => new(() => Terminal.ProfileDirector.RequestUsersBlockingAsync(this));
+        public Synced<List<User>> Friends { get; }
+        public Synced<List<User>> Following { get; }
+        public Synced<List<User>> FollowedBy { get; }
+        public Synced<List<User>> Blocking { get; }
+        public Synced<List<User>> BlockedBy { get; }
 
-        public Synced<List<Note>> Notes
-            => new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
+        public Synced<List<Note>> Notes { get; }
+        public Synced<List<Penalty>> Penalties { get; }
 
-        public Synced<List<Penalty>> Penalties
-            => new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
-        private Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync
-            => new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
-        public Synced<List<UserReport>> Reports
-            => new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
-        public Synced<List<EventReport>> EventReports
-            => new(async () => (await ReportsSync.Value().ConfigureAwait(false)).EventReports);
+        private Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync { get; }
+        public Synced<List<UserReport>> Reports { get; }
+        public Synced<List<EventReport>> EventReports { get; }
 
-		#endregion
 
-		#region Initialisation & Extraction
+        #endregion
 
-		public User() { }
+        #region Initialisation & Extraction
 
-        public User(UserShard fromUser)
+        public User()
+        {
+            Ratings = new(() => Terminal.ProfileDirector.RequestAllRatingsAsync(this));
+
+            LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
+            LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
+            LastKnownRadius = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Radius);
+
+            HauntSync = new(() => Terminal.AccountDirector.RequestUserHauntAsync(this));
+            Haunt = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Location);
+            HauntRadius = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Radius);
+            HauntStability = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Stability);
+
+            CurrentEvent = new(() => Terminal.EventDirector.RequestCurrentEventForUserAsync(this));
+            PastEvents = new(() => Terminal.EventDirector.RequestPastEventsForUserAsync(this));
+            UpcomingEvents = new(() => Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this));
+
+            Friends = new(() => Terminal.ProfileDirector.RequestFriendsAsync(this));
+            Following = new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));
+            FollowedBy = new(() => Terminal.ProfileDirector.RequestFollowersAsync(this));
+            Blocking = new(() => Terminal.ProfileDirector.RequestBlockedUsersAsync(this));
+            BlockedBy = new(() => Terminal.ProfileDirector.RequestUsersBlockingAsync(this));
+
+            Notes = new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
+            Penalties = new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
+
+            ReportsSync = new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
+            Reports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
+            EventReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).EventReports);
+        }
+
+        public User(UserShard fromUser) : this()
         {
             Id = fromUser.Id;
             PhoneNumber = fromUser.PhoneNumber;
@@ -136,13 +145,13 @@ namespace Core.Entities
             Character = new(fromUser.Character);
         }
 
-        public User(UserSilhouette fromUser)
+        public User(UserSilhouette fromUser) : this()
         {
             Id = fromUser.Id;
             Name = fromUser.Name;
         }
 
-        public User(UserProfile fromUser)
+        public User(UserProfile fromUser) : this()
         {
             Id = fromUser.Id;
             Name = fromUser.Name;
@@ -221,7 +230,7 @@ namespace Core.Entities
 
         public async Task<Event> NextEvent()
         {
-            return (await UpcomingEvents)[0];
+            return (await UpcomingEvents).Count != 0 ? (await UpcomingEvents)[0] : Event.None;
         }
 
 		#endregion
@@ -266,7 +275,7 @@ namespace Core.Entities
 
         public async Task<bool> IsAtEvent()
         {
-            if ((await CurrentEvent) == null)
+            if ((await CurrentEvent).Equals(Event.None))
             { return false; }
 
             return true;
@@ -373,11 +382,11 @@ namespace Core.Entities
 			{ return AccountStatus; }
 
 			// Check if there are enough reports
-			if ((await Reports.Value()).Count < 6)
+			if ((await Reports).Count < 6)
 			{ return UserAccountStatus.Limited; }
             
 			// Check if there are enough reports
-			if ((await Reports.Value()).Count < 10)
+			if ((await Reports).Count < 10)
 			{ return UserAccountStatus.Suspended; }
 
             return UserAccountStatus.Blacklisted;

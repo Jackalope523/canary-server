@@ -89,17 +89,17 @@ namespace Core.Tests.Entities
 		[Fact]
 		public async Task Constructor_ExistingValue_ProperlyInitialised()
 		{
-            Synced<int> syncedValue = new(0);
+            Synced<int> syncedValue = new(101);
 
-            Assert.True((await syncedValue) == 0);
+            Assert.Equal(101, await syncedValue);
 		}
 
 		[Fact]
 		public async Task Constructor_UnsyncedValue_ProperlyInitialised()
 		{
-            Synced<int> syncedValue = new(() => Task.FromResult(0));
+            Synced<int> syncedValue = new(() => Task.FromResult(101));
 
-            Assert.True((await syncedValue) == 0);
+            Assert.Equal(101, await syncedValue);
 		}
 
 		[Fact]
@@ -113,31 +113,31 @@ namespace Core.Tests.Entities
 		[Fact]
 		public async Task Sync_UnsyncedValue_Syncs()
 		{
-            Synced<int> syncedValue = new(() => Task.FromResult(0));
+            Synced<int> syncedValue = new(() => Task.FromResult(101));
             _ = syncedValue.Sync();
 
-            Assert.Equal(0, await syncedValue);
+            Assert.Equal(101, await syncedValue);
 		}
 
 		[Fact]
 		public async Task Sync_SyncedValue_Resyncs()
 		{
-            Synced<int> syncedValue = new(() => { return Task.FromResult(0); });
+            Synced<int> syncedValue = new(() => Task.FromResult(101));
             await syncedValue.Sync();
 
-            syncedValue.Set(2);
+            syncedValue.Set(202);
             await syncedValue.Sync();
 
-            Assert.Equal(0, await syncedValue);
+            Assert.Equal(101, await syncedValue);
 		}
 
 		[Fact]
 		public async Task Set_Value_Correct()
 		{
-            Synced<int> syncedValue = new(0);
-            syncedValue.Set(1);
+            Synced<int> syncedValue = new(101);
+            syncedValue.Set(202);
 
-            Assert.True((await syncedValue) == 1);
+            Assert.Equal(202, await syncedValue);
 		}
     }
 }

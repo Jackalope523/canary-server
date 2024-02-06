@@ -61,39 +61,42 @@ namespace Core.Entities
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumEtchingLateness);
 
-		////////
-		// Synced Properties
-		//////////////////////
+        ////////
+        // Synced Properties
+        //////////////////////
 
-		public Synced<List<(User User, EventBond State)>> AllUsers
-            => new(() => Terminal.EventDirector.RequestAllUsersFromEventAsync(this));
-        public Synced<List<User>> Watching
-            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Watching)).ConvertAll(user => user.User));
-		public Synced<List<User>> Guests
-            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Guest)).ConvertAll(user => user.User));
-        public Synced<List<User>> Arrived
-            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Arrived)).ConvertAll(user => user.User));
-        public Synced<List<User>> Left
-            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Left)).ConvertAll(user => user.User));
-        public Synced<List<User>> Kicked
-            => new(async () => (await AllUsers.Value()).FindAll(user => user.State.Equals(EventBond.Kicked)).ConvertAll(user => user.User));
+        public Synced<List<(User User, EventBond State)>> AllUsers { get; }
+        public Synced<List<User>> Watching { get; }
+        public Synced<List<User>> Guests { get; }
+        public Synced<List<User>> Arrived { get; }
+        public Synced<List<User>> Left { get; }
+        public Synced<List<User>> Kicked { get; }
 
-        public Synced<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>> GuestHistory
-            => new(() => Terminal.EventDirector.RequestGuestHistoryAsync(this));
+        public Synced<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>> GuestHistory { get; }
 
-        public Synced<List<EventReport>> EventReports
-            => new(() => Terminal.DisciplineDirector.RequestEventReportsAsync(this));
+        public Synced<List<EventReport>> EventReports { get; }
 
-        public Synced<List<Etching>> Etchings
-            => new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));
+        public Synced<List<Etching>> Etchings { get; }
 
-		#endregion
+        #endregion
 
-		#region Initialisation & Extraction
+        #region Initialisation & Extraction
 
-		public Event() { }
+        public Event()
+        {
+            AllUsers = new(() => Terminal.EventDirector.RequestAllUsersFromEventAsync(this));
+            Watching = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Watching)).ConvertAll(user => user.User));
+            Guests = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Guest)).ConvertAll(user => user.User));
+            Arrived = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Arrived)).ConvertAll(user => user.User));
+            Left = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Left)).ConvertAll(user => user.User));
+            Kicked = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Kicked)).ConvertAll(user => user.User));
 
-        public Event(EventShard fromEvent)
+            GuestHistory = new(() => Terminal.EventDirector.RequestGuestHistoryAsync(this));
+            EventReports = new(() => Terminal.DisciplineDirector.RequestEventReportsAsync(this));
+            Etchings = new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));
+        }
+
+        public Event(EventShard fromEvent) : this()
         {
             Id = fromEvent.Id;
             Host = new(fromEvent.Host);
@@ -111,7 +114,7 @@ namespace Core.Entities
             IsDynamic = fromEvent.IsDynamic;
         }
 
-        public Event(EventThinSlice fromEvent)
+        public Event(EventThinSlice fromEvent) : this()
         {
             Id = fromEvent.Id;
             Host = new(fromEvent.Host);
@@ -144,8 +147,8 @@ namespace Core.Entities
 		public bool ValidateAndNormalise()
         { 
             // Sanitise User content
-            Name = ContentValidation.NormaliseText(Name[..MaximumNameLength]);
-            Description = ContentValidation.NormaliseText(Description[..MaximumDescLength]);
+            Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
+            Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
 
             // Verify Event is within a reasonable time
             if (After(StartTime, Time + OneWeek)) { return false; }
@@ -244,7 +247,7 @@ namespace Core.Entities
         public async Task<bool> HasUserRelationship(User user)
         {
             // Check if user has interacted with event
-            return (await AllUsers).FindAll(x => x.User.Id == user.Id).Count == 1;
+            return IsHostedBy(user) || (await AllUsers).FindAll(x => x.User.Id == user.Id).Count == 1;
         }
 
         public async Task<bool> WasAttendedBy(User user)
@@ -298,13 +301,13 @@ namespace Core.Entities
 
         public async Task Etched(User user)
         {
-            // Verify user can etch into the event
-            Try(await WasAttendedBy(user),
-                new InvalidEventException("User did not attend event."));
-
             // Verify etching is not before event starting or user is host
             Try(HasAlready(StartTime) || IsModifiableBy(user),
                 new InvalidEventException("Event has yet to start."));
+
+            // Verify user can etch into the event
+            Try(await WasAttendedBy(user) || IsModifiableBy(user),
+                new InvalidEventException("User did not attend event."));
 
             // Verify etching is added before event is closed
             Try(IsActive,
