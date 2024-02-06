@@ -11,22 +11,18 @@ import {
 import { globalStyles } from '../styles/GlobalStyles';
 import { buttonStyles } from '../styles/ButtonStyles';
 import { Gap, Spacing } from '../styles/SpacingStyles';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
-
-const Icon = createIconSetFromFontello(fontelloConfig);
+import { Colors } from '../styles/ColorStyles';
 
 // Types
 export interface ButtonProps {
   onPress?: () => void;
   text?: string;
-  icon?: string;
+  Icon?: React.FC<any> | string | any;
 
   type?: ButtonType;
   size?: ButtonSize;
   display?: ButtonDisplay;
+  displayIcon?: boolean;
 
   disabled?: boolean;
 
@@ -37,17 +33,17 @@ export interface ButtonProps {
   // Rest styles
   btnStyle?: ViewStyle[];
   btnTextStyle?: TextStyle[];
-  btnIconStyle?: TextStyle[];
+  btnIconStyle?: string;
 
   // Active styles
   btnActiveStyle?: ViewStyle[];
   btnActiveTextStyle?: TextStyle[];
-  btnActiveIconStyle?: TextStyle[];
+  btnActiveIconStyle?: string;
 
   // Disabled styles
   btnDisabledStyle?: ViewStyle[];
   btnDisabledTextStyle?: TextStyle[];
-  btnDisabledIconStyle?: TextStyle[];
+  btnDisabledIconStyle?: string;
 
   // Exclusive Button Support
   id?: number;
@@ -58,12 +54,13 @@ export interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   onPress = null,
   text = 'NULL',
+  Icon = null,
   btnStyle = [],
   btnTextStyle = [],
-  btnIconStyle = [],
+  btnIconStyle,
   btnActiveStyle = [],
   btnActiveTextStyle = [],
-  btnActiveIconStyle = [],
+  btnActiveIconStyle,
   btnDisabledStyle = [],
   btnDisabledTextStyle = [],
   btnDisabledIconStyle = [],
@@ -74,7 +71,7 @@ export const Button: React.FC<ButtonProps> = ({
   type = null,
   size = null,
   display = null,
-  icon = false,
+  displayIcon = false,
   id = -1,
   current = -1,
   setCurrent = null,
@@ -88,136 +85,136 @@ export const Button: React.FC<ButtonProps> = ({
       // Rest
       btnStyle = [buttonStyles.buttonPrimaryDark];
       btnTextStyle = [globalStyles.textLight];
-      btnIconStyle = [globalStyles.textLight];
+      btnIconStyle = Colors.sparrowSand;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonPrimaryDarkSelected];
       btnActiveTextStyle = [globalStyles.textLight];
-      btnActiveIconStyle = [globalStyles.textLight];
+      btnActiveIconStyle = Colors.sparrowSand;
 
       // Disabled
       btnDisabledStyle = [buttonStyles.buttonPrimaryDarkDisabled];
       btnDisabledTextStyle = [globalStyles.textLight];
-      btnDisabledIconStyle = [globalStyles.textLight];
+      btnDisabledIconStyle = Colors.sparrowSand;
       break;
 
     case ButtonType.SecondaryDark:
       // Rest
       btnStyle = [buttonStyles.buttonSecondaryDark];
       btnTextStyle = [globalStyles.textDark];
-      btnIconStyle = [globalStyles.textDark];
+      btnIconStyle = Colors.sparrowDark;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonSecondaryDarkSelected];
       btnActiveTextStyle = [globalStyles.textLight];
-      btnActiveIconStyle = [globalStyles.textLight];
+      btnActiveIconStyle = Colors.sparrowSand;
 
       // Disabled
       btnDisabledStyle = [buttonStyles.buttonSecondaryDisabled];
       btnDisabledTextStyle = [globalStyles.textDisabled];
-      btnDisabledIconStyle = [globalStyles.textDisabled];
+      btnDisabledIconStyle = Colors.sand300;
       break;
 
     case ButtonType.SecondaryLight:
       // Rest
       btnStyle = [buttonStyles.buttonSecondaryLight];
       btnTextStyle = [globalStyles.textLight];
-      btnIconStyle = [globalStyles.textLight];
+      btnIconStyle = Colors.sparrowSand;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonSecondaryLightSelected];
       btnActiveTextStyle = [globalStyles.textDark];
-      btnActiveIconStyle = [globalStyles.textDark];
+      btnActiveIconStyle = Colors.sparrowDark;
 
       // Disabled
       btnDisabledStyle = [buttonStyles.buttonSecondaryDisabled];
       btnDisabledTextStyle = [globalStyles.textDisabled];
-      btnDisabledIconStyle = [globalStyles.textDisabled];
+      btnDisabledIconStyle = Colors.sand300;
       break;
 
     case ButtonType.Tertiary:
       // Rest
       btnStyle = [buttonStyles.buttonTertiary];
       btnTextStyle = [globalStyles.textLight];
-      btnIconStyle = [globalStyles.textLight];
+      btnIconStyle = Colors.sparrowSand;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonTertiary];
       btnActiveTextStyle = [globalStyles.textLight];
-      btnActiveIconStyle = [globalStyles.textLight];
+      btnActiveIconStyle = Colors.sparrowSand;
 
       // Disabled
       btnDisabledStyle = [buttonStyles.buttonTertiaryDisabled];
       btnDisabledTextStyle = [globalStyles.textLight];
-      btnDisabledIconStyle = [globalStyles.textLight];
+      btnDisabledIconStyle = Colors.sparrowSand;
       break;
 
     case ButtonType.Success:
       // Rest
       btnStyle = [buttonStyles.buttonSuccess];
       btnTextStyle = [buttonStyles.buttonSuccessText];
-      btnIconStyle = [buttonStyles.buttonSuccessText];
+      btnIconStyle = Colors.green700;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonSuccess];
       btnActiveTextStyle = [buttonStyles.buttonSuccessText];
-      btnActiveIconStyle = [buttonStyles.buttonSuccessText];
+      btnActiveIconStyle = Colors.green700;
 
       // Disabled
       btnDisabledStyle = [buttonStyles.buttonSuccessDisabled];
       btnDisabledTextStyle = [buttonStyles.buttonSuccessDisabledText];
-      btnDisabledIconStyle = [buttonStyles.buttonSuccessDisabledText];
+      btnDisabledIconStyle = Colors.green300;
       break;
 
     case ButtonType.Warning:
       // Rest
       btnStyle = [buttonStyles.buttonWarning];
       btnTextStyle = [buttonStyles.buttonWarningText];
-      btnIconStyle = [buttonStyles.buttonWarningText];
+      btnIconStyle = Colors.orange700;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonWarning];
       btnActiveTextStyle = [buttonStyles.buttonWarningText];
-      btnActiveIconStyle = [buttonStyles.buttonWarningText];
+      btnActiveIconStyle = Colors.orange700;
 
       // Disabled
       btnDisabledStyle = [buttonStyles.buttonWarningDisabled];
       btnDisabledTextStyle = [buttonStyles.buttonWarningDisabledText];
-      btnDisabledIconStyle = [buttonStyles.buttonWarningDisabledText];
+      btnDisabledIconStyle = Colors.orange300;
       break;
 
     case ButtonType.Error:
       // Rest
       btnStyle = [buttonStyles.buttonError];
       btnTextStyle = [buttonStyles.buttonErrorText];
-      btnIconStyle = [buttonStyles.buttonErrorText];
+      btnIconStyle = Colors.red700;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonError];
       btnActiveTextStyle = [buttonStyles.buttonErrorText];
-      btnActiveIconStyle = [buttonStyles.buttonErrorText];
+      btnActiveIconStyle = Colors.red700;
 
       // Disabled
       btnDisabledStyle = [buttonStyles.buttonErrorDisabled];
       btnDisabledTextStyle = [buttonStyles.buttonErrorDisabledText];
-      btnDisabledIconStyle = [buttonStyles.buttonErrorDisabledText];
+      btnDisabledIconStyle = Colors.red300;
       break;
 
     case ButtonType.Function:
       // Rest
       btnStyle = [buttonStyles.buttonFunction];
       btnTextStyle = [buttonStyles.buttonFunctionText];
-      btnIconStyle = [buttonStyles.buttonFunctionText];
+      btnIconStyle = Colors.turqoise700;
 
       // Active
       btnActiveStyle = [buttonStyles.buttonFunction];
       btnActiveTextStyle = [buttonStyles.buttonFunctionText];
-      btnActiveIconStyle = [buttonStyles.buttonFunctionText];
+      btnActiveIconStyle = Colors.turqoise700;
 
       // Disabled
-      btnDisabledStyle = [buttonStyles.buttonErrorDisabled];
-      btnDisabledTextStyle = [buttonStyles.buttonErrorDisabledText];
-      btnDisabledIconStyle = [buttonStyles.buttonErrorDisabledText];
+      btnDisabledStyle = [buttonStyles.buttonFunctionDisabled];
+      btnDisabledTextStyle = [buttonStyles.buttonFunctionDisabledText];
+      btnDisabledIconStyle = Colors.turqoise300;
       break;
   }
 
@@ -381,18 +378,16 @@ export const Button: React.FC<ButtonProps> = ({
       onPress={() => {
         handlePressIn();
       }}
-      style={
-        disabled ? btnDisabledStyle : current == id ? btnActiveStyle : btnStyle
-      }
+      style={[
+        disabled ? btnDisabledStyle : current == id ? btnActiveStyle : btnStyle,
+      ]}
       disabled={disabled}>
-      <View style={styles.btnBase}>
-        {icon && (
+      <View style={[styles.btnBase]}>
+        {displayIcon && (
           <Icon
-            name={icon}
-            size={24}
             height={24}
             width={24}
-            style={
+            fill={
               disabled
                 ? btnDisabledIconStyle
                 : current == id
@@ -446,7 +441,7 @@ export enum ButtonDisplay {
 const styles = StyleSheet.create({
   btnBase: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     columnGap: Spacing.sm,
   },
 });
