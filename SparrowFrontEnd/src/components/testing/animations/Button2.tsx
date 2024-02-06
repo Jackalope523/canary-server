@@ -435,8 +435,9 @@ export const Button2: React.FC<ButtonProps> = ({
 
   TODO button needs to:
 
-  1. Animate down when pressed
-  2. Animate up when released
+  1. Animate down when pressed (DONE)
+  2. Animate up when released (DONE)
+  3. Not be able to press again until it has fully animated up
 
   */
 
@@ -446,6 +447,9 @@ export const Button2: React.FC<ButtonProps> = ({
     runOnJS(() => {
       sv.value = withTiming(sv.value - 6, { duration: animationDuration });
       console.log('Press-in triggered');
+      setTimeout(() => {
+        sv.value = withTiming(6, { duration: animationDuration });
+      }, 200);
     })();
 
     if (self != null && status != null && changeState != null) {
