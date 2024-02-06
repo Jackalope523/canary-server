@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Core.Boundaries;
@@ -13,6 +14,7 @@ using System.ComponentModel;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
+using PhoneNumbers;
 
 namespace Core.Tests
 {
@@ -23,7 +25,7 @@ namespace Core.Tests
 		private int instance;
 
 		private static ConcurrentBag<ulong> generatedUserIds = new();
-		private static ulong uniqueUserIncrement = 0;
+		private ulong uniqueUserIncrement = 0;
 		private string testUserPhoneNumberFormat = "000-{0}-{1}";
 		private string testUserEmailFormat = "email_{0}_{1}@test.com";
 		private string testUserName = "name";
@@ -70,7 +72,7 @@ namespace Core.Tests
 
 		internal User CreateTestUser()
 		{
-			var userIncrement = uniqueUserIncrement++;
+			var userIncrement = Interlocked.Increment(ref uniqueUserIncrement);
 
 			User userStub = new()
 			{
@@ -85,8 +87,8 @@ namespace Core.Tests
 		}
 
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
-		{
-			await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
+        {
+            await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
 				userStub.Name, userStub.DateOfBirth, CharacterVector.Default.ToCharacter());
 
 			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
@@ -202,6 +204,7 @@ namespace Core.Tests
 
 			return eventStub;
 		}
+
 		internal async Task<Event> GeneratePastEventAsync(User host, params User[] guests)
 		{
 			var eventStub = CreateTestEvent(host);
@@ -222,7 +225,7 @@ namespace Core.Tests
 		internal async Task<Event> GenerateUniqueEventAsync(User host, params User[] guests)
 		{
 			var eventStub = CreateTestEvent(host);
-			eventStub.Location = new() { Latitude = uniqueEventDegree++, Longitude = uniqueEventDegree++ };
+			eventStub.Location = new() { Latitude = SafeAdd(ref uniqueEventDegree, 1), Longitude = SafeAdd(ref uniqueEventDegree, 1) };
 
 			if (uniqueEventDegree > 80)
 			{ uniqueEventDegree = -89.5; }
@@ -239,7 +242,7 @@ namespace Core.Tests
 
 		internal async Task<List<Event>> GenerateMultipleUniqueEventAsync(params User[] hosts)
 		{
-			double currentDegree = uniqueEventDegree++;
+			double currentDegree = SafeAdd(ref uniqueEventDegree, 1);
 			GeoLocation location = new() { Latitude = currentDegree, Longitude = currentDegree };
 
 			if (uniqueEventDegree > 80)
@@ -335,96 +338,18 @@ namespace Core.Tests
 				catch { }
 			}
 		}
-	}
 
-	public class UserHook : IAccountDatabase
-	{
-		private IAccountDatabase accounts;
-		private ConcurrentBag<ulong> generatedUserIds;
-
-		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<ulong> userIdList)
-		{
-			accounts = accountDatabase;
-			generatedUserIds = userIdList;
-		}
-
-        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
+        public static double SafeAdd(ref double location1, double value)
         {
-			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, character);
-
-			var createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
-			generatedUserIds.Add(createdUser.Id);
-        }
-
-        public async Task DeleteUserAsync(ulong userId)
-        {
-			await accounts.DeleteUserAsync(userId);
-        }
-
-        public async Task<UserShard> FindUserByEmailAsync(string normalisedEmail)
-        {
-			return await accounts.FindUserByEmailAsync(normalisedEmail);
-        }
-
-        public async Task<UserShard> FindUserByIdAsync(ulong userId)
-        {
-			return await accounts.FindUserByIdAsync(userId);
-        }
-
-        public async Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber)
-        {
-			return await accounts.FindUserByPhoneNumberAsync(phoneNumber);
-        }
-
-        public async Task<RecentLocation> GetRecentUserLocationAsync(ulong userId)
-        {
-			return await accounts.GetRecentUserLocationAsync(userId);
-        }
-
-        public async Task<Haunt> GetUserHauntAsync(ulong userId)
-        {
-			return await accounts.GetUserHauntAsync(userId);
-        }
-
-        public async Task UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability)
-        {
-			await accounts.UpdateHauntAsync(userId, latitude, longitude, radius, stability);
-        }
-
-        public async Task UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius)
-        {
-			await accounts.UpdateRecentLocationAsync(userId, latitude, longitude, radius);
-        }
-
-        public async Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits)
-        {
-			await accounts.UpdateUserAsync(userId, edits);
+            double newCurrentValue = location1;
+            while (true)
+            {
+                double currentValue = newCurrentValue;
+                double newValue = currentValue + value;
+                newCurrentValue = Interlocked.CompareExchange(ref location1, newValue, currentValue);
+                if (newCurrentValue.Equals(currentValue))
+                    return newValue;
+            }
         }
     }
-
-	public class NotificationServiceStub : INotificationService
-	{
-		public class NotificationStub
-		{
-			public string Title { get; init; }
-			public string Message { get; init; }
-		}
-
-		public static ConcurrentDictionary<string, ConcurrentBag<NotificationStub>> messages = new();
-
-		public Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message)
-		{
-			ConcurrentBag<NotificationStub> userBag;
-			var exists = messages.TryGetValue(deviceToken, out userBag);
-
-			if (!exists)
-			{ 
-				userBag = new();
-				messages.TryAdd(deviceToken, userBag);
-			}
-
-			userBag.Add(new NotificationStub() { Title = title, Message = message });
-			return Task.FromResult(0);
-		}
-	}
 }

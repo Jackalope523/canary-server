@@ -5,18 +5,19 @@ using Shared;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using System.Threading;
 
 namespace Core.Tests
 {
 	public class CoreTest : IAsyncLifetime, IDisposable
 	{
-		private static int instanceCount = 0;
+		private static int testNumber = 0;
 		
 		protected readonly CoreEnvironment environment;
 
 		public CoreTest()
 		{
-			environment = new(instanceCount++);
+			environment = new(Interlocked.Increment(ref testNumber));
 		}
 
 		public async Task InitializeAsync()
@@ -29,7 +30,6 @@ namespace Core.Tests
 		{
 			GC.SuppressFinalize(this);
 			environment.DisposeEnvironment();
-			--instanceCount;
 		}
 	}
 }
