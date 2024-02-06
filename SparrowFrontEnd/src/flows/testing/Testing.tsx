@@ -22,6 +22,7 @@ import Button from '../../components/Button';
 
 // Icon
 import ImportedIcon from '../../assets/icons/favorite-fill.svg';
+import ButtonGroup from '../../components/ButtonGroup';
 
 const TestScreen = () => {
   return (

@@ -33,17 +33,17 @@ export interface ButtonProps {
   // Rest styles
   btnStyle?: ViewStyle[];
   btnTextStyle?: TextStyle[];
-  btnIconStyle?: string;
+  btnIconStyle: string;
 
   // Active styles
   btnActiveStyle?: ViewStyle[];
   btnActiveTextStyle?: TextStyle[];
-  btnActiveIconStyle?: string;
+  btnActiveIconStyle: string;
 
   // Disabled styles
   btnDisabledStyle?: ViewStyle[];
   btnDisabledTextStyle?: TextStyle[];
-  btnDisabledIconStyle?: string;
+  btnDisabledIconStyle: string;
 
   // Exclusive Button Support
   id?: number;
