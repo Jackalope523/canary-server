@@ -29,7 +29,6 @@ namespace Core.Tests
 
         public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
         {
-            Console.Error.WriteLine($"Checking {phoneNumber}");
 			ContentValidation.TryNormalisePhoneNumber(phoneNumber, out phoneNumber);
             // Ensure no duplicate user exists
             UserShard userCheck = null;

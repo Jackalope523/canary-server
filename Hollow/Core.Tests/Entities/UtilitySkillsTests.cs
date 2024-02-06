@@ -207,7 +207,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public void HasYet_TimeBeforeCurrentTime_ReturnsTrue()
+		public void HasYet_TimeBeforeCurrentTime_ReturnsFalse()
 		{
 			// Arrange
 			DateTimeOffset pastTime = DateTimeOffset.UtcNow.AddMinutes(-1);
@@ -216,11 +216,11 @@ namespace Core.Tests.Entities
 			bool result = Psijic.HasYet(pastTime);
 
 			// Assert
-			Assert.True(result);
+			Assert.False(result);
 		}
 
 		[Fact]
-		public void HasYet_TimeAfterCurrentTime_ReturnsFalse()
+		public void HasYet_TimeAfterCurrentTime_ReturnsTrue()
 		{
 			// Arrange
 			DateTimeOffset futureTime = DateTimeOffset.UtcNow.AddMinutes(1);
@@ -229,11 +229,11 @@ namespace Core.Tests.Entities
 			bool result = Psijic.HasYet(futureTime);
 
 			// Assert
-			Assert.False(result);
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasAlready_TimeBeforeCurrentTime_ReturnsFalse()
+		public void HasAlready_TimeBeforeCurrentTime_ReturnsTrue()
 		{
 			// Arrange
 			DateTimeOffset pastTime = DateTimeOffset.UtcNow.AddMinutes(-1);
@@ -242,11 +242,11 @@ namespace Core.Tests.Entities
 			bool result = Psijic.HasAlready(pastTime);
 
 			// Assert
-			Assert.False(result);
+			Assert.True(result);
 		}
 
 		[Fact]
-		public void HasAlready_TimeAfterCurrentTime_ReturnsTrue()
+		public void HasAlready_TimeAfterCurrentTime_ReturnsFalse()
 		{
 			// Arrange
 			DateTimeOffset futureTime = DateTimeOffset.UtcNow.AddMinutes(1);
@@ -255,7 +255,7 @@ namespace Core.Tests.Entities
 			bool result = Psijic.HasAlready(futureTime);
 
 			// Assert
-			Assert.True(result);
+			Assert.False(result);
 		}
 
 		[Fact]

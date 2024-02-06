@@ -69,7 +69,10 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
+			var nemesis = await environment.GenerateUniqueUserAsync();
+
 			var oldReputation = user.Reputation;
+			await environment.Terminal.ProfileOperations.RateUserAsync(nemesis.Id, user.Id, UserRating.Negative);
 
 			// Act
 			await user.CalculateReputation();
@@ -90,7 +93,7 @@ namespace Core.Tests.Entities
 			var oldCharacter = user.Character;
 
 			// Act
-			user.CalculateCharacter(@event, TimeSpan.FromMinutes(60));
+			user.CalculateCharacter(@event, TimeSpan.FromMinutes(45));
 
 			// Assert
 			Assert.NotEqual(oldCharacter, user.Character);
@@ -250,9 +253,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @event = environment.CreateTestEvent(host);
-			@event.StartTime = DateTime.Now;
-			await environment.GenerateEventUnsafeAsync(@event, host);
+			var @event = await environment.GenerateOngoingEventAsync(host);
 			await environment.AddUserToEventAsync(@event, user, EventBond.Arrived);
 
 			// Act
@@ -307,13 +308,15 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task CanView_Banned_ReturnsFalse()
+		public async Task CanView_Limited_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.Limited);
+
+			await environment.UpdateUser(user, nameof(UserShard.AccountStatus), UserAccountStatus.Limited);
+			user = new(await environment.Terminal.AccountDatabase.FindUserByIdAsync(user.Id));
 
 			// Act
 			var canView = await user.CanView(@event);
@@ -323,7 +326,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task CanView_FriendBanned_ReturnsTrue()
+		public async Task CanView_FriendLimited_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -347,6 +350,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
+			await environment.UpdateUserLocationAsync(user, @event.Location.Latitude, @event.Location.Longitude);
 
 			// Act
 			var canJoin = await user.CanJoin(@event);
@@ -385,7 +389,7 @@ namespace Core.Tests.Entities
 			var etched = user.Etched(etching);
 
 			// Assert
-			Assert.True(etched);
+			Assert.False(etched);
 		}
 
 		[Fact]
@@ -423,6 +427,7 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
+			await user.HandleHaunt();
 			var oldHaunt = await user.Haunt;
 
 			// Act
@@ -437,13 +442,20 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
+			await user.HandleHaunt();
 			var oldHaunt = await user.Haunt;
+
+			user.LastKnownLocation.Set(new()
+			{
+				Latitude = ((await user.LastKnownLocation).Latitude + 1) / 2,
+				Longitude = ((await user.LastKnownLocation).Longitude + 1) / 2
+			});
 
 			// Act
 			await user.HandleHaunt();
 
 			// Assert
-			Assert.Equal(oldHaunt, await user.Haunt);
+			Assert.NotEqual(oldHaunt, await user.Haunt);
 		}
 
 		[Fact]
@@ -452,6 +464,8 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var oldReputation = user.Reputation;
+			await environment.Terminal.DisciplineDirector.PenaliseUserAsync(user, PenaltyType.Unreliable, Psijic.Time);
+			await environment.Terminal.DisciplineDirector.PenaliseUserAsync(user, PenaltyType.Unreliable, Psijic.Time);
 
 			// Act
 			await user.Penalised();
@@ -513,8 +527,8 @@ namespace Core.Tests.Entities
 			// Act
 			await user.Notify("", "");
 
-			// Assert
-			Assert.False(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
+            // Assert
+            Assert.False(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
 		}
 
 		[Fact]

@@ -42,18 +42,22 @@ namespace Core.Entities
 			return true;
 		}
 
-		public static string NormaliseText(string content)
+		public static string NormaliseText(string content, int maximumLength = int.MaxValue)
 		{
-			// Check if text contains inappropriate phrases
-			content = filter.CensorText(content);
+			maximumLength = Math.Min(content.Length, maximumLength);
 
-			// Check if text contains links, phone numbers, or emails
-			content = filter.HideInformation(content);
+			content = content[..maximumLength];
 
-			return content;
-		}
+            // Check if text contains inappropriate phrases
+            content = filter.CensorText(content);
 
-		public static bool TryNormalisePhoneNumber(string phoneNumber, out string normalisedPhoneNumber)
+            // Check if text contains links, phone numbers, or emails
+            content = filter.HideInformation(content);
+
+            return content;
+        }
+
+        public static bool TryNormalisePhoneNumber(string phoneNumber, out string normalisedPhoneNumber)
 		{
 			normalisedPhoneNumber = PhoneNumberUtil.ExtractPossibleNumber(phoneNumber);
 

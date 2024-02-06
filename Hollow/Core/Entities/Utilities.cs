@@ -48,6 +48,22 @@ namespace Core.Entities
         public double LongitudeInRadians => (Math.PI / 180) * Longitude;
 
         #endregion
+
+        #region Dissimilation
+
+        public override bool Equals(object obj)
+        {
+            return obj is GeoLocation other &&
+                Latitude == other.Latitude &&
+                Longitude == other.Longitude;
+        }
+
+        public override int GetHashCode()
+        {
+            return (Latitude + Longitude).GetHashCode();
+        }
+
+        #endregion
     }
 
 

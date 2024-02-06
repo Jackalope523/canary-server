@@ -142,6 +142,7 @@ namespace Core.Entities
             SecurityStamp = fromUser.SecurityStamp;
             LockoutDate = fromUser.LockoutDate;
             AccessTries = fromUser.AccessTries;
+            AccountStatus = fromUser.AccountStatus;
             Character = new(fromUser.Character);
         }
 
@@ -191,7 +192,7 @@ namespace Core.Entities
                 !ContentValidation.IsEmailValid(Email)) { return false; }
 
             // Verify user age
-            if (HasAlready(DateOfBirth + (OneYear * 18))) { return false; }
+            if (HasYet(DateOfBirth + (OneYear * 18))) { return false; }
 
             // Normalise
             Email = string.IsNullOrEmpty(Email) ? Email : Email.ToLower();
@@ -223,9 +224,9 @@ namespace Core.Entities
         public void CalculateCharacter(Event eventAttended, TimeSpan timeAttended)
         {
             // Modified by time spent
-            float modifier = MathF.Log(2.5f * timeAttended.Minutes + 3) / 70f;
+            float modifier = (float) (Math.Log10(3 * timeAttended.TotalMinutes + 3) / 15d);
 
-            Character.MoveTowards(eventAttended.Character, modifier);
+            Character = Character.MoveTowards(eventAttended.Character, modifier);
         }
 
         public async Task<Event> NextEvent()
@@ -250,9 +251,9 @@ namespace Core.Entities
         {
 			// Check if user is following target
 			if ((await Following).Contains(otherUser))
-			{ return false; }
+			{ return true; }
 
-            return true;
+            return false;
         }
 
         public async Task<bool> IsBlocking(User otherUser)
@@ -308,7 +309,7 @@ namespace Core.Entities
 		public async Task<bool> CanJoin(Event @event)
 		{
 			// Check if event is joinable
-			if (@event.IsOpen)
+			if (!@event.IsOpen)
 			{ return false; }
 
 			// Check if user can see event

@@ -91,7 +91,17 @@ namespace Core.Entities
 
 		#region Dissimilation
 
-		public static CharacterVector operator +(CharacterVector a, CharacterVector b)
+		public override bool Equals(object obj)
+        {
+            return obj is CharacterVector other && Magnitude.Equals(other.Magnitude);
+        }
+
+        public override int GetHashCode()
+        {
+            return Magnitude.GetHashCode();
+        }
+
+        public static CharacterVector operator +(CharacterVector a, CharacterVector b)
 		{
 			return new()
 			{
@@ -100,7 +110,8 @@ namespace Core.Entities
 				Chaoticness = a.Chaoticness + b.Chaoticness,
 				Competitiveness = a.Competitiveness + b.Competitiveness,
 				Industriousness = a.Industriousness + b.Industriousness,
-				NightOwl = a.NightOwl + b.NightOwl
+				NightOwl = a.NightOwl + b.NightOwl,
+				Openness = a.Openness
 			};
 		}
 
@@ -113,7 +124,8 @@ namespace Core.Entities
 				Chaoticness = a.Chaoticness - b.Chaoticness,
 				Competitiveness = a.Competitiveness - b.Competitiveness,
 				Industriousness = a.Industriousness - b.Industriousness,
-				NightOwl = a.NightOwl - b.NightOwl
+				NightOwl = a.NightOwl - b.NightOwl,
+				Openness = a.Openness
 			};
 		}
 
@@ -126,7 +138,8 @@ namespace Core.Entities
 				Chaoticness = (int) (a.Chaoticness * f),
 				Competitiveness = (int) (a.Competitiveness * f),
 				Industriousness = (int) (a.Industriousness * f),
-				NightOwl = (int) (a.NightOwl * f)
+				NightOwl = (int) (a.NightOwl * f),
+				Openness = a.Openness
 			};
 		}
 

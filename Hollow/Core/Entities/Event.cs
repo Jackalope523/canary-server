@@ -207,7 +207,7 @@ namespace Core.Entities
         public async Task<bool> IsJoinableBy(User user)
         {
             // Check if event is joinable
-            if (IsOpen)
+            if (!IsOpen)
             { return false; }
 
             // Check if user can see event

@@ -119,6 +119,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
+			await environment.UpdateUserLocationAsync(user, @event.Location.Latitude, @event.Location.Longitude);
 
 			// Act
 			var result = await @event.IsJoinableBy(user);
@@ -462,12 +463,14 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task IsStartable_Upcoming_ReturnsTrue()
+		public async Task IsStartable_Waiting_ReturnsTrue()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			
+			var @event = environment.CreateTestEvent(host);
+			@event.StartTime = Psijic.Time;
+			@event = await environment.GenerateEventUnsafeAsync(@event, host);
+
 			await environment.SetEventState(@event, EventState.Upcoming);
 			await environment.UpdateUserLocationAsync(host,
 				@event.Location.Latitude,
@@ -485,15 +488,13 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-
-			await environment.SetEventState(@event, EventState.Open);
+			var @event = await environment.GenerateOngoingEventAsync(host);
 
 			// Act
 			var result = await @event.IsStartable();
 
 			// Assert
-			Assert.True(result);
+			Assert.False(result);
 		}
 
 		[Fact]
