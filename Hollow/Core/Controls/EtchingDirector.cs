@@ -28,7 +28,7 @@ namespace Core.Controls
             _ = targetEvent.Etchings.Sync();
 
             // Verify user can see the event
-            Try(await targetEvent.WasAttendedBy(user),
+            Try(await targetEvent.WasAttendedBy(user) || targetEvent.IsModifiableBy(user),
                 new InvalidEventException("User did not attend event."));
 
             return await targetEvent.Etchings;
@@ -60,7 +60,7 @@ namespace Core.Controls
             Try(user.Etched(etching) || eventEtched.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove etching."));
 
-            Etchings.RemoveEtchingAsync(etching.Id);
+            await Etchings.RemoveEtchingAsync(etching.Id);
         }
 
         public async Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating)
@@ -77,11 +77,11 @@ namespace Core.Controls
             // Check if removing a rating
             if (rating != UserRating.Remove)
             {
-                Etchings.RateEtchingAsync(user.Id, etching.Id, rating);
+                await Etchings.RateEtchingAsync(etching.Id, user.Id, rating);
             }
             else
             {
-                Etchings.RemoveEtchingRatingAsync(etching.Id, user.Id);
+                await Etchings.RemoveEtchingRatingAsync(etching.Id, user.Id);
             }
         }
 

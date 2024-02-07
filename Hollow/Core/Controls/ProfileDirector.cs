@@ -60,7 +60,14 @@ namespace Core.Controls
             else
             {
                 // Get public hosted events
-                nest.Events = (await Events.FindEventsByUserAsync(user.Id)).ConvertAll(e => new Event(e).ToEventThinSlice());
+                var hostedEvents = (await Events.FindEventsByUserAsync(targetUser.Id)).ConvertAll(e => new Event(e));
+                nest.Events = hostedEvents.ConvertAll(e => e.ToEventThinSlice());
+
+                // Get common events
+                nest.Events.AddRange((await targetUser.PastEvents)
+                    .Except(hostedEvents)
+                    .Intersect(await user.PastEvents)
+                    .ToList().ConvertAll(e => e.ToEventThinSlice()));
             }
 
             return nest;
@@ -72,7 +79,7 @@ namespace Core.Controls
             var targetUser = await GetUserAsync(targetId);
 
             // Verify users are friends
-            Try(await targetUser.IsFriendsWith(user),
+            Try(user.Equals(targetUser) || await targetUser.IsFriendsWith(user),
                 new InvalidUserException("User is unable to view target."));
 
             // Gather active and upcoming events
@@ -139,17 +146,22 @@ namespace Core.Controls
 
         public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
         {
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+            Fail(user.Equals(targetUser),
+                new InvalidUserException("User cannot rate themself."));
+
             // Check if rating is to remove
             if (rating != UserRating.Remove)
             {
-                _ = Profiles.RateUserAsync(userId, targetId, rating);
+                await Profiles.RateUserAsync(userId, targetId, rating);
             }
             else
             {
-                _ = Profiles.RemoveUserRatingAsync(userId, targetId);
+                await Profiles.RemoveUserRatingAsync(userId, targetId);
             }
 
-            var targetUser = await GetUserAsync(targetId);
             await targetUser.CalculateReputation();
             _ = Accounts.UpdateUserAsync(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }

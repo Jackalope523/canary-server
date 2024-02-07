@@ -24,7 +24,7 @@ namespace Core.Tests.Controls
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var user = await director.GetUserAsync(randomUser.Id);
+			User user = new(await director.GetUserAsync(randomUser.Id));
 
 			// Assert
 			Assert.True(randomUser.Equals(user));
@@ -47,7 +47,7 @@ namespace Core.Tests.Controls
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var user = await director.GetUserAsync(randomUser.PhoneNumber);
+			User user = new(await director.GetUserAsync(randomUser.PhoneNumber));
 
 			// Assert
 			Assert.True(randomUser.Equals(user));
@@ -101,7 +101,7 @@ namespace Core.Tests.Controls
 
 			// Assert
 			var updatedUser = await director.GetUserAsync(user.Id);
-			Assert.Equal(user.Name, updatedUser.Name);
+			Assert.Equal(newName, updatedUser.Name);
 		}
 
 		[Fact]

@@ -37,6 +37,7 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, friend);
+			friend.NumberOfFollowers += 1;
 
 			// Act
 			var profile = await director.GetUserProfileAsync(user.Id, friend.Id);

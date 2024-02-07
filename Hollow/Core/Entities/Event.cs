@@ -238,7 +238,7 @@ namespace Core.Entities
         public bool IsHostedBy(User user)
         {
 			// Check if user is event host
-			if (Host.Id.Equals(user.Id))
+			if (Host.Equals(user))
 			{ return true; }
 
 			return false;

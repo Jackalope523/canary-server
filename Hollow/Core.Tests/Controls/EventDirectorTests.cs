@@ -23,11 +23,10 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-
 			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
-			var returnedEvent = await director.GetEventInformationAsync(host.Id, @event.Id);
+			Event returnedEvent = new(await director.GetEventInformationAsync(host.Id, @event.Id));
 
 			// Assert
 			Assert.True(@event.Equals(returnedEvent));
@@ -43,7 +42,7 @@ namespace Core.Tests.Controls
 			var @event = await environment.GenerateUpcomingEventAsync(host);
 
 			// Act
-			var returnedEvent = await director.GetEventInformationAsync(user.Id, @event.Id);
+			Event returnedEvent = new(await director.GetEventInformationAsync(user.Id, @event.Id));
 
 			// Assert
 			Assert.True(@event.Equals(returnedEvent));
@@ -107,10 +106,11 @@ namespace Core.Tests.Controls
 			var host2 = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var events = await environment.GenerateMultipleUniqueEventAsync(host1, host2);
+			var closeEvent = await environment.GenerateUniqueEventAsync(host1);
+			await environment.GenerateUniqueEventAsync(host2);
 
 			// Act
-			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, events[0].Location.Latitude, events[0].Location.Longitude, 1);
+			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, closeEvent.Location.Latitude, closeEvent.Location.Longitude, 1);
 
 			// Assert
 			Assert.Single(nearbyEvents);
@@ -124,8 +124,8 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-
+			var @event = await environment.GenerateUniqueEventAsync(host);
+			
 			// Act
 			var nearbyEvents = await director.GetEventsInAreaAsync(user.Id, @event.Location.Latitude, @event.Location.Longitude, 10);
 
@@ -215,6 +215,8 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
+			await environment.UpdateUser(host, nameof(UserShard.AccountStatus), UserAccountStatus.Impotent);
+
 			var eventStub = environment.CreateTestEvent(host);
 
 			// Act
@@ -365,9 +367,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
+            await environment.UpdateUserLocationAsync(user, @event.Location.Latitude, @event.Location.Longitude);
 
-			// Act
-			await director.JoinEventAsync(user.Id, @event.Id);
+            // Act
+            await director.JoinEventAsync(user.Id, @event.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -379,9 +382,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GeneratePastEventAsync(host);
+            await environment.UpdateUserLocationAsync(user, @event.Location.Latitude, @event.Location.Longitude);
 
-			// Act
-			var join = director.WatchEventAsync(user.Id, @event.Id);
+            // Act
+            var join = director.WatchEventAsync(user.Id, @event.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await join);
@@ -395,7 +399,8 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await director.JoinEventAsync(user.Id, @event.Id);
+            await environment.UpdateUserLocationAsync(user, @event.Location.Latitude, @event.Location.Longitude);
+            await director.JoinEventAsync(user.Id, @event.Id);
 
 			// Act
 			await director.LeaveEventAsync(user.Id, @event.Id);
@@ -519,7 +524,7 @@ namespace Core.Tests.Controls
 
 			// Assert
 			Assert.Equal(0, Watchers);
-			Assert.Equal(1, GuestCount);
+			Assert.Equal(3, GuestCount);
 
 			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
 			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Left)));
@@ -554,6 +559,7 @@ namespace Core.Tests.Controls
 			await environment.ForceFriendshipAsync(user, friend);
 
 			var @event = await environment.GenerateUpcomingEventAsync(host, user);
+			await environment.UpdateUserLocationAsync(friend, @event.Location.Latitude, @event.Location.Longitude);
 
 			// Act
 			var invitees = await director.GetPotentialInviteesAsync(user.Id, @event.Id);
@@ -572,9 +578,10 @@ namespace Core.Tests.Controls
 			await environment.ForceFriendshipAsync(user, friend);
 
 			var @event = await environment.GenerateUpcomingEventAsync(host, user);
+            await environment.UpdateUserLocationAsync(friend, @event.Location.Latitude, @event.Location.Longitude);
 
-			// Act
-			await director.InviteUserAsync(user.Id, friend.Id, @event.Id);
+            // Act
+            await director.InviteUserAsync(user.Id, friend.Id, @event.Id);
 			// If no exception is thrown, the test is successful
 		}
 

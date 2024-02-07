@@ -117,7 +117,7 @@ namespace Core.Tests.Controls
 
 			// Assert
 			var subscription = await environment.GetUserSubscriptionAsync(user);
-			Assert.True(string.IsNullOrEmpty(subscription.DeviceToken));
+			Assert.Null(subscription);
 		}
 
 		[Fact]

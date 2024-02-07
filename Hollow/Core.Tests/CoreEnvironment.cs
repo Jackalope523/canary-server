@@ -312,7 +312,15 @@ namespace Core.Tests
 
 		internal async Task<DeviceSilhouette> GetUserSubscriptionAsync(User user)
 		{
-			return await Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
+			DeviceSilhouette subscription = null;
+
+			try
+			{
+				subscription = await Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
+			}
+			catch { }
+
+			return subscription;
 		}
 
 		internal List<NotificationServiceStub.NotificationStub> GetUserMessages(User user)

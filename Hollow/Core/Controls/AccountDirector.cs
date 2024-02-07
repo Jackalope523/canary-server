@@ -185,7 +185,7 @@ namespace Core.Controls
             }
             // Check if user is on their way to an event
             else if (!await userIsAtEvent &&
-                nextEvent != null)
+                nextEvent != Event.None)
             {
                 // Check if user is close enough to be a guest
                 if (await nextEvent.IsInRange(user))

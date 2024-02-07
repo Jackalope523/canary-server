@@ -39,7 +39,7 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
+			var @event = await environment.GenerateOngoingEventAsync(host, guest);
 			await environment.GenerateEtchingAsync(@event, host);
 			await environment.GenerateEtchingAsync(@event, host);
 
@@ -73,7 +73,7 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
+			var @event = await environment.GenerateOngoingEventAsync(host, guest);
 			string etchingImageURL = "https://cdn.sparrow.com/0";
 
 			// Act
@@ -139,7 +139,7 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host, guest);
+			var @event = await environment.GenerateOngoingEventAsync(host, guest);
 			var coolEtching = await environment.GenerateEtchingAsync(@event, host);
 			var uglyEtching = await environment.GenerateEtchingAsync(@event, host);
 
@@ -155,8 +155,8 @@ namespace Core.Tests.Controls
 			Assert.Equal(0, serverCoolEtching.Ratings.Negative);
 
 			var serverUglyEtching = serverEtchings.Find(etching => etching.Id.Equals(uglyEtching.Id));
-			Assert.Equal(0, serverCoolEtching.Ratings.Positive);
-			Assert.Equal(1, serverCoolEtching.Ratings.Negative);
+			Assert.Equal(0, serverUglyEtching.Ratings.Positive);
+			Assert.Equal(1, serverUglyEtching.Ratings.Negative);
 		}
 
 		[Fact]

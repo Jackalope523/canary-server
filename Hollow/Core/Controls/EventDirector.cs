@@ -44,7 +44,7 @@ namespace Core.Controls
 			var nearbyEvents = await Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove events from list that the user cannot access
-			await RemoveInaccessibleEventsAsync(user, nearbyEvents);
+			nearbyEvents = await RemoveInaccessibleEventsAsync(user, nearbyEvents);
 
 			return nearbyEvents;
 		}
@@ -56,7 +56,7 @@ namespace Core.Controls
 			var nearbyEvents = await Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove inaccessible events and events with a large difference between event and user interest
-			await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
+			nearbyEvents = await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
 
 			return nearbyEvents;
 		}
@@ -188,7 +188,7 @@ namespace Core.Controls
 			// Push update
 			await Events.UpdateEventAsync(targetEvent.Id, edits);
 
-			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "This event was edited by the host, check to see the updates.");
+			_ = targetEvent.NotifyActive($"{targetEvent.Name}", "The event was edited by the host, check to see the updates.");
 		}
 
 		public async Task StartEventAsync(ulong userId, ulong eventId)
@@ -235,10 +235,16 @@ namespace Core.Controls
 			var targetEvent = await GetEventAsync(eventId);
 
 			// Verify user is allowed to view event
-			Try(await targetEvent.IsJoinableBy(user),
+			Try(await targetEvent.IsVisibleTo(user),
 				new InvalidEventException($"User is unable to join event.\nAccount Status: {user.AccountStatus}"));
 
-			var userIntention = await Events.GetUserStateAsync(userId, eventId);
+			EventBond? userIntention = null;
+
+			try
+			{
+				userIntention = await Events.GetUserStateAsync(userId, eventId);
+			}
+			catch { }
 
 			// Ensure correct state transition
 			if (!userIntention.HasValue)
@@ -252,7 +258,13 @@ namespace Core.Controls
 
 		public async Task UnwatchEventAsync(ulong userId, ulong eventId)
 		{
-			var userIntention = await Events.GetUserStateAsync(userId, eventId);
+            EventBond? userIntention = null;
+
+            try
+            {
+                userIntention = await Events.GetUserStateAsync(userId, eventId);
+            }
+            catch { }
 
 			// Ensure correct state transition
 			if (userIntention.HasValue &&
@@ -309,11 +321,11 @@ namespace Core.Controls
 			var targetEvent = await GetEventAsync(eventId);
 
 			// Verify user is the host
-			Try(targetEvent.IsHostedBy(user),
+			Fail(targetEvent.IsHostedBy(user),
 				new InvalidUserException("Host cannot leave the event."));
 
-			// Get the user's current status
-			var userIntention = await Events.GetUserStateAsync(user.Id, targetEvent.Id);
+            // Get the user's current status
+            var userIntention = await Events.GetUserStateAsync(userId, eventId);
 			
 			// Check if user is guest or arrived
 			if (userIntention.Equals(EventBond.Arrived))
@@ -369,7 +381,8 @@ namespace Core.Controls
 					user => user.State.Equals(EventBond.Arrived) || user.State.Equals(EventBond.Left)));
 
 				guestList.GuestCount = (await targetEvent.Arrived).Count;
-			}
+                guestList.Watchers = guestList.Guests.Where(guest => guest.State.Equals(EventBond.Watching)).Count();
+            }
 			// Check if user can view event
 			else if (await targetEvent.IsVisibleTo(user))
 			{
@@ -443,11 +456,11 @@ namespace Core.Controls
 				new InvalidEventException("Cannot kick users after event has been archived."));
 
 			// Verify host is not kicking themself
-			Try(@event.IsHostedBy(targetUser),
+			Fail(host.Equals(targetUser),
 				new InvalidUserException("Host cannot kick themself."));
 
 			// Kick target user from event
-			Events.SetUserStateAsync(targetUser.Id, @event.Id, EventBond.Kicked);
+			await Events.SetUserStateAsync(targetUser.Id, @event.Id, EventBond.Kicked);
 
 			// Hide target user's etchings from event
 			foreach (Etching etching in await @event.Etchings)
@@ -462,7 +475,11 @@ namespace Core.Controls
 		#region Favours
 
 		internal async Task<Event> RequestCurrentEventForUserAsync(User user)
-			=> new(await Events.FindCurrentEventForUserAsync(user.Id));
+		{
+			var currentEvent = await Events.FindCurrentEventForUserAsync(user.Id);
+
+			return currentEvent != null ? new(currentEvent) : Event.None;
+		}
 
 		internal async Task<List<Event>> RequestPastEventsForUserAsync(User user)
 		{
@@ -506,32 +523,40 @@ namespace Core.Controls
 		internal async Task<List<EventThinSlice>>
 			RemoveInaccessibleEventsAsync(User user, List<EventThinSlice> events)
 		{
+			List<EventThinSlice> inaccessibleEvents = new();
+
 			foreach (EventThinSlice e in events)
 			{
 				Event targetEvent = new(e);
 
 				if (!await user.CanView(targetEvent))
-				{ events.Remove(e); }
+				{ inaccessibleEvents.Add(e); }
 			}
+
+			events = events.Except(inaccessibleEvents).ToList();
 
 			return events;
 		}
 
 		internal async Task<List<EventThinSlice>>
 			RemoveUnattractiveEventsAsync(User user, List<EventThinSlice> events, float maximumAngle)
-		{
-			foreach (EventThinSlice e in events)
+        {
+            List<EventThinSlice> inaccessibleEvents = new();
+
+            foreach (EventThinSlice e in events)
 			{
 				Event targetEvent = new(e);
 
 				if (!await user.CanJoin(targetEvent))
-				{ events.Remove(e); continue; }
+				{ inaccessibleEvents.Remove(e); continue; }
 
 				if (CharacterVector.AngleBetweenAffected(user.Character, targetEvent.Character) > maximumAngle)
-				{ events.Remove(e); }
-			}
+				{ inaccessibleEvents.Remove(e); }
+            }
 
-			return events;
+            events = events.Except(inaccessibleEvents).ToList();
+
+            return events;
 		}
 
 		#endregion
