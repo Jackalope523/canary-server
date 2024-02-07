@@ -3,8 +3,8 @@ import { Colors } from './ColorStyles';
 
 // Flag colors
 export const FlagColors = {
-  startingSoon: Colors.picton400,
-  startingLate: Colors.orange400,
+  startingLate: Colors.picton400,
+  startingSoon: Colors.orange400,
   live: Colors.green400,
   terminated: Colors.red400,
 };

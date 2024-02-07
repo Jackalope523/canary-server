@@ -23,6 +23,7 @@ import Button from '../../components/Button';
 // Icon
 import ImportedIcon from '../../assets/icons/favorite-fill.svg';
 import ButtonGroup from '../../components/ButtonGroup';
+import FlagMedium, { FlagType } from '../../components/FlagMedium';
 
 const TestScreen = () => {
   return (
@@ -40,14 +41,16 @@ const TestScreen = () => {
 
       {/* --- START TESTING CODE BELOW --- */}
 
-      <Button
+      <FlagMedium type={FlagType.StartingSoon} time={'02:23:12'} />
+
+      {/* <Button
         type={ButtonType.Warning}
         size={ButtonSize.Medium}
         display={ButtonDisplay.Full}
         text="Example"
         Icon={ImportedIcon}
         displayIcon={true}
-      />
+      /> */}
 
       {/* <HeaderOptions title="Options" />
       <HeaderEditTitled title="Selected titled" />
