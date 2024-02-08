@@ -24,6 +24,8 @@ fails after user testing. This input is pretty solid UX-wise and should fit on a
 interface DateOfBirthInputV2Props {}
 
 export const DateOfBirthInputV2: React.FC<DateOfBirthInputV2Props> = ({}) => {
+  const [validDay, setValidDay] = React.useState(false);
+  const [validYear, setValidYear] = React.useState(false);
   const [Day, setDay] = React.useState('');
   const [Year, setYear] = React.useState('');
 
@@ -35,8 +37,10 @@ export const DateOfBirthInputV2: React.FC<DateOfBirthInputV2Props> = ({}) => {
         <TextInputSmall
           type={InputType.Day}
           label="Day"
-          value={Day}
-          onChangeText={setDay}
+          valid={validDay}
+          setValid={setValidDay}
+          text={Day}
+          setText={setDay}
           inputMode="numeric"
           maxLength={2}
           clearButton={false}
@@ -48,8 +52,10 @@ export const DateOfBirthInputV2: React.FC<DateOfBirthInputV2Props> = ({}) => {
         <TextInputSmall
           type={InputType.Day}
           label="Month"
-          value={Day}
-          onChangeText={setDay}
+          valid={validDay}
+          setValid={setValidDay}
+          text={Day}
+          setText={setDay}
           inputMode="numeric"
           maxLength={2}
           clearButton={false}
@@ -60,8 +66,10 @@ export const DateOfBirthInputV2: React.FC<DateOfBirthInputV2Props> = ({}) => {
         <TextInputSmall
           type={InputType.Year}
           label="Year"
-          value={Year}
-          onChangeText={setYear}
+          valid={validYear}
+          setValid={setValidYear}
+          text={Year}
+          setText={setYear}
           inputMode="numeric"
           maxLength={4}
           clearButton={false}
