@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Spacing } from '../../styles/SpacingStyles';
@@ -27,10 +27,11 @@ import FlagMedium, { FlagType } from '../../components/FlagMedium';
 import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 
 import TempAvatarImage from '../../assets/images/temp/image-placeholder.png';
+import PhotoPost from '../../components/PhotoPost';
 
 const TestScreen = () => {
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text
           style={[
@@ -46,11 +47,15 @@ const TestScreen = () => {
 
       <FlagMedium type={FlagType.StartingSoon} time={'02:23:12'} />
 
-      <Avatar
+      {/* <Avatar
         size={AvatarSize.Large}
         status={AvatarStatus.Offline}
         image={TempAvatarImage}
-      />
+      /> */}
+
+      <View style={globalStyles.baseContainer}>
+        <PhotoPost />
+      </View>
 
       {/* <Button
         type={ButtonType.Warning}
@@ -82,7 +87,7 @@ const TestScreen = () => {
         size={ButtonSize.Medium}
         display={ButtonDisplay.Contained}
       /> */}
-    </View>
+    </ScrollView>
   );
 };
 

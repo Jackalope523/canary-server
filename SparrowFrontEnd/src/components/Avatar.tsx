@@ -63,11 +63,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <View>
-      <Image
-        // source={require('../assets/images/temp/image-placeholder.png')}
-        source={image}
-        style={[avatarContainer, avatarBorder]}
-      />
+      <Image source={image} style={[avatarContainer, avatarBorder]} />
     </View>
   );
 };
