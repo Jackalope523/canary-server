@@ -51,7 +51,7 @@ namespace Core.Tests
 				throw new UnexpectedFailureException();
 			}
 
-			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, character);
+			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, Psijic.Time, dateOfBirth, character);
 
 			UserShard createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
 			generatedUserIds.Add(createdUser.Id);
