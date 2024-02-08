@@ -126,6 +126,15 @@ namespace Core.Controls
 
         public async Task FollowUserAsync(ulong userId, ulong targetId)
         {
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+            Fail(user.Equals(targetUser),
+                new InvalidUserException("User cannot follow themself."));
+
+            Fail(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
+                new InvalidUserException("User cannot follow blocked/blocking user."));
+
             await Profiles.FollowUserAsync(userId, targetId);
         }
 
@@ -136,7 +145,13 @@ namespace Core.Controls
 
         public async Task BlockUserAsync(ulong userId, ulong targetId)
         {
-            await Profiles.BlockUserAsync(userId, targetId);
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+			Fail(user.Equals(targetUser),
+				new InvalidUserException("User cannot block themself."));
+
+			await Profiles.BlockUserAsync(userId, targetId);
         }
 
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
