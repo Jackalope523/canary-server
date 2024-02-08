@@ -1,12 +1,10 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  ScrollView,
   StyleSheet,
   Image,
-  Dimensions,
+  Pressable,
+  Keyboard
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 
@@ -32,6 +30,7 @@ import TextButton, {
 type LoginProps = StackScreenProps<AuthStackParamList, 'Login'>;
 
 const LoginScreen = ({ navigation }: LoginProps) => {
+  const [validPhoneNumber, setValidPhoneNumber] = useState(false);
   const [PhoneNumber, setPhoneNumber] = React.useState('');
   const [buttonEnabled, setButtonEnabled] = React.useState(true);
 
@@ -56,7 +55,7 @@ const LoginScreen = ({ navigation }: LoginProps) => {
   }
 
   return (
-    <View style={[styles.container, globalStyles.baseContainer]}>
+    <Pressable style={[styles.container, globalStyles.baseContainer]} onPress = {Keyboard.dismiss}>
       <View style={styles.headerContainer}>
         <Image
           source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
@@ -69,11 +68,14 @@ const LoginScreen = ({ navigation }: LoginProps) => {
         <TextInputSmall
           type={InputType.PhoneNumber}
           label="Phone Number"
-          value={PhoneNumber}
-          onChangeText={setPhoneNumber}
+          valid={validPhoneNumber}
+          setValid={setValidPhoneNumber}
+          text={PhoneNumber}
+          setText={setPhoneNumber}
           inputMode="tel"
-          maxLength={15}
-          required
+          maxLength={17}
+          required = {true}
+          mask = '+1 ([000]) [000]-[0000]'
         />
         <View style={styles.buttonContainer}>
           <Button
@@ -82,18 +84,17 @@ const LoginScreen = ({ navigation }: LoginProps) => {
             display={ButtonDisplay.Full}
             text={'Log in'}
             onPress={navigate}
-            disabled={!buttonEnabled}
+            disabled={!validPhoneNumber}
           />
 
           <TextButton
             text="Can't log in?"
             type={TextButtonType.Dark}
             variant={TextButtonVariant.Three}
-            onPress={null}
           />
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

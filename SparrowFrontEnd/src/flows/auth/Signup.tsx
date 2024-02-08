@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -37,14 +37,22 @@ import ExampleScreen from '../../components/testing/ExampleScreen';
 type SignupProps = StackScreenProps<AuthStackParamList, 'Signup'>;
 
 const SignupScreen = ({ navigation }: SignupProps) => {
-  const [PhoneNumber, setPhoneNumber] = React.useState('');
-  const [Email, setEmail] = React.useState('');
-  const [Name, setName] = React.useState('');
-  const [Day, setDay] = React.useState('');
-  const [Month, setMonth] = React.useState('');
-  const [Year, setYear] = React.useState('');
-  const [termsOfServiceAgreed, setTermsOfServiceAgreed] = React.useState(false);
-  const [privacyPolicyAgreed, setPrivacyPolicyAgreed] = React.useState(false);
+  const [validPhoneNumber, setValidPhoneNumber] = useState(false);
+  const [validEmail, setValidEmail] = useState(false);
+  const [validName, setValidName] = useState(false);
+  const [validDay, setValidDay] = useState(false);
+  const [validMonth, setValidMonth] = useState(false);
+  const [validYear, setValidYear] = useState(false);
+
+  const [termsOfServiceAgreed, setTermsOfServiceAgreed] = useState(false);
+  const [privacyPolicyAgreed, setPrivacyPolicyAgreed] = useState(false);
+
+  const [PhoneNumber, setPhoneNumber] = useState('');
+  const [Email, setEmail] = useState('');
+  const [Name, setName] = useState('');
+  const [Day, setDay] = useState('');
+  const [Month, setMonth] = useState('');
+  const [Year, setYear] = useState('');
 
   /* 
   
@@ -123,8 +131,10 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           <TextInputSmall
             type={InputType.FirstName}
             label="First name"
-            value={Name}
-            onChangeText={setName}
+            valid={validName}
+            setValid={setValidName}
+            text={Name}
+            setText={setName}
             inputMode="text"
             maxLength={256}
             required
@@ -133,8 +143,10 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           <TextInputSmall
             type={InputType.Email}
             label="Email"
-            value={Email}
-            onChangeText={setEmail}
+            valid={validEmail}
+            setValid={setValidEmail}
+            text={Email}
+            setText={setEmail}
             autoComplete="email"
             inputMode="email"
             maxLength={256}
@@ -152,6 +164,12 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           description="You must be 18 years or older to use Sparrow. Your date of birth will not be visible to other users."
         /> */}
         <DateOfBirthInput 
+        day={Day}
+        year={Year}
+        validDay={validDay}
+        validYear={validYear}
+        setValidDay={setValidDay}
+        setValidYear={setValidYear}
         onDayChangeText={setDay}
         onMonthChangeText={setMonth}
         onYearChangeText={setYear}
@@ -194,11 +212,11 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           onPress={navigate}
           // disabled
           disabled={
-            Name === "" || 
-            Email === "" || 
-            Day === "" || 
-            Month === "" || 
-            Year === "" || 
+            !validName || 
+            !validEmail || 
+            !validDay || 
+            !validMonth || 
+            !validYear || 
             !termsOfServiceAgreed || 
             !privacyPolicyAgreed
           }

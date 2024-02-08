@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { View, Text, TextInput, StyleSheet, Image, Pressable, Keyboard, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable, Keyboard, KeyboardAvoidingView } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 
-import { Colors } from '../../styles/ColorStyles';
 import { globalStyles } from '../../styles/GlobalStyles';
 
 import { AuthStackParamList } from '../../components/atoms/types';
@@ -14,13 +13,10 @@ import Button, {
 
 import { verify } from './accountPigeon';
 import { Spacing } from '../../styles/SpacingStyles';
-import TextInputSmall, { InputType } from '../../components/TextInputSmall';
 import TextButton, {
   TextButtonType,
   TextButtonVariant,
 } from '../../components/TextButton';
-import ExampleScreen from '../../components/testing/ExampleScreen';
-import OTPInputV2 from '../../components/testing/OTPInputV2';
 import OTPInput from '../../components/OTPInput';
 
 type VerifyProps = StackScreenProps<AuthStackParamList, 'Verify'>;
@@ -62,10 +58,8 @@ const VerifyScreen = ({ route }: VerifyProps) => {
           Enter the 4-digit code we sent to your number ending in
           {route.params.PhoneNumber.substring(
             route.params.PhoneNumber.length - 4,
-          )}
-          .
+          )}. 
         </Text>
-
         <OTPInput codeLength = {codeLength} code = {code} setCode = {setCode} setCodeReady = {setCodeReady}/>
       </View>
 

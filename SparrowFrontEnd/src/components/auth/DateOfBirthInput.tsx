@@ -15,12 +15,28 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 // ! ||                                     Types                                      ||
 // ! ||--------------------------------------------------------------------------------||
 interface DateOfBirthInputProps {
+  day: string;
+  year: string;
+
+  validDay: boolean;
+  validYear: boolean;
+  setValidDay: React.Dispatch<React.SetStateAction<boolean>>;
+  setValidYear: React.Dispatch<React.SetStateAction<boolean>>;
+
   onDayChangeText: React.Dispatch<React.SetStateAction<string>>;
   onMonthChangeText: React.Dispatch<React.SetStateAction<string>>;
   onYearChangeText: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
+  day,
+  year,
+
+  validDay,
+  validYear,
+  setValidDay,
+  setValidYear,
+
   onDayChangeText,
   onMonthChangeText,
   onYearChangeText,
@@ -32,8 +48,11 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
       <View style={{ flex: 1 }}>
         <TextInputSmall
           type={InputType.Day}
+          valid={validDay}
+          setValid={setValidDay}
           label="Day"
-          onChangeText={onDayChangeText}
+          text={day}
+          setText={onDayChangeText}
           inputMode="numeric"
           maxLength={2}
           clearButton={false}
@@ -50,7 +69,10 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
         <TextInputSmall
           type={InputType.Year}
           label="Year"
-          onChangeText={onYearChangeText}
+          valid={validYear}
+          setValid={setValidYear}
+          text={year}
+          setText={onYearChangeText}
           inputMode="numeric"
           maxLength={4}
           clearButton={false}

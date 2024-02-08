@@ -81,13 +81,11 @@ const ExampleScreen = () => {
         <TextInputSmall
           type={InputType.Email}
           label="Date of birth"
-          value={null}
-          onChangeText={() => {
-            null;
-          }}
           inputMode="numeric"
           maxLength={256}
-          required
+          text = ''
+          setText={() => null}
+          required={true}
         />
       </View>
     </View>
