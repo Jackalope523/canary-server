@@ -25,11 +25,18 @@ TODO implement similar mechanics as in EventCardMedium:
 
 */
 
-interface PhotoPostProps {}
+interface PhotoPostProps {
+  name: string;
+  time: string;
+  title: string;
+  attendees: string[] | string;
+  leftoverAttendeeCount: number;
+  location: string;
+  likeCount: number;
+}
 
-export const PhotoPost: React.FC<PhotoPostProps> = (
-  {
-    /*
+export const PhotoPost: React.FC<PhotoPostProps> = ({
+  /*
 
 variables here
 naming ideas:
@@ -45,8 +52,15 @@ location,
 likesCount
 
 */
-  },
-) => {
+
+  name = 'NULL',
+  time = 'NULL',
+  title = 'NULL',
+  attendees,
+  leftoverAttendeeCount,
+  location = 'NULL',
+  likeCount,
+}) => {
   // 1. switch for size
   //   switch (status) {
   //     case AvatarStatus.Online:
@@ -68,11 +82,11 @@ likesCount
             image={TempAvatarImage}
           />
           <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
-            Anna
+            {name}
           </Text>
         </View>
         <Text style={[globalStyles.textDark, globalStyles.labelTextOneAsTyped]}>
-          14h ago
+          {time} ago
         </Text>
       </View>
       {/* TOP ENDS */}
@@ -80,7 +94,7 @@ likesCount
       <View style={styles.card}>
         <View style={styles.cardInfo}>
           <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
-            Two-on-two basketball at the sunny Venice Beach
+            {title}
           </Text>
         </View>
 
@@ -96,7 +110,7 @@ likesCount
           <View style={styles.info}>
             <PersonIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
             <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
-              Gui, Larry and 4 others
+              {attendees} and {leftoverAttendeeCount} others
             </Text>
           </View>
           <View style={styles.info}>
@@ -106,7 +120,7 @@ likesCount
               fill={Colors.sparrowDarkBrown}
             />
             <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
-              Venice Beach, Venice
+              {location}
             </Text>
           </View>
         </View>
@@ -117,7 +131,7 @@ likesCount
         <View style={styles.info}>
           <LikeIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
           <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
-            24 likes
+            {likeCount}
           </Text>
         </View>
         <MeatballIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
@@ -173,6 +187,7 @@ const styles = StyleSheet.create({
   cardInfo: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
+    rowGap: Spacing.sm,
   },
 
   /*
@@ -208,6 +223,8 @@ const styles = StyleSheet.create({
 
   info: {
     flexDirection: 'row',
+    alignItems: 'center',
+
     // TODO change spacing to xs (?)
     columnGap: Spacing.sm,
   },

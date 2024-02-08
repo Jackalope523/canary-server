@@ -54,7 +54,15 @@ const TestScreen = () => {
       /> */}
 
       <View style={globalStyles.baseContainer}>
-        <PhotoPost />
+        <PhotoPost
+          name="Gale"
+          time="14h"
+          title="Two-on-two basketball at Venice Beach"
+          attendees={['Beatrice, ', 'John, ', 'Sara']}
+          leftoverAttendeeCount={4}
+          location="Venice Beach, Venice, CA"
+          likeCount={3}
+        />
       </View>
 
       {/* <Button
