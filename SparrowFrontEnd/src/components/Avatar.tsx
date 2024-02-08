@@ -1,4 +1,4 @@
-import { View, ViewStyle, Image, StyleSheet, ImageStyle } from 'react-native';
+import { View, Image, ImageStyle } from 'react-native';
 import * as React from 'react';
 import { avatarStyles } from '../styles/AvatarStyles';
 import { globalStyles } from '../styles/GlobalStyles';
@@ -6,10 +6,10 @@ import { globalStyles } from '../styles/GlobalStyles';
 interface AvatarProps {
   status?: AvatarStatus;
   size?: AvatarSize;
+  image?: any;
 
   avatarBorder?: ImageStyle[];
   avatarContainer?: ImageStyle[];
-  avatarImage?: ImageStyle[];
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -17,7 +17,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   size = null,
   avatarBorder = [],
   avatarContainer = [],
-  avatarImage = [],
+  image,
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Status                                     ||
@@ -64,7 +64,8 @@ export const Avatar: React.FC<AvatarProps> = ({
   return (
     <View>
       <Image
-        source={require('../assets/images/temp/image-placeholder.png')}
+        // source={require('../assets/images/temp/image-placeholder.png')}
+        source={image}
         style={[avatarContainer, avatarBorder]}
       />
     </View>
