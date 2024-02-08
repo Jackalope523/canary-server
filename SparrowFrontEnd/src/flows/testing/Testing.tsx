@@ -24,6 +24,7 @@ import Button from '../../components/Button';
 import ImportedIcon from '../../assets/icons/favorite-fill.svg';
 import ButtonGroup from '../../components/ButtonGroup';
 import FlagMedium, { FlagType } from '../../components/FlagMedium';
+import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 
 const TestScreen = () => {
   return (
@@ -42,6 +43,8 @@ const TestScreen = () => {
       {/* --- START TESTING CODE BELOW --- */}
 
       <FlagMedium type={FlagType.StartingSoon} time={'02:23:12'} />
+
+      <Avatar size={AvatarSize.Large} status={AvatarStatus.Offline} />
 
       {/* <Button
         type={ButtonType.Warning}
