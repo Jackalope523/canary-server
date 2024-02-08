@@ -236,7 +236,10 @@ namespace Core.Controls
 
 			// Verify user is allowed to view event
 			Try(await targetEvent.IsVisibleTo(user),
-				new InvalidEventException($"User is unable to join event.\nAccount Status: {user.AccountStatus}"));
+				new InvalidEventException($"User is unable to watch event.\nAccount Status: {user.AccountStatus}"));
+
+			Fail(targetEvent.EndTime.HasValue,
+				new InvalidEventException("User is unable to watch event, event has ended."));
 
 			EventBond? userIntention = null;
 
@@ -364,7 +367,7 @@ namespace Core.Controls
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers,
 					user => !user.State.Equals(EventBond.Watching)));
 
-				guestList.GuestCount = (await targetEvent.Arrived).Count;
+				guestList.GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count;
 				guestList.Watchers = (await targetEvent.Watching).Count;
 			}
 			// Check if user is a guest
@@ -380,19 +383,19 @@ namespace Core.Controls
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers,
 					user => user.State.Equals(EventBond.Arrived) || user.State.Equals(EventBond.Left)));
 
-				guestList.GuestCount = (await targetEvent.Arrived).Count;
-                guestList.Watchers = guestList.Guests.Where(guest => guest.State.Equals(EventBond.Watching)).Count();
+				guestList.GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count;
+				guestList.Watchers = guestList.Guests.Where(guest => guest.State.Equals(EventBond.Watching)).Count();
             }
 			// Check if user can view event
 			else if (await targetEvent.IsVisibleTo(user))
 			{
 				// Retrieve user's friends that will be, are, or were attending
 				var friends = await targetEvent.GetFriendsOf(user);
-
-				guestList.Guests = SelectAsSilhouette(friends, friend => !friend.State.Equals(EventBond.Watching));
+				guestList.Guests = SelectAsSilhouette(friends, _ => true);
 
 				// Add visible information
-				guestList.GuestCount = (await targetEvent.Arrived).Count;
+				guestList.GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count;
+				guestList.Watchers = SelectAsSilhouette(friends, friend => friend.State.Equals(EventBond.Watching)).Count;
 			}
 			// User cannot recieve information about event
 			else

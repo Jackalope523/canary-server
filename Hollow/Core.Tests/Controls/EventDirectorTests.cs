@@ -498,7 +498,7 @@ namespace Core.Tests.Controls
 
 			// Assert
 			Assert.Equal(1, Watchers);
-			Assert.Equal(1, GuestCount);
+			Assert.Equal(2, GuestCount);
 
 			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
 			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
@@ -526,8 +526,8 @@ namespace Core.Tests.Controls
 			Assert.Equal(0, Watchers);
 			Assert.Equal(3, GuestCount);
 
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Left)));
+			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
+			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
 			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Guest)));
 			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Watching)));
 		}
