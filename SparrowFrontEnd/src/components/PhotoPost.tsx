@@ -92,7 +92,7 @@ likesCount
       {/* TOP ENDS */}
       {/* CARD */}
       <View style={styles.card}>
-        <View style={styles.cardInfo}>
+        <View style={[styles.cardInfo, styles.cardInfoTop]}>
           <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
             {title}
           </Text>
@@ -106,7 +106,7 @@ likesCount
           />
         </View>
 
-        <View style={styles.cardInfo}>
+        <View style={[styles.cardInfo, styles.cardInfoBottom]}>
           <View style={styles.info}>
             <PersonIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
             <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
@@ -190,6 +190,16 @@ const styles = StyleSheet.create({
     rowGap: Spacing.sm,
   },
 
+  cardInfoTop: {
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.sparrowDarkBrown,
+  },
+
+  cardInfoBottom: {
+    borderTopWidth: 2,
+    borderTopColor: Colors.sparrowDarkBrown,
+  },
+
   /*
 
     TODO fix the imageContainer and image styles;
@@ -201,19 +211,13 @@ const styles = StyleSheet.create({
     // TODO make height responsive and dynamic
     height: 312,
     width: '100%',
-
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    borderTopColor: Colors.sparrowDarkBrown,
-    borderBottomColor: Colors.sparrowDarkBrown,
   },
 
   image: {
-    flex: 1,
-    alignSelf: 'center',
-    resizeMode: 'cover',
     width: '100%',
     height: '100%',
+    alignSelf: 'center',
+    resizeMode: 'cover',
   },
 
   bottom: {
