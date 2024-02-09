@@ -29,17 +29,9 @@ namespace Repository.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => 
-                ctx.EventLinks.
-                ExecuteDelete());
-
-            sentry.ExecuteWrite(ctx => 
-                ctx.Users.
-                ExecuteDelete());
-
-            sentry.ExecuteWrite(ctx => 
-                ctx.Events.
-                ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.EventLinks.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
         }
 
 

@@ -25,9 +25,7 @@ namespace Repository.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => 
-                ctx.Users.             
-                ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
         }
 
         [Fact]
