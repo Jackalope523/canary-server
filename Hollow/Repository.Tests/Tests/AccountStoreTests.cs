@@ -32,13 +32,14 @@ namespace Repository.Tests
         public async Task CreateUserAsync_SUCCESS()
         {
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-
+       
             await store.CreateUserAsync(
                 subject.PhoneNumber,
                 subject.Email,
                 subject.NormalisedEmail,
                 subject.Name,
                 subject.DateOfBirth,
+                subject.JoinDate,
                 new Character(
                     subject.Extroversion,
                     subject.Athleticisme,
@@ -49,7 +50,7 @@ namespace Repository.Tests
                     subject.Openness
                     ));
 
-            User created = sentry.ExecuteRead(ctx => ctx.Users.First());
+            User created = sentry.ExecuteRead(ctx => ctx.Users.Single());
 
             Assert.NotNull(created);
 
@@ -58,6 +59,7 @@ namespace Repository.Tests
             Assert.Equal(subject.NormalisedEmail, created.NormalisedEmail);
             Assert.Equal(subject.Name, created.Name);
             Assert.Equal(subject.DateOfBirth, created.DateOfBirth);
+            Assert.Equal(subject.JoinDate, created.JoinDate);
             Assert.Equal(User.DefaultReputation, created.Reputation);
             Assert.Equal(User.DefaultIsPhoneConfirmed, created.IsPhoneConfirmed);
             Assert.Equal(User.DefaultIsEmailConfirmed, created.IsEmailConfirmed);

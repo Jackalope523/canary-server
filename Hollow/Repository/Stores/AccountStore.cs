@@ -11,7 +11,7 @@ namespace Repository
         {
         }
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
+        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
         {
             User toCreate = new()
             {
@@ -20,7 +20,7 @@ namespace Repository
                 NormalisedEmail = normalisedEmail,
                 Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTimeOffset.Now,
+                JoinDate = joinDate,
                 Reputation = 50,
                 Extroversion = character.Extraversion,
                 Athleticisme = character.Athleticism,

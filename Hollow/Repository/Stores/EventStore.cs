@@ -257,12 +257,33 @@ namespace Repository
             {
                 switch (Property)
                 {
-                    case "Description":
+                    case nameof(EventShard.Description):
                         e.Description = (string)Value;
                         break;
-                    case "State":
+                    case nameof(EventShard.State):
                         e.State = (EventState)Value;
-                        break;                  
+                        break;
+                    case nameof(EventShard.StartTime):
+                        e.StartTime = (DateTimeOffset)Value;
+                        break;
+                    case nameof(EventShard.Latitude):
+                        e.Location.Y = (double)Value;
+                        break;
+                    case nameof(EventShard.Longitude):
+                        e.Location.X = (double)Value;
+                        break;
+                    case nameof(EventShard.Radius):
+                        e.Radius = (double)Value;
+                        break;
+                    case nameof(EventShard.IsDynamic):
+                        e.IsDynamic = (bool)Value;
+                        break;
+                    case nameof(EventShard.GroupMinimum):
+                        e.GroupMinimum = (int)Value;                    
+                        break;
+                    case nameof(EventShard.GroupMaximum):
+                        e.GroupMaximum = (int)Value;
+                        break;
                     default:
                         throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
                 }

@@ -108,7 +108,7 @@ namespace Repository.Tests
             string newDescription = "The Second of few.";
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add(("Description", newDescription));
+            updates.Add((nameof(EventShard.Description), newDescription));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -124,6 +124,9 @@ namespace Repository.Tests
             Assert.Equal(testEvent.Location.X, updated.Location.X);
             Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.State, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
         }
         [Fact]
         public async Task UpdateEventAsync_Status()
@@ -131,7 +134,111 @@ namespace Repository.Tests
             EventState newState = EventState.Open;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add(("State", newState));
+            updates.Add((nameof(EventShard.State), newState));
+
+            await store.UpdateEventAsync(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
+
+            Assert.NotNull(updated);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.NotEqual(testEvent.State, updated.State);
+            Assert.Equal(newState, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
+        }
+        [Fact]
+        public async Task UpdateEventAsync_StartTime()
+        {
+            DateTimeOffset newTime = DateTimeOffset.UtcNow;
+
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add((nameof(EventShard.StartTime), newTime));
+
+            await store.UpdateEventAsync(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
+
+            Assert.NotNull(updated);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.NotEqual(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(newTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.State, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
+        }
+        [Fact]
+        public async Task UpdateEventAsync_Latitude()
+        {
+            double newLatitude = 34.052;
+
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add((nameof(EventShard.Latitude), newLatitude));
+
+            await store.UpdateEventAsync(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
+
+            Assert.NotNull(updated);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.NotEqual(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(newLatitude, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.State, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
+        }
+        [Fact]
+        public async Task UpdateEventAsync_Longitude()
+        {
+            double newLongitude = -118.243;
+
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add((nameof(EventShard.Longitude), newLongitude));
+
+            await store.UpdateEventAsync(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
+
+            Assert.NotNull(updated);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.NotEqual(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(newLongitude, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.State, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
+        }
+        [Fact]
+        public async Task UpdateEventAsync_Radius()
+        {
+            double newRadius = 27.056;
+
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add((nameof(EventShard.Radius), newRadius));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -147,7 +254,88 @@ namespace Repository.Tests
             Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
             Assert.Equal(testEvent.State, updated.State);
-        }       
+            Assert.NotEqual(testEvent.Radius, updated.Radius);
+            Assert.Equal(newRadius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
+        }
+        [Fact]
+        public async Task UpdateEventAsync_IsDynamic()
+        {
+            bool newType = true;
+
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add((nameof(EventShard.IsDynamic), newType));
+
+            await store.UpdateEventAsync(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
+
+            Assert.NotNull(updated);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.State, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.NotEqual(testEvent.IsDynamic, updated.IsDynamic);
+            Assert.Equal(newType, updated.IsDynamic);
+        }
+        [Fact]
+        public async Task UpdateEventAsync_GroupMinimum()
+        {
+            int newMinimum = 6;
+
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add((nameof(EventShard.GroupMinimum), newMinimum));
+
+            await store.UpdateEventAsync(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
+
+            Assert.NotNull(updated);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.NotEqual(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.Equal(newMinimum, updated.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.State, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
+        }
+        [Fact]
+        public async Task UpdateEventAsync_GroupMaximum()
+        {
+            int newMaximum = 6;
+
+            List<(string, object)> updates = new List<(string, object)>();
+            updates.Add((nameof(EventShard.GroupMaximum), newMaximum));
+
+            await store.UpdateEventAsync(testEvent.Id, updates);
+
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
+
+            Assert.NotNull(updated);
+            Assert.Equal(testUser.Id, updated.HostId);
+            Assert.Equal(testEvent.Name, updated.Name);
+            Assert.Equal(testEvent.Description, updated.Description);
+            Assert.Equal(testEvent.StartTime, updated.StartTime);
+            Assert.Equal(testEvent.Location.Y, updated.Location.Y);
+            Assert.Equal(testEvent.Location.X, updated.Location.X);
+            Assert.Equal(testEvent.GroupMinimum, updated.GroupMinimum);
+            Assert.NotEqual(testEvent.GroupMaximum, updated.GroupMaximum);
+            Assert.Equal(newMaximum, updated.GroupMaximum);
+            Assert.Equal(testEvent.State, updated.State);
+            Assert.Equal(testEvent.Radius, updated.Radius);
+            Assert.Equal(testEvent.IsDynamic, updated.IsDynamic);
+        }
         [Fact]
         public async Task FindCurrentEventForUserAsync_SUCCESS()
         {
