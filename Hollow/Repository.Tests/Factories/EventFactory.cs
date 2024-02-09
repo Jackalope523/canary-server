@@ -1,6 +1,4 @@
 ﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using NetTopologySuite.Geometries;
 
 namespace Repository
 {
@@ -9,7 +7,7 @@ namespace Repository
         private int produced = 0;
         private readonly CoordinateFactory innerFactory = new();
         public Event Create(User host)
-        {
+        {          
             produced++;
             return new Event
             {

@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class EtchingStoreTests : IDisposable
     {
         private static TestSentry sentry = new TestSentry();
@@ -25,10 +26,21 @@ namespace Repository.Tests.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.PostLinks.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Posts.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => 
+                ctx.PostLinks.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Posts.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Users.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Events.
+                ExecuteDelete());
         }
 
         [Fact]

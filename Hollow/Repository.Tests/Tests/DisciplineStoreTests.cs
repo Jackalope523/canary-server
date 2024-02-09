@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class DisciplineStoreTests : IDisposable
     {
         private static TestSentry sentry = new TestSentry();
@@ -33,10 +34,21 @@ namespace Repository.Tests.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.Penalties.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Reports.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => 
+                ctx.Penalties.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Reports.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Users.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Events.
+                ExecuteDelete());
         }
 
         [Fact]

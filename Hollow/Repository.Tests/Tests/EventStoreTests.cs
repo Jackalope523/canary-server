@@ -4,8 +4,9 @@ using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
 using Shared;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class EventStoreTests : IDisposable
     {
         private static TestSentry sentry = new TestSentry();
@@ -28,16 +29,24 @@ namespace Repository.Tests.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.EventLinks.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => 
+                ctx.EventLinks.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Users.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Events.
+                ExecuteDelete());
         }
 
 
         [Fact]
         public async Task CreateEventAsync_SUCCESS()
         {
-            await store.CreateEventAsync(
+            EventShard createdShard = await store.CreateEventAsync(
                 testEvent.HostId,
                 testEvent.Name,
                 testEvent.Description,
@@ -58,7 +67,7 @@ namespace Repository.Tests.Tests
                 testEvent.IsDynamic
                 );
 
-            Event created = sentry.ExecuteRead(ctx => ctx.Events.First());
+            Event created = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == createdShard.Id).Single());
 
             Assert.NotNull(created);
             Assert.Equal(testEvent.HostId, created.HostId);
@@ -111,7 +120,7 @@ namespace Repository.Tests.Tests
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
-            Event updated = await sentry.ExecuteReadAsync(ctx => ctx.Events.FirstAsync());
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
 
             Assert.NotNull(updated);
             Assert.Equal(testUser.Id, updated.HostId);
@@ -134,7 +143,7 @@ namespace Repository.Tests.Tests
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
-            Event updated = await sentry.ExecuteReadAsync(ctx => ctx.Events.FirstAsync());
+            Event updated = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
 
             Assert.NotNull(updated);
             Assert.Equal(testUser.Id, updated.HostId);
@@ -264,15 +273,23 @@ namespace Repository.Tests.Tests
         public async Task EndEventAsync_SUCCESS()
         {
             EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Arrived, DateTimeOffset.MinValue);
+
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentEvent, testEvent.Id)));
+            sentry.ExecuteWrite(ctx => 
+                ctx.Users.
+                Where(u => u.Id == testUser.Id).
+                ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentEvent, testEvent.Id)));
 
             await store.EndEventAsync(testEvent.Id);
 
-            List<EventLink> links = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.ToListAsync());
+            List<EventLink> links = await sentry.ExecuteReadAsync(ctx => 
+                ctx.EventLinks.
+                Where(l => l.Id == link.Id).
+                ToListAsync());
+
             links.Sort((x, y) => DateTimeOffset.Compare(x.Time, y.Time));
 
-            Event ended = await sentry.ExecuteReadAsync(ctx => ctx.Events.SingleAsync());
+            Event ended = sentry.ExecuteRead(ctx => ctx.Events.Where(e => e.Id == testEvent.Id).Single());
 
             Assert.Equal(DateTimeOffset.MinValue, links.First().Time);
             Assert.Equal(testUser.Id, links.First().UserId);

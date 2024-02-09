@@ -3,8 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Xunit.Abstractions;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class ProfileStoreTests : IDisposable
     {
         private static TestSentry sentry = new TestSentry();
@@ -27,8 +28,13 @@ namespace Repository.Tests.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => 
+                ctx.UserLinks.
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Users.
+                ExecuteDelete());
         }
 
         [Fact]

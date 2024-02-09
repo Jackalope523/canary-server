@@ -4,8 +4,9 @@ using Repository.Entities;
 using Shared;
 using Xunit.Abstractions;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class NotificationStoreTests: IDisposable
     {
         private readonly ITestOutputHelper _testOutputHelper;
@@ -30,9 +31,20 @@ namespace Repository.Tests.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.Notes.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Subscriptions.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => 
+                ctx.Notes.
+                Where(n => n.NotifierId == subject1.Id || n.NotifierId == subject2.Id).
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Subscriptions.
+                Where(s => s.UserId == subject1.Id || s.UserId == subject2.Id).
+                ExecuteDelete());
+
+            sentry.ExecuteWrite(ctx => 
+                ctx.Users.
+                Where(u => u.Id == subject1.Id || u.Id == subject2.Id).
+                ExecuteDelete());
         }
 
         [Fact]
@@ -41,7 +53,7 @@ namespace Repository.Tests.Tests
             Entities.Note note = new NoteFactory().Create(subject1, subject2);
             sentry.ExecuteWrite(ctx => ctx.Notes.Add(note));
 
-            Core.Boundaries.Note found = (await store.GetNotesAsync(subject1.Id)).Single();
+            Core.Boundaries.Note found = (await store.GetNotesAsync(subject2.Id)).Single();
 
             Assert.NotNull(found);
             Assert.Equal(subject1.Id, found.NotifierId);

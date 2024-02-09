@@ -4,8 +4,9 @@ using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
 using Shared;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class AccountStoreTests : IDisposable
     {
         private readonly ITestOutputHelper _testOutputHelper;
@@ -24,7 +25,9 @@ namespace Repository.Tests.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => 
+                ctx.Users.             
+                ExecuteDelete());
         }
 
         [Fact]

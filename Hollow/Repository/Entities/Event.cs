@@ -14,7 +14,7 @@ namespace Repository
         internal User Host { get; set; } 
         public Point Location { get; set; } // X = Longitude Y = Latitude
 
-        public EventState State { get; set; }
+        public EventState State { get; set; } = EventState.Open;
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public DateTimeOffset? EndTime { get; set; }

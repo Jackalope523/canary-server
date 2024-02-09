@@ -429,7 +429,10 @@ namespace Repository
             List<Task> tasks = new();
             foreach (ulong guest in guests)
             {
-                tasks.Add(SetUserStateAsync(guest, id, EventBond.Left));
+                tasks.Add(storeSentry.ExecuteWriteAsync(ctx => 
+                    ctx.EventLinks.
+                    Where(l => l.UserId == guest).
+                    ExecuteUpdate(setter => setter.SetProperty(l => l.Type, EventBond.Left))));
             }
             await Task.WhenAll(tasks);
 
