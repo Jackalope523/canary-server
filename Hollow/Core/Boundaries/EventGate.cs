@@ -37,6 +37,7 @@ namespace Core.Boundaries
 			double Radius, bool isDynamic);
 		Task UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
 		Task EndEventAsync(ulong eventId);
+		Task DeleteEventAsync(ulong eventId);
 
 		Task<EventBond?> GetUserStateAsync(ulong userId, ulong eventId);
 		Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState);
