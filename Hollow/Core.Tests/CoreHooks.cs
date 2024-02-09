@@ -27,7 +27,7 @@ namespace Core.Tests
 			generatedUserIds = userIdList;
 		}
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
+        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
         {
 			ContentValidation.TryNormalisePhoneNumber(phoneNumber, out phoneNumber);
             // Ensure no duplicate user exists
@@ -51,7 +51,7 @@ namespace Core.Tests
 				throw new UnexpectedFailureException();
 			}
 
-			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, character);
+			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, joinDate, dateOfBirth, character);
 
 			UserShard createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
 			generatedUserIds.Add(createdUser.Id);

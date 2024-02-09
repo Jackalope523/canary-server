@@ -74,6 +74,9 @@ namespace Core.Controls
             Try(await eventEtched.WasAttendedBy(user),
                 new InvalidUserException("User cannot interact with etching."));
 
+            Fail(user.Etched(etching),
+                new InvalidUserException("User cannot rate their own etching."));
+
             // Check if removing a rating
             if (rating != UserRating.Remove)
             {

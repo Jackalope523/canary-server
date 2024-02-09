@@ -89,7 +89,7 @@ namespace Core.Tests
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
         {
             await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
-				userStub.Name, userStub.DateOfBirth, CharacterVector.Default.ToCharacter());
+				userStub.Name, userStub.DateOfBirth, Psijic.Time, CharacterVector.Default.ToCharacter());
 
 			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
 

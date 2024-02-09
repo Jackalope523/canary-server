@@ -60,7 +60,7 @@ namespace Core.Controls
 
             // Store profile
             await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
-                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter());
+                newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default.ToCharacter());
         }
 
         public async Task EditUserAsync(ulong userId,

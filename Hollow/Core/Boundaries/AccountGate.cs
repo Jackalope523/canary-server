@@ -31,7 +31,7 @@ namespace Core.Boundaries
         Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<UserShard> FindUserByEmailAsync(string normalisedEmail);
 		Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
-			string name, DateTimeOffset dateOfBirth, Character character);
+			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character);
 		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
 		Task DeleteUserAsync(ulong userId);
 
