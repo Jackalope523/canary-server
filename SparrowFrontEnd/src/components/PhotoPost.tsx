@@ -13,6 +13,7 @@ import PersonIcon from '../assets/icons/account-fill.svg';
 import LocationIcon from '../assets/icons/location-fill.svg';
 import LikeIcon from '../assets/icons/favorite-outline.svg';
 import MeatballIcon from '../assets/icons/meatball-outline.svg';
+import { CustomDimensions } from '../styles/CustomDimensionStyles';
 
 /*
 
@@ -208,8 +209,7 @@ const styles = StyleSheet.create({
   */
 
   imageContainer: {
-    // TODO make height responsive and dynamic
-    height: 312,
+    height: CustomDimensions.windowWidth - Spacing.lg * 2,
     width: '100%',
   },
 

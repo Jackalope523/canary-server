@@ -74,15 +74,12 @@ const TestScreen = () => {
         displayIcon={true}
       /> */}
 
-      {/* <HeaderOptions title="Options" />
-      <HeaderEditTitled title="Selected titled" />
-      <HeaderDefaultTitled title="Testing" />
-      <HeaderFlagAttendee
+      {/* <HeaderFlagAttendee
         title="Attendee header"
         previousType={APType.StartingSoon}
         nextType={ANType.Live}
-      />
-      <HeaderFlagHost
+      /> */}
+      {/* <HeaderFlagHost
         title="Host header"
         previousType={HPType.StartingSoon}
         nextType={HNType.Live}
