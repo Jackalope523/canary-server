@@ -165,8 +165,7 @@ namespace Core.Controls
 			}
 			if (IsNotNull(latitude) && IsNotNull(longitude))
 			{
-				edits.Add((nameof(EventShard.Latitude), editedEvent.Location.Latitude));
-				edits.Add((nameof(EventShard.Longitude), editedEvent.Location.Longitude));
+				edits.Add(("Location", (editedEvent.Location.Latitude, editedEvent.Location.Longitude)));
 			}
 			if (IsNotNull(radius))
 			{
@@ -207,6 +206,7 @@ namespace Core.Controls
 
 			// Try to start event
 			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.Open) });
+			await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Arrived);
 
 			await targetEvent.Started();
 		}

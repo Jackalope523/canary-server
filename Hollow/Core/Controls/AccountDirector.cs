@@ -179,25 +179,25 @@ namespace Core.Controls
                 else if (currentEvent.IsHostedBy(user) && currentEvent.IsDynamic)
                 {
                     // Update the position of the event
-                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { (nameof(EventShard.Latitude), (await user.LastKnownLocation).Latitude),
-                        (nameof(EventShard.Longitude), (await user.LastKnownLocation).Longitude) });
+                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
                 }
             }
             // Check if user is on their way to an event
             else if (!await userIsAtEvent &&
                 nextEvent != Event.None)
             {
-                // Check if user is close enough to be a guest
-                if (await nextEvent.IsInRange(user))
+                // Check if user is host and can start event
+                if (nextEvent.IsWaiting &&
+                    nextEvent.IsHostedBy(user))
                 {
-                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived);
+                    await Terminal.EventDirector.StartEventAsync(user.Id, nextEvent.Id);
+                }
+                // Check if user is close enough to be arrived
+                else if (nextEvent.IsOngoing &&
+                    await nextEvent.IsInRange(user))
+                {
+                    await Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived);
 
-                    // Check if user is host and can start event
-                    if (nextEvent.IsWaiting &&
-                        nextEvent.IsHostedBy(user))
-                    {
-                        await Terminal.EventDirector.StartEventAsync(user.Id, nextEvent.Id);
-                    }
                 }
             }
         }
