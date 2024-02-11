@@ -21,6 +21,7 @@ namespace Repository
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
         public ulong? CurrentEvent { get; set; } = DefaultCurrentEvent;
+
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
         public int Athleticisme { get; init; } = DefaultAthleticisme;

@@ -96,7 +96,7 @@ namespace Repository
             return (await userReportsToReturn, await eventReportsToReturn);
         }
 
-        public async Task ReportEventAsync(ulong userId, ulong eventId, ulong HostId, EventReportType reportType, string reportDetails)
+        public async Task ReportEventAsync(ulong userId, ulong eventId, ulong HostId, DateTimeOffset timeOfReport, EventReportType reportType, string reportDetails)
         {
             EventReport toCreate = new()
             {
@@ -104,14 +104,14 @@ namespace Repository
                 OtherId = HostId,
                 EventId = eventId,
                 Type = reportType,
-                FilingDate = DateTime.UtcNow,
+                FilingDate = timeOfReport,
                 Notes = reportDetails
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(toCreate));
         }
 
-        public async Task ReportUserAsync(ulong selfId, ulong eventId, ulong targetId, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(ulong selfId, ulong eventId, ulong targetId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
         {
             UserReport toCreate = new()
             {
@@ -119,7 +119,7 @@ namespace Repository
                 OtherId = targetId,
                 EventId = eventId,
                 Type = reportType,
-                FilingDate = DateTime.UtcNow,
+                FilingDate = timeOfReport,
                 Notes = reportDetails
             };
 
@@ -144,18 +144,6 @@ namespace Repository
             Where(p => p.PenalizedId == userId).
             Select(p => new Penalty(p.Type, p.Time)).
             ToListAsync());
-        }
-
-        public async Task ReportUserAsync(ulong userId, ulong eventId, ulong targetUserId, DateTimeOffset timeOfReport,
-            UserReportType reportType, string reportDetails)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task ReportEventAsync(ulong userId, ulong eventId, ulong hostId, DateTimeOffset timeOfReport,
-            EventReportType reportType, string reportDetails)
-        {
-            throw new NotImplementedException();
         }
     }
 }

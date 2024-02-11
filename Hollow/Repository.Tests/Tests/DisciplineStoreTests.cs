@@ -72,8 +72,9 @@ namespace Repository.Tests
         {
             string notes = "Test";
             Shared.UserReportType type = Shared.UserReportType.Rude;
+            DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            await store.ReportUserAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
+            await store.ReportUserAsync(subject1.Id, testEvent.Id, subject2.Id, time, type, notes);
 
             UserReport created = await sentry.ExecuteReadAsync(ctx => ctx.UserReports.FirstAsync());
 
@@ -81,6 +82,7 @@ namespace Repository.Tests
             Assert.Equal(subject1.Id, created.SelfId);
             Assert.Equal(subject2.Id, created.OtherId);
             Assert.Equal(testEvent.Id, created.EventId);
+            Assert.Equal(time, created.FilingDate);
             Assert.Equal(type, created.Type);
             Assert.Equal(notes, created.Notes);
         }
@@ -89,8 +91,9 @@ namespace Repository.Tests
         {
             string notes = "Test";
             Shared.EventReportType type = Shared.EventReportType.Inappropriate;
+            DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            await store.ReportEventAsync(subject1.Id, testEvent.Id, subject2.Id, type, notes);
+            await store.ReportEventAsync(subject1.Id, testEvent.Id, subject2.Id, time, type, notes);
 
             EventReport created = await sentry.ExecuteReadAsync(ctx => ctx.EventReports.FirstAsync());
 
@@ -98,6 +101,7 @@ namespace Repository.Tests
             Assert.Equal(subject1.Id, created.SelfId);
             Assert.Equal(subject2.Id, created.OtherId);
             Assert.Equal(testEvent.Id, created.EventId);
+            Assert.Equal(time, created.FilingDate);
             Assert.Equal(type, created.Type);
             Assert.Equal(notes, created.Notes);
         }

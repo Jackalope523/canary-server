@@ -131,7 +131,7 @@ namespace Repository.Tests
         [Fact]
         public async Task UpdateEventAsync_Status()
         {
-            EventState newState = EventState.Open;
+            EventState newState = EventState.Ended;
 
             List<(string, object)> updates = new List<(string, object)>();
             updates.Add((nameof(EventShard.State), newState));
@@ -464,7 +464,7 @@ namespace Repository.Tests
 
             List<EventLink> links = await sentry.ExecuteReadAsync(ctx => 
                 ctx.EventLinks.
-                Where(l => l.Id == link.Id).
+                Where(l => l.UserId == testUser.Id).
                 ToListAsync());
 
             links.Sort((x, y) => DateTimeOffset.Compare(x.Time, y.Time));
@@ -540,6 +540,15 @@ namespace Repository.Tests
             Assert.Equal(testUser.Id, User.Id);
             Assert.Equal(testUser.Name, User.Name);
             Assert.Equal(EventBond.Watching, State);
+        }
+        [Fact]
+        public async Task DeleteEventAsync_SUCCESS()
+        {
+            await store.DeleteEventAsync(testEvent.Id);
+
+            int count = sentry.ExecuteRead(ctx => ctx.Events.Count());
+
+            Assert.Equal(0, count);
         }
     }
 }

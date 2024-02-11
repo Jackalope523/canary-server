@@ -15,10 +15,10 @@ namespace Repository
         {
             Event toCreate = new()
             {
-                HostId = hostId,
                 Name = name,
                 Description = description,
                 StartTime = startTime,
+                HostId = hostId,
                 Location = new CoordinateFactory().Create(longitude, latitude),
                 GroupMinimum = groupMinimum,
                 GroupMaximum = groupMaximum,
@@ -35,6 +35,17 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Events.Add(toCreate));
+
+            EventLink hostLink = new() 
+            { 
+                UserId = hostId,
+                EventId = toCreate.Id,
+                Type = EventBond.Guest,      
+                Time = DateTimeOffset.UtcNow
+            };
+            
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Add(hostLink));
+
             UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync());
 
 
@@ -117,7 +128,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
-            Where(l => l.UserId == id && l.Type == EventBond.Guest).
+            Where(l => l.UserId == id && (l.Type == EventBond.Guest)).
             Join(
                 ctx.Events,
                 l => l.EventId,
@@ -380,26 +391,30 @@ namespace Repository
             return states.Last().Type;
         }
         public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState)
-        {
-            Discussion currentDiscussion = storeSentry.BeginDiscussion();
-
+        {          
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.EventLinks.
                 Add(new EventLink { UserId = userId, EventId = eventId, Type = userState }
                 ));
 
-            User u;         
-            if (userState == EventBond.Left || userState == EventBond.Kicked)
+            if (userState == EventBond.Left || userState == EventBond.Kicked || userState == EventBond.Arrived)
             {
-                u = new() { Id = userId, CurrentEvent = null };         
-            }
-            else
-            {
-                u = new() { Id = userId, CurrentEvent = eventId };
-            }
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true, currentDiscussion);
-            await storeSentry.EndDiscussionAsync(currentDiscussion);
+                Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
+                User u;
+                if (userState == EventBond.Left || userState == EventBond.Kicked)
+                {
+                    u = new() { Id = userId, CurrentEvent = null };
+                }
+                else
+                {
+                    u = new() { Id = userId, CurrentEvent = eventId };
+                }
+
+                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true, currentDiscussion);
+                await storeSentry.EndDiscussionAsync(currentDiscussion);
+            } 
         }
         public async Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId)
         {
@@ -439,28 +454,43 @@ namespace Repository
         }
         public async Task EndEventAsync(ulong id)
         {
-            Discussion currentDiscussion = storeSentry.BeginDiscussion();
-
             List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.Users.
-            Where(u => u.CurrentEvent == id).
-            Select(u => u.Id).
-            ToListAsync());
+                ctx.Users.
+                Where(u => u.CurrentEvent == id).
+                Select(u => u.Id).
+                ToListAsync());
 
             List<Task> tasks = new();
             foreach (ulong guest in guests)
             {
-                tasks.Add(storeSentry.ExecuteWriteAsync(ctx => 
-                    ctx.EventLinks.
-                    Where(l => l.UserId == guest).
-                    ExecuteUpdate(setter => setter.SetProperty(l => l.Type, EventBond.Left))));
+                tasks.Add(SetUserStateAsync(guest, id, EventBond.Left));
             }
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks);       
+
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
             Event e = new() { Id = id, EndTime = DateTimeOffset.UtcNow };
             storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true, currentDiscussion);
+
             await storeSentry.EndDiscussionAsync(currentDiscussion);         
+        }
+        public async Task DeleteEventAsync(ulong eventId)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => 
+                ctx.Events.
+                Where(e => e.Id == eventId).
+                ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.EventLinks.
+                Where(l => l.EventId == eventId).
+                ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.EventReports.
+                Where(l => l.EventId == eventId).
+                ExecuteDelete());
         }
     }
 }
