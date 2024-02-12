@@ -197,6 +197,7 @@ namespace Core.Tests
 
 			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
 			await Terminal.EventDatabase.UpdateEventAsync(eventStub.Id, new() { (nameof(EventShard.State), EventState.Open) });
+			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived);
 
 			foreach (var guest in guests)
 			{

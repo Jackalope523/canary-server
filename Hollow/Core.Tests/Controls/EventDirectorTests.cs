@@ -300,7 +300,11 @@ namespace Core.Tests.Controls
 
 			// Act
 			await director.StartEventAsync(user.Id, @event.Id);
-			// If no exception is thrown, the test is successful
+
+			// Assert
+			Event startedEvent = new(await environment.Terminal.EventDatabase.FindEventAsync(@event.Id));
+			Assert.Equal(@event, startedEvent);
+			Assert.Equal(EventState.Open, startedEvent.State);
 		}
 
 		[Fact]
@@ -340,8 +344,10 @@ namespace Core.Tests.Controls
 			var @event = await environment.GeneratePastEventAsync(host);
 
 			// Act
-			await director.WatchEventAsync(user.Id, @event.Id);
-			// If no exception is thrown, the test is successful
+			var watchSync = director.WatchEventAsync(user.Id, @event.Id);
+
+			// Assert
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await watchSync);
 		}
 
 		[Fact]
