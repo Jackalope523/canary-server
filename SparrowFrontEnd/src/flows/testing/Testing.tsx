@@ -57,7 +57,7 @@ const TestScreen = () => {
         <PhotoPost
           name="Gale"
           time="14h"
-          title="Two-on-two basketball at Venice Beach"
+          title="Downhill MTB competition at Grey Feather Mountain"
           attendees={['Beatrice, ', 'John, ', 'Sara']}
           leftoverAttendeeCount={4}
           location="Venice Beach, Venice, CA"

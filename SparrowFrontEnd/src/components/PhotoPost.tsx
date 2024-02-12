@@ -13,6 +13,8 @@ import Avatar from './Avatar';
 import { Spacing } from '../styles/SpacingStyles';
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
 import { SAMPLEEVENTDATA } from '../data/sampleEventData';
+import { MEDIA } from '../data/sampleMediaData';
+import LocationIndicator from './LocationIndicator';
 
 // TEMP. avatar image
 import TempAvatarImage from '../assets/images/temp/image-placeholder.png';
@@ -44,26 +46,11 @@ interface PhotoPostProps {
   leftoverAttendeeCount: number;
   location: string;
   likeCount: number;
+
+  index?: number;
 }
 
 export const PhotoPost: React.FC<PhotoPostProps> = ({
-  /*
-
-variables here
-naming ideas:
-
-size,
-
-name,
-time,
-title,
-image, images or media,
-attendees,
-location,
-likesCount
-
-*/
-
   name = 'NULL',
   time = 'NULL',
   title = 'NULL',
@@ -72,31 +59,31 @@ likesCount
   location = 'NULL',
   likeCount,
 }) => {
-  // 1. switch for size
-  //   switch (status) {
-  //     case AvatarStatus.Online:
-  //       avatarBorder = [avatarStyles.avatarOnline];
-  //       break;
+  // Location indicator
+  const [index, setIndex] = React.useState(0);
 
-  //     case AvatarStatus.Offline:
-  //       avatarBorder = [avatarStyles.avatarOffline];
-  //       break;
-  //   }
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 50,
+  };
 
-  const MEDIA = [
-    {
-      id: '1',
-      uri: require('../assets/images/temp/event-img-1.jpg'),
-    },
-    {
-      id: '2',
-      uri: require('../assets/images/temp/event-img-1.2.jpg'),
-    },
-    {
-      id: '3',
-      uri: require('../assets/images/temp/event-img-1.3.jpg'),
-    },
-  ];
+  // TODO FIX: getting a typescript error when browsing through images - cannot read property "index" of undefined
+
+  const onViewableItemsChanged = ({
+    viewableItems,
+    changed,
+  }: {
+    viewableItems: any[];
+    changed: any[];
+  }) => {
+    console.log('Visible items are', viewableItems);
+    console.log('Changed in this iteration', changed);
+
+    setIndex(viewableItems[0].index);
+  };
+
+  const viewabilityConfigCallbackPairs = React.useRef([
+    { viewabilityConfig, onViewableItemsChanged },
+  ]);
 
   return (
     <View style={styles.container}>
@@ -126,18 +113,28 @@ likesCount
 
         {/* MEDIA CONTAINER */}
 
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          overScrollMode="never"
-          data={MEDIA}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.imageContainer}>
-              <Image source={item.uri} style={styles.image} />
-            </View>
-          )}
-        />
+        <View>
+          <FlatList
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            overScrollMode="never"
+            data={MEDIA}
+            pagingEnabled={true}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.imageContainer}>
+                <Image source={item.uri} style={styles.image} />
+              </View>
+            )}
+            // onScroll={handleScroll}
+
+            viewabilityConfigCallbackPairs={
+              viewabilityConfigCallbackPairs.current
+            }
+            viewabilityConfig={viewabilityConfig}
+          />
+          <LocationIndicator data={MEDIA} selected={index} />
+        </View>
 
         {/* <View style={styles.imageContainer}>
           <Image
