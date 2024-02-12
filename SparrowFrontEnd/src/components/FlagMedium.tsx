@@ -77,8 +77,10 @@ const FlagMedium: React.FC<FlagMediumProps> = ({
   }
 
   return (
-    <View style={[styles.flag, flagStyle]}>
-      <Text style={flagTextStyle}>{flagText}</Text>
+    <View>
+      <View style={[styles.flag, flagStyle]}>
+        <Text style={flagTextStyle}>{flagText}</Text>
+      </View>
     </View>
   );
 };
