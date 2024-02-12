@@ -27,25 +27,26 @@ import LikeOutlineIcon from '../assets/icons/favorite-outline.svg';
 import LikeFillIcon from '../assets/icons/favorite-fill.svg';
 import MeatballIcon from '../assets/icons/meatball-outline.svg';
 import { runOnJS } from 'react-native-reanimated';
+import FlagMedium, { FlagType } from './FlagMedium';
 
 /*
 
-TODO implement similar mechanics as in EventCardMedium:
-1. when the text is too long add ... at the end
+TODO implement mechanics:
 
-2. Implement sharing all kinds of media:
-- image gallery (multiple images)
-- video/s
-
-3. Add double press to like functionality
-
-4. Add pinch to zoom functinality
+1. when the text is too long add ... at the end (similar to event card medium)
+2. DONE: Multiple image support
+3. Single image support
+4. DONE: Add double press to like functionality
+5. Add pinch to zoom functinality
+6. Disable location indicator when there is only one image
+7. If event is live, use live flag, if it's passed use the time ago text
+8. Add an animation for the like button icon
 
 */
 
 interface PhotoPostProps {
   name: string;
-  time: string;
+  time: string | FlagType.Live;
   title: string;
   attendees: string[] | string;
   leftoverAttendeeCount: number;
@@ -73,8 +74,6 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
     itemVisiblePercentThreshold: 50,
   };
 
-  // TODO FIX: getting a typescript error when browsing through images - cannot read property "index" of undefined
-
   const onViewableItemsChanged = ({
     viewableItems,
     changed,
@@ -85,6 +84,7 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
     console.log('Visible items are', viewableItems);
     console.log('Changed in this iteration', changed);
 
+    // TODO FIX: getting a typescript error when browsing through images - cannot read property "index" of undefined
     setIndex(viewableItems[0].index);
   };
 
@@ -97,11 +97,11 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   /*
  
-  If like is true:
+  TODO if like === true:
   1. change the icon to filled heart
   2. change the color of the icon to orange400
   3. set the likeCount to +1
-  4. TODO LATER: add an animation to the media container
+  4. add an animation to the media container
   
   */
 
@@ -129,9 +129,19 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
             {name}
           </Text>
         </View>
+        {time === FlagType.Live ? (
+          <FlagMedium type={FlagType.Live} />
+        ) : (
+          <Text
+            style={[globalStyles.textDark, globalStyles.labelTextOneAsTyped]}>
+            {time} ago
+          </Text>
+        )}
+
+        {/* <FlagMedium type={FlagType.Live} />
         <Text style={[globalStyles.textDark, globalStyles.labelTextOneAsTyped]}>
           {time} ago
-        </Text>
+        </Text> */}
       </View>
       {/* TOP ENDS */}
       {/* CARD */}

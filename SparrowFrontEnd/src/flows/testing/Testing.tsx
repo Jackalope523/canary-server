@@ -28,6 +28,7 @@ import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 
 import TempAvatarImage from '../../assets/images/temp/image-placeholder.png';
 import PhotoPost from '../../components/PhotoPost';
+import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
 
 const TestScreen = () => {
   return (
@@ -44,6 +45,12 @@ const TestScreen = () => {
       </View>
 
       {/* --- START TESTING CODE BELOW --- */}
+
+      <DropdownSmall
+        options={['one', 'two', 'three']}
+        icon={Icon.Meatball}
+        align={Align.Right}
+      />
 
       <FlagMedium type={FlagType.StartingSoon} time={'02:23:12'} />
 
