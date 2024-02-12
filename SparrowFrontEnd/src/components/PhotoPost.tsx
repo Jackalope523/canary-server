@@ -1,9 +1,18 @@
-import { View, Image, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import * as React from 'react';
 import { globalStyles } from '../styles/GlobalStyles';
 import { Colors } from '../styles/ColorStyles';
 import Avatar from './Avatar';
 import { Spacing } from '../styles/SpacingStyles';
+import { CustomDimensions } from '../styles/CustomDimensionStyles';
+import { SAMPLEEVENTDATA } from '../data/sampleEventData';
 
 // TEMP. avatar image
 import TempAvatarImage from '../assets/images/temp/image-placeholder.png';
@@ -13,7 +22,6 @@ import PersonIcon from '../assets/icons/account-fill.svg';
 import LocationIcon from '../assets/icons/location-fill.svg';
 import LikeIcon from '../assets/icons/favorite-outline.svg';
 import MeatballIcon from '../assets/icons/meatball-outline.svg';
-import { CustomDimensions } from '../styles/CustomDimensionStyles';
 
 /*
 
@@ -23,6 +31,8 @@ TODO implement similar mechanics as in EventCardMedium:
 2. Implement sharing all kinds of media:
 - image gallery (multiple images)
 - video/s
+
+3. Add double press to like functionality
 
 */
 
@@ -73,6 +83,21 @@ likesCount
   //       break;
   //   }
 
+  const MEDIA = [
+    {
+      id: '1',
+      uri: require('../assets/images/temp/event-img-1.jpg'),
+    },
+    {
+      id: '2',
+      uri: require('../assets/images/temp/event-img-1.2.jpg'),
+    },
+    {
+      id: '3',
+      uri: require('../assets/images/temp/event-img-1.3.jpg'),
+    },
+  ];
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -99,13 +124,29 @@ likesCount
           </Text>
         </View>
 
-        <View style={styles.imageContainer}>
+        {/* MEDIA CONTAINER */}
+
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          overScrollMode="never"
+          data={MEDIA}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.imageContainer}>
+              <Image source={item.uri} style={styles.image} />
+            </View>
+          )}
+        />
+
+        {/* <View style={styles.imageContainer}>
           <Image
             source={require('../assets/images/temp/image-placeholder.png')}
             style={styles.image}
             // style={globalStyles.illustrationFull}
           />
-        </View>
+        </View> */}
+        {/* MEDIA CONTAINER ENDS */}
 
         <View style={[styles.cardInfo, styles.cardInfoBottom]}>
           <View style={styles.info}>
@@ -210,14 +251,15 @@ const styles = StyleSheet.create({
 
   imageContainer: {
     height: CustomDimensions.windowWidth - Spacing.lg * 2,
-    width: '100%',
+    width: CustomDimensions.windowWidth - Spacing.lg * 2,
   },
 
   image: {
-    width: '100%',
-    height: '100%',
     alignSelf: 'center',
     resizeMode: 'cover',
+    // Fixes blank bottom pixel spacing
+    width: '102%',
+    height: '102%',
   },
 
   bottom: {
