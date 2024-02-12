@@ -15,6 +15,7 @@ import { CustomDimensions } from '../styles/CustomDimensionStyles';
 import { SAMPLEEVENTDATA } from '../data/sampleEventData';
 import { MEDIA } from '../data/sampleMediaData';
 import LocationIndicator from './LocationIndicator';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 // TEMP. avatar image
 import TempAvatarImage from '../assets/images/temp/image-placeholder.png';
@@ -22,8 +23,10 @@ import TempAvatarImage from '../assets/images/temp/image-placeholder.png';
 // Icons
 import PersonIcon from '../assets/icons/account-fill.svg';
 import LocationIcon from '../assets/icons/location-fill.svg';
-import LikeIcon from '../assets/icons/favorite-outline.svg';
+import LikeOutlineIcon from '../assets/icons/favorite-outline.svg';
+import LikeFillIcon from '../assets/icons/favorite-fill.svg';
 import MeatballIcon from '../assets/icons/meatball-outline.svg';
+import { runOnJS } from 'react-native-reanimated';
 
 /*
 
@@ -35,6 +38,8 @@ TODO implement similar mechanics as in EventCardMedium:
 - video/s
 
 3. Add double press to like functionality
+
+4. Add pinch to zoom functinality
 
 */
 
@@ -59,7 +64,9 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
   location = 'NULL',
   likeCount,
 }) => {
-  // Location indicator
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                               Location indicator                               ||
+  // ! ||--------------------------------------------------------------------------------||
   const [index, setIndex] = React.useState(0);
 
   const viewabilityConfig = {
@@ -84,6 +91,30 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
   const viewabilityConfigCallbackPairs = React.useRef([
     { viewabilityConfig, onViewableItemsChanged },
   ]);
+
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                               Like functionality                               ||
+  // ! ||--------------------------------------------------------------------------------||
+  /*
+ 
+  If like is true:
+  1. change the icon to filled heart
+  2. change the color of the icon to orange400
+  3. set the likeCount to +1
+  4. TODO LATER: add an animation to the media container
+  
+  */
+
+  const [like, setLike] = React.useState(false);
+
+  const doubleTap = Gesture.Tap()
+    .numberOfTaps(2)
+    .onEnd((_, success) => {
+      if (success) {
+        console.log('Double tap');
+        runOnJS(setLike)(!like);
+      }
+    });
 
   return (
     <View style={styles.container}>
@@ -122,9 +153,11 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
             pagingEnabled={true}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View style={styles.imageContainer}>
-                <Image source={item.uri} style={styles.image} />
-              </View>
+              <GestureDetector gesture={doubleTap}>
+                <View style={styles.imageContainer}>
+                  <Image source={item.uri} style={styles.image} />
+                </View>
+              </GestureDetector>
             )}
             // onScroll={handleScroll}
 
@@ -168,9 +201,21 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
       {/* BOTTOM */}
       <View style={styles.bottom}>
         <View style={styles.info}>
-          <LikeIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
+          {like ? (
+            <LikeFillIcon
+              height={24}
+              width={24}
+              fill={Colors.sparrowDarkBrown}
+            />
+          ) : (
+            <LikeOutlineIcon
+              height={24}
+              width={24}
+              fill={Colors.sparrowDarkBrown}
+            />
+          )}
           <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
-            {likeCount}
+            {like ? likeCount + 1 : likeCount}
           </Text>
         </View>
         <MeatballIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
