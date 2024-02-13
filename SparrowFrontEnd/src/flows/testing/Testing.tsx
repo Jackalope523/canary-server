@@ -25,7 +25,7 @@ import ButtonGroup from '../../components/ButtonGroup';
 import FlagMedium, { FlagType } from '../../components/FlagMedium';
 import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 
-import PhotoPost from '../../components/PhotoPost';
+import Post from '../../components/Post';
 import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
 import dropdownOptionsPost from '../../components/DropdownOptionsPost';
 import avatarimg from '../../assets/images/temp/host-img-1.jpg';
@@ -55,7 +55,7 @@ const TestScreen = () => {
       /> */}
 
       <View style={globalStyles.baseContainer}>
-        <PhotoPost
+        <Post
           name="Gale"
           time="14h"
           title="Downhill MTB competition at Grey Feather Mountain"

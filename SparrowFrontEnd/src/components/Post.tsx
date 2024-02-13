@@ -23,13 +23,9 @@ import LikeFillIcon from '../assets/icons/favorite-fill.svg';
 TODO implement mechanics:
 
 1. when the text is too long add ... at the end (similar to event card medium)
-2. DONE: Multiple image support
-3. Single image support
-4. DONE: Add double press to like functionality
-5. Add pinch to zoom functinality
-6. Disable location indicator when there is only one image
-7. If event is live, use live flag, if it's passed use the time ago text
-8. Add an animation for the like button icon
+2. Add pinch to zoom functinality
+3. Add an animation for the like button icon
+4. Make image unswipable if there's only one image
 
 */
 

@@ -11,6 +11,10 @@ TODO test in various scenarios and customize as necessary
 For ex. it's possible that when the kebab icon is in use,
 we would need different layout that places the dropdown next to the kebab icon
 
+TODO when pressed outside the dropdown, it should close
+- ideally, don't use the TouchableWithoutFeedback component as it's heavily
+discouraged in the docs and could cause issues in the future
+
 */
 
 // Icons

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import PhotoPost from '../../components/PhotoPost';
+import Post from '../../components/Post';
 import { Spacing } from '../../styles/SpacingStyles';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
 import { FlagType } from '../../components/FlagMedium';
@@ -24,7 +24,7 @@ const FeedScreen = () => {
         keyExtractor={(item) => item.id}
         data={SAMPLE_PAST_EVENT_DATA}
         renderItem={({ item }) => (
-          <PhotoPost
+          <Post
             name={item.host}
             avatar={item.avatar}
             time={item.status === 'live' ? FlagType.Live : item.time}
