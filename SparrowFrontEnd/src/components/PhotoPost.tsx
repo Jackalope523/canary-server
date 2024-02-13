@@ -170,8 +170,6 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
                 </View>
               </GestureDetector>
             )}
-            // onScroll={handleScroll}
-
             viewabilityConfigCallbackPairs={
               viewabilityConfigCallbackPairs.current
             }
@@ -232,7 +230,7 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
         <DropdownSmall
           icon={Icon.Meatball}
           options={dropdownOptionsPost}
-          align={Align.Left}
+          align={Align.BottomLeft}
         />
       </View>
       {/* BOTTOM ENDS */}

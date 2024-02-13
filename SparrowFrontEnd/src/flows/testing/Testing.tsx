@@ -47,12 +47,6 @@ const TestScreen = () => {
 
       {/* --- START TESTING CODE BELOW --- */}
 
-      <DropdownSmall
-        options={dropdownOptionsPost}
-        icon={Icon.Meatball}
-        align={Align.Right}
-      />
-
       <FlagMedium type={FlagType.StartingSoon} time={'02:23:12'} />
 
       {/* <Avatar

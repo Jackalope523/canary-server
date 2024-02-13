@@ -8,17 +8,17 @@ Type: Feed post
 const dropdownOptionsPost = [
   {
     id: 1,
-    text: 'Option 1',
+    text: 'View event',
     onPress: () => console.log('Option 1 pressed'),
   },
   {
     id: 2,
-    text: 'Option 2',
+    text: 'View user',
     onPress: () => console.log('Option 2 pressed'),
   },
   {
     id: 3,
-    text: 'Option 3',
+    text: 'Report',
     onPress: () => console.log('Option 3 pressed'),
   },
 ];

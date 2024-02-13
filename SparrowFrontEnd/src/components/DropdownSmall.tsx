@@ -23,6 +23,7 @@ interface DropdownSmallProps {
   align: Align;
 
   containerStyle?: ViewStyle[];
+  buttonStyle?: ViewStyle[];
   dropdownContainerStyle?: ViewStyle[];
 }
 
@@ -31,33 +32,37 @@ const DropdownSmall = ({
   icon,
   align,
   containerStyle,
+  buttonStyle,
   dropdownContainerStyle,
 }: DropdownSmallProps) => {
   const [selected, setSelected] = React.useState(false);
 
   // Alignment
   switch (align) {
-    case Align.Left: {
-      containerStyle = [styles.containerAlignLeft, styles.container];
+    case Align.BottomLeft: {
+      containerStyle = [styles.containerAlignBottomLeft, styles.container];
       dropdownContainerStyle = [
-        styles.dropdownContainerAlignLeft,
+        styles.dropdownContainerAlignBottomLeft,
         styles.dropdownContainer,
       ];
+      buttonStyle = [styles.buttonAlignBottomLeft];
       break;
     }
 
-    case Align.Right: {
-      containerStyle = [styles.containerAlignRight, styles.container];
+    case Align.BottomRight: {
+      containerStyle = [styles.containerAlignBottomRight, styles.container];
       dropdownContainerStyle = [
-        styles.dropdownContainerAlignRight,
+        styles.dropdownContainerAlignBottomRight,
         styles.dropdownContainer,
       ];
+      buttonStyle = [styles.buttonAlignBottomRight];
+      break;
     }
   }
 
   return (
     <View style={containerStyle}>
-      <Pressable onPress={() => setSelected(!selected)}>
+      <Pressable onPress={() => setSelected(!selected)} style={buttonStyle}>
         {icon === Icon.Meatball ? (
           <MeatballIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
         ) : (
@@ -71,11 +76,7 @@ const DropdownSmall = ({
               <Pressable key={item.id} onPress={item.onPress}>
                 <Text
                   key={index}
-                  style={[
-                    globalStyles.buttonTextOne,
-                    globalStyles.textLight,
-                    styles.text,
-                  ]}>
+                  style={[globalStyles.buttonTextOne, globalStyles.textLight]}>
                   {item.text}
                 </Text>
               </Pressable>
@@ -96,13 +97,15 @@ export enum Icon {
 }
 
 export enum Align {
-  Left,
-  Right,
+  BottomLeft,
+  BottomRight,
 }
 
 const styles = StyleSheet.create({
   container: {
     zIndex: 10,
+    flexDirection: 'row',
+    columnGap: Spacing.sm,
   },
 
   dropdownContainer: {
@@ -113,24 +116,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     zIndex: 10,
     position: 'absolute',
-    marginTop: Spacing.xs,
+    alignItems: 'center',
   },
 
-  containerAlignRight: {
-    alignItems: 'flex-start',
-  },
+  containerAlignBottomRight: {},
 
-  containerAlignLeft: {
-    alignItems: 'flex-end',
-  },
-
-  dropdownContainerAlignRight: {
+  buttonAlignBottomRight: {
+    position: 'absolute',
     left: 0,
   },
 
-  dropdownContainerAlignLeft: {
+  dropdownContainerAlignBottomRight: {},
+
+  containerAlignBottomLeft: {},
+
+  buttonAlignBottomLeft: {
+    position: 'absolute',
     right: 0,
   },
 
-  text: { textTransform: 'capitalize' },
+  dropdownContainerAlignBottomLeft: {
+    right: 0,
+    bottom: Spacing.xl,
+  },
 });
