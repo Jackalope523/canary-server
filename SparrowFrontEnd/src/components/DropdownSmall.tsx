@@ -18,7 +18,7 @@ import MeatballIcon from '../assets/icons/meatball-outline.svg';
 import KebabIcon from '../assets/icons/kebab-fill.svg';
 
 interface DropdownSmallProps {
-  options: string[];
+  options: { id: string; text: string; onPress: () => void }[];
   icon: Icon;
   align: Align;
 
@@ -35,6 +35,7 @@ const DropdownSmall = ({
 }: DropdownSmallProps) => {
   const [selected, setSelected] = React.useState(false);
 
+  // Alignment
   switch (align) {
     case Align.Left: {
       containerStyle = [styles.containerAlignLeft, styles.container];
@@ -67,15 +68,17 @@ const DropdownSmall = ({
         <View>
           <View style={dropdownContainerStyle}>
             {options.map((item, index) => (
-              <Text
-                key={index}
-                style={[
-                  globalStyles.buttonTextOne,
-                  globalStyles.textLight,
-                  styles.text,
-                ]}>
-                {item}
-              </Text>
+              <Pressable key={item.id} onPress={item.onPress}>
+                <Text
+                  key={index}
+                  style={[
+                    globalStyles.buttonTextOne,
+                    globalStyles.textLight,
+                    styles.text,
+                  ]}>
+                  {item.text}
+                </Text>
+              </Pressable>
             ))}
           </View>
         </View>

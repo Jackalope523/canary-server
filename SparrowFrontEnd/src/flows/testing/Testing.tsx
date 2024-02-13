@@ -29,6 +29,7 @@ import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 import TempAvatarImage from '../../assets/images/temp/image-placeholder.png';
 import PhotoPost from '../../components/PhotoPost';
 import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
+import dropdownOptionsPost from '../../components/DropdownOptionsPost';
 
 const TestScreen = () => {
   return (
@@ -47,7 +48,7 @@ const TestScreen = () => {
       {/* --- START TESTING CODE BELOW --- */}
 
       <DropdownSmall
-        options={['one', 'two', 'three']}
+        options={dropdownOptionsPost}
         icon={Icon.Meatball}
         align={Align.Right}
       />

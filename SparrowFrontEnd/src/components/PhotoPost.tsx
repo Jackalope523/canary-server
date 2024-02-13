@@ -16,6 +16,10 @@ import { SAMPLEEVENTDATA } from '../data/sampleEventData';
 import { MEDIA } from '../data/sampleMediaData';
 import LocationIndicator from './LocationIndicator';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { runOnJS } from 'react-native-reanimated';
+import FlagMedium, { FlagType } from './FlagMedium';
+import DropdownSmall, { Align, Icon } from './DropdownSmall';
+import dropdownOptionsPost from './DropdownOptionsPost';
 
 // TEMP. avatar image
 import TempAvatarImage from '../assets/images/temp/image-placeholder.png';
@@ -25,9 +29,6 @@ import PersonIcon from '../assets/icons/account-fill.svg';
 import LocationIcon from '../assets/icons/location-fill.svg';
 import LikeOutlineIcon from '../assets/icons/favorite-outline.svg';
 import LikeFillIcon from '../assets/icons/favorite-fill.svg';
-import MeatballIcon from '../assets/icons/meatball-outline.svg';
-import { runOnJS } from 'react-native-reanimated';
-import FlagMedium, { FlagType } from './FlagMedium';
 
 /*
 
@@ -228,7 +229,11 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
             {like ? likeCount + 1 : likeCount}
           </Text>
         </View>
-        <MeatballIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
+        <DropdownSmall
+          icon={Icon.Meatball}
+          options={dropdownOptionsPost}
+          align={Align.Left}
+        />
       </View>
       {/* BOTTOM ENDS */}
     </View>
