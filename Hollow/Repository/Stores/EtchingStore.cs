@@ -126,9 +126,20 @@ namespace Repository
                 PostId = postId,
                 Time = DateTimeOffset.UtcNow,
                 Type = type
-            };          
+            };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.PostLinks.Add(toAdd));                
+            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+                        ctx.PostLinks.
+                        Where(l => l.UserId == voterId && l.PostId == postId).
+                        Select(l => l.Id).
+                        SingleOrDefaultAsync());
+
+            if (id != 0)
+            {
+                toAdd.Id = id;
+            }
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.PostLinks.Update(toAdd));
         }
 
         public async Task RemoveEtchingAsync(ulong postId)

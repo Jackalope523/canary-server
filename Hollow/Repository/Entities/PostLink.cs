@@ -4,7 +4,7 @@
     {
         public enum PostLinkType { RateUp, RateDown }
 
-        public ulong Id { get; init; }
+        public ulong Id { get; set; }
         public ulong UserId { get; init; }
         public User User { get; init; }
         public ulong PostId { get; init; }

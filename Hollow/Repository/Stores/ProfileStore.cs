@@ -129,7 +129,18 @@ namespace Repository
                 Type = type
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
+            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+                        ctx.UserLinks.
+                        Where(l => l.SelfId == selfId && l.OtherId == targetId).
+                        Select(l => l.Id).
+                        SingleOrDefaultAsync());
+
+            if (id != 0)
+            {
+                toAdd.Id = id;
+            }
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toAdd));
         }
 
         public async Task RemoveUserRatingAsync(ulong selfId, ulong targetId)
