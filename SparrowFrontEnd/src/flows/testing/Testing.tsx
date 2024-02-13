@@ -20,16 +20,15 @@ import HeaderEditTitled from '../../components/HeaderEditTitled';
 import HeaderOptions from '../../components/HeaderOptions';
 import Button from '../../components/Button';
 
-// Icon
 import ImportedIcon from '../../assets/icons/favorite-fill.svg';
 import ButtonGroup from '../../components/ButtonGroup';
 import FlagMedium, { FlagType } from '../../components/FlagMedium';
 import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 
-import TempAvatarImage from '../../assets/images/temp/image-placeholder.png';
 import PhotoPost from '../../components/PhotoPost';
 import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
 import dropdownOptionsPost from '../../components/DropdownOptionsPost';
+import avatarimg from '../../assets/images/temp/host-img-1.jpg';
 
 const TestScreen = () => {
   return (
@@ -64,6 +63,7 @@ const TestScreen = () => {
           leftoverAttendeeCount={4}
           location="Venice Beach, Venice, CA"
           likeCount={3}
+          avatar={avatarimg}
         />
       </View>
 

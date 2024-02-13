@@ -1,28 +1,16 @@
-import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  FlatList,
-  ScrollView,
-} from 'react-native';
+import { View, Image, Text, StyleSheet, FlatList } from 'react-native';
 import * as React from 'react';
-import { globalStyles } from '../styles/GlobalStyles';
-import { Colors } from '../styles/ColorStyles';
-import Avatar from './Avatar';
-import { Spacing } from '../styles/SpacingStyles';
-import { CustomDimensions } from '../styles/CustomDimensionStyles';
-import { SAMPLEEVENTDATA } from '../data/sampleUpcomingEventData';
-import { MEDIA } from '../data/sampleMediaData';
-import LocationIndicator from './LocationIndicator';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
+import Avatar from './Avatar';
+import LocationIndicator from './LocationIndicator';
 import FlagMedium, { FlagType } from './FlagMedium';
 import DropdownSmall, { Align, Icon } from './DropdownSmall';
 import dropdownOptionsPost from './DropdownOptionsPost';
-
-// TEMP. avatar image
-import TempAvatarImage from '../assets/images/temp/image-placeholder.png';
+import { globalStyles } from '../styles/GlobalStyles';
+import { Colors } from '../styles/ColorStyles';
+import { Spacing } from '../styles/SpacingStyles';
+import { CustomDimensions } from '../styles/CustomDimensionStyles';
 
 // Icons
 import PersonIcon from '../assets/icons/account-fill.svg';

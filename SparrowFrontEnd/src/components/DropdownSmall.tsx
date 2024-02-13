@@ -18,7 +18,7 @@ import MeatballIcon from '../assets/icons/meatball-outline.svg';
 import KebabIcon from '../assets/icons/kebab-fill.svg';
 
 interface DropdownSmallProps {
-  options: { id: string; text: string; onPress: () => void }[];
+  options: { id: number; text: string; onPress: () => void }[];
   icon: Icon;
   align: Align;
 

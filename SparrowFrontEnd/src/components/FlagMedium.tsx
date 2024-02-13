@@ -13,19 +13,19 @@ or/and hook up to back-end
 
 interface FlagMediumProps {
   flagText?: string | number;
-  flagTextStyle: TextStyle[];
+  flagTextStyle?: TextStyle[];
   time?: number | string;
 
   type: FlagType;
-  flagStyle: ViewStyle[];
+  flagStyle?: ViewStyle[];
 }
 
 const FlagMedium: React.FC<FlagMediumProps> = ({
-  flagTextStyle,
+  flagTextStyle = [],
   flagText,
   time,
   type = null,
-  flagStyle,
+  flagStyle = [],
 }) => {
   switch (type) {
     /*
