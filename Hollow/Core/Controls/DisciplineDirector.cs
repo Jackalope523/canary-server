@@ -53,7 +53,7 @@ namespace Core.Controls
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            await Reports.ReportEventAsync(user.Id, targetEvent.Id, targetEvent.Host.Id, Time, reportType, reportDetails);
+            await Reports.ReportEventAsync(user.Id, targetEvent.Id, Time, reportType, reportDetails);
 
             // Check if action is to be taken
             if (await targetEvent.Reported())

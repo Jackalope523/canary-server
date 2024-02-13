@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace Repository
@@ -28,13 +29,12 @@ namespace Repository
 
             Task<List<Core.Boundaries.EventReport>> eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             EventReports.
-            Where(r => r.SelfId == id).
+            Where(r => r.UserId == id).
             Select(r => new Core.Boundaries.EventReport
             (
                 r.Id,
-                r.SelfId,
+                r.UserId,
                 r.EventId,
-                r.OtherId,
                 r.FilingDate,
                 r.Type,
                 r.Notes
@@ -52,9 +52,8 @@ namespace Repository
             Select(r => new Core.Boundaries.EventReport
             (
                 r.Id,
-                r.SelfId,
+                r.UserId,
                 r.EventId,
-                r.OtherId,
                 r.FilingDate,
                 r.Type,
                 r.Notes
@@ -76,17 +75,22 @@ namespace Repository
                  r.Type,
                  r.Notes
              )).
-            ToListAsync());
+            ToListAsync());       
 
-            Task<List<Core.Boundaries.EventReport>> eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            List<ulong> eventsHosted = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Events.
+                Where(e => e.HostId == id).
+                Select(e => e.Id).
+                ToListAsync());
+
+            Task<List<Core.Boundaries.EventReport>>  eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             EventReports.
-            Where(r => r.OtherId == id).
+            Where(r => eventsHosted.Contains(r.EventId)).
             Select(r => new Core.Boundaries.EventReport
             (
                 r.Id,
-                r.SelfId,
+                r.UserId,
                 r.EventId,
-                r.OtherId,
                 r.FilingDate,
                 r.Type,
                 r.Notes
@@ -96,12 +100,11 @@ namespace Repository
             return (await userReportsToReturn, await eventReportsToReturn);
         }
 
-        public async Task ReportEventAsync(ulong userId, ulong eventId, ulong HostId, DateTimeOffset timeOfReport, EventReportType reportType, string reportDetails)
+        public async Task ReportEventAsync(ulong userId, ulong eventId, DateTimeOffset timeOfReport, EventReportType reportType, string reportDetails)
         {
             EventReport toCreate = new()
             {
-                SelfId = userId,
-                OtherId = HostId,
+                UserId = userId,
                 EventId = eventId,
                 Type = reportType,
                 FilingDate = timeOfReport,
@@ -109,6 +112,20 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(toCreate));
+        }
+
+        public async Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
+        {
+            UserReport toCreate = new()
+            {
+                SelfId = userId,
+                OtherId = targetUserId,
+                Type = reportType,
+                FilingDate = timeOfReport,
+                Notes = reportDetails
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(toCreate));
         }
 
         public async Task ReportUserAsync(ulong selfId, ulong eventId, ulong targetId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
@@ -144,6 +161,6 @@ namespace Repository
             Where(p => p.PenalizedId == userId).
             Select(p => new Penalty(p.Type, p.Time)).
             ToListAsync());
-        }
+        }     
     }
 }

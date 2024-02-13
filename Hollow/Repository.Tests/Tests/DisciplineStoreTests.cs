@@ -35,7 +35,8 @@ namespace Repository.Tests
         public void Dispose()
         {
             sentry.ExecuteWrite(ctx => ctx.Penalties.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Reports.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.UserReports.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.EventReports.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
         }
@@ -60,8 +61,7 @@ namespace Repository.Tests
             Assert.Equal(userReport.Type, reports.Item1.First().ReportType);
             Assert.Equal(userReport.Notes, reports.Item1.First().ReportDetails);
 
-            Assert.Equal(eventReport.SelfId, reports.Item2.First().ReportingUserId);
-            Assert.Equal(eventReport.OtherId, reports.Item2.First().ReportedEventHostId);
+            Assert.Equal(eventReport.UserId, reports.Item2.First().ReportingUserId);
             Assert.Equal(eventReport.EventId, reports.Item2.First().ReportedEventId);
             Assert.Equal(eventReport.FilingDate, reports.Item2.First().ReportTime);
             Assert.Equal(eventReport.Type, reports.Item2.First().ReportType);
@@ -93,13 +93,12 @@ namespace Repository.Tests
             Shared.EventReportType type = Shared.EventReportType.Inappropriate;
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            await store.ReportEventAsync(subject1.Id, testEvent.Id, subject2.Id, time, type, notes);
+            await store.ReportEventAsync(subject1.Id, testEvent.Id, time, type, notes);
 
             EventReport created = await sentry.ExecuteReadAsync(ctx => ctx.EventReports.FirstAsync());
 
             Assert.NotNull(created);
-            Assert.Equal(subject1.Id, created.SelfId);
-            Assert.Equal(subject2.Id, created.OtherId);
+            Assert.Equal(subject1.Id, created.UserId);
             Assert.Equal(testEvent.Id, created.EventId);
             Assert.Equal(time, created.FilingDate);
             Assert.Equal(type, created.Type);
@@ -114,8 +113,7 @@ namespace Repository.Tests
             List<Core.Boundaries.EventReport> reports = await store.GetReportsForEventAsync(testEvent.Id);
 
             Assert.NotNull(reports);
-            Assert.Equal(eventReport.SelfId, reports.First().ReportingUserId);
-            Assert.Equal(eventReport.OtherId, reports.First().ReportedEventHostId);
+            Assert.Equal(eventReport.UserId, reports.First().ReportingUserId);
             Assert.Equal(eventReport.EventId, reports.First().ReportedEventId);
             Assert.Equal(eventReport.FilingDate, reports.First().ReportTime);
             Assert.Equal(eventReport.Type, reports.First().ReportType);
@@ -141,8 +139,7 @@ namespace Repository.Tests
             Assert.Equal(userReport.Type, reports.Item1.First().ReportType);
             Assert.Equal(userReport.Notes, reports.Item1.First().ReportDetails);
 
-            Assert.Equal(eventReport.SelfId, reports.Item2.First().ReportingUserId);
-            Assert.Equal(eventReport.OtherId, reports.Item2.First().ReportedEventHostId);
+            Assert.Equal(eventReport.UserId, reports.Item2.First().ReportingUserId);
             Assert.Equal(eventReport.EventId, reports.Item2.First().ReportedEventId);
             Assert.Equal(eventReport.FilingDate, reports.Item2.First().ReportTime);
             Assert.Equal(eventReport.Type, reports.Item2.First().ReportType);

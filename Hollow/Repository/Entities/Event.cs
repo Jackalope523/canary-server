@@ -32,7 +32,7 @@ namespace Repository
 
         // Navigation Properties
         public List<EventLink> Links { get; set; }
-        public List<Report> Reports { get; set; }
+        public List<EventReport> Reports { get; set; }
         public List<Post> Posts { get; set; }
 
         // Default Values
