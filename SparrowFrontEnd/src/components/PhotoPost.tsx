@@ -12,7 +12,7 @@ import { Colors } from '../styles/ColorStyles';
 import Avatar from './Avatar';
 import { Spacing } from '../styles/SpacingStyles';
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
-import { SAMPLEEVENTDATA } from '../data/sampleEventData';
+import { SAMPLEEVENTDATA } from '../data/sampleUpcomingEventData';
 import { MEDIA } from '../data/sampleMediaData';
 import LocationIndicator from './LocationIndicator';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -47,8 +47,13 @@ TODO implement mechanics:
 
 interface PhotoPostProps {
   name: string;
+  avatar: string;
   time: string | FlagType.Live;
   title: string;
+  // media: { id: string; uri: any }[];
+
+  media?: any;
+
   attendees: string[] | string;
   leftoverAttendeeCount: number;
   location: string;
@@ -59,8 +64,10 @@ interface PhotoPostProps {
 
 export const PhotoPost: React.FC<PhotoPostProps> = ({
   name = 'NULL',
+  avatar,
   time = 'NULL',
   title = 'NULL',
+  media,
   attendees,
   leftoverAttendeeCount,
   location = 'NULL',
@@ -124,12 +131,13 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
           <Avatar
             size={AvatarSize.Medium}
             status={AvatarStatus.Offline}
-            image={TempAvatarImage}
+            image={avatar}
           />
           <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
             {name}
           </Text>
         </View>
+        {/* TODO replace FlagType.Live in the {time === FlagType.Live ...} NOT in <FlagMedium /> component, with an event status (live) that's passed down from back-end */}
         {time === FlagType.Live ? (
           <FlagMedium type={FlagType.Live} />
         ) : (
@@ -138,11 +146,6 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
             {time} ago
           </Text>
         )}
-
-        {/* <FlagMedium type={FlagType.Live} />
-        <Text style={[globalStyles.textDark, globalStyles.labelTextOneAsTyped]}>
-          {time} ago
-        </Text> */}
       </View>
       {/* TOP ENDS */}
       {/* CARD */}
@@ -160,7 +163,7 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             overScrollMode="never"
-            data={MEDIA}
+            data={media}
             pagingEnabled={true}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -175,16 +178,12 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
             }
             viewabilityConfig={viewabilityConfig}
           />
-          <LocationIndicator data={MEDIA} selected={index} />
+          {media.length > 1 && (
+            <LocationIndicator data={media} selected={index} />
+          )}
+          {media.length === 1 && null}
         </View>
 
-        {/* <View style={styles.imageContainer}>
-          <Image
-            source={require('../assets/images/temp/image-placeholder.png')}
-            style={styles.image}
-            // style={globalStyles.illustrationFull}
-          />
-        </View> */}
         {/* MEDIA CONTAINER ENDS */}
 
         <View style={[styles.cardInfo, styles.cardInfoBottom]}>
@@ -297,13 +296,6 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.sparrowDarkBrown,
   },
 
-  /*
-
-    TODO fix the imageContainer and image styles;
-    implement the image properly and fix the blurry bottom of the image
-  
-  */
-
   imageContainer: {
     height: CustomDimensions.windowWidth - Spacing.lg * 2,
     width: CustomDimensions.windowWidth - Spacing.lg * 2,
@@ -312,9 +304,16 @@ const styles = StyleSheet.create({
   image: {
     alignSelf: 'center',
     resizeMode: 'cover',
-    // Fixes blank bottom pixel spacing
-    width: '102%',
-    height: '102%',
+
+    /*
+    
+    Setting width and height to a little over 100% such as 102% fixes blank bottom pixel spacing,
+    but I don't see the problem atm so will leave it as it is
+    
+    */
+
+    width: '100%',
+    height: '100%',
   },
 
   bottom: {

@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
 
   selected: {
-    // TODO this is currently set to orange400 as a visual improvement; OG was sparrowDarkBrown
-    backgroundColor: Colors.orange400,
+    // TODO this is currently set to orange500 as a visual improvement; OG was sparrowDarkBrown
+    backgroundColor: Colors.orange500,
   },
 });

@@ -82,7 +82,7 @@ function MainContainer() {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Testing"
+          initialRouteName="Main"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, FlatList } from 'react-native';
 import * as React from 'react';
 
 import EventCardMedium from '../EventCardMedium';
-import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
+import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 
 import { Spacing } from '../../styles/SpacingStyles';
 

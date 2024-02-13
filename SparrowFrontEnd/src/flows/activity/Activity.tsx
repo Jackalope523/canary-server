@@ -10,7 +10,7 @@ import { ButtonDisplay, ButtonSize, ButtonType } from '../../components/Button';
 import ExclusiveButtonView from '../../components/ExclusiveButtonView';
 
 // Sample data
-import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
+import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 
 const ActivityScreen = () => {
   return (

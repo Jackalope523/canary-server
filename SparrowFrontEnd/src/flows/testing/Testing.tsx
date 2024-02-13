@@ -60,7 +60,7 @@ const TestScreen = () => {
           name="Gale"
           time="14h"
           title="Downhill MTB competition at Grey Feather Mountain"
-          attendees={['Beatrice, ', 'John, ', 'Sara']}
+          attendees={['Beatrice, ', 'John']}
           leftoverAttendeeCount={4}
           location="Venice Beach, Venice, CA"
           likeCount={3}
