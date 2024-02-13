@@ -213,6 +213,7 @@ namespace Core.Tests
 			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
+			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived);
 
 			foreach (var guest in guests)
 			{
