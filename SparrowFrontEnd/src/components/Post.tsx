@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import Avatar from './Avatar';
-import LocationIndicator from './LocationIndicator';
+import PaginationIndicator from './PaginationIndicator';
 import FlagMedium, { FlagType } from './FlagMedium';
 import DropdownSmall, { Align, Icon } from './DropdownSmall';
 import dropdownOptionsPost from './DropdownOptionsPost';
@@ -34,8 +34,6 @@ interface PhotoPostProps {
   avatar: string;
   time: string | FlagType.Live;
   title: string;
-  // media: { id: string; uri: any }[];
-
   media?: any;
 
   attendees: string[] | string;
@@ -60,24 +58,14 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                               Location indicator                               ||
   // ! ||--------------------------------------------------------------------------------||
-  const [index, setIndex] = React.useState(0);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
   };
 
-  const onViewableItemsChanged = ({
-    viewableItems,
-    changed,
-  }: {
-    viewableItems: any[];
-    changed: any[];
-  }) => {
-    console.log('Visible items are', viewableItems);
-    console.log('Changed in this iteration', changed);
-
-    // TODO FIX: getting a typescript error when browsing through images - cannot read property "index" of undefined
-    setIndex(viewableItems[0].index);
+  const onViewableItemsChanged = () => {
+    // TODO make the pagination work
   };
 
   const viewabilityConfigCallbackPairs = React.useRef([
@@ -160,10 +148,11 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
             viewabilityConfigCallbackPairs={
               viewabilityConfigCallbackPairs.current
             }
-            viewabilityConfig={viewabilityConfig}
+            snapToAlignment="center"
+            decelerationRate={'normal'}
           />
           {media.length > 1 && (
-            <LocationIndicator data={media} selected={index} />
+            <PaginationIndicator data={media} selectedIndex={selectedIndex} />
           )}
           {media.length === 1 && null}
         </View>

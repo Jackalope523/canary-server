@@ -7,10 +7,13 @@ import { Spacing } from '../styles/SpacingStyles';
 
 interface LocationIndicatorProps {
   data: any[];
-  selected?: number;
+  selectedIndex?: number;
 }
 
-const LocationIndicator: FC<LocationIndicatorProps> = ({ data, selected }) => {
+const LocationIndicator: FC<LocationIndicatorProps> = ({
+  data,
+  selectedIndex,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
@@ -19,7 +22,7 @@ const LocationIndicator: FC<LocationIndicatorProps> = ({ data, selected }) => {
             data={data}
             key={index}
             style={[
-              selected === index ? styles.selected : styles.rest,
+              selectedIndex === index ? styles.selected : styles.rest,
               styles.indicator,
             ]}
           />
