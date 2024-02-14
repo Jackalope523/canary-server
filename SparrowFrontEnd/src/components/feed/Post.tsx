@@ -22,7 +22,6 @@ import LikeFillIcon from '../../assets/icons/favorite-fill.svg';
 
 TODO implement mechanics:
 
-1. when the text is too long add ... at the end (similar to event card medium)
 2. Add pinch to zoom functinality
 3. Add an animation for the like button icon
 4. Make image unswipable if there's only one image
@@ -78,10 +77,7 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
   /*
  
   TODO if like === true:
-  1. change the icon to filled heart
-  2. change the color of the icon to orange400
-  3. set the likeCount to +1
-  4. add an animation to the media container
+  1. add an animation to the media container
   
   */
 
@@ -123,7 +119,9 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
       {/* CARD */}
       <View style={styles.card}>
         <View style={[styles.cardInfo, styles.cardInfoTop]}>
-          <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
+          <Text
+            style={[globalStyles.textDark, globalStyles.headingTextThree]}
+            numberOfLines={2}>
             {title}
           </Text>
         </View>
@@ -172,7 +170,9 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
               width={24}
               fill={Colors.sparrowDarkBrown}
             />
-            <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
+            <Text
+              style={[globalStyles.textDark, globalStyles.bodyTextOne]}
+              numberOfLines={1}>
               {location}
             </Text>
           </View>
