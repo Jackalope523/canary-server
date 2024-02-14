@@ -1,9 +1,7 @@
-import { StyleSheet, View, ViewProps } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import React, { FC } from 'react';
-import { Colors } from '../styles/ColorStyles';
-
-import { MEDIA } from '../data/sampleMediaData';
-import { Spacing } from '../styles/SpacingStyles';
+import { Colors } from '../../styles/ColorStyles';
+import { Spacing } from '../../styles/SpacingStyles';
 
 interface LocationIndicatorProps {
   data: any[];

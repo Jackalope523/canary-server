@@ -2,21 +2,21 @@ import { View, Image, Text, StyleSheet, FlatList } from 'react-native';
 import * as React from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
-import Avatar from './Avatar';
+import Avatar from '../Avatar';
 import PaginationIndicator from './PaginationIndicator';
-import FlagMedium, { FlagType } from './FlagMedium';
-import DropdownSmall, { Align, Icon } from './DropdownSmall';
-import dropdownOptionsPost from './DropdownOptionsPost';
-import { globalStyles } from '../styles/GlobalStyles';
-import { Colors } from '../styles/ColorStyles';
-import { Spacing } from '../styles/SpacingStyles';
-import { CustomDimensions } from '../styles/CustomDimensionStyles';
+import FlagMedium, { FlagType } from '../FlagMedium';
+import DropdownSmall, { Align, Icon } from '../DropdownSmall';
+import dropdownOptionsPost from '../DropdownOptionsPost';
+import { globalStyles } from '../../styles/GlobalStyles';
+import { Colors } from '../../styles/ColorStyles';
+import { Spacing } from '../../styles/SpacingStyles';
+import { CustomDimensions } from '../../styles/CustomDimensionStyles';
 
 // Icons
-import PersonIcon from '../assets/icons/account-fill.svg';
-import LocationIcon from '../assets/icons/location-fill.svg';
-import LikeOutlineIcon from '../assets/icons/favorite-outline.svg';
-import LikeFillIcon from '../assets/icons/favorite-fill.svg';
+import PersonIcon from '../../assets/icons/account-fill.svg';
+import LocationIcon from '../../assets/icons/location-fill.svg';
+import LikeOutlineIcon from '../../assets/icons/favorite-outline.svg';
+import LikeFillIcon from '../../assets/icons/favorite-fill.svg';
 
 /*
 

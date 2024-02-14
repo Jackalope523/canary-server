@@ -25,7 +25,7 @@ import ButtonGroup from '../../components/ButtonGroup';
 import FlagMedium, { FlagType } from '../../components/FlagMedium';
 import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 
-import Post from '../../components/Post';
+import Post from '../../components/feed/Post';
 import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
 import dropdownOptionsPost from '../../components/DropdownOptionsPost';
 import avatarimg from '../../assets/images/temp/host-img-1.jpg';

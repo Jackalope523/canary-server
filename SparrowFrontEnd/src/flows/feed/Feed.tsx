@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import Post from '../../components/Post';
+import Post from '../../components/feed/Post';
 import { Spacing } from '../../styles/SpacingStyles';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
 import { FlagType } from '../../components/FlagMedium';
