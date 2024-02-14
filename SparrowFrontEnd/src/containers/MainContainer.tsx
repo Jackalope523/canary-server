@@ -40,7 +40,6 @@ import DiscoveryScreen from '../flows/discovery/Discovery';
 import FeedScreen from '../flows/feed/Feed';
 import DiscoverySearchScreen from '../flows/discovery/DiscoverySearch';
 import NotificationsScreen from '../flows/activity/Notifications';
-import AccountScreen from '../flows/profile/Account';
 import ProfileScreen from '../flows/profile/Profile';
 import TestScreen from '../flows/testing/Testing';
 

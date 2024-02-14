@@ -1,42 +1,23 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-
-import { Colors } from '../../styles/ColorStyles';
-import { globalStyles } from '../../styles/GlobalStyles';
-
-import {
-  AccountStackParamList,
-  BottomTabParamList,
-} from '../../components/atoms/types';
-
+import { BottomTabParamList } from '../../components/atoms/types';
+import { getAccount, userShard } from '../auth/accountPigeon';
 import Button, {
   ButtonDisplay,
-  ButtonType,
   ButtonSize,
+  ButtonType,
 } from '../../components/Button';
-import { getAccount, userShard } from '../auth/accountPigeon';
 
-/*
+// Icons
+import AddIcon from '../../assets/icons/add-outline.svg';
 
-// TODO [!!!] IMPORTANT [!!!]
-
-Before beginning work on the Account screen:
-
-1. There's two account screens. Delete one of the screens and pick ONE COMMON
-name for an account screen, either Profile or Account
-
-2. Update everything related to the Account screen in MainContainer.tsx
-to use the selected name
-
-3. Update everything related to the Account screen in types.tsx
-
-4. Rename types.tsx to something more appropriate and less general
-
-5. In MainContainer.tsx, add the cardStyle prop and styles.cardStyle style
-to the Account Stack.Navigator
-
-*/
+import { globalStyles } from '../../styles/GlobalStyles';
+import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
+import { SAMPLE_USER_DATA } from '../../data/sampleUserData';
+import { Colors } from '../../styles/ColorStyles';
+import { Spacing } from '../../styles/SpacingStyles';
+import TextLabel, { LabelSize, LabelType } from '../../components/TextLabel';
 
 type ProfileProps = StackScreenProps<BottomTabParamList, 'Profile'>;
 
@@ -53,18 +34,138 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
 
   handleGetAccount();
 
+  /*
+  
+    TODO hook up to real data
+    user types: anon, friend
+  
+  */
+
+  // TEMP. for testing purposes
+  let friend = false;
+  let status = AvatarStatus.Offline;
+
+  const user = SAMPLE_USER_DATA.find((user) => user.id === '1');
+
+  const testUserData = React.useEffect(() => {
+    console.log('user', user);
+  }, [user]);
+
   return (
-    <View>
-      <Button
-        type={ButtonType.PrimaryDark}
-        size={ButtonSize.ExtraSmall}
-        display={ButtonDisplay.Contained}
-        text="Settings"
-        onPress={() => navigation.navigate('Account')}
+    <View style={globalStyles.baseContainer}>
+      {/* label start temp */}
+      <TextLabel
+        size={LabelSize.Large}
+        type={LabelType.Primary}
+        text="Label text"
       />
-      <Text>Profile</Text>
+      {/* label end temp */}
+      <Avatar size={AvatarSize.Large} status={status} image={user?.avatar} />
+      <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
+        {user?.name}
+      </Text>
+      <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+        {user?.location}
+      </Text>
+      {friend ? (
+        <Button
+          type={ButtonType.PrimaryDark}
+          size={ButtonSize.ExtraSmall}
+          display={ButtonDisplay.Contained}
+          text={'Invite to event'}
+          displayIcon={true}
+          Icon={AddIcon}
+          onPress={null}
+        />
+      ) : (
+        <Button
+          type={ButtonType.PrimaryDark}
+          size={ButtonSize.ExtraSmall}
+          display={ButtonDisplay.Contained}
+          text={'Add friend'}
+          displayIcon={true}
+          Icon={AddIcon}
+          onPress={null}
+        />
+      )}
+      <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+        {user?.bio}
+      </Text>
+
+      {/* LABELS HERE */}
+
+      {/* EVENTS */}
+      <View>
+        <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
+          Events
+        </Text>
+        <View style={styles.eventsContainer}>
+          {/* inner wrapper start */}
+          <View style={styles.eventsInnerWrapper}>
+            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+              Attended
+            </Text>
+            <View
+              style={[
+                styles.eventsInnerContainer,
+                styles.eventsContainerAttended,
+              ]}>
+              <Text
+                style={[globalStyles.displayTextTwo, globalStyles.textLight]}>
+                {user?.eventsAttended}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.eventsInnerWrapper}>
+            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+              Hosted
+            </Text>
+            <View
+              style={[
+                styles.eventsInnerContainer,
+                styles.eventsContainerHosted,
+              ]}>
+              <Text
+                style={[globalStyles.displayTextTwo, globalStyles.textLight]}>
+                {user?.eventsHosted}
+              </Text>
+            </View>
+          </View>
+          {/* inner wrapper end */}
+        </View>
+      </View>
     </View>
   );
 };
 
 export default ProfileScreen;
+
+const styles = StyleSheet.create({
+  // EVENTS
+  eventsContainer: {
+    flexDirection: 'row',
+    columnGap: Spacing.md,
+  },
+
+  eventsInnerWrapper: {
+    flex: 1,
+  },
+
+  eventsInnerContainer: {
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+    alignItems: 'center',
+  },
+
+  eventsContainerAttended: {
+    backgroundColor: Colors.green400,
+  },
+
+  eventsContainerHosted: {
+    backgroundColor: Colors.picton400,
+  },
+});
