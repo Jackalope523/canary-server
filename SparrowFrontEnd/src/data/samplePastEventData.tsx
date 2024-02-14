@@ -31,7 +31,7 @@ export const SAMPLE_PAST_EVENT_DATA = [
     time: 'live',
     host: 'Liam',
     avatar: h1img,
-    attendees: ['Gale ', 'Mia'],
+    attendees: ['Gale, ', 'Mia'],
     leftoverAttendeeCount: 2,
     title: 'Peak Shredder Showdown',
     description:
@@ -47,7 +47,7 @@ export const SAMPLE_PAST_EVENT_DATA = [
     time: 'live',
     host: 'Ava',
     avatar: h2img,
-    attendees: ['Monica ', 'Dylan'],
+    attendees: ['Monica, ', 'Dylan'],
     leftoverAttendeeCount: 6,
     title: 'Golden Hour Photography Workshop',
     description:
@@ -63,7 +63,7 @@ export const SAMPLE_PAST_EVENT_DATA = [
     time: '12m',
     host: 'Ruben',
     avatar: h3img,
-    attendees: ['Sonya ', 'Lauren'],
+    attendees: ['Sonya, ', 'Lauren'],
     leftoverAttendeeCount: 13,
     title: 'Come join a friendly soccer match and meet the locals!',
     description:
@@ -78,7 +78,7 @@ export const SAMPLE_PAST_EVENT_DATA = [
     time: '3h',
     host: 'Ksenia',
     avatar: h4img,
-    attendees: ['Mason ', 'Stephen'],
+    attendees: ['Mason, ', 'Stephen'],
     leftoverAttendeeCount: 17,
     title: "Roll, Strateize, Conquer: Board Game Night at Mason's",
     description:
@@ -93,7 +93,7 @@ export const SAMPLE_PAST_EVENT_DATA = [
     time: '18h',
     host: 'Clara',
     avatar: h5img,
-    attendees: ['Gordon ', 'Stephanie'],
+    attendees: ['Gordon, ', 'Stephanie'],
     leftoverAttendeeCount: 23,
     title: 'Slow hike for nature lovers of all ages',
     description:
