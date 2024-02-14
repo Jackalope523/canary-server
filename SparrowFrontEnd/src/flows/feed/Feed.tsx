@@ -17,6 +17,7 @@ const FeedScreen = () => {
         data={SAMPLE_PAST_EVENT_DATA}
         renderItem={({ item }) => (
           <Post
+            key={item.id}
             name={item.host}
             avatar={item.avatar}
             time={item.status === 'live' ? FlagType.Live : item.time}
