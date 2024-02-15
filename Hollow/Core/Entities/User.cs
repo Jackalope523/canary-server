@@ -284,7 +284,15 @@ namespace Core.Entities
 
 		public async Task<bool> CanView(Event @event)
 		{
-			// Note: This is efficient with multiple events. For multiple users, see Event.IsVisibleTo
+            // Note: This is efficient with multiple events. For multiple users, see Event.IsVisibleTo
+
+            // Check if user is host
+            if (@event.IsHostedBy(this))
+            { return true; }
+
+            // Check if event is deleted
+            if (@event.IsDeleted)
+            { return false; }
 
 			// Check if user account is locked
 			if (IsLocked)

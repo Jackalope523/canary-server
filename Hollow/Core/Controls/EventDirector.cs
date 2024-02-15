@@ -229,7 +229,26 @@ namespace Core.Controls
 			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(UserShard.Character), user.Character) });
 		}
 
-		public async Task WatchEventAsync(ulong userId, ulong eventId)
+		public async Task DeleteEventAsync(ulong userId, ulong eventId)
+		{
+            var user = await GetUserAsync(userId);
+            var targetEvent = await GetEventAsync(eventId);
+
+			// Verify event has not yet started
+			Fail(targetEvent.IsOngoing || targetEvent.IsEnded,
+				new InvalidEventException("Event cannot be deleted once it has started."));
+
+            // Verify user is able to delete the event
+            Try(targetEvent.IsModifiableBy(user),
+                new InvalidUserException("User does not have permissions to delete event."));
+
+			// Try to end to delete event
+			await Events.DeleteEventAsync(eventId);
+
+            _ = targetEvent.NotifyActive($"{targetEvent.Name}", "Uh oh! The event was deleted by the host.");
+        }
+
+        public async Task WatchEventAsync(ulong userId, ulong eventId)
 		{
 			var user = await GetUserAsync(userId);
 			var targetEvent = await GetEventAsync(eventId);

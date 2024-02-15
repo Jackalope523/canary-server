@@ -7,6 +7,7 @@ using Core.Boundaries;
 
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Entities
 {
@@ -47,6 +48,7 @@ namespace Core.Entities
         public EventState State { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
+        public bool IsDeleted { get; set; }
 
         public bool IsWaiting
             => State.Equals(EventState.Upcoming) &&
@@ -60,6 +62,8 @@ namespace Core.Entities
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumEtchingLateness);
+        public bool IsEnded
+            => EndTime.HasValue;
 
         ////////
         // Synced Properties
@@ -112,6 +116,7 @@ namespace Core.Entities
             Character = new(fromEvent.Character);
             Radius = new() { Kilometres = fromEvent.Radius };
             IsDynamic = fromEvent.IsDynamic;
+            IsDeleted = fromEvent.IsDeleted;
         }
 
         public Event(EventThinSlice fromEvent) : this()
@@ -127,7 +132,7 @@ namespace Core.Entities
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
-                Radius.Kilometres, IsDynamic);
+                Radius.Kilometres, IsDynamic, IsDeleted);
         }
 
         public EventThinSlice ToEventThinSlice()
@@ -184,6 +189,14 @@ namespace Core.Entities
 		{
 			// Note: This is efficient with multiple users. For multiple events, see User.CanView
 
+            // Check if user is host
+            if (IsHostedBy(user))
+            { return true; }
+
+            // Check if event is deleted
+            if (IsDeleted)
+            { return false; }
+
 			// Check if user account is locked
 			if (user.IsLocked)
             { return false; }
@@ -201,7 +214,7 @@ namespace Core.Entities
 			if (await Host.IsBlockedBy(user) || await Host.IsBlocking(user))
 			{ return false; }
 
-			return true;
+            return true;
 		}
 
         public async Task<bool> IsJoinableBy(User user)
