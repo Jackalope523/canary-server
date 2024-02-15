@@ -9,6 +9,9 @@ export const Spacing = {
   // Small
   sm: 8,
 
+  // In-between - Medium small
+  mdsm: 12,
+
   // Medium
   md: 16,
 
