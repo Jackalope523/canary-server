@@ -1,9 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Shared;
-using System.Linq;
 
 namespace Repository
 {
@@ -331,12 +329,10 @@ namespace Repository
                     case nameof(EventShard.StartTime):
                         e.StartTime = (DateTimeOffset)Value;
                         break;
-                    case nameof(EventShard.Latitude):
-                        e.Location.Y = (double)Value;
-                        break;
-                    case nameof(EventShard.Longitude):
-                        e.Location.X = (double)Value;
-                        break;
+                    case "Location":
+                        var Location = ((double,double))Value;
+                        e.Location = new CoordinateFactory().Create(Location.Item2, Location.Item1);
+                        break;              
                     case nameof(EventShard.Radius):
                         e.Radius = (double)Value;
                         break;

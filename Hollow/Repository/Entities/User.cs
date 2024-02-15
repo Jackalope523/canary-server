@@ -21,6 +21,7 @@ namespace Repository
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
         public ulong? CurrentEvent { get; set; } = DefaultCurrentEvent;
+        public bool PendingDeletion { get; set; } = DefaultPendingDeletion;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -39,15 +40,15 @@ namespace Repository
         public double CurrentRadius { get; set; } = DefaultCurrentRadius;
 
         // Navigation Properties
-        public List<UserLink> UserLinks { get; set; }
-        public List<EventLink> EventLinks { get; set; }
-        public List<PostLink> PostLinks { get; set; }
-        public List<UserReport> ReporterList { get; set; }
-        public List<UserReport> ReporteeList { get; set; }
-        public List<Post> Posts { get; set; }
-        public List<Entities.Note> Notes { get; set; }
-        public List<Subscription> Subscriptions { get; set; }
-        public List<Entities.Penalty> Penalties { get; set; }
+        public List<UserLink>? UserLinks { get; set; }
+        public List<EventLink>? EventLinks { get; set; }
+        public List<PostLink>? PostLinks { get; set; }
+        public List<UserReport>? ReporterList { get; set; }
+        public List<UserReport>? ReporteeList { get; set; }
+        public List<Post>? Posts { get; set; }
+        public List<Entities.Note>? Notes { get; set; }
+        public List<Subscription>? Subscriptions { get; set; }
+        public List<Entities.Penalty>? Penalties { get; set; }
 
         // Default Values
         public static ulong DefaultId { get; set; } = ulong.MinValue;
@@ -65,6 +66,7 @@ namespace Repository
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
         public static ulong? DefaultCurrentEvent { get; set; } = null;
+        public static bool DefaultPendingDeletion { get; set; } = false;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;
@@ -78,17 +80,10 @@ namespace Repository
         private static readonly CoordinateFactory Factory = new();
 
         //Geolocation: X = Longitude Y = Latitude     
-        public static Point DefaultHaunt { get; set; } = Factory.Create(40.712, -74.006);
+        public static Point DefaultHaunt { get; set; } = Factory.Create(7.540, 53.483);
         public static double DefaultHauntRadius { get; set; } = 10;
         public static int DefaultHauntWheight { get; set; } = 0;
-        public static Point DefaultCurrentLocation { get; set; } = Factory.Create(40.712, -74.006);
-        public static double DefaultCurrentRadius { get; set; } = 10;
-
-        public User()
-        {
-            DefaultHaunt = Factory.Create(7.540, 53.483);
-            DefaultCurrentLocation = Factory.Create(7.544, 53.483);
-        }
-        
+        public static Point DefaultCurrentLocation { get; set; } = Factory.Create(7.544, 53.483);
+        public static double DefaultCurrentRadius { get; set; } = 10;       
     }
 }

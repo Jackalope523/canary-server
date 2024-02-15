@@ -154,6 +154,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Openness")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("PendingDeletion")
+                        .HasColumnType("INTEGER");
+
                     b.Property<double>("Radius")
                         .HasColumnType("REAL");
 
@@ -365,6 +368,9 @@ namespace Repository.Migrations.TestMigrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Openness")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("PendingDeletion")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PhoneNumber")

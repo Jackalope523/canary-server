@@ -186,7 +186,7 @@ namespace Repository.Tests
             double newLatitude = 34.052;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.Latitude), newLatitude));
+            updates.Add(("Location", (newLatitude, testEvent.Location.X)));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -212,7 +212,7 @@ namespace Repository.Tests
             double newLongitude = -118.243;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.Longitude), newLongitude));
+            updates.Add(("Location", (testEvent.Location.Y, newLongitude)));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 

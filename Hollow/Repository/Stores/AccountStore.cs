@@ -21,7 +21,6 @@ namespace Repository
                 Name = name,
                 DateOfBirth = dateOfBirth,
                 JoinDate = joinDate,
-                Reputation = 50,
                 Extroversion = character.Extraversion,
                 Athleticisme = character.Athleticism,
                 Openness = character.Openness,
