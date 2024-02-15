@@ -29,8 +29,15 @@ import Post from '../../components/feed/Post';
 import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
 import dropdownOptionsPost from '../../components/DropdownOptionsPost';
 import avatarimg from '../../assets/images/temp/host-img-1.jpg';
+import EventCardSmall from '../../components/EventCardSmall';
+
+import testImage from '../../assets/images/temp/event-img-11.jpg';
+
+import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 
 const TestScreen = () => {
+  const upcomingEventData = SAMPLEEVENTDATA.find((event) => event.id === '2');
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -46,35 +53,17 @@ const TestScreen = () => {
 
       {/* --- START TESTING CODE BELOW --- */}
 
-      <FlagMedium type={FlagType.StartingSoon} time={'02:23:12'} />
-
-      {/* <Avatar
-        size={AvatarSize.Large}
-        status={AvatarStatus.Offline}
-        image={TempAvatarImage}
-      /> */}
-
       <View style={globalStyles.baseContainer}>
-        <Post
-          name="Gale"
-          time="14h"
-          title="Downhill MTB competition at Grey Feather Mountain"
-          attendees={['Beatrice, ', 'John']}
-          leftoverAttendeeCount={4}
-          location="Venice Beach, Venice, CA"
-          likeCount={3}
-          avatar={avatarimg}
+        <EventCardSmall
+          eventHeroImage={upcomingEventData?.uri}
+          eventTitle={upcomingEventData?.title}
+          eventDate={upcomingEventData?.date}
+          eventTime={upcomingEventData?.time}
+          eventLocation={upcomingEventData?.location}
+          eventAttendees={upcomingEventData?.attendees}
+          onPress={() => console.log('Event card image pressed')}
         />
       </View>
-
-      {/* <Button
-        type={ButtonType.Warning}
-        size={ButtonSize.Medium}
-        display={ButtonDisplay.Full}
-        text="Example"
-        Icon={ImportedIcon}
-        displayIcon={true}
-      /> */}
 
       {/* <HeaderFlagAttendee
         title="Attendee header"

@@ -29,10 +29,10 @@ export const SAMPLEEVENTDATA = [
     date: 'Today',
     time: '22:00',
     attendees: 6,
-    title: 'The Spookiest Night of the Year',
+    title: 'The Spookiest Night of the Year - Prepare Your Costumes!',
     description:
       "I'm hosting a Halloween party at my house. Everyone from the neighborhood is welcome to join. Please show up dressed up in a costume that matches the Halloween theme. Food will be provided but you're welcome to bring food and drinks to the get-together. We have planned a movie night and karaoke. If that spikes your interest, come and join the event.",
-    location: '38 Deer Street, Potton',
+    location: '38 Deer Street, Potton Boulevard, Potton',
     uri: img2,
   },
 

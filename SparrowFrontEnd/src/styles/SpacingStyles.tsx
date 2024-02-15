@@ -3,6 +3,9 @@ export const Spacing = {
   // ! ||                                     Spacing                                    ||
   // ! ||--------------------------------------------------------------------------------||
 
+  // Extra, extra small
+  xxs: 2,
+
   // Extra small
   xs: 4,
 
