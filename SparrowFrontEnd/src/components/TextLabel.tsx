@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { globalStyles } from '../styles/GlobalStyles';
 import { Spacing } from '../styles/SpacingStyles';
 import { Colors } from '../styles/ColorStyles';
@@ -8,15 +8,19 @@ export interface TextLabelProps {
   text: string;
   type: LabelType;
   size: LabelSize;
+  display: LabelDisplay;
 
   labelStyle?: ViewStyle[];
+  textStyle?: TextStyle[];
 }
 
 export const TextLabel: React.FC<TextLabelProps> = ({
   text = 'NULL',
   type,
   size,
+  display,
   labelStyle = [],
+  textStyle = [],
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Type                                      ||
@@ -43,23 +47,34 @@ export const TextLabel: React.FC<TextLabelProps> = ({
   switch (size) {
     case LabelSize.Large:
       labelStyle = [...labelStyle, styles.large];
+      textStyle = [globalStyles.labelTextOneAsTyped, globalStyles.textDark];
       break;
 
     case LabelSize.Small:
       labelStyle = [...labelStyle, styles.small];
+      textStyle = [globalStyles.labelTextTwoAsTyped, globalStyles.textDark];
       break;
   }
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                    Display                                     ||
   // ! ||--------------------------------------------------------------------------------||
-  // TODO add display; similar to Button.tsx
+
+  switch (display) {
+    case LabelDisplay.Contained:
+      labelStyle = [...labelStyle, styles.contained];
+      break;
+
+    case LabelDisplay.Full:
+      labelStyle = [...labelStyle, styles.full];
+      break;
+  }
 
   return (
-    <View style={labelStyle}>
-      <Text style={[globalStyles.labelTextOneAsTyped, globalStyles.textDark]}>
-        {text}
-      </Text>
+    <View>
+      <View style={labelStyle}>
+        <Text style={textStyle}>{text}</Text>
+      </View>
     </View>
   );
 };
@@ -79,6 +94,11 @@ export enum LabelSize {
   Small,
 }
 
+export enum LabelDisplay {
+  Contained,
+  Full,
+}
+
 // ! ||--------------------------------------------------------------------------------||
 // ! ||                                     Styles                                     ||
 // ! ||--------------------------------------------------------------------------------||
@@ -93,15 +113,13 @@ const styles = StyleSheet.create({
 
   friend: {
     backgroundColor: Colors.yellow400,
-    // borderColor: Colors.sparrowDarkBrown,
-    // TODO check out this experimental border color
-    borderColor: Colors.yellow700,
+    borderColor: Colors.sparrowDarkBrown,
     borderWidth: 2,
   },
 
   you: {
     backgroundColor: Colors.orange400,
-    borderColor: Colors.orange700,
+    borderColor: Colors.sparrowDarkBrown,
     borderWidth: 2,
   },
 
@@ -113,9 +131,18 @@ const styles = StyleSheet.create({
   },
 
   small: {
-    paddingHorizontal: 12,
+    paddingHorizontal: Spacing.mdsm,
     paddingVertical: Spacing.xs,
     borderRadius: 100,
+  },
+
+  // Display
+  contained: {
+    alignSelf: 'flex-start',
+  },
+
+  full: {
+    alignSelf: 'stretch',
   },
 });
 
