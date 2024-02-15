@@ -63,6 +63,7 @@ namespace Core.Tests
                 harbor.ProfileDatabaseAccess,
                 harbor.ReportDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
+				harbor.AdminDatabaseAccess,
 				new NotificationServiceStub());
 		}
 
@@ -344,9 +345,11 @@ namespace Core.Tests
 			{
 				try
 				{
-					await Terminal.AccountDatabase.DeleteUserAsync(id);
+					Console.WriteLine($"Deleting user {id}");
+					await Terminal.AdminDatabase.VoidUserAsync(id);
+					Console.WriteLine($"Deleted");
 				}
-				catch { }
+				catch (Exception e) { Console.WriteLine(e); }
 			}
 		}
 

@@ -18,6 +18,7 @@ namespace Core.Boundaries
 		public IProfileDatabase ProfileDatabase { get; init; }
 		public IDisciplineDatabase DisciplineDatabase { get; init; }
 		public INotificationDatabase NotificationDatabase { get; init; }
+		public IAdminDatabase AdminDatabase { get; init; }
 
 		public IAccountOperations AccountOperations
 			=> AccountDirector;
@@ -56,14 +57,14 @@ namespace Core.Boundaries
 		public static CoreTerminal CreateTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
 			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
-			INotificationService notificationService)
+			IAdminDatabase adminDatabase, INotificationService notificationService)
 		{
 			lock (initLock)
 			{
 				if (Terminal == null)
 				{
 					Terminal = new CoreTerminal(accountDatabase, eventDatabase, etchingDatabase, profileDatabase,
-					disciplineDatabase, notificationDatabase, notificationService);
+					disciplineDatabase, notificationDatabase, adminDatabase, notificationService);
 				}
 			
 				return Terminal;
@@ -73,7 +74,7 @@ namespace Core.Boundaries
 		private CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
 			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
-			INotificationService notificationService)
+			IAdminDatabase adminDatabase, INotificationService notificationService)
 		{
 			AccountDatabase = accountDatabase;
 			EventDatabase = eventDatabase;
@@ -81,6 +82,7 @@ namespace Core.Boundaries
 			ProfileDatabase = profileDatabase;
 			DisciplineDatabase = disciplineDatabase;
 			NotificationDatabase = notificationDatabase;
+			AdminDatabase = adminDatabase;
 
 			NotificationService = notificationService;
 
