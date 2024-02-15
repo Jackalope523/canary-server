@@ -9,7 +9,7 @@ import img5 from '../assets/images/temp/host-img-5.jpg';
 export const SAMPLE_USER_DATA = [
   {
     id: '1',
-    name: 'Gale',
+    name: 'Robert',
     location: 'Vancouver, Canada',
     friend: true,
     avatar: img1,

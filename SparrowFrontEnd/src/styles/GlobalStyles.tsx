@@ -189,7 +189,6 @@ export const globalStyles = StyleSheet.create({
   },
 
   // Alignment
-
   textAlignCenter: {
     textAlign: 'center',
   },

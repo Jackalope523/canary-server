@@ -17,7 +17,12 @@ import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 import { SAMPLE_USER_DATA } from '../../data/sampleUserData';
 import { Colors } from '../../styles/ColorStyles';
 import { Spacing } from '../../styles/SpacingStyles';
-import TextLabel, { LabelSize, LabelType } from '../../components/TextLabel';
+import TextLabel, {
+  LabelDisplay,
+  LabelSize,
+  LabelType,
+} from '../../components/TextLabel';
+import { labelText } from '../../components/LabelText';
 
 type ProfileProps = StackScreenProps<BottomTabParamList, 'Profile'>;
 
@@ -51,51 +56,79 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
     console.log('user', user);
   }, [user]);
 
+  // Labels
+  // const userSince = 'User since ' + user?.userSince;
+  // const lastSeen = 'Last seen ' + user?.lastSeen + ' ago';
+
   return (
     <View style={globalStyles.baseContainer}>
-      {/* label start temp */}
-      <TextLabel
-        size={LabelSize.Large}
-        type={LabelType.Primary}
-        text="Label text"
-      />
-      {/* label end temp */}
-      <Avatar size={AvatarSize.Large} status={status} image={user?.avatar} />
-      <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-        {user?.name}
-      </Text>
-      <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-        {user?.location}
-      </Text>
-      {friend ? (
-        <Button
-          type={ButtonType.PrimaryDark}
-          size={ButtonSize.ExtraSmall}
-          display={ButtonDisplay.Contained}
-          text={'Invite to event'}
-          displayIcon={true}
-          Icon={AddIcon}
-          onPress={null}
-        />
-      ) : (
-        <Button
-          type={ButtonType.PrimaryDark}
-          size={ButtonSize.ExtraSmall}
-          display={ButtonDisplay.Contained}
-          text={'Add friend'}
-          displayIcon={true}
-          Icon={AddIcon}
-          onPress={null}
-        />
-      )}
-      <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+      <View style={styles.topContainer}>
+        <Avatar size={AvatarSize.Large} status={status} image={user?.avatar} />
+        <View style={styles.userInfo}>
+          <View style={styles.userInfoInner}>
+            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
+              {user?.name}
+            </Text>
+            <TextLabel
+              text={labelText.you}
+              type={LabelType.You}
+              size={LabelSize.Small}
+              display={LabelDisplay.Contained}
+            />
+          </View>
+          <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+            {user?.location}
+          </Text>
+        </View>
+        <View>
+          {friend ? (
+            <Button
+              type={ButtonType.PrimaryDark}
+              size={ButtonSize.ExtraSmall}
+              display={ButtonDisplay.Contained}
+              text={'Invite to event'}
+              displayIcon={true}
+              Icon={AddIcon}
+              onPress={null}
+            />
+          ) : (
+            <Button
+              type={ButtonType.PrimaryDark}
+              size={ButtonSize.ExtraSmall}
+              display={ButtonDisplay.Contained}
+              text={'Add friend'}
+              displayIcon={true}
+              Icon={AddIcon}
+              onPress={null}
+            />
+          )}
+        </View>
+      </View>
+
+      <Text
+        style={[globalStyles.bodyTextOne, globalStyles.textDark, styles.bio]}>
         {user?.bio}
       </Text>
 
       {/* LABELS HERE */}
+      <View style={styles.labelContainer}>
+        <TextLabel
+          text={labelText.userSince}
+          type={LabelType.Primary}
+          size={LabelSize.Small}
+          display={LabelDisplay.Contained}
+        />
+
+        <TextLabel
+          text={labelText.lastSeen}
+          type={LabelType.Primary}
+          size={LabelSize.Small}
+          display={LabelDisplay.Contained}
+        />
+      </View>
 
       {/* EVENTS */}
-      <View>
+      <View style={styles.events}>
         <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
           Events
         </Text>
@@ -142,7 +175,39 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  // EVENTS
+  topContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.lg,
+  },
+
+  userInfo: {
+    alignItems: 'center',
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
+  },
+
+  userInfoInner: {
+    flexDirection: 'row',
+    columnGap: Spacing.mdsm,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  bio: {
+    marginBottom: Spacing.md,
+  },
+
+  // Labels
+  labelContainer: {
+    flexDirection: 'row',
+    columnGap: Spacing.mdsm,
+  },
+
+  // Events
+  events: {
+    marginTop: Spacing.xl,
+  },
+
   eventsContainer: {
     flexDirection: 'row',
     columnGap: Spacing.md,
