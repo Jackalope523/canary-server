@@ -34,6 +34,7 @@ import EventCardSmall from '../../components/EventCardSmall';
 import testImage from '../../assets/images/temp/event-img-11.jpg';
 
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
+import Gallery from '../../components/Gallery';
 
 const TestScreen = () => {
   const upcomingEventData = SAMPLEEVENTDATA.find((event) => event.id === '2');
@@ -54,6 +55,8 @@ const TestScreen = () => {
       {/* --- START TESTING CODE BELOW --- */}
 
       <View style={globalStyles.baseContainer}>
+        <Gallery />
+
         <EventCardSmall
           eventHeroImage={upcomingEventData?.uri}
           eventTitle={upcomingEventData?.title}
