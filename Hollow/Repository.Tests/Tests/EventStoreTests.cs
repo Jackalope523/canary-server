@@ -347,6 +347,7 @@ namespace Repository.Tests
 
             Assert.NotNull(@event);
             Assert.Equal(testEvent.HostId, @event.Host.Id);
+            Assert.Equal(testUser.Name, @event.Host.Name);
             Assert.Equal(testEvent.Name, @event.Name);
             Assert.Equal(testEvent.Description, @event.Description);
             Assert.Equal(testEvent.StartTime, @event.StartTime);
@@ -380,11 +381,16 @@ namespace Repository.Tests
         {
             EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Left);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
+            sentry.ExecuteWrite(ctx => 
+                   ctx.Events.
+                   Where(e => e.Id == testEvent.Id).
+                   ExecuteUpdate(setter => setter.SetProperty(e => e.State, EventState.Ended)));
 
             EventShard @event = (await store.FindPastEventsForUserAsync(testUser.Id)).First();
 
             Assert.NotNull(@event);
             Assert.Equal(testEvent.HostId, @event.Host.Id);
+            Assert.Equal(testUser.Name, @event.Host.Name);
             Assert.Equal(testEvent.Name, @event.Name);
             Assert.Equal(testEvent.Description, @event.Description);
             Assert.Equal(testEvent.StartTime, @event.StartTime);
@@ -392,7 +398,7 @@ namespace Repository.Tests
             Assert.Equal(testEvent.Location.X, @event.Longitude);
             Assert.Equal(testEvent.GroupMinimum, @event.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, @event.GroupMaximum);
-            Assert.Equal(testEvent.State, @event.State);
+            Assert.Equal(EventState.Ended, @event.State);
         }       
         [Fact]
         public async Task RemoveUserAsync_SUCCESS()

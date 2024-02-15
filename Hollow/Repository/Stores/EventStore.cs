@@ -1,7 +1,9 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Shared;
+using System.Linq;
 
 namespace Repository
 {
@@ -127,16 +129,103 @@ namespace Repository
         public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.EventLinks.
-            Where(l => l.UserId == id && (l.Type == EventBond.Guest)).
-            Join(
-                ctx.Events,
+             ctx.EventLinks.
+             Where(l => l.UserId == id && l.Type == EventBond.Guest).
+             Join(
+                ctx.Events.Where(e => e.State == EventState.Upcoming || e.State == EventState.Open),
                 l => l.EventId,
                 e => e.Id,
-                (l,e) => new EventShard
+                (l, e) => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.HostId,
+                    e.Description,
+                    e.StartTime,
+                    e.Location,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness,
+                    e.Radius,
+                    e.IsDynamic
+                }).
+             Join(
+                 ctx.Users,
+                 e => e.HostId,
+                 u => u.Id,
+                 (e, u) => new EventShard
+                 (
+                    e.Id,
+                    new UserSilhouette(u.Id, u.Name),
+                    e.Name,
+                    e.Description,
+                    e.StartTime,
+                    e.Location.Y,
+                    e.Location.X,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    new Character(
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness),
+                    e.Radius,
+                    e.IsDynamic
+                 )).
+               ToListAsync());
+        }
+        public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.UserId == id && l.Type == EventBond.Left).
+            Join(
+               ctx.Events.Where(e => e.State == EventState.Ended),
+               l => l.EventId,
+               e => e.Id,
+               (l, e) => new
+               {
+                  e.Id,               
+                  e.Name,
+                  e.HostId,
+                  e.Description,
+                  e.StartTime,
+                  e.Location,
+                  e.EndTime,
+                  e.State,
+                  e.GroupMinimum,
+                  e.GroupMaximum,                 
+                  e.Extroversion,
+                  e.Athleticisme,
+                  e.Chaos,
+                  e.Competitiveness,
+                  e.Industriousness,
+                  e.NightOwl,
+                  e.Openness,
+                  e.Radius,
+                  e.IsDynamic
+                }).
+            Join(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, u) => new EventShard
                 (
                    e.Id,
-                   new UserSilhouette(e.HostId, e.Host.Name),
+                   new UserSilhouette(u.Id, u.Name),
                    e.Name,
                    e.Description,
                    e.StartTime,
@@ -157,42 +246,7 @@ namespace Repository
                    e.Radius,
                    e.IsDynamic
                 )).
-            ToListAsync());
-        }
-        public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id) 
-        {
-            return await storeSentry.ExecuteReadAsync(ctx =>
-           ctx.EventLinks.
-           Where(l => l.UserId == id && l.Type == EventBond.Left).
-           Join(
-               ctx.Events,
-               l => l.EventId,
-               e => e.Id,
-               (l, e) => new EventShard
-               (
-                  e.Id,
-                  new UserSilhouette(e.HostId, e.Host.Name),
-                  e.Name,
-                  e.Description,
-                  e.StartTime,
-                  e.Location.Y,
-                  e.Location.X,
-                  e.EndTime,
-                  e.State,
-                  e.GroupMinimum,
-                  e.GroupMaximum,
-                  new Character(
-                  e.Extroversion,
-                  e.Athleticisme,
-                  e.Chaos,
-                  e.Competitiveness,
-                  e.Industriousness,
-                  e.NightOwl,
-                  e.Openness),
-                  e.Radius,
-                  e.IsDynamic
-               )).
-           ToListAsync());
+              ToListAsync());
         }
         public async Task<EventShard> FindEventAsync(ulong id)
         {
@@ -391,11 +445,26 @@ namespace Repository
             return states.Last().Type;
         }
         public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState)
-        {          
-            await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.EventLinks.
-                Add(new EventLink { UserId = userId, EventId = eventId, Type = userState }
-                ));
+        {
+            EventLink toAdd = new() 
+            { 
+                UserId = userId, 
+                EventId = eventId, 
+                Type = userState 
+            };
+
+            ulong id = await storeSentry.ExecuteReadAsync(ctx => 
+                       ctx.EventLinks.
+                       Where(l => l.UserId == userId && l.EventId == eventId && l.Type == userState).
+                       Select(l => l.Id).
+                       SingleOrDefaultAsync());
+
+            if (id != 0)
+            {
+                toAdd.Id = id;
+            }
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Update(toAdd));
 
             if (userState == EventBond.Left || userState == EventBond.Kicked || userState == EventBond.Arrived)
             {
