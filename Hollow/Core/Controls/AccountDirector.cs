@@ -196,7 +196,7 @@ namespace Core.Controls
                 else if (nextEvent.IsOngoing &&
                     await nextEvent.IsInRange(user))
                 {
-                    await Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived);
+                    await Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived, Time);
 
                 }
             }

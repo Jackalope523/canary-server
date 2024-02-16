@@ -15,6 +15,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
 using PhoneNumbers;
+using System.Timers;
 
 namespace Core.Tests
 {
@@ -123,7 +124,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.FollowUserAsync(user.Id, otherUser.Id, Psijic.Time);
+					await Terminal.ProfileDatabase.FollowUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}
@@ -137,7 +138,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.BlockUserAsync(user.Id, otherUser.Id, Psijic.Time);
+					await Terminal.ProfileDatabase.BlockUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}
@@ -184,8 +185,8 @@ namespace Core.Tests
 			var eventStub = await GenerateUpcomingEventAsync(host);
 
 			foreach (var guest in guests)
-			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Guest);
+            {
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Guest, DateTimeOffset.UtcNow);
 			}
 
 			return eventStub;
@@ -198,11 +199,11 @@ namespace Core.Tests
 
 			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
 			await Terminal.EventDatabase.UpdateEventAsync(eventStub.Id, new() { (nameof(EventShard.State), EventState.Open) });
-			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived);
+			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived);
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
 			return eventStub;
@@ -214,14 +215,14 @@ namespace Core.Tests
 			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
-			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived);
+			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived);
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
-			await Terminal.EventDatabase.EndEventAsync(eventStub.Id);
+			await Terminal.EventDatabase.EndEventAsync(eventStub.Id, DateTimeOffset.UtcNow);
 
 			return eventStub;
 		}
@@ -238,7 +239,7 @@ namespace Core.Tests
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived);
+				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
 			return eventStub;
@@ -267,7 +268,7 @@ namespace Core.Tests
 
 		internal async Task AddUserToEventAsync(Event @event, User user, EventBond state)
 		{
-			await Terminal.EventDatabase.SetUserStateAsync(user.Id, @event.Id, state);
+			await Terminal.EventDatabase.SetUserStateAsync(user.Id, @event.Id, state, DateTimeOffset.UtcNow);
 		}
 
 		internal async Task SetEventState(Event @event, EventState state)

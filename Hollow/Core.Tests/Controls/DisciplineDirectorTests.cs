@@ -51,7 +51,7 @@ namespace Core.Tests.Controls
 			await director.ReportUserAsync(user.Id, reportedUser.Id, report, reportDetails);
 
 			// Assert
-			Assert.Equal(3, (await user.Reports).Count);
+			Assert.Equal(3, (await reportedUser.Reports).Count);
 		}
 
 		[Fact]

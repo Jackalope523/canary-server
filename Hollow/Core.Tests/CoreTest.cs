@@ -9,6 +9,7 @@ using System.Threading;
 
 namespace Core.Tests
 {
+	[Collection("Core Collection")]
 	public class CoreTest : IAsyncLifetime, IDisposable
 	{
 		private static int testNumber = 0;

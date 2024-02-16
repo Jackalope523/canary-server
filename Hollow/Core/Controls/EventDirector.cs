@@ -169,7 +169,7 @@ namespace Core.Controls
 			}
 			if (IsNotNull(radius))
 			{
-				edits.Add((nameof(EventShard.Radius), editedEvent.Radius));
+				edits.Add((nameof(EventShard.Radius), editedEvent.Radius.Kilometres));
 			}
 			if (IsNotNull(isDynamic))
 			{
@@ -206,7 +206,7 @@ namespace Core.Controls
 
 			// Try to start event
 			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.Open) });
-			await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Arrived);
+			await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Arrived, Time);
 
 			await targetEvent.Started();
 		}
@@ -221,7 +221,7 @@ namespace Core.Controls
 				new InvalidUserException("User does not have permissions to end event."));
 
 			// Try to end to event
-			await Events.EndEventAsync(eventId);
+			await Events.EndEventAsync(eventId, Time);
 
 			var participants = await targetEvent.Ended();
 
@@ -272,7 +272,7 @@ namespace Core.Controls
 			if (!userIntention.HasValue)
 			{
 				// Try to add user to the event
-				await Events.SetUserStateAsync(userId, eventId, EventBond.Watching);
+				await Events.SetUserStateAsync(userId, eventId, EventBond.Watching, Time);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not watch event, user currently {userIntention.Value} event."); }
@@ -324,12 +324,12 @@ namespace Core.Controls
 				await targetEvent.IsInRange(user))
 			{
 				// Try to add user to the event
-				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Arrived);
+				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Arrived, Time);
 			}
 			else
 			{
 				// Try to add user to the event
-				await Events.SetUserStateAsync(userId, eventId, EventBond.Guest);
+				await Events.SetUserStateAsync(userId, eventId, EventBond.Guest, Time);
 			}			
 
 			// Notify host if event has already started
@@ -353,7 +353,7 @@ namespace Core.Controls
 			if (userIntention.Equals(EventBond.Arrived))
 			{
 				// Try to remove user from event
-				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Left);
+				await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Left, Time);
 			}
 			else if (userIntention.Equals(EventBond.Guest))
 			{
@@ -482,7 +482,7 @@ namespace Core.Controls
 				new InvalidUserException("Host cannot kick themself."));
 
 			// Kick target user from event
-			await Events.SetUserStateAsync(targetUser.Id, @event.Id, EventBond.Kicked);
+			await Events.SetUserStateAsync(targetUser.Id, @event.Id, EventBond.Kicked, Time);
 
 			// Hide target user's etchings from event
 			foreach (Etching etching in await @event.Etchings)
