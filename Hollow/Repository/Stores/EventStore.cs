@@ -197,7 +197,7 @@ namespace Repository
                  )).
                ToListAsync());
 
-            List<ulong> eventsArrivedAt = await storeSentry.ExecuteReadAsync(ctx =>
+            List<ulong> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.EventLinks.
                Where(l => l.UserId == id && l.Type == EventBond.Arrived).
                Select(l => l.EventId). 
@@ -205,9 +205,10 @@ namespace Repository
 
             for (int i = 0; i < upcomingEvents.Count; i++)
             {
-                if (eventsArrivedAt.Contains(upcomingEvents[i].Id))
+                if (toExclude.Contains(upcomingEvents[i].Id))
                 {
                     upcomingEvents.RemoveAt(i);
+                    i--;
                 }
             }
 
@@ -568,10 +569,10 @@ namespace Repository
 
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
-            Event e = new() { Id = id, EndTime = DateTimeOffset.UtcNow };
+            Event e = new() { Id = id, EndTime = DateTimeOffset.UtcNow, State = EventState.Ended };
             storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true, currentDiscussion);
-
+            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.State)).IsModified = true, currentDiscussion);
             await storeSentry.EndDiscussionAsync(currentDiscussion);         
         }
     }
