@@ -22,12 +22,12 @@ namespace Core.Boundaries
         Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
         Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId);
 
-        Task FollowUserAsync(ulong userId, ulong targetUserId);
+        Task FollowUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnfollowUserAsync(ulong userId, ulong targetUserId);
-		Task BlockUserAsync(ulong userId, ulong targetUserId);
+		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnblockUserAsync(ulong userId, ulong targetUserId);
 
-		Task RateUserAsync(ulong userId, ulong targetUserId, UserRating rating);
+		Task RateUserAsync(ulong userId, ulong targetUserId, UserRating rating, DateTimeOffset time);
 		Task RemoveUserRatingAsync(ulong userId, ulong targetUserId);
 		Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong userId);
     }

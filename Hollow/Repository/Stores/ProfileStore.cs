@@ -17,13 +17,13 @@ namespace Repository
         {
         }
         
-        public async Task FollowUserAsync(ulong selfId, ulong targetId) 
+        public async Task FollowUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
             UserLink toAdd = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
-                Time = DateTimeOffset.UtcNow,
+                Time = time,
                 Type = UserLink.UserLinkType.Follow
             };
 
@@ -34,13 +34,13 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Follow));
         }
-        public async Task BlockUserAsync(ulong selfId, ulong targetId) 
+        public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
             UserLink toAdd = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
-                Time = DateTimeOffset.UtcNow,
+                Time = time,
                 Type = UserLink.UserLinkType.Block
             };
 
@@ -115,7 +115,7 @@ namespace Repository
             return (await up, await down);
         }
 
-        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating)
+        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating, DateTimeOffset time)
         {
             UserLink.UserLinkType type;
             if (rating.Equals(UserRating.Positive)) type = UserLink.UserLinkType.RateUp;
@@ -125,7 +125,7 @@ namespace Repository
             {
                 SelfId = selfId,
                 OtherId = targetId,
-                Time = DateTimeOffset.UtcNow,
+                Time = time,
                 Type = type
             };
 
