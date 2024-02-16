@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Xunit.Abstractions;
+using Shared;
 
 namespace Repository.Tests
 {
@@ -35,38 +36,50 @@ namespace Repository.Tests
         [Fact]
         public async Task FollowUserAsync_SUCCESS()
         {
-            await profileStore.FollowUserAsync(subject1.Id, subject2.Id);
+            DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            UserLink link = await sentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).SingleAsync());
+            await profileStore.FollowUserAsync(subject1.Id, subject2.Id, time);
+
+            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).Single());
 
             Assert.NotNull(link);
+            Assert.Equal(subject1.Id, link.SelfId);
+            Assert.Equal(subject2.Id, link.OtherId);
+            Assert.Equal(time, link.Time);
             Assert.Equal(UserLink.UserLinkType.Follow, link.Type);
         }
         [Fact]
         public async Task UnfollowUserAsync_SUCCESS()
         {
-            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(new UserLink { SelfId = subject1.Id, OtherId = subject2.Id, Type = UserLink.UserLinkType.Follow }));
+            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Follow);
+            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
             await profileStore.UnfollowUserAsync(subject1.Id, subject2.Id);
 
-            int numLinks = await sentry.ExecuteReadAsync(ctx => ctx.UserLinks.CountAsync());
+            int count = sentry.ExecuteRead(ctx => ctx.UserLinks.Count());
 
-            Assert.Equal(0, numLinks);
+            Assert.Equal(0, count);
         }
         [Fact]
         public async Task BlockUserAsync_SUCCESS()
         {
-            await profileStore.BlockUserAsync(subject1.Id, subject2.Id);
+            DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            UserLink link = await sentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).SingleAsync());
+            await profileStore.BlockUserAsync(subject1.Id, subject2.Id, time);
+
+            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).Single());
 
             Assert.NotNull(link);
+            Assert.Equal(subject1.Id, link.SelfId);
+            Assert.Equal(subject2.Id, link.OtherId);
+            Assert.Equal(time, link.Time);
             Assert.Equal(UserLink.UserLinkType.Block, link.Type);
         }
         [Fact]
         public async Task UnblockUserAsync_SUCCESS()
         {
-            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(new UserLink { SelfId = subject1.Id, OtherId = subject2.Id, Type = UserLink.UserLinkType.Block }));
+            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Block);
+            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
             await profileStore.UnblockUserAsync(subject1.Id, subject2.Id);
 
@@ -77,30 +90,38 @@ namespace Repository.Tests
         [Fact]
         public async Task RateUserAsync_UP()
         {
-            await profileStore.RateUserAsync(subject1.Id, subject2.Id, Shared.UserRating.Positive);
+            DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            UserLink link = await sentry.ExecuteReadAsync(ctx => ctx.UserLinks.SingleAsync());
+            await profileStore.RateUserAsync(subject1.Id, subject2.Id, UserRating.Positive, time);
 
+            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Single());
+
+            Assert.NotNull(link);
             Assert.Equal(subject1.Id, link.SelfId);
             Assert.Equal(subject2.Id, link.OtherId);
+            Assert.Equal(time, link.Time);
             Assert.Equal(UserLink.UserLinkType.RateUp, link.Type);
         }
         [Fact]
         public async Task RateUserAsync_Down()
         {
-            await profileStore.RateUserAsync(subject1.Id, subject2.Id, Shared.UserRating.Negative);
+            DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            UserLink link = await sentry.ExecuteReadAsync(ctx => ctx.UserLinks.SingleAsync());
+            await profileStore.RateUserAsync(subject1.Id, subject2.Id, UserRating.Negative, time);
 
+            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Single());
+
+            Assert.NotNull(link);
             Assert.Equal(subject1.Id, link.SelfId);
             Assert.Equal(subject2.Id, link.OtherId);
+            Assert.Equal(time, link.Time);
             Assert.Equal(UserLink.UserLinkType.RateDown, link.Type);
         }
         [Fact]
         public async Task RemoveUserRatingAsync_SUCCESS()
         {
             UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.RateUp);
-            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
+            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
             await profileStore.RemoveUserRatingAsync(subject1.Id, subject2.Id);
 
@@ -114,7 +135,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Follow);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
 
-            UserSilhouette user = (await profileStore.GetFollowedUsersAsync(subject1.Id)).First();
+            UserSilhouette user = (await profileStore.GetFollowedUsersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -126,7 +147,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Block);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(link));
 
-            UserSilhouette user = (await profileStore.GetBlockedUsersAsync(subject1.Id)).First();
+            UserSilhouette user = (await profileStore.GetBlockedUsersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -153,7 +174,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            UserSilhouette user = (await profileStore.GetFriendsAsync(subject1.Id)).First();
+            UserSilhouette user = (await profileStore.GetFriendsAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -165,7 +186,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
-            UserSilhouette user = (await profileStore.GetUsersFollowingAsync(subject1.Id)).First();
+            UserSilhouette user = (await profileStore.GetUsersFollowingAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -177,7 +198,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Block);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
-            UserSilhouette user = (await profileStore.GetUsersBlockingAsync(subject1.Id)).First();
+            UserSilhouette user = (await profileStore.GetUsersBlockingAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
