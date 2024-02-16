@@ -8,7 +8,7 @@ namespace Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=/Users/coss/Desktop/Projects/project-sparrow/Hollow/Repository/TestDB.db", x => x.UseNetTopologySuite());
+            optionsBuilder.UseSqlite("Data Source=C:\\Users\\ECote\\source\\repos\\project-sparrow\\Hollow\\Repository\\TestDB.db", x => x.UseNetTopologySuite());
             optionsBuilder.UseExceptionProcessor();
         }
 

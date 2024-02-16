@@ -12,7 +12,7 @@ using Repository;
 namespace Repository.Migrations.TestMigrations
 {
     [DbContext(typeof(TestContext))]
-    [Migration("20240215023405_Init")]
+    [Migration("20240216013003_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -142,6 +142,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<bool>("IsDynamic")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsPendingDeletion")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Point>("Location")
                         .IsRequired()
                         .HasColumnType("POINT")
@@ -155,9 +158,6 @@ namespace Repository.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Openness")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("PendingDeletion")
                         .HasColumnType("INTEGER");
 
                     b.Property<double>("Radius")
@@ -350,6 +350,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<bool>("IsEmailConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsPendingDeletion")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsPhoneConfirmed")
                         .HasColumnType("INTEGER");
 
@@ -371,9 +374,6 @@ namespace Repository.Migrations.TestMigrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Openness")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("PendingDeletion")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PhoneNumber")
