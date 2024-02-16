@@ -67,7 +67,7 @@ namespace Repository.Tests
             Assert.Equal(User.DefaultLockoutDate, created.LockoutDate);
             Assert.Equal(User.DefaultAccessTries, created.AccessTries);
             Assert.Equal(User.DefaultAccountStatus, created.AccountStatus);
-            Assert.Equal(subject.PendingDeletion, created.PendingDeletion);
+            Assert.Equal(subject.IsPendingDeletion, created.IsPendingDeletion);
             Assert.Equal(subject.Extroversion, created.Extroversion);
             Assert.Equal(subject.Athleticisme, created.Athleticisme);
             Assert.Equal(subject.Chaos, created.Chaos);

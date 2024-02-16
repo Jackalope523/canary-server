@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Shared;
 
@@ -35,7 +36,36 @@ namespace Repository
 
         public async Task DeleteUserAsync(ulong id)
         {
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Remove(new User { Id = id }));
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Users.
+                Where(u => u.Id == id).
+                ExecuteUpdate(setter => setter.SetProperty(u => u.IsPendingDeletion, true)));
+
+            List<ulong> upcomingEvents = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Events.
+                Where(e => e.HostId == id && e.State == EventState.Upcoming).
+                Select(e => e.Id).
+                ToListAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Events.
+               Where(e => upcomingEvents.Contains(e.Id)).
+               ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
+        
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Notes.
+               Where(n => n.NotifierId == id || n.RecipientId == id).
+               ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Posts.
+               Where(p => p.OwnerId == id).
+               ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Subscriptions.
+               Where(s => s.UserId == id).
+               ExecuteDelete());
         }
 
         public async Task<UserShard> FindUserByIdAsync(ulong id) 
@@ -44,7 +74,10 @@ namespace Repository
             UserShard user;
             try 
             {
-               user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new UserShard
+               user = await storeSentry.ExecuteReadAsync(ctx => 
+               ctx.Users.
+               Where(u => u.Id == id).
+               Select(u => new UserShard
                (
                    u.Id,
                    u.PhoneNumber,
@@ -53,6 +86,7 @@ namespace Repository
                    u.DateOfBirth,
                    u.IsPhoneConfirmed,
                    u.IsEmailConfirmed,
+                   u.IsPendingDeletion,
                    u.SecurityStamp,
                    u.LockoutDate,
                    u.AccessTries,
@@ -85,7 +119,10 @@ namespace Repository
             UserShard user;
             try
             {
-              user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.PhoneNumber == phoneNumber).Select(u => new UserShard
+              user = await storeSentry.ExecuteReadAsync(ctx => 
+              ctx.Users.
+              Where(u => u.PhoneNumber == phoneNumber).
+              Select(u => new UserShard
               (
                   u.Id,
                   u.PhoneNumber,
@@ -94,6 +131,7 @@ namespace Repository
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
+                  u.IsPendingDeletion,
                   u.SecurityStamp,
                   u.LockoutDate,
                   u.AccessTries,
@@ -126,7 +164,10 @@ namespace Repository
             UserShard user;
             try
             {
-              user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Email == email).Select(u => new UserShard
+              user = await storeSentry.ExecuteReadAsync(ctx => 
+              ctx.Users.
+              Where(u => u.Email == email).
+              Select(u => new UserShard
               (
                   u.Id,
                   u.PhoneNumber,
@@ -135,6 +176,7 @@ namespace Repository
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
+                  u.IsPendingDeletion,
                   u.SecurityStamp,
                   u.LockoutDate,
                   u.AccessTries,

@@ -71,6 +71,9 @@ namespace Repository.Tests
             Assert.Equal(testEvent.GroupMinimum, created.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, created.GroupMaximum);
             Assert.Equal(testEvent.State, created.State);
+            Assert.Equal(testEvent.State, created.State);
+            Assert.Equal(testEvent.State, created.State);
+            Assert.Equal(testEvent.State, created.State);
         }
         [Fact]
         public async Task FindEventAsync_SUCCESS()

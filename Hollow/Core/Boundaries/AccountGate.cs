@@ -10,7 +10,7 @@ namespace Core.Boundaries
 	{ Active, Impotent, Limited, Suspended, Blacklisted }
 
 	public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
-		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
+		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
 

@@ -21,7 +21,7 @@ namespace Repository
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
         public ulong? CurrentEvent { get; set; } = DefaultCurrentEvent;
-        public bool PendingDeletion { get; set; } = DefaultPendingDeletion;
+        public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -66,7 +66,7 @@ namespace Repository
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
         public static ulong? DefaultCurrentEvent { get; set; } = null;
-        public static bool DefaultPendingDeletion { get; set; } = false;
+        public static bool DefaultIsPendingDeletion { get; set; } = false;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;

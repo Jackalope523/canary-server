@@ -22,7 +22,7 @@ namespace Repository
         public DateTimeOffset? EndTime { get; set; }
         public double Radius { get; set; } = DefaultRadius;
         public bool IsDynamic { get; set; } = DefaultIsDynamic;
-        public bool PendingDeletion { get; set; } = DefaultPendingDeletion;
+        public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -54,7 +54,7 @@ namespace Repository
         public static int DefaultGroupMaximum { get; set; } = 10;
         public static double DefaultRadius { get; set; } = 10.000;
         public static bool DefaultIsDynamic { get; set; } = false;
-        public static bool DefaultPendingDeletion { get; set; } = false;
+        public static bool DefaultIsPendingDeletion { get; set; } = false;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;

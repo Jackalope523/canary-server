@@ -13,7 +13,7 @@ namespace Core.Boundaries
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
-		double Radius, bool IsDynamic, bool IsDeleted);
+		double Radius, bool IsDynamic, bool IsPendingDeletion);
 	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
 
 	#endregion
