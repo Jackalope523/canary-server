@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
     [Collection("Database Collection")]
     public class AdminStoreTests
