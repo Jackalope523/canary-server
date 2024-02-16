@@ -181,6 +181,11 @@ namespace Core.Entities
             return friends;
         }
 
+        public async Task<List<Etching>> GetEtchingsOf(User user)
+        {
+            return (await Etchings).Where(etching => etching.UserId.Equals(user.Id)).ToList();
+        }
+
 		#endregion
 
 		#region Checks

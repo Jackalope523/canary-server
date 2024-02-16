@@ -44,8 +44,25 @@ namespace Core.Controls
 
             (List<EventThinSlice> Events, List<Etching> Etchings) nest = (new(), new());
 
+            // Check if user is themself
+            if (user.Equals(targetUser))
+            {
+                // Gather active and upcoming events visible to the user
+                var upcomingActivity = await GetUserActivity(targetUser);
+                await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
+
+                // Get private events and etchings
+                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventThinSlice());
+                nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
+
+                foreach (var thinSlice in nest.Events)
+                {
+                    Event @event = new(thinSlice);
+                    nest.Etchings.AddRange(await @event.Etchings);
+                }
+            }
             // Check if users are friends
-            if (await targetUser.IsFriendsWith(user))
+            else if (await targetUser.IsFriendsWith(user))
             {
                 // Gather active and upcoming events visible to the user
                 var upcomingActivity = await GetUserActivity(targetUser);
@@ -64,10 +81,16 @@ namespace Core.Controls
                 nest.Events = hostedEvents.ConvertAll(e => e.ToEventThinSlice());
 
                 // Get common events
-                nest.Events.AddRange((await targetUser.PastEvents)
+                var commonEvents = (await targetUser.PastEvents)
                     .Except(hostedEvents)
                     .Intersect(await user.PastEvents)
-                    .ToList().ConvertAll(e => e.ToEventThinSlice()));
+                    .ToList().ConvertAll(e => e.ToEventThinSlice());
+
+                nest.Events.AddRange(commonEvents);
+
+                var targetEtchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
+
+                nest.Etchings.AddRange(targetEtchings.Where(etching => commonEvents.Exists(e => e.Id.Equals(etching.EventId))));
             }
 
             return nest;
@@ -230,7 +253,8 @@ namespace Core.Controls
             // Gather all user event data
             var upcomingActivity = await user.UpcomingEvents;
 
-            upcomingActivity.Add(await user.CurrentEvent);
+            if (!(await user.CurrentEvent).Equals(Event.None))
+            { upcomingActivity.Add(await user.CurrentEvent); }
 
             return upcomingActivity
 				.ConvertAll(@event => @event.ToEventShard());
