@@ -158,7 +158,7 @@ namespace Core.Controls
             Fail(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User cannot follow blocked/blocking user."));
 
-            await Profiles.FollowUserAsync(userId, targetId);
+            await Profiles.FollowUserAsync(userId, targetId, Psijic.Time);
         }
 
         public async Task UnfollowUserAsync(ulong userId, ulong targetId)
@@ -174,7 +174,7 @@ namespace Core.Controls
 			Fail(user.Equals(targetUser),
 				new InvalidUserException("User cannot block themself."));
 
-			await Profiles.BlockUserAsync(userId, targetId);
+			await Profiles.BlockUserAsync(userId, targetId, Psijic.Time);
         }
 
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
@@ -193,7 +193,7 @@ namespace Core.Controls
             // Check if rating is to remove
             if (rating != UserRating.Remove)
             {
-                await Profiles.RateUserAsync(userId, targetId, rating);
+                await Profiles.RateUserAsync(userId, targetId, rating, Psijic.Time);
             }
             else
             {

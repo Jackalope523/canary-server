@@ -31,7 +31,14 @@ namespace Core.Controls
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            await Reports.ReportUserAsync(userId, occuringEvent.Id, targetUser.Id, Time, reportType, reportDetails);
+            if (occuringEvent.Equals(Event.None))
+            {
+                await Reports.ReportUserAsync(userId, targetUser.Id, Time, reportType, reportDetails);
+            }
+            else
+            {
+                await Reports.ReportUserAsync(userId, occuringEvent.Id, targetUser.Id, Time, reportType, reportDetails);
+            }
 
             // Compute user's standing
             var status = await targetUser.Reported();

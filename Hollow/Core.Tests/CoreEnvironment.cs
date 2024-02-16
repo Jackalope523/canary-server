@@ -123,7 +123,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.FollowUserAsync(user.Id, otherUser.Id);
+					await Terminal.ProfileDatabase.FollowUserAsync(user.Id, otherUser.Id, Psijic.Time);
 				}
 			}
 		}
@@ -137,7 +137,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.BlockUserAsync(user.Id, otherUser.Id);
+					await Terminal.ProfileDatabase.BlockUserAsync(user.Id, otherUser.Id, Psijic.Time);
 				}
 			}
 		}
