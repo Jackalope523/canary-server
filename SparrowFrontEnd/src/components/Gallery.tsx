@@ -1,4 +1,11 @@
-import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React from 'react';
 import { globalStyles } from '../styles/GlobalStyles';
 import TextButton, { TextButtonType, TextButtonVariant } from './TextButton';
@@ -11,6 +18,7 @@ import { Spacing } from '../styles/SpacingStyles';
 import smLayout from '../assets/icons/layout-size-small-fill.svg';
 import mdLayout from '../assets/icons/layout-size-medium-fill.svg';
 import lgLayout from '../assets/icons/layout-size-large-fill.svg';
+import Chevron from '../assets/icons/chevron-outline.svg';
 
 // TODO fix "VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead."
 
@@ -21,18 +29,43 @@ const Gallery: React.FC<GalleryProps> = () => {
   // ! ||                                     Layout                                     ||
   // ! ||--------------------------------------------------------------------------------||
   const [numColumns, setNumColumns] = React.useState(1);
+  const [showAllItems, setShowAllItems] = React.useState(false);
 
+  // View more
+  const onViewMore = () => {
+    console.log('View more button pressed');
+    setShowAllItems(!showAllItems);
+  };
+
+  // Control the number of items displayed based on the layout
+  const displayedData = showAllItems
+    ? SAMPLE_PAST_EVENT_DATA[0].media
+    : numColumns === 1
+    ? SAMPLE_PAST_EVENT_DATA[0].media.slice(0, 2)
+    : numColumns === 2
+    ? SAMPLE_PAST_EVENT_DATA[0].media.slice(0, 4)
+    : numColumns === 3
+    ? SAMPLE_PAST_EVENT_DATA[0].media.slice(0, 6)
+    : [];
+
+  // Handle layout change
   const changeLayout = () => {
     console.log('Change layout button pressed');
 
     if (numColumns === 1) {
       setNumColumns(2);
+      setShowAllItems(false);
+
       console.log('Set from:', numColumns, 'to', numColumns + 1);
     } else if (numColumns === 2) {
       setNumColumns(3);
+      setShowAllItems(false);
+
       console.log('Set from:', numColumns, 'to', numColumns + 1);
     } else if (numColumns === 3) {
       setNumColumns(1);
+      setShowAllItems(false);
+
       console.log('Set from:', numColumns, 'to', numColumns - 2);
     }
   };
@@ -43,7 +76,6 @@ const Gallery: React.FC<GalleryProps> = () => {
   };
 
   // Column layouts
-
   const oneCol = {
     width: imgSize.full,
     height: imgSize.full,
@@ -84,7 +116,7 @@ const Gallery: React.FC<GalleryProps> = () => {
       </View>
 
       <FlatList
-        data={SAMPLE_PAST_EVENT_DATA[0].media}
+        data={displayedData}
         renderItem={({ item }) => (
           <View
             style={
@@ -111,6 +143,24 @@ const Gallery: React.FC<GalleryProps> = () => {
             : styles.threeColWrapper
         }
       />
+
+      <Pressable style={styles.viewMore} onPress={onViewMore}>
+        <Text style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
+          View more
+        </Text>
+
+        {/* TODO animate later if necessary - might get away without animating though */}
+        <Chevron
+          width={24}
+          height={24}
+          fill={Colors.sparrowDarkBrown}
+          style={
+            showAllItems
+              ? { transform: [{ rotate: '180deg' }] }
+              : { transform: [{ rotate: '0deg' }] }
+          }
+        />
+      </Pressable>
     </View>
   );
 };
@@ -162,5 +212,13 @@ const styles = StyleSheet.create({
   },
   threeColSeparator: {
     height: Spacing.md,
+  },
+
+  // View more
+  viewMore: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: Spacing.md,
   },
 });
