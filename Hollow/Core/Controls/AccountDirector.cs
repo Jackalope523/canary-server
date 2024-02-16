@@ -184,7 +184,7 @@ namespace Core.Controls
             }
             // Check if user is on their way to an event
             else if (!await userIsAtEvent &&
-                nextEvent != Event.None)
+                !nextEvent.Equals(Event.None))
             {
                 // Check if user is host and can start event
                 if (nextEvent.IsWaiting &&

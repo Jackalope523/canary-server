@@ -90,7 +90,7 @@ namespace Core.Tests
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
         {
             await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
-				userStub.Name, userStub.DateOfBirth, Psijic.Time, CharacterVector.Default.ToCharacter());
+				userStub.Name, userStub.DateOfBirth, DateTimeOffset.UtcNow, CharacterVector.Default.ToCharacter());
 
 			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
 
@@ -345,9 +345,7 @@ namespace Core.Tests
 			{
 				try
 				{
-					Console.WriteLine($"Deleting user {id}");
 					await Terminal.AdminDatabase.VoidUserAsync(id);
-					Console.WriteLine($"Deleted");
 				}
 				catch (Exception e) { Console.WriteLine(e); }
 			}

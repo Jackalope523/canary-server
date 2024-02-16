@@ -230,7 +230,8 @@ namespace Core.Controls
             // Gather all user event data
             var upcomingActivity = await user.UpcomingEvents;
 
-            upcomingActivity.Add(await user.CurrentEvent);
+            if (!(await user.CurrentEvent).Equals(Event.None))
+            { upcomingActivity.Add(await user.CurrentEvent); }
 
             return upcomingActivity
 				.ConvertAll(@event => @event.ToEventShard());
