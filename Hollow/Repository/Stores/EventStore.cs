@@ -475,13 +475,14 @@ namespace Repository
 
             return states.Last().Type;
         }
-        public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState)
+        public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState, DateTimeOffset time)
         {
             EventLink toAdd = new() 
             { 
                 UserId = userId, 
                 EventId = eventId, 
-                Type = userState 
+                Type = userState, 
+                Time = time
             };
 
             ulong id = await storeSentry.ExecuteReadAsync(ctx => 
@@ -552,7 +553,7 @@ namespace Repository
             }
             return toReturn;
         }
-        public async Task EndEventAsync(ulong id)
+        public async Task EndEventAsync(ulong id, DateTimeOffset time)
         {
             List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Users.
@@ -563,7 +564,7 @@ namespace Repository
             List<Task> tasks = new();
             foreach (ulong guest in guests)
             {
-                tasks.Add(SetUserStateAsync(guest, id, EventBond.Left));
+                tasks.Add(SetUserStateAsync(guest, id, EventBond.Left, time));
             }
             await Task.WhenAll(tasks);       
 
@@ -573,6 +574,7 @@ namespace Repository
             storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true, currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.State)).IsModified = true, currentDiscussion);
+
             await storeSentry.EndDiscussionAsync(currentDiscussion);         
         }
     }

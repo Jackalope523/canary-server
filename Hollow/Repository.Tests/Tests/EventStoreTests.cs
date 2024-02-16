@@ -461,6 +461,7 @@ namespace Repository.Tests
         [Fact]
         public async Task EndEventAsync_SUCCESS()
         {
+            DateTimeOffset time = DateTimeOffset.UtcNow;
             EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Arrived, DateTimeOffset.MinValue);
 
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
@@ -469,7 +470,7 @@ namespace Repository.Tests
                 Where(u => u.Id == testUser.Id).
                 ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentEvent, testEvent.Id)));
 
-            await store.EndEventAsync(testEvent.Id);
+            await store.EndEventAsync(testEvent.Id, time);
 
             List<EventLink> links = await sentry.ExecuteReadAsync(ctx => 
                 ctx.EventLinks.
@@ -530,7 +531,8 @@ namespace Repository.Tests
         [Fact]
         public async Task SetUserStateAsync_SUCCESS()
         {
-            await store.SetUserStateAsync(testUser.Id, testEvent.Id, EventBond.Guest);
+            DateTimeOffset time = DateTimeOffset.UtcNow;
+            await store.SetUserStateAsync(testUser.Id, testEvent.Id, EventBond.Guest, time);
 
             EventLink link = await sentry.ExecuteReadAsync(ctx => ctx.EventLinks.SingleAsync());
 

@@ -1,6 +1,5 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace Repository
@@ -63,8 +62,8 @@ namespace Repository
 
         public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>)> GetReportsForUserAsync(ulong id)
         {
-            Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
-             UserReports.
+            Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => 
+             ctx.UserReports.
              Where(r => r.OtherId == id).
              Select(r => new Core.Boundaries.UserReport
              (
@@ -128,7 +127,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(toCreate));
         }
 
-        public async Task ReportUserAsync(ulong selfId, ulong eventId, ulong targetId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(ulong selfId, ulong targetId, ulong eventId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
         {
             UserReport toCreate = new()
             {

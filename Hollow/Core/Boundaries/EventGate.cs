@@ -34,11 +34,11 @@ namespace Core.Boundaries
 			int groupMinimum, int groupMaximum, Character character,
 			double Radius, bool isDynamic);
 		Task UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
-		Task EndEventAsync(ulong eventId);
+		Task EndEventAsync(ulong eventId, DateTimeOffset time);
 		Task DeleteEventAsync(ulong eventId);
 
 		Task<EventBond?> GetUserStateAsync(ulong userId, ulong eventId);
-		Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState);
+		Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState, DateTimeOffset time);
 		Task RemoveUserAsync(ulong userId, ulong eventId);
 
 		Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId);
