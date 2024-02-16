@@ -498,6 +498,7 @@ namespace Repository.Tests
             Assert.Equal(testEvent.Location.X, ended.Location.X);
             Assert.Equal(testEvent.GroupMinimum, ended.GroupMinimum);
             Assert.Equal(testEvent.GroupMaximum, ended.GroupMaximum);
+            Assert.Equal(EventState.Ended, ended.State);
             Assert.NotNull(ended.EndTime);
         }
         [Fact]
