@@ -45,6 +45,7 @@ namespace Core.Entities
         public bool IsPhoneConfirmed { get; set; }
         public bool IsEmailConfirmed { get; set; }
 
+        public bool IsDeleted { get; set; }
         public string SecurityStamp { get; set; }
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
@@ -139,6 +140,7 @@ namespace Core.Entities
             NumberOfFollowers = fromUser.NumberOfFollowers;
             IsPhoneConfirmed = fromUser.IsPhoneConfirmed;
             IsEmailConfirmed = fromUser.IsEmailConfirmed;
+            IsDeleted = fromUser.IsPendingDeletion;
             SecurityStamp = fromUser.SecurityStamp;
             LockoutDate = fromUser.LockoutDate;
             AccessTries = fromUser.AccessTries;
@@ -163,7 +165,7 @@ namespace Core.Entities
         public UserShard ToUserShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-                IsPhoneConfirmed, IsEmailConfirmed,
+                IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
         }

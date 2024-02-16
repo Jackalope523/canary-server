@@ -93,7 +93,8 @@ namespace Frontier
 				harbor.EtchingDatabaseAccess,
 				harbor.ProfileDatabaseAccess, 
 				harbor.ReportDatabaseAccess,
-                harbor.NotificationDatabaseAccess, 
+                harbor.NotificationDatabaseAccess,
+				harbor.AdminDatabaseAccess,
 				pushNotifications);
 
 			foreach (var (GateType, Instance) in terminal.Gates)

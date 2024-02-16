@@ -116,7 +116,7 @@ namespace Core.Entities
             Character = new(fromEvent.Character);
             Radius = new() { Kilometres = fromEvent.Radius };
             IsDynamic = fromEvent.IsDynamic;
-            IsDeleted = fromEvent.IsDeleted;
+            IsDeleted = fromEvent.IsPendingDeletion;
         }
 
         public Event(EventThinSlice fromEvent) : this()

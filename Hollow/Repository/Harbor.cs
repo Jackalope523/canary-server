@@ -1,4 +1,5 @@
 ﻿using Core.Boundaries;
+using Repository.Stores;
 using Shared;
 
 namespace Repository
@@ -13,6 +14,7 @@ namespace Repository
         public IEventDatabase EventDatabaseAccess { get; private set; }
         public IEtchingDatabase EtchingDatabaseAccess { get; private set; }
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
+        public IAdminDatabase AdminDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -25,6 +27,7 @@ namespace Repository
                     EventDatabaseAccess = new EventStore(new TestSentry());
                     EtchingDatabaseAccess = new EtchingStore(new TestSentry());
                     ReportDatabaseAccess = new DisciplineStore(new TestSentry());               
+                    AdminDatabaseAccess = new AdminStore(new TestSentry());  
                     break;
 
                 case Flag.Production:
@@ -33,7 +36,8 @@ namespace Repository
                     NotificationDatabaseAccess = new NotificationStore(new AzureSentry());
                     EventDatabaseAccess = new EventStore(new AzureSentry());
                     EtchingDatabaseAccess = new EtchingStore(new AzureSentry());
-                    ReportDatabaseAccess = new DisciplineStore(new AzureSentry());
+                    ReportDatabaseAccess = new DisciplineStore(new AzureSentry());             
+                    AdminDatabaseAccess = new AdminStore(new AzureSentry());
                     break;
 
                 default:

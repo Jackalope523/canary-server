@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repository.Stores
 {
-    internal class AdminStore : QueryStore, IAdminDatabase
+    public class AdminStore : QueryStore, IAdminDatabase
     {
         public AdminStore(Sentry sentry) : base(sentry)
         {
