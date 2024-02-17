@@ -199,6 +199,20 @@ export async function endEvent(eventID: number) {
         .catch(handleError);
 }
 
+// Delete event
+export async function deleteEvent(eventID: number) {
+    if (!eventID) {
+        console.log('EventID is missing.');
+        return Promise.reject();
+    }
+
+    return await userSession.delete(`${apiBaseUrl}/${eventID}`)
+        .then(() => {
+            console.log('Event Deleted Successfully');
+        })
+        .catch(handleError);
+}
+
 // Watch event
 export async function watchEvent(eventID: number) {
     if (!eventID) {
