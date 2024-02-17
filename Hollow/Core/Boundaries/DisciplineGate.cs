@@ -15,8 +15,7 @@ namespace Core.Boundaries
 	public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);
 
-    public record EventReport(ulong Id, ulong ReportingUserId, ulong ReportedEventId,
-        ulong ReportedEventHostId, DateTimeOffset ReportTime,
+    public record EventReport(ulong Id, ulong ReportingUserId, ulong ReportedEventId, DateTimeOffset ReportTime,
         EventReportType ReportType, string ReportDetails);
 
 	#endregion
@@ -30,11 +29,13 @@ namespace Core.Boundaries
 
         Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(ulong userId);
         Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(ulong userId);
-        Task ReportUserAsync(ulong userId, ulong eventId, ulong targetUserId,
+        Task ReportUserAsync(ulong userId, ulong targetUserId, ulong eventId, DateTimeOffset timeOfReport,
+            UserReportType reportType, string reportDetails);
+        Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport,
             UserReportType reportType, string reportDetails);
 
         Task<List<EventReport>> GetReportsForEventAsync(ulong eventId);
-        Task ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
+        Task ReportEventAsync(ulong userId, ulong eventId, DateTimeOffset timeOfReport,
             EventReportType reportType, string reportDetails);
     }
 

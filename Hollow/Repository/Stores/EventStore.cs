@@ -15,10 +15,10 @@ namespace Repository
         {
             Event toCreate = new()
             {
-                HostId = hostId,
                 Name = name,
                 Description = description,
                 StartTime = startTime,
+                HostId = hostId,
                 Location = new CoordinateFactory().Create(longitude, latitude),
                 GroupMinimum = groupMinimum,
                 GroupMaximum = groupMaximum,
@@ -34,7 +34,19 @@ namespace Repository
 
             };
 
+
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Events.Add(toCreate));
+
+            EventLink hostLink = new() 
+            { 
+                UserId = hostId,
+                EventId = toCreate.Id,
+                Type = EventBond.Guest,      
+                Time = DateTimeOffset.UtcNow
+            };
+            
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Add(hostLink));
+
             UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync());
 
 
@@ -60,8 +72,16 @@ namespace Repository
                    toCreate.NightOwl,
                    toCreate.Openness),
                    toCreate.Radius,
-                   toCreate.IsDynamic                   
+                   toCreate.IsDynamic,
+                   toCreate.IsPendingDeletion
                    );
+        }
+        public async Task DeleteEventAsync(ulong eventId)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => 
+                ctx.Events.
+                Where(e => e.Id == eventId).
+                ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));       
         }
         public async Task<EventShard> FindCurrentEventForUserAsync(ulong id) 
         {
@@ -99,7 +119,8 @@ namespace Repository
                         e.NightOwl,
                         e.Openness),
                         e.Radius,
-                        e.IsDynamic
+                        e.IsDynamic,
+                        e.IsPendingDeletion
                         )).SingleAsync());
 
                 UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx =>
@@ -115,17 +136,124 @@ namespace Repository
         }
         public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong id) 
         {
-            return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.EventLinks.
-            Where(l => l.UserId == id && l.Type == EventBond.Guest).
-            Join(
-                ctx.Events,
+             List<EventShard> upcomingEvents = await storeSentry.ExecuteReadAsync(ctx =>
+             ctx.EventLinks.
+             Where(l => l.UserId == id && l.Type == EventBond.Guest).
+             Join(
+                ctx.Events.Where(e => e.State == EventState.Upcoming || e.State == EventState.Open),
                 l => l.EventId,
                 e => e.Id,
-                (l,e) => new EventShard
+                (l, e) => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.HostId,
+                    e.Description,
+                    e.StartTime,
+                    e.Location,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness,
+                    e.Radius,
+                    e.IsDynamic,
+                    e.IsPendingDeletion
+                }).
+             Join(
+                 ctx.Users,
+                 e => e.HostId,
+                 u => u.Id,
+                 (e, u) => new EventShard
+                 (
+                    e.Id,
+                    new UserSilhouette(u.Id, u.Name),
+                    e.Name,
+                    e.Description,
+                    e.StartTime,
+                    e.Location.Y,
+                    e.Location.X,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    new Character(
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness),
+                    e.Radius,
+                    e.IsDynamic,
+                    e.IsPendingDeletion
+                 )).
+               ToListAsync());
+
+            List<ulong> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
+               ctx.EventLinks.
+               Where(l => l.UserId == id && l.Type == EventBond.Arrived).
+               Select(l => l.EventId). 
+               ToListAsync());
+
+            for (int i = 0; i < upcomingEvents.Count; i++)
+            {
+                if (toExclude.Contains(upcomingEvents[i].Id))
+                {
+                    upcomingEvents.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            return upcomingEvents;
+        }
+        public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.EventLinks.
+            Where(l => l.UserId == id && l.Type == EventBond.Left).
+            Join(
+               ctx.Events.Where(e => e.State == EventState.Ended),
+               l => l.EventId,
+               e => e.Id,
+               (l, e) => new
+               {
+                  e.Id,               
+                  e.Name,
+                  e.HostId,
+                  e.Description,
+                  e.StartTime,
+                  e.Location,
+                  e.EndTime,
+                  e.State,
+                  e.GroupMinimum,
+                  e.GroupMaximum,                 
+                  e.Extroversion,
+                  e.Athleticisme,
+                  e.Chaos,
+                  e.Competitiveness,
+                  e.Industriousness,
+                  e.NightOwl,
+                  e.Openness,
+                  e.Radius,
+                  e.IsDynamic,
+                  e.IsPendingDeletion
+               }).
+            Join(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, u) => new EventShard
                 (
                    e.Id,
-                   new UserSilhouette(e.HostId, e.Host.Name),
+                   new UserSilhouette(u.Id, u.Name),
                    e.Name,
                    e.Description,
                    e.StartTime,
@@ -144,44 +272,10 @@ namespace Repository
                    e.NightOwl,
                    e.Openness),
                    e.Radius,
-                   e.IsDynamic
+                   e.IsDynamic,
+                   e.IsPendingDeletion
                 )).
-            ToListAsync());
-        }
-        public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id) 
-        {
-            return await storeSentry.ExecuteReadAsync(ctx =>
-           ctx.EventLinks.
-           Where(l => l.UserId == id && l.Type == EventBond.Left).
-           Join(
-               ctx.Events,
-               l => l.EventId,
-               e => e.Id,
-               (l, e) => new EventShard
-               (
-                  e.Id,
-                  new UserSilhouette(e.HostId, e.Host.Name),
-                  e.Name,
-                  e.Description,
-                  e.StartTime,
-                  e.Location.Y,
-                  e.Location.X,
-                  e.EndTime,
-                  e.State,
-                  e.GroupMinimum,
-                  e.GroupMaximum,
-                  new Character(
-                  e.Extroversion,
-                  e.Athleticisme,
-                  e.Chaos,
-                  e.Competitiveness,
-                  e.Industriousness,
-                  e.NightOwl,
-                  e.Openness),
-                  e.Radius,
-                  e.IsDynamic
-               )).
-           ToListAsync());
+              ToListAsync());
         }
         public async Task<EventShard> FindEventAsync(ulong id)
         {
@@ -210,7 +304,8 @@ namespace Repository
                    e.NightOwl,
                    e.Openness),
                    e.Radius,
-                   e.IsDynamic
+                   e.IsDynamic,
+                   e.IsPendingDeletion
                )).SingleAsync());
 
             UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == @event.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync()) ;
@@ -248,25 +343,46 @@ namespace Repository
         }
         public async Task UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             Event e = new() { Id = id };
-            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
+            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
 
             foreach ((string Property, object Value) in edits)
             {
                 switch (Property)
                 {
-                    case "Description":
+                    case nameof(EventShard.Description):
                         e.Description = (string)Value;
                         break;
-                    case "State":
+                    case nameof(EventShard.State):
                         e.State = (EventState)Value;
-                        break;                  
+                        break;
+                    case nameof(EventShard.StartTime):
+                        e.StartTime = (DateTimeOffset)Value;
+                        break;
+                    case "Location":
+                        var Location = ((double,double))Value;
+                        e.Location = new CoordinateFactory().Create(Location.Item2, Location.Item1);
+                        break;              
+                    case nameof(EventShard.Radius):
+                        e.Radius = (double)Value;
+                        break;
+                    case nameof(EventShard.IsDynamic):
+                        e.IsDynamic = (bool)Value;
+                        break;
+                    case nameof(EventShard.GroupMinimum):
+                        e.GroupMinimum = (int)Value;                    
+                        break;
+                    case nameof(EventShard.GroupMaximum):
+                        e.GroupMaximum = (int)Value;
+                        break;
                     default:
                         throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
                 }
-                storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(Property).IsModified = true);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(Property).IsModified = true, currentDiscussion);
             }
-            await storeSentry.ExecuteWriteAsync();
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }   
         public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong id)
         {
@@ -316,32 +432,35 @@ namespace Repository
            return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.Events.
            Where(e => e.HostId == userId).
-           Join(ctx.Users,
-           e => e.HostId,
-           u => u.Id,
-           (e, u) => new EventShard(
-               e.Id, 
-               new UserSilhouette(u.Id, u.Name), 
-               e.Name, 
-               e.Description, 
-               e.StartTime, 
-               e.Location.Y, 
-               e.Location.X, 
-               e.EndTime, 
-               e.State, 
-               e.GroupMinimum, 
-               e.GroupMaximum, 
-               new Character(
-                   e.Extroversion,
-                   e.Athleticisme, 
-                   e.Chaos, 
-                   e.Competitiveness,
-                   e.Industriousness, 
-                   e.NightOwl,
-                   e.Openness
-                   ), 
-               e.Radius, 
-               e.IsDynamic)).
+           Join(
+               ctx.Users,
+               e => e.HostId,
+               u => u.Id,
+               (e, u) => new EventShard(
+                    e.Id, 
+                    new UserSilhouette(u.Id, u.Name), 
+                    e.Name, 
+                    e.Description, 
+                    e.StartTime, 
+                    e.Location.Y, 
+                    e.Location.X, 
+                    e.EndTime, 
+                    e.State, 
+                    e.GroupMinimum, 
+                    e.GroupMaximum, 
+                    new Character(
+                        e.Extroversion,
+                        e.Athleticisme, 
+                        e.Chaos, 
+                        e.Competitiveness,
+                        e.Industriousness, 
+                        e.NightOwl,
+                        e.Openness
+                        ), 
+                    e.Radius, 
+                    e.IsDynamic,
+                    e.IsPendingDeletion
+                    )).
            ToListAsync());
         }      
         public async Task<EventBond?> GetUserStateAsync(ulong userId, ulong eventId)
@@ -356,28 +475,47 @@ namespace Repository
 
             return states.Last().Type;
         }
-        public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState)
+        public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState, DateTimeOffset time)
         {
-            await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.EventLinks.
-                Add(new EventLink { UserId = userId, EventId = eventId, Type = userState }
-                ));
+            EventLink toAdd = new() 
+            { 
+                UserId = userId, 
+                EventId = eventId, 
+                Type = userState, 
+                Time = time
+            };
 
-            if (userState == EventBond.Arrived)
-            {              
-                User u = new() { Id = userId, CurrentEvent = eventId };
-                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
-                await storeSentry.ExecuteWriteAsync();
+            ulong id = await storeSentry.ExecuteReadAsync(ctx => 
+                       ctx.EventLinks.
+                       Where(l => l.UserId == userId && l.EventId == eventId && l.Type == userState).
+                       Select(l => l.Id).
+                       SingleOrDefaultAsync());
 
-            }
-            else if (userState == EventBond.Left || userState == EventBond.Kicked)
+            if (id != 0)
             {
-                User u = new() { Id = userId, CurrentEvent = null };
-                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true);
-                await storeSentry.ExecuteWriteAsync();
-            }                       
+                toAdd.Id = id;
+            }
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Update(toAdd));
+
+            if (userState == EventBond.Left || userState == EventBond.Kicked || userState == EventBond.Arrived)
+            {
+                Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
+                User u;
+                if (userState == EventBond.Left || userState == EventBond.Kicked)
+                {
+                    u = new() { Id = userId, CurrentEvent = null };
+                }
+                else
+                {
+                    u = new() { Id = userId, CurrentEvent = eventId };
+                }
+
+                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true, currentDiscussion);
+                await storeSentry.EndDiscussionAsync(currentDiscussion);
+            } 
         }
         public async Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId)
         {
@@ -415,25 +553,29 @@ namespace Repository
             }
             return toReturn;
         }
-        public async Task EndEventAsync(ulong id)
+        public async Task EndEventAsync(ulong id, DateTimeOffset time)
         {
             List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.Users.
-            Where(u => u.CurrentEvent == id).
-            Select(u => u.Id).
-            ToListAsync());
+                ctx.Users.
+                Where(u => u.CurrentEvent == id).
+                Select(u => u.Id).
+                ToListAsync());
 
             List<Task> tasks = new();
             foreach (ulong guest in guests)
             {
-                tasks.Add(SetUserStateAsync(guest, id, EventBond.Left));
+                tasks.Add(SetUserStateAsync(guest, id, EventBond.Left, time));
             }
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks);       
 
-            Event e = new() { Id = id, EndTime = DateTimeOffset.UtcNow };
-            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e));
-            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true);
-            await storeSentry.ExecuteWriteAsync();         
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
+            Event e = new() { Id = id, EndTime = DateTimeOffset.UtcNow, State = EventState.Ended };
+            storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.EndTime)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.State)).IsModified = true, currentDiscussion);
+
+            await storeSentry.EndDiscussionAsync(currentDiscussion);         
         }
     }
 }

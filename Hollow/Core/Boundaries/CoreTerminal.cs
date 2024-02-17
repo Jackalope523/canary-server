@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Core.Controls;
 
 namespace Core.Boundaries
@@ -9,6 +10,7 @@ namespace Core.Boundaries
 		#region Variables
 
 		public static CoreTerminal Terminal { get; private set; }
+		private static object initLock = new();
 
 		public IAccountDatabase AccountDatabase { get; init; }
 		public IEventDatabase EventDatabase { get; init; }
@@ -16,6 +18,7 @@ namespace Core.Boundaries
 		public IProfileDatabase ProfileDatabase { get; init; }
 		public IDisciplineDatabase DisciplineDatabase { get; init; }
 		public INotificationDatabase NotificationDatabase { get; init; }
+		public IAdminDatabase AdminDatabase { get; init; }
 
 		public IAccountOperations AccountOperations
 			=> AccountDirector;
@@ -39,7 +42,7 @@ namespace Core.Boundaries
 		internal DisciplineDirector DisciplineDirector { get; private set; }
 		internal NotificationDirector NotificationDirector { get; private set; }
 
-		public List<(Type DatabaseType, object Instance)> Gates
+		public List<(Type GateType, object Instance)> Gates
 			=> new() { (typeof(IAccountOperations), AccountOperations),
 				(typeof(IEventOperations), EventOperations),
 				(typeof(IEtchingOperations), EtchingOperations),
@@ -51,19 +54,35 @@ namespace Core.Boundaries
 
 		#region Initialisation
 
-		public CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
+		public static CoreTerminal CreateTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
 			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
-			INotificationService notificationService)
+			IAdminDatabase adminDatabase, INotificationService notificationService)
 		{
-			Terminal = this;
+			lock (initLock)
+			{
+				if (Terminal == null)
+				{
+					Terminal = new CoreTerminal(accountDatabase, eventDatabase, etchingDatabase, profileDatabase,
+					disciplineDatabase, notificationDatabase, adminDatabase, notificationService);
+				}
+			
+				return Terminal;
+			}
+		}
 
+		private CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
+			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
+			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
+			IAdminDatabase adminDatabase, INotificationService notificationService)
+		{
 			AccountDatabase = accountDatabase;
 			EventDatabase = eventDatabase;
 			EtchingDatabase = etchingDatabase;
 			ProfileDatabase = profileDatabase;
 			DisciplineDatabase = disciplineDatabase;
 			NotificationDatabase = notificationDatabase;
+			AdminDatabase = adminDatabase;
 
 			NotificationService = notificationService;
 

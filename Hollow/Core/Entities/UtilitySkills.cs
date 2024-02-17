@@ -85,10 +85,10 @@ namespace Core.Entities
 			=> time > time2;
 
 		public static bool HasYet(DateTimeOffset time)
-			=> HappenedBefore(time, Time);
+			=> HappenedBefore(Time, time);
 
 		public static bool HasAlready(DateTimeOffset time)
-			=> HappenedBefore(Time, time);
+			=> HappenedBefore(time, Time);
 
 		public static bool IsWithin(TimeSpan time, TimeSpan time2)
 			=> time.Duration() < time2.Duration();

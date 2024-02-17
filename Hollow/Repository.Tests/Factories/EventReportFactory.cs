@@ -9,8 +9,7 @@
             created++;
             return new EventReport
             {
-                SelfId = reporter.Id,
-                OtherId = location.HostId,
+                UserId = reporter.Id,
                 EventId = location.Id,
                 Type = Shared.EventReportType.Misleading,
                 FilingDate = DateTimeOffset.MinValue,

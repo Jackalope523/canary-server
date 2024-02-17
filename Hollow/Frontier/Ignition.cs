@@ -87,18 +87,19 @@ namespace Frontier
 
 			Harbor harbor = new(Harbor.Flag.Production);
 
-			CoreTerminal terminal = new(
+			CoreTerminal terminal = CoreTerminal.CreateTerminal(
 				harbor.AccountDatabaseAccess,
 				harbor.EventDatabaseAccess, 
 				harbor.EtchingDatabaseAccess,
 				harbor.ProfileDatabaseAccess, 
 				harbor.ReportDatabaseAccess,
-                harbor.NotificationDatabaseAccess, 
+                harbor.NotificationDatabaseAccess,
+				harbor.AdminDatabaseAccess,
 				pushNotifications);
 
-			foreach (var (DatabaseType, Instance) in terminal.Gates)
+			foreach (var (GateType, Instance) in terminal.Gates)
 			{
-				services.AddSingleton(DatabaseType, Instance);
+				services.AddSingleton(GateType, Instance);
 			}
 
 			

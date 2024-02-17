@@ -4,8 +4,9 @@ using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
 using Shared;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class AccountStoreTests : IDisposable
     {
         private readonly ITestOutputHelper _testOutputHelper;
@@ -31,13 +32,14 @@ namespace Repository.Tests.Tests
         public async Task CreateUserAsync_SUCCESS()
         {
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-
+       
             await store.CreateUserAsync(
                 subject.PhoneNumber,
                 subject.Email,
                 subject.NormalisedEmail,
                 subject.Name,
                 subject.DateOfBirth,
+                subject.JoinDate,
                 new Character(
                     subject.Extroversion,
                     subject.Athleticisme,
@@ -48,7 +50,7 @@ namespace Repository.Tests.Tests
                     subject.Openness
                     ));
 
-            User created = sentry.ExecuteRead(ctx => ctx.Users.First());
+            User created = sentry.ExecuteRead(ctx => ctx.Users.Single());
 
             Assert.NotNull(created);
 
@@ -57,6 +59,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(subject.NormalisedEmail, created.NormalisedEmail);
             Assert.Equal(subject.Name, created.Name);
             Assert.Equal(subject.DateOfBirth, created.DateOfBirth);
+            Assert.Equal(subject.JoinDate, created.JoinDate);
             Assert.Equal(User.DefaultReputation, created.Reputation);
             Assert.Equal(User.DefaultIsPhoneConfirmed, created.IsPhoneConfirmed);
             Assert.Equal(User.DefaultIsEmailConfirmed, created.IsEmailConfirmed);
@@ -64,6 +67,7 @@ namespace Repository.Tests.Tests
             Assert.Equal(User.DefaultLockoutDate, created.LockoutDate);
             Assert.Equal(User.DefaultAccessTries, created.AccessTries);
             Assert.Equal(User.DefaultAccountStatus, created.AccountStatus);
+            Assert.Equal(subject.IsPendingDeletion, created.IsPendingDeletion);
             Assert.Equal(subject.Extroversion, created.Extroversion);
             Assert.Equal(subject.Athleticisme, created.Athleticisme);
             Assert.Equal(subject.Chaos, created.Chaos);

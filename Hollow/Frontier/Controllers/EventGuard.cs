@@ -99,6 +99,16 @@ namespace Frontier.Controllers
 			});
         }
 
+        [HttpDelete("{eventId}")]
+        public async Task<IActionResult> DeleteEvent(ulong eventId)
+		{
+			return await Execute(async user =>
+			{
+				// Delete an event
+				await events.DeleteEventAsync(user.Id, eventId);
+			});
+        }
+
 		[HttpPost("{eventId}/watch")]
 		public async Task<IActionResult> WatchEvent(ulong eventId)
 		{

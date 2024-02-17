@@ -349,9 +349,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-#EF Core Garbage
-Hollow/Repository/Migrations/
-Hollow/Repository/TestDB.db
-
 #Apple's gift from God
 .DS_Store

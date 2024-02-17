@@ -1,9 +1,11 @@
-using Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Core.Entities;
+using Shared;
 using Xunit;
 
-namespace Tests
+namespace Core.Tests.Entities
 {
     public class GeoLocationTest
     {
@@ -41,23 +43,101 @@ namespace Tests
 
         [Theory]
         [MemberData(nameof(CityDistances))]
-        internal void Distance_TwoPoints_ReturnsDistance(GeoLocation pointA, GeoLocation pointB, Distance expectedDistance)
+        public void Distance_TwoPoints_ReturnsDistance(GeoLocation pointA, GeoLocation pointB, Distance expectedDistance)
         {
             Assert.Equal(expectedDistance.Kilometres, Math.Round(GeoLocation.DistanceBetween(pointA, pointB).Kilometres));
         }
 
         [Theory]
         [MemberData(nameof(CitiesInRange))]
-        internal void AreInRange_TwoPoints_ReturnsTrue(GeoLocation pointA, GeoLocation pointB, Distance range)
+        public void AreInRange_TwoPoints_ReturnsTrue(GeoLocation pointA, GeoLocation pointB, Distance range)
         {
             Assert.True(GeoLocation.AreInRange(pointA, pointB, range));
         }
 
         [Theory]
         [MemberData(nameof(CitiesNotInRange))]
-        internal void AreInRange_TwoPoints_ReturnsFalse(GeoLocation pointA, GeoLocation pointB, Distance range)
+        public void AreInRange_TwoPoints_ReturnsFalse(GeoLocation pointA, GeoLocation pointB, Distance range)
         {
             Assert.False(GeoLocation.AreInRange(pointA, pointB, range));
         }
+    }
+
+    public class DistanceTests
+    {
+		[Fact]
+		public void Constructor_FromMetres_Correct()
+		{
+            Distance distance = new() { Metres = 1000 };
+
+			Assert.True(distance.Kilometres == 1);
+			Assert.True(distance.Metres == 1000);
+		}
+
+		[Fact]
+		public void Constructor_FromKilometres_Correct()
+		{
+            Distance distance = new() { Kilometres = 1 };
+
+			Assert.True(distance.Kilometres == 1);
+			Assert.True(distance.Metres == 1000);
+		}
+	}
+
+    public class SyncedTests
+    {
+		[Fact]
+		public async Task Constructor_ExistingValue_ProperlyInitialised()
+		{
+            Synced<int> syncedValue = new(101);
+
+            Assert.Equal(101, await syncedValue);
+		}
+
+		[Fact]
+		public async Task Constructor_UnsyncedValue_ProperlyInitialised()
+		{
+            Synced<int> syncedValue = new(() => Task.FromResult(101));
+
+            Assert.Equal(101, await syncedValue);
+		}
+
+		[Fact]
+		public async Task Constructor_NullFunction_Fails()
+		{
+            Synced<int> syncedValue = new(null);
+
+            await Assert.ThrowsAnyAsync<HollowException>(async () => await syncedValue);
+		}
+
+		[Fact]
+		public async Task Sync_UnsyncedValue_Syncs()
+		{
+            Synced<int> syncedValue = new(() => Task.FromResult(101));
+            _ = syncedValue.Sync();
+
+            Assert.Equal(101, await syncedValue);
+		}
+
+		[Fact]
+		public async Task Sync_SyncedValue_Resyncs()
+		{
+            Synced<int> syncedValue = new(() => Task.FromResult(101));
+            await syncedValue.Sync();
+
+            syncedValue.Set(202);
+            await syncedValue.Sync();
+
+            Assert.Equal(101, await syncedValue);
+		}
+
+		[Fact]
+		public async Task Set_Value_Correct()
+		{
+            Synced<int> syncedValue = new(101);
+            syncedValue.Set(202);
+
+            Assert.Equal(202, await syncedValue);
+		}
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Shared;
 
@@ -11,7 +12,7 @@ namespace Repository
         {
         }
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, Character character)
+        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
         {
             User toCreate = new()
             {
@@ -20,8 +21,7 @@ namespace Repository
                 NormalisedEmail = normalisedEmail,
                 Name = name,
                 DateOfBirth = dateOfBirth,
-                JoinDate = DateTimeOffset.Now,
-                Reputation = 50,
+                JoinDate = joinDate,
                 Extroversion = character.Extraversion,
                 Athleticisme = character.Athleticism,
                 Openness = character.Openness,
@@ -36,7 +36,36 @@ namespace Repository
 
         public async Task DeleteUserAsync(ulong id)
         {
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Remove(new User { Id = id }));
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Users.
+                Where(u => u.Id == id).
+                ExecuteUpdate(setter => setter.SetProperty(u => u.IsPendingDeletion, true)));
+
+            List<ulong> upcomingEvents = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Events.
+                Where(e => e.HostId == id && e.State == EventState.Upcoming).
+                Select(e => e.Id).
+                ToListAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Events.
+               Where(e => upcomingEvents.Contains(e.Id)).
+               ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
+        
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Notes.
+               Where(n => n.NotifierId == id || n.RecipientId == id).
+               ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Posts.
+               Where(p => p.OwnerId == id).
+               ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Subscriptions.
+               Where(s => s.UserId == id).
+               ExecuteDelete());
         }
 
         public async Task<UserShard> FindUserByIdAsync(ulong id) 
@@ -45,7 +74,10 @@ namespace Repository
             UserShard user;
             try 
             {
-               user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == id).Select(u => new UserShard
+               user = await storeSentry.ExecuteReadAsync(ctx => 
+               ctx.Users.
+               Where(u => u.Id == id).
+               Select(u => new UserShard
                (
                    u.Id,
                    u.PhoneNumber,
@@ -54,6 +86,7 @@ namespace Repository
                    u.DateOfBirth,
                    u.IsPhoneConfirmed,
                    u.IsEmailConfirmed,
+                   u.IsPendingDeletion,
                    u.SecurityStamp,
                    u.LockoutDate,
                    u.AccessTries,
@@ -86,7 +119,10 @@ namespace Repository
             UserShard user;
             try
             {
-              user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.PhoneNumber == phoneNumber).Select(u => new UserShard
+              user = await storeSentry.ExecuteReadAsync(ctx => 
+              ctx.Users.
+              Where(u => u.PhoneNumber == phoneNumber).
+              Select(u => new UserShard
               (
                   u.Id,
                   u.PhoneNumber,
@@ -95,6 +131,7 @@ namespace Repository
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
+                  u.IsPendingDeletion,
                   u.SecurityStamp,
                   u.LockoutDate,
                   u.AccessTries,
@@ -127,7 +164,10 @@ namespace Repository
             UserShard user;
             try
             {
-              user = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Email == email).Select(u => new UserShard
+              user = await storeSentry.ExecuteReadAsync(ctx => 
+              ctx.Users.
+              Where(u => u.Email == email).
+              Select(u => new UserShard
               (
                   u.Id,
                   u.PhoneNumber,
@@ -136,6 +176,7 @@ namespace Repository
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
+                  u.IsPendingDeletion,
                   u.SecurityStamp,
                   u.LockoutDate,
                   u.AccessTries,
@@ -196,10 +237,12 @@ namespace Repository
         }    
 
         public async Task UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)
-        {                   
+        {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             User u = new() { Id = id };
 
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
 
             foreach ((string Property, object Value) in edits)
             {
@@ -241,32 +284,36 @@ namespace Repository
                     default:
                         throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
                 }
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(Property).IsModified = true);
+                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(Property).IsModified = true, currentDiscussion);
             }
-            await storeSentry.ExecuteWriteAsync();
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
         public async Task UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             Point newHaunt = new CoordinateFactory().Create(longitude, latitude);
             User u = new() { Id = id, Haunt = newHaunt , HauntRadius = radius, HauntWheight = stability };
 
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true);
-            await storeSentry.ExecuteWriteAsync();
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
         public async Task UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
         {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
             Point newCurrentLocation = new CoordinateFactory().Create(longitude, latitude);
             User u = new() { Id = id, CurrentLocation = newCurrentLocation, CurrentRadius = radius };
 
-            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u));
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true);
-            await storeSentry.ExecuteWriteAsync();
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Threading.Tasks;
-using Core.Controls;
 using Shared;
 
 namespace Core.Boundaries
@@ -15,7 +13,7 @@ namespace Core.Boundaries
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
-		double Radius, bool IsDynamic);
+		double Radius, bool IsDynamic, bool IsPendingDeletion);
 	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
 
 	#endregion
@@ -36,10 +34,11 @@ namespace Core.Boundaries
 			int groupMinimum, int groupMaximum, Character character,
 			double Radius, bool isDynamic);
 		Task UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
-		Task EndEventAsync(ulong eventId);
+		Task EndEventAsync(ulong eventId, DateTimeOffset time);
+		Task DeleteEventAsync(ulong eventId);
 
 		Task<EventBond?> GetUserStateAsync(ulong userId, ulong eventId);
-		Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState);
+		Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState, DateTimeOffset time);
 		Task RemoveUserAsync(ulong userId, ulong eventId);
 
 		Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId);
@@ -63,6 +62,7 @@ namespace Core.Boundaries
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
 		Task StartEventAsync(ulong userId, ulong eventId);
 		Task EndEventAsync(ulong userId, ulong eventId);
+		Task DeleteEventAsync(ulong userId, ulong eventId);
 
 		Task WatchEventAsync(ulong userId, ulong eventId);
 		Task UnwatchEventAsync(ulong userId, ulong eventId);

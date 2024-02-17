@@ -1,0 +1,39 @@
+﻿
+using Microsoft.EntityFrameworkCore;
+using Xunit.Abstractions;
+
+namespace Repository.Tests
+{
+    [Collection("Database Collection")]
+    public class AdminStoreTests
+    {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        private static readonly TestSentry sentry = new();
+        private static readonly AdminStore store = new(sentry);
+
+        private User subject;
+
+        public AdminStoreTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+
+            subject = new UserFactory().Create();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
+        }
+        public void Dispose()
+        {
+            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+        }
+        [Fact]
+        public async Task VoidEventAsync_SUCCESS()
+        {
+            throw new NotImplementedException();
+        }
+        [Fact]
+        public async Task VoidUserAsync_SUCCESS()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

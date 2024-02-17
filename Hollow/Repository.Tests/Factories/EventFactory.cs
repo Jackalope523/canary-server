@@ -1,6 +1,4 @@
 ﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using NetTopologySuite.Geometries;
 
 namespace Repository
 {
@@ -9,7 +7,7 @@ namespace Repository
         private int produced = 0;
         private readonly CoordinateFactory innerFactory = new();
         public Event Create(User host)
-        {
+        {          
             produced++;
             return new Event
             {
@@ -19,7 +17,7 @@ namespace Repository
                 StartTime = DateTimeOffset.UtcNow.AddHours(produced),
                 GroupMinimum = 0 + produced,
                 GroupMaximum = 10 + produced,
-                State = EventState.Open,
+                State = EventState.Upcoming,
                 Location = innerFactory.Create(34.052, -118.243),
                 Radius = 10.0,
                 IsDynamic = false,

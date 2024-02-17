@@ -10,7 +10,7 @@ namespace Core.Boundaries
 	{ Active, Impotent, Limited, Suspended, Blacklisted }
 
 	public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
-		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
+		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
 
@@ -31,7 +31,7 @@ namespace Core.Boundaries
         Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<UserShard> FindUserByEmailAsync(string normalisedEmail);
 		Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
-			string name, DateTimeOffset dateOfBirth, Character character);
+			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character);
 		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
 		Task DeleteUserAsync(ulong userId);
 

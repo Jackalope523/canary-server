@@ -4,8 +4,9 @@ using Repository.Entities;
 using Shared;
 using Xunit.Abstractions;
 
-namespace Repository.Tests.Tests
+namespace Repository.Tests
 {
+    [Collection("Database Collection")]
     public class NotificationStoreTests: IDisposable
     {
         private readonly ITestOutputHelper _testOutputHelper;
@@ -41,7 +42,7 @@ namespace Repository.Tests.Tests
             Entities.Note note = new NoteFactory().Create(subject1, subject2);
             sentry.ExecuteWrite(ctx => ctx.Notes.Add(note));
 
-            Core.Boundaries.Note found = (await store.GetNotesAsync(subject1.Id)).Single();
+            Core.Boundaries.Note found = (await store.GetNotesAsync(subject2.Id)).Single();
 
             Assert.NotNull(found);
             Assert.Equal(subject1.Id, found.NotifierId);

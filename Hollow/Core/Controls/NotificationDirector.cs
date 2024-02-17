@@ -60,7 +60,7 @@ namespace Core.Controls
             {
 				userSettings = await Notifications.GetUserSubscriptionAsync(user.Id);
             }
-			catch (InvalidOperationException)
+			catch (Exception)
 			{
 				return;
 			}

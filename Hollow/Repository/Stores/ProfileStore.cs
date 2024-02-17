@@ -17,13 +17,13 @@ namespace Repository
         {
         }
         
-        public async Task FollowUserAsync(ulong selfId, ulong targetId) 
+        public async Task FollowUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
             UserLink toAdd = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
-                Time = DateTimeOffset.UtcNow,
+                Time = time,
                 Type = UserLink.UserLinkType.Follow
             };
 
@@ -34,13 +34,13 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Follow));
         }
-        public async Task BlockUserAsync(ulong selfId, ulong targetId) 
+        public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
             UserLink toAdd = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
-                Time = DateTimeOffset.UtcNow,
+                Time = time,
                 Type = UserLink.UserLinkType.Block
             };
 
@@ -115,7 +115,7 @@ namespace Repository
             return (await up, await down);
         }
 
-        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating)
+        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating, DateTimeOffset time)
         {
             UserLink.UserLinkType type;
             if (rating.Equals(UserRating.Positive)) type = UserLink.UserLinkType.RateUp;
@@ -125,11 +125,22 @@ namespace Repository
             {
                 SelfId = selfId,
                 OtherId = targetId,
-                Time = DateTimeOffset.UtcNow,
+                Time = time,
                 Type = type
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
+            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+                        ctx.UserLinks.
+                        Where(l => l.SelfId == selfId && l.OtherId == targetId).
+                        Select(l => l.Id).
+                        SingleOrDefaultAsync());
+
+            if (id != 0)
+            {
+                toAdd.Id = id;
+            }
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toAdd));
         }
 
         public async Task RemoveUserRatingAsync(ulong selfId, ulong targetId)

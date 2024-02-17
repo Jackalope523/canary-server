@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -45,6 +46,22 @@ namespace Core.Entities
 
         public double LatitudeInRadians => (Math.PI / 180) * Latitude;
         public double LongitudeInRadians => (Math.PI / 180) * Longitude;
+
+        #endregion
+
+        #region Dissimilation
+
+        public override bool Equals(object obj)
+        {
+            return obj is GeoLocation other &&
+                Latitude == other.Latitude &&
+                Longitude == other.Longitude;
+        }
+
+        public override int GetHashCode()
+        {
+            return (Latitude + Longitude).GetHashCode();
+        }
 
         #endregion
     }
@@ -93,73 +110,93 @@ namespace Core.Entities
 
     public struct Synced<T>
     {
-		#region Variables
-
-		private T cachedValue;
-        private bool synced;
-
-        private Func<Task<T>> syncFunction;
-        private Task<T> syncTask;
-
-		#endregion
-
-		#region Initialisation
-
-		public Synced(Func<Task<T>> synchronisationFunction)
+        class SyncData
         {
-            cachedValue = default;
-            synced = false;
-            syncFunction = synchronisationFunction;
-            syncTask = null;
+		    public T cache;
+            public bool isSynced;
+
+            public Func<Task<T>> function;
+            public Task<T> task;
+        }
+
+        #region Variables
+
+        private SyncData sync;
+
+        #endregion
+
+        #region Initialisation
+
+        public Synced(Func<Task<T>> synchronisationFunction)
+        {
+            sync = new()
+            {
+                cache = default,
+                isSynced = false,
+                function = synchronisationFunction,
+                task = null,
+            };
         }
 
         public Synced(T value)
         {
-            cachedValue = value;
-            synced = true;
-            syncFunction = null;
-            syncTask = null;
+            sync = new()
+            {
+                cache = value,
+                isSynced = true,
+                function = null,
+                task = null,
+            };
         }
 
 		#endregion
 
 		#region Actions
 
-		public async Task<T> Value()
+        public async Task<T> Value()
         {
-            if (!synced)
+            if (!sync.isSynced)
             { await Sync(); }
 
-            return cachedValue;
+            return sync.cache;
         }
 
         public async Task Sync()
         {
-            if (syncFunction == null)
-            { throw new UndefinedBehaviourException($"Cannot Sync {nameof(T)} without synchronising function."); }
+            if (sync.function == null)
+            { throw new UndefinedBehaviourException($"Cannot Sync {typeof(T)} without synchronising function."); }
 
-            if (syncTask == null || syncTask.IsCompleted)
-            { syncTask = syncFunction.Invoke(); }
-            
-            cachedValue = await syncTask;
-            synced = true;
+            lock (sync.function)
+            {
+                if (sync.task == null || sync.task.IsCompleted)
+                {
+                    sync.isSynced = false;
+                    sync.task = sync.function.Invoke();
+                }
+            }
+
+            sync.cache = await sync.task;
+            sync.isSynced = true;
         }
 
         public void Set(T value)
         {
-            cachedValue = value;
-            synced = true;
+            sync.cache = value;
+            sync.isSynced = true;
 		}
 
-		#endregion
+        #endregion
 
-		#region Dissimilation
+        #region Dissimilation
+
+        public TaskAwaiter<T> GetAwaiter()
+            => Value().GetAwaiter();
 
 		public static T operator +(Synced<T> a, T b)
-            => ((dynamic)a.cachedValue) + ((dynamic)b);
+            => ((dynamic)a.sync.cache) + ((dynamic)b);
 
 		public static T operator -(Synced<T> a, T b)
-            => ((dynamic)a.cachedValue) - ((dynamic)b);
+            => ((dynamic)a.sync.cache) - ((dynamic)b);
 
 		#endregion
 	}

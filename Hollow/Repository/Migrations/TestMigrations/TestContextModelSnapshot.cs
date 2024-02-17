@@ -139,6 +139,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<bool>("IsDynamic")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsPendingDeletion")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Point>("Location")
                         .IsRequired()
                         .HasColumnType("POINT")
@@ -195,6 +198,37 @@ namespace Repository.Migrations.TestMigrations
                     b.ToTable("EventLinks");
                 });
 
+            modelBuilder.Entity("Repository.EventReport", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("FilingDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EventReports");
+                });
+
             modelBuilder.Entity("Repository.Post", b =>
                 {
                     b.Property<ulong>("Id")
@@ -248,50 +282,10 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasIndex("PostId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "PostId")
+                        .IsUnique();
 
                     b.ToTable("PostLinks");
-                });
-
-            modelBuilder.Entity("Repository.Report", b =>
-                {
-                    b.Property<ulong>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<ulong>("EventId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset>("FilingDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("OtherId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<ulong>("SelfId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("report_type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("OtherId");
-
-                    b.HasIndex("SelfId");
-
-                    b.ToTable("Reports");
-
-                    b.HasDiscriminator<string>("report_type").HasValue("Report");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -351,6 +345,9 @@ namespace Repository.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsEmailConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsPendingDeletion")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsPhoneConfirmed")
@@ -419,30 +416,40 @@ namespace Repository.Migrations.TestMigrations
                     b.ToTable("UserLinks");
                 });
 
-            modelBuilder.Entity("Repository.EventReport", b =>
-                {
-                    b.HasBaseType("Repository.Report");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.HasDiscriminator().HasValue("event");
-                });
-
             modelBuilder.Entity("Repository.UserReport", b =>
                 {
-                    b.HasBaseType("Repository.Report");
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong?>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("FilingDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("OtherId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("SelfId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.ToTable("Reports", t =>
-                        {
-                            t.Property("Type")
-                                .HasColumnName("UserReport_Type");
-                        });
+                    b.HasKey("Id");
 
-                    b.HasDiscriminator().HasValue("user");
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("OtherId");
+
+                    b.HasIndex("SelfId");
+
+                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("Repository.Entities.Note", b =>
@@ -491,6 +498,25 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Repository.EventReport", b =>
+                {
+                    b.HasOne("Repository.Event", "Event")
+                        .WithMany("Reports")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "Self")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Self");
+                });
+
             modelBuilder.Entity("Repository.Post", b =>
                 {
                     b.HasOne("Repository.Event", "Event")
@@ -529,13 +555,30 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Repository.Report", b =>
+            modelBuilder.Entity("Repository.UserLink", b =>
                 {
-                    b.HasOne("Repository.Event", "Event")
-                        .WithMany("Reports")
-                        .HasForeignKey("EventId")
+                    b.HasOne("Repository.User", "Other")
+                        .WithMany("UserLinks")
+                        .HasForeignKey("OtherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Repository.User", "Self")
+                        .WithMany()
+                        .HasForeignKey("SelfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Other");
+
+                    b.Navigation("Self");
+                });
+
+            modelBuilder.Entity("Repository.UserReport", b =>
+                {
+                    b.HasOne("Repository.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
 
                     b.HasOne("Repository.User", "Other")
                         .WithMany("ReporteeList")
@@ -550,25 +593,6 @@ namespace Repository.Migrations.TestMigrations
                         .IsRequired();
 
                     b.Navigation("Event");
-
-                    b.Navigation("Other");
-
-                    b.Navigation("Self");
-                });
-
-            modelBuilder.Entity("Repository.UserLink", b =>
-                {
-                    b.HasOne("Repository.User", "Other")
-                        .WithMany("UserLinks")
-                        .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Repository.User", "Self")
-                        .WithMany()
-                        .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Other");
 

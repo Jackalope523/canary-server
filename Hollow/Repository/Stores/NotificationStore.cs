@@ -15,7 +15,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Notes.
-            Where(n => n.NotifierId == userId).
+            Where(n => n.RecipientId == userId).
             Select(n => new Core.Boundaries.Note(n.NotifierId, n.Time, n.Message, n.Action)).
             ToListAsync());
         }

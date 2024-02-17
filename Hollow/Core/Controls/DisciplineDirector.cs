@@ -6,6 +6,7 @@ using Core.Entities;
 using Shared;
 
 using static Core.Entities.Arbiter;
+using static Core.Entities.Psijic;
 
 namespace Core.Controls
 {
@@ -24,13 +25,20 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
-            var occuringEvent = (await targetUser.CurrentEvent.Value()) ?? Event.None;
+            var occuringEvent = await targetUser.CurrentEvent;
 
             // Verify user can report
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            await Reports.ReportUserAsync(userId, occuringEvent.Id, targetUser.Id, reportType, reportDetails);
+            if (occuringEvent.Equals(Event.None))
+            {
+                await Reports.ReportUserAsync(userId, targetUser.Id, Time, reportType, reportDetails);
+            }
+            else
+            {
+                await Reports.ReportUserAsync(userId, occuringEvent.Id, targetUser.Id, Time, reportType, reportDetails);
+            }
 
             // Compute user's standing
             var status = await targetUser.Reported();
@@ -52,7 +60,7 @@ namespace Core.Controls
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            await Reports.ReportEventAsync(user.Id, targetEvent.Id, targetEvent.Host.Id, reportType, reportDetails);
+            await Reports.ReportEventAsync(user.Id, targetEvent.Id, Time, reportType, reportDetails);
 
             // Check if action is to be taken
             if (await targetEvent.Reported())

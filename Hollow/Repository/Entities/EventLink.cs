@@ -4,7 +4,7 @@ namespace Repository
 {
     public class EventLink
     {
-        public ulong Id { get; init; }
+        public ulong Id { get; set; }
         public ulong UserId { get; init; }
         public User User { get; init; }
         public ulong EventId { get; init; }

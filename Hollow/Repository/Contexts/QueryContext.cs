@@ -10,7 +10,6 @@ namespace Repository
         public DbSet<UserLink> UserLinks { get; set; }
         public DbSet<EventLink> EventLinks { get; set; }
         public DbSet<PostLink> PostLinks { get; set; }
-        public DbSet<Report> Reports { get; set; }
         public DbSet<UserReport> UserReports { get; set; }
         public DbSet<EventReport> EventReports { get; set; }
         public DbSet<Post> Posts { get; set; }
@@ -27,29 +26,23 @@ namespace Repository
             .HasSrid(4326);
 
             modelBuilder.Entity<Event>().Property(e => e.Location)
-            .HasSrid(4326);         
-                    
-            modelBuilder.Entity<Report>()
-                .HasDiscriminator<string>("report_type")
-                .HasValue<UserReport>("user")
-                .HasValue<EventReport>("event");
+            .HasSrid(4326);                                     
 
-            modelBuilder.Entity<Report>()
+            modelBuilder.Entity<PostLink>()
+               .HasIndex(l => new { l.UserId, l.PostId })
+               .IsUnique();
+
+            modelBuilder.Entity<UserReport>()
                 .HasOne(r => r.Self)
                 .WithMany(u => u.ReporterList);
 
-            modelBuilder.Entity<Report>()
+            modelBuilder.Entity<UserReport>()
                 .HasOne(r => r.Other)
                 .WithMany(u => u.ReporteeList);
 
-            modelBuilder.Entity<Report>()
-               .HasOne(r => r.Event)
-               .WithMany(e => e.Reports);
-
-
             modelBuilder.Entity<User>()
-                .HasMany(u => u.UserLinks)
-                .WithOne(l => l.Other);
+               .HasMany(u => u.UserLinks)
+               .WithOne(l => l.Other);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.EventLinks)
@@ -57,7 +50,7 @@ namespace Repository
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.PostLinks)
-                .WithOne(l => l.User);          
+                .WithOne(l => l.User);
         }       
     }
 }
