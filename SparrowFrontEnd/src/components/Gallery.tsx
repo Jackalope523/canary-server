@@ -15,8 +15,8 @@ import { Colors } from '../styles/ColorStyles';
 import { Spacing } from '../styles/SpacingStyles';
 
 // Icons
-import smLayout from '../assets/icons/layout-size-small-fill.svg';
-import mdLayout from '../assets/icons/layout-size-medium-fill.svg';
+import smLayout from '../assets/icons/layout-size-small-fill-alt-2.svg';
+import mdLayout from '../assets/icons/layout-size-medium-fill-alt.svg';
 import lgLayout from '../assets/icons/layout-size-large-fill.svg';
 import Chevron from '../assets/icons/chevron-outline.svg';
 
