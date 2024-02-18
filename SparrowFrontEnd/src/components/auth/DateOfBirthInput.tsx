@@ -15,15 +15,39 @@ const Icon = createIconSetFromFontello(fontelloConfig);
 // ! ||                                     Types                                      ||
 // ! ||--------------------------------------------------------------------------------||
 interface DateOfBirthInputProps {
-  onDayChangeText: React.Dispatch<React.SetStateAction<string>>;
-  onMonthChangeText: React.Dispatch<React.SetStateAction<string>>;
-  onYearChangeText: React.Dispatch<React.SetStateAction<string>>;
+  day: string;
+  month: string;
+  year: string;
+
+  validDay: boolean;
+  validMonth: boolean;
+  validYear: boolean;
+
+  setValidDay: React.Dispatch<React.SetStateAction<boolean>>;
+  setValidMonth: React.Dispatch<React.SetStateAction<boolean>>;
+  setValidYear: React.Dispatch<React.SetStateAction<boolean>>;
+
+  setDay: React.Dispatch<React.SetStateAction<string>>;
+  setMonth: React.Dispatch<React.SetStateAction<string>>;
+  setYear: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
-  onDayChangeText,
-  onMonthChangeText,
-  onYearChangeText,
+  day,
+  month,
+  year,
+
+  validDay,
+  validMonth,
+  validYear,
+
+  setValidDay,
+  setValidMonth,
+  setValidYear,
+
+  setDay,
+  setMonth,
+  setYear
 }) => {
   // TODO for the DAY and YEAR text inputs, might want to disable the clear text button
 
@@ -32,8 +56,11 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
       <View style={{ flex: 1 }}>
         <TextInputSmall
           type={InputType.Day}
+          valid={validDay}
+          setValid={setValidDay}
           label="Day"
-          onChangeText={onDayChangeText}
+          text={day}
+          setText={setDay}
           inputMode="numeric"
           maxLength={2}
           clearButton={false}
@@ -42,7 +69,10 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
       <Dropdown
         label="Month"
         data={MONTHS}
-        onTextChange={onMonthChangeText}
+        valid={validMonth}
+        setValid={setValidMonth}
+        value={month}
+        setValue={setMonth}
         dropdownContentAlignment={styles.dropdownContentAlignment}
         containerFlexValue={styles.containerFlexValue}
       />
@@ -50,7 +80,10 @@ export const DateOfBirthInput: React.FC<DateOfBirthInputProps> = ({
         <TextInputSmall
           type={InputType.Year}
           label="Year"
-          onChangeText={onYearChangeText}
+          valid={validYear}
+          setValid={setValidYear}
+          text={year}
+          setText={setYear}
           inputMode="numeric"
           maxLength={4}
           clearButton={false}

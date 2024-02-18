@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -37,14 +37,22 @@ import ExampleScreen from '../../components/testing/ExampleScreen';
 type SignupProps = StackScreenProps<AuthStackParamList, 'Signup'>;
 
 const SignupScreen = ({ navigation }: SignupProps) => {
-  const [PhoneNumber, setPhoneNumber] = React.useState('');
-  const [Email, setEmail] = React.useState('');
-  const [Name, setName] = React.useState('');
-  const [Day, setDay] = React.useState('');
-  const [Month, setMonth] = React.useState('');
-  const [Year, setYear] = React.useState('');
-  const [termsOfServiceAgreed, setTermsOfServiceAgreed] = React.useState(false);
-  const [privacyPolicyAgreed, setPrivacyPolicyAgreed] = React.useState(false);
+  const [validPhoneNumber, setValidPhoneNumber] = useState(false);
+  const [validEmail, setValidEmail] = useState(false);
+  const [validName, setValidName] = useState(false);
+  const [validDay, setValidDay] = useState(false);
+  const [validMonth, setValidMonth] = useState(false);
+  const [validYear, setValidYear] = useState(false);
+
+  const [termsOfServiceAgreed, setTermsOfServiceAgreed] = useState(false);
+  const [privacyPolicyAgreed, setPrivacyPolicyAgreed] = useState(false);
+
+  const [PhoneNumber, setPhoneNumber] = useState('');
+  const [Email, setEmail] = useState('');
+  const [Name, setName] = useState('');
+  const [Day, setDay] = useState('');
+  const [Month, setMonth] = useState('');
+  const [Year, setYear] = useState('');
 
   /* 
   
@@ -123,39 +131,55 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           <TextInputSmall
             type={InputType.FirstName}
             label="First name"
-            value={Name}
-            onChangeText={setName}
+            valid={validName}
+            setValid={setValidName}
+            text={Name}
+            setText={setName}
             inputMode="text"
             maxLength={256}
             required
             description="Your name will be public and visible to all users."
           />
           <TextInputSmall
+            type={InputType.PhoneNumber}
+            label="Phone Number"
+            valid={validPhoneNumber}
+            setValid={setValidPhoneNumber}
+            text={PhoneNumber}
+            setText={setPhoneNumber}
+            inputMode="tel"
+            maxLength={17}
+            required = {true}
+            mask = "+1 ([000]) [000]-[0000]"
+            description="This will be your primary identifier."
+          />
+          <TextInputSmall
             type={InputType.Email}
             label="Email"
-            value={Email}
-            onChangeText={setEmail}
+            valid={validEmail}
+            setValid={setValidEmail}
+            text={Email}
+            setText={setEmail}
             autoComplete="email"
             inputMode="email"
             maxLength={256}
             recommended
             description="We recommend binding an email address to your account in case you change your phone number."
+          /> 
+          <DateOfBirthInput 
+            day={Day}
+            month={Month}
+            year={Year}
+            validDay={validDay}
+            validMonth={validMonth}
+            validYear={validYear}
+            setValidDay={setValidDay}
+            setValidMonth={setValidMonth}
+            setValidYear={setValidYear}
+            setDay={setDay}
+            setMonth={setMonth}
+            setYear={setYear}
           />
-          {/* <TextInputSmall
-          label="Date of Birth"
-          value={DateOfBirth}
-          onChangeText={setDateOfBirth}
-          placeholder="MM/DD/YYYY"
-          inputMode="numeric"
-          maxLength={8}
-          required
-          description="You must be 18 years or older to use Sparrow. Your date of birth will not be visible to other users."
-        /> */}
-        <DateOfBirthInput 
-        onDayChangeText={setDay}
-        onMonthChangeText={setMonth}
-        onYearChangeText={setYear}
-        />
         </View>
         <View style={styles.checkboxSection}>
           <View style={styles.checkboxInnerSection}>
@@ -194,11 +218,12 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           onPress={navigate}
           // disabled
           disabled={
-            Name === "" || 
-            Email === "" || 
-            Day === "" || 
-            Month === "" || 
-            Year === "" || 
+            !validPhoneNumber || 
+            !validName || 
+            !validEmail || 
+            !validDay || 
+            !validMonth || 
+            !validYear || 
             !termsOfServiceAgreed || 
             !privacyPolicyAgreed
           }

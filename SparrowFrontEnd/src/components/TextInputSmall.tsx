@@ -21,6 +21,8 @@ import { Colors } from '../styles/ColorStyles';
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
 
+import TextInputMask from 'react-native-text-input-mask';
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // ! ||--------------------------------------------------------------------------------||
@@ -36,8 +38,12 @@ interface TextInputSmallProps {
   required?: boolean;
   disabled?: boolean;
   clearButton?: boolean;
-  value?: string | date;
-  onChangeText: React.Dispatch<React.SetStateAction<string>>;
+
+  text: string;
+  setText: React.Dispatch<React.SetStateAction<string>>;
+
+  valid: boolean;
+  setValid: React.Dispatch<React.SetStateAction<boolean>>;
 
   autoComplete?: 'tel' | 'email';
   inputMode?:
@@ -50,6 +56,7 @@ interface TextInputSmallProps {
     | 'email'
     | 'url';
   maxLength?: number;
+  mask?: string
 }
 
 export const TextInputSmall: React.FC<TextInputSmallProps> = ({
@@ -64,7 +71,11 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   autoComplete,
   inputMode,
   maxLength,
-  onChangeText,
+  text,
+  setText,
+  valid,
+  setValid,
+  mask = ''
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Text input                                   ||
@@ -91,7 +102,6 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 
   const customOnFocus = () => {
     setIsFocused(true);
-    locked.current = false;
   };
 
   const customOnBlur = () => {
@@ -102,17 +112,11 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
 
   const handleSubmit = () => {
     validateInput();
-    if (error === '') {
-      onChangeText(text);
-    } else {
-      onChangeText('');
-    }
   };
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                Clear text button                               ||
   // ! ||--------------------------------------------------------------------------------||
-  const [text, setText] = React.useState('');
 
   // Animations
   const iconOpacity = useSharedValue(0);
@@ -133,7 +137,6 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // TODO stop keyboard from abruptly closing and opening when pressing the clear button
   const clearButtonPress = () => {
     setText('');
-    onChangeText(text);
     locked.current = true;
   };
 
@@ -143,19 +146,20 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   const [error, setError] = React.useState('');
 
   const validateInput = () => {
-    
-    let isValid = false;
+
+    let currentValidity = false;
+    let currentError = '';
 
     switch (type) {
       case InputType.FirstName:
         const firstNameRegex = /^[a-zA-Z'-]+$/;
 
         if (text.length === 0) {
-          setError('First name field cannot be empty.');
+          currentError = 'First name field cannot be empty.';
         } else if (!firstNameRegex.test(text)) {
-          setError('First name can only contain letters.');
+          currentError = 'First name can only contain letters.';
         } else {
-          isValid = true;
+          currentValidity = true;
         }
         break;
 
@@ -163,23 +167,23 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (text.length === 0) {
-          setError('Email field cannot be empty.');
+          currentError = 'Email field cannot be empty.';
         } else if (!emailRegex.test(text)) {
-          setError('Please enter a valid email address.');
+          currentError = 'Please enter a valid email address.';
         } else {
-          isValid = true;
+          currentValidity = true;
         }
         break;
 
       case InputType.PhoneNumber:
-        const phoneNumberRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
+        const phoneNumberRegex = /^\+\d{1,2}\s?\(\d{3}\)\s?\d{3}-\d{4}$/;
 
         if (text.length === 0) {
-          setError('Phone number field cannot be empty.');
+          currentError = 'Phone number field cannot be empty.';
         } else if (!phoneNumberRegex.test(text)) {
-          setError('Please enter a valid phone number.');
+          currentError = 'Please enter a valid phone number.';
         } else {
-          isValid = true;
+          currentValidity = true;
         }
         break;
 
@@ -187,9 +191,9 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         const dayRegex = /^[1-31]{1,2}$/;
 
         if (!dayRegex.test(text)) {
-          setError('Invalid.');
+          currentError = 'Invalid.';
         } else {
-          isValid = true;
+          currentValidity = true;
         }
         break;
 
@@ -203,20 +207,21 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
         const maxYear = currentYear - minAge;
 
         if (!yearRegex.test(text) || (parseInt(text) < minYear || parseInt(text) > maxYear)) {
-          setError('Invalid.');
+          currentError = 'Invalid.';
         }
         else {
-          isValid = true;
+          currentValidity = true;
         }
         break;
 
       // Default
       default:
         maxLength = undefined;
-        isValid = false;
+        currentValidity = false;
     }
 
-    if (isValid) setError(''); 
+    setValid(currentValidity);
+    setError(currentError);
   };
 
   return (
@@ -263,16 +268,19 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
           animatedInputStyle,
           disabled && styles.inputContainerDisabled,
         ]}>
-        <TextInput
+       
+        <TextInputMask
           ref={textInput}
+          mask={mask}
+          placeholder={mask}
+          keyboardType="numeric"
+          placeholderTextColor="grey"
           type={type}
           value={text}
-          onChangeText={(val) => setText(val)}
+          onChangeText={(formatted, extracted) => setText(formatted)}
           onFocus={customOnFocus}
           onBlur={customOnBlur}
           style={[styles.input, globalStyles.bodyTextOne]}
-          placeholder={placeholder}
-          placeholderTextColor={Colors.sand400}
           autoComplete={autoComplete}
           selectionColor={Colors.sparrowDarkBrown}
           editable={!disabled}
