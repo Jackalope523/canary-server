@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -54,13 +54,25 @@ const SignupScreen = ({ navigation }: SignupProps) => {
   const [Month, setMonth] = useState('');
   const [Year, setYear] = useState('');
 
+  const [isButtonEnabled, setButtonEnabled] = React.useState(false);
+
+  useEffect(() => {
+    setButtonEnabled(
+      validPhoneNumber && 
+      validName && 
+      validEmail && 
+      validDay && 
+      validMonth && 
+      validYear && 
+      termsOfServiceAgreed && 
+      privacyPolicyAgreed
+      );
+  }, [validPhoneNumber, validName, validEmail, validDay, validMonth, validYear, termsOfServiceAgreed, privacyPolicyAgreed]);
   /* 
   
   START NEW CODE
 
   */
-
-  const [isButtonEnabled, setButtonEnabled] = React.useState(false);
 
   // const validateForm = () => {
   //   if (isValid && isChecked === true) {
@@ -101,6 +113,26 @@ const SignupScreen = ({ navigation }: SignupProps) => {
   //     .finally(() => setButtonEnabled(true));
   // }
 
+  function monthWordToNumber(monthString: string): string | null {
+    let monthsMap: { [key: string]: string } = {
+        "January": "01",
+        "February": "02",
+        "March": "03",
+        "April": "04",
+        "May": "05",
+        "June": "06",
+        "July": "07",
+        "August": "08",
+        "September": "09",
+        "October": "10",
+        "November": "11",
+        "December": "12"
+    };
+
+    let monthNumber = monthsMap[monthString];
+    return monthNumber || null;
+}
+
   function navigate() {
     navigation.navigate('Verify', {
       PhoneNumber,
@@ -112,6 +144,16 @@ const SignupScreen = ({ navigation }: SignupProps) => {
         });
       },
     });
+  }
+
+  function handleContinue() {
+    setButtonEnabled(false);
+    let formattedDate : Date = new Date(Year + "-" + monthWordToNumber(Month) + "-" + Day);
+
+    signup({ PhoneNumber: PhoneNumber, Email: Email, Name: Name, DateOfBirth: formattedDate })
+         .then(navigate)
+         .finally(() => setButtonEnabled(true))
+         .catch(() => console.log("fucked"));
   }
   
   return (
@@ -215,18 +257,8 @@ const SignupScreen = ({ navigation }: SignupProps) => {
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
           text={'Continue'}
-          onPress={navigate}
-          // disabled
-          disabled={
-            !validPhoneNumber || 
-            !validName || 
-            !validEmail || 
-            !validDay || 
-            !validMonth || 
-            !validYear || 
-            !termsOfServiceAgreed || 
-            !privacyPolicyAgreed
-          }
+          onPress={handleContinue}
+          disabled={!isButtonEnabled}
         />
       </ScrollView>
     </KeyboardAvoidingContainer>
