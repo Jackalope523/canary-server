@@ -50,12 +50,6 @@ const FlagMedium: React.FC<FlagMediumProps> = ({
       break;
     }
 
-    /*
-    
-        TODO note to myself (Anna) - might want to look into the * symbol and test it out on mobile
-        as it seems to look different than in Figma, maybe use an SVG instead of a text symbol
-
-    */
     case FlagType.Live: {
       flagStyle = [FlagStyles.live];
       flagText = `${'*'}live${'*'}`;
