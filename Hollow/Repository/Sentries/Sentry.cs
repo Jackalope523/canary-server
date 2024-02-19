@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Repository.Contexts;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Sentries
+namespace Repository
 {
     public abstract class Sentry
     {
-        protected QueryContext context;
+        public abstract T ExecuteRead<T>(Func<QueryContext, T> read);
+        public abstract void ExecuteWrite(Action<QueryContext> write);
 
-        protected abstract void QueryMade();
+        public abstract Task<T> ExecuteReadAsync<T>(Func<QueryContext,Task<T>> read);
+        public abstract Task ExecuteWriteAsync(Action<QueryContext> write);
+        public abstract Task ExecuteWriteAsync(Func<QueryContext,Task> write);
 
-        public QueryContext GetContext()
-        {
-            QueryMade();
-            return context;
-        }     
+        public abstract Discussion BeginDiscussion();
+        public abstract void DiscussWrite(Action<QueryContext> write, Discussion discussion);
+        public abstract void EndDiscussion(Discussion toEnd);
+        public abstract Task EndDiscussionAsync(Discussion toEnd);
+
+
     }
 }

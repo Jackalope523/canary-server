@@ -73,6 +73,7 @@ namespace Frontier.Controllers
 
 		#region Favours
 
+		[NonAction]
 		public async Task<IActionResult> Execute(Func<Task<IActionResult>> action)
 		{
 			try
@@ -99,6 +100,7 @@ namespace Frontier.Controllers
 			}
 		}
 
+		[NonAction]
 		public async Task<IActionResult> Execute(Func<Task> action)
 		{
 			return await Execute(async () =>
@@ -108,6 +110,7 @@ namespace Frontier.Controllers
 			});
 		}
 
+		[NonAction]
 		public async Task<IActionResult> Execute(Func<UserShard, Task> action, bool allowUnverified = false)
 		{
 			return await Execute(async user =>
@@ -118,6 +121,7 @@ namespace Frontier.Controllers
 			allowUnverified);
 		}
 
+		[NonAction]
 		public async Task<IActionResult> Execute(Func<UserShard, Task<IActionResult>> action, bool allowUnverified = false)
 		{
 			return await Execute(async () =>
@@ -131,9 +135,11 @@ namespace Frontier.Controllers
 			});
 		}
 
+		[NonAction]
 		public async Task<UserShard> GetCurrentUserAsync()
 			=> await userManager.GetUserAsync(HttpContext.User);
 
+		[NonAction]
 		public void ThrowIfUnverified(UserShard user)
 		{
 			if (user.IsEmailConfirmed)

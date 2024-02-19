@@ -1,11 +1,15 @@
-﻿namespace Repository.Entities
+﻿namespace Repository
 {
-    public class UserLink : Link
+    public class UserLink
     {
         public enum UserLinkType { Follow, Block, RateUp, RateDown }
 
-        public Guid OtherId { get; init; }
-        internal User Other { get; init; }
+        public ulong Id { get; set; }
+        public ulong SelfId { get; init; }
+        public User Self { get; init; }
+        public ulong OtherId { get; init; }
+        public User Other { get; init; }
+        public DateTimeOffset Time { get; init; }
         public UserLinkType Type { get; set; }
     }
 }

@@ -59,9 +59,8 @@ namespace Core.Controls
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store profile
-            Try(await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
-                newUser.Name, newUser.DateOfBirth, CharacterVector.Default.ToCharacter()),
-                new UnexpectedFailureException("User creation failed."));
+            await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
+                newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default.ToCharacter());
         }
 
         public async Task EditUserAsync(ulong userId,
@@ -132,8 +131,7 @@ namespace Core.Controls
 
         public async Task DeleteUserAsync(ulong userId)
         {
-            Try(await Accounts.DeleteUserAsync(userId),
-                new UnexpectedFailureException("User deletion failed."));
+            await Accounts.DeleteUserAsync(userId);
         }
 
         public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
@@ -146,24 +144,24 @@ namespace Core.Controls
 
             // Position update
             _ = Accounts.UpdateRecentLocationAsync(user.Id,
-                (await user.LastKnownLocation.Value()).Latitude,
-                (await user.LastKnownLocation.Value()).Longitude,
-                (await user.LastKnownRadius.Value()).Metres);
+                (await user.LastKnownLocation).Latitude,
+                (await user.LastKnownLocation).Longitude,
+                (await user.LastKnownRadius).Metres);
             // Haunt update
             _ = Accounts.UpdateHauntAsync(user.Id,
-                (await user.Haunt.Value()).Latitude,
-                (await user.Haunt.Value()).Longitude,
-                (await user.HauntRadius.Value()).Metres,
-                await user.HauntStability.Value());
+                (await user.Haunt).Latitude,
+                (await user.Haunt).Longitude,
+                (await user.HauntRadius).Metres,
+                await user.HauntStability);
 
             var nextEvent = await user.NextEvent();
 
             // Check if user is at an event
             if (await userIsAtEvent)
             {
-                var currentEvent = await user.CurrentEvent.Value();
+                var currentEvent = await user.CurrentEvent;
                 // Check if user left the event radius
-                if (!GeoLocation.AreInRange(await user.LastKnownLocation.Value(), currentEvent.Location, currentEvent.Radius))
+                if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentEvent.Location, currentEvent.Radius))
                 {
                     // Check if user is a guest or the host
                     if (currentEvent.IsHostedBy(user))
@@ -181,25 +179,25 @@ namespace Core.Controls
                 else if (currentEvent.IsHostedBy(user) && currentEvent.IsDynamic)
                 {
                     // Update the position of the event
-                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { (nameof(EventShard.Latitude), (await user.LastKnownLocation.Value()).Latitude),
-                        (nameof(EventShard.Longitude), (await user.LastKnownLocation.Value()).Longitude) });
+                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
                 }
             }
             // Check if user is on their way to an event
             else if (!await userIsAtEvent &&
-                nextEvent != null)
+                !nextEvent.Equals(Event.None))
             {
-                // Check if user is close enough to be a guest
-                if (await nextEvent.IsInRange(user))
+                // Check if user is host and can start event
+                if (nextEvent.IsWaiting &&
+                    nextEvent.IsHostedBy(user))
                 {
-                    _ = Events.SetUserStateAsync(user.Id, nextEvent.Id, EventUserState.Guest);
+                    await Terminal.EventDirector.StartEventAsync(user.Id, nextEvent.Id);
+                }
+                // Check if user is close enough to be arrived
+                else if (nextEvent.IsOngoing &&
+                    await nextEvent.IsInRange(user))
+                {
+                    await Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived, Time);
 
-                    // Check if user is host and can start event
-                    if (nextEvent.IsWaiting &&
-                        nextEvent.IsHostedBy(user))
-                    {
-                        await Terminal.EventDirector.StartEventAsync(user.Id, nextEvent.Id);
-                    }
                 }
             }
         }

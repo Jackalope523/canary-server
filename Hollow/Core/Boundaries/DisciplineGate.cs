@@ -8,15 +8,14 @@ namespace Core.Boundaries
 	#region Schemas
 
     public enum PenaltyType
-    { }
+    { Unreliable }
 
     public record Penalty(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
 
 	public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);
 
-    public record EventReport(ulong Id, ulong ReportingUserId, ulong ReportedEventId,
-        ulong ReportedEventHostId, DateTimeOffset ReportTime,
+    public record EventReport(ulong Id, ulong ReportingUserId, ulong ReportedEventId, DateTimeOffset ReportTime,
         EventReportType ReportType, string ReportDetails);
 
 	#endregion
@@ -26,15 +25,17 @@ namespace Core.Boundaries
 	public interface IDisciplineDatabase
     {
         Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId);
-        Task<bool> PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
+        Task PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
 
         Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(ulong userId);
         Task<(List<UserReport>, List<EventReport>)> GetReportsByUserAsync(ulong userId);
-        Task<bool> ReportUserAsync(ulong userId, ulong eventId, ulong targetUserId,
+        Task ReportUserAsync(ulong userId, ulong targetUserId, ulong eventId, DateTimeOffset timeOfReport,
+            UserReportType reportType, string reportDetails);
+        Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport,
             UserReportType reportType, string reportDetails);
 
         Task<List<EventReport>> GetReportsForEventAsync(ulong eventId);
-        Task<bool> ReportEventAsync(ulong userId, ulong eventId, ulong hostId,
+        Task ReportEventAsync(ulong userId, ulong eventId, DateTimeOffset timeOfReport,
             EventReportType reportType, string reportDetails);
     }
 

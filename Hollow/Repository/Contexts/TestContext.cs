@@ -1,13 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Contexts
+namespace Repository
 {
     public class TestContext : QueryContext
     {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=C:\\Users\\ECote\\source\\repos\\project-sparrow\\ProjectSparrow\\Repository\\TestDB.db", x => x.UseNetTopologySuite());
+            optionsBuilder.UseSqlite("Data Source=C:\\Users\\ECote\\source\\repos\\project-sparrow\\Hollow\\Repository\\TestDB.db", x => x.UseNetTopologySuite());
+            optionsBuilder.UseExceptionProcessor();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -44,15 +44,32 @@ namespace Core.Controls
 
             (List<EventThinSlice> Events, List<Etching> Etchings) nest = (new(), new());
 
-            // Check if users are friends
-            if (await targetUser.IsFriendsWith(user))
+            // Check if user is themself
+            if (user.Equals(targetUser))
             {
                 // Gather active and upcoming events visible to the user
                 var upcomingActivity = await GetUserActivity(targetUser);
                 await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
-                nest.Events = (await targetUser.PastEvents.Value()).ConvertAll(e => e.ToEventThinSlice());
+                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventThinSlice());
+                nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
+
+                foreach (var thinSlice in nest.Events)
+                {
+                    Event @event = new(thinSlice);
+                    nest.Etchings.AddRange(await @event.Etchings);
+                }
+            }
+            // Check if users are friends
+            else if (await targetUser.IsFriendsWith(user))
+            {
+                // Gather active and upcoming events visible to the user
+                var upcomingActivity = await GetUserActivity(targetUser);
+                await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
+
+                // Get private events and etchings
+                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventThinSlice());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
 
                 nest.Etchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
@@ -60,7 +77,20 @@ namespace Core.Controls
             else
             {
                 // Get public hosted events
-                nest.Events = (await Events.FindEventsByUserAsync(user.Id)).ConvertAll(e => new Event(e).ToEventThinSlice());
+                var hostedEvents = (await Events.FindEventsByUserAsync(targetUser.Id)).ConvertAll(e => new Event(e));
+                nest.Events = hostedEvents.ConvertAll(e => e.ToEventThinSlice());
+
+                // Get common events
+                var commonEvents = (await targetUser.PastEvents)
+                    .Except(hostedEvents)
+                    .Intersect(await user.PastEvents)
+                    .ToList().ConvertAll(e => e.ToEventThinSlice());
+
+                nest.Events.AddRange(commonEvents);
+
+                var targetEtchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
+
+                nest.Etchings.AddRange(targetEtchings.Where(etching => commonEvents.Exists(e => e.Id.Equals(etching.EventId))));
             }
 
             return nest;
@@ -72,7 +102,7 @@ namespace Core.Controls
             var targetUser = await GetUserAsync(targetId);
 
             // Verify users are friends
-            Try(await targetUser.IsFriendsWith(user),
+            Try(user.Equals(targetUser) || await targetUser.IsFriendsWith(user),
                 new InvalidUserException("User is unable to view target."));
 
             // Gather active and upcoming events
@@ -91,7 +121,7 @@ namespace Core.Controls
             ConcurrentDictionary<UserSilhouette, List<EventShard>> friendEvents = new();
 
             // Gather visible activity of each friend
-            (await user.Friends.Value()).AsParallel()
+            (await user.Friends).AsParallel()
                 .ForAll(async friend =>
                 {
                     var friendActivity = await GetUserActivity(friend);
@@ -119,7 +149,16 @@ namespace Core.Controls
 
         public async Task FollowUserAsync(ulong userId, ulong targetId)
         {
-            await Profiles.FollowUserAsync(userId, targetId);
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+            Fail(user.Equals(targetUser),
+                new InvalidUserException("User cannot follow themself."));
+
+            Fail(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
+                new InvalidUserException("User cannot follow blocked/blocking user."));
+
+            await Profiles.FollowUserAsync(userId, targetId, Psijic.Time);
         }
 
         public async Task UnfollowUserAsync(ulong userId, ulong targetId)
@@ -129,7 +168,13 @@ namespace Core.Controls
 
         public async Task BlockUserAsync(ulong userId, ulong targetId)
         {
-            await Profiles.BlockUserAsync(userId, targetId);
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+			Fail(user.Equals(targetUser),
+				new InvalidUserException("User cannot block themself."));
+
+			await Profiles.BlockUserAsync(userId, targetId, Psijic.Time);
         }
 
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
@@ -139,17 +184,22 @@ namespace Core.Controls
 
         public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
         {
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+            Fail(user.Equals(targetUser),
+                new InvalidUserException("User cannot rate themself."));
+
             // Check if rating is to remove
             if (rating != UserRating.Remove)
             {
-                _ = Profiles.RateUserAsync(userId, targetId, rating);
+                await Profiles.RateUserAsync(userId, targetId, rating, Psijic.Time);
             }
             else
             {
-                _ = Profiles.RemoveUserRatingAsync(userId, targetId);
+                await Profiles.RemoveUserRatingAsync(userId, targetId);
             }
 
-            var targetUser = await GetUserAsync(targetId);
             await targetUser.CalculateReputation();
             _ = Accounts.UpdateUserAsync(targetId, new() { (nameof(UserShard.Reputation), targetUser.Reputation) });
         }
@@ -201,9 +251,10 @@ namespace Core.Controls
             _ = user.CurrentEvent.Sync();
             
             // Gather all user event data
-            var upcomingActivity = await user.UpcomingEvents.Value();
+            var upcomingActivity = await user.UpcomingEvents;
 
-            upcomingActivity.Add(await user.CurrentEvent.Value());
+            if (!(await user.CurrentEvent).Equals(Event.None))
+            { upcomingActivity.Add(await user.CurrentEvent); }
 
             return upcomingActivity
 				.ConvertAll(@event => @event.ToEventShard());

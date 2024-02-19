@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
-using Shared;
-using NetTopologySuite.Utilities;
-using Microsoft.Extensions.Logging;
-using Repository.Entities;
+
 
 namespace Frontier.Controllers
 {
@@ -101,6 +96,16 @@ namespace Frontier.Controllers
 			{
 				// End an event
 				await events.EndEventAsync(user.Id, eventId);
+			});
+        }
+
+        [HttpDelete("{eventId}")]
+        public async Task<IActionResult> DeleteEvent(ulong eventId)
+		{
+			return await Execute(async user =>
+			{
+				// Delete an event
+				await events.DeleteEventAsync(user.Id, eventId);
 			});
         }
 

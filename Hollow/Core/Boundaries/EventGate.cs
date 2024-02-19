@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Threading.Tasks;
-using Core.Controls;
 using Shared;
 
 namespace Core.Boundaries
@@ -10,12 +8,12 @@ namespace Core.Boundaries
 	#region Schemas
 
 	public enum EventState
-	{ upcoming, active_open, active_closed, ended }
+	{ Upcoming, Open, Sealed, Ended }
 
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
-		double Radius, bool IsDynamic);
+		double Radius, bool IsDynamic, bool IsPendingDeletion);
 	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
 
 	#endregion
@@ -35,14 +33,15 @@ namespace Core.Boundaries
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character,
 			double Radius, bool isDynamic);
-		Task<bool> UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
-		Task<bool> EndEventAsync(ulong eventId);
+		Task UpdateEventAsync(ulong eventId, List<(string Property, object Value)> edits);
+		Task EndEventAsync(ulong eventId, DateTimeOffset time);
+		Task DeleteEventAsync(ulong eventId);
 
-		Task<EventUserState?> GetUserStateAsync(ulong userId, ulong eventId);
-		Task<bool> SetUserStateAsync(ulong userId, ulong eventId, EventUserState userState);
-		Task<bool> RemoveUserAsync(ulong userId, ulong eventId);
+		Task<EventBond?> GetUserStateAsync(ulong userId, ulong eventId);
+		Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState, DateTimeOffset time);
+		Task RemoveUserAsync(ulong userId, ulong eventId);
 
-		Task<List<(UserSilhouette User, EventUserState State)>> GetAllUsersAsync(ulong eventId);
+		Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId);
 		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong eventId);
 	}
 
@@ -63,13 +62,14 @@ namespace Core.Boundaries
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
 		Task StartEventAsync(ulong userId, ulong eventId);
 		Task EndEventAsync(ulong userId, ulong eventId);
+		Task DeleteEventAsync(ulong userId, ulong eventId);
 
 		Task WatchEventAsync(ulong userId, ulong eventId);
 		Task UnwatchEventAsync(ulong userId, ulong eventId);
 		Task JoinEventAsync(ulong userId, ulong eventId);
 		Task LeaveEventAsync(ulong userId, ulong eventId);
 
-		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventUserState State)> Guests)>
+		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)>
 			GetGuestListAsync(ulong userId, ulong eventId);
 		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId);
