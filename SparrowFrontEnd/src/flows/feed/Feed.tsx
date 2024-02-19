@@ -50,44 +50,44 @@ const FeedScreen = () => {
           type={ButtonType.PrimaryDark}
           size={ButtonSize.Large}
           display={ButtonDisplay.Contained}
-          btnText="I MADE A BUTTON!"
+          text="I MADE A BUTTON!"
           btnIcon="settings-outline"
         />
         <Button
           type={ButtonType.SecondaryDark}
           size={ButtonSize.Large}
           display={ButtonDisplay.Contained}
-          btnText="Another one"
+          text="Another one"
         />
         <Button
           type={ButtonType.Tertiary}
           size={ButtonSize.Large}
           display={ButtonDisplay.Contained}
-          btnText="Another one"
+          text="Another one"
         />
         <Button
           type={ButtonType.Success}
           size={ButtonSize.Large}
           display={ButtonDisplay.Contained}
-          btnText="Another one"
+          text="Another one"
         />
         <Button
           type={ButtonType.Warning}
           size={ButtonSize.Large}
           display={ButtonDisplay.Contained}
-          btnText="Another one"
+          text="Another one"
         />
         <Button
           type={ButtonType.Error}
           size={ButtonSize.Large}
           display={ButtonDisplay.Contained}
-          btnText="Another one"
+          text="Another one"
         />
         <Button
           type={ButtonType.Function}
           size={ButtonSize.Large}
           display={ButtonDisplay.Contained}
-          btnText="Another one"
+          text="Another one"
         />
 
         <Text>Button Full</Text>
@@ -95,25 +95,25 @@ const FeedScreen = () => {
           type={ButtonType.Success}
           size={ButtonSize.Small}
           display={ButtonDisplay.Full}
-          btnText="Small Button"
+          text="Small Button"
         />
         <Button
           type={ButtonType.Success}
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
-          btnText="Medium Button"
+          text="Medium Button"
         />
         <Button
           type={ButtonType.Success}
           size={ButtonSize.Large}
           display={ButtonDisplay.Full}
-          btnText="Large Button"
+          text="Large Button"
         />
         <Button
           type={ButtonType.Success}
           size={ButtonSize.ExtraSmall}
           display={ButtonDisplay.Full}
-          btnText="Extra Small Button"
+          text="Extra Small Button"
         />
       </View>
     </ScrollView>

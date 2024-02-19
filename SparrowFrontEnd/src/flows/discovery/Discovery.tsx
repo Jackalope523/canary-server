@@ -32,6 +32,8 @@ import {
   ScrollView,
 } from 'react-native-gesture-handler';
 import { buttonStyles } from '../../styles/ButtonStyles';
+import ExclusiveButtonView from '../../components/ExclusiveButtonView';
+import ExclusiveButtonScroll from '../../components/ExclusiveButtonScroll';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -56,6 +58,7 @@ const DiscoveryScreen = () => {
   // Toggle search close button
   const toggleClose = () => {
     setSearchContentVisible(false);
+    setActiveComponent(null);
     setSearchText('');
   };
 
@@ -67,7 +70,6 @@ const DiscoveryScreen = () => {
 
   const toggleFilter = () => {
     // setFilterVisible(!filterVisible);
-
     if (activeComponent === 'filter') {
       setActiveComponent(null);
     } else {
@@ -171,25 +173,31 @@ const DiscoveryScreen = () => {
                 {searchContentVisible ? (
                   <View>
                     {/* TODO make FILTER and SORT buttons functional */}
-                    <View style={navigationStyles.searchOptions}>
-                      <Button
-                        type={ButtonType.PrimaryDark}
-                        size={ButtonSize.ExtraSmall}
-                        display={ButtonDisplay.Full}
-                        btnText="Filter"
-                        btnIcon="filter-fill"
-                        onPress={toggleFilter}
-                      />
-
-                      <Button
-                        type={ButtonType.PrimaryDark}
-                        size={ButtonSize.ExtraSmall}
-                        display={ButtonDisplay.Full}
-                        btnText="Sort"
-                        btnIcon="sort-outline"
-                        onPress={toggleSort}
-                      />
-                    </View>
+                    <ExclusiveButtonView 
+                    groupStyle = {navigationStyles.searchOptions}  
+                    buttons = 
+                    {
+                      [
+                        {
+                          id: 1,
+                          type: ButtonType.PrimaryDark,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Full,
+                          text: "Filter",
+                          icon: "filter-fill",
+                          onPress: toggleFilter
+                        },
+                        {
+                          id: 2,
+                          type: ButtonType.PrimaryDark,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Full,
+                          text: "Sort",
+                          icon: "sort-outline",
+                          onPress: toggleSort
+                        }
+                      ]
+                    }/>                        
                     {/* TODO fix last 2 events not visible */}
                     {/* Potential not-ideal fix = screen height - (searchBarWrapper height + filterSort height) */}
                     {/* TODO maybe add an opacity 0 to opacity 100 gradient at the top */}
@@ -213,77 +221,81 @@ const DiscoveryScreen = () => {
                   Date
                 </Text>
                 <GestureHandlerRootView>
-                  <ScrollView
-                    horizontal={true}
-                    overScrollMode="never"
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: Spacing.lg }}>
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Today"
-                      onPress={null}
-                      self={1}
-                      status={dateState}
-                      changeState={setDateState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Tomorrow"
-                      onPress={null}
-                      self={2}
-                      status={dateState}
-                      changeState={setDateState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="This week"
-                      onPress={null}
-                      self={3}
-                      status={dateState}
-                      changeState={setDateState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="This weekend"
-                      onPress={null}
-                      self={4}
-                      status={dateState}
-                      changeState={setDateState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Next week"
-                      onPress={null}
-                      self={5}
-                      status={dateState}
-                      changeState={setDateState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Next weekend"
-                      onPress={null}
-                      self={6}
-                      status={dateState}
-                      changeState={setDateState}
-                    />
-                  </ScrollView>
+                <ExclusiveButtonScroll 
+                    props = 
+                    {
+                      {
+                        horizontal: true,
+                        overScrollMode: "never",
+                        showsHorizontalScrollIndicator: false,
+                        contentContainerStyle: {paddingHorizontal: Spacing.lg}, 
+                      }  
+                    } 
+                    buttons = 
+                    {
+                      [
+                        {
+                          id: 1,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Today",
+                          self: 1,
+                          status: dateState,
+                          changeState: setDateState,
+                        },
+                        {
+                          id: 2,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Tomorrow",
+                          self: 2,
+                          status: dateState,
+                          changeState: setDateState
+                        },
+                        {
+                          id: 3,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "This week",
+                          self: 3,
+                          status: dateState,
+                          changeState: setDateState
+                        },
+                        {
+                          id: 4,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "This weekend",
+                          self: 4,
+                          status: dateState,
+                          changeState: setDateState
+                        },
+                        {
+                          id: 5,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Next week",
+                          self: 5,
+                          status: dateState,
+                          changeState: setDateState,
+                        },
+                        {
+                          id: 6,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Next weekend",
+                          self: 6,
+                          status: dateState,
+                          changeState: setDateState
+                        }
+                      ]
+                    }/>                         
                 </GestureHandlerRootView>
               </View>
 
@@ -298,44 +310,52 @@ const DiscoveryScreen = () => {
                   Size
                 </Text>
                 <GestureHandlerRootView>
-                  <ScrollView
-                    horizontal={true}
-                    overScrollMode="never"
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: Spacing.lg }}>
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Cozy"
-                      onPress={null}
-                      self={1}
-                      status={sizeState}
-                      changeState={setSizeState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Thriving"
-                      onPress={null}
-                      self={2}
-                      status={sizeState}
-                      changeState={setSizeState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Bombastic"
-                      onPress={null}
-                      self={3}
-                      status={sizeState}
-                      changeState={setSizeState}
-                    />
-                  </ScrollView>
+                  <ExclusiveButtonScroll
+                    props = 
+                    {
+                      {
+                        horizontal: true,
+                        overScrollMode: "never",
+                        showsHorizontalScrollIndicator: false,
+                        contentContainerStyle: {paddingHorizontal: Spacing.lg}
+                      }
+                    }
+                    buttons = 
+                    {
+                      [
+                        {
+                          id: 1,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Cozy",
+                          self: 1,
+                          status: sizeState,
+                          changeState: setSizeState
+                        },
+                        {
+                          id: 2,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Thriving",
+                          self: 2,
+                          status: sizeState,
+                          changeState: setSizeState
+                        },
+                        {
+                          id: 3,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Bombastic",
+                          self: 3,
+                          status: sizeState,
+                          changeState: setSizeState,
+                        }
+                      ]
+                    }
+                  />
                 </GestureHandlerRootView>
               </View>
               <View style={navigationStyles.searchOptionsInnerSection}>
@@ -355,8 +375,7 @@ const DiscoveryScreen = () => {
                     type={ButtonType.Success}
                     size={ButtonSize.Medium}
                     display={ButtonDisplay.Full}
-                    btnText="Confirm selection"
-                    onPress={null}
+                    text="Confirm selection"
                   />
                 </View>
               </View>
@@ -375,40 +394,43 @@ const DiscoveryScreen = () => {
                   Sort by
                 </Text>
                 <GestureHandlerRootView>
-                  <View style={styles.sortContentWrapper}>
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Most popular"
-                      onPress={null}
-                      self={1}
-                      status={sortState}
-                      changeState={setSortState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Closest"
-                      onPress={null}
-                      self={2}
-                      status={sortState}
-                      changeState={setSortState}
-                    />
-
-                    <Button
-                      type={ButtonType.SecondaryLight}
-                      size={ButtonSize.ExtraSmall}
-                      display={ButtonDisplay.Contained}
-                      btnText="Most recent"
-                      onPress={null}
-                      self={3}
-                      status={sortState}
-                      changeState={setSortState}
-                    />
-                  </View>
+                <ExclusiveButtonView 
+                    groupStyle = {styles.sortContentWrapper}  
+                    buttons = 
+                    {
+                      [
+                        {
+                          id: 1,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Most popular",
+                          self: 1,
+                          status: sortState,
+                          changeState: setSortState,
+                        },
+                        {
+                          id: 2,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Closest",
+                          self: 2,
+                          status: sortState,
+                          changeState: setSortState
+                        },
+                        {
+                          id: 3,
+                          type: ButtonType.SecondaryLight,
+                          size: ButtonSize.ExtraSmall,
+                          display: ButtonDisplay.Contained,
+                          text: "Most recent",
+                          self: 3,
+                          status: sortState,
+                          changeState: setSortState,
+                        }
+                      ]
+                    }/>                     
                 </GestureHandlerRootView>
               </View>
             </View>
@@ -427,8 +449,7 @@ const DiscoveryScreen = () => {
                 type={ButtonType.PrimaryDark}
                 size={ButtonSize.ExtraSmall}
                 display={ButtonDisplay.Contained}
-                btnText="Create Event"
-                onPress={null}
+                text="Create Event"
               />
             </View>
           )}
@@ -437,8 +458,6 @@ const DiscoveryScreen = () => {
     </View>
   );
 };
-
-export default DiscoveryScreen;
 
 const styles = StyleSheet.create({
   sortContentWrapper: {
@@ -475,3 +494,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
   },
 });
+
+export default DiscoveryScreen;

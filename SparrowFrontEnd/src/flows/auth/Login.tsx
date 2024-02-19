@@ -1,5 +1,11 @@
-import * as React from 'react';
-import { View, Text, TextInput } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Pressable,
+  Keyboard
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import { Colors } from '../../styles/ColorStyles';
@@ -13,10 +19,18 @@ import Button, {
 } from '../../components/Button';
 
 import { login } from './accountPigeon';
+import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
+import { Spacing } from '../../styles/SpacingStyles';
+import TextInputSmall, { InputType } from '../../components/TextInputSmall';
+import TextButton, {
+  TextButtonType,
+  TextButtonVariant,
+} from '../../components/TextButton';
 
 type LoginProps = StackScreenProps<AuthStackParamList, 'Login'>;
 
 const LoginScreen = ({ navigation }: LoginProps) => {
+  const [validPhoneNumber, setValidPhoneNumber] = useState(false);
   const [PhoneNumber, setPhoneNumber] = React.useState('');
   const [buttonEnabled, setButtonEnabled] = React.useState(true);
 
@@ -41,30 +55,68 @@ const LoginScreen = ({ navigation }: LoginProps) => {
   }
 
   return (
-    <View>
-      <Text>Phone Number</Text>
-      <TextInput
-        value={PhoneNumber}
-        onChangeText={setPhoneNumber}
-        keyboardType="phone-pad"
-      />
-      <Button
-        type={ButtonType.PrimaryDark}
-        size={ButtonSize.Large}
-        display={ButtonDisplay.Contained}
-        btnText={'Login'}
-        onPress={navigate}
-        disabled={!buttonEnabled}
-      />
-      <Button
-        type={ButtonType.PrimaryDark}
-        size={ButtonSize.Large}
-        display={ButtonDisplay.Contained}
-        btnText={"Can't log in?"}
-        disabled={!buttonEnabled}
-      />
-    </View>
+    <Pressable style={[styles.container, globalStyles.baseContainer]} onPress = {Keyboard.dismiss}>
+      <View style={styles.headerContainer}>
+        <Image
+          source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
+          style={globalStyles.illustrationLarge}
+          resizeMode="contain"
+        />
+      </View>
+
+      <View style={styles.contentContainer}>
+        <TextInputSmall
+          type={InputType.PhoneNumber}
+          label="Phone Number"
+          valid={validPhoneNumber}
+          setValid={setValidPhoneNumber}
+          text={PhoneNumber}
+          setText={setPhoneNumber}
+          inputMode="tel"
+          maxLength={17}
+          required = {true}
+          mask = '+1 ([000]) [000]-[0000]'
+        />
+        <View style={styles.buttonContainer}>
+          <Button
+            type={ButtonType.Success}
+            size={ButtonSize.Medium}
+            display={ButtonDisplay.Full}
+            text={'Log in'}
+            onPress={navigate}
+            disabled={!validPhoneNumber}
+          />
+
+          <TextButton
+            text="Can't log in?"
+            type={TextButtonType.Dark}
+            variant={TextButtonVariant.Three}
+          />
+        </View>
+      </View>
+    </Pressable>
   );
 };
+
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                                     Styles                                     ||
+// ! ||--------------------------------------------------------------------------------||
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+
+  headerContainer: {},
+
+  contentContainer: {
+    rowGap: Spacing.lg,
+  },
+
+  buttonContainer: {
+    alignItems: 'center',
+    rowGap: Spacing.md,
+  },
+});
 
 export default LoginScreen;

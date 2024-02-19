@@ -1,6 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { Colors } from './ColorStyles';
 import { Spacing } from './SpacingStyles';
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export const globalStyles = StyleSheet.create({
   // ! ||--------------------------------------------------------------------------------||
@@ -120,33 +123,85 @@ export const globalStyles = StyleSheet.create({
   },
 
   buttonTextThree: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'UncutSans-Bold',
     // lineHeight: 24,
     // letterSpacing: 2.2,
   },
 
+  buttonTextFour: {
+    fontSize: 14,
+    fontFamily: 'UncutSans-Bold',
+    textTransform: 'uppercase',
+    // lineHeight: 24,
+    // letterSpacing: 2.2,
+  },
+
   // Label text
-  labelTextAsTyped: {
+  // One
+  labelTextOneAsTyped: {
     fontSize: 16,
     fontFamily: 'UncutSans-Bold',
   },
 
-  labelTextUppercase: {
+  labelTextOneUppercase: {
     fontSize: 16,
     textTransform: 'uppercase',
     fontFamily: 'UncutSans-Bold',
   },
 
-  labelTextTitleCase: {
+  labelTextOneTitlecase: {
     fontSize: 16,
     textTransform: 'capitalize',
     fontFamily: 'UncutSans-Bold',
   },
 
+  labelTextOneItalic: {
+    fontSize: 16,
+    fontFamily: 'UncutSans-BoldItalic',
+  },
+
+  // Two
+  labelTextTwoAsTyped: {
+    fontSize: 14,
+    fontFamily: 'UncutSans-Semibold',
+  },
+
+  labelTextTwoUppercase: {
+    fontSize: 14,
+    textTransform: 'uppercase',
+    fontFamily: 'UncutSans-Semibold',
+  },
+
+  labelTextTwoItalic: {
+    fontSize: 14,
+    fontFamily: 'UncutSans-SemiboldItalic',
+  },
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Text                                      ||
   // ! ||--------------------------------------------------------------------------------||
+
+  // Hyperlink
+  hyperlink: {
+    color: Colors.red500,
+    textDecorationLine: 'underline',
+  },
+
+  // Alignment
+
+  textAlignCenter: {
+    textAlign: 'center',
+  },
+
+  textAlignRight: {
+    textAlign: 'right',
+  },
+
+  textAlignLeft: {
+    textAlign: 'left',
+  },
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                 Color variants                                 ||
   // ! ||--------------------------------------------------------------------------------||
@@ -191,19 +246,105 @@ export const globalStyles = StyleSheet.create({
     color: Colors.turqoise300,
   },
 
+  // Disabled
+  // TODO test usability, this was previously sand400
+  textDisabled: {
+    color: Colors.sand300,
+  },
+
+  // Placeholder
+  textPlaceholder: {
+    color: Colors.sand400,
+  },
+
+  // ! ||--------------------------------------------------------------------------------||
+
+  // Highlights
+
+  // Dark
+  highlightDark: {
+    color: Colors.sparrowDark,
+    fontFamily: 'UncutSans-Bold',
+  },
+
+  // Light
+  highlightLight: {
+    color: Colors.sparrowSand,
+    fontFamily: 'UncutSans-Bold',
+  },
+
+  // Yellow
+  highlightYellow: {
+    color: Colors.yellow500,
+  },
+
+  // Orange
+  highlightOrange: {
+    color: Colors.orange500,
+  },
+
+  // Red
+  highlightRed: {
+    color: Colors.red500,
+  },
+
+  // Rose
+  highlightRose: {
+    color: Colors.rose500,
+  },
+
+  // Fuchsia
+  highlightFuchsia: {
+    color: Colors.fuchsia500,
+  },
+
+  // Lavender
+  highlightLavender: {
+    color: Colors.lavender500,
+  },
+
+  // Green
+  highlightGreen: {
+    color: Colors.green500,
+  },
+
+  // Turqoise
+  highlightTurqoise: {
+    color: Colors.turqoise500,
+  },
+
+  // Picton
+  highlightPicton: {
+    color: Colors.picton500,
+  },
+
+  // Azure
+  highlightAzure: {
+    color: Colors.azure500,
+  },
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                  Illustrations                                 ||
   // ! ||--------------------------------------------------------------------------------||
 
   // Large
   illustrationLarge: {
+    alignSelf: 'center',
     resizeMode: 'center',
     height: 280,
   },
 
   // Medium
   illustrationMedium: {
+    alignSelf: 'center',
     resizeMode: 'center',
     height: 200,
+  },
+
+  // Full
+  illustrationFull: {
+    maxWidth: windowWidth - Spacing.lg * 2,
+    maxHeight: windowWidth,
+    aspectRatio: 1,
   },
 });

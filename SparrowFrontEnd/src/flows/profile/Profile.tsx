@@ -38,7 +38,7 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
         type={ButtonType.PrimaryDark}
         size={ButtonSize.ExtraSmall}
         display={ButtonDisplay.Contained}
-        btnText="Settings"
+        text="Settings"
         onPress={() => navigation.navigate('Account')}
       />
       <Text>Profile</Text>

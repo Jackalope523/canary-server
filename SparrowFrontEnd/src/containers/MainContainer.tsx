@@ -18,12 +18,23 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Screens
+// Auth
 import LandingScreen from '../flows/auth/Landing';
 import LoginScreen from '../flows/auth/Login';
 import SignupScreen from '../flows/auth/Signup';
 import VerifyScreen from '../flows/auth/Verify';
 import ContinueScreen from '../flows/auth/Continue';
 
+// Quiz
+import IntroScreen from '../flows/auth/survey/Intro';
+import Q1Screen from '../flows/auth/survey/Q1';
+import Q2Screen from '../flows/auth/survey/Q2';
+import Q3Screen from '../flows/auth/survey/Q3';
+import Q4Screen from '../flows/auth/survey/Q4';
+import Q5Screen from '../flows/auth/survey/Q5';
+import Q6Screen from '../flows/auth/survey/Q6';
+
+// Main
 import ActivityScreen from '../flows/activity/Activity';
 import DiscoveryScreen from '../flows/discovery/Discovery';
 import FeedScreen from '../flows/feed/Feed';
@@ -43,6 +54,7 @@ import {
 } from '../components/atoms/types';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// TODO setup top navbars for all necessary screens
 // TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 
@@ -54,6 +66,8 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 const ActivityStack = createStackNavigator();
 const AccountStack = createStackNavigator();
 
+// TODO change initialRouteName back to Auth when finished with Survey
+
 function MainContainer() {
   return (
     <SafeAreaProvider>
@@ -62,6 +76,7 @@ function MainContainer() {
           initialRouteName="Auth"
           screenOptions={{ headerShown: false }}>
           <AppStack.Screen name="Auth" component={Authentication} />
+          <AppStack.Screen name="Survey" component={Survey} />
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
         </AppStack.Navigator>
@@ -74,12 +89,30 @@ export default MainContainer;
 
 function Authentication() {
   return (
-    <AuthStack.Navigator initialRouteName="Landing">
+    <AuthStack.Navigator
+      initialRouteName="Landing"
+      screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Landing" component={LandingScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Signup" component={SignupScreen} />
       <AuthStack.Screen name="Verify" component={VerifyScreen} />
       <AuthStack.Screen name="Continue" component={ContinueScreen} />
+    </AuthStack.Navigator>
+  );
+}
+
+function Survey() {
+  return (
+    <AuthStack.Navigator
+      initialRouteName="Intro"
+      screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Intro" component={IntroScreen} />
+      <AuthStack.Screen name="Q1" component={Q1Screen} />
+      <AuthStack.Screen name="Q2" component={Q2Screen} />
+      <AuthStack.Screen name="Q3" component={Q3Screen} />
+      <AuthStack.Screen name="Q4" component={Q4Screen} />
+      <AuthStack.Screen name="Q5" component={Q5Screen} />
+      <AuthStack.Screen name="Q6" component={Q6Screen} />
     </AuthStack.Navigator>
   );
 }

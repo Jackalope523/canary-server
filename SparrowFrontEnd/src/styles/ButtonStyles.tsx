@@ -21,7 +21,7 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  buttonPrimaryDarkDisasbled: {
+  buttonPrimaryDarkDisabled: {
     backgroundColor: Colors.sand200,
     borderColor: Colors.sand300,
   },
@@ -75,7 +75,11 @@ export const buttonStyles = StyleSheet.create({
   // Success
   buttonSuccess: {
     backgroundColor: Colors.green400,
-    borderColor: Colors.sparrowDarkBrown,
+    borderColor: Colors.green700,
+  },
+
+  buttonSuccessText: {
+    color: Colors.green700,
   },
 
   buttonSuccessDisabled: {
@@ -83,10 +87,18 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.green300,
   },
 
+  buttonSuccessDisabledText: {
+    color: Colors.green300,
+  },
+
   // Warning
   buttonWarning: {
     backgroundColor: Colors.orange400,
-    borderColor: Colors.sparrowDarkBrown,
+    borderColor: Colors.orange700,
+  },
+
+  buttonWarningText: {
+    color: Colors.orange700,
   },
 
   buttonWarningDisabled: {
@@ -94,10 +106,18 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.orange300,
   },
 
+  buttonWarningDisabledText: {
+    color: Colors.orange300,
+  },
+
   // Error
   buttonError: {
     backgroundColor: Colors.red400,
-    borderColor: Colors.sparrowDarkBrown,
+    borderColor: Colors.red700,
+  },
+
+  buttonErrorText: {
+    color: Colors.red700,
   },
 
   buttonErrorDisabled: {
@@ -105,15 +125,27 @@ export const buttonStyles = StyleSheet.create({
     borderColor: Colors.red300,
   },
 
+  buttonErrorDisabledText: {
+    color: Colors.red300,
+  },
+
   // Function
   buttonFunction: {
     backgroundColor: Colors.turqoise300,
-    borderColor: Colors.sparrowDarkBrown,
+    borderColor: Colors.turqoise700,
+  },
+
+  buttonFunctionText: {
+    color: Colors.turqoise700,
   },
 
   buttonFunctionDisabled: {
     backgroundColor: Colors.turqoise100,
     borderColor: Colors.turqoise300,
+  },
+
+  buttonFunctionDisabledText: {
+    color: Colors.turqoise300,
   },
 
   // ! ||--------------------------------------------------------------------------------||
@@ -127,7 +159,7 @@ export const buttonStyles = StyleSheet.create({
 
   // Makes the button full-width
   buttonFull: {
-    flex: 1,
+    alignSelf: 'stretch',
   },
 
   // Icon buttons - buttons with icons

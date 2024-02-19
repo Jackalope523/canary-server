@@ -1,0 +1,107 @@
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { globalStyles } from '../../styles/GlobalStyles';
+
+// Buttons
+import Button, { ButtonDisplay, ButtonSize, ButtonType } from '../Button';
+import ButtonGroup from '../ButtonGroup';
+
+// Input fields
+import DateOfBirthInput from '../auth/DateOfBirthInput';
+import DateOfBirthInputV2 from '../auth/DateOfBirthInputV2';
+import RadioButton from '../RadioButton';
+import OTPInputV1 from './OTPInputV1';
+import TextInputSmall, { InputType } from '../TextInputSmall';
+import OTPInputV2 from './OTPInputV2';
+import OTPInputV3 from './OTPInputV3';
+
+const ExampleScreen = () => {
+  const [code, setCode] = React.useState('');
+  const [isPinReady, setIsPinReady] = React.useState(false);
+  const MAX_CODE_LENGTH = 4;
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+
+      <View style={styles.header}>
+        <Text style={[globalStyles.displayTextTwo, globalStyles.textDark]}>
+          Examples
+        </Text>
+        <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+          Keep sections you don't want to test commented out for better
+          visibility.
+        </Text>
+      </View>
+
+      {/* Buttons */}
+
+      {/* <View style={styles.container}>
+        <Button
+          type={ButtonType.Warning}
+          size={ButtonSize.Medium}
+          display={ButtonDisplay.Full}
+          text={'Warning Button'}
+          onPress={() => {}}
+        />
+        <Button
+          type={ButtonType.Warning}
+          size={ButtonSize.Medium}
+          display={ButtonDisplay.Full}
+          text={'Disabled Success Button'}
+          onPress={() => {}}
+          disabled
+        />
+        <ButtonGroup
+          buttonText={['One', 'Two', 'Three']}
+          onSelect={(item) => console.log(item)}
+        />
+      </View> */}
+
+      {/* Input fields */}
+
+      <View style={styles.container}>
+        {/* <DateOfBirthInput /> */}
+        <DateOfBirthInputV2 />
+        {/* <OTPInputV1
+          setIsPinReady={setIsPinReady}
+          code={code}
+          setCode={setCode}
+          maxLength={MAX_CODE_LENGTH}
+        /> */}
+        <OTPInputV1
+          setIsPinReady={setIsPinReady}
+          code={code}
+          setCode={setCode}
+          maxLength={MAX_CODE_LENGTH}
+        />
+
+        <OTPInputV2 length={4} onChange={() => null} />
+
+        <TextInputSmall
+          type={InputType.Email}
+          label="Date of birth"
+          inputMode="numeric"
+          maxLength={256}
+          text = ''
+          setText={() => null}
+          required={true}
+        />
+      </View>
+    </View>
+  );
+};
+
+export default ExampleScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    gap: 16,
+    paddingBottom: 24,
+  },
+
+  header: {
+    paddingBottom: 8,
+  },
+});
