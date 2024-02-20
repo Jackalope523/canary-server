@@ -28,6 +28,8 @@ interface EventCardSmallProps {
   eventAttendees?: number;
 
   onPress?: () => void;
+
+  eventStatus?: EventStatus;
 }
 
 const EventCardSmall: React.FC<EventCardSmallProps> = ({
@@ -38,6 +40,7 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({
   eventLocation = 'NULL',
   eventAttendees,
   onPress = null,
+  eventStatus = EventStatus.Upcoming,
 }) => {
   // Text
   const attendees = `${eventAttendees} attendees`;
@@ -69,16 +72,18 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({
               {eventDate}
             </Text>
           </View>
-          <View style={styles.eventDetailsInnerContainer}>
-            <TimeOutline
-              height={24}
-              width={24}
-              fill={Colors.sparrowDarkBrown}
-            />
-            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-              {eventTime}
-            </Text>
-          </View>
+          {eventStatus === EventStatus.Upcoming && (
+            <View style={styles.eventDetailsInnerContainer}>
+              <TimeOutline
+                height={24}
+                width={24}
+                fill={Colors.sparrowDarkBrown}
+              />
+              <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+                {eventTime}
+              </Text>
+            </View>
+          )}
         </View>
         <View style={styles.eventDetailsInnerContainer}>
           <LocationOutline
@@ -92,20 +97,28 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({
             {eventLocation}
           </Text>
         </View>
-        <View style={styles.eventDetailsInnerContainer}>
-          <AccountOutline
-            height={24}
-            width={24}
-            fill={Colors.sparrowDarkBrown}
-          />
-          <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-            {attendees}
-          </Text>
-        </View>
+        {eventStatus === EventStatus.Upcoming && (
+          <View style={styles.eventDetailsInnerContainer}>
+            <AccountOutline
+              height={24}
+              width={24}
+              fill={Colors.sparrowDarkBrown}
+            />
+            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+              {attendees}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
 };
+
+// Exported enums
+export enum EventStatus {
+  Upcoming,
+  Past,
+}
 
 export default EventCardSmall;
 
@@ -133,7 +146,7 @@ const styles = StyleSheet.create({
   dateAndTime: {
     flexDirection: 'row',
     columnGap: Spacing.md,
-    marginTop: Spacing.md,
+    marginTop: Spacing.sm,
   },
 
   eventDetailsInnerContainer: {
