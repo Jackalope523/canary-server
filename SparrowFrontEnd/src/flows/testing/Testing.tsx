@@ -35,6 +35,7 @@ import testImage from '../../assets/images/temp/event-img-11.jpg';
 
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import Gallery from '../../components/Gallery';
+import OtherUserProfileScreen from './OtherUserProfile';
 
 const TestScreen = () => {
   const upcomingEventData = SAMPLEEVENTDATA.find((event) => event.id === '2');
@@ -54,8 +55,7 @@ const TestScreen = () => {
 
       {/* --- START TESTING CODE BELOW --- */}
 
-      <View style={globalStyles.baseContainer}>
-        <Gallery />
+      {/* <Gallery />
 
         <EventCardSmall
           eventHeroImage={upcomingEventData?.uri}
@@ -65,8 +65,9 @@ const TestScreen = () => {
           eventLocation={upcomingEventData?.location}
           eventAttendees={upcomingEventData?.attendees}
           onPress={() => console.log('Event card image pressed')}
-        />
-      </View>
+        /> */}
+
+      <OtherUserProfileScreen />
 
       {/* <HeaderFlagAttendee
         title="Attendee header"

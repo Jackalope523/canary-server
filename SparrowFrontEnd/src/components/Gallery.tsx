@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  ImageSourcePropType,
   Pressable,
   StyleSheet,
   Text,
@@ -22,13 +23,19 @@ import Chevron from '../assets/icons/chevron-outline.svg';
 
 // TODO fix "VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead."
 
-interface GalleryProps {}
+interface GalleryProps {
+  images: { media: ImageSourcePropType[] }[];
+}
 
-const Gallery: React.FC<GalleryProps> = () => {
+const Gallery: React.FC<GalleryProps> = ({ images }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Layout                                     ||
   // ! ||--------------------------------------------------------------------------------||
-  const [numColumns, setNumColumns] = React.useState(3);
+
+  const [numColumns, setNumColumns] = React.useState(
+    images.length <= 1 ? 1 : images.length === 2 ? 2 : 3,
+  );
+
   const [showAllItems, setShowAllItems] = React.useState(false);
 
   // View more
@@ -39,13 +46,13 @@ const Gallery: React.FC<GalleryProps> = () => {
 
   // Control the number of items displayed based on the layout
   const displayedData = showAllItems
-    ? SAMPLE_PAST_EVENT_DATA[0].media
+    ? images[0].media
     : numColumns === 1
-    ? SAMPLE_PAST_EVENT_DATA[0].media.slice(0, 2)
+    ? images[0].media.slice(0, 2)
     : numColumns === 2
-    ? SAMPLE_PAST_EVENT_DATA[0].media.slice(0, 4)
+    ? images[0].media.slice(0, 4)
     : numColumns === 3
-    ? SAMPLE_PAST_EVENT_DATA[0].media.slice(0, 6)
+    ? images[0].media.slice(0, 6)
     : [];
 
   // Handle layout change
@@ -97,22 +104,24 @@ const Gallery: React.FC<GalleryProps> = () => {
         <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
           Gallery
         </Text>
-        <View>
-          <TextButton
-            text="Layout"
-            type={TextButtonType.Dark}
-            variant={TextButtonVariant.Four}
-            displayIcon={true}
-            Icon={
-              numColumns === 1
-                ? mdLayout
-                : numColumns === 2
-                ? lgLayout
-                : smLayout
-            }
-            onPress={changeLayout}
-          />
-        </View>
+        {images.length > 1 && (
+          <View>
+            <TextButton
+              text="Layout"
+              type={TextButtonType.Dark}
+              variant={TextButtonVariant.Four}
+              displayIcon={true}
+              Icon={
+                numColumns === 1
+                  ? mdLayout
+                  : numColumns === 2
+                  ? lgLayout
+                  : smLayout
+              }
+              onPress={changeLayout}
+            />
+          </View>
+        )}
       </View>
 
       <FlatList
@@ -144,23 +153,25 @@ const Gallery: React.FC<GalleryProps> = () => {
         }
       />
 
-      <Pressable style={styles.viewMore} onPress={onViewMore}>
-        <Text style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
-          View more
-        </Text>
+      {images.length > 1 && (
+        <Pressable style={styles.viewMore} onPress={onViewMore}>
+          <Text style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
+            View more
+          </Text>
 
-        {/* TODO animate later if necessary - might get away without animating though */}
-        <Chevron
-          width={24}
-          height={24}
-          fill={Colors.sparrowDarkBrown}
-          style={
-            showAllItems
-              ? { transform: [{ rotate: '180deg' }] }
-              : { transform: [{ rotate: '0deg' }] }
-          }
-        />
-      </Pressable>
+          {/* TODO animate later if necessary - might get away without animating though */}
+          <Chevron
+            width={24}
+            height={24}
+            fill={Colors.sparrowDarkBrown}
+            style={
+              showAllItems
+                ? { transform: [{ rotate: '180deg' }] }
+                : { transform: [{ rotate: '0deg' }] }
+            }
+          />
+        </Pressable>
+      )}
     </View>
   );
 };
