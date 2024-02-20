@@ -28,7 +28,7 @@ const Gallery: React.FC<GalleryProps> = () => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Layout                                     ||
   // ! ||--------------------------------------------------------------------------------||
-  const [numColumns, setNumColumns] = React.useState(1);
+  const [numColumns, setNumColumns] = React.useState(3);
   const [showAllItems, setShowAllItems] = React.useState(false);
 
   // View more
