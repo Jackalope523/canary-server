@@ -67,7 +67,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
-import OtherUserProfileScreen from '../flows/testing/OtherUserProfile';
+import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
 
 // v1.0.1
 
@@ -92,7 +92,7 @@ function MainContainer() {
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
 
-          <AppStack.Screen name="Testing" component={TestScreen} />
+          <AppStack.Screen name="Testing" component={OtherUserProfileScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

@@ -14,11 +14,13 @@ import { SAMPLE_PAST_EVENT_DATA } from '../data/samplePastEventData';
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
 import { Colors } from '../styles/ColorStyles';
 import { Spacing } from '../styles/SpacingStyles';
+import ViewMoreButton from './ViewMoreButton';
 
 // Icons
 import smLayout from '../assets/icons/layout-size-small-fill-alt-2.svg';
 import mdLayout from '../assets/icons/layout-size-medium-fill-alt.svg';
 import lgLayout from '../assets/icons/layout-size-large-fill.svg';
+
 import Chevron from '../assets/icons/chevron-outline.svg';
 
 // TODO fix "VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead."
@@ -33,7 +35,7 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
   // ! ||--------------------------------------------------------------------------------||
 
   const [numColumns, setNumColumns] = React.useState(
-    images.length <= 1 ? 1 : images.length === 2 ? 2 : 3,
+    images[0].media.length <= 1 ? 1 : images[0].media.length === 2 ? 2 : 3,
   );
 
   const [showAllItems, setShowAllItems] = React.useState(false);
@@ -43,6 +45,9 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
     console.log('View more button pressed');
     setShowAllItems(!showAllItems);
   };
+
+  // TESTING
+  console.log(images[0].media.length);
 
   // Control the number of items displayed based on the layout
   const displayedData = showAllItems
@@ -104,7 +109,7 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
         <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
           Gallery
         </Text>
-        {images.length > 1 && (
+        {images[0].media.length > 1 && (
           <View>
             <TextButton
               text="Layout"
@@ -153,12 +158,11 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
         }
       />
 
-      {images.length > 1 && (
+      {images[0].media.length <= 2 ? null : (
         <Pressable style={styles.viewMore} onPress={onViewMore}>
           <Text style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
             View more
           </Text>
-
           {/* TODO animate later if necessary - might get away without animating though */}
           <Chevron
             width={24}

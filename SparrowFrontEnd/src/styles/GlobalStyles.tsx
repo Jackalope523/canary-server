@@ -20,8 +20,7 @@ export const globalStyles = StyleSheet.create({
 
   // Used for screens
   baseContainer: {
-    // flex: 1,
-    margin: 24,
+    padding: 24,
   },
 
   // ! ||--------------------------------------------------------------------------------||

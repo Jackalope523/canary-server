@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { BottomTabParamList } from '../../components/atoms/types';
 import { getAccount, userShard } from '../auth/accountPigeon';
@@ -20,13 +27,15 @@ import TextLabel, {
   LabelType,
 } from '../../components/TextLabel';
 import { labelText } from '../../components/LabelText';
+import { EventStatus } from '../../components/EventCardSmall';
 import PreviouslyAttendedEvent from '../../components/otherUserProfile/previouslyAttendedEvent';
-
-import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
+import UpcomingEvent from '../../components/otherUserProfile/upcomingEvent';
 
 // Icons
 import AddIcon from '../../assets/icons/add-outline.svg';
-import { EventStatus } from '../../components/EventCardSmall';
+import Chevron from '../../assets/icons/chevron-outline.svg';
+
+import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
 
 type OtherUserProfileScreenProps = StackScreenProps<
@@ -44,6 +53,14 @@ const OtherUserProfileScreen = ({
   );
 
   const [debugText, setDebugText] = React.useState('');
+
+  const [showAllItems, setShowAllItems] = React.useState(false);
+
+  // View more
+  const onViewMore = () => {
+    console.log('View more button pressed');
+    setShowAllItems(!showAllItems);
+  };
 
   function handleGetAccount() {
     if (debugText == '') return;
@@ -73,7 +90,10 @@ const OtherUserProfileScreen = ({
   }, [user]);
 
   return (
-    <View style={globalStyles.baseContainer}>
+    <ScrollView
+      contentContainerStyle={globalStyles.baseContainer}
+      overScrollMode="never"
+      showsVerticalScrollIndicator={false}>
       <View style={styles.topContainer}>
         <Avatar size={AvatarSize.Large} status={status} image={user?.avatar} />
         <View style={styles.userInfo}>
@@ -125,7 +145,7 @@ const OtherUserProfileScreen = ({
         {user?.bio}
       </Text>
 
-      {/* LABELS HERE */}
+      {/* LABELS */}
       <View style={styles.labelContainer}>
         <TextLabel
           text={labelText.userSince}
@@ -148,7 +168,6 @@ const OtherUserProfileScreen = ({
           Events
         </Text>
         <View style={styles.eventsContainer}>
-          {/* inner wrapper start */}
           <View style={styles.eventsInnerWrapper}>
             <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
               Attended
@@ -180,7 +199,6 @@ const OtherUserProfileScreen = ({
               </Text>
             </View>
           </View>
-          {/* inner wrapper end */}
         </View>
 
         {friend ? (
@@ -191,7 +209,58 @@ const OtherUserProfileScreen = ({
                 style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
                 Upcoming RSVP'd
               </Text>
-              {/* <PreviouslyAttendedEvent /> */}
+              {showAllItems ? (
+                <FlatList
+                  data={SAMPLEEVENTDATA}
+                  renderItem={({ item }) => (
+                    <UpcomingEvent
+                      eventStatus={EventStatus.Upcoming}
+                      eventHeroImage={item.uri}
+                      eventTitle={item.title}
+                      eventDate={item.date}
+                      eventTime={item.time}
+                      eventLocation={item.location}
+                      eventAttendees={item.attendees}
+                      onPress={() => console.log('Event card image pressed')}
+                    />
+                  )}
+                  keyExtractor={(item) => item.id}
+                  ItemSeparatorComponent={
+                    <View style={{ height: Spacing.md }} />
+                  }
+                />
+              ) : (
+                SAMPLEEVENTDATA.slice(0, 2).map((item) => (
+                  <UpcomingEvent
+                    eventStatus={EventStatus.Upcoming}
+                    eventHeroImage={item.uri}
+                    eventTitle={item.title}
+                    eventDate={item.date}
+                    eventTime={item.time}
+                    eventLocation={item.location}
+                    eventAttendees={item.attendees}
+                    onPress={() => console.log('Event card image pressed')}
+                  />
+                ))
+              )}
+
+              {/* TODO replace this with ViewMoreButton component */}
+              <Pressable style={styles.viewMore} onPress={onViewMore}>
+                <Text
+                  style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
+                  View more
+                </Text>
+                <Chevron
+                  width={24}
+                  height={24}
+                  fill={Colors.sparrowDarkBrown}
+                  style={
+                    showAllItems
+                      ? { transform: [{ rotate: '180deg' }] }
+                      : { transform: [{ rotate: '0deg' }] }
+                  }
+                />
+              </Pressable>
             </View>
             <View style={styles.pastEvents}>
               <Text
@@ -206,35 +275,27 @@ const OtherUserProfileScreen = ({
                 eventLocation={pastEventData?.location}
                 eventAttendees={pastEventData?.attendees}
                 onPress={() => console.log('Event card image pressed')}
-                /*
-                
-                TODO fix possible bug when using pastEventData?.media -
-                error cannot read property 'slice' of undefined
-
-                current fix below needs testing
-
-                TODO if Gallery has 1 image:
-                1. hide view more button
-                2. set numColumns to 1
-                3. hide change layout button
-
-                TODO if Gallery has 0 images:
-                1. hide Gallery component
-
-                */
                 images={pastEventData?.media ? [pastEventData] : []}
               />
             </View>
           </View>
         ) : null}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 export default OtherUserProfileScreen;
 
 const styles = StyleSheet.create({
+  // TODO delete viewMore styles after the ViewMoreButton component has been integrated
+  viewMore: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: Spacing.md,
+  },
+
   topContainer: {
     alignItems: 'center',
     paddingVertical: Spacing.lg,

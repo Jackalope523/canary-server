@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  Pressable,
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { BottomTabParamList } from '../../components/atoms/types';
 import { getAccount, userShard } from '../auth/accountPigeon';
@@ -11,6 +18,7 @@ import Button, {
 
 // Icons
 import AddIcon from '../../assets/icons/add-outline.svg';
+import Chevron from '../../assets/icons/chevron-outline.svg';
 
 import { globalStyles } from '../../styles/GlobalStyles';
 import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
@@ -24,9 +32,29 @@ import TextLabel, {
 } from '../../components/TextLabel';
 import { labelText } from '../../components/LabelText';
 
+import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
+import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
+import UpcomingEvent from '../../components/otherUserProfile/upcomingEvent';
+import { EventStatus } from '../../components/EventCardSmall';
+import PreviouslyAttendedEvent from '../../components/otherUserProfile/previouslyAttendedEvent';
+
 type ProfileProps = StackScreenProps<BottomTabParamList, 'Profile'>;
 
 const ProfileScreen = ({ navigation }: ProfileProps) => {
+  // Sample event data
+  const upcomingEventData = SAMPLEEVENTDATA.find((event) => event.id === '2');
+  const pastEventData = SAMPLE_PAST_EVENT_DATA.find(
+    (event) => event.id === '3',
+  );
+
+  const [showAllItems, setShowAllItems] = React.useState(false);
+
+  // View more
+  const onViewMore = () => {
+    console.log('View more button pressed');
+    setShowAllItems(!showAllItems);
+  };
+
   const [debugText, setDebugText] = React.useState('');
 
   function handleGetAccount() {
@@ -56,12 +84,11 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
     console.log('user', user);
   }, [user]);
 
-  // Labels
-  // const userSince = 'User since ' + user?.userSince;
-  // const lastSeen = 'Last seen ' + user?.lastSeen + ' ago';
-
   return (
-    <View style={globalStyles.baseContainer}>
+    <ScrollView
+      contentContainerStyle={globalStyles.baseContainer}
+      overScrollMode="never"
+      showsVerticalScrollIndicator={false}>
       <View style={styles.topContainer}>
         <Avatar size={AvatarSize.Large} status={status} image={user?.avatar} />
         <View style={styles.userInfo}>
@@ -167,14 +194,96 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
           </View>
           {/* inner wrapper end */}
         </View>
+
+        <View>
+          {/* Upcoming RSVP'd */}
+          <View style={styles.upcomingEvents}>
+            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
+              Upcoming RSVP'd
+            </Text>
+            {showAllItems ? (
+              <FlatList
+                data={SAMPLEEVENTDATA}
+                renderItem={({ item }) => (
+                  <UpcomingEvent
+                    eventStatus={EventStatus.Upcoming}
+                    eventHeroImage={item.uri}
+                    eventTitle={item.title}
+                    eventDate={item.date}
+                    eventTime={item.time}
+                    eventLocation={item.location}
+                    eventAttendees={item.attendees}
+                    onPress={() => console.log('Event card image pressed')}
+                  />
+                )}
+                keyExtractor={(item) => item.id}
+                ItemSeparatorComponent={<View style={{ height: Spacing.md }} />}
+              />
+            ) : (
+              SAMPLEEVENTDATA.slice(0, 2).map((item) => (
+                <UpcomingEvent
+                  eventStatus={EventStatus.Upcoming}
+                  eventHeroImage={item.uri}
+                  eventTitle={item.title}
+                  eventDate={item.date}
+                  eventTime={item.time}
+                  eventLocation={item.location}
+                  eventAttendees={item.attendees}
+                  onPress={() => console.log('Event card image pressed')}
+                />
+              ))
+            )}
+
+            {/* TODO replace this with ViewMoreButton component */}
+            <Pressable style={styles.viewMore} onPress={onViewMore}>
+              <Text
+                style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
+                View more
+              </Text>
+              <Chevron
+                width={24}
+                height={24}
+                fill={Colors.sparrowDarkBrown}
+                style={
+                  showAllItems
+                    ? { transform: [{ rotate: '180deg' }] }
+                    : { transform: [{ rotate: '0deg' }] }
+                }
+              />
+            </Pressable>
+          </View>
+          <View style={styles.pastEvents}>
+            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
+              Previously attended
+            </Text>
+            <PreviouslyAttendedEvent
+              eventStatus={EventStatus.Past}
+              eventHeroImage={pastEventData?.media[0]}
+              eventTitle={pastEventData?.title}
+              eventDate={pastEventData?.time}
+              eventLocation={pastEventData?.location}
+              eventAttendees={pastEventData?.attendees}
+              onPress={() => console.log('Event card image pressed')}
+              images={pastEventData?.media ? [pastEventData] : []}
+            />
+          </View>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
+  // TODO delete viewMore styles after the ViewMoreButton component has been integrated
+  viewMore: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: Spacing.md,
+  },
+
   topContainer: {
     alignItems: 'center',
     paddingVertical: Spacing.lg,
@@ -232,5 +341,15 @@ const styles = StyleSheet.create({
 
   eventsContainerHosted: {
     backgroundColor: Colors.picton400,
+  },
+
+  upcomingEvents: {
+    paddingTop: Spacing.xl,
+    rowGap: Spacing.md,
+  },
+
+  pastEvents: {
+    paddingTop: Spacing.xl,
+    rowGap: Spacing.md,
   },
 });
