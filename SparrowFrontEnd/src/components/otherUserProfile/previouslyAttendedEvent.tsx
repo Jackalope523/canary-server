@@ -10,9 +10,7 @@ type PreviouslyAttendedEventProps = {
   eventHeroImage: ImageSourcePropType;
   eventTitle: string;
   eventDate: string;
-  eventTime: string;
   eventLocation: string;
-  eventAttendees: number;
   onPress: () => void;
   images: { media: ImageSourcePropType[] }[];
 };
@@ -22,9 +20,7 @@ const PreviouslyAttendedEvent: FC<PreviouslyAttendedEventProps> = ({
   eventHeroImage,
   eventTitle,
   eventDate,
-  eventTime,
   eventLocation,
-  eventAttendees,
   onPress,
   images,
 }) => {
@@ -35,9 +31,7 @@ const PreviouslyAttendedEvent: FC<PreviouslyAttendedEventProps> = ({
         eventHeroImage={eventHeroImage}
         eventTitle={eventTitle}
         eventDate={eventDate + ' ago'}
-        eventTime={eventTime}
         eventLocation={eventLocation}
-        eventAttendees={eventAttendees}
         onPress={onPress}
       />
       {images.length > 0 && <Gallery images={images} />}

@@ -267,15 +267,24 @@ const OtherUserProfileScreen = ({
                 style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
                 Previously attended
               </Text>
-              <PreviouslyAttendedEvent
-                eventStatus={EventStatus.Past}
-                eventHeroImage={pastEventData?.media[0]}
-                eventTitle={pastEventData?.title}
-                eventDate={pastEventData?.time}
-                eventLocation={pastEventData?.location}
-                eventAttendees={pastEventData?.attendees}
-                onPress={() => console.log('Event card image pressed')}
-                images={pastEventData?.media ? [pastEventData] : []}
+
+              <FlatList
+                data={SAMPLE_PAST_EVENT_DATA.filter(
+                  (item) => !item.time.includes('live'),
+                )}
+                renderItem={({ item }) => (
+                  <PreviouslyAttendedEvent
+                    eventStatus={EventStatus.Past}
+                    eventHeroImage={item.media[0]}
+                    eventTitle={item.title}
+                    eventDate={item.time}
+                    eventLocation={item.location}
+                    onPress={() => console.log('Event card image pressed')}
+                    images={item.media ? [item] : []}
+                  />
+                )}
+                keyExtractor={(item) => item.id}
+                ItemSeparatorComponent={<View style={{ height: Spacing.lg }} />}
               />
             </View>
           </View>
