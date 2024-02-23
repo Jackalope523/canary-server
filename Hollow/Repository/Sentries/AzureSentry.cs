@@ -12,7 +12,7 @@ namespace Repository
 
         public override T ExecuteRead<T>(Func<QueryContext, T> read)
         {
-            using (TestContext context = new())
+            using (AzureContext context = new())
             {
                 try
                 {
@@ -32,7 +32,7 @@ namespace Repository
 
         public override void ExecuteWrite(Action<QueryContext> write)
         {
-            using (TestContext context = new())
+            using (AzureContext context = new())
             {
                 try
                 {
@@ -52,7 +52,7 @@ namespace Repository
 
         public async override Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
         {
-            using (TestContext context = new())
+            using (AzureContext context = new())
             {
                 try
                 {
@@ -72,7 +72,7 @@ namespace Repository
 
         public async override Task ExecuteWriteAsync(Action<QueryContext> write)
         {
-            using (TestContext context = new())
+            using (AzureContext context = new())
             {
                 try
                 {
@@ -91,7 +91,7 @@ namespace Repository
         }
         public async override Task ExecuteWriteAsync(Func<QueryContext, Task> write)
         {
-            using (TestContext context = new())
+            using (AzureContext context = new())
             {
                 try
                 {
@@ -111,7 +111,7 @@ namespace Repository
 
         public override Discussion BeginDiscussion()
         {
-            return new Discussion(new TestContext());
+            return new Discussion(new AzureContext());
         }
 
         public override void DiscussWrite(Action<QueryContext> write, Discussion discussion)
