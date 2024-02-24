@@ -39,7 +39,7 @@ const LoginScreen = ({ navigation }: LoginProps) => {
 
     login({ PhoneNumber })
       .then(navigate)
-      .finally(() => setButtonEnabled(true));
+      .finally(() => setButtonEnabled(true)).catch(() => console.log("ERROR"));
   }
 
   function navigate() {
@@ -83,7 +83,7 @@ const LoginScreen = ({ navigation }: LoginProps) => {
             size={ButtonSize.Medium}
             display={ButtonDisplay.Full}
             text={'Log in'}
-            onPress={navigate}
+            onPress={handleLogin}
             disabled={!validPhoneNumber}
           />
 

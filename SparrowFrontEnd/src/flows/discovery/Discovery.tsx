@@ -35,6 +35,8 @@ import { buttonStyles } from '../../styles/ButtonStyles';
 import ExclusiveButtonView from '../../components/ExclusiveButtonView';
 import ExclusiveButtonScroll from '../../components/ExclusiveButtonScroll';
 
+import MapboxGL, { MapView, LocationPuck }  from "@rnmapbox/maps";
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // TEMP. map image - replace with actual working map
@@ -104,12 +106,11 @@ const DiscoveryScreen = () => {
 
   // TODO split up the page into components - implement the search bar from Discovery/SearchBar and Discovery Search in a different screen
 
+  MapboxGL.setAccessToken("sk.eyJ1IjoiamFja2Fsb3BlNTIzIiwiYSI6ImNsb3o0Y3ZoYTA5aW4ya3Bwb3M5YjY0cXkifQ.g0fLvyL1wWfyotb8L5oigg");
+
   return (
     <View style={styles.mapWrapper}>
-      <ImageBackground
-        source={tempMapImage}
-        resizeMode="cover"
-        style={styles.mapImage}>
+      <View style={styles.overlayWrapper}>
         <View>
           {/* Search */}
           {/* Search header */}
@@ -454,7 +455,8 @@ const DiscoveryScreen = () => {
             </View>
           )}
         </View>
-      </ImageBackground>
+      </View>
+      <MapView style={styles.map} scaleBarEnabled = {false}/>
     </View>
   );
 };
@@ -481,8 +483,17 @@ const styles = StyleSheet.create({
 
   // Map
   mapWrapper: {
-    flex: 1,
+    flex: 1
   },
+
+  overlayWrapper: {
+    backgroundColor:"transparent",
+    position:'absolute',
+    top:"0%",
+    left:"50%",
+    zIndex:10
+  },
+
 
   mapImage: {
     flex: 1,
@@ -492,6 +503,21 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     alignSelf: 'flex-end',
     marginHorizontal: 24,
+  },
+
+  map: {
+    flex: 1
+  },
+  page: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5FCFF"
+  },
+  mapContainer: {
+    height: 300,
+    width: 300,
+    backgroundColor: "tomato"
   },
 });
 
