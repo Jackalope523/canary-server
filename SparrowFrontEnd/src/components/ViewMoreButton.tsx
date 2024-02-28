@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import React, { FC } from 'react';
 import { Spacing } from '../styles/SpacingStyles';
 import { globalStyles } from '../styles/GlobalStyles';
@@ -8,16 +8,14 @@ import Chevron from '../assets/icons/chevron-outline.svg';
 import { Colors } from '../styles/ColorStyles';
 
 type Props = {
-  state: boolean;
+  showAllItems: boolean;
+  setShowAllItems: (showAllItems: boolean) => void;
 };
 
-const ViewMoreButton: FC<Props> = ({ state }) => {
-  const [showAllItems, setShowAllItems] = React.useState(false);
-
+const ViewMoreButton: FC<Props> = ({ showAllItems, setShowAllItems }) => {
   const onViewMore = () => {
-    console.log('View more button pressed');
+    console.log('view more button pressed');
     setShowAllItems(!showAllItems);
-    setShowAllItems(!state);
   };
 
   return (

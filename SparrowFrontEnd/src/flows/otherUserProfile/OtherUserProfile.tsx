@@ -37,6 +37,7 @@ import Chevron from '../../assets/icons/chevron-outline.svg';
 
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
+import ViewMoreButton from '../../components/ViewMoreButton';
 
 type OtherUserProfileScreenProps = StackScreenProps<
   BottomTabParamList,
@@ -55,12 +56,6 @@ const OtherUserProfileScreen = ({
   const [debugText, setDebugText] = React.useState('');
 
   const [showAllItems, setShowAllItems] = React.useState(false);
-
-  // View more
-  const onViewMore = () => {
-    console.log('View more button pressed');
-    setShowAllItems(!showAllItems);
-  };
 
   function handleGetAccount() {
     if (debugText == '') return;
@@ -245,22 +240,10 @@ const OtherUserProfileScreen = ({
               )}
 
               {/* TODO replace this with ViewMoreButton component */}
-              <Pressable style={styles.viewMore} onPress={onViewMore}>
-                <Text
-                  style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
-                  View more
-                </Text>
-                <Chevron
-                  width={24}
-                  height={24}
-                  fill={Colors.sparrowDarkBrown}
-                  style={
-                    showAllItems
-                      ? { transform: [{ rotate: '180deg' }] }
-                      : { transform: [{ rotate: '0deg' }] }
-                  }
-                />
-              </Pressable>
+              <ViewMoreButton
+                showAllItems={showAllItems}
+                setShowAllItems={setShowAllItems}
+              />
             </View>
             <View style={styles.pastEvents}>
               <Text
@@ -299,14 +282,6 @@ const OtherUserProfileScreen = ({
 export default OtherUserProfileScreen;
 
 const styles = StyleSheet.create({
-  // TODO delete viewMore styles after the ViewMoreButton component has been integrated
-  viewMore: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Spacing.md,
-  },
-
   topContainer: {
     alignItems: 'center',
     paddingVertical: Spacing.lg,
