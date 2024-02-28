@@ -82,7 +82,7 @@ function MainContainer() {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Main"
+          initialRouteName="Testing"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
@@ -193,38 +193,17 @@ function ActivityStackScreen() {
     <ActivityStack.Navigator
       screenOptions={() => ({
         headerShown: false,
-
         cardStyle: styles.cardContainer,
-
         headerTitleStyle: {
           fontSize: 16,
           color: Colors.sparrowDark,
         },
-
-        // headerTitleContainerStyle: {
-        //     marginHorizontal: 24,
-        // },
-
-        // headerLeftContainerStyle: {
-        //     marginLeft: 0,
-        // },
-
         headerStyle: {
           height: 50,
           backgroundColor: Colors.sparrowSand,
           borderBottomColor: Colors.sparrowDarkBrown,
           borderBottomWidth: 2,
         },
-
-        // headerLeftContainerStyle: {
-        //     marginLeft: 24,
-        // },
-
-        // headerLeftContainerStyle: {
-        //     backgroundColor: Colors.red400,
-        //     // marginHorizontal: 16, // between btn and title
-        //     // left: 24, // moves ONLY btn from left, absolute
-        // },
       })}>
       <ActivityStack.Screen name="Activity" component={ActivityScreen} />
       <ActivityStack.Screen
@@ -243,7 +222,7 @@ function Account() {
         headerShown: true,
         cardStyle: styles.cardContainer,
       }}>
-      <AccountStack.Screen name="Account" component={AccountScreen} />
+      <AccountStack.Screen name="Profile" component={ProfileScreen} />
     </AccountStack.Navigator>
   );
 }
@@ -251,7 +230,5 @@ function Account() {
 const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: Colors.sparrowSand,
-    // TESTING ONLY
-    // backgroundColor: Colors.fuchsia300,
   },
 });
