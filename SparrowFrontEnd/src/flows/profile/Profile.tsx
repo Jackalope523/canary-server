@@ -196,62 +196,6 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
         </View>
 
         <View>
-          {/* Upcoming RSVP'd */}
-          <View style={styles.upcomingEvents}>
-            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-              Upcoming RSVP'd
-            </Text>
-            {showAllItems ? (
-              <FlatList
-                data={SAMPLEEVENTDATA}
-                renderItem={({ item }) => (
-                  <UpcomingEvent
-                    eventStatus={EventStatus.Upcoming}
-                    eventHeroImage={item.uri}
-                    eventTitle={item.title}
-                    eventDate={item.date}
-                    eventTime={item.time}
-                    eventLocation={item.location}
-                    eventAttendees={item.attendees}
-                    onPress={() => console.log('Event card image pressed')}
-                  />
-                )}
-                keyExtractor={(item) => item.id}
-                ItemSeparatorComponent={<View style={{ height: Spacing.md }} />}
-              />
-            ) : (
-              SAMPLEEVENTDATA.slice(0, 2).map((item) => (
-                <UpcomingEvent
-                  eventStatus={EventStatus.Upcoming}
-                  eventHeroImage={item.uri}
-                  eventTitle={item.title}
-                  eventDate={item.date}
-                  eventTime={item.time}
-                  eventLocation={item.location}
-                  eventAttendees={item.attendees}
-                  onPress={() => console.log('Event card image pressed')}
-                />
-              ))
-            )}
-
-            {/* TODO replace this with ViewMoreButton component */}
-            <Pressable style={styles.viewMore} onPress={onViewMore}>
-              <Text
-                style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
-                View more
-              </Text>
-              <Chevron
-                width={24}
-                height={24}
-                fill={Colors.sparrowDarkBrown}
-                style={
-                  showAllItems
-                    ? { transform: [{ rotate: '180deg' }] }
-                    : { transform: [{ rotate: '0deg' }] }
-                }
-              />
-            </Pressable>
-          </View>
           <View style={styles.pastEvents}>
             <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
               Previously attended
@@ -272,7 +216,9 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
                 />
               )}
               keyExtractor={(item) => item.id}
-              ItemSeparatorComponent={<View style={{ height: Spacing.lg }} />}
+              ItemSeparatorComponent={() => (
+                <View style={{ height: Spacing.lg }} />
+              )}
             />
           </View>
         </View>

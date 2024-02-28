@@ -16,7 +16,6 @@ type UpcomingEventProps = {
   eventLocation: string;
   eventAttendees: number;
   onPress: () => void;
-  images: { media: ImageSourcePropType[] }[];
 };
 
 const UpcomingEvent: FC<UpcomingEventProps> = ({
@@ -28,7 +27,6 @@ const UpcomingEvent: FC<UpcomingEventProps> = ({
   eventLocation,
   eventAttendees,
   onPress,
-  images,
 }) => {
   return (
     <View style={styles.container}>

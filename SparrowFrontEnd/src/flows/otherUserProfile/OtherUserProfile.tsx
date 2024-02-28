@@ -284,7 +284,9 @@ const OtherUserProfileScreen = ({
                   />
                 )}
                 keyExtractor={(item) => item.id}
-                ItemSeparatorComponent={<View style={{ height: Spacing.lg }} />}
+                ItemSeparatorComponent={() => (
+                  <View style={{ height: Spacing.lg }} />
+                )}
               />
             </View>
           </View>
