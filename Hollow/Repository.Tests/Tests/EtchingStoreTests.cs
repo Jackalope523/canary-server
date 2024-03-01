@@ -221,32 +221,34 @@ namespace Repository.Tests
 
 
 			// Post block
-			// Time A
+			// alpha
 			Post e1 = new EtchingFactory().Create(friendE, alpha, timeA);
-			Post e5 = new EtchingFactory().Create(friendE, kilo, timeA);
 			Post j1 = new EtchingFactory().Create(friendJ, alpha, timeA);
-			Post j2 = new EtchingFactory().Create(friendJ, echo, timeA);
-			Post j5 = new EtchingFactory().Create(friendJ, romeo, timeA);
-			Post x1 = new EtchingFactory().Create(baitX, alpha, timeA);
-
-            // Time B
 			Post e2 = new EtchingFactory().Create(friendE, alpha, timeB);
+			Post x1 = new EtchingFactory().Create(baitX, alpha, timeB);
+			Post e3 = new EtchingFactory().Create(friendE, alpha, timeC);
+			Post m1 = new EtchingFactory().Create(friendM, alpha, timeD);
+
+            // echo
+			Post j2 = new EtchingFactory().Create(friendJ, echo, timeA);
 			Post j3 = new EtchingFactory().Create(friendJ, echo, timeB);
-			Post j4 = new EtchingFactory().Create(friendJ, kilo, timeB);
 			Post x2 = new EtchingFactory().Create(baitX, echo, timeB);
 
-            // Time C
-			Post e3 = new EtchingFactory().Create(friendE, alpha, timeC);
+            // hotel
 			Post e4 = new EtchingFactory().Create(friendE, hotel, timeC);
 			Post m2 = new EtchingFactory().Create(friendM, hotel, timeC);
+
+            // kilo
+			Post e5 = new EtchingFactory().Create(friendE, kilo, timeA);
+			Post j4 = new EtchingFactory().Create(friendJ, kilo, timeB);
 			Post m3 = new EtchingFactory().Create(friendM, kilo, timeC);
 
-            // Time D
-			Post m1 = new EtchingFactory().Create(friendM, alpha, timeD);
+            // romeo
+			Post j5 = new EtchingFactory().Create(friendJ, romeo, timeA);
 			Post m4 = new EtchingFactory().Create(friendM, romeo, timeD);
 			Post x3 = new EtchingFactory().Create(baitX, romeo, timeD);
             
-            await BulkWritePost(e1, e2, e3, e4, e5, j1, j2, j3, j4, j5, m1, m2, m3, m4);
+            await BulkWritePost(e1, e2, e3, e4, e5, j1, j2, j3, j4, j5, m1, m2, m3, m4, x1, x2, x3);
 
 
             List<ulong> exclusionList = new() { kilo.Id };
