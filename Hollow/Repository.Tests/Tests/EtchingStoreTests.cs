@@ -1,6 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.GeometriesGraph;
+using System.Reflection.Metadata.Ecma335;
 using Xunit.Abstractions;
 
 namespace Repository.Tests
@@ -257,6 +258,25 @@ namespace Repository.Tests
 
 			Assert.NotNull(retrieved);
             Assert.Equal(9, retrieved.Count);
+
+            Etching e1Etching = retrieved.Find(etching => etching.Id.Equals(e1.Id));
+            Assert.NotNull(e1Etching);
+            Assert.Equal(e1.OwnerId, e1Etching.UserId);
+            Assert.Equal(e1.EventId, e1Etching.EventId);
+            Assert.Equal(e1.PhotoURL, e1Etching.ImageURL);
+            Assert.Equal(e1.PostedAt, e1Etching.TimeEtched);
+
+            var retrievedAsPostIds = retrieved.ConvertAll(etching => etching.Id);
+
+            Assert.Contains(e1.Id, retrievedAsPostIds);
+            Assert.Contains(e2.Id, retrievedAsPostIds);
+            Assert.Contains(e3.Id, retrievedAsPostIds);
+            Assert.Contains(j1.Id, retrievedAsPostIds);
+            Assert.Contains(j2.Id, retrievedAsPostIds);
+            Assert.Contains(j3.Id, retrievedAsPostIds);
+            Assert.Contains(j5.Id, retrievedAsPostIds);
+            Assert.Contains(m1.Id, retrievedAsPostIds);
+            Assert.Contains(m4.Id, retrievedAsPostIds);
 		}
         private async Task BulkWritePost(params Post[] posts)
         {
