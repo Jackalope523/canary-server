@@ -220,9 +220,9 @@ const OtherUserProfileScreen = ({
                     />
                   )}
                   keyExtractor={(item) => item.id}
-                  ItemSeparatorComponent={
+                  ItemSeparatorComponent={() => (
                     <View style={{ height: Spacing.md }} />
-                  }
+                  )}
                 />
               ) : (
                 SAMPLEEVENTDATA.slice(0, 2).map((item) => (
