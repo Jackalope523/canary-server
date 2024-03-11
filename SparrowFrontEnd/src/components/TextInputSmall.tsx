@@ -4,9 +4,7 @@ import { TextInput, StyleSheet, Text, View, Pressable } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  Easing,
   withTiming,
-  SharedValue,
 } from 'react-native-reanimated';
 
 import { globalStyles } from '../styles/GlobalStyles';
@@ -59,7 +57,7 @@ interface TextInputSmallProps {
   mask?: string
 }
 
-export const TextInputSmall: React.FC<TextInputSmallProps> = ({
+const TextInputSmall: React.FC<TextInputSmallProps> = ({
   type = null,
   label,
   description,
@@ -76,6 +74,7 @@ export const TextInputSmall: React.FC<TextInputSmallProps> = ({
   valid,
   setValid,
   mask = ''
+
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Text input                                   ||

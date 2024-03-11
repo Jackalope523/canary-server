@@ -102,41 +102,8 @@ export const navigationStyles = StyleSheet.create({
     flexDirection: 'row',
   },
 
-  searchBarTextInput: {
-    margin: 0,
-    padding: 0,
-    flex: 1,
-
-    fontFamily: 'UncutSans-Regular',
-    fontSize: 16,
-    fontWeight: 'regular',
-  },
-
-  searchOptions: {
-    flexDirection: 'row',
-    columnGap: Spacing.md,
-    paddingTop: Spacing.md,
-
-    // TODO remove bgc later
-    backgroundColor: Colors.fuchsia500,
-  },
-
-  searchOptionsInner: {
-    backgroundColor: Colors.sparrowBrown,
-    height: '100%',
-  },
-
-  searchOptionsInnerSection: {
-    rowGap: Spacing.md,
-    paddingTop: Spacing.lg,
-  },
-
   searchOptionsInnerSectionContent: {
     columnGap: Spacing.md,
-  },
-
-  searchContent: {
-    marginHorizontal: 24,
   },
 
   // TODO DELETE test later when it's not used anymore

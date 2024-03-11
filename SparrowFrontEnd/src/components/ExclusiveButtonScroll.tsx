@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {ScrollView, ScrollViewProps, FlatList, View} from 'react-native';
 import Button, {ButtonProps} from './Button';
 import {Spacing} from '../styles/SpacingStyles'
@@ -6,17 +6,32 @@ import {Spacing} from '../styles/SpacingStyles'
 interface ExclusiveButtonScrollProps {
     props?: ScrollViewProps;
     buttons?: ButtonProps[];
+    setCurrentValue?: React.Dispatch<React.SetStateAction<number|string|undefined>>;
   }
 
-export const ExclusiveButtonGroup: React.FC<ExclusiveButtonScrollProps> = 
+const ExclusiveButtonGroup: React.FC<ExclusiveButtonScrollProps> = 
 (
     {
         props = null,
-        buttons = []
+        buttons = [],
+        setCurrentValue = () => {},
     }
 ) => 
 {
     const [current, setCurrent] = useState(-1);
+
+    function mapIdToValue(id: number): string | null 
+    {
+        let map: Map<number, string> = new Map();
+        for (let i = 0; i < buttons.length; i++) {
+            map.set(buttons[i].id ?? -1, buttons[i].text ?? "undefined");
+        }
+        return map.get(id) || null;
+    }
+
+    useEffect(() => {
+        return setCurrentValue(mapIdToValue(current));
+    }, [current]);
 
    return  (
     <FlatList

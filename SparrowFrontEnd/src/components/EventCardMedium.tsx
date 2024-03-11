@@ -7,6 +7,7 @@ import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
 import { globalStyles } from '../styles/GlobalStyles';
 import { Colors } from '../styles/ColorStyles';
+import { point, Point, Feature, Properties} from '@turf/helpers';
 
 // !! THIS COMPONENT IS CURRENTLY NOT IN USE !!
 
@@ -22,7 +23,7 @@ const bgImage = {
 // Text onTextLayout - {handleTextLayout}
 
 // Types
-interface EventCardMediumProps {
+export interface EventCardMediumProps {
   onPress: () => void;
 
   eventDate: string;
@@ -30,6 +31,8 @@ interface EventCardMediumProps {
   eventAttendees: number;
   eventTitle: string;
   eventLocation: string;
+  eventCoordinate: Feature<Point, Properties>
+  eventDateTest: Date;
   eventHeroImage: { uri: string };
 }
 
@@ -39,6 +42,9 @@ export const EventCardMedium: React.FC<EventCardMediumProps> = ({
   eventAttendees = null,
   eventTitle = null,
   eventLocation = null,
+  eventCoordinate = point([-74.0060, 40.7128]),
+  eventDateTest = new Date(),
+
 
   // TODO insert an IMAGE NOT FOUND image here
   eventHeroImage = {

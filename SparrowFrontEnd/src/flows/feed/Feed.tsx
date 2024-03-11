@@ -20,6 +20,8 @@ import Button, {
   ButtonType,
 } from '../../components/Button';
 
+import SearchFilter from '../../components/organisms/SearchFilter';
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 const FeedScreen = () => {
@@ -40,8 +42,9 @@ const FeedScreen = () => {
   const [minValue, setMinValue] = useState(MIN_DEFAULT);
   const [maxValue, setMaxValue] = useState(MAX_DEFAULT);
 
-  return (
-    <ScrollView>
+  return ( 
+    <View>
+      <SearchFilter />
       <View style={styles.container}>
         <SingleValueSlider />
 
@@ -116,7 +119,7 @@ const FeedScreen = () => {
           text="Extra Small Button"
         />
       </View>
-    </ScrollView>
+    </View>
     // <GestureHandlerRootView style={{flex: 1}}>
     //   <View style={styles.container}>
     //     <View style={styles.contentContainer}>
