@@ -33,7 +33,7 @@ namespace Core.Controls
             return targetUser.ToUserProfile();
         }
 
-        public async Task<(List<EventThinSlice> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId)
+        public async Task<(List<EventShard> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -42,7 +42,7 @@ namespace Core.Controls
             Fail(await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User is unable to view target."));
 
-            (List<EventThinSlice> Events, List<Etching> Etchings) nest = (new(), new());
+            (List<EventShard> Events, List<Etching> Etchings) nest = (new(), new());
 
             // Check if user is themself
             if (user.Equals(targetUser))
@@ -52,8 +52,8 @@ namespace Core.Controls
                 await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
-                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventThinSlice());
-                nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
+                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventShard());
+                nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventShard()));
 
                 foreach (var thinSlice in nest.Events)
                 {
@@ -69,8 +69,8 @@ namespace Core.Controls
                 await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
-                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventThinSlice());
-                nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventThinSlice()));
+                nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventShard());
+                nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventShard()));
 
                 nest.Etchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
             }
@@ -78,13 +78,13 @@ namespace Core.Controls
             {
                 // Get public hosted events
                 var hostedEvents = (await Events.FindEventsByUserAsync(targetUser.Id)).ConvertAll(e => new Event(e));
-                nest.Events = hostedEvents.ConvertAll(e => e.ToEventThinSlice());
+                nest.Events = hostedEvents.ConvertAll(e => e.ToEventShard());
 
                 // Get common events
                 var commonEvents = (await targetUser.PastEvents)
                     .Except(hostedEvents)
                     .Intersect(await user.PastEvents)
-                    .ToList().ConvertAll(e => e.ToEventThinSlice());
+                    .ToList().ConvertAll(e => e.ToEventShard());
 
                 nest.Events.AddRange(commonEvents);
 

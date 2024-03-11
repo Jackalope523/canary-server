@@ -35,7 +35,7 @@ namespace Core.Boundaries
 	public interface IProfileOperations
     {
         Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId);
-        Task<(List<EventThinSlice> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId);
+        Task<(List<EventShard> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId);
 
         Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId);
         Task<IDictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId);

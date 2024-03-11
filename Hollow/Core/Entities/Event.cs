@@ -49,6 +49,7 @@ namespace Core.Entities
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public bool IsDeleted { get; set; }
+        public int NumberOfGuests { get; set; }
 
         public bool IsWaiting
             => State.Equals(EventState.Upcoming) &&
@@ -117,14 +118,7 @@ namespace Core.Entities
             Radius = new() { Kilometres = fromEvent.Radius };
             IsDynamic = fromEvent.IsDynamic;
             IsDeleted = fromEvent.IsPendingDeletion;
-        }
-
-        public Event(EventThinSlice fromEvent) : this()
-        {
-            Id = fromEvent.Id;
-            Host = new(fromEvent.Host);
-            Location = new()
-                { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
+            NumberOfGuests = fromEvent.NumberOfGuests;
         }
 
         public EventShard ToEventShard()
@@ -132,12 +126,7 @@ namespace Core.Entities
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
-                Radius.Kilometres, IsDynamic, IsDeleted);
-        }
-
-        public EventThinSlice ToEventThinSlice()
-        {
-            return new(Id, Host.ToUserSilhouette(), Location.Latitude, Location.Longitude);
+                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
         }
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
