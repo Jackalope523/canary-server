@@ -68,6 +68,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
 import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
+import EventScreen from '../flows/event/Event';
 
 // v1.0.1
 
@@ -82,7 +83,7 @@ function MainContainer() {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Main"
+          initialRouteName="Testing"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
@@ -92,7 +93,7 @@ function MainContainer() {
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
 
-          <AppStack.Screen name="Testing" component={OtherUserProfileScreen} />
+          <AppStack.Screen name="Testing" component={EventScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
