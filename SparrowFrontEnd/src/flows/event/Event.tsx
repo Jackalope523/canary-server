@@ -14,13 +14,17 @@ import TextLabel, {
 } from '../../components/TextLabel';
 import { labelText } from '../../components/LabelText';
 import { Spacing } from '../../styles/SpacingStyles';
+import { borderRadius } from '../../styles/BorderStyles';
 
 type EventProps = StackScreenProps<EventStackParamList, 'Event'>;
 
 // TEMP. images
 import tempAvatar from '../../assets/images/temp/host-img-1.jpg';
 import tempBanner from '../../assets/images/temp/event-img-1.jpg';
-import { borderRadius } from '../../styles/BorderStyles';
+
+// Icons
+import DateIcon from '../../assets/icons/date-outline.svg';
+import TimeIcon from '../../assets/icons/time-outline.svg';
 
 const EventScreen = ({ route }: EventProps) => {
   // const [errorText, setErrorText] = React.useState('');
@@ -86,6 +90,39 @@ const EventScreen = ({ route }: EventProps) => {
           style={styles.bannerImage}
           resizeMode="cover"
         />
+        <Text
+          style={[
+            globalStyles.headingTextThree,
+            globalStyles.textDark,
+            styles.title,
+          ]}>
+          Event title
+        </Text>
+
+        {/* DATE AND TIME SECTION */}
+        <View style={styles.dateTimeSection}>
+          <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+            Date and time
+          </Text>
+          {/* inner */}
+          <View style={styles.dateTimeInnerSection}>
+            {/* date */}
+            <View style={styles.dateTime}>
+              <DateIcon width={24} height={24} fill={Colors.sparrowDarkBrown} />
+              <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+                Date
+              </Text>
+            </View>
+
+            {/* time */}
+            <View style={styles.dateTime}>
+              <TimeIcon width={24} height={24} fill={Colors.sparrowDarkBrown} />
+              <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+                Time
+              </Text>
+            </View>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -98,6 +135,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingBottom: Spacing.md,
   },
 
   hostSection: {
@@ -115,5 +153,28 @@ const styles = StyleSheet.create({
     height: 160,
 
     borderRadius: borderRadius.md,
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  title: {
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
+  },
+
+  dateTimeSection: {
+    rowGap: Spacing.sm,
+  },
+
+  // TODO column-based layout here (grid)
+  dateTimeInnerSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  dateTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.sm,
   },
 });

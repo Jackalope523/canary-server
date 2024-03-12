@@ -174,6 +174,6 @@ const styles = StyleSheet.create({
   pressable: {
     flexDirection: 'row',
     alignItems: 'center',
-    columnGap: Spacing.mdsm,
+    columnGap: Spacing.sm,
   },
 });
