@@ -3,6 +3,7 @@ using Core.Boundaries;
 using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
 using Shared;
+using Microsoft.Extensions.Logging;
 
 namespace Repository.Tests
 {
@@ -96,14 +97,18 @@ namespace Repository.Tests
         public async Task FindEventsAsync_SUCCESS()
         {
             Point location = testEvent.Location;
-            List<EventThinSlice> found = await store.FindEventsAsync(location.Y, location.X, 10);
+            EventShard found = (await store.FindEventsAsync(location.Y, location.X, 10)).First();
 
-            Assert.Single(found);
-            Assert.Equal(testEvent.Id, found.First().Id);
-            Assert.Equal(testUser.Id, found.First().Host.Id);
-            Assert.Equal(testUser.Name, found.First().Host.Name);
-            Assert.Equal(testEvent.Location.Y, found.First().Latitude);
-            Assert.Equal(testEvent.Location.X, found.First().Longitude);
+            Assert.NotNull(found);
+            Assert.Equal(testEvent.HostId, found.Host.Id);
+            Assert.Equal(testEvent.Name, found.Name);
+            Assert.Equal(testEvent.Description, found.Description);
+            Assert.Equal(testEvent.StartTime, found.StartTime);
+            Assert.Equal(testEvent.Location.Y, found.Latitude);
+            Assert.Equal(testEvent.Location.X, found.Longitude);
+            Assert.Equal(testEvent.GroupMinimum, found.GroupMinimum);
+            Assert.Equal(testEvent.GroupMaximum, found.GroupMaximum);
+            Assert.Equal(testEvent.State, found.State);
         }
         [Fact]
         public async Task UpdateEventAsync_Description()

@@ -31,7 +31,6 @@ namespace Repository
                 Competitiveness = character.Competitiveness,
                 Industriousness = character.Industriousness,
                 NightOwl = character.NightOwl,
-
             };
 
 
@@ -73,7 +72,8 @@ namespace Repository
                    toCreate.Openness),
                    toCreate.Radius,
                    toCreate.IsDynamic,
-                   toCreate.IsPendingDeletion
+                   toCreate.IsPendingDeletion,
+                   toCreate.NumberOfGuests
                    );
         }
         public async Task DeleteEventAsync(ulong eventId)
@@ -120,7 +120,8 @@ namespace Repository
                         e.Openness),
                         e.Radius,
                         e.IsDynamic,
-                        e.IsPendingDeletion
+                        e.IsPendingDeletion,
+                        e.NumberOfGuests
                         )).SingleAsync());
 
                 UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx =>
@@ -164,7 +165,8 @@ namespace Repository
                     e.Openness,
                     e.Radius,
                     e.IsDynamic,
-                    e.IsPendingDeletion
+                    e.IsPendingDeletion,
+                    e.NumberOfGuests
                 }).
              Join(
                  ctx.Users,
@@ -193,7 +195,8 @@ namespace Repository
                     e.Openness),
                     e.Radius,
                     e.IsDynamic,
-                    e.IsPendingDeletion
+                    e.IsPendingDeletion,
+                    e.NumberOfGuests
                  )).
                ToListAsync());
 
@@ -244,7 +247,8 @@ namespace Repository
                   e.Openness,
                   e.Radius,
                   e.IsDynamic,
-                  e.IsPendingDeletion
+                  e.IsPendingDeletion,
+                  e.NumberOfGuests
                }).
             Join(
                 ctx.Users,
@@ -273,7 +277,8 @@ namespace Repository
                    e.Openness),
                    e.Radius,
                    e.IsDynamic,
-                   e.IsPendingDeletion
+                   e.IsPendingDeletion,
+                   e.NumberOfGuests
                 )).
               ToListAsync());
         }
@@ -305,21 +310,50 @@ namespace Repository
                    e.Openness),
                    e.Radius,
                    e.IsDynamic,
-                   e.IsPendingDeletion
-               )).SingleAsync());
+                   e.IsPendingDeletion,
+                   e.NumberOfGuests
+               )).
+             SingleAsync());
 
             UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == @event.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync()) ;
 
             return @event with {Host = host } ;
         }
-        public async Task<List<EventThinSlice>> FindEventsAsync(double latitude, double longitude, double distance)
+        public async Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance)
         {
-            return await storeSentry.ExecuteReadAsync(ctx => ctx.Events.Where(e => e.Location.Distance(new Point(longitude, latitude)) <= distance && !e.EndTime.HasValue).
-                                Join(ctx.Users, 
-                                e => e.HostId, 
-                                u => u.Id, 
-                                (e,u) => new EventThinSlice(e.Id, new UserSilhouette(u.Id, u.Name), e.Location.Y, e.Location.X)).
-                                ToListAsync());
+            return await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Events.
+                Where(e => e.Location.Distance(new Point(longitude, latitude)) <= distance && !e.EndTime.HasValue).
+                Join(
+                    ctx.Users, 
+                    e => e.HostId, 
+                    u => u.Id, 
+                    (e,u) => new EventShard
+                    (
+                        e.Id,
+                        new UserSilhouette(u.Id, u.Name),
+                        e.Name,
+                        e.Description,
+                        e.StartTime,
+                        e.Location.Y,
+                        e.Location.X,
+                        e.EndTime,
+                        e.State,
+                        e.GroupMinimum,
+                        e.GroupMaximum,
+                        new Character(
+                        e.Extroversion,
+                        e.Athleticisme,
+                        e.Chaos,
+                        e.Competitiveness,
+                        e.Industriousness,
+                        e.NightOwl,
+                        e.Openness),
+                        e.Radius,
+                        e.IsDynamic,
+                        e.IsPendingDeletion,
+                        e.NumberOfGuests
+                   )).ToListAsync());
         }     
         public async Task<List<UserSilhouette>> GetGuestListAsync(ulong id)
         {
@@ -459,7 +493,8 @@ namespace Repository
                         ), 
                     e.Radius, 
                     e.IsDynamic,
-                    e.IsPendingDeletion
+                    e.IsPendingDeletion,
+                    e.NumberOfGuests
                     )).
            ToListAsync());
         }      

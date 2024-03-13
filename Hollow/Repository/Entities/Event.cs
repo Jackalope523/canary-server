@@ -23,6 +23,7 @@ namespace Repository
         public double Radius { get; set; } = DefaultRadius;
         public bool IsDynamic { get; set; } = DefaultIsDynamic;
         public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
+        public int NumberOfGuests { get; set; } = DefaultNumberOfGuests;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -55,6 +56,7 @@ namespace Repository
         public static double DefaultRadius { get; set; } = 10.000;
         public static bool DefaultIsDynamic { get; set; } = false;
         public static bool DefaultIsPendingDeletion { get; set; } = false;
+        public static int DefaultNumberOfGuests { get; set; } = 0;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;
