@@ -28,31 +28,18 @@ TODO implement mechanics:
 
 */
 
-interface PhotoPostProps {
+export interface PhotoPostProps {
   name: string;
-  avatar: string;
-  time: string | FlagType.Live;
-  title: string;
-  media?: any;
-
-  attendees: string[] | string;
-  leftoverAttendeeCount: number;
+  media?: string[];
+  author: string[];
   location: string;
-  likeCount: number;
-
-  index?: number;
 }
 
 export const PhotoPost: React.FC<PhotoPostProps> = ({
-  name = 'NULL',
-  avatar,
-  time = 'NULL',
-  title = 'NULL',
+  name = "Poker Night",
   media,
-  attendees,
-  leftoverAttendeeCount,
-  location = 'NULL',
-  likeCount,
+  author = "John Marston",
+  location = "St Denis",
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                               Location indicator                               ||
@@ -94,27 +81,6 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.top}>
-        <View style={styles.user}>
-          <Avatar
-            size={AvatarSize.Medium}
-            status={AvatarStatus.Offline}
-            image={avatar}
-          />
-          <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
-            {name}
-          </Text>
-        </View>
-        {/* TODO replace FlagType.Live in the {time === FlagType.Live ...} NOT in <FlagMedium /> component, with an event status (live) that's passed down from back-end */}
-        {time === FlagType.Live ? (
-          <FlagMedium type={FlagType.Live} />
-        ) : (
-          <Text
-            style={[globalStyles.textDark, globalStyles.labelTextOneAsTyped]}>
-            {time} ago
-          </Text>
-        )}
-      </View>
       {/* TOP ENDS */}
       {/* CARD */}
       <View style={styles.card}>
@@ -122,12 +88,11 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
           <Text
             style={[globalStyles.textDark, globalStyles.headingTextThree]}
             numberOfLines={2}>
-            {title}
+            {name}
           </Text>
         </View>
 
         {/* MEDIA CONTAINER */}
-
         <View>
           <FlatList
             horizontal={true}
@@ -154,14 +119,13 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
           )}
           {media.length === 1 && null}
         </View>
-
         {/* MEDIA CONTAINER ENDS */}
 
         <View style={[styles.cardInfo, styles.cardInfoBottom]}>
           <View style={styles.info}>
             <PersonIcon height={24} width={24} fill={Colors.sparrowDarkBrown} />
             <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
-              {attendees} and {leftoverAttendeeCount} others
+              {author}
             </Text>
           </View>
           <View style={styles.info}>
@@ -179,33 +143,6 @@ export const PhotoPost: React.FC<PhotoPostProps> = ({
         </View>
       </View>
       {/* CARD ENDS */}
-      {/* BOTTOM */}
-      <View style={styles.bottom}>
-        <View style={styles.info}>
-          {like ? (
-            <LikeFillIcon
-              height={24}
-              width={24}
-              fill={Colors.sparrowDarkBrown}
-            />
-          ) : (
-            <LikeOutlineIcon
-              height={24}
-              width={24}
-              fill={Colors.sparrowDarkBrown}
-            />
-          )}
-          <Text style={[globalStyles.textDark, globalStyles.bodyTextOne]}>
-            {like ? likeCount + 1 : likeCount}
-          </Text>
-        </View>
-        <DropdownSmall
-          icon={Icon.Meatball}
-          options={dropdownOptionsPost}
-          align={Align.BottomLeft}
-        />
-      </View>
-      {/* BOTTOM ENDS */}
     </View>
   );
 };

@@ -1,6 +1,7 @@
 import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { character, extractCharacter } from '../auth/accountPigeon';
 import { extractUserSilhouette, userSilhouette } from '../profile/profilePigeon';
+import { point, Point } from '@turf/helpers';
 
 const apiBaseUrl = '/event';
 
@@ -67,7 +68,11 @@ export type eventHeader = {
     Id: number,
     Name: string,
     IsActive: string,
-    LastActiveTime: Date
+    LastActiveTime: Date,
+    // ** NEW **
+    Longitude: number,
+    Latitude: number
+    //************
 }
 
 export function extractEventHeader(data: any) {
@@ -85,6 +90,9 @@ export type etchingShard = {
     Id: number,
     EventId: number,
     UserId: number,
+    // ** NEW **
+    Owner: string,
+    //************
     TimeEtched: Date,
     ImageURL: string,
     Ratings: [Positive: number, Negative: number],
