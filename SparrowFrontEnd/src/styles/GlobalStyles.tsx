@@ -226,22 +226,38 @@ export const globalStyles = StyleSheet.create({
 
   // Success
   textSuccess: {
-    color: Colors.green400,
+    color: Colors.green500,
+  },
+
+  textSuccessDarker: {
+    color: Colors.green700,
   },
 
   // Warning
   textWarning: {
-    color: Colors.orange400,
+    color: Colors.orange500,
+  },
+
+  textWarningDarker: {
+    color: Colors.orange700,
   },
 
   // Error
   textError: {
-    color: Colors.red400,
+    color: Colors.red500,
+  },
+
+  textErrorDarker: {
+    color: Colors.red700,
   },
 
   // Function
   textFunction: {
-    color: Colors.turqoise300,
+    color: Colors.turqoise500,
+  },
+
+  textFunctionDarker: {
+    color: Colors.turqoise700,
   },
 
   // Disabled
