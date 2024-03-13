@@ -102,20 +102,24 @@ namespace Core.Controls
             // Get the respective event headers for the etchings
             foreach (var etching in friendEtchings)
             {
-                // Add event header if it does not yet exist
-                if (!eventHeaders.ContainsKey(etching.EventId))
-                {
-                    var etchedEvent = await GetEventAsync(etching.EventId);
+                var eventId = etching.EventId;
 
-                    eventHeaders.Add(etching.EventId, etchedEvent.ToEventHeader(etching.TimeEtched));
+                // Add event header if it does not yet exist
+                if (!eventHeaders.ContainsKey(eventId))
+                {
+                    var etchedEvent = await GetEventAsync(eventId);
+
+                    eventHeaders.Add(eventId, etchedEvent.ToEventHeader(etching.TimeEtched));
                 }
                 // Update event header active time if etching is more recent
-                else if (HappenedBefore(eventHeaders[etching.EventId].LastActiveTime, etching.TimeEtched))
+                else if (HappenedBefore(eventHeaders[eventId].LastActiveTime, etching.TimeEtched))
                 {
-                    eventHeaders[etching.EventId] = new(etching.EventId,
-                        eventHeaders[etching.EventId].Name,
-                        eventHeaders[etching.EventId].IsActive,
-                        etching.TimeEtched);
+                    eventHeaders[eventId] = new(eventId,
+                        eventHeaders[eventId].Name,
+                        eventHeaders[eventId].IsActive,
+                        etching.TimeEtched,
+                        eventHeaders[eventId].Latitude,
+                        eventHeaders[eventId].Longitude);
                 }
             }
 

@@ -131,7 +131,7 @@ namespace Core.Entities
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Name, IsActive, lastActiveTime);
+            return new(Id, Name, IsActive, lastActiveTime, Location.Latitude, Location.Longitude);
         }
 
 		#endregion
@@ -172,7 +172,7 @@ namespace Core.Entities
 
         public async Task<List<Etching>> GetEtchingsOf(User user)
         {
-            return (await Etchings).Where(etching => etching.UserId.Equals(user.Id)).ToList();
+            return (await Etchings).Where(etching => etching.User.Id.Equals(user.Id)).ToList();
         }
 
 		#endregion

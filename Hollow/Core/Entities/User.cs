@@ -336,7 +336,7 @@ namespace Core.Entities
 
 		public bool Etched(Etching etching)
         {
-            return etching.UserId.Equals(Id);
+            return etching.User.Id.Equals(Id);
 		}
 
         public async Task<bool> CanReport()

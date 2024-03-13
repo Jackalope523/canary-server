@@ -96,9 +96,9 @@ namespace Core.Tests.Controls
 
 			// Assert
 			Assert.Equal(3, Events.Count);
-			Assert.Equal(hostedEvent.ToEventThinSlice(), Events.Find(e => e.Id.Equals(hostedEvent.Id)));
-			Assert.Equal(attendedEvent.ToEventThinSlice(), Events.Find(e => e.Id.Equals(attendedEvent.Id)));
-			Assert.Equal(ongoingEvent.ToEventThinSlice(), Events.Find(e => e.Id.Equals(ongoingEvent.Id)));
+			Assert.Equal(hostedEvent.ToEventShard(), Events.Find(e => e.Id.Equals(hostedEvent.Id)));
+			Assert.Equal(attendedEvent.ToEventShard(), Events.Find(e => e.Id.Equals(attendedEvent.Id)));
+			Assert.Equal(ongoingEvent.ToEventShard(), Events.Find(e => e.Id.Equals(ongoingEvent.Id)));
 
 			Assert.Equal(3, Etchings.Count);
 			Assert.Equal(funLovingEtching, Etchings.Find(e => e.Id.Equals(funLovingEtching.Id)));

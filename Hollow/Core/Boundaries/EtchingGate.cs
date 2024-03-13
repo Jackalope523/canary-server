@@ -7,9 +7,10 @@ namespace Core.Boundaries
 {
 	#region Schemas
 
-	public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime);
+	public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
+        double Latitude, double Longitude);
 
-    public record Etching(ulong Id, ulong EventId, ulong UserId,
+    public record Etching(ulong Id, ulong EventId, UserSilhouette User,
         DateTimeOffset TimeEtched, string ImageURL,
         (int Positive, int Negative) Ratings, bool IsHidden);
 
