@@ -8,9 +8,9 @@ import Button, {
 } from '../../components/Button';
 import { Spacing } from '../../styles/SpacingStyles';
 
-interface TerminateEventProps {}
+interface LeaveEventProps {}
 
-const TerminateEvent = (props: TerminateEventProps) => {
+const LeaveEvent = (props: LeaveEventProps) => {
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
       <View style={styles.info}>
@@ -20,7 +20,7 @@ const TerminateEvent = (props: TerminateEventProps) => {
             globalStyles.textDark,
             globalStyles.textAlignCenter,
           ]}>
-          Are you sure you want to terminate the event?
+          Are you sure you want to leave the event?
         </Text>
         <Image
           source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
@@ -34,14 +34,14 @@ const TerminateEvent = (props: TerminateEventProps) => {
           type={ButtonType.Success}
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
-          text={'Leave event up'}
+          text={'Stay in event'}
           onPress={null}
         />
         <Button
           type={ButtonType.Error}
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
-          text={'Terminate event'}
+          text={'Leave event'}
           onPress={null}
         />
       </View>
@@ -49,7 +49,7 @@ const TerminateEvent = (props: TerminateEventProps) => {
   );
 };
 
-export default TerminateEvent;
+export default LeaveEvent;
 
 const styles = StyleSheet.create({
   container: {

@@ -69,6 +69,8 @@ import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
 import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
 import EventScreen from '../flows/event/Event';
+import TerminateEvent from '../flows/event/TerminateEvent';
+import LeaveEvent from '../flows/event/LeaveEvent';
 
 // v1.0.1
 
@@ -93,7 +95,7 @@ function MainContainer() {
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
 
-          <AppStack.Screen name="Testing" component={EventScreen} />
+          <AppStack.Screen name="Testing" component={LeaveEvent} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
