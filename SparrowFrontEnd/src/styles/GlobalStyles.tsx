@@ -91,11 +91,21 @@ export const globalStyles = StyleSheet.create({
     // letterSpacing: 0,
   },
 
+  bodyTextOneBold: {
+    fontSize: 16,
+    fontFamily: 'UncutSans-Bold',
+  },
+
   bodyTextTwo: {
     fontSize: 14,
     fontFamily: 'UncutSans-Regular',
     // lineHeight: 22,
     // letterSpacing: 0,
+  },
+
+  bodyTextTwoBold: {
+    fontSize: 14,
+    fontFamily: 'UncutSans-Bold',
   },
 
   // Small text

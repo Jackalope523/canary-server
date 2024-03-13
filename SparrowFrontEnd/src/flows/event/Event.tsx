@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  LayoutChangeEvent,
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { Colors } from '../../styles/ColorStyles';
@@ -32,6 +33,11 @@ import Button, {
   ButtonSize,
   ButtonType,
 } from '../../components/Button';
+import AvatarStackScroll, {
+  AvatarType,
+} from '../../components/AvatarStackScroll';
+import { SAMPLE_USER_DATA } from '../../data/sampleUserData';
+import SmallMessage, { SmallMessageType } from '../../components/SmallMessage';
 
 type EventProps = StackScreenProps<EventStackParamList, 'Event'>;
 
@@ -46,11 +52,59 @@ import TimeIcon from '../../assets/icons/time-outline.svg';
 import MapIcon from '../../assets/icons/discovery-fill.svg';
 import LocationIcon from '../../assets/icons/location-outline.svg';
 import PersonIcon from '../../assets/icons/account-outline.svg';
+import ShareIcon from '../../assets/icons/share-outline.svg';
 
 const EventScreen = ({ route }: EventProps) => {
+  // Sample data
   const pastEventData = SAMPLE_PAST_EVENT_DATA.find(
     (event) => event.id === '3',
   );
+
+  const avatarData = SAMPLE_USER_DATA.map((user) => user.avatar);
+
+  const hostRating = 4.5;
+  const hostName = 'Jordan';
+  const hostAvatar = tempAvatar;
+  const hostStatus = AvatarStatus.Online;
+
+  const eventTitle = 'Dog Walk and Play Meetup at Central Park';
+  const eventDate = 'This Tuesday';
+  const eventTime = '16:30';
+  const eventLocation = 'Central Park, Manhattan, New York';
+  const eventDescription = `Join us for a fun dog walk and play at Central Park. We will meet at the entrance and walk around the park. We will have a break at the dog park for some playtime. All dogs are welcome!`;
+
+  // types - Live, Upcoming (subtypes - in >24h, in <24h), Terminated
+  const eventStatus = 'Upcoming';
+
+  // user who is viewing the event
+  // types - host, attendee
+  const userType = 'Attendee';
+  // user who is hosting
+  // types - you, friend, anon
+  const hostType = 'You';
+
+  const hasUserJoinedEvent = false;
+
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Layout                                     ||
+  // ! ||--------------------------------------------------------------------------------||
+  const [multiline, setMultiline] = React.useState(false);
+
+  const handleTextLayout = (event: LayoutChangeEvent) => {
+    const { lines } = event.nativeEvent;
+    setMultiline(lines.length > 1);
+  };
+
+  /*
+  
+  TODO get exact height from button component;
+  best if I measure this once as the component size wouldn't change and
+  create a separate TS file for button height constants and import it here
+
+  BLOCK: the new Button.tsx (animated) needs to be fixed beforehand
+
+  */
+  const attendeeControlsButtonHeight = 24;
 
   // TODO fix TS error in the code below
 
@@ -77,172 +131,292 @@ const EventScreen = ({ route }: EventProps) => {
   // }
 
   return (
-    <ScrollView
-      contentContainerStyle={globalStyles.baseContainer}
-      overScrollMode="never"
-      showsVerticalScrollIndicator={false}>
-      {/* <Text style={{ color: Colors.red400 }}>{errorText}</Text>
-      <Text>{eventText}</Text> */}
+    <View>
+      {/* TODO add a fixed HeaderFlag component here after bugfix */}
+      <Text style={{ backgroundColor: Colors.fuchsia400 }}>
+        fixed HeaderFlag component here after bugfix
+      </Text>
 
-      {/* TODO add FlagLarge component here */}
-      <Text>FlagLarge component here after bugfix</Text>
+      {/* ATTENDEE CONTROLS */}
+      {userType === 'Attendee' ? (
+        <View style={styles.attendeeControls}>
+          {hasUserJoinedEvent ? (
+            <Button
+              type={ButtonType.Error}
+              size={ButtonSize.Medium}
+              display={ButtonDisplay.Full}
+              text={'Leave event'}
+              onPress={null}
+            />
+          ) : (
+            <Button
+              type={ButtonType.Success}
+              size={ButtonSize.Medium}
+              display={ButtonDisplay.Full}
+              text={'Join event'}
+              onPress={null}
+            />
+          )}
+        </View>
+      ) : null}
 
-      {/* HOST SECTION  */}
-      <View style={styles.hostSectionWrapper}>
-        <View style={styles.hostSection}>
-          <Avatar
-            image={tempAvatar}
-            size={AvatarSize.Medium}
-            status={AvatarStatus.Online}
-          />
-          <View>
+      {/* EVENT */}
+      <ScrollView
+        contentContainerStyle={styles.container}
+        overScrollMode="never"
+        showsVerticalScrollIndicator={false}>
+        {/* HOST SECTION  */}
+        <View style={[styles.hostSectionWrapper, styles.basePadding]}>
+          <View style={styles.hostSection}>
+            <Avatar
+              image={hostAvatar}
+              size={AvatarSize.Medium}
+              status={hostStatus}
+            />
+            <View>
+              <Text
+                style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+                {hostName}
+              </Text>
+              <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+                Rating: {hostRating}
+              </Text>
+            </View>
+          </View>
+
+          {hostType === 'You' ? (
+            <TextLabel
+              text={labelText.you}
+              type={LabelType.You}
+              size={LabelSize.Small}
+              display={LabelDisplay.Contained}
+            />
+          ) : hostType === 'Friend' ? (
+            <TextLabel
+              text={labelText.friend}
+              type={LabelType.Friend}
+              size={LabelSize.Small}
+              display={LabelDisplay.Contained}
+            />
+          ) : null}
+        </View>
+
+        {/* EVENT INFO SECTION */}
+        <View>
+          <View style={styles.basePadding}>
+            <Image
+              source={tempBanner}
+              style={styles.bannerImage}
+              resizeMode="cover"
+            />
+            <Text
+              style={[
+                globalStyles.headingTextThree,
+                globalStyles.textDark,
+                styles.title,
+              ]}>
+              {eventTitle}
+            </Text>
+          </View>
+
+          {/* DATE AND TIME SECTION */}
+          <View style={[styles.dateTimeSection, styles.basePadding]}>
             <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              Host's name
+              Date and time
+            </Text>
+            {/* inner */}
+            <View style={styles.dateTimeInnerSection}>
+              {/* date */}
+              <View style={styles.dateTime}>
+                <DateIcon
+                  width={24}
+                  height={24}
+                  fill={Colors.sparrowDarkBrown}
+                />
+                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+                  {eventDate}
+                </Text>
+              </View>
+
+              {/* time */}
+              <View style={styles.dateTime}>
+                <TimeIcon
+                  width={24}
+                  height={24}
+                  fill={Colors.sparrowDarkBrown}
+                />
+                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+                  {eventTime}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* LOCATION SECTION */}
+          {/* TODO add mapbox */}
+          <View style={[styles.locationSection, styles.basePadding]}>
+            {/* inner */}
+            <View style={styles.locationInnerSection}>
+              <Text
+                style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+                Location
+              </Text>
+              <TextButton
+                type={TextButtonType.Dark}
+                variant={TextButtonVariant.Four}
+                displayIcon
+                Icon={MapIcon}
+                text="show on maps"
+                onPress={null}
+              />
+            </View>
+
+            <Image
+              source={tempMap}
+              style={styles.mapImage}
+              resizeMode="cover"
+            />
+
+            <View
+              style={[
+                styles.location,
+                multiline ? styles.textAlignFlexStart : styles.textAlignCenter,
+              ]}>
+              <LocationIcon
+                width={24}
+                height={24}
+                fill={Colors.sparrowDarkBrown}
+              />
+              <Text
+                style={[globalStyles.bodyTextOne, globalStyles.textDark]}
+                onTextLayout={handleTextLayout}>
+                {eventLocation}
+              </Text>
+            </View>
+          </View>
+
+          {/* ABOUT SECTION */}
+          <View style={[styles.aboutSection, styles.basePadding]}>
+            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+              About
             </Text>
             <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-              Rating: 0.0
+              {eventDescription}
             </Text>
           </View>
-        </View>
 
-        <TextLabel
-          text={labelText.you}
-          type={LabelType.You}
-          size={LabelSize.Small}
-          display={LabelDisplay.Contained}
-        />
-      </View>
-
-      {/* EVENT INFO SECTION */}
-      <View>
-        <Image
-          source={tempBanner}
-          style={styles.bannerImage}
-          resizeMode="cover"
-        />
-        <Text
-          style={[
-            globalStyles.headingTextThree,
-            globalStyles.textDark,
-            styles.title,
-          ]}>
-          Event title
-        </Text>
-
-        {/* DATE AND TIME SECTION */}
-        <View style={styles.dateTimeSection}>
-          <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-            Date and time
-          </Text>
-          {/* inner */}
-          <View style={styles.dateTimeInnerSection}>
-            {/* date */}
-            <View style={styles.dateTime}>
-              <DateIcon width={24} height={24} fill={Colors.sparrowDarkBrown} />
-              <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-                Date
+          {/* ATTENDEES SECTION */}
+          <View style={styles.attendeesSection}>
+            <View style={[styles.attendeesInnerSection, styles.basePadding]}>
+              <Text
+                style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+                Attendees
               </Text>
+              {userType === 'Host' ? (
+                <TextButton
+                  type={TextButtonType.Dark}
+                  variant={TextButtonVariant.Four}
+                  displayIcon
+                  Icon={PersonIcon}
+                  text="manage"
+                  onPress={null}
+                />
+              ) : (
+                <TextButton
+                  type={TextButtonType.Dark}
+                  variant={TextButtonVariant.Four}
+                  displayIcon
+                  Icon={ShareIcon}
+                  text="invite friends"
+                  onPress={null}
+                />
+              )}
             </View>
-
-            {/* time */}
-            <View style={styles.dateTime}>
-              <TimeIcon width={24} height={24} fill={Colors.sparrowDarkBrown} />
-              <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-                Time
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* LOCATION SECTION */}
-        <View style={styles.locationSection}>
-          {/* inner */}
-          <View style={styles.locationInnerSection}>
-            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              Location
-            </Text>
-            <TextButton
-              type={TextButtonType.Dark}
-              variant={TextButtonVariant.Four}
-              displayIcon
-              Icon={MapIcon}
-              text="show on maps"
+            <AvatarStackScroll
+              avatars={avatarData}
+              type={AvatarType.Beside}
+              size={AvatarSize.Large}
+              status={AvatarStatus.Online}
               onPress={null}
             />
           </View>
 
-          <Image source={tempMap} style={styles.mapImage} resizeMode="cover" />
-
-          {/* TODO check how it looks with more than 1 line, might need to adjust stlye; when more than 2 lines don't use alignItems center */}
-          <View style={styles.location}>
-            <LocationIcon
-              width={24}
-              height={24}
-              fill={Colors.sparrowDarkBrown}
-            />
-            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-              Location
-            </Text>
-          </View>
-        </View>
-
-        {/* ABOUT SECTION */}
-        <View style={styles.aboutSection}>
-          <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-            About
-          </Text>
-          <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-            Description
-          </Text>
-        </View>
-
-        {/* ATTENDEES SECTION */}
-        {/* TODO add conditional logic - different TextButtons */}
-        <View style={styles.attendeesSection}>
-          <View style={styles.attendeesInnerSection}>
-            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              Attendees
-            </Text>
-            <TextButton
-              type={TextButtonType.Dark}
-              variant={TextButtonVariant.Four}
-              displayIcon
-              Icon={PersonIcon}
-              text="manage"
-              onPress={null}
-            />
-          </View>
-          <Text>AvatarStack component here</Text>
-        </View>
-
-        {/* GALLERY SECTION */}
-        {/* TODO add conditional logic - gallery */}
-        <View style={styles.gallerySection}>
+          {/* GALLERY SECTION */}
           {pastEventData?.media.length > 0 && (
-            <Gallery images={pastEventData?.media ? [pastEventData] : []} />
+            <View
+              style={[
+                eventStatus === 'Terminated'
+                  ? styles.basePadding
+                  : styles.gallerySection,
+                styles.basePadding,
+              ]}>
+              <Gallery images={pastEventData?.media ? [pastEventData] : []} />
+            </View>
+          )}
+
+          {/* CONTROLS SECTION */}
+          {/* HOST */}
+          {eventStatus === 'Terminated' ? null : (
+            <>
+              {userType === 'Host' && (
+                <View style={[styles.controlsSection, styles.basePadding]}>
+                  <Button
+                    type={ButtonType.Error}
+                    size={ButtonSize.Medium}
+                    display={ButtonDisplay.Full}
+                    text={'Terminate event'}
+                    onPress={null}
+                  />
+
+                  <SmallMessage
+                    type={SmallMessageType.Info}
+                    message={
+                      <>
+                        Terminating an event restricts access to create a new
+                        event for
+                        <Text style={globalStyles.bodyTextTwoBold}>
+                          {' '}
+                          15 minutes
+                        </Text>
+                        .
+                      </>
+                    }
+                  />
+                </View>
+              )}
+            </>
           )}
         </View>
 
-        {/* CONTROLS SECTION */}
-        <View style={styles.controlsSection}>
-          <Button
-            type={ButtonType.Error}
-            size={ButtonSize.Medium}
-            display={ButtonDisplay.Full}
-            text={'Continue'}
-            onPress={null}
+        {userType === 'Attendee' ? (
+          <View
+            style={{
+              paddingBottom: Spacing.lg * 2 + attendeeControlsButtonHeight,
+            }}
           />
-
-          <Text>SmallMessage component here</Text>
-        </View>
-      </View>
-    </ScrollView>
+        ) : (
+          <View
+            style={{
+              paddingBottom: Spacing.lg,
+            }}
+          />
+        )}
+      </ScrollView>
+    </View>
   );
 };
 
 export default EventScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    paddingVertical: Spacing.lg,
+  },
+
+  basePadding: {
+    paddingHorizontal: Spacing.lg,
+  },
+
   hostSectionWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -255,8 +429,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     columnGap: Spacing.mdsm,
   },
-
-  eventSection: {},
 
   bannerImage: {
     width: '100%',
@@ -314,8 +486,15 @@ const styles = StyleSheet.create({
 
   location: {
     flexDirection: 'row',
-    alignItems: 'center',
     columnGap: Spacing.sm,
+  },
+
+  textAlignCenter: {
+    alignItems: 'center',
+  },
+
+  textAlignFlexStart: {
+    alignItems: 'flex-start',
   },
 
   aboutSection: {
@@ -340,5 +519,18 @@ const styles = StyleSheet.create({
 
   controlsSection: {
     rowGap: Spacing.md,
+  },
+
+  attendeeControls: {
+    backgroundColor: Colors.sparrowSand,
+    padding: Spacing.lg,
+    borderTopColor: Colors.sparrowDarkBrown,
+    borderTopWidth: 2,
+
+    position: 'absolute',
+    bottom: 0,
+    flex: 1,
+    zIndex: 2,
+    width: '100%',
   },
 });

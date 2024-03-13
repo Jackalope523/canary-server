@@ -1,4 +1,4 @@
-import { View, Image, ImageStyle } from 'react-native';
+import { View, Image, ImageStyle, Pressable } from 'react-native';
 import * as React from 'react';
 import { avatarStyles } from '../styles/AvatarStyles';
 import { globalStyles } from '../styles/GlobalStyles';
@@ -7,6 +7,7 @@ interface AvatarProps {
   status?: AvatarStatus;
   size?: AvatarSize;
   image?: any;
+  onPress?: () => void;
 
   avatarBorder?: ImageStyle[];
   avatarContainer?: ImageStyle[];
@@ -18,6 +19,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   avatarBorder = [],
   avatarContainer = [],
   image,
+  onPress,
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Status                                     ||
@@ -62,9 +64,9 @@ export const Avatar: React.FC<AvatarProps> = ({
   */
 
   return (
-    <View>
+    <Pressable onPress={onPress}>
       <Image source={image} style={[avatarContainer, avatarBorder]} />
-    </View>
+    </Pressable>
   );
 };
 
