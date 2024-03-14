@@ -70,7 +70,7 @@ namespace Repository.Tests
             Etching retrieved = await etchingStore.GetEtchingAsync(testEtching.Id);
 
             Assert.NotNull(retrieved);
-            Assert.Equal(testEtching.OwnerId, retrieved.UserId);
+            Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
@@ -88,7 +88,7 @@ namespace Repository.Tests
            Etching retrieved = (await etchingStore.GetEtchingsByUserAsync(subject.Id)).First();
 
             Assert.NotNull(retrieved);
-            Assert.Equal(testEtching.OwnerId, retrieved.UserId);
+            Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
@@ -103,7 +103,7 @@ namespace Repository.Tests
             Etching retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
 
             Assert.NotNull(retrieved);
-            Assert.Equal(testEtching.OwnerId, retrieved.UserId);
+            Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
@@ -155,7 +155,7 @@ namespace Repository.Tests
             Etching retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
 
             Assert.NotNull(retrieved);
-            Assert.Equal(testEtching.OwnerId, retrieved.UserId);
+            Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
