@@ -40,7 +40,6 @@ import DiscoveryScreen from '../flows/discovery/Discovery';
 import FeedScreen from '../flows/feed/Feed';
 import DiscoverySearchScreen from '../flows/discovery/DiscoverySearch';
 import NotificationsScreen from '../flows/activity/Notifications';
-import AccountScreen from '../flows/profile/Account';
 import ProfileScreen from '../flows/profile/Profile';
 import TestScreen from '../flows/testing/Testing';
 
@@ -68,6 +67,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
+import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
 
 // v1.0.1
 
@@ -92,7 +92,7 @@ function MainContainer() {
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
 
-          <AppStack.Screen name="Testing" component={TestScreen} />
+          <AppStack.Screen name="Testing" component={OtherUserProfileScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
@@ -193,38 +193,17 @@ function ActivityStackScreen() {
     <ActivityStack.Navigator
       screenOptions={() => ({
         headerShown: false,
-
         cardStyle: styles.cardContainer,
-
         headerTitleStyle: {
           fontSize: 16,
           color: Colors.sparrowDark,
         },
-
-        // headerTitleContainerStyle: {
-        //     marginHorizontal: 24,
-        // },
-
-        // headerLeftContainerStyle: {
-        //     marginLeft: 0,
-        // },
-
         headerStyle: {
           height: 50,
           backgroundColor: Colors.sparrowSand,
           borderBottomColor: Colors.sparrowDarkBrown,
           borderBottomWidth: 2,
         },
-
-        // headerLeftContainerStyle: {
-        //     marginLeft: 24,
-        // },
-
-        // headerLeftContainerStyle: {
-        //     backgroundColor: Colors.red400,
-        //     // marginHorizontal: 16, // between btn and title
-        //     // left: 24, // moves ONLY btn from left, absolute
-        // },
       })}>
       <ActivityStack.Screen name="Activity" component={ActivityScreen} />
       <ActivityStack.Screen
@@ -243,7 +222,7 @@ function Account() {
         headerShown: true,
         cardStyle: styles.cardContainer,
       }}>
-      <AccountStack.Screen name="Account" component={AccountScreen} />
+      <AccountStack.Screen name="Profile" component={ProfileScreen} />
     </AccountStack.Navigator>
   );
 }
@@ -251,7 +230,5 @@ function Account() {
 const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: Colors.sparrowSand,
-    // TESTING ONLY
-    // backgroundColor: Colors.fuchsia300,
   },
 });

@@ -3,11 +3,17 @@ export const Spacing = {
   // ! ||                                     Spacing                                    ||
   // ! ||--------------------------------------------------------------------------------||
 
+  // Extra, extra small
+  xxs: 2,
+
   // Extra small
   xs: 4,
 
   // Small
   sm: 8,
+
+  // In-between - Medium small
+  mdsm: 12,
 
   // Medium
   md: 16,

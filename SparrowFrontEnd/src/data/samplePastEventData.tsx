@@ -3,6 +3,15 @@
 import e1img1 from '../assets/images/temp/event-img-11.jpg';
 import e1img2 from '../assets/images/temp/event-img-11.2.jpg';
 import e1img3 from '../assets/images/temp/event-img-11.3.jpg';
+import e1img4 from '../assets/images/temp/event-img-11.4.jpg';
+import e1img5 from '../assets/images/temp/event-img-11.5.jpg';
+import e1img6 from '../assets/images/temp/event-img-11.6.jpg';
+import e1img7 from '../assets/images/temp/event-img-11.7.jpg';
+import e1img8 from '../assets/images/temp/event-img-11.8.jpg';
+import e1img9 from '../assets/images/temp/event-img-11.9.jpg';
+import e1img10 from '../assets/images/temp/event-img-11.10.jpg';
+import e1img11 from '../assets/images/temp/event-img-11.11.jpg';
+import e1img12 from '../assets/images/temp/event-img-11.12.jpg';
 
 import e2img1 from '../assets/images/temp/event-img-12.jpg';
 import e2img2 from '../assets/images/temp/event-img-12.2.jpg';
@@ -38,7 +47,20 @@ export const SAMPLE_PAST_EVENT_DATA = [
       "Get ready to carve through the powder and showcase your snowboarding skills. This adrenaline-packed event brings together snowboarders of all levels for a thrilling day of tricks, jumps and high-flying stunts. Whether you're a seasoned pro or just starting out, join us for a day of snowy excitement and friendly competition.",
     location: 'Frosty Ridge Terrain Park',
     likeCount: 3,
-    media: [e1img1, e1img2, e1img3],
+    media: [
+      e1img1,
+      e1img2,
+      e1img3,
+      e1img4,
+      e1img5,
+      e1img6,
+      e1img7,
+      e1img8,
+      e1img9,
+      e1img10,
+      e1img11,
+      e1img12,
+    ],
   },
 
   {
