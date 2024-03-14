@@ -17,6 +17,27 @@ import Button, {
 } from '../../components/Button';
 import { getAccount, userShard } from '../auth/accountPigeon';
 
+/*
+
+// TODO [!!!] IMPORTANT [!!!]
+
+Before beginning work on the Account screen:
+
+1. There's two account screens. Delete one of the screens and pick ONE COMMON
+name for an account screen, either Profile or Account
+
+2. Update everything related to the Account screen in MainContainer.tsx
+to use the selected name
+
+3. Update everything related to the Account screen in types.tsx
+
+4. Rename types.tsx to something more appropriate and less general
+
+5. In MainContainer.tsx, add the cardStyle prop and styles.cardStyle style
+to the Account Stack.Navigator
+
+*/
+
 type ProfileProps = StackScreenProps<BottomTabParamList, 'Profile'>;
 
 const ProfileScreen = ({ navigation }: ProfileProps) => {

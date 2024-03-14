@@ -35,24 +35,29 @@ const ExclusiveButtonGroup: React.FC<ExclusiveButtonScrollProps> =
 
    return  (
     <FlatList
-    horizontal = {true}
-    showsHorizontalScrollIndicator = {false}
-    ItemSeparatorComponent={() => <View style={{paddingRight: Spacing.md}}/>}
-    data = {buttons}
-    renderItem={ ({item}) =>  
+      horizontal={true}
+      overScrollMode="never"
+      showsHorizontalScrollIndicator={false}
+      ItemSeparatorComponent={() => (
+        <View style={{ paddingRight: Spacing.md }} />
+      )}
+      data={buttons}
+      renderItem={({ item }) => (
         <Button
-        id ={item.id}
-        current = {current}
-        setCurrent = {setCurrent}
-        type={item.type}
-        size={item.size}
-        display={item.display}
-        text={item.text}
-        icon={item.icon}
-        onPress={item.onPress}/>
-    }
+          id={item.id}
+          current={current}
+          setCurrent={setCurrent}
+          type={item.type}
+          size={item.size}
+          display={item.display}
+          text={item.text}
+          displayIcon={item.displayIcon}
+          Icon={item.Icon}
+          onPress={item.onPress}
+        />
+      )}
     />
-    );
+  );
 };
 
 export default ExclusiveButtonGroup;

@@ -1,14 +1,12 @@
 import { View, Text } from 'react-native';
 import * as React from 'react';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { navigationStyles } from '../../styles/NavigationStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
 
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import ArrowBack from '../../assets/icons/arrow-back-outline.svg';
+import { Colors } from '../../styles/ColorStyles';
 
 // TODO possibly delete all these topNavbar components, if you're going to code them differently
 
@@ -19,7 +17,7 @@ const TopNavbarDefaultTitled = () => {
         navigationStyles.topNavbar,
         navigationStyles.topNavbarDefaultTitled,
       ]}>
-      <Icon style={navigationStyles.topNavbarIcon} name="arrow-back-outline" />
+      <ArrowBack width={24} height={24} fill={Colors.sparrowDarkBrown} />
       <Text style={[globalStyles.headingTextFive, buttonStyles.buttonTertiary]}>
         Notifications
       </Text>

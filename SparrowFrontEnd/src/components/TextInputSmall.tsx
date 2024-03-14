@@ -80,7 +80,8 @@ const TextInputSmall: React.FC<TextInputSmallProps> = ({
   // ! ||                                   Text input                                   ||
   // ! ||--------------------------------------------------------------------------------||
   const [isFocused, setIsFocused] = React.useState(false);
-  const textInput: React.MutableRefObject<TextInput | undefined> = React.useRef();
+  const textInput: React.MutableRefObject<TextInput | undefined> =
+    React.useRef();
   const locked: React.MutableRefObject<boolean> = React.useRef(false);
 
   // Animations
@@ -293,11 +294,10 @@ const TextInputSmall: React.FC<TextInputSmallProps> = ({
         {clearButton && isFocused && (
           <Pressable onPress={clearButtonPress}>
             <Animated.View style={animatedIconStyle}>
-              <Icon
-                name="close-outline"
-                size={24}
+              <CloseOutline
                 height={24}
                 width={24}
+                fill={Colors.sparrowDarkBrown}
                 style={styles.icon}
               />
             </Animated.View>
@@ -325,12 +325,11 @@ const TextInputSmall: React.FC<TextInputSmallProps> = ({
 
       {error ? (
         <View style={styles.errorContainer}>
-          <Icon
-            name="error-fill"
-            size={24}
-            height={24}
+          <ErrorFill
             width={24}
-            style={styles.iconError}
+            height={24}
+            fill={Colors.sparrowDarkBrown}
+            style={styles.icon}
           />
           <Text style={[globalStyles.bodyTextTwo, globalStyles.textError]}>
             {error}
@@ -398,12 +397,6 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    color: Colors.sparrowDark,
-    flex: 0,
-  },
-
-  iconError: {
-    color: Colors.red400,
     flex: 0,
   },
 

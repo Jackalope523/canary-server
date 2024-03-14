@@ -14,6 +14,7 @@ export type AppStackParamList = {
   Main: undefined;
   Account: undefined;
   Survey: undefined;
+  Testing: undefined;
 };
 
 export type AuthStackParamList = {

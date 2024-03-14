@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
-import {View, StyleProp, ViewStyle} from 'react-native';
-import Button, {ButtonProps} from './Button';
-
+import React, { useState } from 'react';
+import { View, StyleProp, ViewStyle } from 'react-native';
+import Button, { ButtonProps } from './Button';
 
 interface ExclusiveButtonViewProps {
     groupStyle?: StyleProp<ViewStyle>
@@ -41,8 +40,5 @@ export const ExclusiveButtonView: React.FC<ExclusiveButtonViewProps> =
     </View> 
     );
 };
-
-
-
 
 export default ExclusiveButtonView;

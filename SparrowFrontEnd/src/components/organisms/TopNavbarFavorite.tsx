@@ -1,20 +1,19 @@
 import { View } from 'react-native';
 import * as React from 'react';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
 import { navigationStyles } from '../../styles/NavigationStyles';
 
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import ArrowBack from '../../assets/icons/arrow-back-outline.svg';
+import FavoriteOutline from '../../assets/icons/favorite-outline.svg';
+import { Colors } from '../../styles/ColorStyles';
 
 const TopNavbarFavorite = () => {
   return (
     <View
       style={[navigationStyles.topNavbar, navigationStyles.topNavbarFavorite]}>
-      <Icon style={navigationStyles.topNavbarIcon} name="arrow-back-outline" />
+      <ArrowBack width={24} height={24} fill={Colors.sparrowDarkBrown} />
       {/* TODO change favorite-outline to favorite-fill on tap, when user is adding event to favorites */}
-      <Icon style={navigationStyles.topNavbarIcon} name="favorite-outline" />
+      <FavoriteOutline height={24} width={24} fill={Colors.sparrowDarkBrown} />
     </View>
   );
 };
