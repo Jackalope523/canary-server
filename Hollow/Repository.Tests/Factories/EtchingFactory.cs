@@ -17,5 +17,17 @@ namespace Repository.Tests
                 IsHidden = false
             };
         }
+        public Post Create(User owner, Event location, DateTimeOffset postedAt)
+        {
+            created++;
+            return new Post
+            {
+                OwnerId = owner.Id,
+                EventId = location.Id,
+                PostedAt = postedAt,
+                PhotoURL = "URL " + created,
+                IsHidden = false
+            };
+        }
     }
 }
