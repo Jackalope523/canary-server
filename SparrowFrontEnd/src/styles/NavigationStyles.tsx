@@ -7,11 +7,11 @@ export const navigationStyles = StyleSheet.create({
   // ! ||                                   Navigation                                   ||
   // ! ||--------------------------------------------------------------------------------||
   // ! ||--------------------------------------------------------------------------------||
-  // ! ||                               Top navbar (header)                              ||
+  // ! ||                               Header (top navbar)                              ||
   // ! ||--------------------------------------------------------------------------------||
 
   // Base
-  topNavbar: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
@@ -21,38 +21,62 @@ export const navigationStyles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  topNavbarIcon: {
+  headerIcon: {
     color: Colors.sparrowDarkBrown,
   },
 
-  topNavbarGapLeft: {
+  headerGapLeft: {
     marginRight: Spacing.md,
   },
 
   // Types
   // Default with title
-  topNavbarDefaultTitled: {
+  headerDefaultTitled: {
     columnGap: Spacing.md,
   },
 
   // Favorite
-  topNavbarFavorite: {
+  headerFavorite: {
     justifyContent: 'space-between',
   },
 
   // Options
-  topNavbarOptions: {
+  headerOptions: {
     justifyContent: 'space-between',
   },
 
   // Edit
-  topNavbarEdit: {
+  headerEdit: {
     justifyContent: 'space-between',
   },
 
-  topNavbarEditWrapper: {
+  headerEditLeft: {
     flexDirection: 'row',
+    alignItems: 'center',
     columnGap: Spacing.md,
+  },
+
+  // Flags
+  flag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 12,
+    borderBottomWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  flagLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.md,
+  },
+
+  flagRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.sm,
   },
 
   // ! ||--------------------------------------------------------------------------------||
@@ -102,41 +126,8 @@ export const navigationStyles = StyleSheet.create({
     flexDirection: 'row',
   },
 
-  searchBarTextInput: {
-    margin: 0,
-    padding: 0,
-    flex: 1,
-
-    fontFamily: 'UncutSans-Regular',
-    fontSize: 16,
-    fontWeight: 'regular',
-  },
-
-  searchOptions: {
-    flexDirection: 'row',
-    columnGap: Spacing.md,
-    paddingTop: Spacing.md,
-
-    // TODO remove bgc later
-    backgroundColor: Colors.fuchsia500,
-  },
-
-  searchOptionsInner: {
-    backgroundColor: Colors.sparrowBrown,
-    height: '100%',
-  },
-
-  searchOptionsInnerSection: {
-    rowGap: Spacing.md,
-    paddingTop: Spacing.lg,
-  },
-
   searchOptionsInnerSectionContent: {
     columnGap: Spacing.md,
-  },
-
-  searchContent: {
-    marginHorizontal: 24,
   },
 
   // TODO DELETE test later when it's not used anymore

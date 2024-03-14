@@ -1,19 +1,16 @@
 import { View, Text } from 'react-native';
 import * as React from 'react';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
 import { navigationStyles } from '../../styles/NavigationStyles';
 
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import ArrowBack from '../../assets/icons/arrow-back-outline.svg';
 
 const TopNavbarEditSelected = () => {
   return (
     <View style={[navigationStyles.topNavbar, navigationStyles.topNavbarEdit]}>
-      <Icon style={navigationStyles.topNavbarIcon} name="arrow-back-outline" />
+      <ArrowBack width={24} height={24} fill={Colors.sparrowDarkBrown} />
       <Text
         style={[globalStyles.buttonTextThree, { color: Colors.sparrowDark }]}>
         Save

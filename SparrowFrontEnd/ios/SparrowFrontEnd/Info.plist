@@ -67,5 +67,8 @@
 		<string>UncutSans-SemiboldItalic.otf</string>
 		<string>sparrow-icons.ttf</string>
 	</array>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>Show current location on map.</string>
 </dict>
 </plist>

@@ -37,7 +37,7 @@ namespace Core.Controls
 			return targetEvent.ToEventShard();
 		}
 
-		public async Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userId,
+		public async Task<List<EventShard>> GetEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUserAsync(userId);
@@ -49,7 +49,7 @@ namespace Core.Controls
 			return nearbyEvents;
 		}
 
-		public async Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(ulong userId,
+		public async Task<List<EventShard>> GetPersonalisedEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUserAsync(userId);
@@ -531,23 +531,9 @@ namespace Core.Controls
 		internal async Task<List<EventShard>>
 			RemoveInaccessibleEventsAsync(User user, List<EventShard> events)
 		{
+			List<EventShard> inaccessibleEvents = new();
+
 			foreach (EventShard e in events)
-			{
-				Event targetEvent = new(e);
-
-				if (!await user.CanView(targetEvent))
-				{ events.Remove(e); }
-			}
-
-			return events;
-		}
-
-		internal async Task<List<EventThinSlice>>
-			RemoveInaccessibleEventsAsync(User user, List<EventThinSlice> events)
-		{
-			List<EventThinSlice> inaccessibleEvents = new();
-
-			foreach (EventThinSlice e in events)
 			{
 				Event targetEvent = new(e);
 
@@ -560,12 +546,12 @@ namespace Core.Controls
 			return events;
 		}
 
-		internal async Task<List<EventThinSlice>>
-			RemoveUnattractiveEventsAsync(User user, List<EventThinSlice> events, float maximumAngle)
+		internal async Task<List<EventShard>>
+			RemoveUnattractiveEventsAsync(User user, List<EventShard> events, float maximumAngle)
         {
-            List<EventThinSlice> inaccessibleEvents = new();
+            List<EventShard> inaccessibleEvents = new();
 
-            foreach (EventThinSlice e in events)
+            foreach (EventShard e in events)
 			{
 				Event targetEvent = new(e);
 

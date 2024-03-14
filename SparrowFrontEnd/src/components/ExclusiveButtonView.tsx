@@ -1,23 +1,24 @@
-import React, {useState} from 'react';
-import {View, StyleProp, ViewStyle} from 'react-native';
-import Button, {ButtonProps} from './Button';
-
+import React, { useState } from 'react';
+import { View, StyleProp, ViewStyle } from 'react-native';
+import Button, { ButtonProps } from './Button';
 
 interface ExclusiveButtonViewProps {
     groupStyle?: StyleProp<ViewStyle>
     buttons?: ButtonProps[];
+    activeButton?: number;
+    setActiveButton?: React.Dispatch<React.SetStateAction<number>>;
   }
 
 export const ExclusiveButtonView: React.FC<ExclusiveButtonViewProps> = 
 (
     {
         groupStyle = null,
-        buttons = []
+        buttons = [],
+        activeButton = -1,
+        setActiveButton
     }
 ) => 
 {
-    const [current, setCurrent] = useState(-1);
-
    return  (
     <View style = {groupStyle}>
         {
@@ -25,8 +26,8 @@ export const ExclusiveButtonView: React.FC<ExclusiveButtonViewProps> =
                 (button) =>  
                     <Button
                       id ={button.id}
-                      current = {current}
-                      setCurrent = {setCurrent}
+                      current = {activeButton}
+                      setCurrent = {setActiveButton}
                       type={button.type}
                       size={button.size}
                       display={button.display}
@@ -39,8 +40,5 @@ export const ExclusiveButtonView: React.FC<ExclusiveButtonViewProps> =
     </View> 
     );
 };
-
-
-
 
 export default ExclusiveButtonView;

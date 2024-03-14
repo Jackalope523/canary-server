@@ -13,8 +13,7 @@ namespace Core.Boundaries
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
-		double Radius, bool IsDynamic, bool IsPendingDeletion);
-	public record EventThinSlice(ulong Id, UserSilhouette Host, double Latitude, double Longitude);
+		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests);
 
 	#endregion
 
@@ -23,7 +22,7 @@ namespace Core.Boundaries
 	public interface IEventDatabase
 	{
         Task<EventShard> FindEventAsync(ulong eventId);
-		Task<List<EventThinSlice>> FindEventsAsync(double latitude, double longitude, double distance);
+		Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance);
 		Task<EventShard> FindCurrentEventForUserAsync(ulong userId);
 		Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong userId);
 		Task<List<EventShard>> FindPastEventsForUserAsync(ulong userId);
@@ -48,9 +47,9 @@ namespace Core.Boundaries
 	public interface IEventOperations
 	{
 		Task<EventShard> GetEventInformationAsync(ulong userId, ulong eventId);
-		Task<List<EventThinSlice>> GetEventsInAreaAsync(ulong userId,
+		Task<List<EventShard>> GetEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance);
-		Task<List<EventThinSlice>> GetPersonalisedEventsInAreaAsync(ulong userId,
+		Task<List<EventShard>> GetPersonalisedEventsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance);
 
 		Task<EventShard> CreateEventAsync(ulong userId, string eventName, string eventDescription,
