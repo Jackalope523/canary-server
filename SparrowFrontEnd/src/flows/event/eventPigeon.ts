@@ -21,7 +21,8 @@ export type eventShard = {
     GroupMaximum: number,
     Character: character,
     Radius: number,
-    IsDynamic: boolean
+    IsDynamic: boolean,
+    NumberOfGuests: number
 };
 
 export function extractEventShard(data: any) {
@@ -40,26 +41,9 @@ export function extractEventShard(data: any) {
         GroupMaximum: data['GroupMaximum'],
         Character: extractCharacter(data['Character']),
         Radius: data['Radius'],
-        IsDynamic: data['IsDynamic']
+        IsDynamic: data['IsDynamic'],
+        NumberOfGuests: data['NumberOfGuests']
     }
-
-    return event;
-}
-
-export type eventThinSlice = {
-    Id: number,
-    Host: userSilhouette,
-    Latitude: number,
-    Longitude: number
-};
-
-export function extractEventThinSlice(data: any) {
-    let event: eventThinSlice = {
-        Id: data['Id'],
-        Host: extractUserSilhouette(data['Host']),
-        Latitude: data['Latitude'],
-        Longitude: data['Longitude']
-    };
 
     return event;
 }
@@ -69,10 +53,8 @@ export type eventHeader = {
     Name: string,
     IsActive: string,
     LastActiveTime: Date,
-    // ** NEW **
-    Longitude: number,
-    Latitude: number
-    //************
+    Latitude: number,
+    Longitude: number
 }
 
 export function extractEventHeader(data: any) {
@@ -80,7 +62,9 @@ export function extractEventHeader(data: any) {
         Id: data['Id'],
         Name: data['EventId'],
         IsActive: data['IsActive'],
-        LastActiveTime: extractDate(data['LastTimeActive'])
+        LastActiveTime: extractDate(data['LastTimeActive']),
+        Latitude: data['Latitude'],
+        Longitude: data['Longitude']
     };
 
     return header;
@@ -89,10 +73,7 @@ export function extractEventHeader(data: any) {
 export type etchingShard = {
     Id: number,
     EventId: number,
-    UserId: number,
-    // ** NEW **
-    Owner: string,
-    //************
+    User: userSilhouette,
     TimeEtched: Date,
     ImageURL: string,
     Ratings: [Positive: number, Negative: number],
@@ -103,7 +84,7 @@ export function extractEtchingShard(data: any) {
     let etching: etchingShard = {
         Id: data['id'],
         EventId: data['EventId'],
-        UserId: data['UserId'],
+        User: extractUserSilhouette(data['User']),
         TimeEtched: extractDate(data['TimeEtched']),
         ImageURL: data['ImageURL'],
         Ratings: [data['Ratings']['Positive'],

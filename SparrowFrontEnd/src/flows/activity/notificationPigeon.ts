@@ -1,6 +1,6 @@
 import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { extractCharacter } from '../auth/accountPigeon';
-import { etchingShard, eventShard, eventThinSlice } from '../event/eventPigeon';
+import { etchingShard, eventShard } from '../event/eventPigeon';
 
 const apiBaseUrl = '/notifications';
 

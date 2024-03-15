@@ -1,6 +1,6 @@
 import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { extractCharacter } from '../auth/accountPigeon';
-import { etchingShard, eventShard, eventThinSlice, extractEtchingShard, extractEventShard, extractEventThinSlice } from '../event/eventPigeon';
+import { etchingShard, eventShard, extractEtchingShard, extractEventShard } from '../event/eventPigeon';
 
 const apiBaseUrl = '/profile';
 
@@ -67,7 +67,7 @@ export async function getUserNest(targetIdentification: number) {
         .then((response: any) => {
             console.log('User Nest:', response.data);
             
-            let events = extractList(response.data['Events'], extractEventThinSlice);
+            let events = extractList(response.data['Events'], extractEventShard);
             let etchings = extractList(response.data['Etchings'], extractEtchingShard);
 
             return [ events, etchings ];
