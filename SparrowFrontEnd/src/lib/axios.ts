@@ -9,7 +9,11 @@ export function initialiseAxios() {
     axios.defaults.validateStatus = (status: any) => { return status === 200 };
 }
 
-export var userSession: AxiosInstance;
+export var userSession: AxiosInstance = axios.create({
+    baseURL: API_URL,
+    headers: {'Content-Type': 'application/json'},
+    validateStatus: (status: any) => { return status === 200 },
+});
 
 export function initialiseAxiosSession(token: string) {
     userSession = axios.create({

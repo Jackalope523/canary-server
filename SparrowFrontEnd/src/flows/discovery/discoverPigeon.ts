@@ -1,4 +1,4 @@
-import { userSession, handleError, extractList } from '../../lib/axios';
+import { initialiseAxiosSession, userSession, handleError, extractList } from '../../lib/axios';
 import { eventShard, extractEventShard } from '../event/eventPigeon';
 
 const apiBaseUrl = '/discover';

@@ -1,11 +1,12 @@
 import React, {useEffect} from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 
-import {EventCardMediumProps, EventCardMedium} from '../EventCardMedium';
+import {EventCardMediumProps, EventCardMedium} from '../../components/EventCardMedium';
 import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
 
 import { Spacing } from '../../styles/SpacingStyles';
 import { point, Point, Feature, Properties} from '@turf/helpers';
+import { getAllEvents } from './discoverPigeon';
 
 //  TODO make search filter, search for events based on TEXT input from Discovery -> searchBar -> TextInput component.
 // TODO make FILTER and SORT buttons functional
@@ -35,6 +36,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       eventDateTest: data.dateTest
     }
   });
+
+  useEffect(() => {
+    getAllEvents(10, 10, 10)
+    .then(value => {console.log("GOT DISCOVERY RESPONSE")})
+    .catch(() => "SESSION ERROR");
+  }, []);
 
   filterBy.forEach((filter) => {toDisplay = toDisplay.filter(filter)});
   console.log("SORTING");

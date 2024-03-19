@@ -19,13 +19,14 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 using Repository;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Frontier
 {
     public class Ignition
     {
         public static void Main(string[] args)
-        {
+		{ 
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Console()
 				.CreateLogger();

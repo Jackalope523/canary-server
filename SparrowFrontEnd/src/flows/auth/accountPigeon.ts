@@ -195,7 +195,7 @@ export async function modifyAccount(details: accountDetails) {
         return Promise.reject();
     }
 
-  return await userSession.put(`${apiBaseUrl}`, details)
+  return await userSession.post(`${apiBaseUrl}`, details)
     .then((response: any) => {
             console.log('Account modified.', response.data);
     })

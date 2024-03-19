@@ -19,7 +19,7 @@ import Button, {
   ButtonSize,
   ButtonDisplay,
 } from '../../components/Button';
-import SearchFilter from '../../components/organisms/SearchFilter';
+import SearchFilter from './SearchFilter';
 
 import Animated, {
   useAnimatedStyle,

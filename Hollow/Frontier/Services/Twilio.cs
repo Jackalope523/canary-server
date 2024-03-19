@@ -19,7 +19,7 @@ namespace Frontier.Services
 
 		public async Task SendSMSAsync(string phoneNumber, string message)
 		{
-			if (phoneNumber[0] == '+')
+            if (phoneNumber[0] == '+')
 			{
 				await MessageResource.CreateAsync(
 					from: new Twilio.Types.PhoneNumber(senderPhoneNumber),

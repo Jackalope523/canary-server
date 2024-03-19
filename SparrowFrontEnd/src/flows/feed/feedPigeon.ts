@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { userSession, handleError, extractDate, extractList } from '../../lib/axios';
 import { etchingShard, eventEtching, eventHeader, extractEtchingShard, extractEventHeader } from '../event/eventPigeon';
 
@@ -21,7 +22,7 @@ export async function getUserFeed(options: feedOptions) : Promise<rawFeed> {
         console.log('Feed options are missing.');
         return Promise.reject();
     }
-
+    
     return await userSession.get(`${apiBaseUrl}/${options.Depth}`, { data: options })
         .then((response: any) => {
             console.log('User Feed:', response.data);
