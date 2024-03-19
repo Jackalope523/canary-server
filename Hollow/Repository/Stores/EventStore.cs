@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Shared;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Repository
 {
@@ -370,10 +371,45 @@ namespace Repository
         }    
         public async Task RemoveUserAsync(ulong userId, ulong eventId) 
         { 
-            await storeSentry.ExecuteWriteAsync(ctx => 
-            ctx.EventLinks.
-            Where(l => l.UserId == userId && l.EventId == eventId).
-            ExecuteDeleteAsync());
+            EventBond type = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.EventLinks.
+                Where(l => l.UserId == userId && l.EventId == eventId).
+                Select(l => l.Type).
+                SingleAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.EventLinks.
+                Where(l => l.UserId == userId && l.EventId == eventId).
+                ExecuteDeleteAsync());
+
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+            switch (type)
+            {
+                case EventBond.Watching:
+                    break;
+                case EventBond.Guest:
+                    int num = await storeSentry.ExecuteReadAsync(ctx =>
+                        ctx.Events.
+                        Where(e => e.Id == eventId).
+                        Select(e => e.NumberOfGuests).
+                        SingleAsync());
+
+                    Event e = new() { Id = eventId, NumberOfGuests = num - 1 };
+                    storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
+                    storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.NumberOfGuests)).IsModified = true, currentDiscussion);
+                    break;
+                case EventBond.Arrived:
+                    User arrivedUser = new() { Id = userId, CurrentEvent = null };
+
+                    storeSentry.DiscussWrite(ctx => ctx.Users.Attach(arrivedUser), currentDiscussion);
+                    storeSentry.DiscussWrite(ctx => ctx.Entry(arrivedUser).Property(nameof(arrivedUser.CurrentEvent)).IsModified = true, currentDiscussion);
+                    break;
+                case EventBond.Left:
+                    break;
+                case EventBond.Kicked:
+                    break;
+            }
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
         public async Task UpdateEventAsync(ulong id, List<(string Property, object Value)> edits)
         {
@@ -533,24 +569,42 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.EventLinks.Update(toAdd));
 
-            if (userState == EventBond.Left || userState == EventBond.Kicked || userState == EventBond.Arrived)
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+            switch (userState)
             {
-                Discussion currentDiscussion = storeSentry.BeginDiscussion();
+                case EventBond.Watching:
+                    break;
+                case EventBond.Guest:
+                    int num = await storeSentry.ExecuteReadAsync(ctx => 
+                        ctx.Events.
+                        Where(e => e.Id == eventId).
+                        Select(e => e.NumberOfGuests).
+                        SingleAsync());
 
-                User u;
-                if (userState == EventBond.Left || userState == EventBond.Kicked)
-                {
-                    u = new() { Id = userId, CurrentEvent = null };
-                }
-                else
-                {
-                    u = new() { Id = userId, CurrentEvent = eventId };
-                }
+                    Event e = new() { Id = eventId, NumberOfGuests = num + 1};
+                    storeSentry.DiscussWrite(ctx => ctx.Events.Attach(e), currentDiscussion);
+                    storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.NumberOfGuests)).IsModified = true, currentDiscussion);
+                    break;
+                case EventBond.Arrived:
+                    User arrivedUser = new() { Id = userId, CurrentEvent = eventId };
 
-                storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
-                storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentEvent)).IsModified = true, currentDiscussion);
-                await storeSentry.EndDiscussionAsync(currentDiscussion);
-            } 
+                    storeSentry.DiscussWrite(ctx => ctx.Users.Attach(arrivedUser), currentDiscussion);
+                    storeSentry.DiscussWrite(ctx => ctx.Entry(arrivedUser).Property(nameof(arrivedUser.CurrentEvent)).IsModified = true, currentDiscussion);
+                    break;
+                case EventBond.Left:
+                    User leftUser = new() { Id = userId, CurrentEvent = null };
+
+                    storeSentry.DiscussWrite(ctx => ctx.Users.Attach(leftUser), currentDiscussion);
+                    storeSentry.DiscussWrite(ctx => ctx.Entry(leftUser).Property(nameof(leftUser.CurrentEvent)).IsModified = true, currentDiscussion);
+                    break;
+                case EventBond.Kicked:
+                    User kickedUser = new() { Id = userId, CurrentEvent = null };
+
+                    storeSentry.DiscussWrite(ctx => ctx.Users.Attach(kickedUser), currentDiscussion);
+                    storeSentry.DiscussWrite(ctx => ctx.Entry(kickedUser).Property(nameof(kickedUser.CurrentEvent)).IsModified = true, currentDiscussion);
+                    break;
+            }
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
         public async Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId)
         {
