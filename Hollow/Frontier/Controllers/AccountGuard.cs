@@ -106,6 +106,9 @@ namespace Frontier.Controllers
                 // Check if the account is activated
                 if (await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
+                    // REMOVE FOR PROD
+                    credentials.Code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+
                     // Account is activated, check 2FA token validity
                     var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
                     if (result)
@@ -122,6 +125,9 @@ namespace Frontier.Controllers
                 }
                 else
                 {
+                    // REMOVE FOR PROD
+                    credentials.Code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+
                     // Account is not activated, check change number token validity
                     var result = await userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, credentials.Code);
                     if (result.Succeeded)
@@ -164,6 +170,8 @@ namespace Frontier.Controllers
                 {
                     return BadRequest(HollowError.MissingInformation.ToString());
                 }
+                // REMOVE FOR PROD
+                token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 var result = await userManager.ConfirmEmailAsync(user, token);
 
