@@ -13,10 +13,10 @@ export type noteShard = {
 
 export function extractNoteShard(data: any) {
     let note: noteShard = {
-        NotifierId: data['NotifierId'],
-        Time: extractDate(data['Time']),
-        Message: data['Message'],
-        Action: data['Action']
+        NotifierId: data['notifierId'],
+        Time: extractDate(data['time']),
+        Message: data['message'],
+        Action: data['action']
     }
 
     return note;

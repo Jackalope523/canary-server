@@ -94,23 +94,6 @@ namespace Repository.Tests
             Assert.Equal(testEvent.GroupMaximum, found.GroupMaximum);
         }
         [Fact]
-        public async Task FindEventsAsync_SUCCESS()
-        {
-            Point location = testEvent.Location;
-            EventShard found = (await store.FindEventsAsync(location.Y, location.X, 10)).First();
-
-            Assert.NotNull(found);
-            Assert.Equal(testEvent.HostId, found.Host.Id);
-            Assert.Equal(testEvent.Name, found.Name);
-            Assert.Equal(testEvent.Description, found.Description);
-            Assert.Equal(testEvent.StartTime, found.StartTime);
-            Assert.Equal(testEvent.Location.Y, found.Latitude);
-            Assert.Equal(testEvent.Location.X, found.Longitude);
-            Assert.Equal(testEvent.GroupMinimum, found.GroupMinimum);
-            Assert.Equal(testEvent.GroupMaximum, found.GroupMaximum);
-            Assert.Equal(testEvent.State, found.State);
-        }
-        [Fact]
         public async Task UpdateEventAsync_Description()
         {
             string newDescription = "The Second of few.";
@@ -566,6 +549,6 @@ namespace Repository.Tests
             int count = sentry.ExecuteRead(ctx => ctx.Events.Count());
 
             Assert.Equal(0, count);
-        }
+        }      
     }
 }

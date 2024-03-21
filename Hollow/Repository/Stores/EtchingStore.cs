@@ -32,7 +32,7 @@ namespace Repository
             return new Etching ( toAdd.Id, toAdd.EventId, new UserSilhouette(toAdd.OwnerId, ownerName), toAdd.PostedAt, toAdd.PhotoURL, new(0, 0), toAdd.IsHidden );
         }
 
-        public async Task<List<Etching>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, List<ulong> exclusionList)
+        public async Task<List<Etching>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
             // Get List of Friends.
             Task<List<ulong>> following = storeSentry.ExecuteReadAsync(ctx => 
@@ -51,17 +51,15 @@ namespace Repository
             // Get unseen posts by friends from certain depth.
             List<Etching> friendPosts = await storeSentry.ExecuteReadAsync(ctx => 
                ctx.Posts.
-               Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && p.PostedAt > depthCharge && p.PostedAt < DateTimeOffset.UtcNow).
+               Where(p => friends.Contains(p.OwnerId) && p.PostedAt > depthCharge && p.PostedAt < lastDepthCharge).
                Join(
-               storeSentry.ExecuteRead(ctx => 
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() })),
+               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
                p => p.Id,
                l => l.PostId,
                (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, p.IsHidden, l.RateUps }
                ).
                Join(
-               storeSentry.ExecuteRead(ctx => 
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() })),
+               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
                p => p.Id,
                l => l.PostId,
                (a, b) => new { a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, a.RateUps, b.RateDowns, a.IsHidden }             
@@ -83,7 +81,7 @@ namespace Repository
             }
 
             // Get remaining friend posts from same events as others even if outside time range. 
-            List<Etching> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !exclusionList.Contains(p.EventId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
+            List<Etching> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
                Join(
                ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
                p => p.Id,

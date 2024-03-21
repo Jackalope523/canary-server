@@ -30,16 +30,16 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{feedDepth}")]
-        public async Task<IActionResult> GetFeed([FromBody] FeedManifest feedOptions)
+		[HttpGet("{depth}-{lastDepth}")]
+        public async Task<IActionResult> GetFeed(int depth, int lastDepth)
         {
 			// Verify parameters
-            if (feedOptions == null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             { return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
 			{
-				var userFeed = await etchings.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
+				var userFeed = await etchings.GetUserFeedAsync(user.Id, depth, lastDepth);
 
 				return Ok(userFeed);
 			});

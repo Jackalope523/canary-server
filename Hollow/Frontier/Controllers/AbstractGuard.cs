@@ -85,7 +85,7 @@ namespace Frontier.Controllers
 				// Log failure
 				Log.Error(ex, ex.Message);
 
-				return StatusCode(500);
+				return StatusCode(500, ex.StackTrace);
 			}
 			catch (UserErrorException ex)
 			{
@@ -96,7 +96,7 @@ namespace Frontier.Controllers
 				// Log failure
 				Log.Error(ex, ex.Message);
 
-				return StatusCode(500);
+				return StatusCode(500, ex.StackTrace);
 			}
 		}
 

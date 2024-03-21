@@ -46,8 +46,8 @@ export function extractDate(data: any) {
 
 export function extractList<T>(listData: any, extractingFunction: (data: any) => T) {
     let items: T[] = [];
-    
-    for (const datum of listData['Events'])
+
+    for (const datum of listData)
     {
         items.push(extractingFunction(datum));
     }

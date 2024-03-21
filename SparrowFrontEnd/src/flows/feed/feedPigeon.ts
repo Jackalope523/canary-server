@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosHeaders } from 'axios';
 import { userSession, handleError, extractDate, extractList } from '../../lib/axios';
 import { etchingShard, eventEtching, eventHeader, extractEtchingShard, extractEventHeader } from '../event/eventPigeon';
 
 const apiBaseUrl = '/feed';
 
 type feedOptions = {
-    Depth: number,
-    ExclusionList: number[]
+    DepthCharge: number,
+    LastDepth: number
 }
 
 type rawFeed = {
@@ -23,13 +23,13 @@ export async function getUserFeed(options: feedOptions) : Promise<rawFeed> {
         return Promise.reject();
     }
     
-    return await userSession.get(`${apiBaseUrl}/${options.Depth}`, { data: options })
+    return await userSession.get(`${apiBaseUrl}/${options.DepthCharge}-${options.LastDepth}`)
         .then((response: any) => {
             console.log('User Feed:', response.data);
 
-            let depth: number = response.data['Depth'];
-            let headers = extractList(response.data['Headers'], extractEventHeader);
-            let etchings = extractList(response.data['Etchings'], extractEtchingShard);
+            let depth: number = response.data['depth'];
+            let headers = extractList(response.data['headers'], extractEventHeader);
+            let etchings = extractList(response.data['etchings'], extractEtchingShard);
 
             return  { Depth:depth, Headers:headers, Etchings:etchings };
         })

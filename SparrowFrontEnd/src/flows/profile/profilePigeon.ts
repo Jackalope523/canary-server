@@ -13,10 +13,10 @@ export type userProfile = {
 
 export function extractUserProfile(data: any) {
     let profile: userProfile = {
-        Id: data['Id'],
-        Name: data['Name'],
-        Reputation: data['Reputation'],
-        NumberOfFollowers: data['NumberOfFollowers']
+        Id: data['id'],
+        Name: data['name'],
+        Reputation: data['reputation'],
+        NumberOfFollowers: data['numberOfFollowers']
     }
 
     return profile;
@@ -29,8 +29,8 @@ export type userSilhouette = {
 
 export function extractUserSilhouette(data: any) {
     let silhouette: userSilhouette = {
-        Id: data['Id'],
-        Name: data['Name']
+        Id: data['id'],
+        Name: data['name']
     }
 
     return silhouette;

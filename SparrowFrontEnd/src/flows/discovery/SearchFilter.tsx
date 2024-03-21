@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 
 import {EventCardMediumProps, EventCardMedium} from '../../components/EventCardMedium';
@@ -6,46 +6,35 @@ import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
 
 import { Spacing } from '../../styles/SpacingStyles';
 import { point, Point, Feature, Properties} from '@turf/helpers';
+import { eventShard } from '../event/eventPigeon';
 import { getAllEvents } from './discoverPigeon';
+import {formatDate, formatTime} from './chronologicalTools'
 
 //  TODO make search filter, search for events based on TEXT input from Discovery -> searchBar -> TextInput component.
 // TODO make FILTER and SORT buttons functional
 
 interface SearchFilterProps {
-  list?:EventCardMediumProps[];
-  sortBy?:(x:EventCardMediumProps, y:EventCardMediumProps) => number;
-  filterBy?:((x:EventCardMediumProps) => boolean)[];
+  list?:eventShard[];
+  sortBy?:(x:eventShard, y:eventShard) => number;
+  filterBy?:((x:eventShard) => boolean)[];
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
   list = [],
-  sortBy = (x:EventCardMediumProps, y:EventCardMediumProps) => {return 0},
-  filterBy = [(x:EventCardMediumProps) => {return true}]
+  sortBy = (x:eventShard, y:eventShard) => {return 0},
+  filterBy = [(x:eventShard) => {return true}]
 }) => {
 
-  let toDisplay: EventCardMediumProps[] = SAMPLEEVENTDATA.map((data) => 
-  {return {
-      onPress: () => {},
-      eventDate: data.date,
-      eventTime: data.time,
-      eventAttendees: data.attendees,
-      eventTitle: data.title,
-      eventLocation: data.location,
-      eventHeroImage: data.uri,
-      eventCoordinate: point([data.longitude, data.latitude]),
-      eventDateTest: data.dateTest
-    }
-  });
+  const [events, setEvents] = useState<eventShard[]>([]);
 
   useEffect(() => {
-    getAllEvents(10, 10, 10)
-    .then(value => {console.log("GOT DISCOVERY RESPONSE")})
+    getAllEvents(53.483, 7.544, 10000)
+    .then(value => { setEvents(value); })
     .catch(() => "SESSION ERROR");
   }, []);
 
-  filterBy.forEach((filter) => {toDisplay = toDisplay.filter(filter)});
-  console.log("SORTING");
-  toDisplay.sort(sortBy);
+  filterBy.forEach((filter) => {setEvents(events.filter(filter))});
+  events.sort(sortBy);
 
   return (
     <FlatList
@@ -53,19 +42,19 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         horizontal = {false}
         showsVerticalScrollIndicator = {false}
         overScrollMode = "never"
-        data = {toDisplay}
-        renderItem = {({ item }) => (
-          <EventCardMedium 
-            onPress = {item.onPress}
-            eventDate= {item.eventDate}
-            eventTime= {item.eventTime}
-            eventAttendees= {item.eventAttendees}
-            eventTitle= {item.eventTitle}
-            eventLocation= {item.eventLocation}
-            eventHeroImage= {item.eventHeroImage}
-            eventCoordinate={item.eventCoordinate}
-          />
-        )}
+        data = {events}
+        renderItem = {({ item }) =>
+        <EventCardMedium 
+          onPress={() => {}}
+          eventDate= {formatDate(item.StartTime)}
+          eventTime= {formatTime(item.StartTime)}
+          eventAttendees= {item.NumberOfGuests}
+          eventTitle= {item.Name}
+          eventLocation= {"Skogr"}
+          eventHeroImage= {{
+            uri: 'https://images.unsplash.com/photo-1541140134513-85a161dc4a00?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          }}
+        />}
       />
   );
 };

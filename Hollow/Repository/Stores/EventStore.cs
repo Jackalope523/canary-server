@@ -322,9 +322,13 @@ namespace Repository
         }
         public async Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance)
         {
+            Point currentLocation = new CoordinateFactory().Create(longitude, latitude);
+            DateTimeOffset today = DateTimeOffset.UtcNow;
+            DateTimeOffset inTwoWeeks = today.AddDays(14);
+
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Events.
-                Where(e => e.Location.Distance(new Point(longitude, latitude)) <= distance && !e.EndTime.HasValue).
+                Where(e => e.Location.Distance(currentLocation) <= distance && e.StartTime >= today && e.StartTime < inTwoWeeks && !e.EndTime.HasValue).
                 Join(
                     ctx.Users, 
                     e => e.HostId, 

@@ -18,7 +18,7 @@ export async function getPersonalizedEvents(latitude: number, longitude: number,
 export async function getAllEvents(latitude: number, longitude: number, distance: number) {
     return await userSession.get(`${apiBaseUrl}/all/${latitude}-${longitude}-${distance}`)
         .then((response: any) => {
-            console.log('All Events:', response.data);
+            // console.log('All Events:', response.data);
             
             return extractList(response.data, extractEventShard);
         })

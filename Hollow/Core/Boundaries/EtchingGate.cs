@@ -31,7 +31,7 @@ namespace Core.Boundaries
 		Task RateEtchingAsync(ulong etchingId, ulong voterId, UserRating rating);
 		Task RemoveEtchingRatingAsync(ulong etchingId, ulong voterId);
 
-        Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, List<ulong> exclusionList);
+        Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
     }
 
     public interface IEtchingOperations
@@ -42,8 +42,7 @@ namespace Core.Boundaries
         Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating);
 
         Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
-            GetUserFeedAsync(ulong userId, int depth,
-            List<ulong> exclusionList = null);
+            GetUserFeedAsync(ulong userId, int depth, int lastDepth);
     }
 
 	#endregion

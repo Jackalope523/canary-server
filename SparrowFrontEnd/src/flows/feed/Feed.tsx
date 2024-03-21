@@ -14,21 +14,9 @@ import { length } from '@turf/turf';
 const FeedScreen = () => {
 
   let posts : JSX.Element[] = [];
-/*
-  useEffect(() => {
-    getAccount()
-    .then(() => {  console.log("__________________________________________________________________________________________________________");});
-  });
-  */
 
   useEffect(() => {
-    modifyAccount({ Name:"Larry" })
-    .then(() => {  console.log("__________________________________________________________________________________________________________");});
-  });
-
-  /*
-  useEffect(() => {
-    getUserFeed({ Depth: 30, ExclusionList: [22, 24] })
+    getUserFeed({ DepthCharge: 30, LastDepth: 0 })
     .then(value => 
       {
         let headers = value.Headers;
@@ -52,10 +40,9 @@ const FeedScreen = () => {
 
             console.log("LENGTH: " + posts);
          }
-      }).catch(() => console.log("ERROR"));
+      })
+    .catch(() => console.log("ERROR"));
   }, []);
-  */
-
 
 
   return (
