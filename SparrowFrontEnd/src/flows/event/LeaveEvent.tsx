@@ -8,9 +8,9 @@ import Button, {
 } from '../../components/Button';
 import { Spacing } from '../../styles/SpacingStyles';
 
-interface LeaveEventProps {}
+interface LeaveEventScreenProps {}
 
-const LeaveEvent = (props: LeaveEventProps) => {
+const LeaveEventScreen = (props: LeaveEventScreenProps) => {
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
       <View style={styles.info}>
@@ -28,6 +28,8 @@ const LeaveEvent = (props: LeaveEventProps) => {
           resizeMode="contain"
         />
       </View>
+
+      {/* TODO hook up onPress */}
 
       <View style={styles.controls}>
         <Button
@@ -49,7 +51,7 @@ const LeaveEvent = (props: LeaveEventProps) => {
   );
 };
 
-export default LeaveEvent;
+export default LeaveEventScreen;
 
 const styles = StyleSheet.create({
   container: {

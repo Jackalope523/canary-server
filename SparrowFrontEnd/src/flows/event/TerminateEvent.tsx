@@ -8,9 +8,9 @@ import Button, {
 } from '../../components/Button';
 import { Spacing } from '../../styles/SpacingStyles';
 
-interface TerminateEventProps {}
+interface TerminateEventScreenProps {}
 
-const TerminateEvent = (props: TerminateEventProps) => {
+const TerminateEventScreen = (props: TerminateEventScreenProps) => {
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
       <View style={styles.info}>
@@ -28,6 +28,8 @@ const TerminateEvent = (props: TerminateEventProps) => {
           resizeMode="contain"
         />
       </View>
+
+      {/* TODO hook up onPress */}
 
       <View style={styles.controls}>
         <Button
@@ -49,7 +51,7 @@ const TerminateEvent = (props: TerminateEventProps) => {
   );
 };
 
-export default TerminateEvent;
+export default TerminateEventScreen;
 
 const styles = StyleSheet.create({
   container: {
