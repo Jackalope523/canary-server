@@ -215,42 +215,35 @@ namespace Frontier.Controllers
 			if (details == null || !ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-            try
-			{
-                // Persist a new user
-                await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
-                    details.Name, details.DateOfBirth.ToUniversalTime());
-                
-                // Send an SMS to new user with a generated change number token
-                var user = await accounts.GetUserAsync(details.PhoneNumber);
-				var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-				await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
-			}
-            catch (InvalidUserException e)
-			{
-                // Account already exists
-				var user = await accounts.GetUserAsync(details.PhoneNumber);
-
-                // Check if account is activated
-				if (!await userManager.IsPhoneNumberConfirmedAsync(user))
+            return await Execute(async () =>
+            {
+                try
                 {
-                    // Account is not activated, send an SMS with a generated change number token
-					var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-					await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
-				}
+                    // Persist a new user
+                    await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
+                        details.Name, details.DateOfBirth.ToUniversalTime());
 
-                return BadRequest(e.ToString());
-            }
-            catch (InvalidInformationException e)
-            {
-                return BadRequest(e.ToString());
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
+                    // Send an SMS to new user with a generated change number token
+                    var user = await accounts.GetUserAsync(details.PhoneNumber);
+                    var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                    await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
+                }
+                catch (InvalidUserException e)
+                {
+                    // Account already exists
+                    var user = await accounts.GetUserAsync(details.PhoneNumber);
 
-            return Ok();
+                    // Check if account is activated
+                    if (!await userManager.IsPhoneNumberConfirmedAsync(user))
+                    {
+                        // Account is not activated, send an SMS with a generated change number token
+                        var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                        await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
+                    }
+
+                    throw e;
+                }
+            });
         }
 
         [HttpPut]
