@@ -172,14 +172,14 @@ namespace Core.Tests.Controls
 			var anotherEtching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
-			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue, 0);
+			var feed = await director.GetUserFeedAsync(friend.Id, int.MaxValue, 0);
 
 			// Assert
-			Assert.Single(feedHeaders);
-			Assert.Equal(@event.Id, feedHeaders[0].Id);
+			Assert.Single(feed.Headers);
+			Assert.Equal(@event.Id, feed.Headers[0].Id);
 
-			Assert.Equal(2, feedEtchings.Count);
-			var serverSomeEtching = feedEtchings.Find(etching => etching.Id.Equals(someEtching.Id));
+			Assert.Equal(2, feed.Etchings.Count);
+			var serverSomeEtching = feed.Etchings.Find(etching => etching.Id.Equals(someEtching.Id));
 			Assert.Equal(@event.Id, serverSomeEtching.EventId);
 			Assert.Equal(someEtching.Id, serverSomeEtching.Id);
 		}
@@ -200,14 +200,14 @@ namespace Core.Tests.Controls
 			var unseenEtching = await environment.GenerateEtchingAsync(event1, host2);
 
 			// Act
-			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue, 1);
+			var feed = await director.GetUserFeedAsync(friend.Id, int.MaxValue, 1);
 
 			// Assert
-			Assert.Single(feedHeaders);
-			Assert.Equal(event2.Id, feedHeaders[0].Id);
+			Assert.Single(feed.Headers);
+			Assert.Equal(event2.Id, feed.Headers[0].Id);
 
-			Assert.Single(feedEtchings);
-			var serverSomeEtching = feedEtchings.Find(etching => etching.Id.Equals(unseenEtching.Id));
+			Assert.Single(feed.Etchings);
+			var serverSomeEtching = feed.Etchings.Find(etching => etching.Id.Equals(unseenEtching.Id));
 			Assert.Equal(event2.Id, serverSomeEtching.EventId);
 			Assert.Equal(unseenEtching.Id, serverSomeEtching.Id);
 		}

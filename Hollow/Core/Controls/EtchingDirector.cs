@@ -88,7 +88,7 @@ namespace Core.Controls
             }
         }
 
-        public async Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
+        public async Task<Feed>
             GetUserFeedAsync(ulong userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
@@ -126,7 +126,11 @@ namespace Core.Controls
                 }
             }
 
-            return (depth, eventHeaders.Values.ToList(), friendEtchings);
+            eventHeaders.Add(666, new(0, "test header", false, Time, 0, 0));
+            friendEtchings.Add(new(0, 666, new(0, "test friend one"), Time, "aa", (3, 1), false));
+            friendEtchings.Add(new(1, 666, new(0, "test friend two"), Time, "bb", (10, 0), false));
+
+            return new(eventHeaders.Values.ToList(), friendEtchings);
         }
 
 		#endregion

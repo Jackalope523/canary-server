@@ -10,7 +10,6 @@ type feedOptions = {
 }
 
 type rawFeed = {
-    Depth: number,
     Headers: eventHeader[],
     Etchings: etchingShard[],
 
@@ -27,11 +26,10 @@ export async function getUserFeed(options: feedOptions) : Promise<rawFeed> {
         .then((response: any) => {
             console.log('User Feed:', response.data);
 
-            let depth: number = response.data['depth'];
             let headers = extractList(response.data['headers'], extractEventHeader);
             let etchings = extractList(response.data['etchings'], extractEtchingShard);
 
-            return  { Depth:depth, Headers:headers, Etchings:etchings };
+            return  { Headers:headers, Etchings:etchings };
         })
         .catch(handleError);
 }
