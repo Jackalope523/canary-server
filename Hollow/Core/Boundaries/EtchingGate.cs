@@ -43,8 +43,7 @@ namespace Core.Boundaries
         Task RemoveEtchingAsync(ulong userId, ulong etchingId);
         Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating);
 
-        Task<Feed>
-            GetUserFeedAsync(ulong userId, int depth, int lastDepth);
+        Task<Feed> GetUserFeedAsync(ulong userId, int depth, int lastDepth);
     }
 
 	#endregion

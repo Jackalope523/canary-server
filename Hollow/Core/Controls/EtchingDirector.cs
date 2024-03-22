@@ -126,10 +126,6 @@ namespace Core.Controls
                 }
             }
 
-            eventHeaders.Add(666, new(0, "test header", false, Time, 0, 0));
-            friendEtchings.Add(new(0, 666, new(0, "test friend one"), Time, "aa", (3, 1), false));
-            friendEtchings.Add(new(1, 666, new(0, "test friend two"), Time, "bb", (10, 0), false));
-
             return new(eventHeaders.Values.ToList(), friendEtchings);
         }
 
