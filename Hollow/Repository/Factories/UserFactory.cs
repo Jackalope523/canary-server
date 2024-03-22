@@ -12,7 +12,7 @@ namespace Repository
             produced++;
             return new User
             {
-                PhoneNumber = new string((char)produced, 3) + "-" + new string((char)produced, 3) + "-" + new string((char)produced, 4),
+                PhoneNumber = "1" + new string((char)produced, 10),
                 Email = "email_" + produced + "@test.com",
                 Name = "user" + produced,
                 DateOfBirth = DateTimeOffset.Now.AddDays(-(produced + 1000)),

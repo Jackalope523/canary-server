@@ -20,7 +20,6 @@ namespace Repository
             switch (flag)
             {
                 case Flag.Development:
-                    TestSentry.SeedDatabase();
                     AccountDatabaseAccess = new AccountStore(new TestSentry());
                     ProfileDatabaseAccess = new ProfileStore(new TestSentry());
                     NotificationDatabaseAccess = new NotificationStore(new TestSentry());

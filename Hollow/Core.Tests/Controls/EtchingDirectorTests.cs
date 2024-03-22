@@ -172,7 +172,7 @@ namespace Core.Tests.Controls
 			var anotherEtching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
-			var feed = await director.GetUserFeedAsync(friend.Id, int.MaxValue, 0);
+			var feed = await director.GetUserFeedAsync(friend.Id, 100, 0);
 
 			// Assert
 			Assert.Single(feed.Headers);
@@ -200,7 +200,7 @@ namespace Core.Tests.Controls
 			var unseenEtching = await environment.GenerateEtchingAsync(event1, host2);
 
 			// Act
-			var feed = await director.GetUserFeedAsync(friend.Id, int.MaxValue, 1);
+			var feed = await director.GetUserFeedAsync(friend.Id, 100, 1);
 
 			// Assert
 			Assert.Single(feed.Headers);
