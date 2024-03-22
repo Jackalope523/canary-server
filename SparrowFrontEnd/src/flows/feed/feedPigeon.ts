@@ -26,8 +26,15 @@ export async function getUserFeed(options: feedOptions) : Promise<rawFeed> {
         .then((response: any) => {
             console.log('User Feed:', response.data);
 
-            let headers = extractList(response.data['headers'], extractEventHeader);
-            let etchings = extractList(response.data['etchings'], extractEtchingShard);
+            let headers: eventHeader[] = [];
+            let etchings: etchingShard[] = [];
+
+            try
+            {
+                headers = extractList(response.data['headers'], extractEventHeader);
+                etchings = extractList(response.data['etchings'], extractEtchingShard);
+            }
+            catch { }
 
             return  { Headers:headers, Etchings:etchings };
         })
