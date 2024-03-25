@@ -73,6 +73,7 @@ import TerminateEventScreen from '../flows/event/host/TerminateEvent';
 import LeaveEventScreen from '../flows/event/LeaveEvent';
 import HostEventControlsScreen from '../flows/event/host/HostEventControls';
 import ManageAttendeesScreen from '../flows/event/host/ManageAttendees';
+import ShareScreen from '../flows/event/Share';
 
 // v1.0.1
 
@@ -97,7 +98,7 @@ function MainContainer() {
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
 
-          <AppStack.Screen name="Testing" component={ManageAttendeesScreen} />
+          <AppStack.Screen name="Testing" component={ShareScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

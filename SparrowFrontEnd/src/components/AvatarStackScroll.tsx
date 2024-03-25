@@ -7,7 +7,6 @@ import { Spacing } from '../styles/SpacingStyles';
 interface AvatarStackScrollProps {
   avatars: any[];
   size: AvatarSize;
-  status?: AvatarStatus;
   onPress?: () => void;
   type?: AvatarType;
   viewStyle?: any;
@@ -16,7 +15,6 @@ interface AvatarStackScrollProps {
 export const AvatarStackScroll: React.FC<AvatarStackScrollProps> = ({
   avatars,
   size,
-  status,
   onPress = null,
   type = null,
   viewStyle,
@@ -54,13 +52,7 @@ export const AvatarStackScroll: React.FC<AvatarStackScrollProps> = ({
       horizontal
       showsHorizontalScrollIndicator={false}>
       {avatars.map((avatar, index) => (
-        <Avatar
-          key={index}
-          size={size}
-          status={status}
-          image={avatar}
-          onPress={onPress}
-        />
+        <Avatar key={index} size={size} image={avatar} onPress={onPress} />
       ))}
     </ScrollView>
   );

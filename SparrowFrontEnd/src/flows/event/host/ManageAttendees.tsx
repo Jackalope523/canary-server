@@ -1,12 +1,15 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { globalStyles } from '../../../styles/GlobalStyles';
+import { Spacing } from '../../../styles/SpacingStyles';
+import UserListItemDropdown from '../../../components/event/UserListItemDropdown';
+import AvatarStackScroll, {
+  AvatarType,
+} from '../../../components/AvatarStackScroll';
+import { AvatarSize } from '../../../components/Avatar';
 
 // TEMP. data
 import { SAMPLE_USER_DATA } from '../../../data/sampleUserData';
-import Avatar, { AvatarSize } from '../../../components/Avatar';
-import { Spacing } from '../../../styles/SpacingStyles';
-import UserListItemDropdown from '../../../components/event/UserListItemDropdown';
 
 interface ManageAttendeesScreenProps {}
 
@@ -28,20 +31,12 @@ const ManageAttendeesScreen = (props: ManageAttendeesScreenProps) => {
           </Text>
           {/* TODO make AvatarListItem into a component */}
           {/* TODO come up with a better design */}
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.inviteFriendsInner}>
-            {SAMPLE_USER_DATA.map((user) => (
-              <View key={user.id} style={styles.avatarListItem}>
-                <Avatar size={AvatarSize.Large} image={user.avatar} />
-                {/* <Text
-                style={[globalStyles.textDark, globalStyles.headingTextFive]}>
-                {user.name}
-              </Text> */}
-              </View>
-            ))}
-          </ScrollView>
+          <AvatarStackScroll
+            avatars={SAMPLE_USER_DATA.map((user) => user.avatar)}
+            size={AvatarSize.Large}
+            type={AvatarType.Beside}
+            onPress={null}
+          />
         </View>
         <View style={styles.attendees}>
           <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>

@@ -4,6 +4,7 @@ import { globalStyles } from '../../../styles/GlobalStyles';
 import { borderRadius } from '../../../styles/BorderStyles';
 import { Colors } from '../../../styles/ColorStyles';
 import { CustomDimensions } from '../../../styles/CustomDimensionStyles';
+import { Spacing } from '../../../styles/SpacingStyles';
 
 import tempBanner from '../../assets/images/temp/event-img-1.jpg';
 import Button, {
@@ -16,7 +17,6 @@ import FlagMedium, { FlagType } from '../../../components/FlagMedium';
 // Icons
 import PersonIcon from '../../assets/icons/account-outline.svg';
 import DiagonalUpArrowIcon from '../../assets/icons/arrow-up-outline-alt.svg';
-import { Spacing } from '../../../styles/SpacingStyles';
 
 interface HostEventControlsScreenProps {}
 
