@@ -43,6 +43,14 @@ import NotificationsScreen from '../flows/activity/Notifications';
 import ProfileScreen from '../flows/profile/Profile';
 import TestScreen from '../flows/testing/Testing';
 
+// Event
+import EventScreen from '../flows/event/Event';
+import TerminateEventScreen from '../flows/event/host/TerminateEvent';
+import LeaveEventScreen from '../flows/event/LeaveEvent';
+import HostEventControlsScreen from '../flows/event/host/HostEventControls';
+import ManageAttendeesScreen from '../flows/event/host/ManageAttendees';
+import ShareScreen from '../flows/event/Share';
+
 // Icons
 import ActivityIconRest from '../assets/icons/activity-fill.svg';
 import DiscoveryIconRest from '../assets/icons/discovery-fill.svg';
@@ -54,7 +62,6 @@ import DiscoveryIconSelected from '../assets/icons/discovery-fill.svg';
 import FeedIconSelected from '../assets/icons/feed-outline-v2.svg';
 import ProfileIconSelected from '../assets/icons/account-fill.svg';
 
-// More imports
 import {
   BottomTabParamList,
   StackParamList,
@@ -64,31 +71,23 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // TODO setup top navbars for all necessary screens
-// TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
 import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
-import EventScreen from '../flows/event/Event';
-import TerminateEventScreen from '../flows/event/host/TerminateEvent';
-import LeaveEventScreen from '../flows/event/LeaveEvent';
-import HostEventControlsScreen from '../flows/event/host/HostEventControls';
-import ManageAttendeesScreen from '../flows/event/host/ManageAttendees';
-import ShareScreen from '../flows/event/Share';
-
-// v1.0.1
 
 const AppStack = createStackNavigator<AppStackParamList>();
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 const ActivityStack = createStackNavigator();
 const AccountStack = createStackNavigator();
+const EventStack = createStackNavigator();
 
 function MainContainer() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Testing"
+          initialRouteName="Event"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
@@ -97,6 +96,7 @@ function MainContainer() {
           <AppStack.Screen name="Survey" component={Survey} />
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
+          <AppStack.Screen name="Event" component={Event} />
 
           <AppStack.Screen name="Testing" component={ShareScreen} />
         </AppStack.Navigator>
@@ -230,6 +230,33 @@ function Account() {
       }}>
       <AccountStack.Screen name="Profile" component={ProfileScreen} />
     </AccountStack.Navigator>
+  );
+}
+
+function Event() {
+  return (
+    <EventStack.Navigator
+      initialRouteName="Event"
+      screenOptions={{
+        headerShown: false,
+        cardStyle: styles.cardContainer,
+      }}>
+      <EventStack.Screen name="Event" component={EventScreen} />
+      <EventStack.Screen name="Share" component={ShareScreen} />
+      <EventStack.Screen name="LeaveEvent" component={LeaveEventScreen} />
+      <EventStack.Screen
+        name="TerminateEvent"
+        component={TerminateEventScreen}
+      />
+      <EventStack.Screen
+        name="ManageAttendees"
+        component={ManageAttendeesScreen}
+      />
+      <EventStack.Screen
+        name="HostEventControls"
+        component={HostEventControlsScreen}
+      />
+    </EventStack.Navigator>
   );
 }
 

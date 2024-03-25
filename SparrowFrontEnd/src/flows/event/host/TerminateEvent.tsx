@@ -7,10 +7,16 @@ import Button, {
   ButtonType,
 } from '../../../components/Button';
 import { Spacing } from '../../../styles/SpacingStyles';
+import { StackScreenProps } from '@react-navigation/stack';
+import { EventStackParamList } from '../../../components/atoms/types';
 
-interface TerminateEventScreenProps {}
+type TerminateEventScreenProps = StackScreenProps<EventStackParamList, 'Event'>;
 
-const TerminateEventScreen = (props: TerminateEventScreenProps) => {
+const TerminateEventScreen = ({ navigation }: TerminateEventScreenProps) => {
+  function leaveEventUp() {
+    navigation.navigate('Event');
+  }
+
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
       <View style={styles.info}>
@@ -23,7 +29,7 @@ const TerminateEventScreen = (props: TerminateEventScreenProps) => {
           Are you sure you want to terminate the event?
         </Text>
         <Image
-          source={require('../../assets/illustrations/temp/illustration-placeholder.png')}
+          source={require('../../../assets/illustrations/temp/illustration-placeholder.png')}
           style={globalStyles.illustrationLarge}
           resizeMode="contain"
         />
@@ -37,7 +43,7 @@ const TerminateEventScreen = (props: TerminateEventScreenProps) => {
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
           text={'Leave event up'}
-          onPress={null}
+          onPress={leaveEventUp}
         />
         <Button
           type={ButtonType.Error}

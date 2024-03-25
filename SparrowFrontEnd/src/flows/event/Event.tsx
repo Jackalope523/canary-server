@@ -54,7 +54,7 @@ import LocationIcon from '../../assets/icons/location-outline.svg';
 import PersonIcon from '../../assets/icons/account-outline.svg';
 import ShareIcon from '../../assets/icons/share-outline.svg';
 
-const EventScreen = ({ route }: EventProps) => {
+const EventScreen = ({ route, navigation }: EventProps) => {
   // Sample data
   const pastEventData = SAMPLE_PAST_EVENT_DATA.find(
     (event) => event.id === '3',
@@ -130,6 +130,22 @@ const EventScreen = ({ route }: EventProps) => {
   //           Start Time: ${data.StartTime}`);
   // }
 
+  function manageAttendees() {
+    navigation.navigate('ManageAttendees');
+  }
+
+  function inviteFriends() {
+    navigation.navigate('Share');
+  }
+
+  function terminateEvent() {
+    navigation.navigate('TerminateEvent');
+  }
+
+  function leaveEvent() {
+    navigation.navigate('LeaveEvent');
+  }
+
   return (
     <View>
       {/* TODO add a fixed HeaderFlag component here after bugfix */}
@@ -146,7 +162,7 @@ const EventScreen = ({ route }: EventProps) => {
               size={ButtonSize.Medium}
               display={ButtonDisplay.Full}
               text={'Leave event'}
-              onPress={null}
+              onPress={leaveEvent}
             />
           ) : (
             <Button
@@ -319,7 +335,7 @@ const EventScreen = ({ route }: EventProps) => {
                   displayIcon
                   Icon={PersonIcon}
                   text="manage"
-                  onPress={null}
+                  onPress={manageAttendees}
                 />
               ) : (
                 <TextButton
@@ -328,7 +344,7 @@ const EventScreen = ({ route }: EventProps) => {
                   displayIcon
                   Icon={ShareIcon}
                   text="invite friends"
-                  onPress={null}
+                  onPress={inviteFriends}
                 />
               )}
             </View>
@@ -336,7 +352,6 @@ const EventScreen = ({ route }: EventProps) => {
               avatars={avatarData}
               type={AvatarType.Beside}
               size={AvatarSize.Large}
-              status={AvatarStatus.Online}
               onPress={null}
             />
           </View>
@@ -365,7 +380,7 @@ const EventScreen = ({ route }: EventProps) => {
                     size={ButtonSize.Medium}
                     display={ButtonDisplay.Full}
                     text={'Terminate event'}
-                    onPress={null}
+                    onPress={terminateEvent}
                   />
 
                   <SmallMessage

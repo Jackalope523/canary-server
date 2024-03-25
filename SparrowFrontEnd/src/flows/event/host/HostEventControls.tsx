@@ -6,21 +6,29 @@ import { Colors } from '../../../styles/ColorStyles';
 import { CustomDimensions } from '../../../styles/CustomDimensionStyles';
 import { Spacing } from '../../../styles/SpacingStyles';
 
-import tempBanner from '../../assets/images/temp/event-img-1.jpg';
 import Button, {
   ButtonDisplay,
   ButtonSize,
   ButtonType,
 } from '../../../components/Button';
 import FlagMedium, { FlagType } from '../../../components/FlagMedium';
+import { StackScreenProps } from '@react-navigation/stack';
+import { EventStackParamList } from '../../../components/atoms/types';
+
+import tempBanner from '../../../assets/images/temp/event-img-1.jpg';
 
 // Icons
-import PersonIcon from '../../assets/icons/account-outline.svg';
-import DiagonalUpArrowIcon from '../../assets/icons/arrow-up-outline-alt.svg';
+import PersonIcon from '../../../assets/icons/account-outline.svg';
+import DiagonalUpArrowIcon from '../../../assets/icons/arrow-up-outline-alt.svg';
 
-interface HostEventControlsScreenProps {}
+type HostEventControlsScreenProps = StackScreenProps<
+  EventStackParamList,
+  'HostEventControls'
+>;
 
-const HostEventControlsScreen = (props: HostEventControlsScreenProps) => {
+const HostEventControlsScreen = ({
+  navigation,
+}: HostEventControlsScreenProps) => {
   /* TODO hook up real time here - how long has an event been live for
 
   Similar to a stopwatch but with the stop being the terminate event button
@@ -29,6 +37,10 @@ const HostEventControlsScreen = (props: HostEventControlsScreenProps) => {
   let eventActiveFor = '00:12:34';
 
   const eventTitle = 'Dog Walk and Play Meetup at Central Park';
+
+  function manageAttendees() {
+    navigation.navigate('ManageAttendees');
+  }
 
   return (
     <View style={[globalStyles.baseContainer, styles.hostEventControls]}>
@@ -74,7 +86,7 @@ const HostEventControlsScreen = (props: HostEventControlsScreenProps) => {
           text={'View event page'}
           displayIcon={true}
           Icon={DiagonalUpArrowIcon}
-          onPress={null}
+          onPress={() => navigation.navigate('Event')}
         />
       </View>
     </View>

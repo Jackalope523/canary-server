@@ -7,10 +7,16 @@ import Button, {
   ButtonType,
 } from '../../components/Button';
 import { Spacing } from '../../styles/SpacingStyles';
+import { StackScreenProps } from '@react-navigation/stack';
+import { EventStackParamList } from '../../components/atoms/types';
 
-interface LeaveEventScreenProps {}
+type LeaveEventScreenProps = StackScreenProps<EventStackParamList, 'Event'>;
 
-const LeaveEventScreen = (props: LeaveEventScreenProps) => {
+const LeaveEventScreen = ({ navigation }: LeaveEventScreenProps) => {
+  function stayInEvent() {
+    navigation.navigate('Event');
+  }
+
   return (
     <View style={[globalStyles.baseContainer, styles.container]}>
       <View style={styles.info}>
@@ -37,7 +43,7 @@ const LeaveEventScreen = (props: LeaveEventScreenProps) => {
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
           text={'Stay in event'}
-          onPress={null}
+          onPress={stayInEvent}
         />
         <Button
           type={ButtonType.Error}
