@@ -1,22 +1,22 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { globalStyles } from '../../styles/GlobalStyles';
-import { borderRadius } from '../../styles/BorderStyles';
-import { Colors } from '../../styles/ColorStyles';
+import { globalStyles } from '../../../styles/GlobalStyles';
+import { borderRadius } from '../../../styles/BorderStyles';
+import { Colors } from '../../../styles/ColorStyles';
+import { CustomDimensions } from '../../../styles/CustomDimensionStyles';
 
 import tempBanner from '../../assets/images/temp/event-img-1.jpg';
 import Button, {
   ButtonDisplay,
   ButtonSize,
   ButtonType,
-} from '../../components/Button';
+} from '../../../components/Button';
+import FlagMedium, { FlagType } from '../../../components/FlagMedium';
 
 // Icons
 import PersonIcon from '../../assets/icons/account-outline.svg';
 import DiagonalUpArrowIcon from '../../assets/icons/arrow-up-outline-alt.svg';
-import { Spacing } from '../../styles/SpacingStyles';
-import FlagMedium, { FlagType } from '../../components/FlagMedium';
-import { CustomDimensions } from '../../styles/CustomDimensionStyles';
+import { Spacing } from '../../../styles/SpacingStyles';
 
 interface HostEventControlsScreenProps {}
 
@@ -56,6 +56,7 @@ const HostEventControlsScreen = (props: HostEventControlsScreenProps) => {
       </View>
 
       {/* TODO currently, visually, buttons aren't consistent with the design system but the naming partly is, once new button issue is fixed - update these */}
+      {/* TODO hook up onPress */}
       <View style={styles.controls}>
         <Button
           type={ButtonType.PrimaryDark}

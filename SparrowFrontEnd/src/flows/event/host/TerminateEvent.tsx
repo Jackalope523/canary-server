@@ -1,12 +1,12 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { globalStyles } from '../../styles/GlobalStyles';
+import { globalStyles } from '../../../styles/GlobalStyles';
 import Button, {
   ButtonDisplay,
   ButtonSize,
   ButtonType,
-} from '../../components/Button';
-import { Spacing } from '../../styles/SpacingStyles';
+} from '../../../components/Button';
+import { Spacing } from '../../../styles/SpacingStyles';
 
 interface TerminateEventScreenProps {}
 
