@@ -25,24 +25,29 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   filterBy = [(x:eventShard) => {return true}]
 }) => {
 
-  const [events, setEvents] = useState<eventShard[]>([]);
+  const [toDisplay, setToDisplay] = useState<eventShard[]>([]); 
 
   useEffect(() => {
-    getAllEvents(53.483, 7.544, 10000)
-    .then(value => { setEvents(value); })
-    .catch(() => "SESSION ERROR");
+    let toProcess = list;
+
+    filterBy.forEach((filter) => {
+      toProcess = toProcess.filter(filter)
+    });
+  
+    toProcess.sort(sortBy);
+
+    setToDisplay(toProcess);
   }, []);
 
-  filterBy.forEach((filter) => {setEvents(events.filter(filter))});
-  events.sort(sortBy);
+ 
 
   return (
     <FlatList
         contentContainerStyle = {{alignItems: "center"}}
         horizontal = {false}
         showsVerticalScrollIndicator = {false}
-        overScrollMode = "never"
-        data = {events}
+        overScrollMode = "always"
+        data = {toDisplay}
         renderItem = {({ item }) =>
         <EventCardMedium 
           onPress={() => {}}

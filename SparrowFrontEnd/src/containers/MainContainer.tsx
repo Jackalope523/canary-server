@@ -1,3 +1,4 @@
+// #region Imports
 import * as React from 'react';
 
 // Styles
@@ -68,7 +69,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
 import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
-
+// #endregion
 // v1.0.1
 
 const AppStack = createStackNavigator<AppStackParamList>();

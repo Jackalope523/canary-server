@@ -1,3 +1,4 @@
+// #region Imports
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -43,14 +44,23 @@ import {isToday, isTomorrow, isNextWeek, isNextWeekend, isThisWeek, isThisWeeken
 import { EventCardMediumProps, EventCardMedium } from '../../components/EventCardMedium';
 import { point, Point, distance, Feature, Properties } from '@turf/turf';
 import Geolocation from 'react-native-geolocation-service';
-import { eventShard } from '../event/eventPigeon';
+import { etchingShard, eventShard } from '../event/eventPigeon';
+import { getAllEvents } from './discoverPigeon';
+// #endregion
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // TEMP. map image - replace with actual working map
 const tempMapImage = require('../../assets/images/temp/temp-map.png');
 
+enum ActiveComponent {
+  None,
+  Filter,
+  Sort
+}
+
 const DiscoveryScreen = () => {
+
   const { height, width } = useWindowDimensions();
 
   const [searchContentVisible, setSearchContentVisible] = useState(false);
@@ -65,37 +75,15 @@ const DiscoveryScreen = () => {
     }
   }, [isTextInputFocused]);
 
-  // Toggle search close button
-  const toggleClose = () => {
-    setSearchContentVisible(false);
-    setActiveComponent("");
-    setSearchText('');
-  };
-
   // Search options
-  const [activeComponent, setActiveComponent] = useState("none");
+  const [activeComponent, setActiveComponent] = useState(ActiveComponent.None);
 
-  // Toggle filter
-  const [filterVisible, setFilterVisible] = useState(false);
-
-  const toggleFilter = () => {
+  const toggleActiveComponent = (component:ActiveComponent) => {
     Keyboard.dismiss();
-    if (activeComponent === "filter") {
-      setActiveComponent("none");
+    if (activeComponent === component) {
+      setActiveComponent(ActiveComponent.None);
     } else {
-      setActiveComponent("filter");
-    }
-  };
-
-  // Toggle sort
-  const [sortVisible, setSortVisible] = useState(false);
-
-  const toggleSort = () => {
-    Keyboard.dismiss();
-    if (activeComponent === "sort") {
-      setActiveComponent("none");
-    } else {
-      setActiveComponent("sort");
+      setActiveComponent(component);
     }
   };
 
@@ -134,18 +122,31 @@ const DiscoveryScreen = () => {
   const [filterDateValue, setFilterDateValue] = useState("");
   const [filterSizeValue, setFilterSizeValue] = useState("");
   const [currentLocation, setCurrentLocation] = useState(point([0, 0]));
+  const [events, setEvents] = useState<eventShard[]>([]); 
+
+  const pollCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        setCurrentLocation(point([position.coords.longitude, position.coords.latitude]));
+      },
+      error => {
+        console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
+
+  useEffect(() => {
+    pollCurrentLocation();
+
+    getAllEvents(currentLocation.geometry.coordinates[0], currentLocation.geometry.coordinates[1], 1000000000000000)
+    .then(value => { setEvents(value); })
+    .catch(() => "SESSION ERROR");
+  }, []);
 
   useEffect(() => {
     if (sortValue === "Closest") {
-      Geolocation.getCurrentPosition(
-        position => {
-          setCurrentLocation(point([position.coords.longitude, position.coords.latitude]));
-        },
-        error => {
-          console.log(error.code, error.message);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
+      pollCurrentLocation();
     }
   }, [sortValue]);
 
@@ -201,26 +202,25 @@ const DiscoveryScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Map />
+      <Map events={events}/>
 
-      <View style={searchContentVisible ? { position: 'absolute', width: width, backgroundColor: "white" } : { position: 'absolute', width: width }}>
-        <View style={{ flexDirection: "row" }}>
+      <View style={searchContentVisible ? { position: 'absolute', width: width,  backgroundColor: "white" } : { position: 'absolute', width: width }}>
+        <View style={{ flexDirection: "row"}}>
           {searchContentVisible ? (
-            <Pressable onPress={() => {
-              setIsTextInputFocused(false);
-              setSearchContentVisible(false);
-              Keyboard.dismiss();
-            }}>
-              <Animated.View style={animatedIconStyle}>
-                <Icon
-                  name="arrow-back-outline"
-                  size={40}
-                  style={styles.icon}
-                  paddingTop={20}
-                  paddingLeft={20}
-                />
-              </Animated.View>
-            </Pressable>
+          <Pressable onPress={() => {
+            setIsTextInputFocused(false);
+            setSearchContentVisible(false);
+            Keyboard.dismiss()}}>
+            <Animated.View style={animatedIconStyle}>
+              <Icon
+                name="arrow-back-outline"
+                size={40}
+                style={styles.icon}
+                paddingTop={20}
+                paddingLeft={20}
+              />
+            </Animated.View>
+          </Pressable>
           ) : null}
 
           <SearchBar
@@ -259,7 +259,7 @@ const DiscoveryScreen = () => {
                 display: ButtonDisplay.Full,
                 text: "Filter",
                 icon: "filter-fill",
-                onPress: toggleFilter
+                onPress: () => { toggleActiveComponent(ActiveComponent.Filter); }
               },
               {
                 id: 2,
@@ -268,14 +268,14 @@ const DiscoveryScreen = () => {
                 display: ButtonDisplay.Full,
                 text: "Sort",
                 icon: "sort-outline",
-                onPress: toggleSort
+                onPress: () => { toggleActiveComponent(ActiveComponent.Sort); }
               }
             ]} />
         </View>
 
 
 
-        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === "sort" && searchContentVisible) ? { display: 'none' } : {}]}>
+        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === ActiveComponent.Sort && searchContentVisible) ? { display: 'none' } : {}]}>
           <View style={{ rowGap: Spacing.md, paddingTop: Spacing.lg, height: '100%' }}>
             <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>
               Sort by
@@ -330,7 +330,7 @@ const DiscoveryScreen = () => {
 
 
 
-        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === "filter" && searchContentVisible) ? { display: 'none' } : {}]}>
+        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === ActiveComponent.Filter && searchContentVisible) ? { display: 'none' } : {}]}>
           <View style={{ rowGap: Spacing.md, paddingTop: Spacing.lg }}>
             <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>
               Date
@@ -491,13 +491,13 @@ const DiscoveryScreen = () => {
             </View>
           </View>
         </View>
-
       </View>
 
       {/* TODO probably have to enable it and disable filter or sort if there's text input in the textInput component */}
-      {activeComponent === "none" && searchContentVisible ? (
+      {activeComponent === ActiveComponent.None && searchContentVisible ? (
         <View style={isTextInputFocused ? { paddingTop: 130 } : { paddingTop: 75 }}>
           <SearchFilter
+            list={events}
             sortBy={generateSortBy()}
             filterBy={generateFilterArray()}
           />

@@ -22,12 +22,19 @@ import MapboxGL,
 }  from "@rnmapbox/maps";
 
 import { featureCollection, feature, point } from '@turf/helpers';
+import { eventShard } from '../event/eventPigeon.ts'
 
 import exampleIcon from '../../assets/pins/Pin.png';
 
-export interface MapProps {}
+export interface MapProps {
+  events?: eventShard[]
 
-const Map : React.FC<MapProps> = () => {
+}
+
+const Map : React.FC<MapProps> = ({
+  events = [],
+} 
+) => {
   MapboxGL.setAccessToken("sk.eyJ1IjoiamFja2Fsb3BlNTIzIiwiYSI6ImNsb3o0Y3ZoYTA5aW4ya3Bwb3M5YjY0cXkifQ.g0fLvyL1wWfyotb8L5oigg");
   const [location, setLocation] = useState<Location>();
 
@@ -57,10 +64,19 @@ const Map : React.FC<MapProps> = () => {
       }, []);   
   }
 
+  /*
   const [stateFeatureCollection, setStateFeatureCollection] =
   useState<GeoJSON.FeatureCollection>(
     featureCollection([point([-73.970895, 40.723279], {name: "A"}), point([-60.970895, 40.723279], {name: "B"}), point([-73.5674, 45.5019], {name: "Xavier's Birthday"}), point([-73.970895, 35.723279], {name: "D"})]),
   );
+  */
+
+  const [stateFeatureCollection, setStateFeatureCollection] = useState<GeoJSON.FeatureCollection>(featureCollection([]));
+
+  useEffect(() => {
+    setStateFeatureCollection(featureCollection(events.map((e) => 
+      point([e.Location.geometry.coordinates[0], e.Location.geometry.coordinates[1]], {name: e.Name}))));
+  }, [events]);
   
     return (
       <MapView 

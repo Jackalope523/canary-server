@@ -18,7 +18,7 @@ namespace Repository
                 GroupMinimum = 0 + produced,
                 GroupMaximum = 10 + produced,
                 State = EventState.Upcoming,
-                Location = Event.DefaultLocation,
+                Location = innerFactory.Create(7.544 + produced, 53.483 - produced),
                 Radius = 10.0,
                 IsDynamic = false,
 

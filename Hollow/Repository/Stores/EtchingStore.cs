@@ -49,57 +49,67 @@ namespace Repository
             List<ulong> friends = (await following).Intersect(await followingMe).ToList();
 
             // Get unseen posts by friends from certain depth.
-            List<Etching> friendPosts = await storeSentry.ExecuteReadAsync(ctx => 
-               ctx.Posts.
-               Where(p => friends.Contains(p.OwnerId) && p.PostedAt > depthCharge && p.PostedAt < lastDepthCharge).
-               Join(
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
-               p => p.Id,
-               l => l.PostId,
-               (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, p.IsHidden, l.RateUps }
-               ).
-               Join(
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
-               p => p.Id,
-               l => l.PostId,
-               (a, b) => new { a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, a.RateUps, b.RateDowns, a.IsHidden }             
-               ).
-               Join(
-               ctx.Users,
-               p => p.OwnerId,
-               u => u.Id,
-               (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, p.PhotoURL, new(p.RateUps, p.RateDowns), p.IsHidden)
+            List<Etching> friendPosts = await storeSentry.ExecuteReadAsync(ctx =>
+              ctx.Posts.
+              Where(p => friends.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
+              Join(
+                  ctx.Users,
+                  p => p.OwnerId,
+                  u => u.Id,
+                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, p.PhotoURL, new(-1, -1), p.IsHidden)
                ).ToListAsync());
 
-            // Compile unique list if events spanned by friend posts and a list of already loaded posts. 
+            List<Task<int>> friendPostsPositiveRatings = new();
+            List<Task<int>> friendPostNegativeRatings = new();
             List<ulong> sitesToBeExplored = new();
             List<ulong> previouslyExtractedPosts = new();
-            foreach (Etching p in friendPosts)
+            foreach (Etching e in friendPosts)
             {
-                if (!sitesToBeExplored.Contains(p.EventId)) sitesToBeExplored.Add(p.EventId);
-                previouslyExtractedPosts.Add(p.Id);
+                friendPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
+                    ctx.PostLinks.
+                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateUp).
+                    CountAsync()));
+
+                friendPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
+                    ctx.PostLinks.
+                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateDown).
+                    CountAsync()));
+
+                // Compile unique list if events spanned by friend posts and a list of already loaded posts. 
+                if (!sitesToBeExplored.Contains(e.EventId)) sitesToBeExplored.Add(e.EventId);
+                previouslyExtractedPosts.Add(e.Id);
             }
 
-            // Get remaining friend posts from same events as others even if outside time range. 
-            List<Etching> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => ctx.Posts.Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
-               Join(
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateUp).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateUps = l.Count() }),
-               p => p.Id,
-               l => l.PostId,
-               (p, l) => new { p.Id, p.EventId, p.OwnerId, p.PostedAt, p.PhotoURL, p.IsHidden, l.RateUps }
-               ).
-               Join(
-               ctx.PostLinks.Where(l => l.Type == PostLink.PostLinkType.RateDown).GroupBy(l => l.PostId).Select(l => new { PostId = l.Key, RateDowns = l.Count() }),
-               p => p.Id,
-               l => l.PostId,
-               (a, b) => new { a.Id, a.EventId, a.OwnerId, a.PostedAt, a.PhotoURL, a.RateUps, b.RateDowns, a.IsHidden }
-               ).
-               Join(
-               ctx.Users,
-               p => p.OwnerId,
-               u => u.Id,
-               (p,u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, p.PhotoURL, new(p.RateUps, p.RateDowns), p.IsHidden)
-               ).ToListAsync());
+            // Get remaining friend posts from same events as others even if outside time range.
+            List<Etching> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Posts.
+                Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
+                Join(
+                  ctx.Users,
+                  p => p.OwnerId,
+                  u => u.Id,
+                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, p.PhotoURL, new(-1, -1), p.IsHidden)
+                ).ToListAsync());
+
+            List<Task<int>> nettedPostsPositiveRatings = new();
+            List<Task<int>> nettedPostNegativeRatings = new();
+            foreach (Etching e in nettedPosts)
+            {
+                nettedPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
+                    ctx.PostLinks.
+                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateUp).
+                    CountAsync()));
+
+                nettedPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
+                    ctx.PostLinks.
+                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateDown).
+                    CountAsync()));
+            }
+
+            await Task.WhenAll(friendPostsPositiveRatings);
+            await Task.WhenAll(friendPostNegativeRatings);
+            await Task.WhenAll(nettedPostsPositiveRatings);
+            await Task.WhenAll(nettedPostNegativeRatings);
 
             return friendPosts.Concat(nettedPosts).ToList();
         }
