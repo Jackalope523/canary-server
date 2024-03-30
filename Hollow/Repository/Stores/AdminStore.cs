@@ -7,7 +7,7 @@ namespace Repository
 {
     public class AdminStore : QueryStore, IAdminDatabase
     {
-        public AdminStore(Sentry sentry) : base(sentry)
+        public AdminStore(IDatabaseSentry sentry) : base(sentry)
         {
 
         }

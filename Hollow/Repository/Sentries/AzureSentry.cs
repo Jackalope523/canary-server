@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Identity;
+using Azure.Storage.Blobs;
+using Microsoft.EntityFrameworkCore;
 using Shared;
+using System.Text;
 
 namespace Repository
 {
-    public class AzureSentry : Sentry
+    public class AzureSentry : IDatabaseSentry, IBlobStorageSentry
     {
         public AzureSentry()
         {
@@ -54,7 +57,8 @@ namespace Repository
             context.SaveChanges();
         }
 
-        public override T ExecuteRead<T>(Func<QueryContext, T> read)
+        #region Database
+        public T ExecuteRead<T>(Func<QueryContext, T> read)
         {
             using (AzureContext context = new())
             {
@@ -74,7 +78,7 @@ namespace Repository
             }
         }
 
-        public override void ExecuteWrite(Action<QueryContext> write)
+        public void ExecuteWrite(Action<QueryContext> write)
         {
             using (AzureContext context = new())
             {
@@ -94,7 +98,7 @@ namespace Repository
             }
         }
 
-        public async override Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
+        public async Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
         {
             using (AzureContext context = new())
             {
@@ -114,7 +118,7 @@ namespace Repository
             }
         }
 
-        public async override Task ExecuteWriteAsync(Action<QueryContext> write)
+        public async Task ExecuteWriteAsync(Action<QueryContext> write)
         {
             using (AzureContext context = new())
             {
@@ -133,7 +137,7 @@ namespace Repository
                 }
             }
         }
-        public async override Task ExecuteWriteAsync(Func<QueryContext, Task> write)
+        public async Task ExecuteWriteAsync(Func<QueryContext, Task> write)
         {
             using (AzureContext context = new())
             {
@@ -153,12 +157,12 @@ namespace Repository
             }
         }
 
-        public override Discussion BeginDiscussion()
+        public Discussion BeginDiscussion()
         {
             return new Discussion(new AzureContext());
         }
 
-        public override void DiscussWrite(Action<QueryContext> write, Discussion discussion)
+        public void DiscussWrite(Action<QueryContext> write, Discussion discussion)
         {
             try
             {
@@ -171,7 +175,7 @@ namespace Repository
             }
         }
 
-        public override void EndDiscussion(Discussion toEnd)
+        public void EndDiscussion(Discussion toEnd)
         {
             try
             {
@@ -183,7 +187,7 @@ namespace Repository
             }
         }
 
-        public async override Task EndDiscussionAsync(Discussion toEnd)
+        public async Task EndDiscussionAsync(Discussion toEnd)
         {
             try
             {
@@ -194,5 +198,59 @@ namespace Repository
                 throw new DatabaseWriteException(ex);
             }
         }
+        #endregion
+
+        #region Blob Storage
+        public async Task UploadBlob(string accountName, string containerName, string blobName, string blobContents)
+        {
+            // Construct the blob container endpoint from the arguments.
+            string containerEndpoint = string.Format("https://{0}.blob.core.windows.net/{1}",
+                                                        accountName,
+                                                        containerName);
+
+            // Get a credential and create a client object for the blob container.
+            BlobContainerClient containerClient = new(new Uri(containerEndpoint),new DefaultAzureCredential());
+
+            try
+            {
+                // Create the container if it does not exist.
+                await containerClient.CreateIfNotExistsAsync();
+
+                // Upload text to a new block blob.
+                byte[] byteArray = Encoding.ASCII.GetBytes(blobContents);
+
+                using (MemoryStream stream = new MemoryStream(byteArray))
+                {
+                    await containerClient.UploadBlobAsync(blobName, stream);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public Task<Stream> DownloadBlobAsync(string containerName, string blobName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteBlobAsync(string containerName, string blobName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> BlobExistsAsync(string containerName, string blobName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<string>> ListBlobsAsync(string containerName)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
     }
 }
+
+

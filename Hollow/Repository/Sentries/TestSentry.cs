@@ -3,7 +3,7 @@ using Shared;
 
 namespace Repository
 {
-    public class TestSentry : Sentry
+    public class TestSentry : IDatabaseSentry
     {      
         public TestSentry() 
         {
@@ -55,7 +55,7 @@ namespace Repository
             context.SaveChanges();
         }
 
-        public override T ExecuteRead<T>(Func<QueryContext, T> read)
+        public T ExecuteRead<T>(Func<QueryContext, T> read)
         {
             using (TestContext context = new())
             {
@@ -75,7 +75,7 @@ namespace Repository
             }       
         }
         
-        public override void ExecuteWrite(Action<QueryContext> write)
+        public void ExecuteWrite(Action<QueryContext> write)
         {
             using (TestContext context = new())
             {
@@ -95,7 +95,7 @@ namespace Repository
             }   
         }
 
-        public async override Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
+        public async Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
         {
             using (TestContext context = new())
             {
@@ -115,7 +115,7 @@ namespace Repository
             }    
         }
    
-        public async override Task ExecuteWriteAsync(Action<QueryContext> write)
+        public async Task ExecuteWriteAsync(Action<QueryContext> write)
         {
             using (TestContext context = new())
             {
@@ -134,7 +134,7 @@ namespace Repository
                 }
             }
         }
-        public async override Task ExecuteWriteAsync(Func<QueryContext,Task> write)
+        public async Task ExecuteWriteAsync(Func<QueryContext,Task> write)
         {
             using (TestContext context = new()) 
             {
@@ -154,12 +154,12 @@ namespace Repository
             }
         }
 
-        public override Discussion BeginDiscussion()
+        public Discussion BeginDiscussion()
         {
             return new Discussion(new TestContext());
         }
 
-        public override void DiscussWrite(Action<QueryContext> write, Discussion discussion)
+        public void DiscussWrite(Action<QueryContext> write, Discussion discussion)
         {
             try
             {           
@@ -172,7 +172,7 @@ namespace Repository
             }
         }
 
-        public override void EndDiscussion(Discussion toEnd)
+        public void EndDiscussion(Discussion toEnd)
         {
             try
             {
@@ -184,7 +184,7 @@ namespace Repository
             }
         }
 
-        public async override Task EndDiscussionAsync(Discussion toEnd)
+        public async Task EndDiscussionAsync(Discussion toEnd)
         {
             try
             {

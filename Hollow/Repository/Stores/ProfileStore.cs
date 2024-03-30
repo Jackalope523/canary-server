@@ -13,7 +13,7 @@ namespace Repository
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());
 
-        public ProfileStore(Sentry sentry) : base(sentry)
+        public ProfileStore(IDatabaseSentry sentry) : base(sentry)
         {
         }
         

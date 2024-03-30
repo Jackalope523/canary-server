@@ -7,7 +7,7 @@ namespace Repository
 {
     public class NotificationStore : QueryStore, INotificationDatabase
     {
-        public NotificationStore(Sentry sentry) : base(sentry)
+        public NotificationStore(IDatabaseSentry sentry) : base(sentry)
         {
         }
 

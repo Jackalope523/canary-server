@@ -8,7 +8,7 @@ namespace Repository
 {
     public class EventStore : QueryStore, IEventDatabase
     {
-        public EventStore(Sentry sentry) : base(sentry)
+        public EventStore(IDatabaseSentry sentry) : base(sentry)
         {
         }
 

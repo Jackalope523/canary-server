@@ -2,9 +2,9 @@
 {
     public abstract class QueryStore
     {
-        protected Sentry storeSentry;
+        protected IDatabaseSentry storeSentry;
 
-        public QueryStore(Sentry sentry)
+        public QueryStore(IDatabaseSentry sentry)
         {
             storeSentry = sentry;
         }      

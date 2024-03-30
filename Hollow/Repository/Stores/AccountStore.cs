@@ -8,7 +8,7 @@ namespace Repository
 {
     public class AccountStore : QueryStore, IAccountDatabase
     {
-        public AccountStore(Sentry sentry) : base(sentry)
+        public AccountStore(IDatabaseSentry sentry) : base(sentry)
         {
         }
 

@@ -8,7 +8,7 @@ namespace Repository
 {
     public class EtchingStore : QueryStore, IEtchingDatabase
     {   
-        public EtchingStore(Sentry sentry) : base(sentry)
+        public EtchingStore(IDatabaseSentry sentry) : base(sentry)
         {
         }
 

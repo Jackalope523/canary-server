@@ -6,7 +6,7 @@ namespace Repository
 {
     public class DisciplineStore : QueryStore, IDisciplineDatabase
     {
-        public DisciplineStore(Sentry sentry) : base(sentry)
+        public DisciplineStore(IDatabaseSentry sentry) : base(sentry)
         {
         }
 
