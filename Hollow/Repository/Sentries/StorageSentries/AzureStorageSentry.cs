@@ -1,6 +1,8 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
 using Shared;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Repository
 {
@@ -12,7 +14,7 @@ namespace Repository
         {
             storageContext = new AzureStorageContext();
         }
-        public async Task UploadBlobAsync(string containerName, string blobName, byte[] blob)
+        public async Task UploadBlobAsync(string containerName, string blobName, Image image)
         {
             BlobContainerClient containerClient = new(storageContext.GetUri(containerName), new DefaultAzureCredential());
 
@@ -20,8 +22,11 @@ namespace Repository
             {
                 await containerClient.CreateIfNotExistsAsync();
 
-                using (MemoryStream stream = new(blob))
+                using (MemoryStream stream = new())
                 {
+                    image.Save(stream, ImageFormat.Jpeg);
+                    stream.Position = 0;
+
                     await containerClient.UploadBlobAsync(blobName, stream);
                 }
             }
@@ -31,7 +36,7 @@ namespace Repository
             }
         }
 
-        public async Task<byte[]> DownloadBlobAsync(string containerName, string blobName)
+        public async Task<MemoryStream> DownloadBlobAsync(string containerName, string blobName)
         {
             BlobClient blobClient = new(storageContext.GetUri(containerName, blobName), new DefaultAzureCredential());
 
@@ -40,7 +45,8 @@ namespace Repository
                 using (MemoryStream stream = new())
                 {
                     await blobClient.DownloadToAsync(stream);
-                    return stream.ToArray();
+                    stream.Position = 0;
+                    return stream;  
                 }
             }
             catch (Exception ex)

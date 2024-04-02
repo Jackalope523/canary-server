@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using System.Drawing;
+using System.IO;
 
 namespace Core.Boundaries
 {
@@ -8,11 +10,11 @@ namespace Core.Boundaries
 
     #region Gates
 
-    public interface IPhotoDatabase
+    public interface IImageDatabase
     {
-        public Task<byte[]> DownloadPhotoAsync(ulong etchingId, ulong ownerId);
-        public Task UploadPhotoAsync(ulong etchingId, ulong ownerId, byte[] blob);
-        public Task DeletePhotoAsync(ulong etchingId, ulong ownerId);
+        public Task<MemoryStream> DownloadImageAsync(ulong etchingId, ulong ownerId);
+        public Task UploadImageAsync(ulong etchingId, ulong ownerId, Image image);
+        public Task DeleteImageAsync(ulong etchingId, ulong ownerId);
     }
 
     #endregion

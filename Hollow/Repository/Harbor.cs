@@ -14,7 +14,7 @@ namespace Repository
         public IEtchingDatabase EtchingDatabaseAccess { get; private set; }
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
-        public IPhotoDatabase PhotoDatabaseAccess { get; private set; }
+        public IImageDatabase PhotoDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -25,7 +25,7 @@ namespace Repository
             EtchingDatabaseAccess = new EFCoreEtchingStore(flag);
             ReportDatabaseAccess = new EFCoreDisciplineStore(flag);
             AdminDatabaseAccess = new EFCoreAdminStore(flag);
-            PhotoDatabaseAccess = new AzurePhotoStore();
+            PhotoDatabaseAccess = new AzureImageStore();
         }
     }
 }
