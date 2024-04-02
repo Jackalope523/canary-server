@@ -7,7 +7,7 @@ namespace Repository.Tests
     [Collection("Database Collection")]
     public class DisciplineStoreTests : IDisposable
     {
-        private static TestSentry sentry = new TestSentry();
+        private static EFCoreSentry sentry = new(Harbor.Flag.Development);
         private static DisciplineStore store = new DisciplineStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;

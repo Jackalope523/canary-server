@@ -7,7 +7,7 @@ namespace Repository.Tests
     [Collection("Database Collection")]
     public class FeedTests : IDisposable
     {
-        private static AzureSentry sentry = new AzureSentry();
+        private static EFCoreSentry sentry = new StandardSentry();
         private static EtchingStore store = new EtchingStore(sentry);
 
         private readonly ITestOutputHelper _testOutputHelper;

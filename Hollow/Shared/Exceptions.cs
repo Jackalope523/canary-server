@@ -74,18 +74,18 @@ namespace Shared
     #region Repository
 
     [Serializable]
-    public class UndefinedHarborStateException : HollowFailureException
+    public class UnsupportedHarborFlagException : HollowFailureException
     {
-        public UndefinedHarborStateException()
+        public UnsupportedHarborFlagException()
         {
         }
 
-        public UndefinedHarborStateException(string message)
+        public UnsupportedHarborFlagException(string message)
             : base(message)
         {
         }
 
-        public UndefinedHarborStateException(string message, Exception inner)
+        public UnsupportedHarborFlagException(string message, Exception inner)
             : base(message, inner)
         {
         }
@@ -197,6 +197,27 @@ namespace Shared
         {
         }
         public DatabaseReadException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+    [Serializable]
+    public class BlobIOException : HollowFailureException
+    {
+        private static readonly string defaultMessage = "An unexpected error occured while communicating with the blob storage.";
+        public BlobIOException()
+        {
+        }
+
+        public BlobIOException(string message)
+            : base(message)
+        {
+        }
+        public BlobIOException(Exception inner)
+            : base(defaultMessage, inner)
+        {
+        }
+        public BlobIOException(string message, Exception inner)
             : base(message, inner)
         {
         }

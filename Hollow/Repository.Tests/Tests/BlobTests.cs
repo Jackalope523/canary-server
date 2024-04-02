@@ -1,0 +1,55 @@
+﻿
+
+using Azure.Identity;
+using Xunit.Abstractions;
+
+namespace Repository.Tests
+{
+    [Collection("Database Collection")]
+    public class BlobTests : IDisposable
+    {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        private static readonly EFCoreSentry sentry = new();
+
+        public BlobTests(ITestOutputHelper testOutputHelper) 
+        {
+            _testOutputHelper = testOutputHelper;
+
+        }
+        public void Dispose()
+        {
+            
+        }
+
+        [Fact]
+        public async Task UploadBlob_SUCCESS()
+        {
+            await sentry.UploadBlob("testcontainer", "testblob", new byte[1]);
+        }
+
+        [Fact]
+        public async Task DownloadBlobAsync_SUCCESS()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public Task DeleteBlobAsync_SUCCESS()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public Task BlobExistsAsync_SUCCESS()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public Task ListBlobsAsync_SUCCESS()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

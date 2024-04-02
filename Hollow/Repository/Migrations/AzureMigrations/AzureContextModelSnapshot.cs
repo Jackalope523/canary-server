@@ -11,7 +11,7 @@ using Repository;
 
 namespace Repository.Migrations.AzureMigrations
 {
-    [DbContext(typeof(AzureContext))]
+    [DbContext(typeof(AzureSQLContext))]
     partial class AzureContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

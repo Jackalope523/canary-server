@@ -10,7 +10,7 @@ using Repository;
 
 namespace Repository.Migrations.TestMigrations
 {
-    [DbContext(typeof(TestContext))]
+    [DbContext(typeof(SQLiteContext))]
     partial class TestContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

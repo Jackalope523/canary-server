@@ -11,7 +11,7 @@ namespace Repository.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static TestSentry sentry = new();
+        private static EFCoreSentry sentry = new(Harbor.Flag.Development);
         private static NotificationStore store = new NotificationStore(sentry);
 
         private User subject1;

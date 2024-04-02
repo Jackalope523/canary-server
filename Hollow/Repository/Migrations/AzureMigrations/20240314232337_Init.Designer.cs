@@ -12,7 +12,7 @@ using Repository;
 
 namespace Repository.Migrations.AzureMigrations
 {
-    [DbContext(typeof(AzureContext))]
+    [DbContext(typeof(AzureSQLContext))]
     [Migration("20240314232337_Init")]
     partial class Init
     {

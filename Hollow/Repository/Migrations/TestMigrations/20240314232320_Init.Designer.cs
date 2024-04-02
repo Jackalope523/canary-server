@@ -11,7 +11,7 @@ using Repository;
 
 namespace Repository.Migrations.TestMigrations
 {
-    [DbContext(typeof(TestContext))]
+    [DbContext(typeof(SQLiteContext))]
     [Migration("20240314232320_Init")]
     partial class Init
     {

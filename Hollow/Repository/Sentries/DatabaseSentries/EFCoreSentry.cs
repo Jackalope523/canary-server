@@ -1,18 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shared;
+using static Repository.Harbor;
 
 namespace Repository
 {
-    public class TestSentry : IDatabaseSentry
-    {      
-        public TestSentry() 
+    public class EFCoreSentry : IDatabaseSentry
+    {
+        private readonly Func<QueryContext> initializeContext;
+        public EFCoreSentry(Flag flag)
         {
+            switch (flag)
+            {
+                case Flag.Development:
+                    initializeContext = () => new SQLiteContext();
+                    break;
 
+                case Flag.Production:
+                    initializeContext = () => new AzureSQLContext();
+                    break;
+
+                default:
+                    throw new UnsupportedHarborFlagException();
+            }
         }
-
         public static void SeedDatabase()
         {
-            using TestContext context = new();
+            using AzureSQLContext context = new();
 
             UserFactory userFactory = new();
             EventFactory eventFactory = new();
@@ -57,7 +70,7 @@ namespace Repository
 
         public T ExecuteRead<T>(Func<QueryContext, T> read)
         {
-            using (TestContext context = new())
+            using (QueryContext context = initializeContext())
             {
                 try
                 {
@@ -72,12 +85,12 @@ namespace Repository
                 {
                     context.Dispose();
                 }
-            }       
+            }
         }
-        
+
         public void ExecuteWrite(Action<QueryContext> write)
         {
-            using (TestContext context = new())
+            using (QueryContext context = initializeContext())
             {
                 try
                 {
@@ -92,12 +105,12 @@ namespace Repository
                 {
                     context.Dispose();
                 }
-            }   
+            }
         }
 
         public async Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
         {
-            using (TestContext context = new())
+            using (QueryContext context = initializeContext())
             {
                 try
                 {
@@ -112,12 +125,12 @@ namespace Repository
                 {
                     await context.DisposeAsync();
                 }
-            }    
+            }
         }
-   
+
         public async Task ExecuteWriteAsync(Action<QueryContext> write)
         {
-            using (TestContext context = new())
+            using (QueryContext context = initializeContext())
             {
                 try
                 {
@@ -134,9 +147,9 @@ namespace Repository
                 }
             }
         }
-        public async Task ExecuteWriteAsync(Func<QueryContext,Task> write)
+        public async Task ExecuteWriteAsync(Func<QueryContext, Task> write)
         {
-            using (TestContext context = new()) 
+            using (QueryContext context = initializeContext())
             {
                 try
                 {
@@ -156,18 +169,18 @@ namespace Repository
 
         public Discussion BeginDiscussion()
         {
-            return new Discussion(new TestContext());
+            return new Discussion(initializeContext());
         }
 
         public void DiscussWrite(Action<QueryContext> write, Discussion discussion)
         {
             try
-            {           
+            {
                 write.Invoke(discussion.SharedContext);
             }
             catch (Exception ex)
             {
-                discussion.EndNow();          
+                discussion.EndNow();
                 throw new DatabaseWriteException(ex);
             }
         }
@@ -197,3 +210,5 @@ namespace Repository
         }
     }
 }
+
+
