@@ -7,8 +7,8 @@ namespace Repository.Tests
     [Collection("Database Collection")]
     public class FeedTests : IDisposable
     {
-        private static EFCoreSentry sentry = new StandardSentry();
-        private static EtchingStore store = new EtchingStore(sentry);
+        private static EFCoreSentry sentry = new(Harbor.Flag.Development);
+        private static EFCoreEtchingStore store = new(Harbor.Flag.Development);
 
         private readonly ITestOutputHelper _testOutputHelper;
 

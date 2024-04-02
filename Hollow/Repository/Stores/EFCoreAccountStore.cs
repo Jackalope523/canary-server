@@ -6,9 +6,9 @@ using Shared;
 
 namespace Repository
 {
-    public class AccountStore : QueryStore, IAccountDatabase
+    public class EFCoreAccountStore : QueryStore, IAccountDatabase
     {
-        public AccountStore(IDatabaseSentry sentry) : base(sentry)
+        public EFCoreAccountStore(Harbor.Flag flag) : base(flag)
         {
         }
 

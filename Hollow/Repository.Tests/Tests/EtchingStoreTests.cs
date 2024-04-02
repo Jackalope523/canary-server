@@ -8,7 +8,7 @@ namespace Repository.Tests
     public class EtchingStoreTests : IDisposable
     {
         private static EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static EtchingStore etchingStore = new EtchingStore(sentry);
+        private static EFCoreEtchingStore etchingStore = new(Harbor.Flag.Development);
 
         private readonly ITestOutputHelper _testOutputHelper;
 

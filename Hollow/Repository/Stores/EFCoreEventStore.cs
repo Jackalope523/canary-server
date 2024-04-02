@@ -6,9 +6,9 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace Repository
 {
-    public class EventStore : QueryStore, IEventDatabase
+    public class EFCoreEventStore : QueryStore, IEventDatabase
     {
-        public EventStore(IDatabaseSentry sentry) : base(sentry)
+        public EFCoreEventStore(Harbor.Flag flag) : base(flag)
         {
         }
 

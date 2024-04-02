@@ -4,9 +4,9 @@ using Shared;
 
 namespace Repository
 {
-    public class DisciplineStore : QueryStore, IDisciplineDatabase
+    public class EFCoreDisciplineStore : QueryStore, IDisciplineDatabase
     {
-        public DisciplineStore(IDatabaseSentry sentry) : base(sentry)
+        public EFCoreDisciplineStore(Harbor.Flag flag) : base(flag)
         {
         }
 

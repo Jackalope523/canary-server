@@ -8,7 +8,7 @@ namespace Repository
     {
         private readonly AzureStorageContext storageContext;
 
-        public AzureStorageSentry(Harbor.Flag flag)
+        public AzureStorageSentry()
         {
             storageContext = new AzureStorageContext();
         }

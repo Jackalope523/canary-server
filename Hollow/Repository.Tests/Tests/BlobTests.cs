@@ -10,7 +10,7 @@ namespace Repository.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static readonly EFCoreSentry sentry = new();
+        private static readonly AzureStorageSentry sentry = new();
 
         public BlobTests(ITestOutputHelper testOutputHelper) 
         {
@@ -25,7 +25,7 @@ namespace Repository.Tests
         [Fact]
         public async Task UploadBlob_SUCCESS()
         {
-            await sentry.UploadBlob("testcontainer", "testblob", new byte[1]);
+            throw new NotImplementedException();
         }
 
         [Fact]

@@ -18,14 +18,14 @@ namespace Repository
 
         public Harbor(Flag flag)
         {
-            AccountDatabaseAccess = new AccountStore(new EFCoreSentry(flag));
-            ProfileDatabaseAccess = new ProfileStore(new EFCoreSentry(flag));
-            NotificationDatabaseAccess = new NotificationStore(new EFCoreSentry(flag));
-            EventDatabaseAccess = new EventStore(new EFCoreSentry(flag));
-            EtchingDatabaseAccess = new EtchingStore(new EFCoreSentry(flag));
-            ReportDatabaseAccess = new DisciplineStore(new EFCoreSentry(flag));
-            AdminDatabaseAccess = new AdminStore(new EFCoreSentry(flag));
-            PhotoDatabaseAccess = new PhotoStore(new AzureStorageSentry(flag));
+            AccountDatabaseAccess = new EFCoreAccountStore(flag);
+            ProfileDatabaseAccess = new EFCoreProfileStore(flag);
+            NotificationDatabaseAccess = new EFCoreNotificationStore(flag);
+            EventDatabaseAccess = new EFCoreEventStore(flag);
+            EtchingDatabaseAccess = new EFCoreEtchingStore(flag);
+            ReportDatabaseAccess = new EFCoreDisciplineStore(flag);
+            AdminDatabaseAccess = new EFCoreAdminStore(flag);
+            PhotoDatabaseAccess = new AzurePhotoStore();
         }
     }
 }

@@ -4,7 +4,7 @@ using Shared;
 
 namespace Repository
 {
-    public class ProfileStore : QueryStore, IProfileDatabase
+    public class EFCoreProfileStore : QueryStore, IProfileDatabase
     {     
         private static readonly Func<QueryContext, ulong, ulong, UserLink.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
@@ -13,7 +13,7 @@ namespace Repository
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());
 
-        public ProfileStore(IDatabaseSentry sentry) : base(sentry)
+        public EFCoreProfileStore(Harbor.Flag flag) : base(flag)
         {
         }
         

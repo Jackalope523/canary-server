@@ -1,12 +1,13 @@
-﻿namespace Repository
+﻿
+namespace Repository
 {
     public abstract class QueryStore
     {
         protected IDatabaseSentry storeSentry;
 
-        public QueryStore(IDatabaseSentry sentry)
+        public QueryStore(Harbor.Flag flag)
         {
-            storeSentry = sentry;
+            storeSentry = new EFCoreSentry(flag);
         }      
     }
 }

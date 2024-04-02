@@ -1,15 +1,14 @@
 ﻿using Core.Boundaries;
-using Shared;
 
 namespace Repository
 {
-    internal class PhotoStore : IPhotoDatabase
+    internal class AzurePhotoStore : IPhotoDatabase
     {
         private IStorageSentry sentry;
 
-        public PhotoStore(IStorageSentry sentry)
+        public AzurePhotoStore()
         {
-            this.sentry = sentry;
+            sentry = new AzureStorageSentry();
         }
         
         public async Task<byte[]> DownloadPhotoAsync(ulong etchingId, ulong ownerId)

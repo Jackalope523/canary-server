@@ -10,7 +10,7 @@ namespace Repository.Tests
     public class ProfileStoreTests : IDisposable
     {
         private static EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static ProfileStore profileStore = new ProfileStore(sentry);
+        private static EFCoreProfileStore profileStore = new(Harbor.Flag.Development);
 
         private readonly ITestOutputHelper _testOutputHelper;
 

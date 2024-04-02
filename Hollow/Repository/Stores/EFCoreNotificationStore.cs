@@ -5,9 +5,9 @@ using Shared;
 
 namespace Repository
 {
-    public class NotificationStore : QueryStore, INotificationDatabase
+    public class EFCoreNotificationStore : QueryStore, INotificationDatabase
     {
-        public NotificationStore(IDatabaseSentry sentry) : base(sentry)
+        public EFCoreNotificationStore(Harbor.Flag flag) : base(flag)
         {
         }
 

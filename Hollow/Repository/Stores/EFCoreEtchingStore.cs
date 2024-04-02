@@ -6,9 +6,9 @@ using System;
 
 namespace Repository
 {
-    public class EtchingStore : QueryStore, IEtchingDatabase
+    public class EFCoreEtchingStore : QueryStore, IEtchingDatabase
     {   
-        public EtchingStore(IDatabaseSentry sentry) : base(sentry)
+        public EFCoreEtchingStore(Harbor.Flag flag) : base(flag)
         {
         }
 

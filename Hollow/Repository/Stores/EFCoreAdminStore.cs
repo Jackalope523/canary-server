@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Repository
 {
-    public class AdminStore : QueryStore, IAdminDatabase
+    public class EFCoreAdminStore : QueryStore, IAdminDatabase
     {
-        public AdminStore(IDatabaseSentry sentry) : base(sentry)
+        public EFCoreAdminStore(Harbor.Flag flag) : base(flag)
         {
 
         }
