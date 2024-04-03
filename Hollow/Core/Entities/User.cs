@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Shared;
 
 using static Core.Entities.Psijic;
+using static Core.Entities.Arbiter;
 
 namespace Core.Entities
 {
@@ -332,6 +333,21 @@ namespace Core.Entities
 			{ return false; }
 
 			return true;
+		}
+
+        public async Task CanEtch(Event @event)
+		{
+			// Verify etching is not before event starting or user is host
+			Try(HasAlready(@event.StartTime) || @event.IsModifiableBy(this),
+				new InvalidEventException("Event has yet to start."));
+
+			// Verify user can etch into the event
+			Try(await @event.WasAttendedBy(this) || @event.IsModifiableBy(this),
+				new InvalidEventException("User did not attend event."));
+
+			// Verify etching is added before event is closed
+			Try(@event.IsActive,
+				new InvalidEventException("Event has already ended."));
 		}
 
 		public bool Etched(Etching etching)

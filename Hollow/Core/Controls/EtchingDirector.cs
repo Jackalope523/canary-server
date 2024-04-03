@@ -42,7 +42,7 @@ namespace Core.Controls
             var user = await userSync;
             var targetEvent = await targetEventSync;
 
-            await targetEvent.Etched(user);
+            await user.CanEtch(targetEvent);
 
             // Try to etch
             var etching = await Etchings.AddEtchingAsync(targetEvent.Id, user.Id, Time);
