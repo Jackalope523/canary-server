@@ -11,6 +11,7 @@ import ExclusiveButtonView from '../../components/ExclusiveButtonView';
 
 // Sample data
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
+import EventCardLarge from '../../components/EventCardLarge';
 
 const ActivityScreen = () => {
   return (
@@ -26,6 +27,9 @@ const ActivityScreen = () => {
           Hey, User!
         </Text>
       </View>
+      {/* TODO REMOVE THIS LATER */}
+      <EventCardLarge />
+
       {/* --- FILTER --- */}
       {/* TODO first filter button ("All") has to be set as selected/active on default */}
 
