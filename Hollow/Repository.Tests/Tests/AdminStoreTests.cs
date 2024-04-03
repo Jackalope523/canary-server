@@ -9,7 +9,7 @@ namespace Repository.Tests
         private readonly ITestOutputHelper _testOutputHelper;
 
         private static readonly EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static readonly EFCoreAdminStore store = new(Harbor.Flag.Development);
+        private static readonly AdminStoreCoordinator store = new(Harbor.Flag.Development);
 
         private User subject;
 
