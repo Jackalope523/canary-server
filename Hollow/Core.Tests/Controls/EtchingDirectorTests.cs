@@ -74,15 +74,17 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateOngoingEventAsync(host, guest);
-			string etchingImageURL = "https://cdn.sparrow.com/0";
+			byte[] image = { byte.MinValue, 0, 1, 3, byte.MaxValue, 7, 8 };
 
 			// Act
-			await director.AddEtchingAsync(guest.Id, @event.Id, etchingImageURL);
+			await director.AddEtchingAsync(guest.Id, @event.Id, new(image));
 
 			// Assert
 			var serverEtchings = await director.GetEventEtchingsAsync(guest.Id, @event.Id);
 			Assert.Single(serverEtchings);
-			Assert.Equal(etchingImageURL, serverEtchings[0].ImageURL);
+
+			var etching = serverEtchings[0];
+			Assert.Equal(image, (await environment.Terminal.MediaDatabase.DownloadImageAsync(etching.Id, guest.Id)).ToArray());
 		}
 
 		[Fact]
@@ -92,10 +94,9 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			string etchingImageURL = "https://cdn.sparrow.com/0";
 
 			// Act
-			var addEtchingSync = director.AddEtchingAsync(sneakyUser.Id, @event.Id, etchingImageURL);
+			var addEtchingSync = director.AddEtchingAsync(sneakyUser.Id, @event.Id, new(0));
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await addEtchingSync);

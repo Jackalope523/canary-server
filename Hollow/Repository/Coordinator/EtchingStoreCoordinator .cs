@@ -13,9 +13,9 @@ namespace Repository
             store = new EFCoreEtchingStore(flag);
         }
 
-        public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted, string imageURL)
+        public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted)
         { 
-             return await store.AddEtchingAsync(eventId, posterId, timePosted, imageURL);  
+             return await store.AddEtchingAsync(eventId, posterId, timePosted);  
         }
 
         public async Task<List<Etching>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)

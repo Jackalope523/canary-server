@@ -44,7 +44,6 @@ namespace Core.Tests
 		private bool testEventIsDynamic = false;
 
 		private DateTimeOffset testEtchingTime = new(DateTime.UtcNow);
-		private string testEtchingImageURL = "https://cdn.sparrow.com/101";
 
 		/////
 		// Set-up
@@ -284,17 +283,17 @@ namespace Core.Tests
 
 		internal async Task<Etching> GenerateEtchingAsync(Event etchedEvent, User etcher)
 		{
-			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime, testEtchingImageURL);
+			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime);
 		}
 
 		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, Etching etching)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, etching.TimeEtched, etching.ImageURL);
+			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, etching.TimeEtched);
 		}
 
-		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched, string imageURL)
+		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched, imageURL);
+			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched);
 		}
 
 		///////////

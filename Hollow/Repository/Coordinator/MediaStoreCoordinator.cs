@@ -2,9 +2,9 @@
 
 namespace Repository
 {
-    internal class MediaStoreCoordinator: IImageDatabase
+    internal class MediaStoreCoordinator: IMediaDatabase
     {
-        private readonly IImageDatabase store;
+        private readonly IMediaDatabase store;
 
         public MediaStoreCoordinator()
         {
