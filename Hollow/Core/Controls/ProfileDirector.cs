@@ -11,7 +11,7 @@ using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
-	internal class ProfileDirector : AbstractDirector, IProfileOperations
+    internal class ProfileDirector : AbstractDirector, IProfileOperations
 	{
 		#region Initialisation
 

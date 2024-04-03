@@ -15,7 +15,7 @@ using static Core.Entities.Psijic;
 
 namespace Core.Controls
 {
-	internal class EventDirector : AbstractDirector, IEventOperations
+    internal class EventDirector : AbstractDirector, IEventOperations
 	{
 		#region Initialisation
 

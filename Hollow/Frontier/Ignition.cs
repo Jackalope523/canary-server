@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 using Repository;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Core;
 
 namespace Frontier
 {
@@ -90,12 +91,13 @@ namespace Frontier
 
 			CoreTerminal terminal = CoreTerminal.CreateTerminal(
 				harbor.AccountDatabaseAccess,
+				harbor.AdminDatabaseAccess,
 				harbor.EventDatabaseAccess, 
 				harbor.EtchingDatabaseAccess,
-				harbor.ProfileDatabaseAccess, 
 				harbor.ReportDatabaseAccess,
+				harbor.PhotoDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
-				harbor.AdminDatabaseAccess,
+				harbor.ProfileDatabaseAccess, 
 				pushNotifications);
 
 			foreach (var (GateType, Instance) in terminal.Gates)

@@ -11,7 +11,7 @@ using static Core.Entities.Psijic;
 
 namespace Core.Controls
 {
-	internal class EtchingDirector : AbstractDirector, IEtchingOperations
+    internal class EtchingDirector : AbstractDirector, IEtchingOperations
 	{
 		#region Initialisation
 
