@@ -18,6 +18,7 @@ import Animated, {
 import MaskedView from '@react-native-masked-view/masked-view';
 import { navigationStyles } from '../styles/NavigationStyles';
 import { globalStyles } from '../styles/GlobalStyles';
+import { FlagStyles } from '../styles/FlagStyles';
 
 /* --- DEV NOTES --- */
 /*
@@ -93,37 +94,37 @@ const HeaderFlagHost: React.FC<Props> = ({
 
   switch (previousType) {
     case HPType.StartingLate:
-      previousTypeStyle = [styles.flagStartingLate];
+      previousTypeStyle = [FlagStyles.startingLate];
       break;
 
     case HPType.StartingSoon:
-      previousTypeStyle = [styles.flagStartingSoon];
+      previousTypeStyle = [FlagStyles.startingSoon];
       break;
 
     case HPType.Live:
-      previousTypeStyle = [styles.flagLive];
+      previousTypeStyle = [FlagStyles.live];
       break;
 
     case HPType.Terminated:
-      previousTypeStyle = [styles.flagTerminated];
+      previousTypeStyle = [FlagStyles.terminated];
       break;
   }
 
   switch (nextType) {
     case HNType.StartingLate:
-      nextTypeStyle = [styles.flagStartingLate];
+      nextTypeStyle = [FlagStyles.startingLate];
       break;
 
     case HNType.StartingSoon:
-      nextTypeStyle = [styles.flagStartingSoon];
+      nextTypeStyle = [FlagStyles.startingSoon];
       break;
 
     case HNType.Live:
-      nextTypeStyle = [styles.flagLive];
+      nextTypeStyle = [FlagStyles.live];
       break;
 
     case HNType.Terminated:
-      nextTypeStyle = [styles.flagTerminated];
+      nextTypeStyle = [FlagStyles.terminated];
       break;
   }
 
@@ -234,22 +235,5 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 24,
     paddingVertical: 16,
-  },
-
-  // Flag types
-  flagStartingLate: {
-    backgroundColor: Colors.azure400,
-  },
-
-  flagStartingSoon: {
-    backgroundColor: Colors.orange400,
-  },
-
-  flagLive: {
-    backgroundColor: Colors.green400,
-  },
-
-  flagTerminated: {
-    backgroundColor: Colors.red400,
   },
 });

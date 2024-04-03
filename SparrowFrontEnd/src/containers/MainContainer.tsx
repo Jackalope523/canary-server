@@ -40,9 +40,16 @@ import DiscoveryScreen from '../flows/discovery/Discovery';
 import FeedScreen from '../flows/feed/Feed';
 import DiscoverySearchScreen from '../flows/discovery/DiscoverySearch';
 import NotificationsScreen from '../flows/activity/Notifications';
-import AccountScreen from '../flows/profile/Account';
 import ProfileScreen from '../flows/profile/Profile';
 import TestScreen from '../flows/testing/Testing';
+
+// Event
+import EventScreen from '../flows/event/Event';
+import TerminateEventScreen from '../flows/event/host/TerminateEvent';
+import LeaveEventScreen from '../flows/event/LeaveEvent';
+import HostEventControlsScreen from '../flows/event/host/HostEventControls';
+import ManageAttendeesScreen from '../flows/event/host/ManageAttendees';
+import ShareScreen from '../flows/event/Share';
 
 // Icons
 import ActivityIconRest from '../assets/icons/activity-fill.svg';
@@ -55,7 +62,6 @@ import DiscoveryIconSelected from '../assets/icons/discovery-fill.svg';
 import FeedIconSelected from '../assets/icons/feed-outline-v2.svg';
 import ProfileIconSelected from '../assets/icons/account-fill.svg';
 
-// More imports
 import {
   BottomTabParamList,
   StackParamList,
@@ -65,24 +71,23 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // TODO setup top navbars for all necessary screens
-// TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
-
-// v1.0.1
+import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
 
 const AppStack = createStackNavigator<AppStackParamList>();
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 const ActivityStack = createStackNavigator();
 const AccountStack = createStackNavigator();
+const EventStack = createStackNavigator();
 
 function MainContainer() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Main"
+          initialRouteName="Event"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
@@ -91,8 +96,9 @@ function MainContainer() {
           <AppStack.Screen name="Survey" component={Survey} />
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
+          <AppStack.Screen name="Event" component={Event} />
 
-          <AppStack.Screen name="Testing" component={TestScreen} />
+          <AppStack.Screen name="Testing" component={ShareScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
@@ -193,38 +199,17 @@ function ActivityStackScreen() {
     <ActivityStack.Navigator
       screenOptions={() => ({
         headerShown: false,
-
         cardStyle: styles.cardContainer,
-
         headerTitleStyle: {
           fontSize: 16,
           color: Colors.sparrowDark,
         },
-
-        // headerTitleContainerStyle: {
-        //     marginHorizontal: 24,
-        // },
-
-        // headerLeftContainerStyle: {
-        //     marginLeft: 0,
-        // },
-
         headerStyle: {
           height: 50,
           backgroundColor: Colors.sparrowSand,
           borderBottomColor: Colors.sparrowDarkBrown,
           borderBottomWidth: 2,
         },
-
-        // headerLeftContainerStyle: {
-        //     marginLeft: 24,
-        // },
-
-        // headerLeftContainerStyle: {
-        //     backgroundColor: Colors.red400,
-        //     // marginHorizontal: 16, // between btn and title
-        //     // left: 24, // moves ONLY btn from left, absolute
-        // },
       })}>
       <ActivityStack.Screen name="Activity" component={ActivityScreen} />
       <ActivityStack.Screen
@@ -243,15 +228,40 @@ function Account() {
         headerShown: true,
         cardStyle: styles.cardContainer,
       }}>
-      <AccountStack.Screen name="Account" component={AccountScreen} />
+      <AccountStack.Screen name="Profile" component={ProfileScreen} />
     </AccountStack.Navigator>
+  );
+}
+
+function Event() {
+  return (
+    <EventStack.Navigator
+      initialRouteName="Event"
+      screenOptions={{
+        headerShown: false,
+        cardStyle: styles.cardContainer,
+      }}>
+      <EventStack.Screen name="Event" component={EventScreen} />
+      <EventStack.Screen name="Share" component={ShareScreen} />
+      <EventStack.Screen name="LeaveEvent" component={LeaveEventScreen} />
+      <EventStack.Screen
+        name="TerminateEvent"
+        component={TerminateEventScreen}
+      />
+      <EventStack.Screen
+        name="ManageAttendees"
+        component={ManageAttendeesScreen}
+      />
+      <EventStack.Screen
+        name="HostEventControls"
+        component={HostEventControlsScreen}
+      />
+    </EventStack.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: Colors.sparrowSand,
-    // TESTING ONLY
-    // backgroundColor: Colors.fuchsia300,
   },
 });

@@ -20,7 +20,7 @@ import Button, {
   ButtonDisplay,
 } from '../../components/Button';
 import EventCardMedium from '../../components/EventCardMedium';
-import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
+import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import SearchFilter from '../../components/organisms/SearchFilter';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {

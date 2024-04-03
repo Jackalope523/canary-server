@@ -9,13 +9,8 @@ import { Gap, Spacing } from '../styles/SpacingStyles';
 import { buttonStyles } from '../styles/ButtonStyles';
 import { globalStyles } from '../styles/GlobalStyles';
 
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Colors } from '../styles/ColorStyles';
-
-const Icon = createIconSetFromFontello(fontelloConfig);
 
 // Types
 interface ButtonGroupProps {

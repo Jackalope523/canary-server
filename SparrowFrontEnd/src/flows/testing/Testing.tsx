@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Spacing } from '../../styles/SpacingStyles';
@@ -20,13 +20,28 @@ import HeaderEditTitled from '../../components/HeaderEditTitled';
 import HeaderOptions from '../../components/HeaderOptions';
 import Button from '../../components/Button';
 
-// Icon
 import ImportedIcon from '../../assets/icons/favorite-fill.svg';
 import ButtonGroup from '../../components/ButtonGroup';
+import FlagMedium, { FlagType } from '../../components/FlagMedium';
+import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
+
+import Post from '../../components/feed/Post';
+import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
+import dropdownOptionsPost from '../../components/DropdownOptionsPost';
+import avatarimg from '../../assets/images/temp/host-img-1.jpg';
+import EventCardSmall from '../../components/EventCardSmall';
+
+import testImage from '../../assets/images/temp/event-img-11.jpg';
+
+import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
+import Gallery from '../../components/Gallery';
+import OtherUserProfileScreen from '../otherUserProfile/OtherUserProfile';
 
 const TestScreen = () => {
+  const upcomingEventData = SAMPLEEVENTDATA.find((event) => event.id === '2');
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text
           style={[
@@ -40,24 +55,26 @@ const TestScreen = () => {
 
       {/* --- START TESTING CODE BELOW --- */}
 
-      <Button
-        type={ButtonType.Warning}
-        size={ButtonSize.Medium}
-        display={ButtonDisplay.Full}
-        text="Example"
-        Icon={ImportedIcon}
-        displayIcon={true}
-      />
+      {/* <Gallery />
 
-      {/* <HeaderOptions title="Options" />
-      <HeaderEditTitled title="Selected titled" />
-      <HeaderDefaultTitled title="Testing" />
-      <HeaderFlagAttendee
+        <EventCardSmall
+          eventHeroImage={upcomingEventData?.uri}
+          eventTitle={upcomingEventData?.title}
+          eventDate={upcomingEventData?.date}
+          eventTime={upcomingEventData?.time}
+          eventLocation={upcomingEventData?.location}
+          eventAttendees={upcomingEventData?.attendees}
+          onPress={() => console.log('Event card image pressed')}
+        /> */}
+
+      <OtherUserProfileScreen />
+
+      {/* <HeaderFlagAttendee
         title="Attendee header"
         previousType={APType.StartingSoon}
         nextType={ANType.Live}
-      />
-      <HeaderFlagHost
+      /> */}
+      {/* <HeaderFlagHost
         title="Host header"
         previousType={HPType.StartingSoon}
         nextType={HNType.Live}
@@ -70,7 +87,7 @@ const TestScreen = () => {
         size={ButtonSize.Medium}
         display={ButtonDisplay.Contained}
       /> */}
-    </View>
+    </ScrollView>
   );
 };
 

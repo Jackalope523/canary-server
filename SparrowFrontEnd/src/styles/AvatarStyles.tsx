@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from './ColorStyles';
 
+// TODO move these styles to components -> Avatar.tsx after implementing Avatar component in Activity -> Notifications
+
 export const avatarStyles = StyleSheet.create({
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Avatars                                    ||
