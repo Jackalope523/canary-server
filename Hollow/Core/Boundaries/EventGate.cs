@@ -68,8 +68,7 @@ namespace Core.Boundaries
 		Task JoinEventAsync(ulong userId, ulong eventId);
 		Task LeaveEventAsync(ulong userId, ulong eventId);
 
-		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)>
-			GetGuestListAsync(ulong userId, ulong eventId);
+		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)> GetGuestListAsync(ulong userId, ulong eventId);
 		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId);
 		Task KickUserAsync(ulong hostId, ulong targetId, ulong eventId);

@@ -1,5 +1,4 @@
 ﻿using Core.Boundaries;
-using Shared;
 
 namespace Repository
 {
@@ -18,14 +17,14 @@ namespace Repository
 
         public Harbor(Flag flag)
         {
-            AccountDatabaseAccess = new EFCoreAccountStore(flag);
-            ProfileDatabaseAccess = new EFCoreProfileStore(flag);
-            NotificationDatabaseAccess = new EFCoreNotificationStore(flag);
-            EventDatabaseAccess = new EFCoreEventStore(flag);
-            EtchingDatabaseAccess = new EFCoreEtchingStore(flag);
-            ReportDatabaseAccess = new EFCoreDisciplineStore(flag);
-            AdminDatabaseAccess = new EFCoreAdminStore(flag);
-            PhotoDatabaseAccess = new AzureImageStore();
+            AccountDatabaseAccess = new AccountStoreCoordinator(flag);
+            ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
+            NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
+            EventDatabaseAccess = new EventStoreCoordinator(flag);
+            EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
+            ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
+            AdminDatabaseAccess = new AdminStoreCoordinator(flag);
+            PhotoDatabaseAccess = new MediaStoreCoordinator();
         }
     }
 }

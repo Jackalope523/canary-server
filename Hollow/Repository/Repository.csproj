@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\TestDBMigrations\**" />
+    <Compile Remove="Databases\EFCore\Migrations\TestDBMigrations\**" />
     <Compile Remove="TestDBMigrations\**" />
-    <EmbeddedResource Remove="Migrations\TestDBMigrations\**" />
+    <EmbeddedResource Remove="Databases\EFCore\Migrations\TestDBMigrations\**" />
     <EmbeddedResource Remove="TestDBMigrations\**" />
-    <None Remove="Migrations\TestDBMigrations\**" />
+    <None Remove="Databases\EFCore\Migrations\TestDBMigrations\**" />
     <None Remove="TestDBMigrations\**" />
   </ItemGroup>
 
@@ -41,9 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
-    <Folder Include="Migrations\AzureMigrations\" />
-    <Folder Include="Migrations\TestMigrations\" />
+    <Folder Include="Databases\EFCore\Migrations\" />
   </ItemGroup>
 
 </Project>
