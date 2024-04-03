@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 using Repository;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Core;
 
 namespace Frontier
 {

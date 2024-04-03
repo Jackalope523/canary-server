@@ -9,7 +9,7 @@ using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
-	internal abstract class AbstractDirector
+    internal abstract class AbstractDirector
 	{
 		#region Variables
 

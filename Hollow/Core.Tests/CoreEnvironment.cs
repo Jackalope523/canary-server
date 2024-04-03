@@ -19,7 +19,7 @@ using System.Timers;
 
 namespace Core.Tests
 {
-	public class CoreEnvironment
+    public class CoreEnvironment
 	{
 		public CoreTerminal Terminal;
 
