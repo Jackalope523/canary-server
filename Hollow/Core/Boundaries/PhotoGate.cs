@@ -13,7 +13,7 @@ namespace Core.Boundaries
     public interface IImageDatabase
     {
         public Task<MemoryStream> DownloadImageAsync(ulong etchingId, ulong ownerId);
-        public Task UploadImageAsync(ulong etchingId, ulong ownerId, Image image);
+        public Task UploadImageAsync(ulong etchingId, ulong ownerId, MemoryStream image);
         public Task DeleteImageAsync(ulong etchingId, ulong ownerId);
     }
 

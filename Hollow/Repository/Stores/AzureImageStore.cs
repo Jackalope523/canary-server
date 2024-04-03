@@ -17,7 +17,7 @@ namespace Repository
             return await sentry.DownloadBlobAsync(ownerId.ToString(), etchingId.ToString());
         }
 
-        public async Task UploadImageAsync(ulong etchingId, ulong ownerId, Image image)
+        public async Task UploadImageAsync(ulong etchingId, ulong ownerId, MemoryStream image)
         {
             await sentry.UploadBlobAsync(ownerId.ToString(), etchingId.ToString(), image);
         }

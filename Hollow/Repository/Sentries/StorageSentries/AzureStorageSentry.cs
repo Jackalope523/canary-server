@@ -1,8 +1,6 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
 using Shared;
-using System.Drawing;
-using System.Drawing.Imaging;
 
 namespace Repository
 {
@@ -14,7 +12,7 @@ namespace Repository
         {
             storageContext = new AzureStorageContext();
         }
-        public async Task UploadBlobAsync(string containerName, string blobName, Image image)
+        public async Task UploadBlobAsync(string containerName, string blobName, MemoryStream stream)
         {
             BlobContainerClient containerClient = new(storageContext.GetUri(containerName), new DefaultAzureCredential());
 
@@ -22,13 +20,8 @@ namespace Repository
             {
                 await containerClient.CreateIfNotExistsAsync();
 
-                using (MemoryStream stream = new())
-                {
-                    image.Save(stream, ImageFormat.Jpeg);
-                    stream.Position = 0;
-
-                    await containerClient.UploadBlobAsync(blobName, stream);
-                }
+                stream.Position = 0;
+                await containerClient.UploadBlobAsync(blobName, stream);
             }
             catch (Exception ex)
             {
@@ -39,19 +32,20 @@ namespace Repository
         public async Task<MemoryStream> DownloadBlobAsync(string containerName, string blobName)
         {
             BlobClient blobClient = new(storageContext.GetUri(containerName, blobName), new DefaultAzureCredential());
-
+            MemoryStream stream = new MemoryStream();
             try
             {
-                using (MemoryStream stream = new())
-                {
-                    await blobClient.DownloadToAsync(stream);
-                    stream.Position = 0;
-                    return stream;  
-                }
+                await blobClient.DownloadToAsync(stream);
+                stream.Position = 0;
+                return stream;
             }
             catch (Exception ex)
             {
                 throw new BlobIOException(ex);
+            }
+            finally
+            {
+                stream.Dispose();
             }
         }
 
