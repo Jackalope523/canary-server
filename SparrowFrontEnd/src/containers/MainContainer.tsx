@@ -5,9 +5,9 @@ import { Colors } from '../styles/ColorStyles';
 import { globalStyles } from '../styles/GlobalStyles';
 
 // Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../config.json';
-const Icon = createIconSetFromFontello(fontelloConfig);
+// import { createIconSetFromFontello } from 'react-native-vector-icons';
+// import fontelloConfig from '../config.json';
+// const Icon = createIconSetFromFontello(fontelloConfig);
 
 // Navigation
 import { NavigationContainer } from '@react-navigation/native';
@@ -44,6 +44,17 @@ import AccountScreen from '../flows/profile/Account';
 import ProfileScreen from '../flows/profile/Profile';
 import TestScreen from '../flows/testing/Testing';
 
+// Icons
+import ActivityIconRest from '../assets/icons/activity-fill.svg';
+import DiscoveryIconRest from '../assets/icons/discovery-fill.svg';
+import FeedIconRest from '../assets/icons/feed-outline-v2.svg';
+import ProfileIconRest from '../assets/icons/account-fill.svg';
+
+import ActivityIconSelected from '../assets/icons/activity-fill.svg';
+import DiscoveryIconSelected from '../assets/icons/discovery-fill.svg';
+import FeedIconSelected from '../assets/icons/feed-outline-v2.svg';
+import ProfileIconSelected from '../assets/icons/account-fill.svg';
+
 // More imports
 import {
   BottomTabParamList,
@@ -66,14 +77,12 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 const ActivityStack = createStackNavigator();
 const AccountStack = createStackNavigator();
 
-// TODO change initialRouteName back to Auth when finished with Survey
-
 function MainContainer() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Testing"
+          initialRouteName="Main"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
@@ -130,34 +139,29 @@ function Survey() {
 
 // TODO If possible, set the tab navigator horizontal margin to 24, probably with tabBarStyle
 
-function Main() {
+interface IconProps {
+  Icon: React.FC<any>;
+}
+
+function Main({ Icon }: IconProps) {
   return (
     <Tab.Navigator
       sceneContainerStyle={globalStyles.mainContainer}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color }) => {
-          let iconName;
           let rn = route.name;
 
           if (rn === 'Activity') {
-            iconName = focused ? 'activity-fill' : 'activity-fill';
+            Icon = focused ? ActivityIconSelected : ActivityIconRest;
           } else if (rn === 'Discovery') {
-            iconName = focused ? 'discovery-fill' : 'discovery-fill';
+            Icon = focused ? DiscoveryIconSelected : DiscoveryIconRest;
           } else if (rn === 'Feed') {
-            iconName = focused ? 'feed-fill' : 'feed-fill';
+            Icon = focused ? FeedIconSelected : FeedIconRest;
           } else if (rn === 'Profile') {
-            iconName = focused ? 'account-fill' : 'account-fill';
+            Icon = focused ? ProfileIconSelected : ProfileIconRest;
           }
 
-          return (
-            <Icon
-              name={iconName}
-              size={40}
-              height={40}
-              width={40}
-              color={color}
-            />
-          );
+          return <Icon height={40} width={40} fill={color} />;
         },
 
         tabBarActiveTintColor: Colors.sparrowRed,

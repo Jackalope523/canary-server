@@ -18,6 +18,11 @@ import HeaderFlagHost, {
 } from '../../components/HeaderFlagHost';
 import HeaderEditTitled from '../../components/HeaderEditTitled';
 import HeaderOptions from '../../components/HeaderOptions';
+import Button from '../../components/Button';
+
+// Icon
+import ImportedIcon from '../../assets/icons/favorite-fill.svg';
+import ButtonGroup from '../../components/ButtonGroup';
 
 const TestScreen = () => {
   return (
@@ -35,7 +40,16 @@ const TestScreen = () => {
 
       {/* --- START TESTING CODE BELOW --- */}
 
-      <HeaderOptions title="Options" />
+      <Button
+        type={ButtonType.Warning}
+        size={ButtonSize.Medium}
+        display={ButtonDisplay.Full}
+        text="Example"
+        Icon={ImportedIcon}
+        displayIcon={true}
+      />
+
+      {/* <HeaderOptions title="Options" />
       <HeaderEditTitled title="Selected titled" />
       <HeaderDefaultTitled title="Testing" />
       <HeaderFlagAttendee
@@ -47,15 +61,15 @@ const TestScreen = () => {
         title="Host header"
         previousType={HPType.StartingSoon}
         nextType={HNType.Live}
-      />
+      /> */}
 
       {/* <Header4 previousType={PType.StartingSoon} nextType={NType.Live} /> */}
-      <Button2
+      {/* <Button2
         text="Example button"
         type={ButtonType.Success}
         size={ButtonSize.Medium}
         display={ButtonDisplay.Contained}
-      />
+      /> */}
     </View>
   );
 };

@@ -52,11 +52,6 @@ export const cardStyles = StyleSheet.create({
     flexShrink: 1,
   },
 
-  // TODO check if works, when implementing SVG's instead of icon fonts
-  eventCardMediumIcon: {
-    color: Colors.sparrowDarkBrown,
-  },
-
   // If textWrapper text exceeds 2 lines, align items to flex-start
   eventCardMediumTextWrapperCenter: {
     alignItems: 'center',

@@ -1,19 +1,17 @@
 import { View } from 'react-native';
 import * as React from 'react';
-
-// Icons font
-import { createIconSetFromFontello } from 'react-native-vector-icons';
-import fontelloConfig from '../../config.json';
 import { navigationStyles } from '../../styles/NavigationStyles';
 
-const Icon = createIconSetFromFontello(fontelloConfig);
+// Icons
+import ArrowBack from '../../assets/icons/arrow-back-outline.svg';
+import KebabFill from '../../assets/icons/kebab-fill.svg';
 
 const TopNavbarOptions = () => {
   return (
     <View
       style={[navigationStyles.topNavbar, navigationStyles.topNavbarOptions]}>
-      <Icon style={navigationStyles.topNavbarIcon} name="arrow-back-outline" />
-      <Icon style={navigationStyles.topNavbarIcon} name="kebab-fill" />
+      <ArrowBack width={24} height={24} fill={Colors.sparrowDarkBrown} />
+      <KebabFill width={24} height={24} fill={Colors.sparrowDarkBrown} />
     </View>
   );
 };

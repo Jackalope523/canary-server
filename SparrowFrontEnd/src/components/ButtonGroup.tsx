@@ -13,6 +13,7 @@ import { globalStyles } from '../styles/GlobalStyles';
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../config.json';
 import { ScrollView } from 'react-native-gesture-handler';
+import { Colors } from '../styles/ColorStyles';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
@@ -22,13 +23,14 @@ interface ButtonGroupProps {
   onSelect: (item: string | GestureResponderEvent) => void;
 
   buttonText: string[];
-  icon?: string | false;
+  // icon?: string | false;
+  displayIcon: boolean;
 }
 
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   onSelect,
   buttonText,
-  icon = false,
+  displayIcon = false,
 }) => {
   const [selectedId, setSelectedId] = React.useState(0);
 
@@ -63,7 +65,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
                     Gap.gapMedium,
                   ]
             }>
-            {icon && (
+            {/* {displayIcon && (
               <Icon
                 name={icon}
                 size={24}
@@ -73,6 +75,17 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
                   index === selectedId
                     ? globalStyles.textLight
                     : globalStyles.textDark
+                }
+              />
+            )} */}
+            {displayIcon && (
+              <Icon
+                height={24}
+                width={24}
+                fill={
+                  index === selectedId
+                    ? Colors.sparrowSand
+                    : Colors.sparrowDarkBrown
                 }
               />
             )}
