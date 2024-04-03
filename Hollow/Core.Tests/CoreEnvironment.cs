@@ -59,12 +59,13 @@ namespace Core.Tests
 
             Terminal = CoreTerminal.CreateTerminal(
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
+				harbor.AdminDatabaseAccess,
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
-                harbor.ProfileDatabaseAccess,
                 harbor.ReportDatabaseAccess,
+                harbor.PhotoDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
-				harbor.AdminDatabaseAccess,
+                harbor.ProfileDatabaseAccess,
 				new NotificationServiceStub());
 		}
 

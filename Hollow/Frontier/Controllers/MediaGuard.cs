@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
+using System.Collections.Generic;
 
 namespace Frontier.Controllers
 {
-    [Route("feed")]
-    public class FeedGuard : AbstractGuard
-    {
+	[Route("media")]
+	public class MediaGuard : AbstractGuard
+	{
 		#region Initialisation
 
-		public FeedGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public MediaGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
@@ -31,19 +30,21 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{depth}-{lastDepth}")]
-        public async Task<IActionResult> GetFeed(int depth, int lastDepth)
-        {
-			// Verify parameters
-            if (!ModelState.IsValid)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
-
+		[HttpGet("{etchingId}")]
+		public async Task<IActionResult> GetImage(ulong etchingId)
+		{
 			return await Execute(async user =>
 			{
-				var userFeed = await etchings.GetUserFeedAsync(user.Id, depth, lastDepth);
+				var image = await media.GetImageStreamAsync(user.Id, etchingId);
 
-				return Ok(userFeed);
+				return Ok(image);
 			});
+        }
+
+		[HttpPost("{etchingId}")]
+		public async Task<IActionResult> UploadImage(ulong etchingId)
+		{
+			return await Execute(async user => await media.UploadImageAsync(user.Id, etchingId, await StreamFirstFile()));
         }
 
 		#endregion
