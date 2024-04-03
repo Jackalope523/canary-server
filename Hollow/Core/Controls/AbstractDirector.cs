@@ -18,9 +18,10 @@ namespace Core.Controls
 		protected IAccountDatabase Accounts { get; private set; }
 		protected IEventDatabase Events { get; private set; }
 		protected IEtchingDatabase Etchings { get; private set; }
-		protected IProfileDatabase Profiles { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
+		protected IMediaDatabase Media { get; private set; }
 		protected INotificationDatabase Notifications { get; private set; }
+		protected IProfileDatabase Profiles { get; private set; }
 
 		#endregion
 
@@ -33,9 +34,10 @@ namespace Core.Controls
 			Accounts = Terminal.AccountDatabase;
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
-			Profiles = Terminal.ProfileDatabase;
 			Reports = Terminal.DisciplineDatabase;
+			Media = Terminal.MediaDatabase;
 			Notifications = Terminal.NotificationDatabase;
+			Profiles = Terminal.ProfileDatabase;
         }
 
 		#endregion

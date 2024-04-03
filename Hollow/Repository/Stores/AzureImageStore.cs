@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Repository
 {
-    internal class AzureImageStore : IImageDatabase
+    internal class AzureImageStore : IMediaDatabase
     {
         private IStorageSentry sentry;
 
