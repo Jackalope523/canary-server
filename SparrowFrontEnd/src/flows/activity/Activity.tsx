@@ -28,7 +28,9 @@ const ActivityScreen = () => {
         </Text>
       </View>
       {/* TODO REMOVE THIS LATER */}
-      <EventCardLarge />
+      <View style={{ paddingHorizontal: 24 }}>
+        <EventCardLarge />
+      </View>
 
       {/* --- FILTER --- */}
       {/* TODO first filter button ("All") has to be set as selected/active on default */}
