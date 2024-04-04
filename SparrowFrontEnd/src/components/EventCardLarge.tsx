@@ -2,8 +2,6 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Avatar, { AvatarSize } from './Avatar';
 
-interface EventCardLargeProps {}
-
 // Icons
 import FeatherIcon from '../assets/icons/feather-fill-colored.svg';
 import DateIcon from '../assets/icons/date-outline.svg';
@@ -19,18 +17,44 @@ import { Spacing } from '../styles/SpacingStyles';
 import { Colors } from '../styles/ColorStyles';
 import { borderRadius } from '../styles/BorderStyles';
 import TextLabel, { LabelDisplay, LabelSize, LabelType } from './TextLabel';
+import { CustomDimensions } from '../styles/CustomDimensionStyles';
 
-const EventCardLarge: React.FC<EventCardLargeProps> = () => {
+interface EventCardLargeProps {
+  onPress: () => void;
+
+  eventHeroImage: any;
+  eventHostName: string;
+  eventTitle: string;
+  eventDate: string;
+  eventTime: string;
+  eventLocation: string;
+  eventAttendees: number;
+  eventAttendeesFriends: number;
+}
+
+const EventCardLarge: React.FC<EventCardLargeProps> = ({
+  onPress,
+  eventHeroImage,
+  eventHostName,
+  eventTitle,
+  eventDate,
+  eventTime,
+  eventLocation,
+  eventAttendees,
+  eventAttendeesFriends,
+}) => {
   // TODO hook up to back-end data
   var friend = true;
 
-  const hostName = 'Robert';
-  const eventTitle = 'Hike and Sunrise Breakfast Adventure at Pine Ridge Trail';
-  const eventDate = 'This Saturtday';
-  const eventTime = '12:30';
-  const eventLocation = 'Pine Ridge Trail, Trailhead Parking Lot Number 2';
-  const eventAttendees = 9;
-  const eventAttendeesFriends = 2;
+  // TODO delete the constants below after hooking up data; TEMP. data
+
+  // const eventHostName = 'Robert';
+  // const eventTitle = 'Hike and Sunrise Breakfast Adventure at Pine Ridge Trail';
+  // const eventDate = 'This Saturtday';
+  // const eventTime = '12:30';
+  // const eventLocation = 'Pine Ridge Trail, Trailhead Parking Lot Number 2';
+  // const eventAttendees = 9;
+  // const eventAttendeesFriends = 2;
 
   const eventAttendeesFriendsLabelText = `${eventAttendeesFriends} FRIENDS`;
 
@@ -41,7 +65,7 @@ const EventCardLarge: React.FC<EventCardLargeProps> = () => {
           <Avatar size={AvatarSize.Small} image={TempAvatarImage} />
           <View style={styles.hostNameContainer}>
             <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              {hostName}
+              {eventHostName}
             </Text>
             {friend && <FeatherIcon height={24} width={24} />}
           </View>
@@ -51,7 +75,7 @@ const EventCardLarge: React.FC<EventCardLargeProps> = () => {
           {/* aligned to top */}
           <View style={styles.eventTop}>
             <Image
-              source={tempHeroImage}
+              source={eventHeroImage}
               resizeMode="cover"
               style={styles.eventHeroImage}
             />
@@ -108,12 +132,14 @@ const EventCardLarge: React.FC<EventCardLargeProps> = () => {
                   {eventAttendees}
                 </Text>
               </View>
-              <TextLabel
-                text={eventAttendeesFriendsLabelText}
-                type={LabelType.Friend}
-                size={LabelSize.Small}
-                display={LabelDisplay.Contained}
-              />
+              {eventAttendeesFriends > 0 && (
+                <TextLabel
+                  text={eventAttendeesFriendsLabelText}
+                  type={LabelType.Friend}
+                  size={LabelSize.Small}
+                  display={LabelDisplay.Contained}
+                />
+              )}
             </View>
           </View>
         </View>
@@ -139,6 +165,7 @@ const styles = StyleSheet.create({
     // TODO add dynamic height based on screen size AND image size
     // REMEMBER: card height needs to stay the same when viewed from the same device; the image size should change on other devices/screen sizes
     height: 480,
+    width: CustomDimensions.windowWidth - Spacing.lg * 2,
   },
 
   // Host

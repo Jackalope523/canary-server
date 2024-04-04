@@ -30,7 +30,7 @@ investigate and make a better one later, when there's time
 import { Dimensions } from 'react-native';
 const screenWidth = Dimensions.get('window').width;
 
-interface DropdownProps {
+interface DropdownInputProps {
   label: string;
   disabled?: boolean;
   initialValue?: string;
@@ -52,7 +52,7 @@ interface DropdownProps {
 // Icon
 import ChevronOutline from '../assets/icons/chevron-outline.svg';
 
-export const Dropdown: React.FC<DropdownProps> = ({
+export const DropdownInput: React.FC<DropdownInputProps> = ({
   label,
   disabled = false,
   initialValue = 'Initial text',
@@ -64,7 +64,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   setValid,
 
   value,
-  setValue
+  setValue,
 }) => {
   // Selection
   // const [selected, setSelected] = React.useState(initialValue);
@@ -183,7 +183,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   );
 };
 
-export default Dropdown;
+export default DropdownInput;
 
 const styles = StyleSheet.create({
   // TODO make the dropdown hover over the screen content

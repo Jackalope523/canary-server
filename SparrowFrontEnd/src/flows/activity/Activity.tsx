@@ -12,6 +12,7 @@ import ExclusiveButtonView from '../../components/ExclusiveButtonView';
 // Sample data
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import EventCardLarge from '../../components/EventCardLarge';
+import DropdownSelectorIcon from '../../components/DropdownSelectorIcon';
 
 const ActivityScreen = () => {
   return (
@@ -23,53 +24,42 @@ const ActivityScreen = () => {
         <View style={styles.notificationContainer}>
           <NotificationIndicator />
         </View>
-        <Text style={[globalStyles.displayTextTwo, styles.displayText]}>
-          Hey, User!
-        </Text>
-      </View>
-      {/* TODO REMOVE THIS LATER */}
-      <View style={{ paddingHorizontal: 24 }}>
-        <EventCardLarge />
       </View>
 
-      {/* --- FILTER --- */}
-      {/* TODO first filter button ("All") has to be set as selected/active on default */}
+      <View style={styles.events}>
+        {/* TODO first filter button ("All") has to be set as selected/active on default */}
+        {/* TODO we keeping the filter  or deleting it?; in app design it's deleted */}
 
-      <ExclusiveButtonView
-        groupStyle={styles.filter}
-        buttons={[
-          {
-            id: 1,
-            type: ButtonType.SecondaryDark,
-            size: ButtonSize.Small,
-            display: ButtonDisplay.Full,
-            text: 'All',
-            onPress: null,
-          },
-          {
-            id: 2,
-            type: ButtonType.SecondaryDark,
-            size: ButtonSize.Small,
-            display: ButtonDisplay.Full,
-            text: 'By you',
-            onPress: null,
-          },
-          {
-            id: 3,
-            type: ButtonType.SecondaryDark,
-            size: ButtonSize.Small,
-            display: ButtonDisplay.Full,
-            text: 'By friends',
-            onPress: null,
-          },
-        ]}
-      />
+        {/* <ExclusiveButtonView
+          groupStyle={styles.filter}
+          buttons={[
+            {
+              id: 1,
+              type: ButtonType.SecondaryDark,
+              size: ButtonSize.Small,
+              display: ButtonDisplay.Full,
+              text: 'All',
+              onPress: null,
+            },
+            {
+              id: 2,
+              type: ButtonType.SecondaryDark,
+              size: ButtonSize.Small,
+              display: ButtonDisplay.Full,
+              text: 'By you',
+              onPress: null,
+            },
+            {
+              id: 3,
+              type: ButtonType.SecondaryDark,
+              size: ButtonSize.Small,
+              display: ButtonDisplay.Full,
+              text: 'By friends',
+              onPress: null,
+            },
+          ]}
+        /> */}
 
-      {/* --- FILTER END --- */}
-      <View style={styles.sectionContainer}>
-        <Text style={[globalStyles.headingTextOne, styles.headingText]}>
-          Upcoming
-        </Text>
         <FlatList
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
@@ -79,66 +69,16 @@ const ActivityScreen = () => {
           keyExtractor={(item) => item.id}
           data={SAMPLEEVENTDATA}
           renderItem={({ item }) => (
-            <EventCardMedium
+            <EventCardLarge
               onPress={null}
               eventHeroImage={item.uri}
+              eventHostName={item.host}
+              eventTitle={item.title}
               eventDate={item.date}
               eventTime={item.time}
-              eventAttendees={item.attendees}
               eventLocation={item.location}
-              eventTitle={item.title}
-            />
-          )}
-        />
-      </View>
-
-      <View style={styles.sectionContainer}>
-        <Text style={[globalStyles.headingTextOne, styles.headingText]}>
-          Watched
-        </Text>
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
-          ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
-          overScrollMode="never"
-          horizontal={true}
-          keyExtractor={(item) => item.id}
-          data={SAMPLEEVENTDATA}
-          renderItem={({ item }) => (
-            <EventCardMedium
-              onPress={null}
-              eventHeroImage={item.uri}
-              eventDate={item.date}
-              eventTime={item.time}
               eventAttendees={item.attendees}
-              eventLocation={item.location}
-              eventTitle={item.title}
-            />
-          )}
-        />
-      </View>
-
-      <View style={styles.sectionContainerBottom}>
-        <Text style={[globalStyles.headingTextOne, styles.headingText]}>
-          Recommended
-        </Text>
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
-          ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
-          overScrollMode="never"
-          horizontal={true}
-          keyExtractor={(item) => item.id}
-          data={SAMPLEEVENTDATA}
-          renderItem={({ item }) => (
-            <EventCardMedium
-              onPress={null}
-              eventHeroImage={item.uri}
-              eventDate={item.date}
-              eventTime={item.time}
-              eventAttendees={item.attendees}
-              eventLocation={item.location}
-              eventTitle={item.title}
+              eventAttendeesFriends={item.attendeesFriends}
             />
           )}
         />
@@ -151,7 +91,7 @@ export default ActivityScreen;
 
 const styles = StyleSheet.create({
   displayText: {
-    color: Colors.sparrowRed,
+    color: Colors.picton500,
     marginVertical: Spacing.lg,
   },
 
@@ -182,11 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
 
-  sectionContainer: {
+  events: {
     marginBottom: Spacing.lg,
-  },
-
-  sectionContainerBottom: {
-    marginBottom: Spacing.xl,
   },
 });

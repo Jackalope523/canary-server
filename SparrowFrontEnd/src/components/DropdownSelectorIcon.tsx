@@ -21,7 +21,7 @@ discouraged in the docs and could cause issues in the future
 import MeatballIcon from '../assets/icons/meatball-outline.svg';
 import KebabIcon from '../assets/icons/kebab-fill.svg';
 
-interface DropdownSmallProps {
+interface DropdownSelectorIconProps {
   options: { id: number; text: string; onPress: () => void }[];
   icon: Icon;
   align: Align;
@@ -31,14 +31,14 @@ interface DropdownSmallProps {
   dropdownContainerStyle?: ViewStyle[];
 }
 
-const DropdownSmall = ({
+const DropdownSelectorIcon = ({
   options,
   icon,
   align,
   containerStyle,
   buttonStyle,
   dropdownContainerStyle,
-}: DropdownSmallProps) => {
+}: DropdownSelectorIconProps) => {
   const [selected, setSelected] = React.useState(false);
 
   // Alignment
@@ -92,7 +92,7 @@ const DropdownSmall = ({
   );
 };
 
-export default DropdownSmall;
+export default DropdownSelectorIcon;
 
 // Exported enums
 export enum Icon {
