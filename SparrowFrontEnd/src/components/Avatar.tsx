@@ -50,6 +50,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 // ! ||--------------------------------------------------------------------------------||
 
 export enum AvatarSize {
+  ExtraSmall,
   Small,
   Medium,
   Large,
