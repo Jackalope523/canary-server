@@ -3,19 +3,19 @@ using Repository.Entities;
 
 namespace Repository
 {
-    public abstract class QueryContext : DbContext
+    internal abstract class QueryContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Event> Events { get; set; }
-        public DbSet<UserLink> UserLinks { get; set; }
-        public DbSet<EventLink> EventLinks { get; set; }
-        public DbSet<PostLink> PostLinks { get; set; }
-        public DbSet<UserReport> UserReports { get; set; }
-        public DbSet<EventReport> EventReports { get; set; }
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<Note> Notes { get; set; }
-        public DbSet<Subscription> Subscriptions { get; set; }
-        public DbSet<Penalty> Penalties { get; set; }
+        internal DbSet<User> Users { get; set; }
+        internal DbSet<Event> Events { get; set; }
+        internal DbSet<UserLink> UserLinks { get; set; }
+        internal DbSet<EventLink> EventLinks { get; set; }
+        internal DbSet<PostLink> PostLinks { get; set; }
+        internal DbSet<UserReport> UserReports { get; set; }
+        internal DbSet<EventReport> EventReports { get; set; }
+        internal DbSet<Post> Posts { get; set; }
+        internal DbSet<Note> Notes { get; set; }
+        internal DbSet<Subscription> Subscriptions { get; set; }
+        internal DbSet<Penalty> Penalties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -2,14 +2,14 @@
 
 namespace Repository
 {
-    public class EventLink
+    internal class EventLink
     {
-        public ulong Id { get; set; }
-        public ulong UserId { get; init; }
-        public User User { get; init; }
-        public ulong EventId { get; init; }
-        public Event Event { get; init; }
-        public DateTimeOffset Time { get; init; }
-        public EventBond Type { get; set; }
+        internal ulong Id { get; set; }
+        internal ulong UserId { get; init; }
+        internal User User { get; init; }
+        internal ulong EventId { get; init; }
+        internal Event Event { get; init; }
+        internal DateTimeOffset Time { get; init; }
+        internal EventBond Type { get; set; }
     }
 }

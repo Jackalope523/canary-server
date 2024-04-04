@@ -2,12 +2,12 @@
 
 namespace Repository
 {
-    public class UserFactory
+    internal class UserFactory
     {
         private int produced = 0;
         private CoordinateFactory internalFactory = new();
 
-        public User Create()
+        internal User Create()
         {
             produced++;
             return new User

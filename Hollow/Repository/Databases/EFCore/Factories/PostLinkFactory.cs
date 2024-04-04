@@ -1,9 +1,9 @@
 ﻿
 namespace Repository
 {
-    public class PostLinkFactory
+    internal class PostLinkFactory
     {
-        public PostLink Create(User user, Post etching)
+        internal PostLink Create(User user, Post etching)
         {
             return new PostLink
             {

@@ -1,11 +1,11 @@
 ﻿
 namespace Repository
 {
-    public class NoteFactory
+    internal class NoteFactory
     {
         private int produced = 0;
 
-        public Entities.Note Create(User Notifier, User Recipient)
+        internal Entities.Note Create(User Notifier, User Recipient)
         {
             produced++;
             return new Entities.Note

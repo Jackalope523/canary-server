@@ -2,10 +2,10 @@
 
 namespace Repository
 {
-    public class EventLinkFactory
+    internal class EventLinkFactory
     {
         int created = 0;
-        public EventLink Create(User user, Event @event, EventBond type)
+        internal EventLink Create(User user, Event @event, EventBond type)
         {
             created++;
             return new EventLink
@@ -16,7 +16,7 @@ namespace Repository
                 Time = DateTimeOffset.MinValue.AddHours(created)
             };
         }
-        public EventLink Create(User user, Event @event, EventBond type, DateTimeOffset time)
+        internal EventLink Create(User user, Event @event, EventBond type, DateTimeOffset time)
         {
             created++;
             return new EventLink

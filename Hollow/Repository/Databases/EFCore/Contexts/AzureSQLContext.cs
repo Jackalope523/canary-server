@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
-    public class AzureSQLContext : QueryContext
+    internal class AzureSQLContext : QueryContext
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {      

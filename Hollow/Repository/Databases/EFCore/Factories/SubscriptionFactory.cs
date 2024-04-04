@@ -2,11 +2,11 @@
 
 namespace Repository
 {
-    public class SubscriptionFactory
+    internal class SubscriptionFactory
     {
         private int produced = 0;
 
-        public Subscription Create(User user)
+        internal Subscription Create(User user)
         {
             produced++;
             return new Subscription

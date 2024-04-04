@@ -2,13 +2,13 @@
 
 namespace Repository.Entities
 {
-    public class Subscription
+    internal class Subscription
     {
-        public ulong Id { get; set; }
+        internal ulong Id { get; set; }
 
-        public ulong UserId { get; set; }
+        internal ulong UserId { get; set; }
         internal User User { get; set; }
-        public DeviceType DeviceType { get; set; }
-        public string DeviceToken { get; set; }
+        internal DeviceType DeviceType { get; set; }
+        internal string DeviceToken { get; set; }
     }
 }

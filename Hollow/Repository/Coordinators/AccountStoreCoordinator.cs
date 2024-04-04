@@ -2,7 +2,7 @@
 
 namespace Repository
 {
-    public class AccountStoreCoordinator : IAccountDatabase
+    internal class AccountStoreCoordinator : IAccountDatabase
     {
         private readonly IAccountDatabase store;
 

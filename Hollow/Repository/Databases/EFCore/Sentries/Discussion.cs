@@ -3,16 +3,16 @@ using System.Runtime.CompilerServices;
 
 namespace Repository
 {
-    public class Discussion
+    internal class Discussion
     {
-        public QueryContext SharedContext { get; private set; }
+        internal QueryContext SharedContext { get; private set; }
 
-        public Discussion(QueryContext sharedContext)
+        internal Discussion(QueryContext sharedContext)
         {
             SharedContext = sharedContext;
         }
 
-        public void End()
+        internal void End()
         {
             try
             {
@@ -28,7 +28,7 @@ namespace Repository
             }                
         }
 
-        public async Task  EndAsync()
+        internal async Task  EndAsync()
         {
             try
             {
@@ -44,7 +44,7 @@ namespace Repository
             }
         }
 
-        public void EndNow()
+        internal void EndNow()
         {
             SharedContext.Dispose();
         }

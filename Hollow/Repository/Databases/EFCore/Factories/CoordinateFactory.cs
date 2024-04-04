@@ -2,11 +2,11 @@
 
 namespace Repository
 {
-    public class CoordinateFactory
+    internal class CoordinateFactory
     {
         private readonly GeometryFactory internalFactory;
 
-        public CoordinateFactory()
+        internal CoordinateFactory()
         {
             NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
                 (
@@ -20,7 +20,7 @@ namespace Repository
             internalFactory = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(4326);
         }
 
-        public Point Create(double longitude, double latitude)
+        internal Point Create(double longitude, double latitude)
         {         
             return internalFactory.CreatePoint(new Coordinate(longitude, latitude));
         }

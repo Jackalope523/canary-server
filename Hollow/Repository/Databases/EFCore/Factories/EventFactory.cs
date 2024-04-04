@@ -2,11 +2,11 @@
 
 namespace Repository
 {
-    public class EventFactory
+    internal class EventFactory
     {
         private int produced = 0;
         private readonly CoordinateFactory innerFactory = new();
-        public Event Create(User host)
+        internal Event Create(User host)
         {          
             produced++;
             return new Event

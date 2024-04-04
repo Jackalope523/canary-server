@@ -3,9 +3,9 @@ using Core.Boundaries;
 
 namespace Repository
 {
-    public class PenaltyFactory
+    internal class PenaltyFactory
     {
-        public Entities.Penalty Create(User user)
+        internal Entities.Penalty Create(User user)
         {
             return new Entities.Penalty
             {

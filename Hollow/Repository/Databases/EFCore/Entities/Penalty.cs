@@ -3,12 +3,12 @@ using Core.Boundaries;
 
 namespace Repository.Entities
 {
-    public class Penalty
+    internal class Penalty
     {
-        public ulong Id { get; set; }
-        public ulong PenalizedId { get; set; }
-        public User Penalized { get; set; }
-        public PenaltyType Type { get; set; }   
-        public DateTimeOffset Time { get; set; }
+        internal ulong Id { get; set; }
+        internal ulong PenalizedId { get; set; }
+        internal User Penalized { get; set; }
+        internal PenaltyType Type { get; set; }   
+        internal DateTimeOffset Time { get; set; }
     }
 }

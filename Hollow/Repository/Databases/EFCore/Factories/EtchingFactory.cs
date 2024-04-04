@@ -1,11 +1,11 @@
 ﻿
 namespace Repository
 {
-    public class EtchingFactory
+    internal class EtchingFactory
     {
         private int created = 0;
         
-        public Post Create(User owner, Event location)
+        internal Post Create(User owner, Event location)
         {
             created++;
             return new Post
@@ -17,7 +17,7 @@ namespace Repository
                 IsHidden = false
             };
         }
-        public Post Create(User owner, Event location, DateTimeOffset postedAt)
+        internal Post Create(User owner, Event location, DateTimeOffset postedAt)
         {
             created++;
             return new Post

@@ -1,17 +1,17 @@
 ﻿namespace Repository
 {
-    public interface IDatabaseSentry
+    internal interface IDatabaseSentry
     {
-        public T ExecuteRead<T>(Func<QueryContext, T> read);
-        public void ExecuteWrite(Action<QueryContext> write);
+        internal T ExecuteRead<T>(Func<QueryContext, T> read);
+        internal void ExecuteWrite(Action<QueryContext> write);
 
-        public Task<T> ExecuteReadAsync<T>(Func<QueryContext,Task<T>> read);
-        public Task ExecuteWriteAsync(Action<QueryContext> write);
-        public Task ExecuteWriteAsync(Func<QueryContext,Task> write);
+        internal Task<T> ExecuteReadAsync<T>(Func<QueryContext,Task<T>> read);
+        internal Task ExecuteWriteAsync(Action<QueryContext> write);
+        internal Task ExecuteWriteAsync(Func<QueryContext,Task> write);
 
-        public Discussion BeginDiscussion();
-        public void DiscussWrite(Action<QueryContext> write, Discussion discussion);
-        public void EndDiscussion(Discussion toEnd);
-        public Task EndDiscussionAsync(Discussion toEnd);
+        internal Discussion BeginDiscussion();
+        internal void DiscussWrite(Action<QueryContext> write, Discussion discussion);
+        internal void EndDiscussion(Discussion toEnd);
+        internal Task EndDiscussionAsync(Discussion toEnd);
     }
 }

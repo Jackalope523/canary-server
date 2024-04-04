@@ -1,10 +1,10 @@
 ﻿namespace Repository
 {
-    public class EventReportFactory
+    internal class EventReportFactory
     {
         private int created = 0;
 
-        public EventReport Create(User reporter, Event location)
+        internal EventReport Create(User reporter, Event location)
         {
             created++;
             return new EventReport

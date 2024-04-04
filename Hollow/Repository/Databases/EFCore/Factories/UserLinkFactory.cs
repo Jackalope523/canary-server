@@ -1,8 +1,8 @@
 ﻿namespace Repository
 {
-    public class UserLinkFactory
+    internal class UserLinkFactory
     {      
-        public UserLink Create(User self, User other, UserLink.UserLinkType type)
+        internal UserLink Create(User self, User other, UserLink.UserLinkType type)
         {
             return new UserLink
             {

@@ -1,15 +1,15 @@
 namespace Repository
 {
-    public class Post
+    internal class Post
     {
-        public ulong Id { get; set; }
+        internal ulong Id { get; set; }
 
-        public ulong OwnerId { get; set; }
-        public User Owner { get; set; }
-        public ulong EventId { get; set; }
-        public Event Event { get; set; }
-        public DateTimeOffset PostedAt { get; init; }
-        public string PhotoURL { get; set; }
-        public bool IsHidden { get; set; }
+        internal ulong OwnerId { get; set; }
+        internal User Owner { get; set; }
+        internal ulong EventId { get; set; }
+        internal Event Event { get; set; }
+        internal DateTimeOffset PostedAt { get; init; }
+        internal string PhotoURL { get; set; }
+        internal bool IsHidden { get; set; }
     }
 }

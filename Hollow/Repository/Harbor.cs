@@ -1,10 +1,13 @@
 ﻿using Core.Boundaries;
+using Microsoft.Extensions.Logging;
 
 namespace Repository
 {
     public class Harbor
     {
         public enum Flag { Development, Production }
+
+        internal static ILogger logger;
 
         public IAccountDatabase AccountDatabaseAccess { get; private set; }
         public IProfileDatabase ProfileDatabaseAccess { get; private set; }
@@ -17,6 +20,20 @@ namespace Repository
 
         public Harbor(Flag flag)
         {
+            AccountDatabaseAccess = new AccountStoreCoordinator(flag);
+            ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
+            NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
+            EventDatabaseAccess = new EventStoreCoordinator(flag);
+            EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
+            ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
+            AdminDatabaseAccess = new AdminStoreCoordinator(flag);
+            PhotoDatabaseAccess = new MediaStoreCoordinator();
+        }
+
+        public Harbor(Flag flag, ILogger logger)
+        {
+            Harbor.logger = logger;
+
             AccountDatabaseAccess = new AccountStoreCoordinator(flag);
             ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
             NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);

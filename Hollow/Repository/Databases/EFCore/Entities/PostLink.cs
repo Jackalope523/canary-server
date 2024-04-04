@@ -1,15 +1,15 @@
 ﻿namespace Repository
 {
-    public class PostLink
+    internal class PostLink
     {
-        public enum PostLinkType { RateUp, RateDown }
+        internal enum PostLinkType { RateUp, RateDown }
 
-        public ulong Id { get; set; }
-        public ulong UserId { get; init; }
-        public User User { get; init; }
-        public ulong PostId { get; init; }
-        public Post Post { get; init; }
-        public DateTimeOffset Time { get; init; }
-        public PostLinkType Type { get; set; }
+        internal ulong Id { get; set; }
+        internal ulong UserId { get; init; }
+        internal User User { get; init; }
+        internal ulong PostId { get; init; }
+        internal Post Post { get; init; }
+        internal DateTimeOffset Time { get; init; }
+        internal PostLinkType Type { get; set; }
     }
 }

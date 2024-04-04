@@ -14,7 +14,7 @@ namespace Repository
         }
         public async Task UploadBlobAsync(string containerName, string blobName, MemoryStream stream)
         {
-            BlobContainerClient containerClient = new(storageContext.GetUri(containerName), new DefaultAzureCredential());
+            BlobContainerClient containerClient = new(storageContext.BuildUri(containerName), new DefaultAzureCredential());
 
             try
             {
@@ -31,7 +31,7 @@ namespace Repository
 
         public async Task<MemoryStream> DownloadBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(storageContext.GetUri(containerName, blobName), new DefaultAzureCredential());
+            BlobClient blobClient = new(storageContext.BuildUri(containerName, blobName), new DefaultAzureCredential());
             MemoryStream stream = new MemoryStream();
             try
             {
@@ -51,7 +51,7 @@ namespace Repository
 
         public async Task DeleteBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(storageContext.GetUri(containerName, blobName), new DefaultAzureCredential());
+            BlobClient blobClient = new(storageContext.BuildUri(containerName, blobName), new DefaultAzureCredential());
 
             try
             {

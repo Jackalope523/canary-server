@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
-    public class SQLiteContext : QueryContext
+    internal class SQLiteContext : QueryContext
     {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
