@@ -7,7 +7,7 @@ namespace Repository
     internal class EFCoreSentry : IDatabaseSentry
     {
         private readonly Func<QueryContext> initializeContext;
-        internal EFCoreSentry(Flag flag)
+        public EFCoreSentry(Flag flag)
         {
             switch (flag)
             {
@@ -23,7 +23,7 @@ namespace Repository
                     throw new UnsupportedHarborFlagException();
             }
         }
-        internal static void SeedDatabase()
+        public static void SeedDatabase()
         {
             using AzureSQLContext context = new();
 
@@ -68,7 +68,7 @@ namespace Repository
             context.SaveChanges();
         }
 
-        internal T ExecuteRead<T>(Func<QueryContext, T> read)
+        public T ExecuteRead<T>(Func<QueryContext, T> read)
         {
             using (QueryContext context = initializeContext())
             {
@@ -88,7 +88,7 @@ namespace Repository
             }
         }
 
-        internal void ExecuteWrite(Action<QueryContext> write)
+        public void ExecuteWrite(Action<QueryContext> write)
         {
             using (QueryContext context = initializeContext())
             {
@@ -108,7 +108,7 @@ namespace Repository
             }
         }
 
-        internal async Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
+        public async Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
         {
             using (QueryContext context = initializeContext())
             {
@@ -128,7 +128,7 @@ namespace Repository
             }
         }
 
-        internal async Task ExecuteWriteAsync(Action<QueryContext> write)
+        public async Task ExecuteWriteAsync(Action<QueryContext> write)
         {
             using (QueryContext context = initializeContext())
             {
@@ -147,7 +147,7 @@ namespace Repository
                 }
             }
         }
-        internal async Task ExecuteWriteAsync(Func<QueryContext, Task> write)
+        public async Task ExecuteWriteAsync(Func<QueryContext, Task> write)
         {
             using (QueryContext context = initializeContext())
             {
@@ -167,12 +167,12 @@ namespace Repository
             }
         }
 
-        internal Discussion BeginDiscussion()
+        public Discussion BeginDiscussion()
         {
             return new Discussion(initializeContext());
         }
 
-        internal void DiscussWrite(Action<QueryContext> write, Discussion discussion)
+        public void DiscussWrite(Action<QueryContext> write, Discussion discussion)
         {
             try
             {
@@ -185,7 +185,7 @@ namespace Repository
             }
         }
 
-        internal void EndDiscussion(Discussion toEnd)
+        public void EndDiscussion(Discussion toEnd)
         {
             try
             {
@@ -197,7 +197,7 @@ namespace Repository
             }
         }
 
-        internal async Task EndDiscussionAsync(Discussion toEnd)
+        public async Task EndDiscussionAsync(Discussion toEnd)
         {
             try
             {

@@ -16,7 +16,7 @@ namespace Repository
         public IEtchingDatabase EtchingDatabaseAccess { get; private set; }
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
-        public IMediaDatabase PhotoDatabaseAccess { get; private set; }
+        public IMediaDatabase MediaDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -27,7 +27,7 @@ namespace Repository
             EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
-            PhotoDatabaseAccess = new MediaStoreCoordinator();
+            MediaDatabaseAccess = new MediaStoreCoordinator();
         }
 
         public Harbor(Flag flag, ILogger logger)
@@ -41,7 +41,7 @@ namespace Repository
             EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
-            PhotoDatabaseAccess = new MediaStoreCoordinator();
+            MediaDatabaseAccess = new MediaStoreCoordinator();
         }
     }
 }

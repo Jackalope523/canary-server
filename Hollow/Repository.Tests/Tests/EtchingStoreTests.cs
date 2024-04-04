@@ -38,7 +38,7 @@ namespace Repository.Tests
             DateTimeOffset postTime = DateTimeOffset.MinValue;
             string url = "URL";
 
-            await etchingStore.AddEtchingAsync(testEvent.Id, subject.Id, postTime, url);
+            await etchingStore.AddEtchingAsync(testEvent.Id, subject.Id, postTime);
 
             Post created = await sentry.ExecuteReadAsync(ctx => ctx.Posts.FirstAsync());
 
@@ -73,7 +73,6 @@ namespace Repository.Tests
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
-            Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
             Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
@@ -91,7 +90,6 @@ namespace Repository.Tests
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
-            Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
             Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
@@ -106,7 +104,6 @@ namespace Repository.Tests
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
-            Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
             Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
@@ -153,7 +150,6 @@ namespace Repository.Tests
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
             Assert.Equal(testEtching.EventId, retrieved.EventId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
-            Assert.Equal(testEtching.PhotoURL, retrieved.ImageURL);
             Assert.NotEqual(testEtching.IsHidden, retrieved.IsHidden);
             Assert.True(retrieved.IsHidden);
         }

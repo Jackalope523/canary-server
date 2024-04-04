@@ -1,7 +1,4 @@
-﻿
-
-using Azure.Identity;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Repository.Tests
 {

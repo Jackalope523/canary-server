@@ -95,7 +95,7 @@ namespace Frontier
 				harbor.EventDatabaseAccess, 
 				harbor.EtchingDatabaseAccess,
 				harbor.ReportDatabaseAccess,
-				harbor.PhotoDatabaseAccess,
+				harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
 				harbor.ProfileDatabaseAccess, 
 				pushNotifications);

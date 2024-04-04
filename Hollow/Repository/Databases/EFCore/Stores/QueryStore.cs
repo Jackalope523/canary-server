@@ -3,7 +3,7 @@ namespace Repository
 {
     public abstract class QueryStore
     {
-        protected IDatabaseSentry storeSentry;
+        internal IDatabaseSentry storeSentry;
 
         public QueryStore(Harbor.Flag flag)
         {
@@ -11,7 +11,6 @@ namespace Repository
         }      
     }
 }
-
 
 /*
     _.+._

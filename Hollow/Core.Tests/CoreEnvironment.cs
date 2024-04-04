@@ -62,7 +62,7 @@ namespace Core.Tests
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
                 harbor.ReportDatabaseAccess,
-                harbor.PhotoDatabaseAccess,
+                harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.ProfileDatabaseAccess,
 				new NotificationServiceStub());
