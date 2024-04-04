@@ -1,4 +1,3 @@
-// #region Imports
 import * as React from 'react';
 
 // Styles
@@ -6,9 +5,9 @@ import { Colors } from '../styles/ColorStyles';
 import { globalStyles } from '../styles/GlobalStyles';
 
 // Icons font
-// import { createIconSetFromFontello } from 'react-native-vector-icons';
-// import fontelloConfig from '../config.json';
-// const Icon = createIconSetFromFontello(fontelloConfig);
+import { createIconSetFromFontello } from 'react-native-vector-icons';
+import fontelloConfig from '../config.json';
+const Icon = createIconSetFromFontello(fontelloConfig);
 
 // Navigation
 import { NavigationContainer } from '@react-navigation/native';
@@ -44,17 +43,6 @@ import NotificationsScreen from '../flows/activity/Notifications';
 import ProfileScreen from '../flows/profile/Profile';
 import TestScreen from '../flows/testing/Testing';
 
-// Icons
-import ActivityIconRest from '../assets/icons/activity-fill.svg';
-import DiscoveryIconRest from '../assets/icons/discovery-fill.svg';
-import FeedIconRest from '../assets/icons/feed-outline-v2.svg';
-import ProfileIconRest from '../assets/icons/account-fill.svg';
-
-import ActivityIconSelected from '../assets/icons/activity-fill.svg';
-import DiscoveryIconSelected from '../assets/icons/discovery-fill.svg';
-import FeedIconSelected from '../assets/icons/feed-outline-v2.svg';
-import ProfileIconSelected from '../assets/icons/account-fill.svg';
-
 // More imports
 import {
   BottomTabParamList,
@@ -68,8 +56,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // TEMP. testing
 import TopNavbarFavorite from '../components/organisms/TopNavbarFavorite';
 import { StyleSheet } from 'react-native';
-import OtherUserProfileScreen from '../flows/otherUserProfile/OtherUserProfile';
-// #endregion
+
 // v1.0.1
 
 const AppStack = createStackNavigator<AppStackParamList>();
@@ -78,22 +65,24 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 const ActivityStack = createStackNavigator();
 const AccountStack = createStackNavigator();
 
+// TODO change initialRouteName back to Auth when finished with Survey
+
 function MainContainer() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Auth"
+          initialRouteName="Main"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
-          }}>
+        }}>
           <AppStack.Screen name="Auth" component={Authentication} />
           <AppStack.Screen name="Survey" component={Survey} />
           <AppStack.Screen name="Main" component={Main} />
           <AppStack.Screen name="Account" component={Account} />
 
-          <AppStack.Screen name="Testing" component={OtherUserProfileScreen} />
+          <AppStack.Screen name="Testing" component={TestScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
@@ -140,29 +129,34 @@ function Survey() {
 
 // TODO If possible, set the tab navigator horizontal margin to 24, probably with tabBarStyle
 
-interface IconProps {
-  Icon: React.FC<any>;
-}
-
-function Main({ Icon }: IconProps) {
+function Main() {
   return (
     <Tab.Navigator
       sceneContainerStyle={globalStyles.mainContainer}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color }) => {
+          let iconName;
           let rn = route.name;
 
           if (rn === 'Activity') {
-            Icon = focused ? ActivityIconSelected : ActivityIconRest;
+            iconName = focused ? 'activity-fill' : 'activity-fill';
           } else if (rn === 'Discovery') {
-            Icon = focused ? DiscoveryIconSelected : DiscoveryIconRest;
+            iconName = focused ? 'discovery-fill' : 'discovery-fill';
           } else if (rn === 'Feed') {
-            Icon = focused ? FeedIconSelected : FeedIconRest;
+            iconName = focused ? 'feed-fill' : 'feed-fill';
           } else if (rn === 'Profile') {
-            Icon = focused ? ProfileIconSelected : ProfileIconRest;
+            iconName = focused ? 'account-fill' : 'account-fill';
           }
 
-          return <Icon height={40} width={40} fill={color} />;
+          return (
+            <Icon
+              name={iconName}
+              size={40}
+              height={40}
+              width={40}
+              color={color}
+            />
+          );
         },
 
         tabBarActiveTintColor: Colors.sparrowRed,
@@ -194,17 +188,38 @@ function ActivityStackScreen() {
     <ActivityStack.Navigator
       screenOptions={() => ({
         headerShown: false,
+
         cardStyle: styles.cardContainer,
+
         headerTitleStyle: {
           fontSize: 16,
           color: Colors.sparrowDark,
         },
+
+        // headerTitleContainerStyle: {
+        //     marginHorizontal: 24,
+        // },
+
+        // headerLeftContainerStyle: {
+        //     marginLeft: 0,
+        // },
+
         headerStyle: {
           height: 50,
           backgroundColor: Colors.sparrowSand,
           borderBottomColor: Colors.sparrowDarkBrown,
           borderBottomWidth: 2,
         },
+
+        // headerLeftContainerStyle: {
+        //     marginLeft: 24,
+        // },
+
+        // headerLeftContainerStyle: {
+        //     backgroundColor: Colors.red400,
+        //     // marginHorizontal: 16, // between btn and title
+        //     // left: 24, // moves ONLY btn from left, absolute
+        // },
       })}>
       <ActivityStack.Screen name="Activity" component={ActivityScreen} />
       <ActivityStack.Screen
@@ -218,7 +233,7 @@ function ActivityStackScreen() {
 function Account() {
   return (
     <AccountStack.Navigator
-      initialRouteName="Account"
+      initialRouteName="Profile"
       screenOptions={{
         headerShown: true,
         cardStyle: styles.cardContainer,
@@ -231,5 +246,7 @@ function Account() {
 const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: Colors.sparrowSand,
+    // TESTING ONLY
+    // backgroundColor: Colors.fuchsia300,
   },
 });

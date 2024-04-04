@@ -39,7 +39,6 @@ import ExclusiveButtonScroll from '../../components/ExclusiveButtonScroll';
 
 import Map from './Map';
 import SearchBar from './SearchBar';
-import {isToday, isTomorrow, isNextWeek, isNextWeekend, isThisWeek, isThisWeekend} from './chronologicalTools';
 
 import { EventCardMediumProps, EventCardMedium } from '../../components/EventCardMedium';
 import { point, Point, distance, Feature, Properties } from '@turf/turf';
@@ -139,9 +138,9 @@ const DiscoveryScreen = () => {
   useEffect(() => {
     pollCurrentLocation();
 
-    getAllEvents(currentLocation.geometry.coordinates[0], currentLocation.geometry.coordinates[1], 1000000000000000)
+    getAllEvents(currentLocation.geometry.coordinates[1], currentLocation.geometry.coordinates[0], 100000000000)
     .then(value => { setEvents(value); })
-    .catch(() => "SESSION ERROR");
+    .catch(() => console.log("SESSION ERROR"));
   }, []);
 
   useEffect(() => {
@@ -150,55 +149,7 @@ const DiscoveryScreen = () => {
     }
   }, [sortValue]);
 
-  const generateSortBy = () => {
-    switch (sortValue) {
-      case "Most Popular":
-        return (x: eventShard, y: eventShard) => { return y.NumberOfGuests - x.NumberOfGuests };
-      case "Closest":
-        return (x: eventShard, y: eventShard) => { return distance(currentLocation, x.Location) - distance(currentLocation, y.Location) };
-      case "Most Recent":
-        return (x: eventShard, y: eventShard) => { return y.StartTime.getTime() - x.StartTime.getTime() };
-    }
-  };
-
-  const generateFilterArray = () => {
-    let filterArray = new Array<(e: eventShard) => boolean>();
-    let today = new Date();
-
-    switch (filterDateValue) {
-      case "Today":
-        filterArray.push((e: eventShard) => { return isToday(e.StartTime) });
-        break;
-      case "Tomorrow":
-        filterArray.push((e: eventShard) => { return isTomorrow(e.StartTime) });
-        break;
-      case "This Week":
-        filterArray.push((e: eventShard) => { return isThisWeek(e.StartTime) });
-        break;
-      case "This Weekend":
-        filterArray.push((e: eventShard) => { return isThisWeekend(e.StartTime) });
-        break;
-      case "Next Week":
-        filterArray.push((e: eventShard) => { return isNextWeek(e.StartTime) });
-        break;
-      case "Next Weekend":
-        filterArray.push((e: eventShard) => { return isNextWeekend(e.StartTime) });
-        break;
-    }
-
-    switch (filterSizeValue) {
-      case "Cozy":
-        filterArray.push((e: eventShard) => { return e.NumberOfGuests < 5 });
-        break;
-      case "Thriving":
-        filterArray.push((e: eventShard) => { return e.NumberOfGuests > 15 && e.NumberOfGuests < 30 });
-        break;
-      case "Bombastic":
-        filterArray.push((e: eventShard) => { return e.NumberOfGuests > 30 });
-        break;
-    }
-    return filterArray;
-  }
+  
 
   return (
     <View style={{ flex: 1 }}>
@@ -498,8 +449,10 @@ const DiscoveryScreen = () => {
         <View style={isTextInputFocused ? { paddingTop: 130 } : { paddingTop: 75 }}>
           <SearchFilter
             list={events}
-            sortBy={generateSortBy()}
-            filterBy={generateFilterArray()}
+            searchText={searchText}
+            sortValue={sortValue}
+            filterDateValue={filterSizeValue}
+            filterSizeValue={filterSizeValue}
           />
         </View>
       ) : null}
