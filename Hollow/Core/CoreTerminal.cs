@@ -18,7 +18,7 @@ namespace Core
         public IEventDatabase EventDatabase { get; init; }
         public IEtchingDatabase EtchingDatabase { get; init; }
         public IDisciplineDatabase DisciplineDatabase { get; init; }
-        public IImageDatabase ImageDatabase { get; init; }
+        public IMediaDatabase MediaDatabase { get; init; }
         public INotificationDatabase NotificationDatabase { get; init; }
         public IProfileDatabase ProfileDatabase { get; init; }
 
@@ -62,7 +62,7 @@ namespace Core
 
         public static CoreTerminal CreateTerminal(IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
             IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
-            IDisciplineDatabase disciplineDatabase, IImageDatabase imageDatabase,
+            IDisciplineDatabase disciplineDatabase, IMediaDatabase mediaDatabase,
             INotificationDatabase notificationDatabase, IProfileDatabase profileDatabase,
             INotificationService notificationService)
         {
@@ -72,7 +72,7 @@ namespace Core
                 {
                     Terminal = new CoreTerminal(accountDatabase, adminDatabase,
                         eventDatabase, etchingDatabase,
-                        disciplineDatabase, imageDatabase,
+                        disciplineDatabase, mediaDatabase,
                         notificationDatabase, profileDatabase,
                         notificationService);
                 }
@@ -83,7 +83,7 @@ namespace Core
 
         private CoreTerminal(IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
 			IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
-			IDisciplineDatabase disciplineDatabase, IImageDatabase imageDatabase,
+			IDisciplineDatabase disciplineDatabase, IMediaDatabase mediaDatabase,
 			INotificationDatabase notificationDatabase, IProfileDatabase profileDatabase,
             INotificationService notificationService)
         {
@@ -92,7 +92,7 @@ namespace Core
             EventDatabase = eventDatabase;
             EtchingDatabase = etchingDatabase;
             DisciplineDatabase = disciplineDatabase;
-            ImageDatabase = imageDatabase;
+            MediaDatabase = mediaDatabase;
             NotificationDatabase = notificationDatabase;
             ProfileDatabase = profileDatabase;
 

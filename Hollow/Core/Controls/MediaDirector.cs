@@ -1,7 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Shared;
+
+using static Core.Entities.Psijic;
+using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
@@ -15,21 +21,29 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<Note>> GetNotesAsync(ulong userId)
+		public async Task<MemoryStream> GetImageStreamAsync(ulong userId, ulong etchingId)
 		{
 			var user = await GetUserAsync(userId);
+			var etching = await Etchings.GetEtchingAsync(etchingId);
+			User etchingOwner = new(etching.User);
+			var etchedEvent = await GetEventAsync(etching.EventId);
 
-			return await Notifications.GetNotesAsync(user.Id);
+			Try(user.Etched(etching) ||
+				await user.IsFriendsWith(etchingOwner) ||
+				await etchedEvent.WasAttendedBy(user),
+				new InvalidUserException("User cannot access this etching."));
+
+			var stream = await Media.DownloadImageAsync(etching.Id, etching.User.Id);
+
+			return stream;
 		}
 
-		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
+		public async Task UploadImageAsync(ulong userId, ulong etchingId, MemoryStream image)
 		{
-			await Notifications.SubscribeUserAsync(userId, deviceType, deviceToken);
-		}
+			var user = await GetUserAsync(userId);
+			var etching = await Etchings.GetEtchingAsync(etchingId);
 
-		public async Task UnsubscribeUserAsync(ulong userId)
-		{
-			await Notifications.UnsubscribeUserAsync(userId);
+			await Media.UploadImageAsync(etching.Id, user.Id, image);
 		}
 
 		#endregion

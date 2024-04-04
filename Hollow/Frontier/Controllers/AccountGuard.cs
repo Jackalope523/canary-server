@@ -18,12 +18,13 @@ namespace Frontier.Controllers
 		public AccountGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
+			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService) :
 			base(identityUserManager, identitySignInManager,
 				accountOperations, profileOperations,
 				eventOperations, etchingOperations,
-				disciplineOperations, notificationOperations,
+				disciplineOperations, mediaOperations,
+				notificationOperations,
 				externalSMSService, externalEmailService)
 		{ }
 

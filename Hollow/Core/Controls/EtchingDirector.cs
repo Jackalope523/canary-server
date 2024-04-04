@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Boundaries;
@@ -34,19 +35,22 @@ namespace Core.Controls
             return await targetEvent.Etchings;
         }
 
-        public async Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL)
+        public async Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image)
         {
             var userSync = GetUserAsync(userId);
             var targetEventSync = GetEventAsync(eventId);
             var user = await userSync;
             var targetEvent = await targetEventSync;
 
-            await targetEvent.Etched(user);
+            await user.CanEtch(targetEvent);
 
             // Try to etch
-            var userEtching = await Etchings.AddEtchingAsync(targetEvent.Id, user.Id, Time, imageURL);
+            var etching = await Etchings.AddEtchingAsync(targetEvent.Id, user.Id, Time);
 
-            return userEtching;
+            // Save image
+            await Terminal.MediaDirector.UploadImageAsync(user.Id, etching.Id, image);
+
+            return etching;
         }
 
         public async Task RemoveEtchingAsync(ulong userId, ulong etchingId)

@@ -1,0 +1,27 @@
+﻿using System.Threading.Tasks;
+using System.Drawing;
+using System.IO;
+
+namespace Core.Boundaries
+{
+    #region Schemas
+
+    #endregion
+
+    #region Gates
+
+    public interface IMediaDatabase
+    {
+        Task<MemoryStream> DownloadImageAsync(ulong etchingId, ulong ownerId);
+        Task UploadImageAsync(ulong etchingId, ulong ownerId, MemoryStream image);
+        Task DeleteImageAsync(ulong etchingId, ulong ownerId);
+    }
+
+    public interface IMediaOperations
+    {
+        Task<MemoryStream> GetImageStreamAsync(ulong userId, ulong etchingId);
+        Task UploadImageAsync(ulong userId, ulong etchingId, MemoryStream image);
+    }
+
+    #endregion
+}

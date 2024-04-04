@@ -544,18 +544,6 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task Etched_Succeeds()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-
-			// Act
-			await @event.Etched(host);
-			// If no exception is thrown, the test is successful
-		}
-
-		[Fact]
 		public async Task Reported_Succeeds()
 		{
 			// Arrange

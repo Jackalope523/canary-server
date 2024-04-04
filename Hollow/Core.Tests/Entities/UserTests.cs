@@ -359,6 +359,19 @@ namespace Core.Tests.Entities
 			Assert.True(canJoin);
 		}
 
+
+		[Fact]
+		public async Task CanEtch_Succeeds()
+		{
+			// Arrange
+			var host = await environment.GenerateUniqueUserAsync();
+			var @event = await environment.GenerateUpcomingEventAsync(host);
+
+			// Act
+			await host.CanEtch(@event);
+			// If no exception is thrown, the test is successful
+		}
+
 		[Fact]
 		public async Task Etched_OwnedEtching_ReturnsTrue()
 		{

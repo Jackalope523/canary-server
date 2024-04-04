@@ -2,7 +2,7 @@
 
 namespace Repository
 {
-    internal class AzureImageStore : IImageDatabase
+    internal class AzureImageStore : IMediaDatabase
     {
         private IStorageSentry sentry;
 

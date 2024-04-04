@@ -40,10 +40,4 @@ namespace Frontier.Manifests
 
         public uint NumberOfParticipants { get; set; }
     }
-
-    public class EventEtchingManifest
-    {
-        [Required]
-        public string ImageURL { get; set; }
-    }
 }

@@ -10,15 +10,16 @@ namespace Frontier.Controllers
 		#region Initialisation
 
 		public RootGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-            IAccountOperations accountOperations, IProfileOperations profileOperations,
-            IEventOperations eventOperations, IEtchingOperations etchingOperations,
-            IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
-            ISMSService externalSMSService, IEmailService externalEmailService) :
-            base(identityUserManager, identitySignInManager,
-                accountOperations, profileOperations,
-                eventOperations, etchingOperations,
-                disciplineOperations, notificationOperations,
-                externalSMSService, externalEmailService)
+			IAccountOperations accountOperations, IProfileOperations profileOperations,
+			IEventOperations eventOperations, IEtchingOperations etchingOperations,
+			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
+			ISMSService externalSMSService, IEmailService externalEmailService) :
+			base(identityUserManager, identitySignInManager,
+				accountOperations, profileOperations,
+				eventOperations, etchingOperations,
+				disciplineOperations, mediaOperations,
+				notificationOperations,
+				externalSMSService, externalEmailService)
 		{ }
 
 		#endregion

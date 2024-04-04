@@ -15,12 +15,13 @@ namespace Frontier.Controllers
 		public EventGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
+			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService) :
 			base(identityUserManager, identitySignInManager,
 				accountOperations, profileOperations,
 				eventOperations, etchingOperations,
-				disciplineOperations, notificationOperations,
+				disciplineOperations, mediaOperations,
+				notificationOperations,
 				externalSMSService, externalEmailService)
 		{ }
 
@@ -214,15 +215,15 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{eventId}/etchings")]
-		public async Task<IActionResult> EtchingToEvent(ulong eventId, [FromBody] EventEtchingManifest etching)
+		public async Task<IActionResult> EtchingToEvent(ulong eventId)
 		{
 			// Verify parameters
-			if (etching == null || !ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
 			{
-				var newEtching = await etchings.AddEtchingAsync(user.Id, eventId, etching.ImageURL);
+				var newEtching = await etchings.AddEtchingAsync(user.Id, eventId, await StreamFirstFile());
 
 				return Ok(newEtching);
 			});

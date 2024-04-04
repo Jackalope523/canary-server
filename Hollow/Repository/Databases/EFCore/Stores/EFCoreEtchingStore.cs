@@ -12,14 +12,13 @@ namespace Repository
         {
         }
 
-        public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted, string imageURL)
+        public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted)
         { 
             Post toAdd = new() 
             { 
                 EventId = eventId, 
                 OwnerId = posterId, 
-                PostedAt = timePosted, 
-                PhotoURL = imageURL 
+                PostedAt = timePosted
             };
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Add(toAdd));
 
@@ -29,7 +28,7 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return new Etching ( toAdd.Id, toAdd.EventId, new UserSilhouette(toAdd.OwnerId, ownerName), toAdd.PostedAt, toAdd.PhotoURL, new(0, 0), toAdd.IsHidden );
+            return new Etching ( toAdd.Id, toAdd.EventId, new UserSilhouette(toAdd.OwnerId, ownerName), toAdd.PostedAt, new(0, 0), toAdd.IsHidden );
         }
 
         public async Task<List<Etching>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
@@ -56,7 +55,7 @@ namespace Repository
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, p.PhotoURL, new(-1, -1), p.IsHidden)
+                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
                ).ToListAsync());
 
             List<Task<int>> friendPostsPositiveRatings = new();
@@ -88,7 +87,7 @@ namespace Repository
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, p.PhotoURL, new(-1, -1), p.IsHidden)
+                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
                 ).ToListAsync());
 
             List<Task<int>> nettedPostsPositiveRatings = new();
@@ -122,7 +121,7 @@ namespace Repository
             Etching etching = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Posts.
             Where(p => p.Id == id).
-            Select(p => new Etching(p.Id, p.EventId, new UserSilhouette(p.OwnerId, null), p.PostedAt, p.PhotoURL, new (0,0), p.IsHidden)).
+            Select(p => new Etching(p.Id, p.EventId, new UserSilhouette(p.OwnerId, null), p.PostedAt, new (0,0), p.IsHidden)).
             SingleAsync());
 
             Task<string> name = storeSentry.ExecuteReadAsync(ctx => 
@@ -138,7 +137,7 @@ namespace Repository
         {
             List<Etching> etchings = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Posts.Where(p => p.OwnerId == id).
-                 Select(a => new Etching(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, a.PhotoURL, new(0, 0), a.IsHidden)).
+                 Select(a => new Etching(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(etchings.Count);
@@ -211,7 +210,7 @@ namespace Repository
         {
             List<Etching> etchings = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Posts.Where(p => p.EventId == id).
-                 Select(a => new Etching(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, a.PhotoURL, new(0, 0), a.IsHidden)).
+                 Select(a => new Etching(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(etchings.Count);

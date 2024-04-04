@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Shared;
 using Core.Boundaries;
 using Serilog;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Frontier.Controllers
 {
@@ -36,11 +39,12 @@ namespace Frontier.Controllers
 		public SignInManager<UserShard> signInManager;
 
 		public IAccountOperations accounts;
-		public IProfileOperations profiles;
 		public IEventOperations events;
 		public IEtchingOperations etchings;
 		public IDisciplineOperations reports;
+		public IMediaOperations media;
 		public INotificationOperations notifications;
+		public IProfileOperations profiles;
 
 		public ISMSService smsService;
 		public IEmailService emailService;
@@ -52,7 +56,8 @@ namespace Frontier.Controllers
 		public AbstractGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
+			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations,
+			INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService)
 		{
 			userManager = identityUserManager;
@@ -63,6 +68,7 @@ namespace Frontier.Controllers
 			events = eventOperations;
 			etchings = etchingOperations;
 			reports = disciplineOperations;
+			media = mediaOperations;
 			notifications = notificationOperations;
 
 			smsService = externalSMSService;
@@ -144,6 +150,22 @@ namespace Frontier.Controllers
 		{
 			if (user.IsEmailConfirmed)
 			{ throw new InvalidUserException("User has not yet confirmed their email."); }
+		}
+
+		[NonAction]
+		public async Task<MemoryStream> StreamFirstFile()
+		{
+			foreach (var file in Request.Form.Files)
+			{
+				if (file.Length > 0)
+				{
+					using var ms = new MemoryStream();
+					await file.CopyToAsync(ms);
+					return ms;
+				}
+			}
+
+			return null;
 		}
 
 		#endregion
