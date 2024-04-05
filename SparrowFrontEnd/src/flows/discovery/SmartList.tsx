@@ -25,7 +25,7 @@ interface SearchFilterProps {
   filterSizeValue:string,
 }
 
-const SearchFilter: React.FC<SearchFilterProps> = ({
+const SmartList: React.FC<SearchFilterProps> = ({
   list = [],
   location = point([0, 0]),
   searchText = "",
@@ -89,7 +89,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   const [toDisplay, setToDisplay] = useState<eventShard[]>([]); 
 
   useEffect(() => {
-    let toProcess = list;
+    let toProcess = [...list];
 
     generateFilterArray().forEach((filter) => {
       toProcess = toProcess.filter(filter)
@@ -125,6 +125,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   );
 };
 
-export default SearchFilter;
+export default SmartList;
 
 const styles = StyleSheet.create({});

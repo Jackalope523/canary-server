@@ -4,15 +4,12 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   Pressable,
   useWindowDimensions,
-  FlexStyle,
   Keyboard
 } from 'react-native';
 import { Colors } from '../../styles/ColorStyles';
 import { globalStyles } from '../../styles/GlobalStyles';
-import { navigationStyles } from '../../styles/NavigationStyles';
 import { Spacing } from '../../styles/SpacingStyles';
 
 import Button, {
@@ -20,7 +17,7 @@ import Button, {
   ButtonSize,
   ButtonDisplay,
 } from '../../components/Button';
-import SearchFilter from './SearchFilter';
+import SmartList from './SmartList';
 
 import Animated, {
   useAnimatedStyle,
@@ -40,10 +37,9 @@ import ExclusiveButtonScroll from '../../components/ExclusiveButtonScroll';
 import Map from './Map';
 import SearchBar from './SearchBar';
 
-import { EventCardMediumProps, EventCardMedium } from '../../components/EventCardMedium';
-import { point, Point, distance, Feature, Properties } from '@turf/turf';
+import { point } from '@turf/turf';
 import Geolocation from 'react-native-geolocation-service';
-import { etchingShard, eventShard } from '../event/eventPigeon';
+import { eventShard } from '../event/eventPigeon';
 import { getAllEvents } from './discoverPigeon';
 // #endregion
 
@@ -447,11 +443,11 @@ const DiscoveryScreen = () => {
       {/* TODO probably have to enable it and disable filter or sort if there's text input in the textInput component */}
       {activeComponent === ActiveComponent.None && searchContentVisible ? (
         <View style={isTextInputFocused ? { paddingTop: 130 } : { paddingTop: 75 }}>
-          <SearchFilter
+          <SmartList
             list={events}
             searchText={searchText}
             sortValue={sortValue}
-            filterDateValue={filterSizeValue}
+            filterDateValue={filterDateValue}
             filterSizeValue={filterSizeValue}
           />
         </View>
