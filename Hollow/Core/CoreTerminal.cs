@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Core.Boundaries;
 using Core.Controls;
+using Microsoft.Extensions.Logging;
 
 namespace Core
 {
@@ -12,6 +13,8 @@ namespace Core
 
         public static CoreTerminal Terminal { get; private set; }
         private static object initLock = new();
+
+        public ILogger Log { get; init; }
 
         public IAccountDatabase AccountDatabase { get; init; }
         public IAdminDatabase AdminDatabase { get; init; }
@@ -60,7 +63,8 @@ namespace Core
 
         #region Initialisation
 
-        public static CoreTerminal CreateTerminal(IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
+        public static CoreTerminal CreateTerminal(ILogger logger,
+            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
             IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
             IDisciplineDatabase disciplineDatabase, IMediaDatabase mediaDatabase,
             INotificationDatabase notificationDatabase, IProfileDatabase profileDatabase,
@@ -68,25 +72,25 @@ namespace Core
         {
             lock (initLock)
             {
-                if (Terminal == null)
-                {
-                    Terminal = new CoreTerminal(accountDatabase, adminDatabase,
+                Terminal ??= new CoreTerminal(logger,
+                        accountDatabase, adminDatabase,
                         eventDatabase, etchingDatabase,
                         disciplineDatabase, mediaDatabase,
                         notificationDatabase, profileDatabase,
                         notificationService);
-                }
 
                 return Terminal;
             }
         }
 
-        private CoreTerminal(IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
+        private CoreTerminal(ILogger logger, IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
 			IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
 			IDisciplineDatabase disciplineDatabase, IMediaDatabase mediaDatabase,
 			INotificationDatabase notificationDatabase, IProfileDatabase profileDatabase,
             INotificationService notificationService)
         {
+            Log = logger;
+
             AccountDatabase = accountDatabase;
             AdminDatabase = adminDatabase;
             EventDatabase = eventDatabase;

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Core.Boundaries;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
@@ -12,12 +13,14 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public DiscoverGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public DiscoverGuard(ILogger logger,
+			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService) :
-			base(identityUserManager, identitySignInManager,
+			base(logger,
+				identityUserManager, identitySignInManager,
 				accountOperations, profileOperations,
 				eventOperations, etchingOperations,
 				disciplineOperations, mediaOperations,

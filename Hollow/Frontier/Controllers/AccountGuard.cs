@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
 using Shared;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
@@ -15,12 +16,14 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public AccountGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public AccountGuard(ILogger logger,
+            UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService) :
-			base(identityUserManager, identitySignInManager,
+			base(logger,
+                identityUserManager, identitySignInManager,
 				accountOperations, profileOperations,
 				eventOperations, etchingOperations,
 				disciplineOperations, mediaOperations,

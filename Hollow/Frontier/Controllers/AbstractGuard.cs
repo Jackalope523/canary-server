@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 using Core.Boundaries;
-using Serilog;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
@@ -35,6 +35,8 @@ namespace Frontier.Controllers
 
 		#region Variables
 
+		public ILogger log;
+
 		public UserManager<UserShard> userManager;
 		public SignInManager<UserShard> signInManager;
 
@@ -53,13 +55,16 @@ namespace Frontier.Controllers
 
 		#region Initialisation
 
-		public AbstractGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
+		public AbstractGuard(ILogger logger,
+			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
 			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations,
 			INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService)
 		{
+			log = logger;
+
 			userManager = identityUserManager;
 			signInManager = identitySignInManager;
 
@@ -89,7 +94,7 @@ namespace Frontier.Controllers
 			catch (HollowFailureException ex)
 			{
 				// Log failure
-				Log.Error(ex, ex.Message);
+				log.LogError(ex, "Exception Message: {message}", ex.Message);
 
 				return StatusCode(500, ex.StackTrace);
 			}
@@ -100,7 +105,7 @@ namespace Frontier.Controllers
 			catch (Exception ex)
 			{
 				// Log failure
-				Log.Error(ex, ex.Message);
+				log.LogError(ex, "Exception Message: {message}", ex.Message);
 
 				return StatusCode(500, ex.StackTrace);
 			}

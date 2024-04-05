@@ -21,6 +21,7 @@ using Serilog;
 using Repository;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Core;
+using Serilog.Debugging;
 
 namespace Frontier
 {
@@ -31,6 +32,8 @@ namespace Frontier
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Console()
 				.CreateLogger();
+
+			Log.Debug("Hollow starting up...");
 
 			try
 			{
@@ -45,6 +48,7 @@ namespace Frontier
 			}
 			finally
 			{
+				Log.Debug("Hollow shutting down.");
 				Log.CloseAndFlush();
 			}
         }
@@ -71,6 +75,15 @@ namespace Frontier
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
 			});
 
+
+			var loggerFactory = new LoggerFactory()
+				.AddSerilog(Log.Logger);
+
+			var frontierLogger = loggerFactory.CreateLogger("Frontier");
+			var coreLogger = loggerFactory.CreateLogger("Core");
+			var repositoryLogger = loggerFactory.CreateLogger("Repository");
+
+
 			/////
 			// Services 
 			/////////////
@@ -83,13 +96,15 @@ namespace Frontier
 			services.AddTransient<IEmailService, SendGridService>();
 			// TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
+
 			//////
 			// Connections
 			////////////////
 
-			Harbor harbor = new(Harbor.Flag.Production);
+			Harbor harbor = new(Harbor.Flag.Production, repositoryLogger);
 
 			CoreTerminal terminal = CoreTerminal.CreateTerminal(
+				coreLogger,
 				harbor.AccountDatabaseAccess,
 				harbor.AdminDatabaseAccess,
 				harbor.EventDatabaseAccess, 
@@ -104,6 +119,8 @@ namespace Frontier
 			{
 				services.AddSingleton(GateType, Instance);
 			}
+
+			services.AddSingleton(frontierLogger);
 
 			
 			/////////
