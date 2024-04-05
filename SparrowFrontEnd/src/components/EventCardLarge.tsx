@@ -59,102 +59,104 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
   const eventAttendeesFriendsLabelText = `${eventAttendeesFriends} FRIENDS`;
 
   return (
-    <View style={styles.eventCardLargeContainer}>
-      <View style={styles.eventCardLarge}>
-        <View style={styles.host}>
-          <Avatar size={AvatarSize.Small} image={TempAvatarImage} />
-          <View style={styles.hostNameContainer}>
-            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              {eventHostName}
-            </Text>
-            {friend && <FeatherIcon height={24} width={24} />}
-          </View>
-        </View>
-        {/* event */}
-        <View style={styles.event}>
-          {/* aligned to top */}
-          <View style={styles.eventTop}>
-            <Image
-              source={eventHeroImage}
-              resizeMode="cover"
-              style={styles.eventHeroImage}
-            />
-            <Text
-              style={[globalStyles.headingTextThree, globalStyles.textDark]}
-              numberOfLines={2}>
-              {eventTitle}
-            </Text>
-          </View>
-          {/* aligned to bottom */}
-          <View style={styles.eventBottom}>
-            <View style={styles.eventInfo}>
-              <View style={styles.eventInfoItem}>
-                <DateIcon
-                  height={24}
-                  width={24}
-                  fill={Colors.sparrowDarkBrown}
-                />
-                <Text style={globalStyles.textDark}>
-                  <Text
-                    style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-                    {eventDate} at{' '}
-                  </Text>
-                  <Text
-                    style={[
-                      globalStyles.bodyTextOneBold,
-                      globalStyles.textDark,
-                    ]}>
-                    {eventTime}
-                  </Text>
-                </Text>
-              </View>
-              <View style={styles.eventInfoItem}>
-                <LocationIcon
-                  height={24}
-                  width={24}
-                  fill={Colors.sparrowDarkBrown}
-                />
-                <Text
-                  style={[globalStyles.bodyTextOne, globalStyles.textDark]}
-                  numberOfLines={1}>
-                  {eventLocation}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.eventAttendees}>
-              <View style={styles.eventInfoItem}>
-                <PersonIcon
-                  height={24}
-                  width={24}
-                  fill={Colors.sparrowDarkBrown}
-                />
-                <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-                  {eventAttendees}
-                </Text>
-              </View>
-              {eventAttendeesFriends > 0 && (
-                <TextLabel
-                  text={eventAttendeesFriendsLabelText}
-                  type={LabelType.Friend}
-                  size={LabelSize.Small}
-                  display={LabelDisplay.Contained}
-                />
-              )}
-            </View>
-          </View>
+  <View style={styles.eventCardLargeContainer}>
+    <View style={styles.eventCardLarge}>
+
+      <View style={styles.host}>
+        <Avatar size={AvatarSize.Small} image={TempAvatarImage} />
+        <View style={styles.hostNameContainer}>
+          <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+            {eventHostName}
+          </Text>
+          {friend && <FeatherIcon height={24} width={24} />}
         </View>
       </View>
 
-      {/* TODO add shadow effect */}
-      {/* TODO make shadow effects a re-usable component; it should use the height and width of the chosen component */}
+      {/* Image Title Adaptive Combo */}
+      <View style={styles.eventTop}>
+        <Image
+          source={eventHeroImage}
+          resizeMode="cover"
+          style={styles.eventHeroImage}
+        />
+        <Text
+          style={[globalStyles.headingTextThree, globalStyles.textDark]}
+          numberOfLines={2}>
+          {eventTitle}
+        </Text>
+      </View>
+      {/* aligned to bottom */}
+
+      {/* Event Info */}
+      <View style={styles.eventInfo}>
+        <View style={styles.eventInfoItem}>
+          <DateIcon
+            height={24}
+            width={24}
+            fill={Colors.sparrowDarkBrown}
+          />             
+          <Text style={globalStyles.textDark}>
+            <Text
+              style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+              {eventDate} at{' '}
+            </Text>
+            <Text
+              style={[
+                globalStyles.bodyTextOneBold,
+                globalStyles.textDark,
+              ]}>
+              {eventTime}
+            </Text>
+          </Text>
+        </View>
+        <View style={styles.eventInfoItem}>
+          <LocationIcon
+            height={24}
+            width={24}
+            fill={Colors.sparrowDarkBrown}
+          />
+          <Text
+            style={[globalStyles.bodyTextOne, globalStyles.textDark]}
+            numberOfLines={1}>
+            {eventLocation}
+          </Text>
+        </View>
+      </View>
+
+      {/* Attendee Info*/}
+      <View style={styles.eventAttendees}>
+        <View style={styles.eventInfoItem}>
+          <PersonIcon
+            height={24}
+            width={24}
+            fill={Colors.sparrowDarkBrown}
+          />
+          <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+            {eventAttendees}
+          </Text>
+        </View>
+        {eventAttendeesFriends > 0 && (
+        <TextLabel
+          text={eventAttendeesFriendsLabelText}
+          type={LabelType.Friend}
+          size={LabelSize.Small}
+          display={LabelDisplay.Contained}
+        />
+        )}
+      </View>
     </View>
+
+    {/* TODO add shadow effect */}
+    {/* TODO make shadow effects a re-usable component; it should use the height and width of the chosen component */}
+  </View>
   );
 };
 
 export default EventCardLarge;
 
 const styles = StyleSheet.create({
-  eventCardLargeContainer: {},
+  eventCardLargeContainer: {
+  },
 
   eventCardLarge: {
     backgroundColor: Colors.sparrowSand,
@@ -169,6 +171,9 @@ const styles = StyleSheet.create({
     height: CustomDimensions.windowHeight - Spacing.xl * 6,
     width: CustomDimensions.windowWidth - Spacing.lg * 2,
     flex: 1,
+
+    shadowColor: Colors.sparrowDark,
+    elevation:10
   },
 
   // Host
@@ -177,6 +182,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     columnGap: Spacing.sm,
     paddingBottom: Spacing.md,
+    flex: 1,
   },
 
   hostNameContainer: {
@@ -185,14 +191,9 @@ const styles = StyleSheet.create({
     columnGap: Spacing.xs,
   },
 
-  // Event
-  event: {
-    flex: 1,
-  },
-
   eventTop: {
     rowGap: Spacing.md,
-    flex: 1,
+    flex: 9,
 
     // TODO titls should always be on the same line; space-between config between top and bottom
     paddingBottom: Spacing.lg,
@@ -206,12 +207,10 @@ const styles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
-  eventBottom: {
-    rowGap: Spacing.lg,
-  },
-
   eventInfo: {
     rowGap: Spacing.sm,
+    paddingBottom: 30,
+    flex: 1,
   },
 
   // TODO fix eventInfoItem overlapping the card
@@ -222,11 +221,12 @@ const styles = StyleSheet.create({
   },
 
   eventAttendees: {
-    paddingTop: Spacing.md,
+    paddingTop: 5,
     borderTopWidth: 2,
     borderColor: Colors.sparrowDarkBrown,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flex: 1,
   },
 });
