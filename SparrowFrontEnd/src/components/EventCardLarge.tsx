@@ -29,7 +29,7 @@ interface EventCardLargeProps {
   eventTime: string;
   eventLocation: string;
   eventAttendees: number;
-  eventAttendeesFriends: number;
+  eventAttendeesFriends?: number;
 }
 
 const EventCardLarge: React.FC<EventCardLargeProps> = ({

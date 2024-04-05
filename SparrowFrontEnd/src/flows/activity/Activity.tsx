@@ -3,16 +3,14 @@ import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
 import { Spacing } from '../../styles/SpacingStyles';
-
 import EventCardMedium from '../../components/EventCardMedium';
 import NotificationIndicator from '../../components/activity/NotificationIndicator';
 import { ButtonDisplay, ButtonSize, ButtonType } from '../../components/Button';
 import ExclusiveButtonView from '../../components/ExclusiveButtonView';
-
-// Sample data
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import EventCardLarge from '../../components/EventCardLarge';
-import DropdownSelectorIcon from '../../components/DropdownSelectorIcon';
+import DropdownSelectorText from '../../components/DropdownSelectorText';
+import dropdownOptionsActivity from '../../components/DropdownOptionsActivity';
 
 const ActivityScreen = () => {
   return (
@@ -21,6 +19,8 @@ const ActivityScreen = () => {
       overScrollMode="never"
       showsVerticalScrollIndicator={false}>
       <View style={styles.topContainer}>
+        {/* TODO hook up onPress in dropdownOptionsActivity to here */}
+        <DropdownSelectorText options={dropdownOptionsActivity} />
         <View style={styles.notificationContainer}>
           <NotificationIndicator />
         </View>
@@ -28,7 +28,7 @@ const ActivityScreen = () => {
 
       <View style={styles.events}>
         {/* TODO first filter button ("All") has to be set as selected/active on default */}
-        {/* TODO we keeping the filter  or deleting it?; in app design it's deleted */}
+        {/* TODO we keeping the filter  or deleting it?; in app design it's deleted, so delete if we don't need it */}
 
         {/* <ExclusiveButtonView
           groupStyle={styles.filter}
@@ -90,17 +90,6 @@ const ActivityScreen = () => {
 export default ActivityScreen;
 
 const styles = StyleSheet.create({
-  displayText: {
-    color: Colors.picton500,
-    marginVertical: Spacing.lg,
-  },
-
-  headingText: {
-    color: Colors.sparrowDark,
-    marginBottom: Spacing.md,
-    marginLeft: Spacing.lg,
-  },
-
   mainContainer: {
     paddingBottom: Spacing.lg,
   },
@@ -114,8 +103,12 @@ const styles = StyleSheet.create({
   },
 
   topContainer: {
-    marginHorizontal: Spacing.lg,
-    marginTop: Spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
 
   notificationContainer: {
