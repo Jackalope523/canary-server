@@ -15,8 +15,8 @@ const dropdownOptionsActivity = [
   },
   {
     id: 2,
-    text: 'Past',
-    onPress: () => console.log('Past pressed'),
+    text: 'Watching',
+    onPress: () => console.log('Watching pressed'),
   },
 ];
 
