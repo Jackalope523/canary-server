@@ -62,7 +62,9 @@ const ActivityScreen = () => {
 
         <FlatList
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.lg,
+          }}
           ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           overScrollMode="never"
           horizontal={true}

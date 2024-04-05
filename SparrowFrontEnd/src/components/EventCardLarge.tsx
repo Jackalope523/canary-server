@@ -29,7 +29,7 @@ interface EventCardLargeProps {
   eventTime: string;
   eventLocation: string;
   eventAttendees: number;
-  eventAttendeesFriends?: number;
+  eventAttendeesFriends: number;
 }
 
 const EventCardLarge: React.FC<EventCardLargeProps> = ({
@@ -157,15 +157,18 @@ const styles = StyleSheet.create({
   eventCardLargeContainer: {},
 
   eventCardLarge: {
+    backgroundColor: Colors.sparrowSand,
     padding: Spacing.md,
     borderWidth: 2,
     borderColor: Colors.sparrowDarkBrown,
     borderRadius: borderRadius.md,
 
-    // TODO add dynamic height based on screen size AND image size
+    // TODO add dynamic height based on screen size + configure image size
     // REMEMBER: card height needs to stay the same when viewed from the same device; the image size should change on other devices/screen sizes
-    height: 480,
+    // TEMP. config; can't figure out how to make it fill the whole leftover height area (use flex, just where?)
+    height: CustomDimensions.windowHeight - Spacing.xl * 6,
     width: CustomDimensions.windowWidth - Spacing.lg * 2,
+    flex: 1,
   },
 
   // Host
@@ -190,10 +193,14 @@ const styles = StyleSheet.create({
   eventTop: {
     rowGap: Spacing.md,
     flex: 1,
+
+    // TODO titls should always be on the same line; space-between config between top and bottom
+    paddingBottom: Spacing.lg,
   },
+
   eventHeroImage: {
     width: '100%',
-    height: 128, // TODO make this height dynamic based on screen size
+    flex: 1,
     borderRadius: borderRadius.md,
     borderWidth: 2,
     borderColor: Colors.sparrowDarkBrown,
@@ -207,6 +214,7 @@ const styles = StyleSheet.create({
     rowGap: Spacing.sm,
   },
 
+  // TODO fix eventInfoItem overlapping the card
   eventInfoItem: {
     flexDirection: 'row',
     alignItems: 'center',
