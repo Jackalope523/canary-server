@@ -10,7 +10,7 @@ import ExclusiveButtonView from '../../components/ExclusiveButtonView';
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import EventCardLarge from '../../components/EventCardLarge';
 import DropdownSelectorText from '../../components/DropdownSelectorText';
-import dropdownOptionsActivity from '../../components/DropdownOptionsActivity';
+import dropdownOptionsActivity from './DropdownOptionsActivity';
 
 const ActivityScreen = () => {
   return (

@@ -1,3 +1,4 @@
+//#region imports
 import { Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Avatar, { AvatarSize } from './Avatar';
@@ -18,6 +19,9 @@ import { Colors } from '../styles/ColorStyles';
 import { borderRadius } from '../styles/BorderStyles';
 import TextLabel, { LabelDisplay, LabelSize, LabelType } from './TextLabel';
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
+import { VectorSource } from '@rnmapbox/maps';
+import symbolicateStackTrace from 'react-native/Libraries/Core/Devtools/symbolicateStackTrace';
+//#endregion 
 
 interface EventCardLargeProps {
   onPress: () => void;
@@ -60,8 +64,12 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
 
   return (
   <View style={styles.eventCardLargeContainer}>
+
+    <View style={styles.shadow}/>
+
     <View style={styles.eventCardLarge}>
 
+      {/* Host Info */}
       <View style={styles.host}>
         <Avatar size={AvatarSize.Small} image={TempAvatarImage} />
         <View style={styles.hostNameContainer}>
@@ -144,10 +152,10 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
         />
         )}
       </View>
-    </View>
 
-    {/* TODO add shadow effect */}
+    </View>
     {/* TODO make shadow effects a re-usable component; it should use the height and width of the chosen component */}
+    
   </View>
   );
 };
@@ -156,6 +164,8 @@ export default EventCardLarge;
 
 const styles = StyleSheet.create({
   eventCardLargeContainer: {
+    height: CustomDimensions.windowHeight - Spacing.xl * 6 + 6,
+    width: CustomDimensions.windowWidth - Spacing.lg * 2,
   },
 
   eventCardLarge: {
@@ -171,9 +181,15 @@ const styles = StyleSheet.create({
     height: CustomDimensions.windowHeight - Spacing.xl * 6,
     width: CustomDimensions.windowWidth - Spacing.lg * 2,
     flex: 1,
+    position: "absolute"
+  },
 
-    shadowColor: Colors.sparrowDark,
-    elevation:10
+  shadow: {
+    height: CustomDimensions.windowHeight - Spacing.xl * 6 + 6,
+    width: CustomDimensions.windowWidth - Spacing.lg * 2, 
+    backgroundColor: Colors.sparrowDark,
+    position:'absolute',
+    borderRadius: borderRadius.md
   },
 
   // Host
