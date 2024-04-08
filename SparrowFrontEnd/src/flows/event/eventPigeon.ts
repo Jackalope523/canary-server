@@ -368,7 +368,15 @@ export async function etchIntoEvent(eventID: number, etching: eventEtching) {
         return Promise.reject();
     }
 
-    return await userSession.post(`${apiBaseUrl}/${eventID}/etchings`, etching)
+    var data = new FormData();
+    data.append('image',
+      {
+         uri: etching.ImageURL,
+         name:'etching.jpg',
+         type:'image/jpg'
+      });
+
+    return await userSession.post(`${apiBaseUrl}/${eventID}/etchings`, data)
         .then((response: any) => {
             console.log('Etching Added to Event:', response.data);
 

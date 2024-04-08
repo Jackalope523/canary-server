@@ -20,7 +20,6 @@ namespace Core.Boundaries
     public interface IMediaOperations
     {
         Task<MemoryStream> GetImageStreamAsync(ulong userId, ulong etchingId);
-        Task UploadImageAsync(ulong userId, ulong etchingId, MemoryStream image);
     }
 
     #endregion

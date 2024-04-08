@@ -34,6 +34,10 @@ namespace Core.Controls
 			return stream;
 		}
 
+		#endregion
+
+		#region Favours
+
 		public async Task UploadImageAsync(ulong userId, ulong etchingId, MemoryStream image)
 		{
 			var user = await GetUserAsync(userId);
@@ -41,11 +45,6 @@ namespace Core.Controls
 
 			await Media.UploadImageAsync(etching.Id, user.Id, image);
 		}
-
-		#endregion
-
-		#region Favours
-
 
 		#endregion
 	}

@@ -44,12 +44,6 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPost("{etchingId}")]
-		public async Task<IActionResult> UploadImage(ulong etchingId)
-		{
-			return await Execute(async user => await media.UploadImageAsync(user.Id, etchingId, await StreamFirstFile()));
-        }
-
 		#endregion
 	}
 }
