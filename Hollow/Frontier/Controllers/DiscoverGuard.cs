@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Core.Boundaries;
 using Microsoft.Extensions.Logging;
+using Frontier.Manifests;
 
 namespace Frontier.Controllers
 {
@@ -38,7 +39,8 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve events personalised for the current user
-				var eventList = await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
+				List<EventManifest> eventList = (await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance))
+					.ConvertAll(shard => new EventManifest(shard));
 
 				return Ok(eventList);
 			});
@@ -49,10 +51,11 @@ namespace Frontier.Controllers
         {
 			return await Execute(async user =>
 			{
-				// Retrieve all events available to the current user
-				var eventList = await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
+                // Retrieve all events available to the current user
+                List<EventManifest> eventList = (await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance))
+					.ConvertAll(shard => new EventManifest(shard));
 
-				return Ok(eventList);
+                return Ok(eventList);
 			});
         }
 

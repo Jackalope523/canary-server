@@ -13,6 +13,7 @@ namespace Frontier.Manifests
 
 	public class FeedManifest
 	{
-
+		public List<EventHeaderManifest> Headers { get; set; }
+		public List<EtchingManifest> Etchings { get; set; }
 	}
 }

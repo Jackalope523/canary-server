@@ -38,7 +38,8 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var notes = await notifications.GetNotesAsync(user.Id);
+				List<NoteManifest> notes = (await notifications.GetNotesAsync(user.Id))
+					.ConvertAll(note => new NoteManifest(note));
 
 				return Ok(notes);
 			});

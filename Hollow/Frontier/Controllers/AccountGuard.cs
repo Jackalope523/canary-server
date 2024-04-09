@@ -41,7 +41,7 @@ namespace Frontier.Controllers
             return await Execute(async () =>
             {
                 // Get current user
-                var user = await GetCurrentUserAsync();
+                SelfUserManifest user = new(await GetCurrentUserAsync());
 
                 return Ok(user);
             });

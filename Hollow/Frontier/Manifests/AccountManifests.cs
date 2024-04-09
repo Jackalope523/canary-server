@@ -1,4 +1,5 @@
-﻿using Shared;
+﻿using Core.Boundaries;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -43,8 +44,33 @@ namespace Frontier.Manifests
 	// Outgoing Manifests
 	///////////////////////
 
-	public class UserManifest
+	public class SelfUserManifest
 	{
 		public ulong Id { get; }
-	}
+        public string PhoneNumber { get; }
+		public string Email { get; }
+        public string Name { get; }
+        public int Reputation { get; }
+		public int NumberOfFollowers { get; }
+
+		public SelfUserManifest(UserShard shard)
+		{
+			Id = shard.Id;
+			PhoneNumber = shard.PhoneNumber;
+			Email = shard.Email;
+			Name = shard.Name;
+			Reputation = shard.Reputation;
+			NumberOfFollowers = shard.NumberOfFollowers;
+		}
+    }
+
+	public class OtherUserManifest
+	{
+		public ulong Id { get; }
+        public string PhoneNumber { get; }
+		public string Email { get; }
+        public string Name { get; }
+        public int Reputation { get; }
+		public int NumberOfFollowers { get; }
+    }
 }
