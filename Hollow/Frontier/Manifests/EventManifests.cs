@@ -8,7 +8,11 @@ using Shared;
 
 namespace Frontier.Manifests
 {
-    public class EventDetailsManifest
+	////////
+	// Incoming Manifests
+	///////////////////////
+
+	public class EventDetailsManifest
     {
         [Required]
         public string EventName { get; set; }

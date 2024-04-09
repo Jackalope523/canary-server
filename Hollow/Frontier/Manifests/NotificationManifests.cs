@@ -4,6 +4,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Frontier.Manifests
 {
+	////////
+	// Incoming Manifests
+	///////////////////////
+
 	public class NotificationSubscriptionManifest
 	{
 		[Required]

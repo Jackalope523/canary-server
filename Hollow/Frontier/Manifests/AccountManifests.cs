@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Frontier.Manifests
 {
+	////////
+	// Incoming Manifests
+	///////////////////////
+	
     public class TargetManifest
     {
         [Required]
@@ -34,4 +38,13 @@ namespace Frontier.Manifests
 		[Required]
 		public DateTime DateOfBirth { get; set; }
     }
+
+	////////
+	// Outgoing Manifests
+	///////////////////////
+
+	public class UserManifest
+	{
+		public ulong Id { get; }
+	}
 }
