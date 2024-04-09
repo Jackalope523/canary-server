@@ -74,18 +74,19 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({
           </View>
           {eventStatus === EventStatus.Upcoming && (
             <View style={styles.eventDetailsInnerContainer}>
-              <TimeOutline
+              <DateOutline
                 height={24}
                 width={24}
                 fill={Colors.sparrowDarkBrown}
               />
               <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-                {eventTime}
+                {eventDate} at{' '}
+                <Text style={globalStyles.bodyTextOneBold}>{eventTime}</Text>
               </Text>
             </View>
           )}
         </View>
-        <View style={styles.eventDetailsInnerContainer}>
+        {/* <View style={styles.eventDetailsInnerContainer}>
           <LocationOutline
             height={24}
             width={24}
@@ -96,7 +97,7 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({
             numberOfLines={1}>
             {eventLocation}
           </Text>
-        </View>
+        </View> */}
         {eventStatus === EventStatus.Upcoming && (
           <View style={styles.eventDetailsInnerContainer}>
             <AccountOutline
