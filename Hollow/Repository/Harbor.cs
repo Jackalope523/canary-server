@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.Extensions.Logging;
+using Repository.Coordinators;
 
 namespace Repository
 {
@@ -17,6 +18,7 @@ namespace Repository
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
         public IMediaDatabase MediaDatabaseAccess { get; private set; }
+        public IKeyDatabase KeyDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -28,6 +30,7 @@ namespace Repository
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             MediaDatabaseAccess = new MediaStoreCoordinator();
+            KeyDatabaseAccess = new KeyStoreCoordinator();
         }
 
         public Harbor(Flag flag, ILogger logger)

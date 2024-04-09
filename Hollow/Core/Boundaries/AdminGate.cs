@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Core.Boundaries
@@ -11,7 +12,6 @@ namespace Core.Boundaries
         Task VoidUserAsync(ulong userId);
         Task VoidEventAsync(ulong eventId);
     }
-
     #endregion
 }
 
