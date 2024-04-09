@@ -11,8 +11,33 @@ import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import EventCardLarge from '../../components/EventCardLarge';
 import DropdownSelectorText from '../../components/DropdownSelectorText';
 import dropdownOptionsActivity from './DropdownOptionsActivity';
+import { seedDatabase } from '../testing/testPigeon';
+import { accountStatus, character, userShard } from '../auth/accountPigeon';
+import { eventShard } from '../event/eventPigeon';
+import { 
+  user1, 
+  user2, 
+  user3, 
+  user4, 
+  user5, 
+  user6, 
+  user7, 
+  event1, 
+  event2, 
+  event3, 
+  attendance,
+  follows, 
+  blocks } from '../testing/gardenShed';
 
 const ActivityScreen = () => {
+  seedDatabase(
+    [user1, user2, user3, user4, user5, user6, user7], 
+    [event1, event2, event3], 
+    attendance, 
+    follows, 
+    blocks)
+    .then(() => console.log("DATABASE SEEDED"));
+  
   return (
     <ScrollView
       style={styles.mainContainer}
