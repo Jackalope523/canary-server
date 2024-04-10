@@ -83,10 +83,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve activity
-				List<EventManifest> activity = (await profiles.GetUserActivityAsync(user.Id, targetIdentification))
-					.ConvertAll(@event => new EventManifest(@event));
+				var manifest = ManifestSeries<EventManifest>.Create(
+					await profiles.GetUserActivityAsync(user.Id, targetIdentification),
+					@event => new EventManifest(@event));
 
-				return activity;
+				return manifest;
 			});
 		}
 
@@ -119,10 +120,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve all users that the current user is following
-				List<UserSilhouetteManifest> followedUsers = (await profiles.GetFollowedUsersAsync(user.Id))
-					.ConvertAll(silhouette => new UserSilhouetteManifest(silhouette));
+				var manifest = ManifestSeries<UserSilhouetteManifest>.Create(
+					await profiles.GetFollowedUsersAsync(user.Id),
+					silhouette => new UserSilhouetteManifest(silhouette));
 
-				return followedUsers;
+				return manifest;
 			});
 		}
 
@@ -160,10 +162,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve all users that the current user is blocking
-				List<UserSilhouetteManifest> blockedUsers = (await profiles.GetBlockedUsersAsync(user.Id))
-                    .ConvertAll(silhouette => new UserSilhouetteManifest(silhouette));
+				var manifest = ManifestSeries<UserSilhouetteManifest>.Create(
+					await profiles.GetBlockedUsersAsync(user.Id),
+                    silhouette => new UserSilhouetteManifest(silhouette));
 
-                return blockedUsers;
+                return manifest;
 			});
 		}
 

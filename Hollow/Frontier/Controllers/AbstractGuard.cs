@@ -93,13 +93,15 @@ namespace Frontier.Controllers
 			{
 				var result = await action.Invoke();
 
-                // Check outgoing type is generic or manifest
-                var type = result.GetType();
-
-                if (type != typeof(Manifest) ||
-                    type != typeof(List<>) ||
-					type != typeof(string))
-                { throw new UnexpectedFailureException($"Server tried sending non-manifest object type {type}."); }
+				// Check if there is a result
+				if (result != null)
+				{
+					// Ensure outgoing type is generic or manifest
+					if (result is not Manifest &&
+						result is not string &&
+						result is not int)
+					{ throw new UnexpectedFailureException($"Server tried sending non-manifest object type {result.GetType()}."); }
+				}
 
                 return Ok(result);
 			}
@@ -129,7 +131,7 @@ namespace Frontier.Controllers
 			return await Execute(async () =>
 			{
 				await action.Invoke();
-				return Ok();
+				return null;
 			});
 		}
 
@@ -139,7 +141,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await action.Invoke(user);
-				return Ok();
+				return null;
 			},
 			allowUnverified);
 		}

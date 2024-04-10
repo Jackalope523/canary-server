@@ -39,10 +39,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve events personalised for the current user
-				List<EventManifest> eventList = (await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance))
-					.ConvertAll(shard => new EventManifest(shard));
+				var manifest = ManifestSeries<EventManifest>.Create(
+					await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance),
+					shard => new EventManifest(shard));
 
-				return eventList;
+				return manifest;
 			});
         }
 
@@ -52,10 +53,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
                 // Retrieve all events available to the current user
-                List<EventManifest> eventList = (await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance))
-					.ConvertAll(shard => new EventManifest(shard));
-
-                return eventList;
+                var manifest = ManifestSeries<EventManifest>.Create(
+					await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance),
+					shard => new EventManifest(shard));
+;
+				return manifest;
 			});
         }
 

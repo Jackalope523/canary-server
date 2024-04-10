@@ -178,10 +178,11 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				List<UserSilhouetteManifest> users = (await events.GetPotentialInviteesAsync(user.Id, eventId))
-					.ConvertAll(silhouette => new UserSilhouetteManifest(silhouette));
+				var manifest = ManifestSeries<UserSilhouetteManifest>.Create(
+					await events.GetPotentialInviteesAsync(user.Id, eventId),
+					silhouette => new UserSilhouetteManifest(silhouette));
 
-				return users;
+				return manifest;
 			});
         }
 
@@ -221,10 +222,11 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				List<EtchingManifest> eventEtchings = (await etchings.GetEventEtchingsAsync(user.Id, eventId))
-					.ConvertAll(etching => new EtchingManifest(etching));
+				var manifest = ManifestSeries<EtchingManifest>.Create(
+					await etchings.GetEventEtchingsAsync(user.Id, eventId),
+					etching => new EtchingManifest(etching));
 
-				return eventEtchings;
+				return manifest;
 			});
 		}
 

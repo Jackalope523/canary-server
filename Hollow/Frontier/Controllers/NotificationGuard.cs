@@ -38,10 +38,11 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				List<NoteManifest> notes = (await notifications.GetNotesAsync(user.Id))
-					.ConvertAll(note => new NoteManifest(note));
+				var manifest = ManifestSeries<NoteManifest>.Create(
+					await notifications.GetNotesAsync(user.Id),
+					note => new NoteManifest(note));
 
-				return notes;
+				return manifest;
 			});
         }
 

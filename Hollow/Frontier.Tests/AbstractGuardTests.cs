@@ -2,6 +2,8 @@ using Core.Boundaries;
 using Frontier.Controllers;
 using Frontier.Manifests;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Shared;
 using Xunit;
 
@@ -9,7 +11,7 @@ namespace Frontier.Tests
 {
 	public class AbstractGuardTests
 	{
-		AbstractGuard testGuard = new(null, null, null, null, null, null, null, null, null, null, null, null);
+		AbstractGuard testGuard = new(new LoggerFactory().CreateLogger(""), null, null, null, null, null, null, null, null, null, null, null);
 
 		[Fact]
 		public async Task Execute_NoData_Success()
@@ -29,7 +31,7 @@ namespace Frontier.Tests
 		public async Task Execute_String_Success()
 		{
 			// Arrange
-			var action = async () => "some silly string";
+			Func<Task<object>> action = async () => "some silly string";
 
 			// Act
 			var result = await testGuard.Execute(action) as ObjectResult;
@@ -44,7 +46,7 @@ namespace Frontier.Tests
 		{
 			// Arrange
 			var manifest = new UserSilhouetteManifest(new(117, "John"));
-			var action = async () => manifest;
+			Func<Task<object>> action = async () => manifest;
 
 			// Act
 			var result = await testGuard.Execute(action) as ObjectResult;
@@ -62,8 +64,8 @@ namespace Frontier.Tests
 		public async Task Execute_List_Success()
 		{
 			// Arrange
-			List<UserSilhouetteManifest> list = new() { new UserSilhouetteManifest(new(117, "John")), new UserSilhouetteManifest(new(3, "Thel")) };
-			var action = async () => list;
+			ManifestSeries<UserSilhouetteManifest> manifest = new() { new UserSilhouetteManifest(new(117, "John")), new UserSilhouetteManifest(new(3, "Thel")) };
+			Func<Task<object>> action = async () => manifest;
 
 			// Act
 			var result = await testGuard.Execute(action) as ObjectResult;
@@ -71,9 +73,9 @@ namespace Frontier.Tests
 			// Assert
 			Assert.NotNull(result);
 
-			var resultList = result.Value as List<UserSilhouetteManifest>;
+			var resultList = result.Value as ManifestSeries<UserSilhouetteManifest>;
 			Assert.NotNull(resultList);
-			Assert.Equal(list.Count, resultList.Count);
+			Assert.Equal(manifest.Count, resultList.Count);
 		}
 
 		[Fact]
@@ -81,13 +83,14 @@ namespace Frontier.Tests
 		{
 			// Arrange
 			UserSilhouette bastardData = new(117, "John");
-			var action = async () => bastardData;
+			Func<Task<object>> action = async () => bastardData;
 
 			// Act
-			var resultSync = testGuard.Execute(action);
+			var result = await testGuard.Execute(action) as IStatusCodeActionResult;
 
 			// Assert
-			await Assert.ThrowsAsync<HollowException>(async () => await resultSync);
+			Assert.NotNull(result);
+			Assert.NotEqual(200, result.StatusCode);
 		}
 
 		private static void NoOp()
