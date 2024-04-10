@@ -71,7 +71,7 @@ namespace Core.Boundaries
 			}
 		}
 
-		private CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
+		protected CoreTerminal(IAccountDatabase accountDatabase, IEventDatabase eventDatabase,
 			IEtchingDatabase etchingDatabase, IProfileDatabase profileDatabase,
 			IDisciplineDatabase disciplineDatabase, INotificationDatabase notificationDatabase,
 			IAdminDatabase adminDatabase, INotificationService notificationService)

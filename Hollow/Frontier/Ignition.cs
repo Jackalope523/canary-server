@@ -69,6 +69,7 @@ namespace Frontier
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
 			});
 
+
 			/////
 			// Services 
 			/////////////
@@ -81,25 +82,49 @@ namespace Frontier
 			services.AddTransient<IEmailService, SendGridService>();
 			// TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
+
 			//////
 			// Connections
 			////////////////
 
-			Harbor harbor = new(Harbor.Flag.Production);
-
-			CoreTerminal terminal = CoreTerminal.CreateTerminal(
-				harbor.AccountDatabaseAccess,
-				harbor.EventDatabaseAccess, 
-				harbor.EtchingDatabaseAccess,
-				harbor.ProfileDatabaseAccess, 
-				harbor.ReportDatabaseAccess,
-                harbor.NotificationDatabaseAccess,
-				harbor.AdminDatabaseAccess,
-				pushNotifications);
-
-			foreach (var (GateType, Instance) in terminal.Gates)
+			if (IsDebug)
 			{
-				services.AddSingleton(GateType, Instance);
+				Harbor harbor = new(Harbor.Flag.Development);
+
+				CoreTerminal terminal = DebugTerminal.CreateDebugTerminal(
+					harbor.AccountDatabaseAccess,
+					harbor.EventDatabaseAccess, 
+					harbor.EtchingDatabaseAccess,
+					harbor.ProfileDatabaseAccess, 
+					harbor.ReportDatabaseAccess,
+					harbor.NotificationDatabaseAccess,
+					harbor.AdminDatabaseAccess,
+					pushNotifications,
+					harbor.DebugDatabaseAccess);
+
+				foreach (var (GateType, Instance) in terminal.Gates)
+				{
+					services.AddSingleton(GateType, Instance);
+				}
+			}
+			else
+			{
+				Harbor harbor = new(Harbor.Flag.Production);
+
+				CoreTerminal terminal = CoreTerminal.CreateTerminal(
+					harbor.AccountDatabaseAccess,
+					harbor.EventDatabaseAccess, 
+					harbor.EtchingDatabaseAccess,
+					harbor.ProfileDatabaseAccess, 
+					harbor.ReportDatabaseAccess,
+					harbor.NotificationDatabaseAccess,
+					harbor.AdminDatabaseAccess,
+					pushNotifications);
+
+				foreach (var (GateType, Instance) in terminal.Gates)
+				{
+					services.AddSingleton(GateType, Instance);
+				}
 			}
 
 			
@@ -143,6 +168,18 @@ namespace Frontier
 			{
 				endpoints.MapControllers();
 			});
+		}
+
+		public static bool IsDebug
+		{
+			get
+			{
+				bool isDebug = false;
+#if DEBUG
+				isDebug = true;
+#endif
+				return isDebug;
+			}
 		}
 	}
 }

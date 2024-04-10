@@ -15,9 +15,9 @@ namespace Core.Controls
 
 		private IDebugDatabase Debug;
 
-		public DebugDirector(CoreTerminal terminal) : base(terminal)
-		{ 
-
+		public DebugDirector(DebugTerminal terminal) : base(terminal)
+		{
+			Debug = terminal.DebugDatabase;
 		}
 
 		#endregion

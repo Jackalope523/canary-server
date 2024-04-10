@@ -53,10 +53,21 @@ namespace Frontier.Controllers
 					await accounts.CreateUserAsync(user.PhoneNumber, user.Email, user.Name, user.DateOfBirth);
 
 					seedUsers.Add(await accounts.GetUserAsync(user.PhoneNumber));
+
+					// Confirm user phone
+					var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+					await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, code);
+
+					// Confirm user email
+					var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+					await userManager.ConfirmEmailAsync(user, token);
 				}
 
 				foreach (var @event in seed.Events)
 				{
+					// Move host to proposed event location
+					await accounts.UpdateUserLocationAsync(@event.Host.Id, @event.Latitude, @event.Longitude);
+
 					seedEvents.Add(await events.CreateEventAsync(@event.Host.Id,
 						@event.EventName, @event.EventDescription,
 						@event.StartTime, @event.Latitude, @event.Longitude,
@@ -66,6 +77,10 @@ namespace Frontier.Controllers
 
 				foreach ((var self, var @event) in seed.Attendance)
 				{
+					// Move user to event location
+					await accounts.UpdateUserLocationAsync(seedUsers[self - 1].Id, seedEvents[@event - 1].Latitude, seedEvents[@event - 1].Longitude);
+
+					// Attempt to join the event
 					await events.JoinEventAsync(seedUsers[self - 1].Id, seedEvents[@event - 1].Id);
 				}
 
