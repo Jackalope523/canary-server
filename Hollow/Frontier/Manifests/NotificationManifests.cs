@@ -22,7 +22,7 @@ namespace Frontier.Manifests
     // Outgoing Manifests
     ///////////////////////
 
-	public class NoteManifest
+	public class NoteManifest : Manifest
 	{
 		public ulong NotifierId { get; }
 		public DateTimeOffset Time { get; }

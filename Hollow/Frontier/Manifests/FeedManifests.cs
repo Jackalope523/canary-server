@@ -11,7 +11,7 @@ namespace Frontier.Manifests
 	// Outgoing Manifests
 	///////////////////////
 
-	public class FeedManifest
+	public class FeedManifest : Manifest
 	{
 		public List<EventHeaderManifest> Headers { get; set; }
 		public List<EtchingManifest> Etchings { get; set; }

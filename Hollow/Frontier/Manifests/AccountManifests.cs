@@ -44,7 +44,7 @@ namespace Frontier.Manifests
 	// Outgoing Manifests
 	///////////////////////
 
-	public class SelfUserManifest
+	public class SelfUserManifest : Manifest
 	{
 		public ulong Id { get; }
         public string PhoneNumber { get; }
@@ -64,7 +64,7 @@ namespace Frontier.Manifests
 		}
     }
 
-	public class OtherUserManifest
+	public class OtherUserManifest : Manifest
 	{
 		public ulong Id { get; }
         public string PhoneNumber { get; }

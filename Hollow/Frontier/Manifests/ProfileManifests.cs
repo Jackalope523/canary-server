@@ -25,7 +25,7 @@ namespace Frontier.Manifests
     // Outgoing Manifests
     ///////////////////////
 
-    public class UserProfileManifest
+    public class UserProfileManifest : Manifest
     {
         public ulong Id { get; }
         public string Name { get; }
@@ -41,7 +41,7 @@ namespace Frontier.Manifests
         }
     }
 
-    public class UserSilhouetteManifest
+    public class UserSilhouetteManifest : Manifest
     {
         public ulong Id { get; }
         public string Name { get; }
@@ -53,13 +53,13 @@ namespace Frontier.Manifests
         }
     }
 
-    public class NestManifest
+    public class NestManifest : Manifest
     {
         public List<EventManifest> Events { get; set; }
         public List<EtchingManifest> Etchings { get; set; }
     }
 
-    public class FriendActivityManifest
+    public class FriendActivityManifest : Manifest
     {
         public IDictionary<UserSilhouetteManifest, List<EventManifest>> Activity { get; set; }
     }

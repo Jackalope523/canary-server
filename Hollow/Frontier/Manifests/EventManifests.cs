@@ -51,7 +51,7 @@ namespace Frontier.Manifests
     // Outgoing Manifests
     ///////////////////////
 
-    public class EventManifest
+    public class EventManifest : Manifest
     {
         public ulong Id { get; }
         public UserSilhouetteManifest Host { get; }
@@ -85,7 +85,7 @@ namespace Frontier.Manifests
         }
     }
 
-    public class EventHeaderManifest
+    public class EventHeaderManifest : Manifest
     {
         public ulong Id { get; }
         public string Name { get; }
@@ -105,14 +105,14 @@ namespace Frontier.Manifests
         }
     }
 
-    public class GuestListManifest
+    public class GuestListManifest : Manifest
     {
         public int Watchers { get; set;  }
         public int GuestCount { get; set; }
         public List<(UserSilhouetteManifest, EventBond)> Guests { get; set; }
     }
 
-    public class EtchingManifest
+    public class EtchingManifest : Manifest
     {
         public ulong Id { get; }
         public ulong EventId { get; }

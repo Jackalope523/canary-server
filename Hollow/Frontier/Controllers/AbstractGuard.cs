@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Frontier.Manifests;
+using System.Collections.Generic;
 
 namespace Frontier.Controllers
 {
@@ -89,14 +91,26 @@ namespace Frontier.Controllers
 		{
 			try
 			{
-				return await action.Invoke();
+				var result = await action.Invoke();
+
+                // Check outgoing type is generic or manifest
+                if (result is ObjectResult objectResult && objectResult.Value != null)
+                {
+                    var type = objectResult.Value.GetType();
+
+                    if (type != typeof(Manifest) ||
+                        type != typeof(List<>))
+                    { throw new UnexpectedFailureException($"Server tried sending non-manifest object type {type}."); }
+                }
+
+                return await action.Invoke();
 			}
 			catch (HollowFailureException ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}", ex.Message);
+				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
 
-				return StatusCode(500, ex.StackTrace);
+				return StatusCode(500);
 			}
 			catch (UserErrorException ex)
 			{
@@ -105,9 +119,9 @@ namespace Frontier.Controllers
 			catch (Exception ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}", ex.Message);
+				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
 
-				return StatusCode(500, ex.StackTrace);
+				return StatusCode(500);
 			}
 		}
 
