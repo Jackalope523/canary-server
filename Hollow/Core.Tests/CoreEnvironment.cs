@@ -16,6 +16,7 @@ using System.Linq;
 using System.Collections.Generic;
 using PhoneNumbers;
 using System.Timers;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Tests
 {
@@ -57,6 +58,7 @@ namespace Core.Tests
 			Repository.Harbor harbor = new(Repository.Harbor.Flag.Development);
 
             Terminal = CoreTerminal.CreateTerminal(
+				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
                 harbor.EventDatabaseAccess,

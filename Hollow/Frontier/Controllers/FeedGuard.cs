@@ -43,9 +43,15 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				var userFeed = await etchings.GetUserFeedAsync(user.Id, depth, lastDepth);
+				var shard = await etchings.GetUserFeedAsync(user.Id, depth, lastDepth);
 
-				return Ok(userFeed);
+				FeedManifest feed = new()
+				{
+					Headers = shard.Headers.ConvertAll(header => new EventHeaderManifest(header)),
+					Etchings = shard.Etchings.ConvertAll(etching => new EtchingManifest(etching))
+				};
+
+				return feed;
 			});
         }
 

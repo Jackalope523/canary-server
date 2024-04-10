@@ -1,4 +1,5 @@
-﻿using Shared;
+﻿using Core.Boundaries;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Frontier.Manifests
 {
+	////////
+	// Incoming Manifests
+	///////////////////////
+	
     public class TargetManifest
     {
         [Required]
@@ -33,5 +38,39 @@ namespace Frontier.Manifests
 
 		[Required]
 		public DateTime DateOfBirth { get; set; }
+    }
+
+	////////
+	// Outgoing Manifests
+	///////////////////////
+
+	public class SelfUserManifest : Manifest
+	{
+		public ulong Id { get; }
+        public string PhoneNumber { get; }
+		public string Email { get; }
+        public string Name { get; }
+        public int Reputation { get; }
+		public int NumberOfFollowers { get; }
+
+		public SelfUserManifest(UserShard shard)
+		{
+			Id = shard.Id;
+			PhoneNumber = shard.PhoneNumber;
+			Email = shard.Email;
+			Name = shard.Name;
+			Reputation = shard.Reputation;
+			NumberOfFollowers = shard.NumberOfFollowers;
+		}
+    }
+
+	public class OtherUserManifest : Manifest
+	{
+		public ulong Id { get; }
+        public string PhoneNumber { get; }
+		public string Email { get; }
+        public string Name { get; }
+        public int Reputation { get; }
+		public int NumberOfFollowers { get; }
     }
 }

@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
 using Microsoft.Extensions.Logging;
-
+using Shared;
+using System.Collections.Generic;
 
 namespace Frontier.Controllers
 {
@@ -38,9 +39,9 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve event information
-				var targetEvent = await events.GetEventInformationAsync(user.Id, eventId);
+				EventManifest targetEvent = new (await events.GetEventInformationAsync(user.Id, eventId));
 
-				return Ok(targetEvent);
+				return targetEvent;
 			});
         }
 
@@ -54,13 +55,13 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Create a new event
-				var newEvent = await events.CreateEventAsync(user.Id,
+				EventManifest newEvent = new(await events.CreateEventAsync(user.Id,
 					eventDetails.EventName, eventDetails.EventDescription,
 					eventDetails.StartTime, eventDetails.Latitude, eventDetails.Longitude,
 					eventDetails.Radius, eventDetails.IsDynamic,
-					eventDetails.GroupMinimum, eventDetails.GroupMaximum);
+					eventDetails.GroupMinimum, eventDetails.GroupMaximum));
 
-				return Ok(newEvent);
+				return newEvent;
 			});
         }
 
@@ -158,9 +159,17 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var guestList = await events.GetGuestListAsync(user.Id, eventId);
+				var shard = await events.GetGuestListAsync(user.Id, eventId);
 
-				return Ok(guestList);
+				GuestListManifest guestList = new()
+				{
+					Watchers = shard.Watchers,
+					GuestCount = shard.GuestCount,
+					Guests = shard.Guests
+						.ConvertAll(pair => (new UserSilhouetteManifest(pair.User), pair.State)),
+				};
+
+				return guestList;
 			});
 		}
 
@@ -169,9 +178,11 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var users = await events.GetPotentialInviteesAsync(user.Id, eventId);
+				var manifest = ManifestSeries<UserSilhouetteManifest>.Create(
+					await events.GetPotentialInviteesAsync(user.Id, eventId),
+					silhouette => new UserSilhouetteManifest(silhouette));
 
-				return Ok(users);
+				return manifest;
 			});
         }
 
@@ -211,9 +222,11 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var eventEtchings = await etchings.GetEventEtchingsAsync(user.Id, eventId);
+				var manifest = ManifestSeries<EtchingManifest>.Create(
+					await etchings.GetEventEtchingsAsync(user.Id, eventId),
+					etching => new EtchingManifest(etching));
 
-				return Ok(eventEtchings);
+				return manifest;
 			});
 		}
 
@@ -226,9 +239,9 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				var newEtching = await etchings.AddEtchingAsync(user.Id, eventId, await StreamFirstFile());
+				EtchingManifest newEtching = new(await etchings.AddEtchingAsync(user.Id, eventId, await StreamFirstFile()));
 
-				return Ok(newEtching);
+				return newEtching;
 			});
 		}
 

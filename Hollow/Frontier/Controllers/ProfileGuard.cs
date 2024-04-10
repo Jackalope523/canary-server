@@ -40,9 +40,9 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve profile
-				var profile = await profiles.GetUserProfileAsync(user.Id, targetIdentification);
+				UserProfileManifest profile = new(await profiles.GetUserProfileAsync(user.Id, targetIdentification));
 
-				return Ok(profile);
+				return profile;
 			});
 		}
 
@@ -52,9 +52,15 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve nest
-				var nest = await profiles.GetUserNestAsync(user.Id, targetIdentification);
+				var shard = await profiles.GetUserNestAsync(user.Id, targetIdentification);
 
-				return Ok(nest);
+				NestManifest nest = new()
+				{
+					Events = shard.Events.ConvertAll(@event => new EventManifest(@event)),
+					Etchings = shard.Etchings.ConvertAll(etching => new EtchingManifest(etching))
+				};
+
+				return nest;
 			});
 		}
 
@@ -77,9 +83,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve activity
-				var activity = await profiles.GetUserActivityAsync(user.Id, targetIdentification);
+				var manifest = ManifestSeries<EventManifest>.Create(
+					await profiles.GetUserActivityAsync(user.Id, targetIdentification),
+					@event => new EventManifest(@event));
 
-				return Ok(activity);
+				return manifest;
 			});
 		}
 
@@ -89,9 +97,20 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve activity
-				var activity = await profiles.GetFriendActivityAsync(user.Id);
+				var shard = await profiles.GetFriendActivityAsync(user.Id);
 
-				return Ok(activity);
+				FriendActivityManifest activity = new()
+				{
+					Activity = new Dictionary<UserSilhouetteManifest, List<EventManifest>>()
+				};
+
+				foreach (var pair in shard)
+				{
+					activity.Activity.Add(new UserSilhouetteManifest(pair.Key),
+						pair.Value.ConvertAll(@event => new EventManifest(@event)));
+				}
+
+				return activity;
 			});
 		}
 
@@ -101,9 +120,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve all users that the current user is following
-				var followedUsers = await profiles.GetFollowedUsersAsync(user.Id);
+				var manifest = ManifestSeries<UserSilhouetteManifest>.Create(
+					await profiles.GetFollowedUsersAsync(user.Id),
+					silhouette => new UserSilhouetteManifest(silhouette));
 
-				return Ok(followedUsers);
+				return manifest;
 			});
 		}
 
@@ -141,9 +162,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve all users that the current user is blocking
-				var blockedUsers = await profiles.GetBlockedUsersAsync(user.Id);
+				var manifest = ManifestSeries<UserSilhouetteManifest>.Create(
+					await profiles.GetBlockedUsersAsync(user.Id),
+                    silhouette => new UserSilhouetteManifest(silhouette));
 
-				return Ok(blockedUsers);
+                return manifest;
 			});
 		}
 

@@ -4,7 +4,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Frontier.Manifests
 {
-    public class AccountReportManifest
+	////////
+	// Incoming Manifests
+	///////////////////////
+
+	public class AccountReportManifest
     {
         [Required]
         public UserReportType ReportType { get; set; }
