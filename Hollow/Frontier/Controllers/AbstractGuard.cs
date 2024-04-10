@@ -99,11 +99,12 @@ namespace Frontier.Controllers
                     var type = objectResult.Value.GetType();
 
                     if (type != typeof(Manifest) ||
-                        type != typeof(List<>))
+                        type != typeof(List<>) ||
+						type != typeof(string))
                     { throw new UnexpectedFailureException($"Server tried sending non-manifest object type {type}."); }
                 }
 
-                return await action.Invoke();
+                return result;
 			}
 			catch (HollowFailureException ex)
 			{
