@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
-	[Route("notifications")]
-	public class NotificationGuard : AbstractGuard
+	[Route("keys")]
+	public class KeyGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public NotificationGuard(ILogger logger,
+		public KeyGuard(ILogger logger,
 			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
@@ -34,38 +34,16 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet]
-		public async Task<IActionResult> GetNotes()
+		[HttpGet("{key}")]
+		public async Task<IActionResult> GetSecret(string key)
 		{
 			return await Execute(async user =>
 			{
-				var notes = await notifications.GetNotesAsync(user.Id);
+				var secret = await keys.GetSecretAsync(user.Id, key);
 
-				return Ok(notes);
+				return Ok(secret);
 			});
         }
-
-		[HttpPost]
-		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
-		{
-			// Verify parameters
-			if (subscription == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
-
-			return await Execute(async user =>
-			{
-				await notifications.SubscribeUserAsync(user.Id, subscription.DeviceType, subscription.DeviceToken);
-			}, allowUnverified: true);
-		}
-
-		[HttpDelete]
-		public async Task<IActionResult> Unsubscribe()
-		{
-			return await Execute(async user =>
-			{
-				await notifications.UnsubscribeUserAsync(user.Id);
-			}, allowUnverified: true);
-		}
 
 		#endregion
 	}

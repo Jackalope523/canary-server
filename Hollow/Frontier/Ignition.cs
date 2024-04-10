@@ -110,6 +110,7 @@ namespace Frontier
 				harbor.EventDatabaseAccess, 
 				harbor.EtchingDatabaseAccess,
 				harbor.ReportDatabaseAccess,
+				harbor.KeyDatabaseAccess,
 				harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
 				harbor.ProfileDatabaseAccess, 
