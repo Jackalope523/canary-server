@@ -51,7 +51,7 @@ namespace Frontier.Controllers
 					Etchings = shard.Etchings.ConvertAll(etching => new EtchingManifest(etching))
 				};
 
-				return Ok(feed);
+				return feed;
 			});
         }
 

@@ -41,7 +41,7 @@ namespace Frontier.Controllers
 				List<NoteManifest> notes = (await notifications.GetNotesAsync(user.Id))
 					.ConvertAll(note => new NoteManifest(note));
 
-				return Ok(notes);
+				return notes;
 			});
         }
 

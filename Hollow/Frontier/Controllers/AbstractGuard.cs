@@ -87,24 +87,21 @@ namespace Frontier.Controllers
 		#region Favours
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<Task<IActionResult>> action)
+		public async Task<IActionResult> Execute(Func<Task<object>> action)
 		{
 			try
 			{
 				var result = await action.Invoke();
 
                 // Check outgoing type is generic or manifest
-                if (result is ObjectResult objectResult && objectResult.Value != null)
-                {
-                    var type = objectResult.Value.GetType();
+                var type = result.GetType();
 
-                    if (type != typeof(Manifest) ||
-                        type != typeof(List<>) ||
-						type != typeof(string))
-                    { throw new UnexpectedFailureException($"Server tried sending non-manifest object type {type}."); }
-                }
+                if (type != typeof(Manifest) ||
+                    type != typeof(List<>) ||
+					type != typeof(string))
+                { throw new UnexpectedFailureException($"Server tried sending non-manifest object type {type}."); }
 
-                return result;
+                return Ok(result);
 			}
 			catch (HollowFailureException ex)
 			{
@@ -113,7 +110,7 @@ namespace Frontier.Controllers
 
 				return StatusCode(500);
 			}
-			catch (UserErrorException ex)
+			catch (UserErrorException ex) 
 			{
 				return BadRequest(ex.Message);
 			}
@@ -148,7 +145,7 @@ namespace Frontier.Controllers
 		}
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<UserShard, Task<IActionResult>> action, bool allowUnverified = false)
+		public async Task<IActionResult> Execute(Func<UserShard, Task<object>> action, bool allowUnverified = false)
 		{
 			return await Execute(async () =>
 			{

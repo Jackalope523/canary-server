@@ -42,7 +42,7 @@ namespace Frontier.Controllers
 				// Retrieve profile
 				UserProfileManifest profile = new(await profiles.GetUserProfileAsync(user.Id, targetIdentification));
 
-				return Ok(profile);
+				return profile;
 			});
 		}
 
@@ -60,7 +60,7 @@ namespace Frontier.Controllers
 					Etchings = shard.Etchings.ConvertAll(etching => new EtchingManifest(etching))
 				};
 
-				return Ok(nest);
+				return nest;
 			});
 		}
 
@@ -86,7 +86,7 @@ namespace Frontier.Controllers
 				List<EventManifest> activity = (await profiles.GetUserActivityAsync(user.Id, targetIdentification))
 					.ConvertAll(@event => new EventManifest(@event));
 
-				return Ok(activity);
+				return activity;
 			});
 		}
 
@@ -109,7 +109,7 @@ namespace Frontier.Controllers
 						pair.Value.ConvertAll(@event => new EventManifest(@event)));
 				}
 
-				return Ok(activity);
+				return activity;
 			});
 		}
 
@@ -122,7 +122,7 @@ namespace Frontier.Controllers
 				List<UserSilhouetteManifest> followedUsers = (await profiles.GetFollowedUsersAsync(user.Id))
 					.ConvertAll(silhouette => new UserSilhouetteManifest(silhouette));
 
-				return Ok(followedUsers);
+				return followedUsers;
 			});
 		}
 
@@ -163,7 +163,7 @@ namespace Frontier.Controllers
 				List<UserSilhouetteManifest> blockedUsers = (await profiles.GetBlockedUsersAsync(user.Id))
                     .ConvertAll(silhouette => new UserSilhouetteManifest(silhouette));
 
-                return Ok(blockedUsers);
+                return blockedUsers;
 			});
 		}
 

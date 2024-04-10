@@ -41,7 +41,7 @@ namespace Frontier.Controllers
 				// Retrieve event information
 				EventManifest targetEvent = new (await events.GetEventInformationAsync(user.Id, eventId));
 
-				return Ok(targetEvent);
+				return targetEvent;
 			});
         }
 
@@ -61,7 +61,7 @@ namespace Frontier.Controllers
 					eventDetails.Radius, eventDetails.IsDynamic,
 					eventDetails.GroupMinimum, eventDetails.GroupMaximum));
 
-				return Ok(newEvent);
+				return newEvent;
 			});
         }
 
@@ -169,7 +169,7 @@ namespace Frontier.Controllers
 						.ConvertAll(pair => (new UserSilhouetteManifest(pair.User), pair.State)),
 				};
 
-				return Ok(guestList);
+				return guestList;
 			});
 		}
 
@@ -181,7 +181,7 @@ namespace Frontier.Controllers
 				List<UserSilhouetteManifest> users = (await events.GetPotentialInviteesAsync(user.Id, eventId))
 					.ConvertAll(silhouette => new UserSilhouetteManifest(silhouette));
 
-				return Ok(users);
+				return users;
 			});
         }
 
@@ -224,7 +224,7 @@ namespace Frontier.Controllers
 				List<EtchingManifest> eventEtchings = (await etchings.GetEventEtchingsAsync(user.Id, eventId))
 					.ConvertAll(etching => new EtchingManifest(etching));
 
-				return Ok(eventEtchings);
+				return eventEtchings;
 			});
 		}
 
@@ -239,7 +239,7 @@ namespace Frontier.Controllers
 			{
 				EtchingManifest newEtching = new(await etchings.AddEtchingAsync(user.Id, eventId, await StreamFirstFile()));
 
-				return Ok(newEtching);
+				return newEtching;
 			});
 		}
 

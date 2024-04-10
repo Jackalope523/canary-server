@@ -42,7 +42,7 @@ namespace Frontier.Controllers
 				List<EventManifest> eventList = (await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance))
 					.ConvertAll(shard => new EventManifest(shard));
 
-				return Ok(eventList);
+				return eventList;
 			});
         }
 
@@ -55,7 +55,7 @@ namespace Frontier.Controllers
                 List<EventManifest> eventList = (await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance))
 					.ConvertAll(shard => new EventManifest(shard));
 
-                return Ok(eventList);
+                return eventList;
 			});
         }
 

@@ -40,7 +40,7 @@ namespace Frontier.Controllers
 			{
 				var image = await media.GetImageStreamAsync(user.Id, etchingId);
 
-				return Ok(image);
+				return image;
 			});
         }
 
