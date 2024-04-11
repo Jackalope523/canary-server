@@ -21,6 +21,7 @@ import TextLabel, { LabelDisplay, LabelSize, LabelType } from './TextLabel';
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
 import { VectorSource } from '@rnmapbox/maps';
 import symbolicateStackTrace from 'react-native/Libraries/Core/Devtools/symbolicateStackTrace';
+import Shadow from '../flows/Shadow';
 //#endregion 
 
 interface EventCardLargeProps {
@@ -65,7 +66,7 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
   return (
   <View style={styles.eventCardLargeContainer}>
 
-    <View style={styles.shadow}/>
+    <Shadow height = {styles.eventCardLarge.height} width={styles.eventCardLarge.width}/>
 
     <View style={styles.eventCardLarge}>
 
