@@ -19,6 +19,7 @@ namespace Core.Controls
 		protected IEventDatabase Events { get; private set; }
 		protected IEtchingDatabase Etchings { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
+		protected IKeyDatabase Keys { get; private set; }
 		protected IMediaDatabase Media { get; private set; }
 		protected INotificationDatabase Notifications { get; private set; }
 		protected IProfileDatabase Profiles { get; private set; }
@@ -35,6 +36,7 @@ namespace Core.Controls
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
 			Reports = Terminal.DisciplineDatabase;
+			Keys = Terminal.KeyDatabase;
 			Media = Terminal.MediaDatabase;
 			Notifications = Terminal.NotificationDatabase;
 			Profiles = Terminal.ProfileDatabase;

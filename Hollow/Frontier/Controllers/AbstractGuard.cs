@@ -44,6 +44,7 @@ namespace Frontier.Controllers
 		public IEventOperations events;
 		public IEtchingOperations etchings;
 		public IDisciplineOperations reports;
+		public IKeyOperations keys;
 		public IMediaOperations media;
 		public INotificationOperations notifications;
 		public IProfileOperations profiles;
@@ -59,8 +60,8 @@ namespace Frontier.Controllers
 			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations,
-			INotificationOperations notificationOperations,
+			IDisciplineOperations disciplineOperations, IKeyOperations keyOperations,
+			IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService)
 		{
 			log = logger;
@@ -73,6 +74,7 @@ namespace Frontier.Controllers
 			events = eventOperations;
 			etchings = etchingOperations;
 			reports = disciplineOperations;
+			keys = keyOperations;
 			media = mediaOperations;
 			notifications = notificationOperations;
 

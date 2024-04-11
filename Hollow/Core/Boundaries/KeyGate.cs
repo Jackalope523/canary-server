@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Azure.Security.KeyVault.Keys;
 
 namespace Core.Boundaries
 {
@@ -11,15 +10,15 @@ namespace Core.Boundaries
 
     public interface IKeyDatabase
     {
-        public Task<string> GetSecretAsync(string secretName);
-        public Task<JsonWebKey> GetKeyAsync(string keyName);
-        public Task<byte[]> GetCertificateAsync(string keyName);
+        Task<string> GetSecretAsync(string secretName);
+        Task<object> GetKeyAsync(string keyName);
+        Task<byte[]> GetCertificateAsync(string keyName);
     }
 
     public interface IKeyOperations
-    {
-
-    }
+	{
+		Task<string> GetSecretAsync(ulong userId, string secretName);
+	}
 
     #endregion
 }
