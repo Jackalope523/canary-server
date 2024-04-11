@@ -26,7 +26,7 @@ import TextButton, {
   TextButtonType,
   TextButtonVariant,
 } from '../../components/TextButton';
-import Gallery from '../../components/Gallery';
+import Gallery from '../../components/testing/OldGallery';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
 import Button, {
   ButtonDisplay,

@@ -28,7 +28,7 @@ import TextLabel, {
 } from '../../components/TextLabel';
 import { labelText } from '../../components/LabelText';
 import { EventStatus } from '../../components/EventCardSmall';
-import PreviouslyAttendedEvent from '../../components/otherUserProfile/previouslyAttendedEvent';
+import PreviouslyAttendedEvent from '../../components/otherUserProfile/PreviouslyAttendedEvent';
 import UpcomingEvent from '../../components/otherUserProfile/upcomingEvent';
 
 // Icons

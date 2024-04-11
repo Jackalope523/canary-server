@@ -1,16 +1,12 @@
 import { FlatList, Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { CustomDimensions } from '../styles/CustomDimensionStyles';
-import { Spacing } from '../styles/SpacingStyles';
-import { Colors } from '../styles/ColorStyles';
-import Avatar, { AvatarSize } from './Avatar';
-import { globalStyles } from '../styles/GlobalStyles';
+import { CustomDimensions } from '../../styles/CustomDimensionStyles';
+import { Spacing } from '../../styles/SpacingStyles';
+import { Colors } from '../../styles/ColorStyles';
 
 //#region Props
 interface GalleryProps {
   images: { media: ImageSourcePropType[] }[];
-  posterAvatar: ImageSourcePropType;
-  posterName: string;
 }
 //#endregion
 
@@ -21,11 +17,7 @@ Instructions:
 
 */
 
-const Gallery: React.FC<GalleryProps> = ({
-  images,
-  posterAvatar = "NULL",
-  posterName = "NULL",
-}) => {
+const Gallery: React.FC<GalleryProps> = ({ images }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Layout                                     ||
   // ! ||--------------------------------------------------------------------------------||
@@ -109,7 +101,6 @@ const Gallery: React.FC<GalleryProps> = ({
   // ! ||                                  Select image                                  ||
   // ! ||--------------------------------------------------------------------------------||
   // Two column layout styles
-  // TODO remove if not used
   const image2CLFirstCol = {
     width: imgSize.full,
     height: imgSize.full,
@@ -166,6 +157,8 @@ const Gallery: React.FC<GalleryProps> = ({
   }
 
   const renderItem = ({ item, index }) => {
+    const a = 2 * (index + 1) - 1;
+
     return (
       <Pressable onPress={() => handleImagePress(item)}>
         <View>
@@ -178,11 +171,21 @@ const Gallery: React.FC<GalleryProps> = ({
           {selectedImage === item && (
             <View
               style={
-                oneCol
+                numColumns === 2
+                  ? index === 0
+                    ? image2CLFirstCol
+                    : image2CLSecondCol
+                  : numColumns === 3
+                    ? index === 0
+                      ? image3CLFirstCol
+                      : index === 1
+                        ? image3CLSecondCol
+                        : image3CLThirdCol
+                    : oneCol
               }>
               <View style={styles.user}>
-                <Avatar size={AvatarSize.Small} image={posterAvatar} />
-                <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>{posterName}</Text>
+                <Text>Avatar placeholder</Text>
+                <Text>Name placeholder</Text>
               </View>
               <Image source={item} style={styles.image} />
             </View>
@@ -255,8 +258,7 @@ const styles = StyleSheet.create({
   user: {
     flexDirection: 'row',
     alignItems: 'center',
-    columnGap: Spacing.mdsm,
-    paddingVertical: Spacing.md,
+    columnGap: Spacing.lg,
   },
 
   // Image

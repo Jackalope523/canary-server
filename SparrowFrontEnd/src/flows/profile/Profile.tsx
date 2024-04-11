@@ -19,6 +19,7 @@ import Button, {
 // Icons
 import AddIcon from '../../assets/icons/add-outline.svg';
 import Chevron from '../../assets/icons/chevron-outline.svg';
+import LayoutMediumIcon from '../../assets/icons/layout-size-medium-fill-alt.svg';
 
 import { globalStyles } from '../../styles/GlobalStyles';
 import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
@@ -36,7 +37,7 @@ import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
 import UpcomingEvent from '../../components/otherUserProfile/upcomingEvent';
 import { EventStatus } from '../../components/EventCardSmall';
-import PreviouslyAttendedEvent from '../../components/otherUserProfile/previouslyAttendedEvent';
+import PreviouslyAttendedEvent from '../../components/otherUserProfile/PreviouslyAttendedEvent';
 
 type ProfileProps = StackScreenProps<BottomTabParamList, 'Profile'>;
 
@@ -76,7 +77,6 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
 
   // TEMP. for testing purposes
   let friend = false;
-  let status = AvatarStatus.Offline;
 
   const user = SAMPLE_USER_DATA.find((user) => user.id === '1');
 
@@ -90,22 +90,18 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
       overScrollMode="never"
       showsVerticalScrollIndicator={false}>
       <View style={styles.topContainer}>
-        <Avatar size={AvatarSize.Large} status={status} image={user?.avatar} />
-        <View style={styles.userInfo}>
-          <View style={styles.userInfoInner}>
-            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-              {user?.name}
-            </Text>
-            <TextLabel
-              text={labelText.you}
-              type={LabelType.You}
-              size={LabelSize.Small}
-              display={LabelDisplay.Contained}
-            />
-          </View>
-          <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-            {user?.location}
+        <Avatar size={AvatarSize.Large} image={user?.avatar} />
+        <View style={styles.user}>
+          <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
+            {user?.name}
           </Text>
+          {/* TODO replace TextLabel YOU with an bird icon */}
+          <TextLabel
+            text={labelText.you}
+            type={LabelType.You}
+            size={LabelSize.Small}
+            display={LabelDisplay.Contained}
+          />
         </View>
         <View>
           {friend ? (
@@ -132,69 +128,45 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
         </View>
       </View>
 
-      <Text
-        style={[globalStyles.bodyTextOne, globalStyles.textDark, styles.bio]}>
-        {user?.bio}
-      </Text>
-
-      {/* LABELS HERE */}
-      <View style={styles.labelContainer}>
-        <TextLabel
-          text={labelText.userSince}
-          type={LabelType.Primary}
-          size={LabelSize.Small}
-          display={LabelDisplay.Contained}
-        />
-
-        <TextLabel
-          text={labelText.lastSeen}
-          type={LabelType.Primary}
-          size={LabelSize.Small}
-          display={LabelDisplay.Contained}
+      {/* EVENTS */}
+      {/* NEW EVENTS DESIGN */}
+      <View style={styles.events}>
+        <View style={styles.eventsHeadingContainer}>
+          <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
+            Previously attended
+          </Text>
+          {/* TODO hook up change layout functionality */}
+          <LayoutMediumIcon
+            width={24}
+            height={24}
+            fill={Colors.sparrowDarkBrown}
+          />
+        </View>
+        <FlatList
+          data={SAMPLE_PAST_EVENT_DATA.filter(
+            (item) => !item.time.includes('live'),
+          )}
+          renderItem={({ item }) => (
+            <PreviouslyAttendedEvent
+              eventStatus={EventStatus.Past}
+              eventHeroImage={item.media[0]}
+              eventTitle={item.title}
+              eventDate={item.time}
+              eventLocation={item.location}
+              onPress={() => console.log('Event card image pressed')}
+              images={item.media ? [item] : []}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <View style={{ height: Spacing.lg }} />}
         />
       </View>
 
-      {/* EVENTS */}
-      <View style={styles.events}>
+      {/* OLD EVENTS DESIGN */}
+      {/* <View style={styles.events}>
         <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
           Events
         </Text>
-        <View style={styles.eventsContainer}>
-          {/* inner wrapper start */}
-          <View style={styles.eventsInnerWrapper}>
-            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              Attended
-            </Text>
-            <View
-              style={[
-                styles.eventsInnerContainer,
-                styles.eventsContainerAttended,
-              ]}>
-              <Text
-                style={[globalStyles.displayTextTwo, globalStyles.textLight]}>
-                {user?.eventsAttended}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.eventsInnerWrapper}>
-            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              Hosted
-            </Text>
-            <View
-              style={[
-                styles.eventsInnerContainer,
-                styles.eventsContainerHosted,
-              ]}>
-              <Text
-                style={[globalStyles.displayTextTwo, globalStyles.textLight]}>
-                {user?.eventsHosted}
-              </Text>
-            </View>
-          </View>
-          {/* inner wrapper end */}
-        </View>
-
         <View>
           <View style={styles.pastEvents}>
             <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
@@ -222,7 +194,7 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
             />
           </View>
         </View>
-      </View>
+      </View> */}
     </ScrollView>
   );
 };
@@ -243,17 +215,12 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
   },
 
-  userInfo: {
+  user: {
+    flexDirection: 'row',
     alignItems: 'center',
     paddingTop: Spacing.md,
     paddingBottom: Spacing.lg,
-  },
-
-  userInfoInner: {
-    flexDirection: 'row',
-    columnGap: Spacing.mdsm,
-    justifyContent: 'center',
-    alignItems: 'center',
+    columnGap: Spacing.sm,
   },
 
   bio: {
@@ -268,42 +235,12 @@ const styles = StyleSheet.create({
 
   // Events
   events: {
-    marginTop: Spacing.xl,
+    rowGap: Spacing.lg,
   },
 
-  eventsContainer: {
+  eventsHeadingContainer: {
     flexDirection: 'row',
-    columnGap: Spacing.md,
-  },
-
-  eventsInnerWrapper: {
-    flex: 1,
-  },
-
-  eventsInnerContainer: {
-    paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: Colors.sparrowDarkBrown,
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-
-  eventsContainerAttended: {
-    backgroundColor: Colors.green400,
-  },
-
-  eventsContainerHosted: {
-    backgroundColor: Colors.picton400,
-  },
-
-  upcomingEvents: {
-    paddingTop: Spacing.xl,
-    rowGap: Spacing.md,
-  },
-
-  pastEvents: {
-    paddingTop: Spacing.xl,
-    rowGap: Spacing.md,
   },
 });

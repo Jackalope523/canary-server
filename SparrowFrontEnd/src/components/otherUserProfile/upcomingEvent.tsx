@@ -1,7 +1,7 @@
 import { ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import React, { FC } from 'react';
 import EventCardSmall, { EventStatus } from '../EventCardSmall';
-import Gallery from '../Gallery';
+import Gallery from '../testing/OldGallery';
 import { Spacing } from '../../styles/SpacingStyles';
 
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';

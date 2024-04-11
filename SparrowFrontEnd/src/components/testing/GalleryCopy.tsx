@@ -3,14 +3,10 @@ import React from 'react'
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
 import { Spacing } from '../styles/SpacingStyles';
 import { Colors } from '../styles/ColorStyles';
-import Avatar, { AvatarSize } from './Avatar';
-import { globalStyles } from '../styles/GlobalStyles';
 
 //#region Props
-interface GalleryProps {
+interface GalleryCopyProps {
   images: { media: ImageSourcePropType[] }[];
-  posterAvatar: ImageSourcePropType;
-  posterName: string;
 }
 //#endregion
 
@@ -21,11 +17,7 @@ Instructions:
 
 */
 
-const Gallery: React.FC<GalleryProps> = ({
-  images,
-  posterAvatar = "NULL",
-  posterName = "NULL",
-}) => {
+const GalleryCopy: React.FC<GalleryCopyProps> = ({ images }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Layout                                     ||
   // ! ||--------------------------------------------------------------------------------||
@@ -109,37 +101,20 @@ const Gallery: React.FC<GalleryProps> = ({
   // ! ||                                  Select image                                  ||
   // ! ||--------------------------------------------------------------------------------||
   // Two column layout styles
-  // TODO remove if not used
   const image2CLFirstCol = {
-    width: imgSize.full,
-    height: imgSize.full,
     backgroundColor: 'red',
   }
 
   const image2CLSecondCol = {
     right: (imgSize.full + Spacing.md) / 2,
-    width: imgSize.full,
-    height: imgSize.full,
     backgroundColor: 'green',
   }
 
-  const image3CLFirstCol = {
-    width: imgSize.full,
-    height: imgSize.full,
-    backgroundColor: 'red',
-  }
+  const image3CLFirstCol = {}
 
-  const image3CLSecondCol = {
-    width: imgSize.full,
-    height: imgSize.full,
-    backgroundColor: 'green',
-  }
+  const image3CLSecondCol = {}
 
-  const image3CLThirdCol = {
-    width: imgSize.full,
-    height: imgSize.full,
-    backgroundColor: 'blue',
-  }
+  const image3CLThirdCol = {}
 
   /*
   
@@ -155,7 +130,7 @@ const Gallery: React.FC<GalleryProps> = ({
   */
 
   // const selectItem = () => {
-  //   console.log('if this is here, the gallery isnt done yet')
+  //   console.log('if this is here, the GalleryCopy isnt done yet')
   // }
 
   const [selectedImage, setSelectedImage] = React.useState(null);
@@ -165,35 +140,68 @@ const Gallery: React.FC<GalleryProps> = ({
     setSelectedImage(prevImage => (prevImage === image ? null : image));
   }
 
-  const renderItem = ({ item, index }) => {
-    return (
-      <Pressable onPress={() => handleImagePress(item)}>
-        <View>
+  const renderItem = ({ item, index }) => (
+    // console.log('unique index:', index),
+    console.log('unique item:', item),
+    <Pressable onPress={() => handleImagePress(item)}>
+      {/* <View style={styles.imageContainer}>
+        <Image source={item} style={styles.image} />
+        {selectedImage === item && (
+          <View style={styles.selectedImageContainer}>
+            <Image source={item} style={styles.selectedImage} />
+          </View>
+        )}
+      </View> */}
+      <View>
+        <View
+          style={
+            numColumns === 1 ? oneCol : numColumns === 2 ? twoCol : threeCol
+          }>
+          <Image source={item} style={styles.image} />
+        </View>
+        {selectedImage === item && (
           <View
             style={
-              numColumns === 1 ? oneCol : numColumns === 2 ? twoCol : threeCol
+              // numColumns === 1 ? oneCol : numColumns === 2 ? twoCol : threeCol
+              // oneCol
+              [
+                /*
+                
+                Sketchy workaround for styling I'm experimenting with:
+                
+                1. if the selected image is a part of a two-column layout (numColumns === 2),
+                  and if it's in the first column,
+                  then apply the first column styles to the selected image (image2CLFirstCol),
+                  else apply the second column styles to the selected image (image2CLSecondCol).
+
+                2. if the selected image is a part of a three-column layout (numColumns === 3),
+                  and if it's in the first column,
+                  then apply the first column styles to the selected image (image3CLFirstCol),
+                  else if it's in the second column,
+                  then apply the second column styles to the selected image(image3CLSecondCol),
+                  else apply the third column styles (image3CLThirdCol) to the selected image.
+
+                Each layout style has a different right value, that re-centers the selected image.
+                
+                */
+
+                oneCol,
+                image2CLSecondCol,
+              ]
             }>
+            <View style={styles.user}>
+              <Text>Avatar placeholder</Text>
+              <Text>Name placeholder</Text>
+            </View>
             <Image source={item} style={styles.image} />
           </View>
-          {selectedImage === item && (
-            <View
-              style={
-                oneCol
-              }>
-              <View style={styles.user}>
-                <Avatar size={AvatarSize.Small} image={posterAvatar} />
-                <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>{posterName}</Text>
-              </View>
-              <Image source={item} style={styles.image} />
-            </View>
-          )}
-        </View>
-      </Pressable>
-    );
-  };
+        )}
+      </View>
+    </Pressable>
+  );
 
   return (
-    //#region Gallery
+    //#region GalleryCopy
     <View style={styles.container} >
       <FlatList
         data={displayedData}
@@ -230,11 +238,11 @@ const Gallery: React.FC<GalleryProps> = ({
   )
 }
 
-export default Gallery
+export default GalleryCopy
 
 // Exported enums
 //#region Exported enums
-export enum GalleryLayout {
+export enum GalleryCopyLayout {
   One,
   Two,
   Three,
@@ -255,8 +263,7 @@ const styles = StyleSheet.create({
   user: {
     flexDirection: 'row',
     alignItems: 'center',
-    columnGap: Spacing.mdsm,
-    paddingVertical: Spacing.md,
+    columnGap: Spacing.lg,
   },
 
   // Image

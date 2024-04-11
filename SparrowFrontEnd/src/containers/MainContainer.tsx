@@ -87,7 +87,7 @@ function MainContainer() {
     <SafeAreaProvider>
       <NavigationContainer>
         <AppStack.Navigator
-          initialRouteName="Main"
+          initialRouteName="Testing"
           screenOptions={{
             headerShown: false,
             cardStyle: styles.cardContainer,
@@ -98,7 +98,7 @@ function MainContainer() {
           <AppStack.Screen name="Account" component={Account} />
           <AppStack.Screen name="Event" component={Event} />
 
-          <AppStack.Screen name="Testing" component={ActivityScreen} />
+          <AppStack.Screen name="Testing" component={TestScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
