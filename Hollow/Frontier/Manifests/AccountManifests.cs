@@ -44,7 +44,7 @@ namespace Frontier.Manifests
 	// Outgoing Manifests
 	///////////////////////
 
-	public class SelfUserManifest : Manifest
+	public class UserManifest : Manifest
 	{
 		public ulong Id { get; }
         public string PhoneNumber { get; }
@@ -53,7 +53,7 @@ namespace Frontier.Manifests
         public int Reputation { get; }
 		public int NumberOfFollowers { get; }
 
-		public SelfUserManifest(UserShard shard)
+		public UserManifest(UserShard shard)
 		{
 			Id = shard.Id;
 			PhoneNumber = shard.PhoneNumber;
@@ -62,15 +62,5 @@ namespace Frontier.Manifests
 			Reputation = shard.Reputation;
 			NumberOfFollowers = shard.NumberOfFollowers;
 		}
-    }
-
-	public class OtherUserManifest : Manifest
-	{
-		public ulong Id { get; }
-        public string PhoneNumber { get; }
-		public string Email { get; }
-        public string Name { get; }
-        public int Reputation { get; }
-		public int NumberOfFollowers { get; }
     }
 }

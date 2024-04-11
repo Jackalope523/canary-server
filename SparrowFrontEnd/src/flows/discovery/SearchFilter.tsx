@@ -6,7 +6,7 @@ import { SAMPLEEVENTDATA } from '../../data/sampleEventData';
 
 import { Spacing } from '../../styles/SpacingStyles';
 import { point, Point, Feature, Properties} from '@turf/helpers';
-import { eventShard } from '../event/eventPigeon';
+import { eventManifest } from '../event/eventPigeon';
 import { getAllEvents } from './discoverPigeon';
 import {formatDate, formatTime} from './chronologicalTools'
 
@@ -14,18 +14,18 @@ import {formatDate, formatTime} from './chronologicalTools'
 // TODO make FILTER and SORT buttons functional
 
 interface SearchFilterProps {
-  list?:eventShard[];
-  sortBy?:(x:eventShard, y:eventShard) => number;
-  filterBy?:((x:eventShard) => boolean)[];
+  list?:eventManifest[];
+  sortBy?:(x:eventManifest, y:eventManifest) => number;
+  filterBy?:((x:eventManifest) => boolean)[];
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
   list = [],
-  sortBy = (x:eventShard, y:eventShard) => {return 0},
-  filterBy = [(x:eventShard) => {return true}]
+  sortBy = (x:eventManifest, y:eventManifest) => {return 0},
+  filterBy = [(x:eventManifest) => {return true}]
 }) => {
 
-  const [toDisplay, setToDisplay] = useState<eventShard[]>([]); 
+  const [toDisplay, setToDisplay] = useState<eventManifest[]>([]); 
 
   useEffect(() => {
     let toProcess = list;

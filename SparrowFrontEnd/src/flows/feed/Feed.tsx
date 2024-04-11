@@ -7,7 +7,7 @@ import { FlagType } from '../../components/FlagMedium';
 
 import { getUserFeed } from './feedPigeon';
 import {getAccount, modifyAccount } from '../auth/accountPigeon';
-import { etchingShard } from '../event/eventPigeon';
+import { etchingManifest } from '../event/eventPigeon';
 import { length } from '@turf/turf';
 
 
