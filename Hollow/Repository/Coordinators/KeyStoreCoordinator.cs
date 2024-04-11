@@ -1,5 +1,4 @@
-﻿using Azure.Security.KeyVault.Keys;
-using Core.Boundaries;
+﻿using Core.Boundaries;
 
 namespace Repository.Coordinators
 {
@@ -17,7 +16,7 @@ namespace Repository.Coordinators
             return await store.GetCertificateAsync(certificateName);
         }
 
-        public async Task<JsonWebKey> GetKeyAsync(string keyName)
+        public async Task<object> GetKeyAsync(string keyName)
         {
             return await store.GetKeyAsync(keyName);
         }

@@ -1,7 +1,6 @@
 ﻿using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
-using Serilog;
 using Shared;
 
 namespace Repository
@@ -20,16 +19,11 @@ namespace Repository
             }
             catch (Exception ex)
             {
-                using var log = new LoggerConfiguration()
-                           .WriteTo.AzureApp()
-                           .CreateLogger();
-
-                log.Error("SECRET IO FAILURE");
                 throw new VaultIOException(ex);
             }    
         }
 
-        public async Task<JsonWebKey> GetKeyAsync(string keyName)
+        public async Task<object> GetKeyAsync(string keyName)
         {
             try
             {
@@ -39,12 +33,6 @@ namespace Repository
             }
             catch (Exception ex)
             {
-                using var log = new LoggerConfiguration()
-                          .WriteTo.AzureApp()
-                          .CreateLogger();
-
-                log.Error("KEY IO FAILURE");
-
                 throw new VaultIOException(ex);
             }
         }
@@ -59,12 +47,6 @@ namespace Repository
             }
             catch (Exception ex)
             {
-                using var log = new LoggerConfiguration()
-                          .WriteTo.AzureApp()
-                          .CreateLogger();
-
-                log.Error("CERTIFICATE IO FAILURE");
-
                 throw new VaultIOException(ex);
             }
         }

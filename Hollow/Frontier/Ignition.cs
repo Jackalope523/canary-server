@@ -62,12 +62,13 @@ namespace Frontier
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllers();
-			services.AddSwaggerGen(c =>
+
+            services.AddSwaggerGen(c =>
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
 			});
 
-			var loggerFactory = new LoggerFactory()
+            var loggerFactory = new LoggerFactory()
 				.AddSerilog(Log.Logger);
 
             var frontierLogger = loggerFactory.CreateLogger("Frontier");
@@ -75,11 +76,11 @@ namespace Frontier
 			var repositoryLogger = loggerFactory.CreateLogger("Repository");
 
 
-			/////
-			// Services 
-			/////////////
+            /////
+            // Services 
+            /////////////
 
-			Services.CorePush pushNotifications = new();
+            Services.CorePush pushNotifications = new();
 			Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
 				"", "");
 
@@ -92,7 +93,7 @@ namespace Frontier
 			// Connections
 			////////////////
 
-			Harbor harbor = new(Harbor.Flag.Production);
+			Harbor harbor = new(Harbor.Flag.Production, repositoryLogger);
 
 			CoreTerminal terminal = CoreTerminal.CreateTerminal(
 				coreLogger,

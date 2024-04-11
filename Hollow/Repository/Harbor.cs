@@ -31,8 +31,6 @@ namespace Repository
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             MediaDatabaseAccess = new MediaStoreCoordinator();
             KeyDatabaseAccess = new KeyStoreCoordinator();
-
-            KeyDatabaseAccess.GetSecretAsync("Shaggy");
         }
 
         public Harbor(Flag flag, ILogger logger)
