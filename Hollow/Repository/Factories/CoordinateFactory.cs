@@ -8,7 +8,6 @@ namespace Repository
 
         public CoordinateFactory()
         {
-            //4326
             NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
                 (
                     NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,

@@ -48,7 +48,7 @@ namespace Repository
         public static string DefaultDescription { get; set; } = "";
         public static DateTimeOffset DefaultStartTime { get; set; } = DateTimeOffset.MinValue;
         public static ulong DefaultHostId { get; set; } = ulong.MinValue;
-        public static Point DefaultLocation { get; set; } = Factory.Create(40.712, -74.006);
+        public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
 
         public static EventState DefaultState { get; set; } = EventState.Upcoming;
         public static int DefaultGroupMinimum { get; set; } = 0;

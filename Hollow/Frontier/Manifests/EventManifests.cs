@@ -46,13 +46,4 @@ namespace Frontier.Manifests
         [Required]
         public string ImageURL { get; set; }
     }
-
-    public class FeedManifest
-    {
-        [Required]
-        public int Depth { get; set; }
-
-        [Required]
-        public ulong[] ExclusionList { get; set; }
-    }
 }

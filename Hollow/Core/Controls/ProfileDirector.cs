@@ -55,9 +55,9 @@ namespace Core.Controls
                 nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventShard());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventShard()));
 
-                foreach (var thinSlice in nest.Events)
+                foreach (var shard in nest.Events)
                 {
-                    Event @event = new(thinSlice);
+                    Event @event = new(shard);
                     nest.Etchings.AddRange(await @event.Etchings);
                 }
             }

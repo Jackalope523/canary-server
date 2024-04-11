@@ -154,6 +154,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("NightOwl")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("NumberOfGuests")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Openness")
                         .HasColumnType("INTEGER");
 

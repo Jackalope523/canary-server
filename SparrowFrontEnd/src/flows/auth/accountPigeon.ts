@@ -19,13 +19,13 @@ export type character = {
 
 export function extractCharacter(data: any) {
     let character: character = {
-        Extraversion: data['Extraversion'],
-        Athleticism: data['Athleticism'],
-        Chaoticness: data['Chaoticness'],
-        Competitiveness: data['Competitiveness'],
-        Industriousness: data['Industriousness'],
-        NightOwl: data['NightOwl'],
-        Openness: data['Openness'],
+        Extraversion: data['extraversion'],
+        Athleticism: data['athleticism'],
+        Chaoticness: data['chaoticness'],
+        Competitiveness: data['competitiveness'],
+        Industriousness: data['industriousness'],
+        NightOwl: data['nightOwl'],
+        Openness: data['openness'],
     }
 
     return character;
@@ -51,22 +51,22 @@ export type userShard = {
 
 export function extractUserShard(data: any) {
     let user: userShard = {
-        Id: data['Id'],
-        PhoneNumber: data['PhoneNumber'],
-        Email: data['Email'],
-        Name: data['Name'],
-        DateOfBirth: extractDate(data['DateOfBirth']),
-        IsPhoneConfirmed: data['IsPhoneConfirmed'],
-        IsEmailConfirmed: data['IsEmailConfirmed'],
-        SecurityStamp: data['SecurityStamp'],
-        LockoutDate: data['LockoutDate'] ?
-            extractDate(data['LockoutDate']) : undefined,
-        AccessTries: data['AccessTries'],
-        AccountStatus: data['AccountStatus'],
-        JoinDate: extractDate(data['JoinDate']),
-        Reputation: data['Reputation'],
-        NumberOfFollowers: data['NumberOfFollowers'],
-        Character: extractCharacter(data['Character']),
+        Id: data['id'],
+        PhoneNumber: data['phoneNumber'],
+        Email: data['email'],
+        Name: data['name'],
+        DateOfBirth: extractDate(data['dateOfBirth']),
+        IsPhoneConfirmed: data['isPhoneConfirmed'],
+        IsEmailConfirmed: data['isEmailConfirmed'],
+        SecurityStamp: data['securityStamp'],
+        LockoutDate: data['lockoutDate'] ?
+            extractDate(data['lockoutDate']) : undefined,
+        AccessTries: data['accessTries'],
+        AccountStatus: data['accountStatus'],
+        JoinDate: extractDate(data['joinDate']),
+        Reputation: data['reputation'],
+        NumberOfFollowers: data['numberOfFollowers'],
+        Character: extractCharacter(data['character']),
     }
 
     return user;
@@ -195,7 +195,7 @@ export async function modifyAccount(details: accountDetails) {
         return Promise.reject();
     }
 
-  return await userSession.put(`${apiBaseUrl}`, details)
+  return await userSession.post(`${apiBaseUrl}`, details)
     .then((response: any) => {
             console.log('Account modified.', response.data);
     })

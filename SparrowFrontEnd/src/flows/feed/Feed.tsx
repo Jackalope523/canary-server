@@ -6,7 +6,9 @@ import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
 import { FlagType } from '../../components/FlagMedium';
 
 import { getUserFeed } from './feedPigeon';
+import {getAccount, modifyAccount } from '../auth/accountPigeon';
 import { etchingShard } from '../event/eventPigeon';
+import { length } from '@turf/turf';
 
 
 const FeedScreen = () => {
@@ -14,7 +16,7 @@ const FeedScreen = () => {
   let posts : JSX.Element[] = [];
 
   useEffect(() => {
-    getUserFeed({Depth: 5, ExclusionList: [] })
+    getUserFeed({ DepthCharge: 30, LastDepth: 0 })
     .then(value => 
       {
         let headers = value.Headers;
@@ -25,7 +27,7 @@ const FeedScreen = () => {
           for (let j = 0; j < etchings.length; j++) {
             if (etchings[j].EventId === headers[i].Id) {
               photos.push(etchings[j].ImageURL);
-              authors.push(etchings[j].Owner);
+              authors.push(etchings[j].User.Name);
             }
           }
           posts.push(
@@ -35,9 +37,13 @@ const FeedScreen = () => {
               author = {authors}
               location = {"Valentine"}
             />);   
+
+            console.log("LENGTH: " + posts);
          }
-      });
+      })
+    .catch(() => console.log("ERROR"));
   }, []);
+
 
   return (
     <View style={styles.container}>

@@ -52,7 +52,7 @@ namespace Repository
 
         // Default Values
         public static ulong DefaultId { get; set; } = ulong.MinValue;
-        public static string DefaultPhoneNumber { get; set; } = "000-000-0000";
+        public static string DefaultPhoneNumber { get; set; } = "8199198013";
         public static string DefaultEmail { get; set; } = "JohnDoe@Test.com";
         public static string DefaultNormalisedEmail { get; set; } = "johndoe@test.com";
         public static string DefaultName { get; set; } = "John Doe";
@@ -62,7 +62,7 @@ namespace Repository
         public static bool DefaultIsPhoneConfirmed { get; set; } = false;
         public static bool DefaultIsEmailConfirmed { get; set; } = false;
         public static string DefaultSecurityStamp { get; set; } = "ijhbzdfsoiuh9ui239";
-        public static DateTimeOffset? DefaultLockoutDate { get; set; } = DateTimeOffset.MaxValue;
+        public static DateTimeOffset? DefaultLockoutDate { get; set; } = null;
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
         public static ulong? DefaultCurrentEvent { get; set; } = null;

@@ -25,17 +25,18 @@ namespace Repository
                     NotificationDatabaseAccess = new NotificationStore(new TestSentry());
                     EventDatabaseAccess = new EventStore(new TestSentry());
                     EtchingDatabaseAccess = new EtchingStore(new TestSentry());
-                    ReportDatabaseAccess = new DisciplineStore(new TestSentry());               
-                    AdminDatabaseAccess = new AdminStore(new TestSentry());  
+                    ReportDatabaseAccess = new DisciplineStore(new TestSentry());
+                    AdminDatabaseAccess = new AdminStore(new TestSentry());
                     break;
 
                 case Flag.Production:
+                    AzureSentry.SeedDatabase();
                     AccountDatabaseAccess = new AccountStore(new AzureSentry());
                     ProfileDatabaseAccess = new ProfileStore(new AzureSentry());
                     NotificationDatabaseAccess = new NotificationStore(new AzureSentry());
                     EventDatabaseAccess = new EventStore(new AzureSentry());
                     EtchingDatabaseAccess = new EtchingStore(new AzureSentry());
-                    ReportDatabaseAccess = new DisciplineStore(new AzureSentry());             
+                    ReportDatabaseAccess = new DisciplineStore(new AzureSentry());
                     AdminDatabaseAccess = new AdminStore(new AzureSentry());
                     break;
 
@@ -43,6 +44,5 @@ namespace Repository
                     throw new UndefinedHarborStateException();
             }
         }
-
     }
 }

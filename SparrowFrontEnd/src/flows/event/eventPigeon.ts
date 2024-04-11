@@ -1,7 +1,7 @@
 import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { character, extractCharacter } from '../auth/accountPigeon';
 import { extractUserSilhouette, userSilhouette } from '../profile/profilePigeon';
-import { point, Point } from '@turf/helpers';
+import { point, Point, Feature } from '@turf/turf';
 
 const apiBaseUrl = '/event';
 
@@ -13,53 +13,35 @@ export type eventShard = {
     Name: string,
     Description: string,
     StartTime: Date,
-    Latitude: number,
-    Longitude: number,
+    Location: Feature<Point>,
     TimeEnded?: Date,
     State: eventState,
     GroupMinimum: number,
     GroupMaximum: number,
     Character: character,
     Radius: number,
-    IsDynamic: boolean
+    IsDynamic: boolean,
+    NumberOfGuests: number
 };
 
 export function extractEventShard(data: any) {
     let event: eventShard = {
-        Id: data['Id'],
-        Host: extractUserSilhouette(data['Host']),
-        Name: data['Name'],
-        Description: data['Description'],
-        StartTime: extractDate(data['StartTime']),
-        Latitude: data['Latitude'],
-        Longitude: data['Longitude'],
-        TimeEnded: data['TimeEnded'] ?
-            extractDate(data['TimeEnded']) : undefined,
-        State: data['State'],
-        GroupMinimum: data['GroupMinimum'],
-        GroupMaximum: data['GroupMaximum'],
-        Character: extractCharacter(data['Character']),
-        Radius: data['Radius'],
-        IsDynamic: data['IsDynamic']
+        Id: data['id'],
+        Host: extractUserSilhouette(data['host']),
+        Name: data['name'],
+        Description: data['description'],
+        StartTime: extractDate(data['startTime']),
+        Location: point([data['longitude'], data['latitude']]),
+        TimeEnded: data['timeEnded'] ?
+            extractDate(data['timeEnded']) : undefined,
+        State: data['state'],
+        GroupMinimum: data['groupMinimum'],
+        GroupMaximum: data['groupMaximum'],
+        Character: extractCharacter(data['character']),
+        Radius: data['radius'],
+        IsDynamic: data['isDynamic'],
+        NumberOfGuests: data['numberOfGuests']
     }
-
-    return event;
-}
-
-export type eventThinSlice = {
-    Id: number,
-    Host: userSilhouette,
-    Latitude: number,
-    Longitude: number
-};
-
-export function extractEventThinSlice(data: any) {
-    let event: eventThinSlice = {
-        Id: data['Id'],
-        Host: extractUserSilhouette(data['Host']),
-        Latitude: data['Latitude'],
-        Longitude: data['Longitude']
-    };
 
     return event;
 }
@@ -69,18 +51,18 @@ export type eventHeader = {
     Name: string,
     IsActive: string,
     LastActiveTime: Date,
-    // ** NEW **
-    Longitude: number,
-    Latitude: number
-    //************
+    Latitude: number,
+    Longitude: number
 }
 
 export function extractEventHeader(data: any) {
     let header: eventHeader = {
-        Id: data['Id'],
-        Name: data['EventId'],
-        IsActive: data['IsActive'],
-        LastActiveTime: extractDate(data['LastTimeActive'])
+        Id: data['id'],
+        Name: data['eventId'],
+        IsActive: data['isActive'],
+        LastActiveTime: extractDate(data['lastTimeActive']),
+        Latitude: data['latitude'],
+        Longitude: data['longitude']
     };
 
     return header;
@@ -89,10 +71,7 @@ export function extractEventHeader(data: any) {
 export type etchingShard = {
     Id: number,
     EventId: number,
-    UserId: number,
-    // ** NEW **
-    Owner: string,
-    //************
+    User: userSilhouette,
     TimeEtched: Date,
     ImageURL: string,
     Ratings: [Positive: number, Negative: number],
@@ -102,13 +81,13 @@ export type etchingShard = {
 export function extractEtchingShard(data: any) {
     let etching: etchingShard = {
         Id: data['id'],
-        EventId: data['EventId'],
-        UserId: data['UserId'],
-        TimeEtched: extractDate(data['TimeEtched']),
-        ImageURL: data['ImageURL'],
-        Ratings: [data['Ratings']['Positive'],
-            data['Ratings']['Negative']],
-        IsHidden: data['IsHidden']
+        EventId: data['eventId'],
+        User: extractUserSilhouette(data['user']),
+        TimeEtched: extractDate(data['timeEtched']),
+        ImageURL: data['imageURL'],
+        Ratings: [data['ratings']['positive'],
+            data['ratings']['negative']],
+        IsHidden: data['isHidden']
     };
 
     return etching;

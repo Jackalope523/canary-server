@@ -88,16 +88,19 @@ namespace Core.Controls
             }
         }
 
-        public async Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
-            GetUserFeedAsync(ulong userId, int depth = 0, List<ulong> exclusionList = null)
+        public async Task<Feed>
+            GetUserFeedAsync(ulong userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
-            exclusionList ??= new();
             Dictionary<ulong, EventHeader> eventHeaders = new();
 
+            // Enforce lastDepth < depth
+            lastDepth = Math.Min(lastDepth, depth - 1);
+
             // Retrieve friend-populated event etchings after a specified time excluding previously viewed events
-            DateTimeOffset depthCharge = Time - TimeSpan.FromDays(1 + depth);
-            var friendEtchings = await Etchings.GenerateFeedForUserAsync(user.Id, depthCharge, exclusionList);
+            DateTimeOffset depthCharge = Time - TimeSpan.FromDays(depth);
+            DateTimeOffset lastDepthCharge = Time - TimeSpan.FromDays(lastDepth);
+            var friendEtchings = await Etchings.GenerateFeedForUserAsync(user.Id, depthCharge, lastDepthCharge);
 
             // Get the respective event headers for the etchings
             foreach (var etching in friendEtchings)
@@ -123,7 +126,7 @@ namespace Core.Controls
                 }
             }
 
-            return (depth, eventHeaders.Values.ToList(), friendEtchings);
+            return new(eventHeaders.Values.ToList(), friendEtchings);
         }
 
 		#endregion
