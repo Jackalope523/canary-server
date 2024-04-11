@@ -3,136 +3,109 @@ import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
 import { Spacing } from '../../styles/SpacingStyles';
-
 import EventCardMedium from '../../components/EventCardMedium';
 import NotificationIndicator from '../../components/activity/NotificationIndicator';
 import { ButtonDisplay, ButtonSize, ButtonType } from '../../components/Button';
 import ExclusiveButtonView from '../../components/ExclusiveButtonView';
-
-// Sample data
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
+import EventCardLarge from '../../components/EventCardLarge';
+import DropdownSelectorText from '../../components/DropdownSelectorText';
+import dropdownOptionsActivity from './DropdownOptionsActivity';
+import { seedDatabase } from '../testing/testPigeon';
+import { accountStatus, character, userShard } from '../auth/accountPigeon';
+import { eventShard } from '../event/eventPigeon';
+import { 
+  user1, 
+  user2, 
+  user3, 
+  user4, 
+  user5, 
+  user6, 
+  user7, 
+  event1, 
+  event2, 
+  event3, 
+  attendance,
+  follows, 
+  blocks } from '../testing/gardenShed';
 
 const ActivityScreen = () => {
+  seedDatabase(
+    [user1, user2, user3, user4, user5, user6, user7], 
+    [event1, event2, event3], 
+    attendance, 
+    follows, 
+    blocks)
+    .then(() => console.log("DATABASE SEEDED"));
+  
   return (
     <ScrollView
       style={styles.mainContainer}
       overScrollMode="never"
       showsVerticalScrollIndicator={false}>
       <View style={styles.topContainer}>
+        {/* TODO hook up onPress in dropdownOptionsActivity to here */}
+        <DropdownSelectorText options={dropdownOptionsActivity} />
         <View style={styles.notificationContainer}>
           <NotificationIndicator />
         </View>
-        <Text style={[globalStyles.displayTextTwo, styles.displayText]}>
-          Hey, User!
-        </Text>
       </View>
-      {/* --- FILTER --- */}
-      {/* TODO first filter button ("All") has to be set as selected/active on default */}
 
-      <ExclusiveButtonView
-        groupStyle={styles.filter}
-        buttons={[
-          {
-            id: 1,
-            type: ButtonType.SecondaryDark,
-            size: ButtonSize.Small,
-            display: ButtonDisplay.Full,
-            text: 'All',
-            onPress: null,
-          },
-          {
-            id: 2,
-            type: ButtonType.SecondaryDark,
-            size: ButtonSize.Small,
-            display: ButtonDisplay.Full,
-            text: 'By you',
-            onPress: null,
-          },
-          {
-            id: 3,
-            type: ButtonType.SecondaryDark,
-            size: ButtonSize.Small,
-            display: ButtonDisplay.Full,
-            text: 'By friends',
-            onPress: null,
-          },
-        ]}
-      />
+      <View style={styles.events}>
+        {/* TODO first filter button ("All") has to be set as selected/active on default */}
+        {/* TODO we keeping the filter  or deleting it?; in app design it's deleted, so delete if we don't need it */}
 
-      {/* --- FILTER END --- */}
-      <View style={styles.sectionContainer}>
-        <Text style={[globalStyles.headingTextOne, styles.headingText]}>
-          Upcoming
-        </Text>
+        {/* <ExclusiveButtonView
+          groupStyle={styles.filter}
+          buttons={[
+            {
+              id: 1,
+              type: ButtonType.SecondaryDark,
+              size: ButtonSize.Small,
+              display: ButtonDisplay.Full,
+              text: 'All',
+              onPress: null,
+            },
+            {
+              id: 2,
+              type: ButtonType.SecondaryDark,
+              size: ButtonSize.Small,
+              display: ButtonDisplay.Full,
+              text: 'By you',
+              onPress: null,
+            },
+            {
+              id: 3,
+              type: ButtonType.SecondaryDark,
+              size: ButtonSize.Small,
+              display: ButtonDisplay.Full,
+              text: 'By friends',
+              onPress: null,
+            },
+          ]}
+        /> */}
+
         <FlatList
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.lg,
+          }}
           ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           overScrollMode="never"
           horizontal={true}
           keyExtractor={(item) => item.id}
           data={SAMPLEEVENTDATA}
           renderItem={({ item }) => (
-            <EventCardMedium
+            <EventCardLarge
               onPress={null}
               eventHeroImage={item.uri}
+              eventHostName={item.host}
+              eventTitle={item.title}
               eventDate={item.date}
               eventTime={item.time}
-              eventAttendees={item.attendees}
               eventLocation={item.location}
-              eventTitle={item.title}
-            />
-          )}
-        />
-      </View>
-
-      <View style={styles.sectionContainer}>
-        <Text style={[globalStyles.headingTextOne, styles.headingText]}>
-          Watched
-        </Text>
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
-          ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
-          overScrollMode="never"
-          horizontal={true}
-          keyExtractor={(item) => item.id}
-          data={SAMPLEEVENTDATA}
-          renderItem={({ item }) => (
-            <EventCardMedium
-              onPress={null}
-              eventHeroImage={item.uri}
-              eventDate={item.date}
-              eventTime={item.time}
               eventAttendees={item.attendees}
-              eventLocation={item.location}
-              eventTitle={item.title}
-            />
-          )}
-        />
-      </View>
-
-      <View style={styles.sectionContainerBottom}>
-        <Text style={[globalStyles.headingTextOne, styles.headingText]}>
-          Recommended
-        </Text>
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
-          ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
-          overScrollMode="never"
-          horizontal={true}
-          keyExtractor={(item) => item.id}
-          data={SAMPLEEVENTDATA}
-          renderItem={({ item }) => (
-            <EventCardMedium
-              onPress={null}
-              eventHeroImage={item.uri}
-              eventDate={item.date}
-              eventTime={item.time}
-              eventAttendees={item.attendees}
-              eventLocation={item.location}
-              eventTitle={item.title}
+              eventAttendeesFriends={item.attendeesFriends}
             />
           )}
         />
@@ -144,17 +117,6 @@ const ActivityScreen = () => {
 export default ActivityScreen;
 
 const styles = StyleSheet.create({
-  displayText: {
-    color: Colors.sparrowRed,
-    marginVertical: Spacing.lg,
-  },
-
-  headingText: {
-    color: Colors.sparrowDark,
-    marginBottom: Spacing.md,
-    marginLeft: Spacing.lg,
-  },
-
   mainContainer: {
     paddingBottom: Spacing.lg,
   },
@@ -168,19 +130,19 @@ const styles = StyleSheet.create({
   },
 
   topContainer: {
-    marginHorizontal: Spacing.lg,
-    marginTop: Spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
 
   notificationContainer: {
     alignItems: 'flex-end',
   },
 
-  sectionContainer: {
+  events: {
     marginBottom: Spacing.lg,
-  },
-
-  sectionContainerBottom: {
-    marginBottom: Spacing.xl,
   },
 });

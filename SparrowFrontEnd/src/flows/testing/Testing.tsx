@@ -26,7 +26,10 @@ import FlagMedium, { FlagType } from '../../components/FlagMedium';
 import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
 
 import Post from '../../components/feed/Post';
-import DropdownSmall, { Align, Icon } from '../../components/DropdownSmall';
+import DropdownSelectorIcon, {
+  Align,
+  Icon,
+} from '../../components/DropdownSelectorIcon';
 import dropdownOptionsPost from '../../components/DropdownOptionsPost';
 import avatarimg from '../../assets/images/temp/host-img-1.jpg';
 import EventCardSmall from '../../components/EventCardSmall';

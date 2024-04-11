@@ -1,6 +1,6 @@
 /*
 
-Dropdown options for DropdownSmall component;
+Dropdown options for DropdownSelectorIcon component;
 Type: Feed post
 
 */

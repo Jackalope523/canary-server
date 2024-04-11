@@ -5,7 +5,7 @@ import { runOnJS } from 'react-native-reanimated';
 import Avatar from '../Avatar';
 import PaginationIndicator from './PaginationIndicator';
 import FlagMedium, { FlagType } from '../FlagMedium';
-import DropdownSmall, { Align, Icon } from '../DropdownSmall';
+import DropdownSelectorIcon, { Align, Icon } from '../DropdownSelectorIcon';
 import dropdownOptionsPost from '../DropdownOptionsPost';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
@@ -36,10 +36,10 @@ export interface PhotoPostProps {
 }
 
 export const PhotoPost: React.FC<PhotoPostProps> = ({
-  name = "Poker Night",
+  name = 'Poker Night',
   media,
-  author = "John Marston",
-  location = "St Denis",
+  author = 'John Marston',
+  location = 'St Denis',
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                               Location indicator                               ||

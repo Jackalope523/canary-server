@@ -6,7 +6,7 @@ import { createIconSetFromFontello } from 'react-native-vector-icons';
 import fontelloConfig from '../../config.json';
 import TextInputSmall, { InputType } from '../TextInputSmall';
 import { Spacing } from '../../styles/SpacingStyles';
-import Dropdown from '../Dropdown';
+import DropdownInput from '../DropdownInput';
 import { MONTHS } from '../../data/auth/months';
 
 const Icon = createIconSetFromFontello(fontelloConfig);
