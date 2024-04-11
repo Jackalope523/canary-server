@@ -16,6 +16,7 @@ using System.Linq;
 using System.Collections.Generic;
 using PhoneNumbers;
 using System.Timers;
+using Serilog;
 
 namespace Core.Tests
 {
@@ -56,6 +57,7 @@ namespace Core.Tests
             // Arrange Core
 			Repository.Harbor harbor = new(Repository.Harbor.Flag.Development);
 
+			
             Terminal = CoreTerminal.CreateTerminal(
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
@@ -66,6 +68,7 @@ namespace Core.Tests
                 harbor.NotificationDatabaseAccess,
                 harbor.ProfileDatabaseAccess,
 				new NotificationServiceStub());
+			
 		}
 
 		///////

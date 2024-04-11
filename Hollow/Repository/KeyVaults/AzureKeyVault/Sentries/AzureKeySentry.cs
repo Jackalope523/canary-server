@@ -1,6 +1,8 @@
 ﻿using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Secrets;
+using Serilog;
+using Shared;
 
 namespace Repository
 {
@@ -10,23 +12,61 @@ namespace Repository
 
         public async Task<string> GetSecretAsync(string secretName)
         {
-            SecretClient client = new(context.Uri, context.credentials());
-            KeyVaultSecret secret = await client.GetSecretAsync(secretName);
-            return secret.Value;
+            try
+            {
+                SecretClient client = new(context.Uri, context.credentials());
+                KeyVaultSecret secret = await client.GetSecretAsync(secretName);
+                return secret.Value;
+            }
+            catch (Exception ex)
+            {
+                using var log = new LoggerConfiguration()
+                           .WriteTo.AzureApp()
+                           .CreateLogger();
+
+                log.Error("SECRET IO FAILURE");
+                throw new VaultIOException(ex);
+            }    
         }
 
         public async Task<JsonWebKey> GetKeyAsync(string keyName)
         {
-            KeyClient client = new(context.Uri, context.credentials());
-            KeyVaultKey key = await client.GetKeyAsync(keyName);
-            return key.Key;
+            try
+            {
+                KeyClient client = new(context.Uri, context.credentials());
+                KeyVaultKey key = await client.GetKeyAsync(keyName);
+                return key.Key;
+            }
+            catch (Exception ex)
+            {
+                using var log = new LoggerConfiguration()
+                          .WriteTo.AzureApp()
+                          .CreateLogger();
+
+                log.Error("KEY IO FAILURE");
+
+                throw new VaultIOException(ex);
+            }
         }
 
         public async Task<byte[]> GetCertificateAsync(string certificateName)
         {
-            CertificateClient client = new(context.Uri, context.credentials());
-            KeyVaultCertificate certificate = await client.GetCertificateAsync(certificateName);
-            return certificate.Cer;
+            try
+            {
+                CertificateClient client = new(context.Uri, context.credentials());
+                KeyVaultCertificate certificate = await client.GetCertificateAsync(certificateName);
+                return certificate.Cer;
+            }
+            catch (Exception ex)
+            {
+                using var log = new LoggerConfiguration()
+                          .WriteTo.AzureApp()
+                          .CreateLogger();
+
+                log.Error("CERTIFICATE IO FAILURE");
+
+                throw new VaultIOException(ex);
+            }
         }
     }
 }

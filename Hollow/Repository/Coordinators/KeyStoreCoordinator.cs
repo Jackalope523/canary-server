@@ -12,19 +12,19 @@ namespace Repository.Coordinators
             store = new AzureKeyStore();
         }
 
-        public Task<byte[]> GetCertificateAsync(string certificateName)
+        public async Task<byte[]> GetCertificateAsync(string certificateName)
         {
-            return store.GetCertificateAsync(certificateName);
+            return await store.GetCertificateAsync(certificateName);
         }
 
-        public Task<JsonWebKey> GetKeyAsync(string keyName)
+        public async Task<JsonWebKey> GetKeyAsync(string keyName)
         {
-            return store.GetKeyAsync(keyName);
+            return await store.GetKeyAsync(keyName);
         }
 
-        public Task<string> GetSecretAsync(string secretName)
+        public async Task<string> GetSecretAsync(string secretName)
         {
-            return store.GetSecretAsync(secretName);
+            return await store.GetSecretAsync(secretName);
         }
     }
 }

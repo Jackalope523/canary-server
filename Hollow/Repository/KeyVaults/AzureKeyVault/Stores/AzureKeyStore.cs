@@ -1,9 +1,6 @@
-﻿using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Azure.Security.KeyVault.Keys;
-using Azure.Security.KeyVault.Certificates;
+﻿using Azure.Security.KeyVault.Keys;
 using Core.Boundaries;
-using Repository.KeyVaults.AzureKeyVault.Sentries;
+using Serilog;
 
 namespace Repository
 {
@@ -18,7 +15,17 @@ namespace Repository
 
         public async Task<string> GetSecretAsync(string secretName)
         {
-            return await sentry.GetSecretAsync(secretName);
+            using var log = new LoggerConfiguration()
+                            .WriteTo.AzureApp()
+                            .CreateLogger();
+            
+            log.Fatal("Logger Initialized Properly");
+
+            var secret = await sentry.GetSecretAsync(secretName);
+
+            log.Fatal("Retrieved secret: {$secret}", secret);
+
+            return secret;
         }
 
         public async Task<JsonWebKey> GetKeyAsync(string keyName)
