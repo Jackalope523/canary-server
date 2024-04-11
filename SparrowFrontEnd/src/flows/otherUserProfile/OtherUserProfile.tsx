@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: Spacing.mdsm,
-    columnGap: Spacing.sm,
+    columnGap: Spacing.xs,
   },
 
   userControls: {

@@ -6,6 +6,10 @@ import { Colors } from '../styles/ColorStyles';
 import Avatar, { AvatarSize } from './Avatar';
 import { globalStyles } from '../styles/GlobalStyles';
 
+// Icons
+import FeatherIcon from '../assets/icons/feather-fill-colored.svg'
+import BirdIcon from '../assets/icons/bird-fill-colored.svg'
+
 //#region Props
 interface GalleryProps {
   images: { media: ImageSourcePropType[] }[];
@@ -165,6 +169,11 @@ const Gallery: React.FC<GalleryProps> = ({
     setSelectedImage(prevImage => (prevImage === image ? null : image));
   }
 
+  // TODO remove these variables after testing and hook up to back-end data
+  var you = true;
+  var friend = false;
+  var anon = false;
+
   const renderItem = ({ item, index }) => {
     return (
       <Pressable onPress={() => handleImagePress(item)}>
@@ -182,7 +191,14 @@ const Gallery: React.FC<GalleryProps> = ({
               }>
               <View style={styles.user}>
                 <Avatar size={AvatarSize.Small} image={posterAvatar} />
-                <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>{posterName}</Text>
+                <View style={styles.userInner}>
+                  <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>{posterName}</Text>
+                  {you ?
+                    <BirdIcon height={24} width={24} />
+                    : friend ?
+                      <FeatherIcon height={24} width={24} />
+                      : null}
+                </View>
               </View>
               <Image source={item} style={styles.image} />
             </View>
@@ -257,6 +273,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     columnGap: Spacing.mdsm,
     paddingVertical: Spacing.md,
+  },
+
+  userInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.xs,
   },
 
   // Image

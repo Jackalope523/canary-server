@@ -20,9 +20,10 @@ import Button, {
 import AddIcon from '../../assets/icons/add-outline.svg';
 import Chevron from '../../assets/icons/chevron-outline.svg';
 import LayoutMediumIcon from '../../assets/icons/layout-size-medium-fill-alt.svg';
+import BirdIcon from '../../assets/icons/bird-fill-colored.svg';
 
 import { globalStyles } from '../../styles/GlobalStyles';
-import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
+import Avatar, { AvatarSize } from '../../components/Avatar';
 import { SAMPLE_USER_DATA } from '../../data/sampleUserData';
 import { Colors } from '../../styles/ColorStyles';
 import { Spacing } from '../../styles/SpacingStyles';
@@ -92,12 +93,7 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
             {user?.name}
           </Text>
           {/* TODO replace TextLabel YOU with an bird icon */}
-          <TextLabel
-            text={labelText.you}
-            type={LabelType.You}
-            size={LabelSize.Small}
-            display={LabelDisplay.Contained}
-          />
+          <BirdIcon width={24} height={24} />
         </View>
       </View>
 
@@ -156,7 +152,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: Spacing.mdsm,
-    columnGap: Spacing.sm,
+    columnGap: Spacing.xs,
   },
 
   // Events
