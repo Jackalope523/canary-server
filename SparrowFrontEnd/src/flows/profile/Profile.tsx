@@ -35,7 +35,7 @@ import { labelText } from '../../components/LabelText';
 
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
-import UpcomingEvent from '../../components/otherUserProfile/upcomingEvent';
+import UpcomingEvent from '../../components/otherUserProfile/UpcomingEvent';
 import { EventStatus } from '../../components/EventCardSmall';
 import PreviouslyAttendedEvent from '../../components/otherUserProfile/PreviouslyAttendedEvent';
 
@@ -68,21 +68,17 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
 
   handleGetAccount();
 
-  /*
-  
-    TODO hook up to real data
-    user types: anon, friend
-  
-  */
-
   // TEMP. for testing purposes
-  let friend = false;
-
   const user = SAMPLE_USER_DATA.find((user) => user.id === '1');
 
   const testUserData = React.useEffect(() => {
     console.log('user', user);
   }, [user]);
+
+  // Handle change layout for gallery
+  const handleChangeLayout = () => {
+    console.log('change layout button pressed');
+  };
 
   return (
     <ScrollView
@@ -103,98 +99,46 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
             display={LabelDisplay.Contained}
           />
         </View>
-        <View>
-          {friend ? (
-            <Button
-              type={ButtonType.PrimaryDark}
-              size={ButtonSize.ExtraSmall}
-              display={ButtonDisplay.Contained}
-              text={'Invite to event'}
-              displayIcon={true}
-              Icon={AddIcon}
-              onPress={null}
-            />
-          ) : (
-            <Button
-              type={ButtonType.PrimaryDark}
-              size={ButtonSize.ExtraSmall}
-              display={ButtonDisplay.Contained}
-              text={'Add friend'}
-              displayIcon={true}
-              Icon={AddIcon}
-              onPress={null}
-            />
-          )}
-        </View>
       </View>
 
       {/* EVENTS */}
-      {/* NEW EVENTS DESIGN */}
       <View style={styles.events}>
         <View style={styles.eventsHeadingContainer}>
           <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
             Previously attended
           </Text>
           {/* TODO hook up change layout functionality */}
-          <LayoutMediumIcon
-            width={24}
-            height={24}
-            fill={Colors.sparrowDarkBrown}
-          />
+          {/* TODO implement a way to activate the changeLayout function in the Gallery component, through this parent component */}
+
+          <Pressable onPress={handleChangeLayout}>
+            <LayoutMediumIcon
+              width={24}
+              height={24}
+              fill={Colors.sparrowDarkBrown}
+            />
+          </Pressable>
         </View>
         <FlatList
-          data={SAMPLE_PAST_EVENT_DATA.filter(
-            (item) => !item.time.includes('live'),
-          )}
+          data={SAMPLE_PAST_EVENT_DATA.filter((item) => item.status === 'passed')}
           renderItem={({ item }) => (
             <PreviouslyAttendedEvent
-              eventStatus={EventStatus.Past}
-              eventHeroImage={item.media[0]}
               eventTitle={item.title}
               eventDate={item.time}
-              eventLocation={item.location}
               onPress={() => console.log('Event card image pressed')}
+              onPressViewEvent={() => console.log('View event button pressed')}
               images={item.media ? [item] : []}
+
+              // TODO show the avatar of the user who posted the photo; right now it's showing the host's avatar
+              posterAvatar={item.avatar}
+              // TODO replace item.host name with the name of the user who posted the photo
+              // TODO fix poster images loading slowly
+              posterName={item.host}
             />
           )}
           keyExtractor={(item) => item.id}
           ItemSeparatorComponent={() => <View style={{ height: Spacing.lg }} />}
         />
       </View>
-
-      {/* OLD EVENTS DESIGN */}
-      {/* <View style={styles.events}>
-        <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-          Events
-        </Text>
-        <View>
-          <View style={styles.pastEvents}>
-            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-              Previously attended
-            </Text>
-            <FlatList
-              data={SAMPLE_PAST_EVENT_DATA.filter(
-                (item) => !item.time.includes('live'),
-              )}
-              renderItem={({ item }) => (
-                <PreviouslyAttendedEvent
-                  eventStatus={EventStatus.Past}
-                  eventHeroImage={item.media[0]}
-                  eventTitle={item.title}
-                  eventDate={item.time}
-                  eventLocation={item.location}
-                  onPress={() => console.log('Event card image pressed')}
-                  images={item.media ? [item] : []}
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              ItemSeparatorComponent={() => (
-                <View style={{ height: Spacing.lg }} />
-              )}
-            />
-          </View>
-        </View>
-      </View> */}
     </ScrollView>
   );
 };
@@ -202,35 +146,17 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  // TODO delete viewMore styles after the ViewMoreButton component has been integrated
-  viewMore: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Spacing.md,
-  },
-
   topContainer: {
     alignItems: 'center',
-    paddingVertical: Spacing.lg,
+    paddingBottom: Spacing.xl,
+    paddingTop: Spacing.sm,
   },
 
   user: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: Spacing.md,
-    paddingBottom: Spacing.lg,
+    paddingTop: Spacing.mdsm,
     columnGap: Spacing.sm,
-  },
-
-  bio: {
-    marginBottom: Spacing.md,
-  },
-
-  // Labels
-  labelContainer: {
-    flexDirection: 'row',
-    columnGap: Spacing.mdsm,
   },
 
   // Events

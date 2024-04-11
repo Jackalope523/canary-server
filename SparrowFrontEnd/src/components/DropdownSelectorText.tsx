@@ -8,6 +8,7 @@ import ChevronIcon from '../assets/icons/chevron-outline.svg';
 import { Colors } from '../styles/ColorStyles';
 import { Spacing } from '../styles/SpacingStyles';
 import { borderRadius } from '../styles/BorderStyles';
+import ChevronButton, { ChevronButtonHandle } from './ChevronButton';
 
 interface DropdownSelectorTextProps {
   options: { id: number; text: string; onPress: () => void }[];
@@ -18,26 +19,27 @@ const DropdownSelectorText: React.FC<DropdownSelectorTextProps> = ({
   // other name 2
 }) => {
   const [selected, setSelected] = React.useState(false);
+  const chevronRef = React.useRef<ChevronButtonHandle>(null);
 
   const selectedItem = options[0].text;
+
+  const handlePress = () => {
+    chevronRef.current?.rotate();
+    setSelected(!selected);
+  }
 
   return (
     <View style={styles.dropdownSelectorText}>
       <Pressable
-        onPress={() => setSelected(!selected)}
+        onPress={handlePress}
         style={styles.selectedItem}>
         <Text style={[globalStyles.buttonTextOne, globalStyles.textDark]}>
           {selectedItem}
         </Text>
-        <ChevronIcon
-          height={24}
-          width={24}
-          fill={Colors.sparrowDarkBrown}
-          style={
-            selected
-              ? { transform: [{ rotate: '180deg' }] }
-              : { transform: [{ rotate: '0deg' }] }
-          }
+        <ChevronButton
+          ref={chevronRef}
+          size={24}
+          color={Colors.sparrowDarkBrown}
         />
       </Pressable>
       {selected ? (

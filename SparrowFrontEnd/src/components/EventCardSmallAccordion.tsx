@@ -36,7 +36,7 @@ const EventCardSmallAccordion: React.FC<EventCardSmallAccordionProps> = ({
   onPressViewEvent,
   onPressCard,
 }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = React.useState(true);
   const chevronRef = React.useRef<ChevronButtonHandle>(null);
 
   const handlePress = () => {

@@ -25,7 +25,7 @@ const PreviouslyAttendedEvent: FC<PreviouslyAttendedEventProps> = ({
   posterName,
   onPressViewEvent,
 }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = React.useState(true);
 
   const onPressCard = () => {
     setIsExpanded(!isExpanded);
