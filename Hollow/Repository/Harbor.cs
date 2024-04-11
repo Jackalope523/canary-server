@@ -14,6 +14,7 @@ namespace Repository
         public IEtchingDatabase EtchingDatabaseAccess { get; private set; }
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
+        public IDebugDatabase DebugDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -27,6 +28,7 @@ namespace Repository
                     EtchingDatabaseAccess = new EtchingStore(new TestSentry());
                     ReportDatabaseAccess = new DisciplineStore(new TestSentry());
                     AdminDatabaseAccess = new AdminStore(new TestSentry());
+                    DebugDatabaseAccess = new DebugStore(new TestSentry());
                     break;
 
                 case Flag.Production:
@@ -38,6 +40,7 @@ namespace Repository
                     EtchingDatabaseAccess = new EtchingStore(new AzureSentry());
                     ReportDatabaseAccess = new DisciplineStore(new AzureSentry());
                     AdminDatabaseAccess = new AdminStore(new AzureSentry());
+                    DebugDatabaseAccess = new DebugStore(new AzureSentry());
                     break;
 
                 default:
