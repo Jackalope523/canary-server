@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using PhoneNumbers;
 using System.Timers;
 using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Tests
 {
@@ -59,11 +60,13 @@ namespace Core.Tests
 
 			
             Terminal = CoreTerminal.CreateTerminal(
+				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
                 harbor.ReportDatabaseAccess,
+				harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.ProfileDatabaseAccess,
