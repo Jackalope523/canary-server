@@ -54,16 +54,6 @@ namespace Core
         internal NotificationDirector NotificationDirector { get; private set; }
         internal ProfileDirector ProfileDirector { get; private set; }
 
-        public List<(Type GateType, object Instance)> Gates
-            => new() { (typeof(IAccountOperations), AccountOperations),
-                (typeof(IBannerOperations), BannerOperations),
-                (typeof(IEventOperations), EventOperations),
-                (typeof(IEtchingOperations), EtchingOperations),
-                (typeof(IDisciplineOperations), DisciplineOperations),
-                (typeof(IMediaOperations), MediaOperations),
-                (typeof(INotificationOperations), NotificationOperations),
-                (typeof(IProfileOperations), ProfileOperations) };
-
         #endregion
 
         #region Initialisation

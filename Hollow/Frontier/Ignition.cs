@@ -116,8 +116,15 @@ namespace Frontier
 				harbor.ProfileDatabaseAccess, 
 				pushNotifications);
 
-			GuardBox box = new(frontierLogger, terminal.AccountOperations, terminal.BannerOperations, terminal.ProfileOperations, terminal.EventOperations,
-				terminal.EtchingOperations, terminal.DisciplineOperations, terminal.MediaOperations, terminal.NotificationOperations);
+			GuardBox box = new(frontierLogger,
+				terminal.AccountOperations,
+				terminal.BannerOperations,
+				terminal.ProfileOperations,
+				terminal.EventOperations,
+				terminal.EtchingOperations,
+				terminal.DisciplineOperations,
+				terminal.MediaOperations,
+				terminal.NotificationOperations);
 
 			services.AddSingleton(box);
 
