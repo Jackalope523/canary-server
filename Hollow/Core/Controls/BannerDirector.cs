@@ -32,8 +32,9 @@ namespace Core.Controls
 			try
 			{
 				await Banners.GetUserBannerAsync(invitedPhoneNumber);
+				throw new InvalidUserException("User already has a banner.");
 			}
-			catch { throw new InvalidUserException("User already has a banner."); }
+			catch { }
 
 			// Add user to the banner
 			await Banners.AddBannerMemberAsync(invitedPhoneNumber, userBanner);
