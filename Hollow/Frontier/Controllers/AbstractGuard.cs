@@ -39,9 +39,6 @@ namespace Frontier.Controllers
 
 		public ILogger log;
 
-		public UserManager<UserShard> userManager;
-		public SignInManager<UserShard> signInManager;
-
 		public IAccountOperations accounts;
 		public IBannerOperations banners;
 		public IEventOperations events;
@@ -51,37 +48,26 @@ namespace Frontier.Controllers
 		public INotificationOperations notifications;
 		public IProfileOperations profiles;
 
-		public ISMSService smsService;
-		public IEmailService emailService;
+		public UserManager<UserShard> userManager;
 
 		#endregion
 
 		#region Initialisation
 
-		public AbstractGuard(ILogger logger,
-			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IBannerOperations bannerOperations,
-			IProfileOperations profileOperations, IEventOperations eventOperations,
-			IEtchingOperations etchingOperations, IDisciplineOperations disciplineOperations,
-			IMediaOperations mediaOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService)
+		public AbstractGuard(GuardBox box, UserManager<UserShard> aspUserManager)
 		{
-			log = logger;
+			log = box.log;
 
-			userManager = identityUserManager;
-			signInManager = identitySignInManager;
+			accounts = box.accounts;
+			banners = box.banners;
+			profiles = box.profiles;
+			events = box.events;
+			etchings = box.etchings;
+			reports = box.reports;
+			media = box.media;
+			notifications = box.notifications;
 
-			accounts = accountOperations;
-			banners = bannerOperations;
-			profiles = profileOperations;
-			events = eventOperations;
-			etchings = etchingOperations;
-			reports = disciplineOperations;
-			media = mediaOperations;
-			notifications = notificationOperations;
-
-			smsService = externalSMSService;
-			emailService = externalEmailService;
+			userManager = aspUserManager;
 		}
 
 		#endregion

@@ -14,23 +14,23 @@ namespace Frontier.Controllers
     [Route("account")]
     public class AccountGuard : AbstractGuard
 	{
-		#region Initialisation
+        #region Initialisation
 
-		public AccountGuard(ILogger logger,
-            UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IBannerOperations bannerOperations,
-            IProfileOperations profileOperations, IEventOperations eventOperations,
-            IEtchingOperations etchingOperations, IDisciplineOperations disciplineOperations,
-            IMediaOperations mediaOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService) :
-			base(logger,
-                identityUserManager, identitySignInManager,
-				accountOperations, bannerOperations,
-                profileOperations, eventOperations,
-                etchingOperations, disciplineOperations,
-                mediaOperations, notificationOperations,
-				externalSMSService, externalEmailService)
-		{ }
+        SignInManager<UserShard> signInManager;
+
+        IEmailService emailService;
+        ISMSService smsService;
+
+		public AccountGuard(GuardBox box, UserManager<UserShard> aspUserManager,
+            SignInManager<UserShard> aspSignInManager,
+            IEmailService externalEmailService, ISMSService externalSMSService) :
+            base(box, aspUserManager)
+		{
+            signInManager = aspSignInManager;
+
+            emailService = externalEmailService;
+            smsService = externalSMSService;
+        }
 
 		#endregion
 

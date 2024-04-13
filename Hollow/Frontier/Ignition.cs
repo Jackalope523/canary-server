@@ -116,12 +116,10 @@ namespace Frontier
 				harbor.ProfileDatabaseAccess, 
 				pushNotifications);
 
-			foreach (var (GateType, Instance) in terminal.Gates)
-			{
-				services.AddSingleton(GateType, Instance);
-			}
+			GuardBox box = new(frontierLogger, terminal.AccountOperations, terminal.BannerOperations, terminal.ProfileOperations, terminal.EventOperations,
+				terminal.EtchingOperations, terminal.DisciplineOperations, terminal.MediaOperations, terminal.NotificationOperations);
 
-			services.AddSingleton(frontierLogger);
+			services.AddSingleton(box);
 
 			
 			/////////

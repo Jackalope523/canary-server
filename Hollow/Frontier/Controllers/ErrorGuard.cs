@@ -10,20 +10,7 @@ namespace Frontier.Controllers
     {
 		#region Initialisation
 
-		public ErrorGuard(ILogger logger,
-			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IBannerOperations bannerOperations,
-			IProfileOperations profileOperations, IEventOperations eventOperations,
-			IEtchingOperations etchingOperations, IDisciplineOperations disciplineOperations,
-			IMediaOperations mediaOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService) :
-			base(logger,
-				identityUserManager, identitySignInManager,
-				accountOperations, bannerOperations,
-				profileOperations, eventOperations,
-				etchingOperations, disciplineOperations,
-				mediaOperations, notificationOperations,
-				externalSMSService, externalEmailService)
+		public ErrorGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
