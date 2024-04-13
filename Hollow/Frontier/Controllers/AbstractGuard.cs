@@ -43,6 +43,7 @@ namespace Frontier.Controllers
 		public SignInManager<UserShard> signInManager;
 
 		public IAccountOperations accounts;
+		public IBannerOperations banners;
 		public IEventOperations events;
 		public IEtchingOperations etchings;
 		public IDisciplineOperations reports;
@@ -59,10 +60,10 @@ namespace Frontier.Controllers
 
 		public AbstractGuard(ILogger logger,
 			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IProfileOperations profileOperations,
-			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations,
-			INotificationOperations notificationOperations,
+			IAccountOperations accountOperations, IBannerOperations bannerOperations,
+			IProfileOperations profileOperations, IEventOperations eventOperations,
+			IEtchingOperations etchingOperations, IDisciplineOperations disciplineOperations,
+			IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService)
 		{
 			log = logger;
@@ -71,6 +72,7 @@ namespace Frontier.Controllers
 			signInManager = identitySignInManager;
 
 			accounts = accountOperations;
+			banners = bannerOperations;
 			profiles = profileOperations;
 			events = eventOperations;
 			etchings = etchingOperations;

@@ -16,16 +16,17 @@ namespace Frontier.Controllers
 
 		public DiscoverGuard(ILogger logger,
 			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IProfileOperations profileOperations,
-			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
+			IAccountOperations accountOperations, IBannerOperations bannerOperations,
+			IProfileOperations profileOperations, IEventOperations eventOperations,
+			IEtchingOperations etchingOperations, IDisciplineOperations disciplineOperations,
+			IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService) :
 			base(logger,
 				identityUserManager, identitySignInManager,
-				accountOperations, profileOperations,
-				eventOperations, etchingOperations,
-				disciplineOperations, mediaOperations,
-				notificationOperations,
+				accountOperations, bannerOperations,
+				profileOperations, eventOperations,
+				etchingOperations, disciplineOperations,
+				mediaOperations, notificationOperations,
 				externalSMSService, externalEmailService)
 		{ }
 

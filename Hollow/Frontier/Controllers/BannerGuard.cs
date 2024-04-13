@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
-	[Route("media")]
-	public class MediaGuard : AbstractGuard
+	[Route("banner")]
+	public class BannerGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public MediaGuard(ILogger logger,
+		public BannerGuard(ILogger logger,
 			UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IBannerOperations bannerOperations,
 			IProfileOperations profileOperations, IEventOperations eventOperations,
@@ -34,14 +34,14 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{etchingId}")]
-		public async Task<IActionResult> GetImage(ulong etchingId)
+		[HttpPost("{phoneNumber}")]
+		public async Task<IActionResult> InviteUser(string phoneNumber)
 		{
 			return await Execute(async user =>
 			{
-				var image = await media.GetImageStreamAsync(user.Id, etchingId);
+				var banner = await banners.InviteUserAsync(user.Id, phoneNumber);
 
-				return image;
+				await smsService.SendSMSAsync(phoneNumber, $"You have been invited by ${user.Name} to join the Sparrow beta under the ${banner}.");
 			});
         }
 

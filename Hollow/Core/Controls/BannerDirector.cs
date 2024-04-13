@@ -18,10 +18,15 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task InviteUserAsync(ulong userId, string invitedPhoneNumber)
+		public async Task<string> InviteUserAsync(ulong userId, string invitedPhoneNumber)
 		{
 			var user = await GetUserAsync(userId);
 			var userBanner = await Banners.GetUserBannerAsync(user.Id);
+
+			var validNumber = ContentValidation.TryNormalisePhoneNumber(invitedPhoneNumber, out invitedPhoneNumber);
+
+			Try(validNumber,
+				new InvalidUserException("Invalid phone number."));
 
 			// Check if invited user already has a banner
 			try
@@ -32,6 +37,8 @@ namespace Core.Controls
 
 			// Add user to the banner
 			await Banners.AddBannerMemberAsync(invitedPhoneNumber, userBanner);
+
+			return userBanner;
 		}
 
 		#endregion

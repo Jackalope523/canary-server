@@ -19,7 +19,7 @@ namespace Core.Boundaries
 
 	public interface IBannerOperations
 	{
-        Task InviteUserAsync(ulong userId, string invitedPhoneNumber);
+        Task<string> InviteUserAsync(ulong userId, string invitedPhoneNumber);
     }
 
     #endregion
