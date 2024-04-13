@@ -14,7 +14,7 @@ namespace Core.Boundaries
 	{
         Task<string> GetUserBannerAsync(ulong userId);
         Task<string> GetUserBannerAsync(string phoneNumber);
-        Task AddBannerMemberAsync(string phoneNumber);
+        Task AddBannerMemberAsync(string phoneNumber, string banner);
     }
 
 	public interface IBannerOperations

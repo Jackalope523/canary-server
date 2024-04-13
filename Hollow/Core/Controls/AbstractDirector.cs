@@ -16,6 +16,7 @@ namespace Core.Controls
 		protected CoreTerminal Terminal { get; init; }
 
 		protected IAccountDatabase Accounts { get; private set; }
+		protected IBannerDatabase Banners { get; private set; }
 		protected IEventDatabase Events { get; private set; }
 		protected IEtchingDatabase Etchings { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
@@ -32,6 +33,7 @@ namespace Core.Controls
 			Terminal = terminal;
 			
 			Accounts = Terminal.AccountDatabase;
+			Banners = Terminal.BannerDatabase;
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
 			Reports = Terminal.DisciplineDatabase;

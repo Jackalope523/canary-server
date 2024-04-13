@@ -107,6 +107,7 @@ namespace Frontier
 				coreLogger,
 				harbor.AccountDatabaseAccess,
 				harbor.AdminDatabaseAccess,
+				harbor.BannerDatabaseAccess,
 				harbor.EventDatabaseAccess, 
 				harbor.EtchingDatabaseAccess,
 				harbor.ReportDatabaseAccess,
