@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {ScrollView, ScrollViewProps, FlatList, View} from 'react-native';
 import Button, {ButtonProps} from './Button';
-import {Spacing} from '../styles/SpacingStyles'
+import {Spacing} from '../styles/SpacingStyles';
+import Animated, {useSharedValue, withTiming, Easing, ReduceMotion } from 'react-native-reanimated';
 
 interface ExclusiveButtonScrollProps {
     props?: ScrollViewProps;
@@ -33,30 +34,42 @@ const ExclusiveButtonGroup: React.FC<ExclusiveButtonScrollProps> =
         return setCurrentValue(mapIdToValue(current));
     }, [current]);
 
+    const paddingTop = useSharedValue(10);
+
+    useEffect(() => {
+      paddingTop.value = withTiming(0, {
+        duration: 2000,
+        easing: Easing.elastic(2),
+        reduceMotion: ReduceMotion.System,
+      });
+    });
+
    return  (
-    <FlatList
-      horizontal={true}
-      overScrollMode="never"
-      showsHorizontalScrollIndicator={false}
-      ItemSeparatorComponent={() => (
-        <View style={{ paddingRight: Spacing.md }} />
-      )}
-      data={buttons}
-      renderItem={({ item }) => (
-        <Button
-          id={item.id}
-          current={current}
-          setCurrent={setCurrent}
-          type={item.type}
-          size={item.size}
-          display={item.display}
-          text={item.text}
-          displayIcon={item.displayIcon}
-          Icon={item.Icon}
-          onPress={item.onPress}
-        />
-      )}
-    />
+    <View>
+      <FlatList
+        horizontal={true}
+        overScrollMode="never"
+        showsHorizontalScrollIndicator={false}
+        ItemSeparatorComponent={() => (
+          <View style={{ paddingRight: Spacing.md }} />
+        )}
+        data={buttons}
+        renderItem={({ item }) => (
+          <Button
+            id={item.id}
+            current={current}
+            setCurrent={setCurrent}
+            type={item.type}
+            size={item.size}
+            display={item.display}
+            text={item.text}
+            displayIcon={item.displayIcon}
+            Icon={item.Icon}
+            onPress={item.onPress}
+          />
+        )}
+      />
+    </View>
   );
 };
 

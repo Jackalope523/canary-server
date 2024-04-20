@@ -203,7 +203,7 @@ const DiscoveryScreen = () => {
                 id: 1,
                 type: ButtonType.PrimaryDark,
                 size: ButtonSize.ExtraSmall,
-                display: ButtonDisplay.Full,
+                display: ButtonDisplay.Contained,
                 text: "Filter",
                 icon: "filter-fill",
                 onPress: () => { toggleActiveComponent(ActiveComponent.Filter); }
@@ -212,7 +212,7 @@ const DiscoveryScreen = () => {
                 id: 2,
                 type: ButtonType.PrimaryDark,
                 size: ButtonSize.ExtraSmall,
-                display: ButtonDisplay.Full,
+                display: ButtonDisplay.Contained,
                 text: "Sort",
                 icon: "sort-outline",
                 onPress: () => { toggleActiveComponent(ActiveComponent.Sort); }

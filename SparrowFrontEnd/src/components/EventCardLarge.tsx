@@ -1,6 +1,7 @@
 //#region imports
-import { Image, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Avatar, { AvatarSize } from './Avatar';
 
 // Icons
@@ -22,10 +23,15 @@ import { CustomDimensions } from '../styles/CustomDimensionStyles';
 import { VectorSource } from '@rnmapbox/maps';
 import symbolicateStackTrace from 'react-native/Libraries/Core/Devtools/symbolicateStackTrace';
 import Shadow from '../flows/Shadow';
+
+import Animated, {useSharedValue, ReduceMotion, withSpring, SlideInUp, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated';
+import { TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { SpringConfig } from 'react-native-reanimated/lib/typescript/reanimated2/animation/springUtils';
 //#endregion 
 
 interface EventCardLargeProps {
-  onPress: () => void;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
 
   eventHeroImage: any;
   eventHostName: string;
@@ -38,7 +44,8 @@ interface EventCardLargeProps {
 }
 
 const EventCardLarge: React.FC<EventCardLargeProps> = ({
-  onPress,
+  onPressIn = () => {},
+  onPressOut = () => {},
   eventHeroImage,
   eventHostName,
   eventTitle,
@@ -51,24 +58,72 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
   // TODO hook up to back-end data
   var friend = true;
 
-  // TODO delete the constants below after hooking up data; TEMP. data
-
-  // const eventHostName = 'Robert';
-  // const eventTitle = 'Hike and Sunrise Breakfast Adventure at Pine Ridge Trail';
-  // const eventDate = 'This Saturtday';
-  // const eventTime = '12:30';
-  // const eventLocation = 'Pine Ridge Trail, Trailhead Parking Lot Number 2';
-  // const eventAttendees = 9;
-  // const eventAttendeesFriends = 2;
-
   const eventAttendeesFriendsLabelText = `${eventAttendeesFriends} FRIENDS`;
 
+  const displacement = 6;
+  const shift = useSharedValue(displacement);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      shift.value = withSpring(2, {
+        duration: 1000,
+        dampingRatio: 0.3,
+        stiffness: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 2,
+        reduceMotion: ReduceMotion.System,
+      });
+
+      return () => shift.value = displacement;
+    }, [])
+  );
+
+  const shadowStyle = useAnimatedStyle(() => {
+    return {
+      height: CustomDimensions.windowHeight - Spacing.xl * 6,
+      width: CustomDimensions.windowWidth - Spacing.lg * 2, 
+      backgroundColor: Colors.sparrowDark,
+      position:'absolute',
+      borderRadius: borderRadius.md,
+      top: displacement + shift.value 
+    };
+  });
+
+  const cardStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: Colors.sparrowSand,
+      padding: Spacing.md,
+      borderWidth: 2,
+      borderColor: Colors.sparrowDarkBrown,
+      borderRadius: borderRadius.md,
+  
+      // TODO add dynamic height based on screen size + configure image size
+      // REMEMBER: card height needs to stay the same when viewed from the same device; the image size should change on other devices/screen sizes
+      // TEMP. config; can't figure out how to make it fill the whole leftover height area (use flex, just where?)
+      height: CustomDimensions.windowHeight - Spacing.xl * 6,
+      width: CustomDimensions.windowWidth - Spacing.lg * 2,
+      position: "absolute",
+      top: shift.value 
+    };
+  });
+
   return (
-  <View style={styles.eventCardLargeContainer}>
+  <Pressable onPressIn={() => onPressIn()} onPressOut={() => onPressOut()}>
+    <View style={{ 
+        height: styles.eventCardLarge.height + displacement, 
+        width: styles.eventCardLarge.width, 
+        borderRadius: borderRadius.md, 
+    }}>
 
-    <Shadow height = {styles.eventCardLarge.height} width={styles.eventCardLarge.width}/>
+    {/* <Shadow height = {height} width={styles.eventCardLarge.width}/> */}
 
-    <View style={styles.eventCardLarge}>
+    {/* Shadow */}
+    <Animated.View style={shadowStyle}/>
+
+    {/* <View style={styles.eventCardLarge}/> */}
+
+    <Animated.View style={cardStyle}>
 
       {/* Host Info */}
       <View style={styles.host}>
@@ -154,10 +209,10 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
         )}
       </View>
 
+    </Animated.View>
+
     </View>
-    {/* TODO make shadow effects a re-usable component; it should use the height and width of the chosen component */}
-    
-  </View>
+  </Pressable>
   );
 };
 
@@ -182,7 +237,8 @@ const styles = StyleSheet.create({
     height: CustomDimensions.windowHeight - Spacing.xl * 6,
     width: CustomDimensions.windowWidth - Spacing.lg * 2,
     flex: 1,
-    position: "absolute"
+    position: "absolute",
+    top: 10
   },
 
   shadow: {
@@ -190,7 +246,8 @@ const styles = StyleSheet.create({
     width: CustomDimensions.windowWidth - Spacing.lg * 2, 
     backgroundColor: Colors.sparrowDark,
     position:'absolute',
-    borderRadius: borderRadius.md
+    borderRadius: borderRadius.md,
+    top: 10
   },
 
   // Host

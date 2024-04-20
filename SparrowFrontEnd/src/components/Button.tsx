@@ -1,3 +1,4 @@
+//#region imports
 import * as React from 'react';
 import {
   StyleSheet,
@@ -12,6 +13,9 @@ import { globalStyles } from '../styles/GlobalStyles';
 import { buttonStyles } from '../styles/ButtonStyles';
 import { Gap, Spacing } from '../styles/SpacingStyles';
 import { Colors } from '../styles/ColorStyles';
+import { AnimatedView } from 'react-native-reanimated/lib/typescript/reanimated2/component/View';
+import Animated from 'react-native-reanimated';
+//#endregion
 
 // Types
 export interface ButtonProps {
@@ -79,6 +83,7 @@ export const Button: React.FC<ButtonProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Type                                      ||
   // ! ||--------------------------------------------------------------------------------||
+  //#region Type
 
   switch (type) {
     case ButtonType.PrimaryDark:
@@ -217,10 +222,12 @@ export const Button: React.FC<ButtonProps> = ({
       btnDisabledIconStyle = Colors.turqoise300;
       break;
   }
+  //#endregion
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Size                                      ||
   // ! ||--------------------------------------------------------------------------------||
+  //#region Size
 
   switch (size) {
     case ButtonSize.ExtraSmall:
@@ -330,10 +337,12 @@ export const Button: React.FC<ButtonProps> = ({
       ];
       break;
   }
+  //#endregion 
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Display                                    ||
   // ! ||--------------------------------------------------------------------------------||
+  //#region Display
 
   switch (display) {
     case ButtonDisplay.Contained:
@@ -348,14 +357,27 @@ export const Button: React.FC<ButtonProps> = ({
       btnDisabledStyle = [...btnDisabledStyle, buttonStyles.buttonFull];
       break;
   }
+  //#endregion
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Button                                       ||
   // ! ||--------------------------------------------------------------------------------||
+  
+
+
+
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                     Animation                                  ||
+  // ! ||--------------------------------------------------------------------------------||
+  //#region Animation
+
+  
+  //#endregion
 
   // TODO button needs to reset state back to rest (isPressed = false), when the user has
   // left the screen / doesn't see the button anymore.
 
+  //#region Buttons
   const handlePressIn = () => {
     if (self != null && status != null && changeState != null) {
       if (status == self) changeState(-1);
@@ -375,14 +397,11 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <Pressable
-      onPress={() => {
+      onPressIn={() => {
         handlePressIn();
       }}
-      style={[
-        disabled ? btnDisabledStyle : current == id ? btnActiveStyle : btnStyle,
-      ]}
       disabled={disabled}>
-      <View style={[styles.btnBase]}>
+      <Animated.View style={[styles.btnBase, disabled ? btnDisabledStyle : current == id ? btnActiveStyle : btnStyle]}>
         {displayIcon && (
           <Icon
             height={24}
@@ -406,14 +425,16 @@ export const Button: React.FC<ButtonProps> = ({
           }>
           {text}
         </Text>
-      </View>
+      </Animated.View>
     </Pressable>
   );
 };
+//#endregion
 
 // ! ||--------------------------------------------------------------------------------||
 // ! ||                                 Exported Enums                                 ||
 // ! ||--------------------------------------------------------------------------------||
+//#region Exported Enums
 
 export enum ButtonType {
   PrimaryDark,
@@ -437,6 +458,7 @@ export enum ButtonDisplay {
   Contained,
   Full,
 }
+//#endregion
 
 const styles = StyleSheet.create({
   btnBase: {
