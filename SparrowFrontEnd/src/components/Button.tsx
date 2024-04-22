@@ -30,9 +30,9 @@ export interface ButtonProps {
 
   disabled?: boolean;
 
-  self?: number;
-  status?: number;
-  changeState?: (myNumber: number) => void;
+  // self?: number;
+  // status?: number;
+  // changeState?: (myNumber: number) => void;
 
   // Rest styles
   btnStyle?: ViewStyle[];
@@ -49,14 +49,16 @@ export interface ButtonProps {
   btnDisabledTextStyle?: TextStyle[];
   btnDisabledIconStyle: string;
 
-  // Exclusive Button Support
   id?: number;
-  current?: number;
-  setCurrent?: React.Dispatch<React.SetStateAction<number>>;
+  // current?: number;
+  // setCurrent?: React.Dispatch<React.SetStateAction<number>>;
+
+  pressed?: boolean
+  setPressed?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  onPress = null,
+  onPress = () => {},
   text = 'NULL',
   Icon = null,
   btnStyle = [],
@@ -68,17 +70,23 @@ export const Button: React.FC<ButtonProps> = ({
   btnDisabledStyle = [],
   btnDisabledTextStyle = [],
   btnDisabledIconStyle = [],
-  self = null,
-  status = null,
-  changeState = null,
+
+  // self = null,
+  // status = null,
+  // changeState = null,
+
   disabled = false,
   type = null,
   size = null,
   display = null,
   displayIcon = false,
+
   id = -1,
-  current = -1,
-  setCurrent = null,
+  // current = -1,
+  // setCurrent = null,
+
+  pressed = false,
+  setPressed= (x: boolean) => {},
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Type                                      ||
@@ -362,8 +370,6 @@ export const Button: React.FC<ButtonProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Button                                       ||
   // ! ||--------------------------------------------------------------------------------||
-  
-
 
 
   // ! ||--------------------------------------------------------------------------------||
@@ -371,28 +377,16 @@ export const Button: React.FC<ButtonProps> = ({
   // ! ||--------------------------------------------------------------------------------||
   //#region Animation
 
-  
-  //#endregion
 
-  // TODO button needs to reset state back to rest (isPressed = false), when the user has
-  // left the screen / doesn't see the button anymore.
+
+
+
+  //#endregion
 
   //#region Buttons
   const handlePressIn = () => {
-    if (self != null && status != null && changeState != null) {
-      if (status == self) changeState(-1);
-      else changeState(self);
-    } else {
-      if (onPress != null) {
-        onPress();
-      }
-      if (setCurrent != null && current == id) {
-        setCurrent(-1);
-      }
-      if (setCurrent != null && current != id) {
-        setCurrent(id);
-      }
-    }
+    setPressed(!pressed)
+    onPress();
   };
 
   return (
@@ -401,7 +395,7 @@ export const Button: React.FC<ButtonProps> = ({
         handlePressIn();
       }}
       disabled={disabled}>
-      <Animated.View style={[styles.btnBase, disabled ? btnDisabledStyle : current == id ? btnActiveStyle : btnStyle]}>
+      <Animated.View style={[styles.btnBase, disabled ? btnDisabledStyle : pressed ? btnActiveStyle : btnStyle]}>
         {displayIcon && (
           <Icon
             height={24}
@@ -409,22 +403,22 @@ export const Button: React.FC<ButtonProps> = ({
             fill={
               disabled
                 ? btnDisabledIconStyle
-                : current == id
+                : pressed
                 ? btnActiveIconStyle
                 : btnIconStyle
             }
           />
         )}
-        <Text
+        <Animated.Text
           style={
             disabled
               ? btnDisabledTextStyle
-              : current == id
+              : pressed
               ? btnActiveTextStyle
               : btnTextStyle
           }>
           {text}
-        </Text>
+        </Animated.Text>
       </Animated.View>
     </Pressable>
   );
