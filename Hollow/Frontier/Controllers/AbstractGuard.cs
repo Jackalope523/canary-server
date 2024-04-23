@@ -44,6 +44,7 @@ namespace Frontier.Controllers
 		public IEventOperations events;
 		public IEtchingOperations etchings;
 		public IDisciplineOperations reports;
+		public IKeyOperations keys;
 		public IMediaOperations media;
 		public INotificationOperations notifications;
 		public IProfileOperations profiles;
@@ -63,6 +64,7 @@ namespace Frontier.Controllers
 			profiles = box.profiles;
 			events = box.events;
 			etchings = box.etchings;
+			keys = box.keys;
 			reports = box.reports;
 			media = box.media;
 			notifications = box.notifications;

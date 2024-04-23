@@ -15,7 +15,7 @@ namespace Frontier.Controllers
 		#region Initialisation
 
 		public DiscoverGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
-		{ }
+    { }
 
 		#endregion
 

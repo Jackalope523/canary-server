@@ -22,6 +22,7 @@ namespace Core
         public IEventDatabase EventDatabase { get; init; }
         public IEtchingDatabase EtchingDatabase { get; init; }
         public IDisciplineDatabase DisciplineDatabase { get; init; }
+        public IKeyDatabase KeyDatabase { get; init; }
         public IMediaDatabase MediaDatabase { get; init; }
         public INotificationDatabase NotificationDatabase { get; init; }
         public IProfileDatabase ProfileDatabase { get; init; }
@@ -36,6 +37,8 @@ namespace Core
             => EtchingDirector;
         public IDisciplineOperations DisciplineOperations
             => DisciplineDirector;
+        public IKeyOperations KeyOperations
+            => KeyDirector;
         public IMediaOperations MediaOperations
             => MediaDirector;
         public INotificationOperations NotificationOperations
@@ -50,6 +53,7 @@ namespace Core
         internal EventDirector EventDirector { get; private set; }
         internal EtchingDirector EtchingDirector { get; private set; }
         internal DisciplineDirector DisciplineDirector { get; private set; }
+        internal KeyDirector KeyDirector { get; private set; }
         internal MediaDirector MediaDirector { get; private set; }
         internal NotificationDirector NotificationDirector { get; private set; }
         internal ProfileDirector ProfileDirector { get; private set; }
@@ -61,8 +65,9 @@ namespace Core
         public static CoreTerminal CreateTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
             IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
-            IDisciplineDatabase disciplineDatabase, IMediaDatabase mediaDatabase,
-            INotificationDatabase notificationDatabase, IProfileDatabase profileDatabase,
+            IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
+            IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
+            IProfileDatabase profileDatabase,
             INotificationService notificationService)
         {
             lock (initLock)
@@ -70,8 +75,9 @@ namespace Core
                 Terminal ??= new CoreTerminal(logger,
                         accountDatabase, adminDatabase, bannerDatabase,
                         eventDatabase, etchingDatabase,
-                        disciplineDatabase, mediaDatabase,
-                        notificationDatabase, profileDatabase,
+                        disciplineDatabase, keyDatabase,
+                        mediaDatabase, notificationDatabase,
+                        profileDatabase,
                         notificationService);
 
                 return Terminal;
@@ -81,8 +87,9 @@ namespace Core
         private CoreTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
 			IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
-			IDisciplineDatabase disciplineDatabase, IMediaDatabase mediaDatabase,
-			INotificationDatabase notificationDatabase, IProfileDatabase profileDatabase,
+			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
+            IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
+            IProfileDatabase profileDatabase,
             INotificationService notificationService)
         {
             Log = logger;
@@ -93,6 +100,7 @@ namespace Core
             EventDatabase = eventDatabase;
             EtchingDatabase = etchingDatabase;
             DisciplineDatabase = disciplineDatabase;
+            KeyDatabase = keyDatabase;
             MediaDatabase = mediaDatabase;
             NotificationDatabase = notificationDatabase;
             ProfileDatabase = profileDatabase;
@@ -109,6 +117,7 @@ namespace Core
             EventDirector = new EventDirector(this);
             EtchingDirector = new EtchingDirector(this);
             DisciplineDirector = new DisciplineDirector(this);
+            KeyDirector = new KeyDirector(this);
             MediaDirector = new MediaDirector(this);
             NotificationDirector = new NotificationDirector(this);
             ProfileDirector = new ProfileDirector(this);

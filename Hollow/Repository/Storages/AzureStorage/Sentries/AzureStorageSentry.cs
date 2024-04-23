@@ -1,27 +1,23 @@
-﻿using Azure.Identity;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Shared;
 
 namespace Repository
 {
-    public class AzureStorageSentry : IStorageSentry
+    internal class AzureStorageSentry
     {
-        private readonly AzureStorageContext storageContext;
+        AzureStorageContext context = new();
 
-        public AzureStorageSentry()
+
+        public async Task UploadBlobAsync(string containerName, string blobName, MemoryStream blob)
         {
-            storageContext = new AzureStorageContext();
-        }
-        public async Task UploadBlobAsync(string containerName, string blobName, MemoryStream stream)
-        {
-            BlobContainerClient containerClient = new(storageContext.BuildUri(containerName), new DefaultAzureCredential());
+            BlobContainerClient containerClient = new(context.BuildUri(containerName), context.credentials());
 
             try
             {
                 await containerClient.CreateIfNotExistsAsync();
 
-                stream.Position = 0;
-                await containerClient.UploadBlobAsync(blobName, stream);
+                blob.Position = 0;
+                await containerClient.UploadBlobAsync(blobName, blob);
             }
             catch (Exception ex)
             {
@@ -31,7 +27,7 @@ namespace Repository
 
         public async Task<MemoryStream> DownloadBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(storageContext.BuildUri(containerName, blobName), new DefaultAzureCredential());
+            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
             MemoryStream stream = new MemoryStream();
             try
             {
@@ -51,11 +47,11 @@ namespace Repository
 
         public async Task DeleteBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(storageContext.BuildUri(containerName, blobName), new DefaultAzureCredential());
+            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
 
             try
             {
-                 await blobClient.DeleteAsync();
+                await blobClient.DeleteAsync();
             }
             catch (Exception ex)
             {
