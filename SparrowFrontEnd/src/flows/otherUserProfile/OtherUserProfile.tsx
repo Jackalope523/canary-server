@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { BottomTabParamList } from '../../components/atoms/types';
-import { getAccount, userShard } from '../auth/accountPigeon';
+import { getAccount, userManifest } from '../auth/accountPigeon';
 import Button, {
   ButtonDisplay,
   ButtonSize,

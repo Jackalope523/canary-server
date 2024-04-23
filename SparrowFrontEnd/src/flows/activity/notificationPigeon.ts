@@ -1,10 +1,10 @@
 import { userSession, handleError, ratingType, extractDate, extractList } from '../../lib/axios';
 import { extractCharacter } from '../auth/accountPigeon';
-import { etchingShard, eventShard } from '../event/eventPigeon';
+import { etchingManifest, eventManifest } from '../event/eventPigeon';
 
 const apiBaseUrl = '/notifications';
 
-export type noteShard = {
+export type noteManifest = {
     NotifierId: number,
     Time: Date,
     Message: string,
@@ -12,7 +12,7 @@ export type noteShard = {
 };
 
 export function extractNoteShard(data: any) {
-    let note: noteShard = {
+    let note: noteManifest = {
         NotifierId: data['notifierId'],
         Time: extractDate(data['time']),
         Message: data['message'],

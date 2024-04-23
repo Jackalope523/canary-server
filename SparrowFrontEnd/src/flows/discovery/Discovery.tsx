@@ -44,7 +44,7 @@ import {isToday, isTomorrow, isNextWeek, isNextWeekend, isThisWeek, isThisWeeken
 import { EventCardMediumProps, EventCardMedium } from '../../components/EventCardMedium';
 import { point, Point, distance, Feature, Properties } from '@turf/turf';
 import Geolocation from 'react-native-geolocation-service';
-import { etchingShard, eventShard } from '../event/eventPigeon';
+import { etchingManifest, eventManifest } from '../event/eventPigeon';
 import { getAllEvents } from './discoverPigeon';
 // #endregion
 
@@ -122,7 +122,7 @@ const DiscoveryScreen = () => {
   const [filterDateValue, setFilterDateValue] = useState("");
   const [filterSizeValue, setFilterSizeValue] = useState("");
   const [currentLocation, setCurrentLocation] = useState(point([0, 0]));
-  const [events, setEvents] = useState<eventShard[]>([]); 
+  const [events, setEvents] = useState<eventManifest[]>([]); 
 
   const pollCurrentLocation = () => {
     Geolocation.getCurrentPosition(
@@ -153,48 +153,48 @@ const DiscoveryScreen = () => {
   const generateSortBy = () => {
     switch (sortValue) {
       case "Most Popular":
-        return (x: eventShard, y: eventShard) => { return y.NumberOfGuests - x.NumberOfGuests };
+        return (x: eventManifest, y: eventManifest) => { return y.NumberOfGuests - x.NumberOfGuests };
       case "Closest":
-        return (x: eventShard, y: eventShard) => { return distance(currentLocation, x.Location) - distance(currentLocation, y.Location) };
+        return (x: eventManifest, y: eventManifest) => { return distance(currentLocation, x.Location) - distance(currentLocation, y.Location) };
       case "Most Recent":
-        return (x: eventShard, y: eventShard) => { return y.StartTime.getTime() - x.StartTime.getTime() };
+        return (x: eventManifest, y: eventManifest) => { return y.StartTime.getTime() - x.StartTime.getTime() };
     }
   };
 
   const generateFilterArray = () => {
-    let filterArray = new Array<(e: eventShard) => boolean>();
+    let filterArray = new Array<(e: eventManifest) => boolean>();
     let today = new Date();
 
     switch (filterDateValue) {
       case "Today":
-        filterArray.push((e: eventShard) => { return isToday(e.StartTime) });
+        filterArray.push((e: eventManifest) => { return isToday(e.StartTime) });
         break;
       case "Tomorrow":
-        filterArray.push((e: eventShard) => { return isTomorrow(e.StartTime) });
+        filterArray.push((e: eventManifest) => { return isTomorrow(e.StartTime) });
         break;
       case "This Week":
-        filterArray.push((e: eventShard) => { return isThisWeek(e.StartTime) });
+        filterArray.push((e: eventManifest) => { return isThisWeek(e.StartTime) });
         break;
       case "This Weekend":
-        filterArray.push((e: eventShard) => { return isThisWeekend(e.StartTime) });
+        filterArray.push((e: eventManifest) => { return isThisWeekend(e.StartTime) });
         break;
       case "Next Week":
-        filterArray.push((e: eventShard) => { return isNextWeek(e.StartTime) });
+        filterArray.push((e: eventManifest) => { return isNextWeek(e.StartTime) });
         break;
       case "Next Weekend":
-        filterArray.push((e: eventShard) => { return isNextWeekend(e.StartTime) });
+        filterArray.push((e: eventManifest) => { return isNextWeekend(e.StartTime) });
         break;
     }
 
     switch (filterSizeValue) {
       case "Cozy":
-        filterArray.push((e: eventShard) => { return e.NumberOfGuests < 5 });
+        filterArray.push((e: eventManifest) => { return e.NumberOfGuests < 5 });
         break;
       case "Thriving":
-        filterArray.push((e: eventShard) => { return e.NumberOfGuests > 15 && e.NumberOfGuests < 30 });
+        filterArray.push((e: eventManifest) => { return e.NumberOfGuests > 15 && e.NumberOfGuests < 30 });
         break;
       case "Bombastic":
-        filterArray.push((e: eventShard) => { return e.NumberOfGuests > 30 });
+        filterArray.push((e: eventManifest) => { return e.NumberOfGuests > 30 });
         break;
     }
     return filterArray;

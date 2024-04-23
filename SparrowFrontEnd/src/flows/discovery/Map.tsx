@@ -22,12 +22,12 @@ import MapboxGL,
 }  from "@rnmapbox/maps";
 
 import { featureCollection, feature, point } from '@turf/helpers';
-import { eventShard } from '../event/eventPigeon.ts'
+import { eventManifest } from '../event/eventPigeon.ts'
 
 import exampleIcon from '../../assets/pins/Pin.png';
 
 export interface MapProps {
-  events?: eventShard[]
+  events?: eventManifest[]
 
 }
 

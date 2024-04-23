@@ -1,5 +1,5 @@
 import { initialiseAxiosSession, userSession, handleError, extractList } from '../../lib/axios';
-import { eventShard, extractEventShard } from '../event/eventPigeon';
+import { eventManifest, extractEventManifest } from '../event/eventPigeon';
 
 const apiBaseUrl = '/discover';
 
@@ -9,7 +9,7 @@ export async function getPersonalizedEvents(latitude: number, longitude: number,
         .then((response: any) => {
             console.log('Personalized Events:', response.data);
 
-            return extractList(response.data, extractEventShard);
+            return extractList(response.data, extractEventManifest);
         })
         .catch(handleError);
 }
@@ -20,7 +20,7 @@ export async function getAllEvents(latitude: number, longitude: number, distance
         .then((response: any) => {
             console.log('All Events:', response.data);
             
-            return extractList(response.data, extractEventShard);
+            return extractList(response.data, extractEventManifest);
         })
         .catch(handleError);
 }

@@ -1,22 +1,21 @@
 import axios, { AxiosHeaders } from 'axios';
 import { userSession, handleError, extractDate, extractList } from '../../lib/axios';
-import { etchingShard, eventEtching, eventHeader, extractEtchingShard, extractEventHeader } from '../event/eventPigeon';
+import { etchingManifest, eventEtching, eventHeaderManifest, extractEtchingManifest, extractEventHeaderManifest } from '../event/eventPigeon';
 
 const apiBaseUrl = '/feed';
 
-type feedOptions = {
+export type feedOptions = {
     DepthCharge: number,
     LastDepth: number
 }
 
-type rawFeed = {
-    Headers: eventHeader[],
-    Etchings: etchingShard[],
-
+export type feedManifest = {
+    Headers: eventHeaderManifest[],
+    Etchings: etchingManifest[],
 }
 
 // Get user feed
-export async function getUserFeed(options: feedOptions) : Promise<rawFeed> {
+export async function getUserFeed(options: feedOptions) : Promise<feedManifest> {
     if (!options) {
         console.log('Feed options are missing.');
         return Promise.reject();
@@ -26,13 +25,13 @@ export async function getUserFeed(options: feedOptions) : Promise<rawFeed> {
         .then((response: any) => {
             console.log('User Feed:', response.data);
 
-            let headers: eventHeader[] = [];
-            let etchings: etchingShard[] = [];
+            let headers: eventHeaderManifest[] = [];
+            let etchings: etchingManifest[] = [];
 
             try
             {
-                headers = extractList(response.data['headers'], extractEventHeader);
-                etchings = extractList(response.data['etchings'], extractEtchingShard);
+                headers = extractList(response.data['headers'], extractEventHeaderManifest);
+                etchings = extractList(response.data['etchings'], extractEtchingManifest);
             }
             catch { }
 

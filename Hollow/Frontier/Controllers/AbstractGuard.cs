@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Frontier.Manifests;
+using System.Collections.Generic;
 
 namespace Frontier.Controllers
 {
@@ -87,29 +89,41 @@ namespace Frontier.Controllers
 		#region Favours
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<Task<IActionResult>> action)
+		public async Task<IActionResult> Execute(Func<Task<object>> action)
 		{
 			try
 			{
-				return await action.Invoke();
+				var result = await action.Invoke();
+
+				// Check if there is a result
+				if (result != null)
+				{
+					// Ensure outgoing type is generic or manifest
+					if (result is not Manifest &&
+						result is not string &&
+						result is not int)
+					{ throw new UnexpectedFailureException($"Server tried sending non-manifest object type {result.GetType()}."); }
+				}
+
+                return Ok(result);
 			}
 			catch (HollowFailureException ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}", ex.Message);
+				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
 
-				return StatusCode(500, ex.StackTrace);
+				return StatusCode(500);
 			}
-			catch (UserErrorException ex)
+			catch (UserErrorException ex) 
 			{
 				return BadRequest(ex.Message);
 			}
 			catch (Exception ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}", ex.Message);
+				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
 
-				return StatusCode(500, ex.StackTrace);
+				return StatusCode(500);
 			}
 		}
 
@@ -119,7 +133,7 @@ namespace Frontier.Controllers
 			return await Execute(async () =>
 			{
 				await action.Invoke();
-				return Ok();
+				return null;
 			});
 		}
 
@@ -129,13 +143,13 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await action.Invoke(user);
-				return Ok();
+				return null;
 			},
 			allowUnverified);
 		}
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<UserShard, Task<IActionResult>> action, bool allowUnverified = false)
+		public async Task<IActionResult> Execute(Func<UserShard, Task<object>> action, bool allowUnverified = false)
 		{
 			return await Execute(async () =>
 			{

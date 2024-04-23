@@ -42,9 +42,9 @@ namespace Frontier.Controllers
             return await Execute(async () =>
             {
                 // Get current user
-                var user = await GetCurrentUserAsync();
+                UserManifest user = new(await GetCurrentUserAsync());
 
-                return Ok(user);
+                return user;
             });
         }
 
@@ -104,8 +104,8 @@ namespace Frontier.Controllers
                 var user = await accounts.GetUserAsync(credentials.PhoneNumber);
 
                 if (await userManager.IsLockedOutAsync(user))
-                {
-                    return BadRequest(HollowError.UserLockedOut.ToString());
+				{
+					throw new InvalidUserException(HollowError.UserLockedOut.ToString());
                 }
 
                 // Check if the account is activated
@@ -125,8 +125,8 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-                        return BadRequest(HollowError.IncorrectCode.ToString());
-                    }
+						throw new InvalidInformationException(HollowError.IncorrectCode.ToString());
+					}
                 }
                 else
                 {
@@ -152,11 +152,9 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-                        return BadRequest(HollowError.IncorrectCode.ToString());
+                        throw new InvalidInformationException(HollowError.IncorrectCode.ToString());
                     }
                 }
-
-                return Ok();
             });
         }
 
@@ -173,14 +171,12 @@ namespace Frontier.Controllers
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    return BadRequest(HollowError.MissingInformation.ToString());
+                    throw new InvalidUserException(HollowError.MissingInformation.ToString());
                 }
                 // REMOVE FOR PROD
                 token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 var result = await userManager.ConfirmEmailAsync(user, token);
-
-                return Ok();
             });
 		}
 
@@ -197,7 +193,7 @@ namespace Frontier.Controllers
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    return BadRequest(HollowError.MissingInformation.ToString());
+                    throw new InvalidUserException(HollowError.MissingInformation.ToString());
                 }
 
                 // Send verification email if email is not confirmed
@@ -207,8 +203,6 @@ namespace Frontier.Controllers
                     var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
                     await emailService.SendEmailAsync(user.Email, "Verify your Sparrow email.", $"Verify your Sparrow email.\n\n{confirmationLink}");
                 }
-                
-                return Ok();
             });
 		}
 

@@ -8,7 +8,7 @@ import { globalStyles } from '../../styles/GlobalStyles';
 import { EventStackParamList } from '../../components/atoms/types';
 import Button from '../../components/atoms/Button';
 
-import { eventShard, getEvent } from './eventPigeon';
+import { eventManifest, getEvent } from './eventPigeon';
 
 type EventProps = StackScreenProps<EventStackParamList, 'Event'>;
 
@@ -28,7 +28,7 @@ const EventScreen = ({ route }: EventProps) => {
     // To avoid recursion from component reloading on set state
     handleGetEvent();
 
-  function populateScreen(data: eventShard) {
+  function populateScreen(data: eventManifest) {
     setEventText(`Event Title: ${data.Name}\n
             Host Name: ${data.Host.Name}\n\n
             Event Description: ${data.Description}\n
