@@ -65,6 +65,8 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
+        public Synced<string> Banner { get; }
+
         public Synced<(int Postitive, int Negative)> Ratings { get; }
 
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
@@ -100,6 +102,8 @@ namespace Core.Entities
 
         public User()
         {
+            Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
+
             Ratings = new(() => Terminal.ProfileDirector.RequestAllRatingsAsync(this));
 
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
