@@ -16,16 +16,8 @@ namespace Frontier.Controllers
 
 		private IDebugOperations debug;
 
-		public DebugGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IProfileOperations profileOperations,
-			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService, IDebugOperations debugOperations) :
-			base(identityUserManager, identitySignInManager,
-				accountOperations, profileOperations,
-				eventOperations, etchingOperations,
-				disciplineOperations, notificationOperations,
-				externalSMSService, externalEmailService)
+		public DebugGuard(GuardBox box, UserManager<UserShard> aspUserManager, IDebugOperations debugOperations) :
+			base(box, aspUserManager)
 		{
 			debug = debugOperations;
 		}
