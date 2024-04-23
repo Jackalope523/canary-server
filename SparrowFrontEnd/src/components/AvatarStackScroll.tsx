@@ -52,7 +52,7 @@ export const AvatarStackScroll: React.FC<AvatarStackScrollProps> = ({
       horizontal
       showsHorizontalScrollIndicator={false}>
       {avatars.map((avatar, index) => (
-        <Avatar key={index} size={size} image={avatar} onPress={onPress} />
+        <Avatar key={index} size={size} image={avatar} onPress={onPress} showUserType={true} />
       ))}
     </ScrollView>
   );

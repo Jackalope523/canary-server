@@ -1,21 +1,33 @@
-import { View, Image, ImageStyle, Pressable, StyleSheet } from 'react-native';
+import { View, Image, ImageStyle, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import * as React from 'react';
 import { Colors } from '../styles/ColorStyles';
+
+// Icons
+import FeatherIcon from '../assets/icons/feather-fill-colored.svg'
 
 interface AvatarProps {
   size?: AvatarSize;
   image?: any;
   onPress?: () => void;
+  showUserType: boolean;
 
   avatarContainer?: ImageStyle[];
+  iconStyle?: ViewStyle[];
+  iconSize: number;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
   size = null,
   avatarContainer = [],
+  iconSize,
+  iconStyle = [],
   image,
   onPress,
+  showUserType,
 }) => {
+  // TODO hook up to backend data
+  var friend = true;
+
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Size                                      ||
   // ! ||--------------------------------------------------------------------------------||
@@ -31,16 +43,23 @@ export const Avatar: React.FC<AvatarProps> = ({
 
     case AvatarSize.Medium:
       avatarContainer = [styles.avatarSquareMedium];
+      iconSize = 24;
+      iconStyle = [styles.iconMedium];
       break;
 
     case AvatarSize.Large:
       avatarContainer = [styles.avatarSquareLarge];
+      iconSize = 24;
+      iconStyle = [styles.iconLarge];
       break;
   }
 
   return (
     <Pressable onPress={onPress}>
       <Image source={image} style={avatarContainer} />
+      {showUserType && friend ?
+        <FeatherIcon width={iconSize} height={iconSize} style={iconStyle} />
+        : null}
     </Pressable>
   );
 };
@@ -69,6 +88,17 @@ const styles = StyleSheet.create({
     borderColor: Colors.sparrowDarkBrown,
   },
 
+  iconLarge: {
+    // Alternate design
+    // alignSelf: 'flex-end',
+    // position: 'absolute',
+    // bottom: 0,
+
+    alignSelf: 'center',
+    bottom: 14,
+    marginBottom: -14,
+  },
+
   // Medium
   avatarSquareMedium: {
     width: 48,
@@ -76,6 +106,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: Colors.sparrowDarkBrown,
+  },
+
+  iconMedium: {
+    alignSelf: 'center',
+    bottom: 14,
+    marginBottom: -14,
   },
 
   // Small

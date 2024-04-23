@@ -6,7 +6,6 @@ Type: Activity event type dropdown
 */
 
 // TODO add onPress functions
-
 const dropdownOptionsActivity = [
   {
     id: 1,

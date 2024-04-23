@@ -1,47 +1,28 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { globalStyles } from '../../styles/GlobalStyles';
 import { Spacing } from '../../styles/SpacingStyles';
-import Button2, {
-  ButtonDisplay,
-  ButtonSize,
-  ButtonType,
-} from '../../components/testing/animations/Button2';
-import HeaderDefaultTitled from '../../components/HeaderDefaultTitled';
-import HeaderFlagAttendee, {
-  ANType,
-  APType,
-} from '../../components/HeaderFlagAttendee';
-import HeaderFlagHost, {
-  HNType,
-  HPType,
-} from '../../components/HeaderFlagHost';
-import HeaderEditTitled from '../../components/HeaderEditTitled';
-import HeaderOptions from '../../components/HeaderOptions';
-import Button from '../../components/Button';
-
-import ImportedIcon from '../../assets/icons/favorite-fill.svg';
-import ButtonGroup from '../../components/ButtonGroup';
-import FlagMedium, { FlagType } from '../../components/FlagMedium';
-import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
-
-import Post from '../../components/feed/Post';
-import DropdownSelectorIcon, {
-  Align,
-  Icon,
-} from '../../components/DropdownSelectorIcon';
-import dropdownOptionsPost from '../../components/DropdownOptionsPost';
-import avatarimg from '../../assets/images/temp/host-img-1.jpg';
-import EventCardSmall from '../../components/EventCardSmall';
-
-import testImage from '../../assets/images/temp/event-img-11.jpg';
-
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
+import ActionButton, {
+  ActionButtonDisplay,
+  ActionButtonSize,
+  ActionButtonType,
+} from '../../components/ActionButton';
+import ArrowIcon from '../../assets/icons/arrow-up-outline-alt.svg';
+import EventCardSmallAccordion from '../../components/EventCardSmallAccordion';
+import ChevronButton from '../../components/ChevronButton';
+import PreviouslyAttendedEvent from '../../components/otherUserProfile/PreviouslyAttendedEvent';
+import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
 import Gallery from '../../components/Gallery';
-import OtherUserProfileScreen from '../otherUserProfile/OtherUserProfile';
+import ViewMoreButton from '../../components/ViewMoreButton';
 
 const TestScreen = () => {
   const upcomingEventData = SAMPLEEVENTDATA.find((event) => event.id === '2');
+
+  // Testing layout change for gallery
+  const handleChangeLayout = () => {
+    console.log('pressable pressed');
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -57,40 +38,41 @@ const TestScreen = () => {
       </View>
 
       {/* --- START TESTING CODE BELOW --- */}
+      {/* <EventCardSmallAccordion /> */}
 
-      {/* <Gallery />
+      {/* TODO implement a way to activate the changeLayout function in the Gallery component, through this parent component */}
+      <Pressable onPress={handleChangeLayout}><Text style={[globalStyles.textDark, globalStyles.headingTextFive]}>Change layout</Text></Pressable>
+      <FlatList
+        data={SAMPLE_PAST_EVENT_DATA.filter((item) => item.status === 'passed')}
+        renderItem={({ item }) => (
+          <PreviouslyAttendedEvent
+            eventTitle={item.title}
+            eventDate={item.time}
+            onPress={() => console.log('Event card image pressed')}
+            onPressViewEvent={() => console.log('View event button pressed')}
+            images={item.media ? [item] : []}
 
-        <EventCardSmall
-          eventHeroImage={upcomingEventData?.uri}
-          eventTitle={upcomingEventData?.title}
-          eventDate={upcomingEventData?.date}
-          eventTime={upcomingEventData?.time}
-          eventLocation={upcomingEventData?.location}
-          eventAttendees={upcomingEventData?.attendees}
-          onPress={() => console.log('Event card image pressed')}
-        /> */}
+            // TODO show the avatar of the user who posted the photo; right now it's showing the host's avatar
+            posterAvatar={item.avatar}
+            // TODO replace item.host name with the name of the user who posted the photo
+            // TODO fix poster images loading slowly
+            posterName={item.host}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={() => <View style={{ height: Spacing.lg }} />}
+      />
 
-      <OtherUserProfileScreen />
+      {/* <Gallery /> */}
 
-      {/* <HeaderFlagAttendee
-        title="Attendee header"
-        previousType={APType.StartingSoon}
-        nextType={ANType.Live}
+      {/* <ActionButton
+        Icon={ArrowIcon}
+        display={ActionButtonDisplay.Contained}
+        type={ActionButtonType.SecondaryLight}
+        size={ActionButtonSize.Large}
+        disabled={false}
       /> */}
-      {/* <HeaderFlagHost
-        title="Host header"
-        previousType={HPType.StartingSoon}
-        nextType={HNType.Live}
-      /> */}
-
-      {/* <Header4 previousType={PType.StartingSoon} nextType={NType.Live} /> */}
-      {/* <Button2
-        text="Example button"
-        type={ButtonType.Success}
-        size={ButtonSize.Medium}
-        display={ButtonDisplay.Contained}
-      /> */}
-    </ScrollView>
+    </ScrollView >
   );
 };
 
@@ -100,9 +82,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     gap: 16,
+
+    padding: Spacing.lg,
   },
 
   header: {
-    margin: Spacing.lg,
+    marginBottom: Spacing.lg,
   },
 });

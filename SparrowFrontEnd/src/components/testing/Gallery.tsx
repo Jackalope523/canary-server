@@ -1,20 +1,12 @@
 import { FlatList, Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { CustomDimensions } from '../styles/CustomDimensionStyles';
-import { Spacing } from '../styles/SpacingStyles';
-import { Colors } from '../styles/ColorStyles';
-import Avatar, { AvatarSize } from './Avatar';
-import { globalStyles } from '../styles/GlobalStyles';
-
-// Icons
-import FeatherIcon from '../assets/icons/feather-fill-colored.svg'
-import BirdIcon from '../assets/icons/bird-fill-colored.svg'
+import { CustomDimensions } from '../../styles/CustomDimensionStyles';
+import { Spacing } from '../../styles/SpacingStyles';
+import { Colors } from '../../styles/ColorStyles';
 
 //#region Props
 interface GalleryProps {
   images: { media: ImageSourcePropType[] }[];
-  posterAvatar: ImageSourcePropType;
-  posterName: string;
 }
 //#endregion
 
@@ -25,11 +17,7 @@ Instructions:
 
 */
 
-const Gallery: React.FC<GalleryProps> = ({
-  images,
-  posterAvatar = "NULL",
-  posterName = "NULL",
-}) => {
+const Gallery: React.FC<GalleryProps> = ({ images }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Layout                                     ||
   // ! ||--------------------------------------------------------------------------------||
@@ -113,7 +101,6 @@ const Gallery: React.FC<GalleryProps> = ({
   // ! ||                                  Select image                                  ||
   // ! ||--------------------------------------------------------------------------------||
   // Two column layout styles
-  // TODO remove if not used
   const image2CLFirstCol = {
     width: imgSize.full,
     height: imgSize.full,
@@ -169,12 +156,9 @@ const Gallery: React.FC<GalleryProps> = ({
     setSelectedImage(prevImage => (prevImage === image ? null : image));
   }
 
-  // TODO remove these variables after testing and hook up to back-end data
-  var you = true;
-  var friend = false;
-  var anon = false;
-
   const renderItem = ({ item, index }) => {
+    const a = 2 * (index + 1) - 1;
+
     return (
       <Pressable onPress={() => handleImagePress(item)}>
         <View>
@@ -187,18 +171,21 @@ const Gallery: React.FC<GalleryProps> = ({
           {selectedImage === item && (
             <View
               style={
-                oneCol
+                numColumns === 2
+                  ? index === 0
+                    ? image2CLFirstCol
+                    : image2CLSecondCol
+                  : numColumns === 3
+                    ? index === 0
+                      ? image3CLFirstCol
+                      : index === 1
+                        ? image3CLSecondCol
+                        : image3CLThirdCol
+                    : oneCol
               }>
               <View style={styles.user}>
-                <Avatar size={AvatarSize.Small} image={posterAvatar} />
-                <View style={styles.userInner}>
-                  <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>{posterName}</Text>
-                  {you ?
-                    <BirdIcon height={24} width={24} />
-                    : friend ?
-                      <FeatherIcon height={24} width={24} />
-                      : null}
-                </View>
+                <Text>Avatar placeholder</Text>
+                <Text>Name placeholder</Text>
               </View>
               <Image source={item} style={styles.image} />
             </View>
@@ -210,7 +197,7 @@ const Gallery: React.FC<GalleryProps> = ({
 
   return (
     //#region Gallery
-    <View style={styles.container}>
+    <View style={styles.container} >
       <FlatList
         data={displayedData}
         renderItem={renderItem}
@@ -241,7 +228,7 @@ const Gallery: React.FC<GalleryProps> = ({
               : styles.threeColWrapper
         }
       />
-    </View>
+    </View >
     //#endregion
   )
 }
@@ -271,14 +258,7 @@ const styles = StyleSheet.create({
   user: {
     flexDirection: 'row',
     alignItems: 'center',
-    columnGap: Spacing.mdsm,
-    paddingVertical: Spacing.md,
-  },
-
-  userInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: Spacing.xs,
+    columnGap: Spacing.lg,
   },
 
   // Image

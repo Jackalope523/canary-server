@@ -19,9 +19,11 @@ import Button, {
 // Icons
 import AddIcon from '../../assets/icons/add-outline.svg';
 import Chevron from '../../assets/icons/chevron-outline.svg';
+import LayoutMediumIcon from '../../assets/icons/layout-size-medium-fill-alt.svg';
+import BirdIcon from '../../assets/icons/bird-fill-colored.svg';
 
 import { globalStyles } from '../../styles/GlobalStyles';
-import Avatar, { AvatarSize, AvatarStatus } from '../../components/Avatar';
+import Avatar, { AvatarSize } from '../../components/Avatar';
 import { SAMPLE_USER_DATA } from '../../data/sampleUserData';
 import { Colors } from '../../styles/ColorStyles';
 import { Spacing } from '../../styles/SpacingStyles';
@@ -34,9 +36,9 @@ import { labelText } from '../../components/LabelText';
 
 import { SAMPLEEVENTDATA } from '../../data/sampleUpcomingEventData';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
-import UpcomingEvent from '../../components/otherUserProfile/upcomingEvent';
+import UpcomingEvent from '../../components/otherUserProfile/UpcomingEvent';
 import { EventStatus } from '../../components/EventCardSmall';
-import PreviouslyAttendedEvent from '../../components/otherUserProfile/previouslyAttendedEvent';
+import PreviouslyAttendedEvent from '../../components/otherUserProfile/PreviouslyAttendedEvent';
 
 type ProfileProps = StackScreenProps<BottomTabParamList, 'Profile'>;
 
@@ -67,22 +69,17 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
 
   handleGetAccount();
 
-  /*
-  
-    TODO hook up to real data
-    user types: anon, friend
-  
-  */
-
   // TEMP. for testing purposes
-  let friend = false;
-  let status = AvatarStatus.Offline;
-
   const user = SAMPLE_USER_DATA.find((user) => user.id === '1');
 
   const testUserData = React.useEffect(() => {
     console.log('user', user);
   }, [user]);
+
+  // Handle change layout for gallery
+  const handleChangeLayout = () => {
+    console.log('change layout button pressed');
+  };
 
   return (
     <ScrollView
@@ -90,138 +87,53 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
       overScrollMode="never"
       showsVerticalScrollIndicator={false}>
       <View style={styles.topContainer}>
-        <Avatar size={AvatarSize.Large} status={status} image={user?.avatar} />
-        <View style={styles.userInfo}>
-          <View style={styles.userInfoInner}>
-            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-              {user?.name}
-            </Text>
-            <TextLabel
-              text={labelText.you}
-              type={LabelType.You}
-              size={LabelSize.Small}
-              display={LabelDisplay.Contained}
-            />
-          </View>
-          <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-            {user?.location}
+        <Avatar size={AvatarSize.Large} image={user?.avatar} />
+        <View style={styles.user}>
+          <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
+            {user?.name}
           </Text>
+          {/* TODO replace TextLabel YOU with an bird icon */}
+          <BirdIcon width={24} height={24} />
         </View>
-        <View>
-          {friend ? (
-            <Button
-              type={ButtonType.PrimaryDark}
-              size={ButtonSize.ExtraSmall}
-              display={ButtonDisplay.Contained}
-              text={'Invite to event'}
-              displayIcon={true}
-              Icon={AddIcon}
-              onPress={null}
-            />
-          ) : (
-            <Button
-              type={ButtonType.PrimaryDark}
-              size={ButtonSize.ExtraSmall}
-              display={ButtonDisplay.Contained}
-              text={'Add friend'}
-              displayIcon={true}
-              Icon={AddIcon}
-              onPress={null}
-            />
-          )}
-        </View>
-      </View>
-
-      <Text
-        style={[globalStyles.bodyTextOne, globalStyles.textDark, styles.bio]}>
-        {user?.bio}
-      </Text>
-
-      {/* LABELS HERE */}
-      <View style={styles.labelContainer}>
-        <TextLabel
-          text={labelText.userSince}
-          type={LabelType.Primary}
-          size={LabelSize.Small}
-          display={LabelDisplay.Contained}
-        />
-
-        <TextLabel
-          text={labelText.lastSeen}
-          type={LabelType.Primary}
-          size={LabelSize.Small}
-          display={LabelDisplay.Contained}
-        />
       </View>
 
       {/* EVENTS */}
       <View style={styles.events}>
-        <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-          Events
-        </Text>
-        <View style={styles.eventsContainer}>
-          {/* inner wrapper start */}
-          <View style={styles.eventsInnerWrapper}>
-            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              Attended
-            </Text>
-            <View
-              style={[
-                styles.eventsInnerContainer,
-                styles.eventsContainerAttended,
-              ]}>
-              <Text
-                style={[globalStyles.displayTextTwo, globalStyles.textLight]}>
-                {user?.eventsAttended}
-              </Text>
-            </View>
-          </View>
+        <View style={styles.eventsHeadingContainer}>
+          <Text style={[globalStyles.textDark, globalStyles.headingTextThree]}>
+            Previously attended
+          </Text>
+          {/* TODO hook up change layout functionality */}
+          {/* TODO implement a way to activate the changeLayout function in the Gallery component, through this parent component */}
 
-          <View style={styles.eventsInnerWrapper}>
-            <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-              Hosted
-            </Text>
-            <View
-              style={[
-                styles.eventsInnerContainer,
-                styles.eventsContainerHosted,
-              ]}>
-              <Text
-                style={[globalStyles.displayTextTwo, globalStyles.textLight]}>
-                {user?.eventsHosted}
-              </Text>
-            </View>
-          </View>
-          {/* inner wrapper end */}
-        </View>
-
-        <View>
-          <View style={styles.pastEvents}>
-            <Text style={[globalStyles.headingTextTwo, globalStyles.textDark]}>
-              Previously attended
-            </Text>
-            <FlatList
-              data={SAMPLE_PAST_EVENT_DATA.filter(
-                (item) => !item.time.includes('live'),
-              )}
-              renderItem={({ item }) => (
-                <PreviouslyAttendedEvent
-                  eventStatus={EventStatus.Past}
-                  eventHeroImage={item.media[0]}
-                  eventTitle={item.title}
-                  eventDate={item.time}
-                  eventLocation={item.location}
-                  onPress={() => console.log('Event card image pressed')}
-                  images={item.media ? [item] : []}
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              ItemSeparatorComponent={() => (
-                <View style={{ height: Spacing.lg }} />
-              )}
+          <Pressable onPress={handleChangeLayout}>
+            <LayoutMediumIcon
+              width={24}
+              height={24}
+              fill={Colors.sparrowDarkBrown}
             />
-          </View>
+          </Pressable>
         </View>
+        <FlatList
+          data={SAMPLE_PAST_EVENT_DATA.filter((item) => item.status === 'passed')}
+          renderItem={({ item }) => (
+            <PreviouslyAttendedEvent
+              eventTitle={item.title}
+              eventDate={item.time}
+              onPress={() => console.log('Event card image pressed')}
+              onPressViewEvent={() => console.log('View event button pressed')}
+              images={item.media ? [item] : []}
+
+              // TODO show the avatar of the user who posted the photo; right now it's showing the host's avatar
+              posterAvatar={item.avatar}
+              // TODO replace item.host name with the name of the user who posted the photo
+              // TODO fix poster images loading slowly
+              posterName={item.host}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <View style={{ height: Spacing.lg }} />}
+        />
       </View>
     </ScrollView>
   );
@@ -230,80 +142,27 @@ const ProfileScreen = ({ navigation }: ProfileProps) => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  // TODO delete viewMore styles after the ViewMoreButton component has been integrated
-  viewMore: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Spacing.md,
-  },
-
   topContainer: {
     alignItems: 'center',
-    paddingVertical: Spacing.lg,
+    paddingBottom: Spacing.xl,
+    paddingTop: Spacing.sm,
   },
 
-  userInfo: {
-    alignItems: 'center',
-    paddingTop: Spacing.md,
-    paddingBottom: Spacing.lg,
-  },
-
-  userInfoInner: {
+  user: {
     flexDirection: 'row',
-    columnGap: Spacing.mdsm,
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  bio: {
-    marginBottom: Spacing.md,
-  },
-
-  // Labels
-  labelContainer: {
-    flexDirection: 'row',
-    columnGap: Spacing.mdsm,
+    paddingTop: Spacing.mdsm,
+    columnGap: Spacing.xs,
   },
 
   // Events
   events: {
-    marginTop: Spacing.xl,
+    rowGap: Spacing.lg,
   },
 
-  eventsContainer: {
+  eventsHeadingContainer: {
     flexDirection: 'row',
-    columnGap: Spacing.md,
-  },
-
-  eventsInnerWrapper: {
-    flex: 1,
-  },
-
-  eventsInnerContainer: {
-    paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: Colors.sparrowDarkBrown,
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-
-  eventsContainerAttended: {
-    backgroundColor: Colors.green400,
-  },
-
-  eventsContainerHosted: {
-    backgroundColor: Colors.picton400,
-  },
-
-  upcomingEvents: {
-    paddingTop: Spacing.xl,
-    rowGap: Spacing.md,
-  },
-
-  pastEvents: {
-    paddingTop: Spacing.xl,
-    rowGap: Spacing.md,
   },
 });
