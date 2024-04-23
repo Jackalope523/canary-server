@@ -98,7 +98,7 @@ function MainContainer() {
           <AppStack.Screen name="Account" component={Account} />
           <AppStack.Screen name="Event" component={Event} />
 
-          <AppStack.Screen name="Testing" component={ProfileScreen} />
+          <AppStack.Screen name="Testing" component={EventScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

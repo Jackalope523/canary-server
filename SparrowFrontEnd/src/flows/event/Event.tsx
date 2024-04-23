@@ -53,6 +53,10 @@ import MapIcon from '../../assets/icons/discovery-fill.svg';
 import LocationIcon from '../../assets/icons/location-outline.svg';
 import PersonIcon from '../../assets/icons/account-outline.svg';
 import ShareIcon from '../../assets/icons/share-outline.svg';
+import BirdIcon from '../../assets/icons/bird-fill-colored.svg';
+import FeatherIcon from '../../assets/icons/feather-fill-colored.svg';
+import HeaderFlagAttendee from '../../components/HeaderFlagAttendee';
+import HeaderFlagHost from '../../components/HeaderFlagHost';
 
 const EventScreen = ({ route, navigation }: EventProps) => {
   // Sample data
@@ -65,7 +69,6 @@ const EventScreen = ({ route, navigation }: EventProps) => {
   const hostRating = 4.5;
   const hostName = 'Jordan';
   const hostAvatar = tempAvatar;
-  const hostStatus = AvatarStatus.Online;
 
   const eventTitle = 'Dog Walk and Play Meetup at Central Park';
   const eventDate = 'This Tuesday';
@@ -74,7 +77,7 @@ const EventScreen = ({ route, navigation }: EventProps) => {
   const eventDescription = `Join us for a fun dog walk and play at Central Park. We will meet at the entrance and walk around the park. We will have a break at the dog park for some playtime. All dogs are welcome!`;
 
   // types - Live, Upcoming (subtypes - in >24h, in <24h), Terminated
-  const eventStatus = 'Upcoming';
+  const eventStatus = 'Terminated';
 
   // user who is viewing the event
   // types - host, attendee
@@ -106,7 +109,7 @@ const EventScreen = ({ route, navigation }: EventProps) => {
   */
   const attendeeControlsButtonHeight = 24;
 
-  // TODO fix TS error in the code below
+  // TODO fix TS error in the code below, then uncomment cause it's needed
 
   // const [errorText, setErrorText] = React.useState('');
   // const [eventText, setEventText] = React.useState('');
@@ -187,34 +190,24 @@ const EventScreen = ({ route, navigation }: EventProps) => {
             <Avatar
               image={hostAvatar}
               size={AvatarSize.Medium}
-              status={hostStatus}
             />
             <View>
-              <Text
-                style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-                {hostName}
-              </Text>
+              <View style={styles.hostNameType}>
+                <Text
+                  style={[globalStyles.headingTextFour, globalStyles.textDark]}>
+                  {hostName}
+                </Text>
+                {hostType === 'You' ? (
+                  <BirdIcon width={24} height={24} />
+                ) : hostType === 'Friend' ? (
+                  <FeatherIcon width={24} height={24} />
+                ) : null}
+              </View>
               <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
                 Rating: {hostRating}
               </Text>
             </View>
           </View>
-
-          {hostType === 'You' ? (
-            <TextLabel
-              text={labelText.you}
-              type={LabelType.You}
-              size={LabelSize.Small}
-              display={LabelDisplay.Contained}
-            />
-          ) : hostType === 'Friend' ? (
-            <TextLabel
-              text={labelText.friend}
-              type={LabelType.Friend}
-              size={LabelSize.Small}
-              display={LabelDisplay.Contained}
-            />
-          ) : null}
         </View>
 
         {/* EVENT INFO SECTION */}
@@ -357,7 +350,7 @@ const EventScreen = ({ route, navigation }: EventProps) => {
           </View>
 
           {/* GALLERY SECTION */}
-          {pastEventData?.media.length > 0 && (
+          {eventStatus === 'Terminated' && pastEventData?.media.length > 0 && (
             <View
               style={[
                 eventStatus === 'Terminated'
@@ -403,21 +396,23 @@ const EventScreen = ({ route, navigation }: EventProps) => {
           )}
         </View>
 
-        {userType === 'Attendee' ? (
-          <View
-            style={{
-              paddingBottom: Spacing.lg * 2 + attendeeControlsButtonHeight,
-            }}
-          />
-        ) : (
-          <View
-            style={{
-              paddingBottom: Spacing.lg,
-            }}
-          />
-        )}
-      </ScrollView>
-    </View>
+        {
+          userType === 'Attendee' ? (
+            <View
+              style={{
+                paddingBottom: Spacing.lg * 2 + attendeeControlsButtonHeight,
+              }}
+            />
+          ) : (
+            <View
+              style={{
+                paddingBottom: Spacing.lg,
+              }}
+            />
+          )
+        }
+      </ScrollView >
+    </View >
   );
 };
 
@@ -443,6 +438,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     columnGap: Spacing.mdsm,
+  },
+
+  hostNameType: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.xs,
   },
 
   bannerImage: {
