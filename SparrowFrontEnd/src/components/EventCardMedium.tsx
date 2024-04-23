@@ -37,8 +37,6 @@ export interface EventCardMediumProps {
   eventAttendees: number;
   eventTitle: string;
   eventLocation: string;
-  eventCoordinate: Feature<Point, Properties>
-  eventDateTest: Date;
   eventHeroImage: { uri: string };
 }
 
@@ -48,8 +46,6 @@ export const EventCardMedium: React.FC<EventCardMediumProps> = ({
   eventAttendees = null,
   eventTitle = null,
   eventLocation = null,
-  eventCoordinate = point([-74.0060, 40.7128]),
-  eventDateTest = new Date(),
 
 
   // TODO insert an IMAGE NOT FOUND image here

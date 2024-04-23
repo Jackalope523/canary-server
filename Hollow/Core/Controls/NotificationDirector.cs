@@ -11,7 +11,7 @@ using static Core.Entities.Psijic;
 
 namespace Core.Controls
 {
-	internal class NotificationDirector : AbstractDirector, INotificationOperations
+    internal class NotificationDirector : AbstractDirector, INotificationOperations
 	{
 		#region Initialisation
 

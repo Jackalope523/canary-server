@@ -25,6 +25,7 @@ namespace Core.Boundaries
 		Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance);
 		Task<EventShard> FindCurrentEventForUserAsync(ulong userId);
 		Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong userId);
+		Task<List<EventShard>> FindWatchingEventsForUserAsync(ulong userId);
 		Task<List<EventShard>> FindPastEventsForUserAsync(ulong userId);
 		Task<List<EventShard>> FindEventsByUserAsync(ulong userId);
 
@@ -68,8 +69,7 @@ namespace Core.Boundaries
 		Task JoinEventAsync(ulong userId, ulong eventId);
 		Task LeaveEventAsync(ulong userId, ulong eventId);
 
-		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)>
-			GetGuestListAsync(ulong userId, ulong eventId);
+		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)> GetGuestListAsync(ulong userId, ulong eventId);
 		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId);
 		Task KickUserAsync(ulong hostId, ulong targetId, ulong eventId);

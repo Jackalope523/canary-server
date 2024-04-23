@@ -9,7 +9,7 @@ import { globalStyles } from '../../styles/GlobalStyles';
 import { EventStackParamList } from '../../components/atoms/types';
 import Button from '../../components/atoms/Button';
 
-import { eventShard, getEvent } from './eventPigeon';
+import { eventManifest, getEvent } from './eventPigeon';
 
 type CreateEventProps = StackScreenProps<EventStackParamList, 'CreateEvent'>;
 

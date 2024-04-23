@@ -15,7 +15,7 @@ using static Core.Entities.Psijic;
 
 namespace Core.Controls
 {
-	internal class EventDirector : AbstractDirector, IEventOperations
+    internal class EventDirector : AbstractDirector, IEventOperations
 	{
 		#region Initialisation
 
@@ -514,6 +514,12 @@ namespace Core.Controls
 			return (await Events.FindUpcomingEventsForUserAsync(user.Id))
 				.ConvertAll(@event => new Event(@event));
 		}
+
+		internal async Task<List<Event>> RequestWatchingEventsForUserAsync(User user)
+		{
+			return (await Events.FindWatchingEventsForUserAsync(user.Id))
+				.ConvertAll(@event => new Event(@event));
+		}
 		
 		internal async Task<List<(User User, EventBond State)>> RequestAllUsersFromEventAsync(Event @event)
 		{
@@ -528,22 +534,36 @@ namespace Core.Controls
 				.ConvertAll(userDetails => (userDetails.Joined, userDetails.Left, new User(userDetails.User)));
 		}
 
-		internal async Task<List<EventShard>>
+		internal static async Task<List<EventShard>>
 			RemoveInaccessibleEventsAsync(User user, List<EventShard> events)
 		{
-			List<EventShard> inaccessibleEvents = new();
+			List<EventShard> accessibleEvents = new();
 
 			foreach (EventShard e in events)
 			{
 				Event targetEvent = new(e);
 
-				if (!await user.CanView(targetEvent))
-				{ inaccessibleEvents.Add(e); }
+				if (await user.CanJoin(targetEvent))
+				{ accessibleEvents.Add(e); }
 			}
 
-			events = events.Except(inaccessibleEvents).ToList();
+			return accessibleEvents;
+		}
 
-			return events;
+		internal async Task<List<(EventShard, EventBond)>>
+			RemoveInaccessibleEventBondsAsync(User user, List<(EventShard, EventBond)> events)
+		{
+			List<(EventShard, EventBond)> accessibleEvents = new();
+
+			foreach ((EventShard shard, EventBond bond) in events)
+			{
+				Event targetEvent = new(shard);
+
+				if (await user.CanJoin(targetEvent))
+				{ accessibleEvents.Add((shard, bond)); }
+			}
+
+			return accessibleEvents;
 		}
 
 		internal async Task<List<EventShard>>
@@ -556,10 +576,10 @@ namespace Core.Controls
 				Event targetEvent = new(e);
 
 				if (!await user.CanJoin(targetEvent))
-				{ inaccessibleEvents.Remove(e); continue; }
+				{ inaccessibleEvents.Add(e); continue; }
 
 				if (CharacterVector.AngleBetweenAffected(user.Character, targetEvent.Character) > maximumAngle)
-				{ inaccessibleEvents.Remove(e); }
+				{ inaccessibleEvents.Add(e); }
             }
 
             events = events.Except(inaccessibleEvents).ToList();

@@ -25,7 +25,7 @@ import e10img1 from '../assets/images/temp/event-img-10.jpg';
 // Event dataset
 export const SAMPLEEVENTDATA = [
   {
-    id: '1',
+    id: 1,
     host: 'Robert',
     date: 'Today',
     time: '12:00',
@@ -39,7 +39,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '2',
+    id: 2,
     host: 'Alice',
     date: 'Today',
     time: '22:00',
@@ -53,7 +53,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '3',
+    id: 3,
     host: 'Lily',
     date: 'This Wednesday',
     time: '01:00',
@@ -67,7 +67,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '4',
+    id: 4,
     host: 'David',
     date: 'This Friday',
     time: '16:30',
@@ -81,7 +81,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '5',
+    id: 5,
     host: 'Emily',
     date: 'This Saturtday',
     time: '12:30',
@@ -95,7 +95,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '6',
+    id: 6,
     host: 'Sophia',
     date: 'This Sunday',
     time: '09:00',
@@ -109,7 +109,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '7',
+    id: 7,
     host: 'Oliver',
     date: 'This Sunday',
     time: '21:00',
@@ -123,7 +123,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '8',
+    id: 8,
     host: 'Ethan',
     date: 'Next Monday',
     time: '18:30',
@@ -137,7 +137,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '9',
+    id: 9,
     host: 'Mia',
     date: 'Next Monday',
     time: '15:00',
@@ -151,7 +151,7 @@ export const SAMPLEEVENTDATA = [
   },
 
   {
-    id: '10',
+    id: 10,
     host: 'Noah',
     date: 'Next Tuesday',
     time: '17:00',

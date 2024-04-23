@@ -2,6 +2,7 @@
 using Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Core.Boundaries
 {
@@ -11,8 +12,10 @@ namespace Core.Boundaries
         double Latitude, double Longitude);
 
     public record Etching(ulong Id, ulong EventId, UserSilhouette User,
-        DateTimeOffset TimeEtched, string ImageURL,
+        DateTimeOffset TimeEtched,
         (int Positive, int Negative) Ratings, bool IsHidden);
+
+    public record Feed(List<EventHeader> Headers, List<Etching> Etchings);
 
 	#endregion
 
@@ -24,26 +27,24 @@ namespace Core.Boundaries
         Task<List<Etching>> GetEtchingsByUserAsync(ulong userId);
         Task<Etching> GetEtchingAsync(ulong etchingId);
         Task<Etching> AddEtchingAsync(ulong eventId, ulong etcherId,
-            DateTimeOffset timeEtched, string imageURL);
+            DateTimeOffset timeEtched);
 		Task RemoveEtchingAsync(ulong etchingId);
 		Task HideEtchingAsync(ulong etchingId);
 
 		Task RateEtchingAsync(ulong etchingId, ulong voterId, UserRating rating);
 		Task RemoveEtchingRatingAsync(ulong etchingId, ulong voterId);
 
-        Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, List<ulong> exclusionList);
+        Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
     }
 
     public interface IEtchingOperations
     {
         Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId);
-        Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, string imageURL);
+        Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image);
         Task RemoveEtchingAsync(ulong userId, ulong etchingId);
         Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating);
 
-        Task<(int Depth, List<EventHeader> Headers, List<Etching> Etchings)>
-            GetUserFeedAsync(ulong userId, int depth,
-            List<ulong> exclusionList = null);
+        Task<Feed> GetUserFeedAsync(ulong userId, int depth, int lastDepth);
     }
 
 	#endregion

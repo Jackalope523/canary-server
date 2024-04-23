@@ -5,7 +5,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 using Core.Boundaries;
-using Serilog;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
+using Frontier.Manifests;
+using System.Collections.Generic;
 
 namespace Frontier.Controllers
 {
@@ -32,41 +37,39 @@ namespace Frontier.Controllers
 
 		#region Variables
 
-		public UserManager<UserShard> userManager;
-		public SignInManager<UserShard> signInManager;
+		public ILogger log;
 
 		public IAccountOperations accounts;
-		public IProfileOperations profiles;
+		public IBannerOperations banners;
 		public IEventOperations events;
 		public IEtchingOperations etchings;
 		public IDisciplineOperations reports;
+		public IKeyOperations keys;
+		public IMediaOperations media;
 		public INotificationOperations notifications;
+		public IProfileOperations profiles;
 
-		public ISMSService smsService;
-		public IEmailService emailService;
+		public UserManager<UserShard> userManager;
 
 		#endregion
 
 		#region Initialisation
 
-		public AbstractGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IProfileOperations profileOperations,
-			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService)
+		public AbstractGuard(GuardBox box, UserManager<UserShard> aspUserManager)
 		{
-			userManager = identityUserManager;
-			signInManager = identitySignInManager;
+			log = box.log;
 
-			accounts = accountOperations;
-			profiles = profileOperations;
-			events = eventOperations;
-			etchings = etchingOperations;
-			reports = disciplineOperations;
-			notifications = notificationOperations;
+			accounts = box.accounts;
+			banners = box.banners;
+			profiles = box.profiles;
+			events = box.events;
+			etchings = box.etchings;
+			keys = box.keys;
+			reports = box.reports;
+			media = box.media;
+			notifications = box.notifications;
 
-			smsService = externalSMSService;
-			emailService = externalEmailService;
+			userManager = aspUserManager;
 		}
 
 		#endregion
@@ -74,27 +77,39 @@ namespace Frontier.Controllers
 		#region Favours
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<Task<IActionResult>> action)
+		public async Task<IActionResult> Execute(Func<Task<object>> action)
 		{
 			try
 			{
-				return await action.Invoke();
+				var result = await action.Invoke();
+
+				// Check if there is a result
+				if (result != null)
+				{
+					// Ensure outgoing type is generic or manifest
+					if (result is not Manifest &&
+						result is not string &&
+						result is not int)
+					{ throw new UnexpectedFailureException($"Server tried sending non-manifest object type {result.GetType()}."); }
+				}
+
+                return Ok(result);
 			}
 			catch (HollowFailureException ex)
 			{
 				// Log failure
-				Log.Error(ex, ex.Message);
+				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
 
 				return StatusCode(500);
 			}
-			catch (UserErrorException ex)
+			catch (UserErrorException ex) 
 			{
 				return BadRequest(ex.Message);
 			}
 			catch (Exception ex)
 			{
 				// Log failure
-				Log.Error(ex, ex.Message);
+				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
 
 				return StatusCode(500);
 			}
@@ -106,7 +121,7 @@ namespace Frontier.Controllers
 			return await Execute(async () =>
 			{
 				await action.Invoke();
-				return Ok();
+				return null;
 			});
 		}
 
@@ -116,13 +131,13 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await action.Invoke(user);
-				return Ok();
+				return null;
 			},
 			allowUnverified);
 		}
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<UserShard, Task<IActionResult>> action, bool allowUnverified = false)
+		public async Task<IActionResult> Execute(Func<UserShard, Task<object>> action, bool allowUnverified = false)
 		{
 			return await Execute(async () =>
 			{
@@ -144,6 +159,22 @@ namespace Frontier.Controllers
 		{
 			if (user.IsEmailConfirmed)
 			{ throw new InvalidUserException("User has not yet confirmed their email."); }
+		}
+
+		[NonAction]
+		public async Task<MemoryStream> StreamFirstFile()
+		{
+			foreach (var file in Request.Form.Files)
+			{
+				if (file.Length > 0)
+				{
+					using var ms = new MemoryStream();
+					await file.CopyToAsync(ms);
+					return ms;
+				}
+			}
+
+			return null;
 		}
 
 		#endregion

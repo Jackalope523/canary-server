@@ -10,7 +10,7 @@ using static Core.Entities.Psijic;
 
 namespace Core.Controls
 {
-	internal class DisciplineDirector : AbstractDirector, IDisciplineOperations
+    internal class DisciplineDirector : AbstractDirector, IDisciplineOperations
 	{
 		#region Initialisation
 

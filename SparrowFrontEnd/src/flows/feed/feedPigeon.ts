@@ -1,36 +1,41 @@
+import axios, { AxiosHeaders } from 'axios';
 import { userSession, handleError, extractDate, extractList } from '../../lib/axios';
-import { etchingShard, eventEtching, eventHeader, extractEtchingShard, extractEventHeader } from '../event/eventPigeon';
+import { etchingManifest, eventEtching, eventHeaderManifest, extractEtchingManifest, extractEventHeaderManifest } from '../event/eventPigeon';
 
 const apiBaseUrl = '/feed';
 
-type feedOptions = {
-    Depth: number,
-    ExclusionList: number[]
+export type feedOptions = {
+    DepthCharge: number,
+    LastDepth: number
 }
 
-type rawFeed = {
-    Depth: number,
-    Headers: eventHeader[],
-    Etchings: etchingShard[],
-
+export type feedManifest = {
+    Headers: eventHeaderManifest[],
+    Etchings: etchingManifest[],
 }
 
 // Get user feed
-export async function getUserFeed(options: feedOptions) : Promise<rawFeed> {
+export async function getUserFeed(options: feedOptions) : Promise<feedManifest> {
     if (!options) {
         console.log('Feed options are missing.');
         return Promise.reject();
     }
-
-    return await userSession.get(`${apiBaseUrl}/${options.Depth}`, { data: options })
+    
+    return await userSession.get(`${apiBaseUrl}/${options.DepthCharge}-${options.LastDepth}`)
         .then((response: any) => {
             console.log('User Feed:', response.data);
 
-            let depth: number = response.data['Depth'];
-            let headers = extractList(response.data['Headers'], extractEventHeader);
-            let etchings = extractList(response.data['Etchings'], extractEtchingShard);
+            let headers: eventHeaderManifest[] = [];
+            let etchings: etchingManifest[] = [];
 
-            return  { Depth:depth, Headers:headers, Etchings:etchings };
+            try
+            {
+                headers = extractList(response.data['headers'], extractEventHeaderManifest);
+                etchings = extractList(response.data['etchings'], extractEtchingManifest);
+            }
+            catch { }
+
+            return  { Headers:headers, Etchings:etchings };
         })
         .catch(handleError);
 }

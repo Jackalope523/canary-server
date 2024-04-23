@@ -11,7 +11,7 @@ using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
-	internal class ProfileDirector : AbstractDirector, IProfileOperations
+    internal class ProfileDirector : AbstractDirector, IProfileOperations
 	{
 		#region Initialisation
 
@@ -49,15 +49,15 @@ namespace Core.Controls
             {
                 // Gather active and upcoming events visible to the user
                 var upcomingActivity = await GetUserActivity(targetUser);
-                await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
+                await EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
                 nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventShard());
                 nest.Events.AddRange(upcomingActivity.ConvertAll(e => new Event(e).ToEventShard()));
 
-                foreach (var thinSlice in nest.Events)
+                foreach (var shard in nest.Events)
                 {
-                    Event @event = new(thinSlice);
+                    Event @event = new(shard);
                     nest.Etchings.AddRange(await @event.Etchings);
                 }
             }
@@ -66,7 +66,7 @@ namespace Core.Controls
             {
                 // Gather active and upcoming events visible to the user
                 var upcomingActivity = await GetUserActivity(targetUser);
-                await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
+                await EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
 
                 // Get private events and etchings
                 nest.Events = (await targetUser.PastEvents).ConvertAll(e => e.ToEventShard());
@@ -96,7 +96,7 @@ namespace Core.Controls
             return nest;
         }
 
-        public async Task<List<EventShard>> GetUserActivityAsync(ulong userId, ulong targetId)
+        public async Task<List<(EventShard, EventBond)>> GetUserActivityAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -106,26 +106,26 @@ namespace Core.Controls
                 new InvalidUserException("User is unable to view target."));
 
             // Gather active and upcoming events
-            var upcomingActivity = await GetUserActivity(targetUser);
+            var upcomingActivity = await GetUserActivityBond(targetUser);
 
             // Remove active and upcoming events if the user cannot view them
-            await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, upcomingActivity);
+            await Terminal.EventDirector.RemoveInaccessibleEventBondsAsync(user, upcomingActivity);
 
             return upcomingActivity.ToList();
         }
 
-        public async Task<IDictionary<UserSilhouette, List<EventShard>>> GetFriendActivityAsync(ulong userId)
+        public async Task<IDictionary<UserSilhouette, List<(EventShard, EventBond)>>> GetFriendActivityAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
 
-            ConcurrentDictionary<UserSilhouette, List<EventShard>> friendEvents = new();
+            ConcurrentDictionary<UserSilhouette, List<(EventShard, EventBond)>> friendEvents = new();
 
             // Gather visible activity of each friend
             (await user.Friends).AsParallel()
                 .ForAll(async friend =>
                 {
-                    var friendActivity = await GetUserActivity(friend);
-                    await Terminal.EventDirector.RemoveInaccessibleEventsAsync(user, friendActivity);
+                    var friendActivity = await GetUserActivityBond(friend);
+                    await Terminal.EventDirector.RemoveInaccessibleEventBondsAsync(user, friendActivity);
                     friendEvents.TryAdd(friend.ToUserSilhouette(), friendActivity);
                 });
 
@@ -260,7 +260,25 @@ namespace Core.Controls
 				.ConvertAll(@event => @event.ToEventShard());
         }
 
-		#endregion
-	}
+        private async Task<List<(EventShard, EventBond)>> GetUserActivityBond(User user)
+        {
+            _ = user.UpcomingEvents.Sync();
+            _ = user.CurrentEvent.Sync();
+
+            // Gather all user event data
+            var activity = (await user.UpcomingEvents)
+                .ConvertAll(@event => (@event.ToEventShard(), EventBond.Guest));
+
+            activity.AddRange((await user.WatchingEvents)
+                .ConvertAll(@event => (@event.ToEventShard(), EventBond.Watching)));
+
+            if (!(await user.CurrentEvent).Equals(Event.None))
+            { activity.Add(((await user.CurrentEvent).ToEventShard(), EventBond.Arrived)); }
+
+            return activity;
+        }
+
+        #endregion
+    }
 }
 

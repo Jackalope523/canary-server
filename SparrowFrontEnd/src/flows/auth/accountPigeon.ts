@@ -19,54 +19,35 @@ export type character = {
 
 export function extractCharacter(data: any) {
     let character: character = {
-        Extraversion: data['Extraversion'],
-        Athleticism: data['Athleticism'],
-        Chaoticness: data['Chaoticness'],
-        Competitiveness: data['Competitiveness'],
-        Industriousness: data['Industriousness'],
-        NightOwl: data['NightOwl'],
-        Openness: data['Openness'],
+        Extraversion: data['extraversion'],
+        Athleticism: data['athleticism'],
+        Chaoticness: data['chaoticness'],
+        Competitiveness: data['competitiveness'],
+        Industriousness: data['industriousness'],
+        NightOwl: data['nightOwl'],
+        Openness: data['openness'],
     }
 
     return character;
 }
 
-export type userShard = {
+export type userManifest = {
     Id: number,
     PhoneNumber: string,
     Email: string,
     Name: string,
-    DateOfBirth: Date,
-    IsPhoneConfirmed: boolean,
-    IsEmailConfirmed: boolean,
-    SecurityStamp: string,
-    LockoutDate?: Date,
-    AccessTries: number,
-    AccountStatus: accountStatus,
-    JoinDate: Date,
     Reputation: number,
-    NumberOfFollowers: number,
-    Character: character
+    NumberOfFollowers: number
 };
 
-export function extractUserShard(data: any) {
-    let user: userShard = {
-        Id: data['Id'],
-        PhoneNumber: data['PhoneNumber'],
-        Email: data['Email'],
-        Name: data['Name'],
-        DateOfBirth: extractDate(data['DateOfBirth']),
-        IsPhoneConfirmed: data['IsPhoneConfirmed'],
-        IsEmailConfirmed: data['IsEmailConfirmed'],
-        SecurityStamp: data['SecurityStamp'],
-        LockoutDate: data['LockoutDate'] ?
-            extractDate(data['LockoutDate']) : undefined,
-        AccessTries: data['AccessTries'],
-        AccountStatus: data['AccountStatus'],
-        JoinDate: extractDate(data['JoinDate']),
-        Reputation: data['Reputation'],
-        NumberOfFollowers: data['NumberOfFollowers'],
-        Character: extractCharacter(data['Character']),
+export function extractUserManifest(data: any) {
+    let user: userManifest = {
+        Id: data['id'],
+        PhoneNumber: data['phoneNumber'],
+        Email: data['email'],
+        Name: data['name'],
+        Reputation: data['reputation'],
+        NumberOfFollowers: data['numberOfFollowers'],
     }
 
     return user;
@@ -179,7 +160,7 @@ export async function getAccount() {
     .then((response: any) => {
         console.log('Account Details:', response.data);
         
-        return extractUserShard(response.data);
+        return extractUserManifest(response.data);
     })
     .catch(handleError);
 }
@@ -195,7 +176,7 @@ export async function modifyAccount(details: accountDetails) {
         return Promise.reject();
     }
 
-  return await userSession.put(`${apiBaseUrl}`, details)
+  return await userSession.post(`${apiBaseUrl}`, details)
     .then((response: any) => {
             console.log('Account modified.', response.data);
     })

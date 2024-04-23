@@ -24,6 +24,7 @@ export const SAMPLEEVENTDATA = [
         description: "We're back again for another downhill mountain biking competition at Owl's Head. There are several rewards for winners of the competition. 1st place - $500 and a SCOTT Voltage YZ downhill mountain bike, 2nd place - $350 LOCALBIKES store gift card, 3rd place - $100 LOCALBIKES store gift card.",
         location: "Owl's Head, Vale Perkins",
         uri: img1,
+        
         longitude: -74.0060, 
         latitude: 40.7128,
         dateTest: today

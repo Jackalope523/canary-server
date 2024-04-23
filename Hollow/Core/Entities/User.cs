@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Shared;
 
 using static Core.Entities.Psijic;
+using static Core.Entities.Arbiter;
 
 namespace Core.Entities
 {
@@ -64,6 +65,8 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
+        public Synced<string> Banner { get; }
+
         public Synced<(int Postitive, int Negative)> Ratings { get; }
 
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
@@ -78,6 +81,7 @@ namespace Core.Entities
         public Synced<Event> CurrentEvent { get; }
         public Synced<List<Event>> PastEvents { get; }
         public Synced<List<Event>> UpcomingEvents { get; }
+        public Synced<List<Event>> WatchingEvents { get; }
 
         public Synced<List<User>> Friends { get; }
         public Synced<List<User>> Following { get; }
@@ -99,6 +103,8 @@ namespace Core.Entities
 
         public User()
         {
+            Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
+
             Ratings = new(() => Terminal.ProfileDirector.RequestAllRatingsAsync(this));
 
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
@@ -113,6 +119,7 @@ namespace Core.Entities
             CurrentEvent = new(() => Terminal.EventDirector.RequestCurrentEventForUserAsync(this));
             PastEvents = new(() => Terminal.EventDirector.RequestPastEventsForUserAsync(this));
             UpcomingEvents = new(() => Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this));
+            WatchingEvents = new(() => Terminal.EventDirector.RequestWatchingEventsForUserAsync(this));
 
             Friends = new(() => Terminal.ProfileDirector.RequestFriendsAsync(this));
             Following = new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));
@@ -332,6 +339,21 @@ namespace Core.Entities
 			{ return false; }
 
 			return true;
+		}
+
+        public async Task CanEtch(Event @event)
+		{
+			// Verify etching is not before event starting or user is host
+			Try(HasAlready(@event.StartTime) || @event.IsModifiableBy(this),
+				new InvalidEventException("Event has yet to start."));
+
+			// Verify user can etch into the event
+			Try(await @event.WasAttendedBy(this) || @event.IsModifiableBy(this),
+				new InvalidEventException("User did not attend event."));
+
+			// Verify etching is added before event is closed
+			Try(@event.IsActive,
+				new InvalidEventException("Event has already ended."));
 		}
 
 		public bool Etched(Etching etching)

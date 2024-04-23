@@ -1,24 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Boundaries;
 using Microsoft.AspNetCore.Identity;
-using Frontier.Controllers;
 using Frontier.Stores;
 using Frontier.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 using Repository;
+using Core;
+using Frontier.Controllers;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier
 {
@@ -26,25 +21,29 @@ namespace Frontier
     {
         public static void Main(string[] args)
         {
-			Log.Logger = new LoggerConfiguration()
-				.WriteTo.Console()
-				.CreateLogger();
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.AzureApp()
+                .MinimumLevel.Debug()
+                .CreateLogger();
 
-			try
-			{
-				CreateHostBuilder(args)
-					.UseSerilog()
-					.Build()
-					.Run();
-			}
-			catch (Exception ex)
-			{
-				Log.Fatal(ex, "Hollow failed unexpectedly.");
-			}
-			finally
-			{
-				Log.CloseAndFlush();
-			}
+            Log.Information("Hollow starting up...");
+
+            try
+            {
+                CreateHostBuilder(args)
+                    .UseSerilog()
+                    .Build()
+                    .Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Hollow failed unexpectedly.");
+            }
+            finally
+            {
+                Log.Debug("Hollow shutting down.");
+                Log.CloseAndFlush();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -53,96 +52,138 @@ namespace Frontier
                 {
                     webBuilder.UseStartup<Ignition>();
                 });
-		
-		public IConfiguration Configuration { get; }
 
-		public Ignition(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
+        public IConfiguration Configuration { get; }
 
-		public void ConfigureServices(IServiceCollection services)
-		{
-			services.AddControllers();
-			services.AddSwaggerGen(c =>
-			{
-				c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
-			});
+        public Ignition(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
 
-			/////
-			// Services 
-			/////////////
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllers();
 
-			Services.CorePush pushNotifications = new();
-			Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
-				"", "");
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
+            });
 
-			services.AddTransient<ISMSService, TwilioService>();
-			services.AddTransient<IEmailService, SendGridService>();
-			// TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+            var loggerFactory = new LoggerFactory()
+                .AddSerilog(Log.Logger);
 
-			//////
-			// Connections
-			////////////////
 
-			Harbor harbor = new(Harbor.Flag.Production);
+            /////
+            // Services 
+            /////////////
 
-			CoreTerminal terminal = CoreTerminal.CreateTerminal(
-				harbor.AccountDatabaseAccess,
-				harbor.EventDatabaseAccess, 
-				harbor.EtchingDatabaseAccess,
-				harbor.ProfileDatabaseAccess, 
-				harbor.ReportDatabaseAccess,
+            var frontierLogger = loggerFactory.CreateLogger("Frontier");
+            var coreLogger = loggerFactory.CreateLogger("Core");
+            var repositoryLogger = loggerFactory.CreateLogger("Repository");
+
+            Services.CorePush pushNotifications = new();
+            Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
+                "", "");
+
+            services.AddTransient<ISMSService, TwilioService>();
+            services.AddTransient<IEmailService, SendGridService>();
+            // TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+
+
+            //////
+            // Connections
+            ////////////////
+
+            Harbor harbor;
+
+            if (IsDebug)
+            {
+                harbor = new(Harbor.Flag.Development, repositoryLogger);
+            }
+            else
+            {
+                harbor = new(Harbor.Flag.Production, repositoryLogger);
+            }
+
+            CoreTerminal terminal = CoreTerminal.CreateTerminal(
+                coreLogger,
+                harbor.AccountDatabaseAccess,
+                harbor.AdminDatabaseAccess,
+                harbor.BannerDatabaseAccess,
+                harbor.EventDatabaseAccess,
+                harbor.EtchingDatabaseAccess,
+                harbor.ReportDatabaseAccess,
+                harbor.KeyDatabaseAccess,
+                harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
-				harbor.AdminDatabaseAccess,
-				pushNotifications);
+                harbor.ProfileDatabaseAccess,
+                pushNotifications);
 
-			foreach (var (GateType, Instance) in terminal.Gates)
-			{
-				services.AddSingleton(GateType, Instance);
-			}
+            GuardBox box = new(frontierLogger,
+                terminal.AccountOperations,
+                terminal.BannerOperations,
+                terminal.ProfileOperations,
+                terminal.EventOperations,
+                terminal.EtchingOperations,
+                terminal.KeyOperations,
+                terminal.DisciplineOperations,
+                terminal.MediaOperations,
+                terminal.NotificationOperations);
 
-			
-			/////////
-			// Authentication Schema 
-			//////////////////////////
-			
-			services.AddAuthentication(options =>
-			{
-				options.DefaultScheme = IdentityConstants.ApplicationScheme;
-				options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-				options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-			})
-				.AddIdentityCookies();
+            services.AddSingleton(box);
 
-			services.AddIdentityCore<UserShard>()
-				.AddUserStore<UserAccountStore>()
-				.AddSignInManager()
-				.AddDefaultTokenProviders();
-		}
+            /////////
+            // Authentication Schema 
+            //////////////////////////
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-				app.UseSwagger();
-				app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web v1"));
-			}
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            })
+                .AddIdentityCookies();
 
-			//app.UseHttpsRedirection();
+            services.AddIdentityCore<UserShard>()
+                .AddUserStore<UserAccountStore>()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
+        }
 
-			app.UseRouting();
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web v1"));
+            }
 
-			app.UseAuthentication();
-			app.UseCookiePolicy();
-			app.UseAuthorization();
+            //app.UseHttpsRedirection();
 
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapControllers();
-			});
-		}
-	}
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseCookiePolicy();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+
+        public static bool IsDebug
+        {
+            get
+            {
+                bool isDebug = false;
+#if DEBUG
+				isDebug = true;
+#endif
+                return isDebug;
+            }
+        }
+    }
 }

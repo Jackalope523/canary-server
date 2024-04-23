@@ -43,20 +43,22 @@ const DropdownSelectorText: React.FC<DropdownSelectorTextProps> = ({
         />
       </Pressable>
       {selected ? (
-        <View style={styles.dropdown}>
-          {options
-            .filter((item) => item.text !== selectedItem)
-            .map((item, index) => (
-              <Pressable key={item.id} onPress={item.onPress}>
-                <Text
-                  key={index}
-                  style={[globalStyles.buttonTextOne, globalStyles.textLight]}>
-                  {item.text}
-                </Text>
-              </Pressable>
-            ))}
-        </View>
-      ) : null}
+      <View style={styles.dropdown}>
+        {options
+          .filter((item) => true)
+          .map((item, index) => (
+            
+            <Pressable key={item.id} onPress={item.onPress}>
+              <Text
+                key={index}
+                style={[globalStyles.buttonTextOne, globalStyles.textDark]}>
+                {item.text}
+              </Text>
+            </Pressable>
+            
+          ))}
+      </View>
+    ) : null}
     </View>
   );
 };
@@ -73,8 +75,8 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    marginTop: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
+    // marginTop: Spacing.sm,
+    paddingRight: 10,
     paddingVertical: Spacing.md,
     rowGap: Spacing.sm,
     backgroundColor: Colors.sparrowDarkBrown,
@@ -84,5 +86,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     top: '100%',
     alignSelf: 'flex-start',
+    width: 110
   },
 });

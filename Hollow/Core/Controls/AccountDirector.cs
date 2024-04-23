@@ -54,6 +54,12 @@ namespace Core.Controls
             // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
 
+            // Verify if user is a banner member
+            try
+            {
+                await Banners.GetUserBannerAsync(newUser.PhoneNumber);
+            } catch { throw new InvalidUserException("User is not a member of a banner."); }
+
             // Check if email is in use
             if (!string.IsNullOrEmpty(email))
             { await ThrowIfEmailTaken(newUser.Email); }
