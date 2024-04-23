@@ -42,7 +42,7 @@ interface EventCardLargeProps {
   eventLocation: string;
   eventAttendees: number;
   eventAttendeesFriends: number;
-  hiddenCards: number[];
+  hidden: boolean;
 
   wakeShift?: number;
   shadowWidth?: number;
@@ -60,7 +60,7 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
   eventLocation,
   eventAttendees,
   eventAttendeesFriends,
-  hiddenCards = [],
+  hidden = false,
 
   wakeShift = 4,
   shadowWidth = 1,
@@ -187,8 +187,8 @@ const EventCardLarge: React.FC<EventCardLargeProps> = ({
   //#region Logic                                                                     ||
 
   useEffect(() => {
-    hiddenCards.includes(id) ? hide() : show()
-  }, [hiddenCards]);
+    hidden ? hide() : show()
+  }, [hidden]);
 
   //#endregion                                                                        ||
   //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||

@@ -19,6 +19,9 @@ import Animated from 'react-native-reanimated';
 
 // Types
 export interface ButtonProps {
+  id?: number;
+  pressed?: boolean
+  setPressed?: (arg0: number, arg1: boolean) => {};
   onPress?: () => void;
   text?: string;
   Icon?: React.FC<any> | string | any;
@@ -29,10 +32,6 @@ export interface ButtonProps {
   displayIcon?: boolean;
 
   disabled?: boolean;
-
-  // self?: number;
-  // status?: number;
-  // changeState?: (myNumber: number) => void;
 
   // Rest styles
   btnStyle?: ViewStyle[];
@@ -48,13 +47,6 @@ export interface ButtonProps {
   btnDisabledStyle?: ViewStyle[];
   btnDisabledTextStyle?: TextStyle[];
   btnDisabledIconStyle: string;
-
-  id?: number;
-  // current?: number;
-  // setCurrent?: React.Dispatch<React.SetStateAction<number>>;
-
-  pressed?: boolean
-  setPressed?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -86,7 +78,7 @@ export const Button: React.FC<ButtonProps> = ({
   // setCurrent = null,
 
   pressed = false,
-  setPressed= (x: boolean) => {},
+  setPressed= (x, y) => {},
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Type                                      ||
@@ -385,7 +377,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   //#region Buttons
   const handlePressIn = () => {
-    setPressed(!pressed)
+    setPressed(id, !pressed)
     onPress();
   };
 

@@ -1,5 +1,5 @@
 // #region Imports
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, FlatList, ViewToken, Pressable, ButtonProps } from 'react-native';
 import { PreventRemoveContext, useFocusEffect } from '@react-navigation/native';
 import { globalStyles } from '../../styles/GlobalStyles';
@@ -49,97 +49,67 @@ const ActivityScreen = () => {
   //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
   //#region Logic                                                                     ||
 
-  const AllId = 1;
-  const ByYouId = 2;
-  const ByFriendsId = 3;
-  const AttendingId = 4;
-  const WatchingId = 5;
+  const [data, setData] = useState<eventShard[]>([]);
+
+  useEffect(() => {
+
+  }, []);
+
+  const AllId = 0;
+  const ByYouId = 1;
+  const ByFriendsId = 2;
+  const AttendingId = 3;
+  const WatchingId = 4;
+
+  const exclusiveButtons = [];
+  exclusiveButtons.push(AllId)
+
+  const pressedButtons: [boolean, Dispatch<SetStateAction<boolean>>][] = [];
+  pressedButtons.push(useState<boolean>(false));
+  pressedButtons.push(useState<boolean>(false));
+  pressedButtons.push(useState<boolean>(false));
+  pressedButtons.push(useState<boolean>(false));
+  pressedButtons.push(useState<boolean>(false));
+
+  const hiddenCards: [boolean, Dispatch<SetStateAction<boolean>>][] = [];
 
 
-  const [allSelected, parentSetAllSelected] = useState<boolean>(false);
-  const [byYouSelected, parentSetByYouSelected] = useState<boolean>(false);
-  const [byFriendsSelected, parentSetByFriendsSelected] = useState<boolean>(false);
-  const [attendingSelected, parentSetAttendingSelected] = useState<boolean>(false);
-  const [watchingSelected, parentSetWatchingSelected] = useState<boolean>(false);
-
-  const pressedButtons = [];
-
-  const [sampledata, setSampleData] = useState(SAMPLEEVENTDATA);
-
-  const [hiddenCards, setHiddenCards] = useState<number[]>([]);
-
-  const childSetAllSelected = (x: boolean) => {
-    parentSetAllSelected(true);
-    parentSetByYouSelected(false);
-    parentSetByFriendsSelected(false);
-    parentSetAttendingSelected(false);
-    parentSetWatchingSelected(false);
+  const setSelected = (id: number, value: boolean) => {
+    for (let i = 0; i < exclusiveButtons.length; i++) {
+      pressedButtons[i][1](false);
+    }
+    pressedButtons[id][1](true);
   }
 
-  const childSetByYouSelected = (x: boolean) => {
-    parentSetAllSelected(false);
-    parentSetByYouSelected(true);
+  const setExclusiveSelected = (id: number, value: boolean) => {
+    for (let i = 0; i < pressedButtons.length; i++) {
+      if (i === id) {
+        pressedButtons[i][1](true);
+      }
+      else {
+        pressedButtons[i][1](false);
+      } 
+    }
   }
-
-  const childSetByFriendsSelected = (x: boolean) => {
-    parentSetAllSelected(false);
-    parentSetByFriendsSelected(true);
- 
-  }
-
-  const childSetAttendingSelected = (x: boolean) => {
-    parentSetAllSelected(false);
-    parentSetAttendingSelected(true);
-  }
-
-  const childSetWatchingSelected = (x: boolean) => {
-    parentSetAllSelected(false);
-    parentSetWatchingSelected(true);
-  }
-
 
   const All = () => {
-    setHiddenCards([]);
+    
   }
 
   const ByYou = () => {
-    let ids: number[] = [...hiddenCards];
-    for (let i = 0; i < SAMPLEEVENTDATA.length; i++) {
-      if (true) {
-        ids.push(SAMPLEEVENTDATA[i].id);
-      }
-    }
-    setHiddenCards(ids);
+    
   }
 
   const ByFriends = () => {
-    let ids: number[] = [...hiddenCards];
-    for (let i = 0; i < SAMPLEEVENTDATA.length; i++) {
-      if (SAMPLEEVENTDATA[i].host === "David") {
-        ids.push(SAMPLEEVENTDATA[i].id);
-      }
-    }
-    setHiddenCards(ids);
+    
   }
 
   const Attending = () => {
-    let ids: number[] = [...hiddenCards];
-    for (let i = 0; i < SAMPLEEVENTDATA.length; i++) {
-      if (SAMPLEEVENTDATA[i].host === "Alice") {
-        ids.push(SAMPLEEVENTDATA[i].id);
-      }
-    }
-    setHiddenCards(ids);
+    
   }
 
   const Watching = () => {
-    let ids: number[] = [...hiddenCards];
-    for (let i = 0; i < SAMPLEEVENTDATA.length; i++) {
-      if (SAMPLEEVENTDATA[i].host === "Robert") {
-        ids.push(SAMPLEEVENTDATA[i].id);
-      }
-    }
-    setHiddenCards(ids);
+   
   }
 
   const buttons: ButtonProps[] = [
@@ -150,8 +120,8 @@ const ActivityScreen = () => {
       display: ButtonDisplay.Full,
       text: 'All',
       onPress: All,
-      pressed: allSelected,
-      setPressed: childSetAllSelected
+      pressed: pressedButtons[AllId][0],
+      setPressed: setExclusiveSelected
     },
     {
       id: ByYouId,
@@ -160,8 +130,8 @@ const ActivityScreen = () => {
       display: ButtonDisplay.Full,
       text: 'By you',
       onPress: ByYou,
-      pressed: byYouSelected,
-      setPressed: childSetByYouSelected
+      pressed: pressedButtons[ByYouId][0],
+      setPressed: setSelected
     },
     {
       id: ByFriendsId,
@@ -170,8 +140,8 @@ const ActivityScreen = () => {
       display: ButtonDisplay.Full,
       text: 'By friends',
       onPress: ByFriends,
-      pressed: byFriendsSelected,
-      setPressed: childSetByFriendsSelected
+      pressed: pressedButtons[ByFriendsId][0],
+      setPressed: setSelected
     },
     {
       id: AttendingId,
@@ -180,8 +150,8 @@ const ActivityScreen = () => {
       display: ButtonDisplay.Full,
       text: 'Attending',
       onPress: Attending,
-      pressed: attendingSelected,
-      setPressed: childSetAttendingSelected
+      pressed: pressedButtons[AttendingId][0],
+      setPressed: setSelected
     },
     {
       id: WatchingId,
@@ -190,8 +160,8 @@ const ActivityScreen = () => {
       display: ButtonDisplay.Full,
       text: 'Watching',
       onPress: Watching,
-      pressed: watchingSelected,
-      setPressed: childSetWatchingSelected
+      pressed: pressedButtons[WatchingId][0],
+      setPressed: setSelected
     },
   ];
 
@@ -259,7 +229,7 @@ const ActivityScreen = () => {
               eventLocation={item.location}
               eventAttendees={item.attendees}
               eventAttendeesFriends={item.attendeesFriends}
-              hiddenCards={hiddenCards}
+              hidden={false}
             /> 
           )}
         />
