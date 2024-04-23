@@ -36,6 +36,15 @@ export function extractUserSilhouette(data: any) {
     return silhouette;
 }
 
+export enum eventBond { watching, guest, arrived, left, kicked };
+
+export function extractEventPair(data: any) {
+    let eventShard = extractEventShard(data[0]);
+    let bond: eventBond = data[1];
+
+    return [eventShard, bond];
+}
+
 ///////
 // Profile Flow
 //////////////////
@@ -100,7 +109,7 @@ export async function getUserActivity(targetIdentification: number) {
         .then((response: any) => {
             console.log('User Activity:', response.data);
             
-            return extractList(response.data, extractEventShard);
+            return extractList(response.data, extractEventPair);
         })
         .catch(handleError);
 }
@@ -112,13 +121,13 @@ export async function getFriendActivity() {
             console.log('Friend Activity:', response.data);
             
             let users: userSilhouette[] = [];
-            let activity: { [id: number]: eventShard[] } = {};
+            let activity: { [id: number]: any[] } = {};
 
             for (const pair of response.data)
             {
                 users.push(extractUserSilhouette(pair[0]));
 
-                let events = extractList(pair[1], extractEventShard);
+                let events = extractList(pair[1], extractEventPair);
 
                 activity[pair[0]['Id']] = events;
             }

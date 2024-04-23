@@ -25,6 +25,7 @@ namespace Core.Boundaries
 		Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance);
 		Task<EventShard> FindCurrentEventForUserAsync(ulong userId);
 		Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong userId);
+		Task<List<EventShard>> FindWatchingEventsForUserAsync(ulong userId);
 		Task<List<EventShard>> FindPastEventsForUserAsync(ulong userId);
 		Task<List<EventShard>> FindEventsByUserAsync(ulong userId);
 
