@@ -1,11 +1,14 @@
 ﻿using Core.Boundaries;
-using Shared;
+using Microsoft.Extensions.Logging;
+using Repository.Coordinators;
 
 namespace Repository
 {
     public class Harbor
     {
         public enum Flag { Development, Production }
+
+        internal static ILogger logger;
 
         public IAccountDatabase AccountDatabaseAccess { get; private set; }
         public IProfileDatabase ProfileDatabaseAccess { get; private set; }
@@ -14,35 +17,35 @@ namespace Repository
         public IEtchingDatabase EtchingDatabaseAccess { get; private set; }
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
+        public IMediaDatabase MediaDatabaseAccess { get; private set; }
+        public IKeyDatabase KeyDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
-            switch (flag)
-            {
-                case Flag.Development:
-                    AccountDatabaseAccess = new AccountStore(new TestSentry());
-                    ProfileDatabaseAccess = new ProfileStore(new TestSentry());
-                    NotificationDatabaseAccess = new NotificationStore(new TestSentry());
-                    EventDatabaseAccess = new EventStore(new TestSentry());
-                    EtchingDatabaseAccess = new EtchingStore(new TestSentry());
-                    ReportDatabaseAccess = new DisciplineStore(new TestSentry());               
-                    AdminDatabaseAccess = new AdminStore(new TestSentry());  
-                    break;
-
-                case Flag.Production:
-                    AccountDatabaseAccess = new AccountStore(new AzureSentry());
-                    ProfileDatabaseAccess = new ProfileStore(new AzureSentry());
-                    NotificationDatabaseAccess = new NotificationStore(new AzureSentry());
-                    EventDatabaseAccess = new EventStore(new AzureSentry());
-                    EtchingDatabaseAccess = new EtchingStore(new AzureSentry());
-                    ReportDatabaseAccess = new DisciplineStore(new AzureSentry());             
-                    AdminDatabaseAccess = new AdminStore(new AzureSentry());
-                    break;
-
-                default:
-                    throw new UndefinedHarborStateException();
-            }
+            AccountDatabaseAccess = new AccountStoreCoordinator(flag);
+            ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
+            NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
+            EventDatabaseAccess = new EventStoreCoordinator(flag);
+            EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
+            ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
+            AdminDatabaseAccess = new AdminStoreCoordinator(flag);
+            MediaDatabaseAccess = new MediaStoreCoordinator();
+            KeyDatabaseAccess = new KeyStoreCoordinator();
         }
 
+        public Harbor(Flag flag, ILogger logger)
+        {
+            Harbor.logger = logger;
+
+            AccountDatabaseAccess = new AccountStoreCoordinator(flag);
+            ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
+            NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
+            EventDatabaseAccess = new EventStoreCoordinator(flag);
+            EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
+            ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
+            AdminDatabaseAccess = new AdminStoreCoordinator(flag);
+            MediaDatabaseAccess = new MediaStoreCoordinator();
+            KeyDatabaseAccess = new KeyStoreCoordinator();
+        }
     }
 }

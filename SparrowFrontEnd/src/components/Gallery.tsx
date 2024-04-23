@@ -1,64 +1,54 @@
-import {
-  FlatList,
-  Image,
-  ImageSourcePropType,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import React from 'react';
-import { globalStyles } from '../styles/GlobalStyles';
-import TextButton, { TextButtonType, TextButtonVariant } from './TextButton';
-import { SAMPLE_PAST_EVENT_DATA } from '../data/samplePastEventData';
+import { FlatList, Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from 'react-native'
+import React from 'react'
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
-import { Colors } from '../styles/ColorStyles';
 import { Spacing } from '../styles/SpacingStyles';
-import ViewMoreButton from './ViewMoreButton';
+import { Colors } from '../styles/ColorStyles';
+import Avatar, { AvatarSize } from './Avatar';
+import { globalStyles } from '../styles/GlobalStyles';
 
 // Icons
-import smLayout from '../assets/icons/layout-size-small-fill-alt-2.svg';
-import mdLayout from '../assets/icons/layout-size-medium-fill-alt.svg';
-import lgLayout from '../assets/icons/layout-size-large-fill.svg';
+import FeatherIcon from '../assets/icons/feather-fill-colored.svg'
+import BirdIcon from '../assets/icons/bird-fill-colored.svg'
 
-import Chevron from '../assets/icons/chevron-outline.svg';
-
-// TODO fix "VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead."
-
+//#region Props
 interface GalleryProps {
   images: { media: ImageSourcePropType[] }[];
+  posterAvatar: ImageSourcePropType;
+  posterName: string;
 }
+//#endregion
 
-const Gallery: React.FC<GalleryProps> = ({ images }) => {
+/*
+
+Instructions:
+1. changeLayout goes externally to the parent component
+
+*/
+
+const Gallery: React.FC<GalleryProps> = ({
+  images,
+  posterAvatar = "NULL",
+  posterName = "NULL",
+}) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Layout                                     ||
   // ! ||--------------------------------------------------------------------------------||
+  //#region Layout
 
-  const [numColumns, setNumColumns] = React.useState(
-    images[0].media.length <= 1 ? 1 : images[0].media.length === 2 ? 2 : 3,
-  );
+  /*   const [numColumns, setNumColumns] = React.useState(
+      images[0].media.length <= 1 ? 1 : images[0].media.length === 2 ? 2 : 3,
+    ); */
 
-  const [showAllItems, setShowAllItems] = React.useState(false);
-
-  // View more
-  const onViewMore = () => {
-    console.log('View more button pressed');
-    setShowAllItems(!showAllItems);
-  };
-
-  // TESTING
-  console.log(images[0].media.length);
+  const [numColumns, setNumColumns] = React.useState(2);
 
   // Control the number of items displayed based on the layout
-  const displayedData = showAllItems
-    ? images[0].media
-    : numColumns === 1
+  const displayedData = numColumns === 1
     ? images[0].media.slice(0, 2)
     : numColumns === 2
-    ? images[0].media.slice(0, 4)
-    : numColumns === 3
-    ? images[0].media.slice(0, 6)
-    : [];
+      ? images[0].media.slice(0, 4)
+      : numColumns === 3
+        ? images[0].media.slice(0, 6)
+        : [];
 
   // Handle layout change
   const changeLayout = () => {
@@ -66,21 +56,36 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
 
     if (numColumns === 1) {
       setNumColumns(2);
-      setShowAllItems(false);
 
       console.log('Set from:', numColumns, 'to', numColumns + 1);
     } else if (numColumns === 2) {
       setNumColumns(3);
-      setShowAllItems(false);
 
       console.log('Set from:', numColumns, 'to', numColumns + 1);
     } else if (numColumns === 3) {
       setNumColumns(1);
-      setShowAllItems(false);
 
       console.log('Set from:', numColumns, 'to', numColumns - 2);
     }
   };
+
+  /*   const changeLayout = () => {
+      console.log('Change layout button pressed');
+  
+      if (numColumns === 1) {
+        setNumColumns(2);
+  
+        console.log('Set from:', numColumns, 'to', numColumns + 1);
+      } else if (numColumns === 2) {
+        setNumColumns(3);
+  
+        console.log('Set from:', numColumns, 'to', numColumns + 1);
+      } else if (numColumns === 3) {
+        setNumColumns(1);
+  
+        console.log('Set from:', numColumns, 'to', numColumns - 2);
+      }
+    }; */
 
   // Image size
   const imgSize = {
@@ -102,43 +107,122 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
     width: (imgSize.full - Spacing.md * 2) / 3,
     height: (imgSize.full - Spacing.md * 2) / 3,
   };
+  //#endregion
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.top}>
-        <Text style={[globalStyles.headingTextFour, globalStyles.textDark]}>
-          Gallery
-        </Text>
-        {images[0].media.length > 1 && (
-          <View>
-            <TextButton
-              text="Layout"
-              type={TextButtonType.Dark}
-              variant={TextButtonVariant.Four}
-              displayIcon={true}
-              Icon={
-                numColumns === 1
-                  ? mdLayout
-                  : numColumns === 2
-                  ? lgLayout
-                  : smLayout
-              }
-              onPress={changeLayout}
-            />
-          </View>
-        )}
-      </View>
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                  Select image                                  ||
+  // ! ||--------------------------------------------------------------------------------||
+  // Two column layout styles
+  // TODO remove if not used
+  const image2CLFirstCol = {
+    width: imgSize.full,
+    height: imgSize.full,
+    backgroundColor: 'red',
+  }
 
-      <FlatList
-        data={displayedData}
-        renderItem={({ item }) => (
+  const image2CLSecondCol = {
+    right: (imgSize.full + Spacing.md) / 2,
+    width: imgSize.full,
+    height: imgSize.full,
+    backgroundColor: 'green',
+  }
+
+  const image3CLFirstCol = {
+    width: imgSize.full,
+    height: imgSize.full,
+    backgroundColor: 'red',
+  }
+
+  const image3CLSecondCol = {
+    width: imgSize.full,
+    height: imgSize.full,
+    backgroundColor: 'green',
+  }
+
+  const image3CLThirdCol = {
+    width: imgSize.full,
+    height: imgSize.full,
+    backgroundColor: 'blue',
+  }
+
+  /*
+  
+  TODO: Implement a way to select an image and display it in a larger view, like in the prototype
+  WHEN AN ITEM IS SELECTED:
+  1. Selected item should have a style added that makes it darker (by 75%, #00000)
+  2. A copy of the selected item should be made and displayed in a larger view (1 column layout),
+      right below the original selected item.
+  3. A copy of the selected item should also show the selected item's user (user who posted the image) and their avatar
+  4. The original select item needs to be able to be deselected, by clicking on it again,
+      which would also remove the copy of the selected item.
+ 
+  */
+
+  // const selectItem = () => {
+  //   console.log('if this is here, the gallery isnt done yet')
+  // }
+
+  const [selectedImage, setSelectedImage] = React.useState(null);
+
+  const handleImagePress = (image) => {
+    // setSelectedImage(image);
+    setSelectedImage(prevImage => (prevImage === image ? null : image));
+  }
+
+  // TODO remove these variables after testing and hook up to back-end data
+  var you = true;
+  var friend = false;
+  var anon = false;
+
+  const renderItem = ({ item, index }) => {
+    return (
+      <Pressable onPress={() => handleImagePress(item)}>
+        <View>
           <View
             style={
               numColumns === 1 ? oneCol : numColumns === 2 ? twoCol : threeCol
             }>
             <Image source={item} style={styles.image} />
           </View>
-        )}
+          {selectedImage === item && (
+            <View
+              style={
+                oneCol
+              }>
+              <View style={styles.user}>
+                <Avatar size={AvatarSize.Small} image={posterAvatar} />
+                <View style={styles.userInner}>
+                  <Text style={[globalStyles.headingTextThree, globalStyles.textDark]}>{posterName}</Text>
+                  {you ?
+                    <BirdIcon height={24} width={24} />
+                    : friend ?
+                      <FeatherIcon height={24} width={24} />
+                      : null}
+                </View>
+              </View>
+              <Image source={item} style={styles.image} />
+            </View>
+          )}
+        </View>
+      </Pressable>
+    );
+  };
+
+  return (
+    //#region Gallery
+    <View style={styles.container}>
+      <FlatList
+        data={displayedData}
+        renderItem={renderItem}
+
+        // renderItem={({ item }) => (
+        //   <View
+        //     style={
+        //       numColumns === 1 ? oneCol : numColumns === 2 ? twoCol : threeCol
+        //     }>
+        //     <Image source={item} style={styles.image} />
+        //   </View>
+        // )}
         keyExtractor={(item, index) => index.toString()}
         numColumns={numColumns}
         key={numColumns}
@@ -146,49 +230,34 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
           numColumns === 1
             ? () => <View style={styles.oneColSeparator} />
             : numColumns === 2
-            ? () => <View style={styles.twoColSeparator} />
-            : () => <View style={styles.threeColSeparator} />
+              ? () => <View style={styles.twoColSeparator} />
+              : () => <View style={styles.threeColSeparator} />
         }
         columnWrapperStyle={
           numColumns === 1
             ? false
             : numColumns === 2
-            ? styles.twoColWrapper
-            : styles.threeColWrapper
+              ? styles.twoColWrapper
+              : styles.threeColWrapper
         }
       />
-
-      {images[0].media.length <= 2 ? null : (
-        <Pressable style={styles.viewMore} onPress={onViewMore}>
-          <Text style={[globalStyles.buttonTextThree, globalStyles.textDark]}>
-            View more
-          </Text>
-          {/* TODO animate later if necessary - might get away without animating though */}
-          <Chevron
-            width={24}
-            height={24}
-            fill={Colors.sparrowDarkBrown}
-            style={
-              showAllItems
-                ? { transform: [{ rotate: '180deg' }] }
-                : { transform: [{ rotate: '0deg' }] }
-            }
-          />
-        </Pressable>
-      )}
     </View>
-  );
-};
+    //#endregion
+  )
+}
+
+export default Gallery
 
 // Exported enums
+//#region Exported enums
 export enum GalleryLayout {
   One,
   Two,
   Three,
 }
+//#endregion
 
-export default Gallery;
-
+//#region Styles
 const styles = StyleSheet.create({
   container: {},
 
@@ -198,6 +267,20 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.md,
   },
 
+  // TODO modify to match Figma
+  user: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.mdsm,
+    paddingVertical: Spacing.md,
+  },
+
+  userInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: Spacing.xs,
+  },
+
   // Image
   image: {
     width: '100%',
@@ -205,6 +288,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: Colors.sparrowDarkBrown,
+  },
+
+  selectedImageContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: 300,
+    height: 300,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  selectedImage: {
+    // opacity: 0.5,
+    width: '100%',
+    height: '100%',
   },
 
   // Layouts
@@ -228,12 +328,5 @@ const styles = StyleSheet.create({
   threeColSeparator: {
     height: Spacing.md,
   },
-
-  // View more
-  viewMore: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Spacing.md,
-  },
-});
+})
+//#endregion

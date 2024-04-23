@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from './ColorStyles';
 import { Spacing } from './SpacingStyles';
+import { borderRadius } from './BorderStyles';
 
 export const buttonStyles = StyleSheet.create({
   // ! ||--------------------------------------------------------------------------------||
@@ -170,19 +171,24 @@ export const buttonStyles = StyleSheet.create({
     columnGap: Spacing.sm,
   },
 
-  // TODO check and delete borderColor property if it's unused
-
   // Sizes
   // Large
   // Pair with buttonTextOne
   textButtonLarge: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 32,
-    borderRadius: 8,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: borderRadius.md,
     borderWidth: 2,
-    // borderColor: Colors.sparrowDarkBrown,
+  },
+
+  actionButtonLarge: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.lg,
+    borderRadius: borderRadius.md,
+    borderWidth: 2,
   },
 
   // Medium
@@ -190,11 +196,18 @@ export const buttonStyles = StyleSheet.create({
   textButtonMedium: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: borderRadius.md,
     borderWidth: 2,
-    // borderColor: Colors.sparrowDarkBrown,
+  },
+
+  actionButtonMedium: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 2,
   },
 
   // Small
@@ -202,11 +215,18 @@ export const buttonStyles = StyleSheet.create({
   textButtonSmall: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
     borderWidth: 2,
-    // borderColor: Colors.sparrowDarkBrown,
-    borderRadius: 8,
+    borderRadius: borderRadius.md,
+  },
+
+  actionButtonSmall: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.sm,
+    borderWidth: 2,
+    borderRadius: borderRadius.md,
   },
 
   // Extra small
@@ -214,11 +234,10 @@ export const buttonStyles = StyleSheet.create({
   textButtonExtraSmall: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: borderRadius.md,
     borderWidth: 2,
-    // borderColor: Colors.sparrowDarkBrown,
   },
 
   // TODO move to ICON STYLES file?
@@ -249,5 +268,37 @@ export const buttonStyles = StyleSheet.create({
     fontSize: 32,
     height: 32,
     color: Colors.sparrowDarkBrown,
+  },
+
+  // ! ||--------------------------------------------------------------------------------||
+  // ! ||                                    Shadows                                     ||
+  // ! ||--------------------------------------------------------------------------------||
+  shadow: {
+    zIndex: -1,
+  },
+
+  shadowPrimaryLight: {
+    backgroundColor: Colors.sparrowDark,
+    borderColor: Colors.sparrowDark,
+  },
+
+  shadowSuccess: {
+    backgroundColor: Colors.green700,
+    borderColor: Colors.green700,
+  },
+
+  shadowWarning: {
+    backgroundColor: Colors.orange700,
+    borderColor: Colors.orange700,
+  },
+
+  shadowError: {
+    backgroundColor: Colors.red700,
+    borderColor: Colors.red700,
+  },
+
+  shadowFunction: {
+    backgroundColor: Colors.turqoise700,
+    borderColor: Colors.turqoise700,
   },
 });

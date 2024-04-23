@@ -1,7 +1,7 @@
 import { ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import React, { FC } from 'react';
 import EventCardSmall, { EventStatus } from '../EventCardSmall';
-import Gallery from '../Gallery';
+import Gallery from '../testing/OldGallery';
 import { Spacing } from '../../styles/SpacingStyles';
 
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
@@ -13,8 +13,6 @@ type UpcomingEventProps = {
   eventTitle: string;
   eventDate: string;
   eventTime: string;
-  eventLocation: string;
-  eventAttendees: number;
   onPress: () => void;
 };
 
@@ -24,8 +22,6 @@ const UpcomingEvent: FC<UpcomingEventProps> = ({
   eventTitle,
   eventDate,
   eventTime,
-  eventLocation,
-  eventAttendees,
   onPress,
 }) => {
   return (
@@ -36,8 +32,6 @@ const UpcomingEvent: FC<UpcomingEventProps> = ({
         eventTitle={eventTitle}
         eventDate={eventDate}
         eventTime={eventTime}
-        eventLocation={eventLocation}
-        eventAttendees={eventAttendees}
         onPress={onPress}
       />
     </View>

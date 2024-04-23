@@ -69,7 +69,7 @@ const VerifyScreen = ({ route }: VerifyProps) => {
           size={ButtonSize.Medium}
           display={ButtonDisplay.Full}
           text={'Verify & Continue'}
-          onPress={route.params.Forward}
+          onPress={handleVerify}
           disabled={!codeReady}
         />
 

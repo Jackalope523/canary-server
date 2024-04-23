@@ -16,10 +16,12 @@ using System.Linq;
 using System.Collections.Generic;
 using PhoneNumbers;
 using System.Timers;
+using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Core.Tests
 {
-	public class CoreEnvironment
+    public class CoreEnvironment
 	{
 		public CoreTerminal Terminal;
 
@@ -44,7 +46,6 @@ namespace Core.Tests
 		private bool testEventIsDynamic = false;
 
 		private DateTimeOffset testEtchingTime = new(DateTime.UtcNow);
-		private string testEtchingImageURL = "https://cdn.sparrow.com/101";
 
 		/////
 		// Set-up
@@ -57,15 +58,20 @@ namespace Core.Tests
             // Arrange Core
 			Repository.Harbor harbor = new(Repository.Harbor.Flag.Development);
 
+			
             Terminal = CoreTerminal.CreateTerminal(
+				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
+				harbor.AdminDatabaseAccess,
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
-                harbor.ProfileDatabaseAccess,
                 harbor.ReportDatabaseAccess,
+				harbor.KeyDatabaseAccess,
+                harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
-				harbor.AdminDatabaseAccess,
+                harbor.ProfileDatabaseAccess,
 				new NotificationServiceStub());
+			
 		}
 
 		///////
@@ -283,17 +289,17 @@ namespace Core.Tests
 
 		internal async Task<Etching> GenerateEtchingAsync(Event etchedEvent, User etcher)
 		{
-			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime, testEtchingImageURL);
+			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime);
 		}
 
 		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, Etching etching)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, etching.TimeEtched, etching.ImageURL);
+			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, etching.TimeEtched);
 		}
 
-		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched, string imageURL)
+		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched, imageURL);
+			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched);
 		}
 
 		///////////

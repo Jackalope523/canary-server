@@ -9,18 +9,21 @@ using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
-	internal abstract class AbstractDirector
+    internal abstract class AbstractDirector
 	{
 		#region Variables
 
 		protected CoreTerminal Terminal { get; init; }
 
 		protected IAccountDatabase Accounts { get; private set; }
+		protected IBannerDatabase Banners { get; private set; }
 		protected IEventDatabase Events { get; private set; }
 		protected IEtchingDatabase Etchings { get; private set; }
-		protected IProfileDatabase Profiles { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
+		protected IKeyDatabase Keys { get; private set; }
+		protected IMediaDatabase Media { get; private set; }
 		protected INotificationDatabase Notifications { get; private set; }
+		protected IProfileDatabase Profiles { get; private set; }
 
 		#endregion
 
@@ -31,11 +34,14 @@ namespace Core.Controls
 			Terminal = terminal;
 			
 			Accounts = Terminal.AccountDatabase;
+			Banners = Terminal.BannerDatabase;
 			Events = Terminal.EventDatabase;
 			Etchings = Terminal.EtchingDatabase;
-			Profiles = Terminal.ProfileDatabase;
 			Reports = Terminal.DisciplineDatabase;
+			Keys = Terminal.KeyDatabase;
+			Media = Terminal.MediaDatabase;
 			Notifications = Terminal.NotificationDatabase;
+			Profiles = Terminal.ProfileDatabase;
         }
 
 		#endregion

@@ -74,15 +74,17 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateOngoingEventAsync(host, guest);
-			string etchingImageURL = "https://cdn.sparrow.com/0";
+			byte[] image = { byte.MinValue, 0, 1, 3, byte.MaxValue, 7, 8 };
 
 			// Act
-			await director.AddEtchingAsync(guest.Id, @event.Id, etchingImageURL);
+			await director.AddEtchingAsync(guest.Id, @event.Id, new(image));
 
 			// Assert
 			var serverEtchings = await director.GetEventEtchingsAsync(guest.Id, @event.Id);
 			Assert.Single(serverEtchings);
-			Assert.Equal(etchingImageURL, serverEtchings[0].ImageURL);
+
+			var etching = serverEtchings[0];
+			Assert.Equal(image, (await environment.Terminal.MediaDatabase.DownloadImageAsync(etching.Id, guest.Id)).ToArray());
 		}
 
 		[Fact]
@@ -92,10 +94,9 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
-			string etchingImageURL = "https://cdn.sparrow.com/0";
 
 			// Act
-			var addEtchingSync = director.AddEtchingAsync(sneakyUser.Id, @event.Id, etchingImageURL);
+			var addEtchingSync = director.AddEtchingAsync(sneakyUser.Id, @event.Id, new(0));
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await addEtchingSync);
@@ -167,19 +168,19 @@ namespace Core.Tests.Controls
 			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host, friend);
 
-			var @event = await environment.GenerateUpcomingEventAsync(host);
+			var @event = await environment.GeneratePastEventAsync(host);
 			var someEtching = await environment.GenerateEtchingAsync(@event, host);
 			var anotherEtching = await environment.GenerateEtchingAsync(@event, host);
 
 			// Act
-			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue);
+			var feed = await director.GetUserFeedAsync(friend.Id, 100, 0);
 
 			// Assert
-			Assert.Single(feedHeaders);
-			Assert.Equal(@event.Id, feedHeaders[0].Id);
+			Assert.Single(feed.Headers);
+			Assert.Equal(@event.Id, feed.Headers[0].Id);
 
-			Assert.Equal(2, feedEtchings.Count);
-			var serverSomeEtching = feedEtchings.Find(etching => etching.Id.Equals(someEtching.Id));
+			Assert.Equal(2, feed.Etchings.Count);
+			var serverSomeEtching = feed.Etchings.Find(etching => etching.Id.Equals(someEtching.Id));
 			Assert.Equal(@event.Id, serverSomeEtching.EventId);
 			Assert.Equal(someEtching.Id, serverSomeEtching.Id);
 		}
@@ -193,21 +194,21 @@ namespace Core.Tests.Controls
 			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host1, host2, friend);
 
-			var event1 = await environment.GenerateUpcomingEventAsync(host1);
+			var event1 = await environment.GenerateOngoingEventAsync(host1);
 			var seenEtching = await environment.GenerateEtchingAsync(event1, host1);
 
-			var event2 = await environment.GenerateUpcomingEventAsync(host2);
+			var event2 = await environment.GeneratePastEventAsync(host2);
 			var unseenEtching = await environment.GenerateEtchingAsync(event1, host2);
 
 			// Act
-			var (feedDepth, feedHeaders, feedEtchings) = await director.GetUserFeedAsync(friend.Id, int.MaxValue, new() { event1.Id });
+			var feed = await director.GetUserFeedAsync(friend.Id, 100, 1);
 
 			// Assert
-			Assert.Single(feedHeaders);
-			Assert.Equal(event2.Id, feedHeaders[0].Id);
+			Assert.Single(feed.Headers);
+			Assert.Equal(event2.Id, feed.Headers[0].Id);
 
-			Assert.Single(feedEtchings);
-			var serverSomeEtching = feedEtchings.Find(etching => etching.Id.Equals(unseenEtching.Id));
+			Assert.Single(feed.Etchings);
+			var serverSomeEtching = feed.Etchings.Find(etching => etching.Id.Equals(unseenEtching.Id));
 			Assert.Equal(event2.Id, serverSomeEtching.EventId);
 			Assert.Equal(unseenEtching.Id, serverSomeEtching.Id);
 		}

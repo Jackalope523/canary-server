@@ -21,6 +21,9 @@ import fontelloConfig from '../config.json';
 
 import TextInputMask from 'react-native-text-input-mask';
 
+import CloseOutline from '../assets/icons/close-outline.svg';
+import ErrorFill from '../assets/icons/error-fill.svg';
+
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // ! ||--------------------------------------------------------------------------------||

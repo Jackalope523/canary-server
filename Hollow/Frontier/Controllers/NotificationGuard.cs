@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
@@ -13,16 +14,7 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public NotificationGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IProfileOperations profileOperations,
-			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService) :
-			base(identityUserManager, identitySignInManager,
-				accountOperations, profileOperations,
-				eventOperations, etchingOperations,
-				disciplineOperations, notificationOperations,
-				externalSMSService, externalEmailService)
+		public NotificationGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
@@ -34,9 +26,11 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var notes = await notifications.GetNotesAsync(user.Id);
+				var manifest = ManifestSeries<NoteManifest>.Create(
+					await notifications.GetNotesAsync(user.Id),
+					note => new NoteManifest(note));
 
-				return Ok(notes);
+				return manifest;
 			});
         }
 

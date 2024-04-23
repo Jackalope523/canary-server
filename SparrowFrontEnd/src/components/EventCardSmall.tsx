@@ -14,7 +14,7 @@ import { Spacing } from '../styles/SpacingStyles';
 import { CustomDimensions } from '../styles/CustomDimensionStyles';
 
 // Icons
-import DateOutline from '../assets/icons/date-outline.svg';
+import DateIcon from '../assets/icons/date-outline.svg';
 import TimeOutline from '../assets/icons/time-outline.svg';
 import AccountOutline from '../assets/icons/account-outline.svg';
 import LocationOutline from '../assets/icons/location-outline.svg';
@@ -24,8 +24,6 @@ interface EventCardSmallProps {
   eventTitle?: string;
   eventDate?: string;
   eventTime?: string;
-  eventLocation?: string;
-  eventAttendees?: number;
 
   onPress?: () => void;
 
@@ -37,14 +35,9 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({
   eventTitle = 'NULL',
   eventDate = 'NULL',
   eventTime = 'NULL',
-  eventLocation = 'NULL',
-  eventAttendees,
   onPress = null,
   eventStatus = EventStatus.Upcoming,
 }) => {
-  // Text
-  const attendees = `${eventAttendees} attendees`;
-
   // Image size
   const imageSize = (CustomDimensions.windowWidth - Spacing.lg * 2) / 4.8;
 
@@ -63,52 +56,22 @@ const EventCardSmall: React.FC<EventCardSmallProps> = ({
         </Text>
         <View style={styles.dateAndTime}>
           <View style={styles.eventDetailsInnerContainer}>
-            <DateOutline
+            <DateIcon
               height={24}
               width={24}
               fill={Colors.sparrowDarkBrown}
             />
-            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-              {eventDate}
-            </Text>
-          </View>
-          {eventStatus === EventStatus.Upcoming && (
-            <View style={styles.eventDetailsInnerContainer}>
-              <TimeOutline
-                height={24}
-                width={24}
-                fill={Colors.sparrowDarkBrown}
-              />
+            {eventStatus === EventStatus.Upcoming ? (
               <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-                {eventTime}
+                {eventDate}{' '}at{' '}<Text style={globalStyles.bodyTextOneBold}>{eventTime}</Text>
               </Text>
-            </View>
-          )}
-        </View>
-        <View style={styles.eventDetailsInnerContainer}>
-          <LocationOutline
-            height={24}
-            width={24}
-            fill={Colors.sparrowDarkBrown}
-          />
-          <Text
-            style={[globalStyles.bodyTextOne, globalStyles.textDark]}
-            numberOfLines={1}>
-            {eventLocation}
-          </Text>
-        </View>
-        {eventStatus === EventStatus.Upcoming && (
-          <View style={styles.eventDetailsInnerContainer}>
-            <AccountOutline
-              height={24}
-              width={24}
-              fill={Colors.sparrowDarkBrown}
-            />
-            <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
-              {attendees}
-            </Text>
+            ) : (
+              <Text style={[globalStyles.bodyTextOne, globalStyles.textDark]}>
+                {eventDate}
+              </Text>
+            )}
           </View>
-        )}
+        </View>
       </View>
     </View>
   );

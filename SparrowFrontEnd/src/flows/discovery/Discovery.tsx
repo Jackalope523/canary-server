@@ -1,17 +1,15 @@
+// #region Imports
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   Pressable,
   useWindowDimensions,
-  FlexStyle,
   Keyboard
 } from 'react-native';
 import { Colors } from '../../styles/ColorStyles';
 import { globalStyles } from '../../styles/GlobalStyles';
-import { navigationStyles } from '../../styles/NavigationStyles';
 import { Spacing } from '../../styles/SpacingStyles';
 
 import Button, {
@@ -19,7 +17,7 @@ import Button, {
   ButtonSize,
   ButtonDisplay,
 } from '../../components/Button';
-import SearchFilter from '../../components/organisms/SearchFilter';
+import SmartList from './SmartList';
 
 import Animated, {
   useAnimatedStyle,
@@ -39,16 +37,25 @@ import ExclusiveButtonScroll from '../../components/ExclusiveButtonScroll';
 import Map from './Map';
 import SearchBar from './SearchBar';
 
-import { EventCardMediumProps, EventCardMedium } from '../../components/EventCardMedium';
-import { point, Point, distance, Feature, Properties } from '@turf/turf';
+import { point } from '@turf/turf';
 import Geolocation from 'react-native-geolocation-service';
+import { etchingManifest, eventManifest } from '../event/eventPigeon';
+import { getAllEvents } from './discoverPigeon';
+// #endregion
 
 const Icon = createIconSetFromFontello(fontelloConfig);
 
 // TEMP. map image - replace with actual working map
 const tempMapImage = require('../../assets/images/temp/temp-map.png');
 
+enum ActiveComponent {
+  None,
+  Filter,
+  Sort
+}
+
 const DiscoveryScreen = () => {
+
   const { height, width } = useWindowDimensions();
 
   const [searchContentVisible, setSearchContentVisible] = useState(false);
@@ -63,37 +70,15 @@ const DiscoveryScreen = () => {
     }
   }, [isTextInputFocused]);
 
-  // Toggle search close button
-  const toggleClose = () => {
-    setSearchContentVisible(false);
-    setActiveComponent("");
-    setSearchText('');
-  };
-
   // Search options
-  const [activeComponent, setActiveComponent] = useState("none");
+  const [activeComponent, setActiveComponent] = useState(ActiveComponent.None);
 
-  // Toggle filter
-  const [filterVisible, setFilterVisible] = useState(false);
-
-  const toggleFilter = () => {
+  const toggleActiveComponent = (component:ActiveComponent) => {
     Keyboard.dismiss();
-    if (activeComponent === "filter") {
-      setActiveComponent("none");
+    if (activeComponent === component) {
+      setActiveComponent(ActiveComponent.None);
     } else {
-      setActiveComponent("filter");
-    }
-  };
-
-  // Toggle sort
-  const [sortVisible, setSortVisible] = useState(false);
-
-  const toggleSort = () => {
-    Keyboard.dismiss();
-    if (activeComponent === "sort") {
-      setActiveComponent("none");
-    } else {
-      setActiveComponent("sort");
+      setActiveComponent(component);
     }
   };
 
@@ -132,114 +117,79 @@ const DiscoveryScreen = () => {
   const [filterDateValue, setFilterDateValue] = useState("");
   const [filterSizeValue, setFilterSizeValue] = useState("");
   const [currentLocation, setCurrentLocation] = useState(point([0, 0]));
+  const [events, setEvents] = useState<eventManifest[]>([]); 
+
+  const pollCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        setCurrentLocation(point([position.coords.longitude, position.coords.latitude]));
+      },
+      error => {
+        console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
+
+  useEffect(() => {
+    pollCurrentLocation();
+
+    getAllEvents(currentLocation.geometry.coordinates[1], currentLocation.geometry.coordinates[0], 100000000000)
+    .then(value => { setEvents(value); })
+    .catch(() => console.log("SESSION ERROR"));
+  }, []);
 
   useEffect(() => {
     if (sortValue === "Closest") {
-      Geolocation.getCurrentPosition(
-        position => {
-          setCurrentLocation(point([position.coords.longitude, position.coords.latitude]));
-        },
-        error => {
-          console.log(error.code, error.message);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
+      pollCurrentLocation();
     }
   }, [sortValue]);
 
   const generateSortBy = () => {
     switch (sortValue) {
       case "Most Popular":
-        return (x: EventCardMediumProps, y: EventCardMediumProps) => { return y.eventAttendees - x.eventAttendees };
+        return (x: eventManifest, y: eventManifest) => { return y.NumberOfGuests - x.NumberOfGuests };
       case "Closest":
-        return (x: EventCardMediumProps, y: EventCardMediumProps) => { return distance(currentLocation, x.eventCoordinate) - distance(currentLocation, y.eventCoordinate) };
+        return (x: eventManifest, y: eventManifest) => { return distance(currentLocation, x.Location) - distance(currentLocation, y.Location) };
       case "Most Recent":
-        return (x: EventCardMediumProps, y: EventCardMediumProps) => { return y.eventDateTest.getTime() - x.eventDateTest.getTime() };
+        return (x: eventManifest, y: eventManifest) => { return y.StartTime.getTime() - x.StartTime.getTime() };
     }
   };
 
-  // Function to check if a date is today
-  const isToday = (date: Date): boolean => {
-    const today = new Date();
-    return date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear();
-  };
-
-  // Function to check if a date is tomorrow
-  const isTomorrow = (date: Date): boolean => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return date.getDate() === tomorrow.getDate() &&
-      date.getMonth() === tomorrow.getMonth() &&
-      date.getFullYear() === tomorrow.getFullYear();
-  };
-
-  // Function to check if a date is within the current week
-  const isThisWeek = (date: Date): boolean => {
-    const today = new Date();
-    const lastDayOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (6 - today.getDay()));
-    return date >= today && date <= lastDayOfWeek;
-  };
-
-  // Function to check if a date is during this weekend
-  const isThisWeekend = (date: Date): boolean => {
-    const today = new Date();
-    const thisSaturday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (6 - today.getDay()));
-    const thisSunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (7 - today.getDay()));
-    return date >= thisSaturday && date <= thisSunday;
-  };
-
-  // Function to check if a date is within next week
-  const isNextWeek = (date: Date): boolean => {
-    const today = new Date();
-    const nextWeekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (8 - today.getDay()));
-    const nextWeekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (14 - today.getDay()));
-    return date >= nextWeekStart && date <= nextWeekEnd;
-  };
-
-  // Function to check if a date is during next weekend
-  const isNextWeekend = (date: Date): boolean => {
-    const today = new Date();
-    const nextSaturday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (6 - today.getDay()) + 7);
-    const nextSunday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (7 - today.getDay()) + 7);
-    return date >= nextSaturday && date <= nextSunday;
-  };
-
   const generateFilterArray = () => {
-    let filterArray = new Array<(e: EventCardMediumProps) => boolean>();
+    let filterArray = new Array<(e: eventManifest) => boolean>();
     let today = new Date();
 
     switch (filterDateValue) {
       case "Today":
-        filterArray.push((e: EventCardMediumProps) => { return isToday(e.eventDateTest) });
+        filterArray.push((e: eventManifest) => { return isToday(e.StartTime) });
         break;
       case "Tomorrow":
-        filterArray.push((e: EventCardMediumProps) => { return isTomorrow(e.eventDateTest) });
+        filterArray.push((e: eventManifest) => { return isTomorrow(e.StartTime) });
         break;
       case "This Week":
-        filterArray.push((e: EventCardMediumProps) => { return isThisWeek(e.eventDateTest) });
+        filterArray.push((e: eventManifest) => { return isThisWeek(e.StartTime) });
         break;
       case "This Weekend":
-        filterArray.push((e: EventCardMediumProps) => { return isThisWeekend(e.eventDateTest) });
+        filterArray.push((e: eventManifest) => { return isThisWeekend(e.StartTime) });
         break;
       case "Next Week":
-        filterArray.push((e: EventCardMediumProps) => { return isNextWeek(e.eventDateTest) });
+        filterArray.push((e: eventManifest) => { return isNextWeek(e.StartTime) });
         break;
       case "Next Weekend":
-        filterArray.push((e: EventCardMediumProps) => { return isNextWeekend(e.eventDateTest) });
+        filterArray.push((e: eventManifest) => { return isNextWeekend(e.StartTime) });
         break;
     }
 
     switch (filterSizeValue) {
       case "Cozy":
-        filterArray.push((e: EventCardMediumProps) => { return e.eventAttendees < 5 });
+        filterArray.push((e: eventManifest) => { return e.NumberOfGuests < 5 });
         break;
       case "Thriving":
-        filterArray.push((e: EventCardMediumProps) => { return e.eventAttendees > 15 && e.eventAttendees < 30 });
+        filterArray.push((e: eventManifest) => { return e.NumberOfGuests > 15 && e.NumberOfGuests < 30 });
         break;
       case "Bombastic":
-        filterArray.push((e: EventCardMediumProps) => { return e.eventAttendees > 30 });
+        filterArray.push((e: eventManifest) => { return e.NumberOfGuests > 30 });
         break;
     }
     return filterArray;
@@ -247,26 +197,25 @@ const DiscoveryScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Map />
+      <Map events={events}/>
 
-      <View style={searchContentVisible ? { position: 'absolute', width: width, backgroundColor: "white" } : { position: 'absolute', width: width }}>
-        <View style={{ flexDirection: "row" }}>
+      <View style={searchContentVisible ? { position: 'absolute', width: width,  backgroundColor: "white" } : { position: 'absolute', width: width }}>
+        <View style={{ flexDirection: "row"}}>
           {searchContentVisible ? (
-            <Pressable onPress={() => {
-              setIsTextInputFocused(false);
-              setSearchContentVisible(false);
-              Keyboard.dismiss();
-            }}>
-              <Animated.View style={animatedIconStyle}>
-                <Icon
-                  name="arrow-back-outline"
-                  size={40}
-                  style={styles.icon}
-                  paddingTop={20}
-                  paddingLeft={20}
-                />
-              </Animated.View>
-            </Pressable>
+          <Pressable onPress={() => {
+            setIsTextInputFocused(false);
+            setSearchContentVisible(false);
+            Keyboard.dismiss()}}>
+            <Animated.View style={animatedIconStyle}>
+              <Icon
+                name="arrow-back-outline"
+                size={40}
+                style={styles.icon}
+                paddingTop={20}
+                paddingLeft={20}
+              />
+            </Animated.View>
+          </Pressable>
           ) : null}
 
           <SearchBar
@@ -302,26 +251,26 @@ const DiscoveryScreen = () => {
                 id: 1,
                 type: ButtonType.PrimaryDark,
                 size: ButtonSize.ExtraSmall,
-                display: ButtonDisplay.Full,
+                display: ButtonDisplay.Contained,
                 text: "Filter",
                 icon: "filter-fill",
-                onPress: toggleFilter
+                onPress: () => { toggleActiveComponent(ActiveComponent.Filter); }
               },
               {
                 id: 2,
                 type: ButtonType.PrimaryDark,
                 size: ButtonSize.ExtraSmall,
-                display: ButtonDisplay.Full,
+                display: ButtonDisplay.Contained,
                 text: "Sort",
                 icon: "sort-outline",
-                onPress: toggleSort
+                onPress: () => { toggleActiveComponent(ActiveComponent.Sort); }
               }
             ]} />
         </View>
 
 
 
-        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === "sort" && searchContentVisible) ? { display: 'none' } : {}]}>
+        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === ActiveComponent.Sort && searchContentVisible) ? { display: 'none' } : {}]}>
           <View style={{ rowGap: Spacing.md, paddingTop: Spacing.lg, height: '100%' }}>
             <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>
               Sort by
@@ -376,7 +325,7 @@ const DiscoveryScreen = () => {
 
 
 
-        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === "filter" && searchContentVisible) ? { display: 'none' } : {}]}>
+        <View style={[{ backgroundColor: Colors.sparrowBrown }, !(activeComponent === ActiveComponent.Filter && searchContentVisible) ? { display: 'none' } : {}]}>
           <View style={{ rowGap: Spacing.md, paddingTop: Spacing.lg }}>
             <Text style={[globalStyles.headingTextThree, globalStyles.textLight, styles.wrapper]}>
               Date
@@ -537,15 +486,17 @@ const DiscoveryScreen = () => {
             </View>
           </View>
         </View>
-
       </View>
 
       {/* TODO probably have to enable it and disable filter or sort if there's text input in the textInput component */}
-      {activeComponent === "none" && searchContentVisible ? (
+      {activeComponent === ActiveComponent.None && searchContentVisible ? (
         <View style={isTextInputFocused ? { paddingTop: 130 } : { paddingTop: 75 }}>
-          <SearchFilter
-            sortBy={generateSortBy()}
-            filterBy={generateFilterArray()}
+          <SmartList
+            list={events}
+            searchText={searchText}
+            sortValue={sortValue}
+            filterDateValue={filterDateValue}
+            filterSizeValue={filterSizeValue}
           />
         </View>
       ) : null}

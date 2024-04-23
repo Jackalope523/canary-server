@@ -7,25 +7,30 @@ using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
 using Shared;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
     [Route("account")]
     public class AccountGuard : AbstractGuard
 	{
-		#region Initialisation
+        #region Initialisation
 
-		public AccountGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IProfileOperations profileOperations,
-			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService) :
-			base(identityUserManager, identitySignInManager,
-				accountOperations, profileOperations,
-				eventOperations, etchingOperations,
-				disciplineOperations, notificationOperations,
-				externalSMSService, externalEmailService)
-		{ }
+        SignInManager<UserShard> signInManager;
+
+        IEmailService emailService;
+        ISMSService smsService;
+
+		public AccountGuard(GuardBox box, UserManager<UserShard> aspUserManager,
+            SignInManager<UserShard> aspSignInManager,
+            IEmailService externalEmailService, ISMSService externalSMSService) :
+            base(box, aspUserManager)
+		{
+            signInManager = aspSignInManager;
+
+            emailService = externalEmailService;
+            smsService = externalSMSService;
+        }
 
 		#endregion
 
@@ -37,9 +42,9 @@ namespace Frontier.Controllers
             return await Execute(async () =>
             {
                 // Get current user
-                var user = await GetCurrentUserAsync();
+                UserManifest user = new(await GetCurrentUserAsync());
 
-                return Ok(user);
+                return user;
             });
         }
 
@@ -99,13 +104,16 @@ namespace Frontier.Controllers
                 var user = await accounts.GetUserAsync(credentials.PhoneNumber);
 
                 if (await userManager.IsLockedOutAsync(user))
-                {
-                    return BadRequest(HollowError.UserLockedOut.ToString());
+				{
+					throw new InvalidUserException(HollowError.UserLockedOut.ToString());
                 }
 
                 // Check if the account is activated
                 if (await userManager.IsPhoneNumberConfirmedAsync(user))
                 {
+                    // REMOVE FOR PROD
+                    credentials.Code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+
                     // Account is activated, check 2FA token validity
                     var result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, credentials.Code);
                     if (result)
@@ -117,11 +125,14 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-                        return BadRequest(HollowError.IncorrectCode.ToString());
-                    }
+						throw new InvalidInformationException(HollowError.IncorrectCode.ToString());
+					}
                 }
                 else
                 {
+                    // REMOVE FOR PROD
+                    credentials.Code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+
                     // Account is not activated, check change number token validity
                     var result = await userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, credentials.Code);
                     if (result.Succeeded)
@@ -141,11 +152,9 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-                        return BadRequest(HollowError.IncorrectCode.ToString());
+                        throw new InvalidInformationException(HollowError.IncorrectCode.ToString());
                     }
                 }
-
-                return Ok();
             });
         }
 
@@ -162,12 +171,12 @@ namespace Frontier.Controllers
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    return BadRequest(HollowError.MissingInformation.ToString());
+                    throw new InvalidUserException(HollowError.MissingInformation.ToString());
                 }
+                // REMOVE FOR PROD
+                token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 var result = await userManager.ConfirmEmailAsync(user, token);
-
-                return Ok();
             });
 		}
 
@@ -184,7 +193,7 @@ namespace Frontier.Controllers
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    return BadRequest(HollowError.MissingInformation.ToString());
+                    throw new InvalidUserException(HollowError.MissingInformation.ToString());
                 }
 
                 // Send verification email if email is not confirmed
@@ -194,8 +203,6 @@ namespace Frontier.Controllers
                     var confirmationLink = Url.Action("email", "account", new { token, email = user.Email }, Request.Scheme);
                     await emailService.SendEmailAsync(user.Email, "Verify your Sparrow email.", $"Verify your Sparrow email.\n\n{confirmationLink}");
                 }
-                
-                return Ok();
             });
 		}
 
@@ -207,42 +214,35 @@ namespace Frontier.Controllers
 			if (details == null || !ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
-            try
-			{
-                // Persist a new user
-                await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
-                    details.Name, details.DateOfBirth.ToUniversalTime());
-                
-                // Send an SMS to new user with a generated change number token
-                var user = await accounts.GetUserAsync(details.PhoneNumber);
-				var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-				await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
-			}
-            catch (InvalidUserException e)
-			{
-                // Account already exists
-				var user = await accounts.GetUserAsync(details.PhoneNumber);
-
-                // Check if account is activated
-				if (!await userManager.IsPhoneNumberConfirmedAsync(user))
+            return await Execute(async () =>
+            {
+                try
                 {
-                    // Account is not activated, send an SMS with a generated change number token
-					var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-					await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
-				}
+                    // Persist a new user
+                    await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
+                        details.Name, details.DateOfBirth.ToUniversalTime());
 
-                return BadRequest(e.ToString());
-            }
-            catch (InvalidInformationException e)
-            {
-                return BadRequest(e.ToString());
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
+                    // Send an SMS to new user with a generated change number token
+                    var user = await accounts.GetUserAsync(details.PhoneNumber);
+                    var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                    await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
+                }
+                catch (InvalidUserException e)
+                {
+                    // Account already exists
+                    var user = await accounts.GetUserAsync(details.PhoneNumber);
 
-            return Ok();
+                    // Check if account is activated
+                    if (!await userManager.IsPhoneNumberConfirmedAsync(user))
+                    {
+                        // Account is not activated, send an SMS with a generated change number token
+                        var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                        await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
+                    }
+
+                    throw e;
+                }
+            });
         }
 
         [HttpPut]

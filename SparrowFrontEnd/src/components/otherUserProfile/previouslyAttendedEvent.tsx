@@ -1,40 +1,50 @@
 import { ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import React, { FC } from 'react';
 import EventCardSmall, { EventStatus } from '../EventCardSmall';
-import Gallery from '../Gallery';
 import { Spacing } from '../../styles/SpacingStyles';
 import { SAMPLE_PAST_EVENT_DATA } from '../../data/samplePastEventData';
+import EventCardSmallAccordion from '../EventCardSmallAccordion';
+import Gallery from '../Gallery';
 
 type PreviouslyAttendedEventProps = {
-  eventStatus: EventStatus;
-  eventHeroImage: ImageSourcePropType;
   eventTitle: string;
   eventDate: string;
-  eventLocation: string;
   onPress: () => void;
   images: { media: ImageSourcePropType[] }[];
+  posterAvatar: ImageSourcePropType;
+  posterName: string;
+  onPressViewEvent: () => void;
 };
 
 const PreviouslyAttendedEvent: FC<PreviouslyAttendedEventProps> = ({
-  eventStatus,
-  eventHeroImage,
   eventTitle,
   eventDate,
-  eventLocation,
   onPress,
   images,
+  posterAvatar,
+  posterName,
+  onPressViewEvent,
 }) => {
+  const [isExpanded, setIsExpanded] = React.useState(true);
+
+  const onPressCard = () => {
+    setIsExpanded(!isExpanded);
+  }
+
   return (
     <View style={styles.container}>
-      <EventCardSmall
-        eventStatus={eventStatus}
-        eventHeroImage={eventHeroImage}
+      {/* TODO on handlePress in eventCardSmllAccordion, show the gallery, else hide */}
+      <EventCardSmallAccordion
         eventTitle={eventTitle}
-        eventDate={eventDate + ' ago'}
-        eventLocation={eventLocation}
-        onPress={onPress}
+        eventDate={eventDate}
+        onPressViewEvent={onPressViewEvent}
+        onPressCard={onPressCard}
       />
-      {images.length > 0 && <Gallery images={images} />}
+
+      {
+        isExpanded && images.length > 0 &&
+        <Gallery images={images} posterAvatar={posterAvatar} posterName={posterName} />
+      }
     </View>
   );
 };

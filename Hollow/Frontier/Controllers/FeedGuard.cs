@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
@@ -14,34 +15,31 @@ namespace Frontier.Controllers
     {
 		#region Initialisation
 
-		public FeedGuard(UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
-			IAccountOperations accountOperations, IProfileOperations profileOperations,
-			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, INotificationOperations notificationOperations,
-			ISMSService externalSMSService, IEmailService externalEmailService) :
-			base(identityUserManager, identitySignInManager,
-				accountOperations, profileOperations,
-				eventOperations, etchingOperations,
-				disciplineOperations, notificationOperations,
-				externalSMSService, externalEmailService)
+		public FeedGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
 
 		#region Actions
 
-		[HttpGet("{feedDepth}")]
-        public async Task<IActionResult> GetFeed([FromBody] FeedManifest feedOptions)
+		[HttpGet("{depth}-{lastDepth}")]
+        public async Task<IActionResult> GetFeed(int depth, int lastDepth)
         {
 			// Verify parameters
-            if (feedOptions == null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             { return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
 			{
-				var userFeed = await etchings.GetUserFeedAsync(user.Id, feedOptions.Depth, feedOptions.ExclusionList.ToList());
+				var shard = await etchings.GetUserFeedAsync(user.Id, depth, lastDepth);
 
-				return Ok(userFeed);
+				FeedManifest feed = new()
+				{
+					Headers = shard.Headers.ConvertAll(header => new EventHeaderManifest(header)),
+					Etchings = shard.Etchings.ConvertAll(etching => new EtchingManifest(etching))
+				};
+
+				return feed;
 			});
         }
 
