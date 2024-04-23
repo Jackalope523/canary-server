@@ -13,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Repository;
 using Core;
+using Frontier.Controllers;
 
 namespace Frontier
 {
@@ -115,6 +116,7 @@ namespace Frontier
 				terminal.ProfileOperations,
 				terminal.EventOperations,
 				terminal.EtchingOperations,
+				terminal.KeyOperations,
 				terminal.DisciplineOperations,
 				terminal.MediaOperations,
 				terminal.NotificationOperations);
