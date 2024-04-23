@@ -57,6 +57,7 @@ import BirdIcon from '../../assets/icons/bird-fill-colored.svg';
 import FeatherIcon from '../../assets/icons/feather-fill-colored.svg';
 import HeaderFlagAttendee from '../../components/HeaderFlagAttendee';
 import HeaderFlagHost from '../../components/HeaderFlagHost';
+import GallerySection from '../../components/event/GallerySection';
 
 const EventScreen = ({ route, navigation }: EventProps) => {
   // Sample data
@@ -315,7 +316,13 @@ const EventScreen = ({ route, navigation }: EventProps) => {
           </View>
 
           {/* ATTENDEES SECTION */}
-          <View style={styles.attendeesSection}>
+          <View style={[
+            eventStatus === 'Terminated' ? (
+              styles.attendeesSectionTerminated
+            ) : (
+              styles.attendeesSection
+            )
+          ]}>
             <View style={[styles.attendeesInnerSection, styles.basePadding]}>
               <Text
                 style={[globalStyles.headingTextFour, globalStyles.textDark]}>
@@ -353,12 +360,11 @@ const EventScreen = ({ route, navigation }: EventProps) => {
           {eventStatus === 'Terminated' && pastEventData?.media.length > 0 && (
             <View
               style={[
-                eventStatus === 'Terminated'
-                  ? styles.basePadding
-                  : styles.gallerySection,
+                styles.gallerySection,
                 styles.basePadding,
               ]}>
-              <Gallery images={pastEventData?.media ? [pastEventData] : []} />
+              {/* <Gallery images={pastEventData?.media ? [pastEventData] : []} /> */}
+              <GallerySection images={pastEventData?.media ? [pastEventData] : []} />
             </View>
           )}
 
@@ -520,6 +526,16 @@ const styles = StyleSheet.create({
 
   attendeesSection: {
     rowGap: Spacing.sm,
+
+    // Accurate v1 padding
+    // paddingBottom: Spacing.lg + 4,
+
+    // Bigger gap v2 padding
+    paddingBottom: Spacing.xl,
+  },
+
+  attendeesSectionTerminated: {
+    rowGap: Spacing.sm,
     paddingBottom: Spacing.lg,
   },
 
@@ -530,7 +546,7 @@ const styles = StyleSheet.create({
   },
 
   gallerySection: {
-    paddingBottom: Spacing.xl,
+    paddingBottom: Spacing.xl + 14,
   },
 
   controlsSection: {

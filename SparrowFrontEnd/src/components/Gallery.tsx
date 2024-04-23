@@ -210,7 +210,7 @@ const Gallery: React.FC<GalleryProps> = ({
 
   return (
     //#region Gallery
-    <View style={styles.container} >
+    <View style={styles.container}>
       <FlatList
         data={displayedData}
         renderItem={renderItem}
@@ -241,7 +241,7 @@ const Gallery: React.FC<GalleryProps> = ({
               : styles.threeColWrapper
         }
       />
-    </View >
+    </View>
     //#endregion
   )
 }
