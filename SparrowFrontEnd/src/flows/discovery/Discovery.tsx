@@ -4,15 +4,12 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   Pressable,
   useWindowDimensions,
-  FlexStyle,
   Keyboard
 } from 'react-native';
 import { Colors } from '../../styles/ColorStyles';
 import { globalStyles } from '../../styles/GlobalStyles';
-import { navigationStyles } from '../../styles/NavigationStyles';
 import { Spacing } from '../../styles/SpacingStyles';
 
 import Button, {
@@ -20,7 +17,7 @@ import Button, {
   ButtonSize,
   ButtonDisplay,
 } from '../../components/Button';
-import SearchFilter from './SearchFilter';
+import SmartList from './SmartList';
 
 import Animated, {
   useAnimatedStyle,
@@ -39,10 +36,8 @@ import ExclusiveButtonScroll from '../../components/ExclusiveButtonScroll';
 
 import Map from './Map';
 import SearchBar from './SearchBar';
-import {isToday, isTomorrow, isNextWeek, isNextWeekend, isThisWeek, isThisWeekend} from './chronologicalTools';
 
-import { EventCardMediumProps, EventCardMedium } from '../../components/EventCardMedium';
-import { point, Point, distance, Feature, Properties } from '@turf/turf';
+import { point } from '@turf/turf';
 import Geolocation from 'react-native-geolocation-service';
 import { etchingManifest, eventManifest } from '../event/eventPigeon';
 import { getAllEvents } from './discoverPigeon';
@@ -139,9 +134,9 @@ const DiscoveryScreen = () => {
   useEffect(() => {
     pollCurrentLocation();
 
-    getAllEvents(currentLocation.geometry.coordinates[0], currentLocation.geometry.coordinates[1], 1000000000000000)
+    getAllEvents(currentLocation.geometry.coordinates[1], currentLocation.geometry.coordinates[0], 100000000000)
     .then(value => { setEvents(value); })
-    .catch(() => "SESSION ERROR");
+    .catch(() => console.log("SESSION ERROR"));
   }, []);
 
   useEffect(() => {
@@ -256,7 +251,7 @@ const DiscoveryScreen = () => {
                 id: 1,
                 type: ButtonType.PrimaryDark,
                 size: ButtonSize.ExtraSmall,
-                display: ButtonDisplay.Full,
+                display: ButtonDisplay.Contained,
                 text: "Filter",
                 icon: "filter-fill",
                 onPress: () => { toggleActiveComponent(ActiveComponent.Filter); }
@@ -265,7 +260,7 @@ const DiscoveryScreen = () => {
                 id: 2,
                 type: ButtonType.PrimaryDark,
                 size: ButtonSize.ExtraSmall,
-                display: ButtonDisplay.Full,
+                display: ButtonDisplay.Contained,
                 text: "Sort",
                 icon: "sort-outline",
                 onPress: () => { toggleActiveComponent(ActiveComponent.Sort); }
@@ -496,10 +491,12 @@ const DiscoveryScreen = () => {
       {/* TODO probably have to enable it and disable filter or sort if there's text input in the textInput component */}
       {activeComponent === ActiveComponent.None && searchContentVisible ? (
         <View style={isTextInputFocused ? { paddingTop: 130 } : { paddingTop: 75 }}>
-          <SearchFilter
+          <SmartList
             list={events}
-            sortBy={generateSortBy()}
-            filterBy={generateFilterArray()}
+            searchText={searchText}
+            sortValue={sortValue}
+            filterDateValue={filterDateValue}
+            filterSizeValue={filterSizeValue}
           />
         </View>
       ) : null}

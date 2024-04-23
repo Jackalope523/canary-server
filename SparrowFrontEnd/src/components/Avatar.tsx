@@ -1,73 +1,47 @@
-import { View, Image, ImageStyle } from 'react-native';
+import { View, Image, ImageStyle, Pressable, StyleSheet } from 'react-native';
 import * as React from 'react';
-import { avatarStyles } from '../styles/AvatarStyles';
+import { Colors } from '../styles/ColorStyles';
 
 interface AvatarProps {
-  status?: AvatarStatus;
   size?: AvatarSize;
   image?: any;
+  onPress?: () => void;
 
-  avatarBorder?: ImageStyle[];
   avatarContainer?: ImageStyle[];
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
-  status = null,
   size = null,
-  avatarBorder = [],
   avatarContainer = [],
   image,
+  onPress,
 }) => {
-  // ! ||--------------------------------------------------------------------------------||
-  // ! ||                                     Status                                     ||
-  // ! ||--------------------------------------------------------------------------------||
-
-  switch (status) {
-    case AvatarStatus.Online:
-      avatarBorder = [avatarStyles.avatarOnline];
-      break;
-
-    case AvatarStatus.Offline:
-      avatarBorder = [avatarStyles.avatarOffline];
-      break;
-
-    case AvatarStatus.Anon:
-      avatarBorder = [avatarStyles.avatarAnon];
-      break;
-  }
-
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Size                                      ||
   // ! ||--------------------------------------------------------------------------------||
 
   switch (size) {
+    case AvatarSize.ExtraSmall:
+      avatarContainer = [styles.avatarSquareExtraSmall];
+      break;
+
     case AvatarSize.Small:
-      avatarContainer = [avatarStyles.avatarSquareSmall];
+      avatarContainer = [styles.avatarSquareSmall];
       break;
 
     case AvatarSize.Medium:
-      avatarContainer = [avatarStyles.avatarSquareMedium];
+      avatarContainer = [styles.avatarSquareMedium];
       break;
 
     case AvatarSize.Large:
-      avatarContainer = [avatarStyles.avatarSquareLarge];
+      avatarContainer = [styles.avatarSquareLarge];
       break;
   }
 
-  // TODO finish making this into a component by implementing the following logic:
-
-  /*
-  
-  If user is a friend and is online return an image styled with avtarStyles.avatarOnline
-  If user is a friend and is online return an image styles with avtarStyles.avatarOffline
-  Else return an image styled with avtarStyles.avatarAnon
-  
-  */
-
   return (
-    <View>
-      <Image source={image} style={[avatarContainer, avatarBorder]} />
-    </View>
+    <Pressable onPress={onPress}>
+      <Image source={image} style={avatarContainer} />
+    </Pressable>
   );
 };
 
@@ -75,16 +49,50 @@ export const Avatar: React.FC<AvatarProps> = ({
 // ! ||                                 Exported Enums                                 ||
 // ! ||--------------------------------------------------------------------------------||
 
-export enum AvatarStatus {
-  Online,
-  Offline,
-  Anon,
-}
-
 export enum AvatarSize {
+  ExtraSmall,
   Small,
   Medium,
   Large,
 }
 
 export default Avatar;
+
+const styles = StyleSheet.create({
+  // Square avatars
+  // Large
+  avatarSquareLarge: {
+    width: 72,
+    height: 72,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  // Medium
+  avatarSquareMedium: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  // Small
+  avatarSquareSmall: {
+    width: 32,
+    height: 32,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+
+  // Extra small
+  avatarSquareExtraSmall: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: Colors.sparrowDarkBrown,
+  },
+});

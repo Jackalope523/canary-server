@@ -49,6 +49,11 @@ export type StackParamList = {
 export type EventStackParamList = {
   Event: { EventID: string };
   CreateEvent: undefined;
+  LeaveEvent: undefined;
+  TerminateEvent: undefined;
+  HostEventControls: undefined;
+  ManageAttendees: undefined;
+  Share: undefined;
 };
 
 export type AccountStackParamList = {

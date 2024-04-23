@@ -12,13 +12,14 @@ import { globalStyles } from '../../styles/GlobalStyles';
 import { Colors } from '../../styles/ColorStyles';
 import { navigationStyles } from '../../styles/NavigationStyles';
 import { Spacing } from '../../styles/SpacingStyles';
-import { avatarStyles } from '../../styles/AvatarStyles';
 import { notificationStyles } from '../../styles/NotificationStyles';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NoNotifications from '../../components/activity/notifications/NoNotifications';
 
 import ArrowBack from '../../assets/icons/arrow-back-outline.svg';
+
+// TODO this whole screen needs to be re-written the right way - add components, etc.
 
 const NotificationsScreen = ({ navigation }) => {
   const eventInviteText = ' has invited you to an event.';

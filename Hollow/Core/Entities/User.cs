@@ -81,6 +81,7 @@ namespace Core.Entities
         public Synced<Event> CurrentEvent { get; }
         public Synced<List<Event>> PastEvents { get; }
         public Synced<List<Event>> UpcomingEvents { get; }
+        public Synced<List<Event>> WatchingEvents { get; }
 
         public Synced<List<User>> Friends { get; }
         public Synced<List<User>> Following { get; }
@@ -118,6 +119,7 @@ namespace Core.Entities
             CurrentEvent = new(() => Terminal.EventDirector.RequestCurrentEventForUserAsync(this));
             PastEvents = new(() => Terminal.EventDirector.RequestPastEventsForUserAsync(this));
             UpcomingEvents = new(() => Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this));
+            WatchingEvents = new(() => Terminal.EventDirector.RequestWatchingEventsForUserAsync(this));
 
             Friends = new(() => Terminal.ProfileDirector.RequestFriendsAsync(this));
             Following = new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));

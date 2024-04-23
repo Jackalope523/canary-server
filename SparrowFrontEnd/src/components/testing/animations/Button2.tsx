@@ -1,3 +1,4 @@
+// #region imports
 import * as React from 'react';
 import {
   StyleSheet,
@@ -24,6 +25,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+// #endregion
 
 /*
 
@@ -46,10 +48,6 @@ export interface ButtonProps {
   display?: ButtonDisplay;
 
   disabled?: boolean;
-
-  self?: number;
-  status?: number;
-  changeState?: (myNumber: number) => void;
 
   // Rest styles
   btnStyle?: ViewStyle[];
@@ -82,7 +80,8 @@ export interface ButtonProps {
 }
 
 export const Button2: React.FC<ButtonProps> = ({
-  onPress = null,
+  // #region Props
+  onPress = () => {},
   text = 'NULL',
   btnStyle = [],
   btnTextStyle = [],
@@ -93,9 +92,6 @@ export const Button2: React.FC<ButtonProps> = ({
   btnDisabledStyle = [],
   btnDisabledTextStyle = [],
   btnDisabledIconStyle = [],
-  self = null,
-  status = null,
-  changeState = null,
   disabled = false,
   type = null,
   size = null,
@@ -103,7 +99,7 @@ export const Button2: React.FC<ButtonProps> = ({
   icon = false,
   id = -1,
   current = -1,
-  setCurrent = null,
+  setCurrent = (x:number) => {},
 
   //----------------[ NEW ]----------------
   containerStyle = [],
@@ -112,12 +108,13 @@ export const Button2: React.FC<ButtonProps> = ({
 
   btnShadowStyle = [],
   btnShadowActiveStyle = [],
-  btnShadowDisabledStyle = [],
+  btnShadowDisabledStyle = []
+  // #endregion
 }) => {
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Type                                      ||
   // ! ||--------------------------------------------------------------------------------||
-
+  // #region Type
   switch (type) {
     case ButtonType.PrimaryDark:
       // Rest
@@ -261,11 +258,12 @@ export const Button2: React.FC<ButtonProps> = ({
       btnDisabledIconStyle = [buttonStyles.buttonErrorDisabledText];
       break;
   }
+  // #endregion
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                      Size                                      ||
   // ! ||--------------------------------------------------------------------------------||
-
+  // #region Size
   switch (size) {
     case ButtonSize.ExtraSmall:
       // Rest
@@ -390,11 +388,12 @@ export const Button2: React.FC<ButtonProps> = ({
       ];
       break;
   }
+  // #endregion
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                     Display                                    ||
   // ! ||--------------------------------------------------------------------------------||
-
+  // #region Display
   switch (display) {
     case ButtonDisplay.Contained:
       //----------------[ NEW ]----------------
@@ -411,6 +410,7 @@ export const Button2: React.FC<ButtonProps> = ({
       containerDisabledStyle = [buttonStyles.buttonFull];
       break;
   }
+  // #endregion
 
   // ! ||--------------------------------------------------------------------------------||
   // ! ||                                   Button                                       ||
@@ -435,33 +435,20 @@ export const Button2: React.FC<ButtonProps> = ({
 
   TODO button needs to:
 
-  1. Animate down when pressed
-  2. Animate up when released
+  1. Animate down when pressed (DONE)
+  2. Animate up when released (DONE)
+  3. Not be able to press again until it has fully animated up
 
   */
 
   const handlePressIn = () => {
-    console.log('Pressed');
-
-    runOnJS(() => {
-      sv.value = withTiming(sv.value - 6, { duration: animationDuration });
-      console.log('Press-in triggered');
-    })();
-
-    if (self != null && status != null && changeState != null) {
-      if (status == self) changeState(-1);
-      else changeState(self);
-    } else {
-      if (onPress != null) {
-        onPress();
-      }
-      if (setCurrent != null && current == id) {
-        setCurrent(-1);
-      }
-      if (setCurrent != null && current != id) {
-        setCurrent(id);
-      }
-    }
+    sv.value = withTiming(sv.value - 6 >= 0 ? sv.value - 6 : 0, { duration: animationDuration });
+    setTimeout(() => {
+      sv.value = withTiming(6, { duration: animationDuration });
+    }, 200);
+    
+    setCurrent(current === id ? -1 : id);
+    onPress();
   };
 
   return (
@@ -543,7 +530,7 @@ export const Button2: React.FC<ButtonProps> = ({
 // ! ||--------------------------------------------------------------------------------||
 // ! ||                                 Exported Enums                                 ||
 // ! ||--------------------------------------------------------------------------------||
-
+// #region Exported Enums
 export enum ButtonType {
   PrimaryDark,
   SecondaryDark,
@@ -566,6 +553,7 @@ export enum ButtonDisplay {
   Contained,
   Full,
 }
+// #endregion
 
 const styles = StyleSheet.create({
   btnBase: {

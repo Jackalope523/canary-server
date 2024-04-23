@@ -36,6 +36,15 @@ export function extractUserSilhouetteManifest(data: any) {
     return silhouette;
 }
 
+export enum eventBond { watching, guest, arrived, left, kicked };
+
+export function extractEventPair(data: any) {
+    let eventShard = extractEventShard(data[0]);
+    let bond: eventBond = data[1];
+
+    return [eventShard, bond];
+}
+
 ///////
 // Profile Flow
 //////////////////
