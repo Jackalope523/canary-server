@@ -20,14 +20,15 @@ namespace Frontier.Controllers
             UserManager<UserShard> identityUserManager, SignInManager<UserShard> identitySignInManager,
 			IAccountOperations accountOperations, IProfileOperations profileOperations,
 			IEventOperations eventOperations, IEtchingOperations etchingOperations,
-			IDisciplineOperations disciplineOperations, IMediaOperations mediaOperations, INotificationOperations notificationOperations,
+			IDisciplineOperations disciplineOperations, IKeyOperations keyOperations,
+            IMediaOperations mediaOperations, INotificationOperations notificationOperations,
 			ISMSService externalSMSService, IEmailService externalEmailService) :
 			base(logger,
                 identityUserManager, identitySignInManager,
 				accountOperations, profileOperations,
 				eventOperations, etchingOperations,
-				disciplineOperations, mediaOperations,
-				notificationOperations,
+				disciplineOperations, keyOperations,
+                mediaOperations, notificationOperations,
 				externalSMSService, externalEmailService)
 		{ }
 

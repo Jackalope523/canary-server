@@ -222,6 +222,28 @@ namespace Shared
         {
         }
     }
+
+    [Serializable]
+    public class VaultIOException : HollowFailureException
+    {
+        private static readonly string defaultMessage = "An unexpected error occured while communicating with the key vault.";
+        public VaultIOException()
+        {
+        }
+
+        public VaultIOException(string message)
+            : base(message)
+        {
+        }
+        public VaultIOException(Exception inner)
+            : base(defaultMessage, inner)
+        {
+        }
+        public VaultIOException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
     #endregion
 
 

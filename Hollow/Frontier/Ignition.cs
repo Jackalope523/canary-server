@@ -1,27 +1,18 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Boundaries;
 using Microsoft.AspNetCore.Identity;
-using Frontier.Controllers;
 using Frontier.Stores;
 using Frontier.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 using Repository;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Core;
-using Serilog.Debugging;
 
 namespace Frontier
 {
@@ -30,12 +21,13 @@ namespace Frontier
         public static void Main(string[] args)
 		{ 
 			Log.Logger = new LoggerConfiguration()
-				.WriteTo.Console()
+				.WriteTo.AzureApp()
+				.MinimumLevel.Debug()
 				.CreateLogger();
 
-			Log.Debug("Hollow starting up...");
+			Log.Information("Hollow starting up...");
 
-			try
+            try
 			{
 				CreateHostBuilder(args)
 					.UseSerilog()
@@ -70,25 +62,25 @@ namespace Frontier
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllers();
-			services.AddSwaggerGen(c =>
+
+            services.AddSwaggerGen(c =>
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
 			});
 
-
-			var loggerFactory = new LoggerFactory()
+            var loggerFactory = new LoggerFactory()
 				.AddSerilog(Log.Logger);
 
-			var frontierLogger = loggerFactory.CreateLogger("Frontier");
+            var frontierLogger = loggerFactory.CreateLogger("Frontier");
 			var coreLogger = loggerFactory.CreateLogger("Core");
 			var repositoryLogger = loggerFactory.CreateLogger("Repository");
 
 
-			/////
-			// Services 
-			/////////////
+            /////
+            // Services 
+            /////////////
 
-			Services.CorePush pushNotifications = new();
+            Services.CorePush pushNotifications = new();
 			Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
 				"", "");
 
@@ -110,6 +102,7 @@ namespace Frontier
 				harbor.EventDatabaseAccess, 
 				harbor.EtchingDatabaseAccess,
 				harbor.ReportDatabaseAccess,
+				harbor.KeyDatabaseAccess,
 				harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
 				harbor.ProfileDatabaseAccess, 

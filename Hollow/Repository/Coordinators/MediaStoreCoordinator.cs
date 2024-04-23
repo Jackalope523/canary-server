@@ -8,7 +8,7 @@ namespace Repository
 
         public MediaStoreCoordinator()
         {
-            store = new AzureImageStore();
+            store = new AzureFileStore();
         }
         
         public async Task<MemoryStream> DownloadImageAsync(ulong etchingId, ulong ownerId)

@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using System.Drawing;
 using System.IO;
 
 namespace Core.Boundaries

@@ -7,7 +7,7 @@ namespace Repository.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static readonly AzureStorageSentry sentry = new();
+        private static readonly AzureFileStore sentry = new();
 
         public BlobTests(ITestOutputHelper testOutputHelper) 
         {
