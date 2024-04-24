@@ -1,5 +1,5 @@
-# project-sparrow
-Project coming from Sparrow
+# project-hollow
+Hell yeah.
 
 ## Conventions
 
