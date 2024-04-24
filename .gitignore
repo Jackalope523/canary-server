@@ -349,5 +349,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-#Apple's gift from God
+# Apple's gift from God
 .DS_Store
