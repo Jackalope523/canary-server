@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
-using Shared;
+
 using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers

@@ -71,7 +71,7 @@ namespace Repository.Tests
         public async Task ReportUserAsync_SUCCESS()
         {
             string notes = "Test";
-            Shared.UserReportType type = Shared.UserReportType.Rude;
+            UserReportType type = UserReportType.Rude;
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
             await store.ReportUserAsync(subject1.Id, testEvent.Id, subject2.Id, time, type, notes);
@@ -90,7 +90,7 @@ namespace Repository.Tests
         public async Task ReportEventAsync_SUCCESS()
         {
             string notes = "Test";
-            Shared.EventReportType type = Shared.EventReportType.Inappropriate;
+            EventReportType type = EventReportType.Inappropriate;
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
             await store.ReportEventAsync(subject1.Id, testEvent.Id, time, type, notes);
@@ -163,7 +163,7 @@ namespace Repository.Tests
             Entities.Penalty penalty = new PenaltyFactory().Create(subject1);
             sentry.ExecuteWrite(ctx => ctx.Penalties.Add(penalty));
 
-            Penalty found = (await store.GetPenaltiesForUserAsync(subject1.Id)).Single();
+            PenaltyShard found = (await store.GetPenaltiesForUserAsync(subject1.Id)).Single();
 
             Assert.NotNull(found);
             Assert.Equal(DateTimeOffset.MinValue, found.TimeOfPenalty);

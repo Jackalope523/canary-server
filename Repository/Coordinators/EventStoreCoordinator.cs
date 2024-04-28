@@ -1,5 +1,5 @@
 ﻿using Core.Boundaries;
-using Shared;
+
 
 namespace Repository
 {
@@ -30,6 +30,11 @@ namespace Repository
         public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong id) 
         {
             return await store.FindUpcomingEventsForUserAsync(id);
+        }
+
+        public async Task<List<EventShard>> FindWatchingEventsForUserAsync(ulong id) 
+        {
+            return await store.FindWatchingEventsForUserAsync(id);
         }
 
         public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id)

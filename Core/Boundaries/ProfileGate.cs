@@ -1,13 +1,15 @@
 ﻿using System;
-using Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
-	#region Schemas
+    #region Schemas
 
-	public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
+    public enum UserRating
+    { Positive, Negative, Remove }
+
+    public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
     public record UserSilhouette(ulong Id, string Name);
 
 	#endregion

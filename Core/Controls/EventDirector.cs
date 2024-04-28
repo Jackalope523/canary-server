@@ -1,6 +1,5 @@
 ﻿using Core.Boundaries;
 using Core.Entities;
-using Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;

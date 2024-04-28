@@ -1,7 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
-using Shared;
+
 using Xunit.Abstractions;
 
 namespace Repository.Tests
@@ -42,7 +42,7 @@ namespace Repository.Tests
             Entities.Note note = new NoteFactory().Create(subject1, subject2);
             sentry.ExecuteWrite(ctx => ctx.Notes.Add(note));
 
-            Core.Boundaries.Note found = (await store.GetNotesAsync(subject2.Id)).Single();
+            Core.Boundaries.NoteShard found = (await store.GetNotesAsync(subject2.Id)).Single();
 
             Assert.NotNull(found);
             Assert.Equal(subject1.Id, found.NotifierId);

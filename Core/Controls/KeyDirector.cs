@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Core.Boundaries;
-using Shared;
 
 using static Core.Entities.Arbiter;
 

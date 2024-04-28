@@ -7,7 +7,7 @@ using Core.Boundaries;
 using Core.Entities;
 using Xunit;
 using Xunit.Abstractions;
-using Shared;
+
 using NetTopologySuite.Utilities;
 using System.ComponentModel;
 using System.Collections.Concurrent;

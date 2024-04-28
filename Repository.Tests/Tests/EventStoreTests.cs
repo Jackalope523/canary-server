@@ -2,7 +2,7 @@
 using Core.Boundaries;
 using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
-using Shared;
+
 using Microsoft.Extensions.Logging;
 
 namespace Repository.Tests

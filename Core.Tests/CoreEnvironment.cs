@@ -8,7 +8,7 @@ using Core.Boundaries;
 using Core.Entities;
 using Xunit;
 using Xunit.Abstractions;
-using Shared;
+
 using NetTopologySuite.Utilities;
 using System.ComponentModel;
 using System.Collections.Concurrent;
@@ -63,6 +63,7 @@ namespace Core.Tests
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
+				harbor.BannerDatabaseAccess,
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -311,7 +312,7 @@ namespace Core.Tests
 			await Terminal.NotificationDatabase.SaveNoteAsync(user.Id, notifier.Id, new DateTime(0), message, action);
 		}
 
-		internal async Task<List<Note>> GetNotesAsync(User user)
+		internal async Task<List<NoteShard>> GetNotesAsync(User user)
 		{
 			return await Terminal.NotificationDatabase.GetNotesAsync(user.Id);
 		}

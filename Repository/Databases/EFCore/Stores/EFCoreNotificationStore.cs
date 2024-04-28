@@ -1,7 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
-using Shared;
+
 
 namespace Repository
 {
@@ -11,12 +11,12 @@ namespace Repository
         {
         }
 
-        public async Task<List<Core.Boundaries.Note>> GetNotesAsync(ulong userId)
+        public async Task<List<NoteShard>> GetNotesAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Notes.
             Where(n => n.RecipientId == userId).
-            Select(n => new Core.Boundaries.Note(n.NotifierId, n.Time, n.Message, n.Action)).
+            Select(n => new NoteShard(n.NotifierId, n.Time, n.Message, n.Action)).
             ToListAsync());
         }
         public async Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId)

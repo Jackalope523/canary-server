@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-using Shared;
 
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
@@ -85,7 +84,7 @@ namespace Core.Controls
 
 		#region Favours
 
-        internal async Task<List<Penalty>> RequestPenaltiesForUserAsync(User user)
+        internal async Task<List<PenaltyShard>> RequestPenaltiesForUserAsync(User user)
             => await Reports.GetPenaltiesForUserAsync(user.Id);
 
         internal async Task PenaliseUserAsync(User user, PenaltyType offense, DateTimeOffset timeOfPenalty)

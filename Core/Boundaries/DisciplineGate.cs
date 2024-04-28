@@ -1,5 +1,4 @@
 ﻿using System;
-using Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,7 +9,16 @@ namespace Core.Boundaries
     public enum PenaltyType
     { Unreliable }
 
-    public record Penalty(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
+    public enum EventReportType
+    { Inappropriate, Spam, Misleading, Promotion }
+
+    public enum UserReportType
+    {
+        Rude, HateSpeech, Harassment,
+        Violent, Assault
+    }
+
+    public record PenaltyShard(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
 
 	public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);
@@ -24,7 +32,7 @@ namespace Core.Boundaries
 
 	public interface IDisciplineDatabase
     {
-        Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId);
+        Task<List<PenaltyShard>> GetPenaltiesForUserAsync(ulong userId);
         Task PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
 
         Task<(List<UserReport>, List<EventReport>)> GetReportsForUserAsync(ulong userId);

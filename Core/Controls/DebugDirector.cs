@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-using Shared;
 
 namespace Core.Controls
 {

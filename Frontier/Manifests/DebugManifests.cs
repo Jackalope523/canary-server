@@ -1,5 +1,5 @@
 ﻿using System;
-using Shared;
+
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using Core.Boundaries;

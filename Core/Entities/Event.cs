@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Shared;
 using Core.Boundaries;
 
 using static Core.Entities.Arbiter;

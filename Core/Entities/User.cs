@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Controls;
 using Microsoft.Extensions.Hosting;
-using Shared;
 
 using static Core.Entities.Psijic;
 using static Core.Entities.Arbiter;
@@ -89,8 +88,8 @@ namespace Core.Entities
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
-        public Synced<List<Note>> Notes { get; }
-        public Synced<List<Penalty>> Penalties { get; }
+        public Synced<List<NoteShard>> Notes { get; }
+        public Synced<List<PenaltyShard>> Penalties { get; }
 
         private Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync { get; }
         public Synced<List<UserReport>> Reports { get; }

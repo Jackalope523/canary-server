@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Core.Entities;
-using Shared;
+
 using Xunit;
 
 namespace Core.Tests.Entities

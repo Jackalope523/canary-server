@@ -3,7 +3,6 @@ using Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shared;
 
 using static Core.Entities.Arbiter;
 using static Core.Entities.Artificer;

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
 using Microsoft.Extensions.Logging;
-using Shared;
+
 using System.Collections.Generic;
 
 namespace Frontier.Controllers

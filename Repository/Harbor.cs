@@ -19,6 +19,7 @@ namespace Repository
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
         public IMediaDatabase MediaDatabaseAccess { get; private set; }
         public IKeyDatabase KeyDatabaseAccess { get; private set; }
+        public IBannerDatabase BannerDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {

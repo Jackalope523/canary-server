@@ -4,14 +4,14 @@ using Frontier.Manifests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
-using Shared;
+
 using Xunit;
 
 namespace Frontier.Tests
 {
 	public class AbstractGuardTests
 	{
-		AbstractGuard testGuard = new(new LoggerFactory().CreateLogger(""), null, null, null, null, null, null, null, null, null, null, null);
+		AbstractGuard testGuard = new(null, null);
 
 		[Fact]
 		public async Task Execute_NoData_Success()

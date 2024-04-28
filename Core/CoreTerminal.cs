@@ -84,7 +84,7 @@ namespace Core
             }
         }
 
-        private CoreTerminal(ILogger logger,
+        protected CoreTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
 			IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
 			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,

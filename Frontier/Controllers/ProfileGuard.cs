@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
-using Shared;
+
 using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
@@ -73,7 +73,7 @@ namespace Frontier.Controllers
 				// Retrieve activity
 				var manifest = ManifestSeries<EventManifest>.Create(
 					await profiles.GetUserActivityAsync(user.Id, targetIdentification),
-					@event => new EventManifest(@event));
+					bond => new EventManifest(bond.Item1));
 
 				return manifest;
 			});
@@ -95,7 +95,7 @@ namespace Frontier.Controllers
 				foreach (var pair in shard)
 				{
 					activity.Activity.Add(new UserSilhouetteManifest(pair.Key),
-						pair.Value.ConvertAll(@event => new EventManifest(@event)));
+						pair.Value.ConvertAll(bond => new EventManifest(bond.Item1)));
 				}
 
 				return activity;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shared;
 
 namespace Core.Boundaries
 {
@@ -10,7 +9,10 @@ namespace Core.Boundaries
 	public enum EventState
 	{ Upcoming, Open, Sealed, Ended }
 
-	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
+    public enum EventBond
+    { Watching, Guest, Arrived, Left, Kicked }
+
+    public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests);

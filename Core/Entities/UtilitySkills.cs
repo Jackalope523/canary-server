@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
-using Shared;
 
 namespace Core.Entities
 {

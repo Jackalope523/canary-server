@@ -113,7 +113,7 @@ namespace Repository.Tests
             Post testEtching = new EtchingFactory().Create(subject, testEvent);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
 
-            await etchingStore.RateEtchingAsync(testEtching.Id, subject.Id, Shared.UserRating.Positive);
+            await etchingStore.RateEtchingAsync(testEtching.Id, subject.Id, UserRating.Positive);
 
             PostLink created = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.FirstAsync());
 

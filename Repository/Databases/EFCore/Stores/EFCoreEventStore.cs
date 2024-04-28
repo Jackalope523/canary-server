@@ -1,7 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Shared;
+
 
 namespace Repository
 {
@@ -216,6 +216,10 @@ namespace Repository
             }
 
             return upcomingEvents;
+        }
+        public async Task<List<EventShard>> FindWatchingEventsForUserAsync(ulong id) 
+        {
+            throw new NotImplementedException("help");
         }
         public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id)
         {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.Entities;
 using Xunit;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Shared;
+
 using System.IO;
 using System.Collections.Concurrent;
 

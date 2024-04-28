@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.Entities;
 using Xunit;
 using System.IO;
-using Shared;
+
 
 namespace Core.Tests.Entities
 {

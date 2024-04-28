@@ -1,7 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Mathematics;
-using Shared;
+
 using System;
 
 namespace Repository
