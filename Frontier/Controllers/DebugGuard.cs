@@ -74,8 +74,11 @@ namespace Frontier.Controllers
 						@event.GroupMinimum, @event.GroupMaximum));
 				}
 
-				foreach ((var self, var @event) in seed.Attendance)
+				for (int i = 0; i < seed.Attendance.Count; i++)
 				{
+					var tuple = seed.Attendance[i];
+					var self = tuple[0]; var @event = tuple[1];
+
 					// Move user to event location
 					await accounts.UpdateUserLocationAsync(seedUsers[self - 1].Id, seedEvents[@event - 1].Latitude, seedEvents[@event - 1].Longitude);
 
@@ -83,14 +86,20 @@ namespace Frontier.Controllers
 					await events.JoinEventAsync(seedUsers[self - 1].Id, seedEvents[@event - 1].Id);
 				}
 
-				foreach ((var self, var other) in seed.Follows)
+				for (int i = 0; i < seed.Attendance.Count; i++)
 				{
+					var tuple = seed.Attendance[i];
+					var self = tuple[0]; var other = tuple[1];
+
 					await profiles.FollowUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
 				}
 
-				foreach ((var self, var other) in seed.Blocks)
-				{
-					await profiles.BlockUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
+                for (int i = 0; i < seed.Attendance.Count; i++)
+                {
+                    var tuple = seed.Attendance[i];
+                    var self = tuple[0]; var other = tuple[1];
+
+                    await profiles.BlockUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
 				}
 			});
 		}

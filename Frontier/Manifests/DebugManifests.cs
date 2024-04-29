@@ -16,9 +16,9 @@ namespace Frontier.Manifests
 
         public List<EventDetailsManifest> Events { get; set; }
 
-        public List<(int, int)> Attendance { get; set; }
-        public List<(int, int)> Follows { get; set; }
-        public List<(int, int)> Blocks { get; set; }
+        public List<List<int>> Attendance { get; set; }
+        public List<List<int>> Follows { get; set; }
+        public List<List<int>> Blocks { get; set; }
     }
 }
 
