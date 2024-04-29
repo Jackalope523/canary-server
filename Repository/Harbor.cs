@@ -33,7 +33,7 @@ namespace Repository
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             MediaDatabaseAccess = new MediaStoreCoordinator();
             KeyDatabaseAccess = new KeyStoreCoordinator();
-            DebugDatabaseAccess = null;
+            DebugDatabaseAccess = new DebugStoreCoordinator(flag);
         }
 
         public Harbor(Flag flag, ILogger logger)
