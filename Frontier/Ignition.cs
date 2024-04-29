@@ -132,7 +132,7 @@ namespace Frontier
                 terminal.NotificationOperations);
 
             services.AddSingleton(box);
-            services.AddSingleton(terminal.DebugDatabase);
+            services.AddSingleton(terminal.DebugOperations);
 
             /////////
             // Authentication Schema 
