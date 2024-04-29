@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Frontier.Controllers
 {
@@ -26,6 +27,7 @@ namespace Frontier.Controllers
 
 		#region Actions
 
+		[AllowAnonymous]
 		[HttpPost("seed")]
 		public async Task<IActionResult> Seed([FromBody] SeedManifest seed)
 		{
