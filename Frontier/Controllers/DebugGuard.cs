@@ -88,7 +88,7 @@ namespace Frontier.Controllers
 
 				for (int i = 0; i < seed.Follows.Count; i++)
 				{
-					var tuple = seed.Attendance[i];
+					var tuple = seed.Follows[i];
 					var self = tuple[0]; var other = tuple[1];
 
 					await profiles.FollowUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
@@ -96,7 +96,7 @@ namespace Frontier.Controllers
 
                 for (int i = 0; i < seed.Blocks.Count; i++)
                 {
-                    var tuple = seed.Attendance[i];
+                    var tuple = seed.Blocks[i];
                     var self = tuple[0]; var other = tuple[1];
 
                     await profiles.BlockUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
