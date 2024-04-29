@@ -68,7 +68,7 @@ namespace Frontier.Controllers
                     await accounts.UpdateUserLocationAsync(host.Id, @event.Latitude, @event.Longitude);
 
 					seedEvents.Add(await events.CreateEventAsync(host.Id,
-						@event.EventName, @event.EventDescription,
+						@event.Name, @event.Description,
 						@event.StartTime, @event.Latitude, @event.Longitude,
 						@event.Radius, @event.IsDynamic,
 						@event.GroupMinimum, @event.GroupMaximum));

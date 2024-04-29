@@ -44,7 +44,7 @@ namespace Frontier.Controllers
 			{
 				// Create a new event
 				EventManifest newEvent = new(await events.CreateEventAsync(user.Id,
-					eventDetails.EventName, eventDetails.EventDescription,
+					eventDetails.Name, eventDetails.Description,
 					eventDetails.StartTime, eventDetails.Latitude, eventDetails.Longitude,
 					eventDetails.Radius, eventDetails.IsDynamic,
 					eventDetails.GroupMinimum, eventDetails.GroupMaximum));
@@ -63,7 +63,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await events.EditEventAsync(user.Id, eventId,
-					eventDescription: eventDetails.EventDescription ?? "",
+					eventDescription: eventDetails.Description ?? "",
 					isOpen: eventDetails.IsOpen,
 					startTime: eventDetails.StartTime,
 					latitude: eventDetails.Latitude, longitude: eventDetails.Longitude,
