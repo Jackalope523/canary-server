@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using Core.Controls;
+using Core.Boundaries;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Boundaries
+namespace Core
 {
     public class DebugTerminal : CoreTerminal
 	{
@@ -33,7 +34,7 @@ namespace Core.Boundaries
 
 		#region Initialisation
 
-		public static CoreTerminal CreateDebugTerminal(ILogger logger,
+		public static DebugTerminal CreateDebugTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
             IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
@@ -55,7 +56,7 @@ namespace Core.Boundaries
 						debugDatabase);
 				}
 
-				return Terminal;
+				return (DebugTerminal) Terminal;
 			}
 		}
 
