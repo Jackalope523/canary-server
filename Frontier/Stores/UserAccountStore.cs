@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Core.Boundaries;
+using Frontier.Controllers;
 
 namespace Frontier.Stores
 {
@@ -17,9 +18,9 @@ namespace Frontier.Stores
 	{
 		private IAccountOperations accounts { get; init; }
 
-		public UserAccountStore(IAccountOperations accountOperations)
+		public UserAccountStore(GuardBox box)
 		{
-			accounts = accountOperations;
+			accounts = box.accounts;
 		}
 
 		public async Task<IdentityResult> CreateAsync(UserShard user, CancellationToken cancellationToken)
