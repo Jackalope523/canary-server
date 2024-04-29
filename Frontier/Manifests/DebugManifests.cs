@@ -12,7 +12,7 @@ namespace Frontier.Manifests
 
     public class SeedManifest
     {
-        public List<UserShard> Users { get; set; }
+        public List<AccountSignUpManifest> Users { get; set; }
 
         public List<EventDetailsManifest> Events { get; set; }
 

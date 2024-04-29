@@ -42,25 +42,30 @@ namespace Frontier.Controllers
 			
 				foreach (var user in seed.Users)
 				{
+					await debug.AddUserToBannerAsync(user.PhoneNumber, "debug");
 					await accounts.CreateUserAsync(user.PhoneNumber, user.Email, user.Name, user.DateOfBirth);
 
-					seedUsers.Add(await accounts.GetUserAsync(user.PhoneNumber));
+					var userShard = await accounts.GetUserAsync(user.PhoneNumber);
+
+                    seedUsers.Add(userShard);
 
 					// Confirm user phone
-					var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-					await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider, code);
+					var code = await userManager.GenerateChangePhoneNumberTokenAsync(userShard, user.PhoneNumber);
+					await userManager.VerifyTwoFactorTokenAsync(userShard, TokenOptions.DefaultPhoneProvider, code);
 
 					// Confirm user email
-					var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-					await userManager.ConfirmEmailAsync(user, token);
+					var token = await userManager.GenerateEmailConfirmationTokenAsync(userShard);
+					await userManager.ConfirmEmailAsync(userShard, token);
 				}
 
 				foreach (var @event in seed.Events)
 				{
-					// Move host to proposed event location
-					await accounts.UpdateUserLocationAsync(@event.Host.Id, @event.Latitude, @event.Longitude);
+					var host = await accounts.GetUserAsync(seedUsers[(int) @event.Host.Id - 1].PhoneNumber);
 
-					seedEvents.Add(await events.CreateEventAsync(@event.Host.Id,
+                    // Move host to proposed event location
+                    await accounts.UpdateUserLocationAsync(host.Id, @event.Latitude, @event.Longitude);
+
+					seedEvents.Add(await events.CreateEventAsync(host.Id,
 						@event.EventName, @event.EventDescription,
 						@event.StartTime, @event.Latitude, @event.Longitude,
 						@event.Radius, @event.IsDynamic,

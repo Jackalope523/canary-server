@@ -17,11 +17,19 @@ namespace Core.Boundaries
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests);
 
-	#endregion
+	public record OutgoingEvent(ulong Id, UserSilhouette Host, string Name, string Description,
+        DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
+        EventState State, int GroupMinimum, int GroupMaximum,
+        double Radius, int NumberOfGuests);
 
-	#region Gates
+	public record OutgoingGuestList(int Watchers, int GuestCount,
+		List<(UserSilhouette, EventBond)> Guests);
 
-	public interface IEventDatabase
+    #endregion
+
+    #region Gates
+
+    public interface IEventDatabase
 	{
         Task<EventShard> FindEventAsync(ulong eventId);
 		Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance);

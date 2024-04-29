@@ -14,7 +14,10 @@ namespace Core.Boundaries
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
 
-	public record Character(int Extraversion, int Athleticism, int Chaoticness,
+    public record OutgoingUser(ulong Id, string PhoneNumber, string Email, string Name,
+        DateTimeOffset DateOfBirth, int Reputation, int NumberOfFollowers);
+
+    public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
 
     public record RecentLocation(double Latitude, double Longitude, double Radius);

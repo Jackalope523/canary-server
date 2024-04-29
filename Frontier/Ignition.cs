@@ -109,7 +109,7 @@ namespace Frontier
                 coreLogger,
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
-                harbor.BannerDatabaseAccess,
+                new DebugBannerBypass(),
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
                 harbor.ReportDatabaseAccess,

@@ -83,16 +83,6 @@ namespace Frontier.Controllers
 			{
 				var result = await action.Invoke();
 
-				// Check if there is a result
-				if (result != null)
-				{
-					// Ensure outgoing type is generic or manifest
-					if (result is not Manifest &&
-						result is not string &&
-						result is not int)
-					{ throw new UnexpectedFailureException($"Server tried sending non-manifest object type {result.GetType()}."); }
-				}
-
                 return Ok(result);
 			}
 			catch (HollowFailureException ex)

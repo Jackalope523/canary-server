@@ -13,6 +13,7 @@ namespace Core.Boundaries
 
 	public interface IDebugOperations
 	{
+        Task AddUserToBannerAsync(string phoneNumber, string banner);
         Task SeedDatabaseAsync();
     }
 

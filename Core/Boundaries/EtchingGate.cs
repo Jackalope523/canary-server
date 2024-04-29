@@ -10,17 +10,24 @@ namespace Core.Boundaries
 	public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
         double Latitude, double Longitude);
 
+    public record OutgoingEventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
+        double Latitude, double Longitude);
+
     public record Etching(ulong Id, ulong EventId, UserSilhouette User,
         DateTimeOffset TimeEtched,
         (int Positive, int Negative) Ratings, bool IsHidden);
 
+    public record OutgoingEtching(ulong Id, ulong EventId, UserSilhouette User,
+        DateTimeOffset TimeEtched,
+        (int Positive, int Negative) Ratings);
+
     public record Feed(List<EventHeader> Headers, List<Etching> Etchings);
 
-	#endregion
+    #endregion
 
-	#region Gates
+    #region Gates
 
-	public interface IEtchingDatabase
+    public interface IEtchingDatabase
     {
         Task<List<Etching>> GetEtchingsForEventAsync(ulong eventId);
         Task<List<Etching>> GetEtchingsByUserAsync(ulong userId);
