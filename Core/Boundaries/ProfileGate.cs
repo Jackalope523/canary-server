@@ -11,6 +11,8 @@ namespace Core.Boundaries
 
     public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
     public record UserSilhouette(ulong Id, string Name);
+    public record NestShard(List<EventShard> Events, List<Etching> Etchings);
+    public record ActivityShard(IDictionary<UserSilhouette, List<EventShard>> Activity);
 
 	#endregion
 
