@@ -17,10 +17,10 @@ namespace Frontier.Manifests
 	public class EventDetailsManifest
     {
         [Required]
-        public string EventName { get; set; }
+        public string Name { get; set; }
 
         [Required]
-        public string EventDescription { get; set; }
+        public string Description { get; set; }
         
         public bool? IsOpen { get; set; }
 
