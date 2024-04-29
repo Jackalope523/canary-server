@@ -20,6 +20,7 @@ namespace Repository
         public IMediaDatabase MediaDatabaseAccess { get; private set; }
         public IKeyDatabase KeyDatabaseAccess { get; private set; }
         public IBannerDatabase BannerDatabaseAccess { get; private set; }
+        public IDebugDatabase DebugDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -32,6 +33,7 @@ namespace Repository
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             MediaDatabaseAccess = new MediaStoreCoordinator();
             KeyDatabaseAccess = new KeyStoreCoordinator();
+            DebugDatabaseAccess = null;
         }
 
         public Harbor(Flag flag, ILogger logger)
@@ -47,6 +49,7 @@ namespace Repository
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             MediaDatabaseAccess = new MediaStoreCoordinator();
             KeyDatabaseAccess = new KeyStoreCoordinator();
+            DebugDatabaseAccess = null;
         }
     }
 }
