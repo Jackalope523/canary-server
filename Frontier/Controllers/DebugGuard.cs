@@ -86,7 +86,7 @@ namespace Frontier.Controllers
 					await events.JoinEventAsync(seedUsers[self - 1].Id, seedEvents[@event - 1].Id);
 				}
 
-				for (int i = 0; i < seed.Attendance.Count; i++)
+				for (int i = 0; i < seed.Follows.Count; i++)
 				{
 					var tuple = seed.Attendance[i];
 					var self = tuple[0]; var other = tuple[1];
@@ -94,7 +94,7 @@ namespace Frontier.Controllers
 					await profiles.FollowUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
 				}
 
-                for (int i = 0; i < seed.Attendance.Count; i++)
+                for (int i = 0; i < seed.Blocks.Count; i++)
                 {
                     var tuple = seed.Attendance[i];
                     var self = tuple[0]; var other = tuple[1];
