@@ -14,8 +14,13 @@ namespace Core.Entities
     {
         #region Olive Branches
 
+        public static GeoLocation None
+            => new() { Latitude = 0, Longitude = 0, Exists = false };
+
         public static Distance DistanceBetween(GeoLocation locationAlpha, GeoLocation locationBeta)
         {
+            locationAlpha.ThrowIfNone();
+            locationBeta.ThrowIfNone();
 
             double sdlat = Math.Sin((locationBeta.LatitudeInRadians - locationAlpha.LatitudeInRadians) / 2);
             double sdlon = Math.Sin((locationBeta.LongitudeInRadians - locationAlpha.LongitudeInRadians) / 2);
@@ -29,6 +34,8 @@ namespace Core.Entities
 
         public static bool AreInRange(GeoLocation locationAlpha, GeoLocation locationBeta, Distance range)
         {
+            range.ThrowIfNone();
+
             Distance distance = DistanceBetween(locationAlpha, locationBeta);
 
             return distance.Kilometres <= range.Kilometres;
@@ -46,13 +53,25 @@ namespace Core.Entities
         public double LatitudeInRadians => (Math.PI / 180) * Latitude;
         public double LongitudeInRadians => (Math.PI / 180) * Longitude;
 
+        public bool Exists { get; init; } = true;
+
         #endregion
+
+        public GeoLocation()
+        { }
+
+        public void ThrowIfNone()
+        {
+            if (!Exists)
+            { throw new InvalidInformationException("GeoLocation does not exist."); }
+        }
 
         #region Dissimilation
 
         public override bool Equals(object obj)
         {
             return obj is GeoLocation other &&
+                Exists == other.Exists &&
                 Latitude == other.Latitude &&
                 Longitude == other.Longitude;
         }
@@ -62,12 +81,25 @@ namespace Core.Entities
             return (Latitude + Longitude).GetHashCode();
         }
 
+        public static bool operator ==(GeoLocation left, GeoLocation right)
+            => left.Equals(right);
+
+        public static bool operator !=(GeoLocation left, GeoLocation right)
+            => !(left == right);
+
         #endregion
     }
 
 
     public struct Distance
     {
+        #region Olive Branches
+
+        public static Distance None
+            => new() { Metres = 0, Exists = false };
+
+        #endregion
+
         #region Variables
 
         public double Kilometres
@@ -77,25 +109,38 @@ namespace Core.Entities
         }
         public double Metres { get; set; }
 
+        public bool Exists { get; init; } = true;
+
         #endregion
+
+        public Distance()
+        { }
+
+        public void ThrowIfNone()
+        {
+            if (!Exists)
+            { throw new InvalidInformationException("Distance does not exist."); }
+        }
 
         #region Dissimilation
 
         public static bool operator ==(Distance a, Distance b)
-            => a.Metres == b.Metres;
+            => a.Exists == b.Exists && a.Metres == b.Metres;
 
         public static bool operator !=(Distance a, Distance b)
-            => a.Metres != b.Metres;
+            => a.Exists == b.Exists && a.Metres != b.Metres;
 
         public static bool operator <(Distance a, Distance b)
-            => a.Metres < b.Metres;
+            => a.Exists == b.Exists && a.Metres < b.Metres;
 
         public static bool operator >(Distance a, Distance b)
-            => a.Metres > b.Metres;
+            => a.Exists == b.Exists && a.Metres > b.Metres;
 
         public override bool Equals(object obj)
         {
-            return obj is Distance other && this == other;
+            return obj is Distance other &&
+                Exists == other.Exists &&
+                this == other;
         }
 
         public override int GetHashCode()

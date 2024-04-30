@@ -74,6 +74,10 @@ namespace Core.Controls
 				new InvalidUserException("User cannot host.\n" +
 				$"Account Status: {user.AccountStatus}"));
 
+			// Verify user has position enabled
+			Try((await user.LastKnownLocation).Exists,
+				new InvalidUserException("User must have location enabled in order to host."));
+
 			// Create event
 			Event eventStub = new()
 			{

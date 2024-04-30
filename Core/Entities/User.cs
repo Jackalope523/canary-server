@@ -378,6 +378,14 @@ namespace Core.Entities
         
         public async Task HandleHaunt()
         {
+            // Check if user has a haunt and recent location
+            if (!(await Haunt).Exists || !(await LastKnownLocation).Exists)
+            {
+                Haunt.Set(await LastKnownLocation);
+                HauntStability.Set(1);
+                return;
+            }
+
             // Check if recent location is within haunt area
             if (GeoLocation.DistanceBetween(await Haunt, await LastKnownLocation) < await HauntRadius)
             {

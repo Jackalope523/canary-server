@@ -28,7 +28,7 @@ namespace Core.Entities
         public readonly TimeSpan MaximumEtchingLateness = OneDay;
 
         public static Event None
-            => new() { Id = 0 };
+            => new() { Id = 0, Exists = false };
 
 		///////
 		// Properties
@@ -64,6 +64,8 @@ namespace Core.Entities
                 HasYet(EndTime.Value + MaximumEtchingLateness);
         public bool IsEnded
             => EndTime.HasValue;
+
+        public bool Exists { get; set; } = true;
 
         ////////
         // Synced Properties
@@ -361,7 +363,9 @@ namespace Core.Entities
 
 		public override bool Equals(object obj)
 		{
-			return obj is Event other && Id.Equals(other.Id);
+			return obj is Event other &&
+                Exists == other.Exists &&
+                Id.Equals(other.Id);
 		}
 
 		public override int GetHashCode()
