@@ -66,6 +66,22 @@ namespace Core.Controls
             // Store profile
             await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
                 newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default.ToCharacter());
+
+            // TODO TEMP. Remove Later
+            var nuUser = await Accounts.FindUserByPhoneNumberAsync(newUser.PhoneNumber);
+            double lat = 40.723279, lon = -73.970895;
+
+            // Position update
+            await Accounts.UpdateRecentLocationAsync(nuUser.Id,
+                lat,
+                lon,
+                1);
+            // Haunt update
+            await Accounts.UpdateHauntAsync(nuUser.Id,
+                lat,
+                lon,
+                1,
+                1);
         }
 
         public async Task EditUserAsync(ulong userId,
