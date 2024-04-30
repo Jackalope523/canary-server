@@ -34,10 +34,7 @@ namespace Core
 		{
 			lock (initLock)
 			{
-				if (Terminal == null)
-				{
-					logger.LogError("Creating terminal.");
-					Terminal = new DebugTerminal(logger,
+				Terminal ??= new DebugTerminal(logger,
                         accountDatabase, adminDatabase, bannerDatabase,
                         eventDatabase, etchingDatabase,
                         disciplineDatabase, keyDatabase,
@@ -45,8 +42,6 @@ namespace Core
                         profileDatabase,
                         notificationService,
 						debugDatabase);
-					logger.LogError("Is Terminal null? {thing}", Terminal == null);
-				}
 
 				return (DebugTerminal) Terminal;
 			}

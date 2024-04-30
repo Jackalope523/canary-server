@@ -593,7 +593,7 @@ namespace Core.Controls
 		private async Task ThrowIfUserAtEvent(User user)
 		{
 			Fail(await user.IsAtEvent(),
-				new InvalidUserException("User is currently attending an event."));
+				new InvalidUserException($"{user.Name} is currently attending the event {(await user.CurrentEvent).Name}."));
 		}
 
 		private List<(UserSilhouette User, EventBond State)>

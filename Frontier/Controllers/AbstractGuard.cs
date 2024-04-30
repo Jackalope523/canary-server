@@ -88,18 +88,21 @@ namespace Frontier.Controllers
 			catch (HollowFailureException ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
+				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
 
 				return StatusCode(500);
 			}
-			catch (UserErrorException ex) 
+			catch (UserErrorException ex)
 			{
-				return BadRequest(ex.Message);
+				// Log debug information
+				log.LogError("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+
+                return BadRequest(ex.Message);
 			}
 			catch (Exception ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
+				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
 
 				return StatusCode(500);
 			}

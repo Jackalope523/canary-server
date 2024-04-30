@@ -116,12 +116,7 @@ namespace Core.Entities
             HauntRadius = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Radius);
             HauntStability = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Stability);
 
-            CurrentEvent = new(() => {
-                Terminal.Log.LogError("Is Terminal null? {thing}", Terminal == null);
-                Terminal.Log.LogError("Is EventDirector null? {thing}", Terminal.EventDirector == null);
-                Terminal.Log.LogError("Is This null? {thing}", this == null);
-                    return Terminal.EventDirector.RequestCurrentEventForUserAsync(this);
-                });
+            CurrentEvent = new(() => Terminal.EventDirector.RequestCurrentEventForUserAsync(this));
             PastEvents = new(() => Terminal.EventDirector.RequestPastEventsForUserAsync(this));
             UpcomingEvents = new(() => Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this));
             WatchingEvents = new(() => Terminal.EventDirector.RequestWatchingEventsForUserAsync(this));
