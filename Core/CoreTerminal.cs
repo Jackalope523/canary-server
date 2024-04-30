@@ -11,7 +11,7 @@ namespace Core
     {
         #region Variables
 
-        public static CoreTerminal Terminal { get; private set; }
+        public static CoreTerminal Terminal { get; protected set; }
         private static object initLock = new();
 
         public ILogger Log { get; init; }

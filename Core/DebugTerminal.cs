@@ -11,7 +11,6 @@ namespace Core
 	{
 		#region Variables
 
-		public static new CoreTerminal Terminal { get; private set; }
 		private static object initLock = new();
 
 		public IDebugDatabase DebugDatabase { get; init; }
@@ -20,15 +19,6 @@ namespace Core
 			=> DebugDirector;
 
 		internal DebugDirector DebugDirector { get; private set; }
-
-		public new List<(Type GateType, object Instance)> Gates
-			=> new() { (typeof(IAccountOperations), AccountOperations),
-				(typeof(IEventOperations), EventOperations),
-				(typeof(IEtchingOperations), EtchingOperations),
-				(typeof(IProfileOperations), ProfileOperations),
-				(typeof(IDisciplineOperations), DisciplineOperations),
-				(typeof(INotificationOperations), NotificationOperations),
-				(typeof(IDebugOperations), DebugOperations) };
 
 		#endregion
 
