@@ -36,20 +36,9 @@ namespace Repository
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
         }
 
-        public Harbor(Flag flag, ILogger logger)
+        public Harbor(Flag flag, ILogger logger) : this(flag)
         {
             Harbor.logger = logger;
-
-            AccountDatabaseAccess = new AccountStoreCoordinator(flag);
-            ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
-            NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
-            EventDatabaseAccess = new EventStoreCoordinator(flag);
-            EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
-            ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
-            AdminDatabaseAccess = new AdminStoreCoordinator(flag);
-            MediaDatabaseAccess = new MediaStoreCoordinator();
-            KeyDatabaseAccess = new KeyStoreCoordinator();
-            DebugDatabaseAccess = null;
         }
     }
 }
