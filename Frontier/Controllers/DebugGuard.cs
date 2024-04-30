@@ -65,7 +65,7 @@ namespace Frontier.Controllers
 					var host = await accounts.GetUserAsync(seedUsers[(int) @event.Host.Id - 1].PhoneNumber);
 
                     // Move host to proposed event location
-                    await accounts.UpdateUserLocationAsync(host.Id, @event.Latitude, @event.Longitude);
+                    // await accounts.UpdateUserLocationAsync(host.Id, @event.Latitude, @event.Longitude);
 
 					seedEvents.Add(await events.CreateEventAsync(host.Id,
 						@event.Name, @event.Description,
