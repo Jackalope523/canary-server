@@ -1,17 +1,17 @@
 ﻿
 namespace Repository.Entities
 {
-    internal class Note
+    public class Note
     {
-        internal ulong Id { get; set; }
+        public ulong Id { get; set; }
        
-        internal ulong NotifierId { get; set; }
+        public ulong NotifierId { get; set; }
         internal User Notifier { get; set; }
-        internal ulong RecipientId { get; set; }
+        public ulong RecipientId { get; set; }
         internal User Recipient { get; set; }
-        internal DateTimeOffset Time { get; set; }
-        internal string Message { get; set; }
-        internal string Action { get; set; }
-        internal bool Read { get; set; } 
+        public DateTimeOffset Time { get; set; }
+        public string Message { get; set; }
+        public string Action { get; set; }
+        public bool Read { get; set; } 
     }
 }

@@ -51,6 +51,8 @@ namespace Repository
             modelBuilder.Entity<User>()
                 .HasMany(u => u.PostLinks)
                 .WithOne(l => l.User);
+
+           
         }       
     }
 }
