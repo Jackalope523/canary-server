@@ -92,8 +92,8 @@ namespace Core.Controls
 			};
 
 			// Validate event
-			Try(eventStub.ValidateAndNormalise(),
-				new InvalidInformationException("Invalid event details provided."));
+			Try(eventStub.ValidateAndNormalise(out string issues),
+				new InvalidInformationException($"Invalid event details provided. Issues: {issues}"));
 
 			// Verify user has no conflict
 			var conflict = (await user.UpcomingEvents).Find(e => IsWithin(e.StartTime - eventStub.StartTime, HalfHour));
@@ -148,8 +148,8 @@ namespace Core.Controls
 			};
 
 			// Validate event
-			Try(editedEvent.ValidateAndNormalise(),
-				new InvalidInformationException("Invalid event details provided."));
+			Try(editedEvent.ValidateAndNormalise(out string issues),
+				new InvalidInformationException($"Invalid event details provided. Issues: {issues}"));
 
 			List<(string Property, object Value)> edits = new();
 

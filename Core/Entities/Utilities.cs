@@ -47,8 +47,8 @@ namespace Core.Entities
 
         #region Variables
 
-        public double Latitude { get; init; }
-        public double Longitude { get; init; }
+        public double Latitude { get; init; } = 0;
+        public double Longitude { get; init; } = 0;
 
         public double LatitudeInRadians => (Math.PI / 180) * Latitude;
         public double LongitudeInRadians => (Math.PI / 180) * Longitude;
@@ -107,7 +107,7 @@ namespace Core.Entities
             get => Metres / 1000d;
             set => Metres = value * 1000d;
         }
-        public double Metres { get; set; }
+        public double Metres { get; set; } = 0;
 
         public bool Exists { get; init; } = true;
 

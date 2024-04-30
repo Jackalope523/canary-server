@@ -47,8 +47,8 @@ namespace Core.Controls
             };
 
             // Validate and normalise user
-            Try(newUser.ValidateAndNormalise(),
-                new InvalidInformationException("Invalid account details provided."));
+            Try(newUser.ValidateAndNormalise(out string issues),
+                new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
 
             // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
@@ -87,8 +87,8 @@ namespace Core.Controls
             user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
-            Try(user.ValidateAndNormalise(),
-                new InvalidInformationException("Invalid details provided."));
+            Try(user.ValidateAndNormalise(out string issues),
+                new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
 
             List<(string Property, object Value)> edits = new();
 

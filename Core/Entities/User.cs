@@ -191,23 +191,26 @@ namespace Core.Entities
 
 		#region Composition
 
-		public bool ValidateAndNormalise()
+		public bool ValidateAndNormalise(out string issues)
         {
+            issues = "";
+
             // Verify phone number
-            if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
+            if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber))
+            { issues += "Invalid phone number. "; }
 
             // Verify email if it exists
             if (!string.IsNullOrEmpty(Email) &&
-                !ContentValidation.IsEmailValid(Email)) { return false; }
+                !ContentValidation.IsEmailValid(Email)) { issues += "Invalid email. "; }
 
             // Verify user age
-            if (HasYet(DateOfBirth + (OneYear * 18))) { return false; }
+            if (HasYet(DateOfBirth + (OneYear * 18))) { issues += "User is too young. "; }
 
             // Normalise
             Email = string.IsNullOrEmpty(Email) ? Email : Email.ToLower();
             PhoneNumber = normalisedPhoneNumber;
 
-            return true;
+            return issues.Equals("");
         }
 
         public void GenerateSecurityStamp()

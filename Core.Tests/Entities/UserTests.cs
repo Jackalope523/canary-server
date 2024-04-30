@@ -26,7 +26,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = validUser.ValidateAndNormalise();
+			bool result = validUser.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.True(result);
@@ -44,7 +44,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = invalidUser.ValidateAndNormalise();
+			bool result = invalidUser.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.False(result);

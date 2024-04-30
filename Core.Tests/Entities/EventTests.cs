@@ -30,7 +30,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = validEvent.ValidateAndNormalise();
+			bool result = validEvent.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.True(result);
@@ -50,7 +50,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = invalidEvent.ValidateAndNormalise();
+			bool result = invalidEvent.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.False(result);

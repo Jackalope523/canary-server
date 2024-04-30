@@ -139,21 +139,26 @@ namespace Core.Entities
 
 		#region Composition
 
-		public bool ValidateAndNormalise()
-        { 
+		public bool ValidateAndNormalise(out string issues)
+        {
+            issues = "";
+
             // Sanitise User content
             Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
 
+            // Verify Event is now or in the future
+            if (HappenedBefore(StartTime, Time)) { issues += "Event is in the past. "; }
+
             // Verify Event is within a reasonable time
-            if (After(StartTime, Time + OneWeek)) { return false; }
+            if (After(StartTime, Time + OneWeek)) { issues += "Event is too far in the future. "; }
 
             // Verify group bounds
             if (GroupMaximum != 0 &&
                 (GroupMaximum <= GroupMinimum ||
-                GroupMaximum < 4)) { return false; }
+                GroupMaximum < 4)) { issues += "Event group bounds invalid. "; }
 
-            return true;
+            return issues.Equals("");
         }
 
         public async Task<List<(User User, EventBond State)>> GetFriendsOf(User user)
