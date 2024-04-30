@@ -610,7 +610,7 @@ namespace Repository
             Select(l => new { l.Type, l.Time }).
             ToListAsync());
 
-            states.Sort((x,y) => DateTimeOffset.Compare(x.Time, y.Time));
+            states.Sort((x, y) => DateTimeOffset.Compare(x.Time, y.Time));
 
             return states.Last().Type;
         }

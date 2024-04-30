@@ -5,11 +5,11 @@ namespace Repository
     public class EventLink
     {
         public ulong Id { get; set; }
-        public ulong UserId { get; init; }
-        public User User { get; init; }
-        public ulong EventId { get; init; }
-        public Event? Event { get; init; }
-        public DateTimeOffset Time { get; init; }
+        public ulong UserId { get; set; }
+        public User User { get; set; }
+        public ulong EventId { get; set; }
+        public Event? Event { get; set; }
+        public DateTimeOffset Time { get; set; }
         public EventBond Type { get; set; }
     }
 }

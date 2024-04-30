@@ -11,8 +11,8 @@ namespace Repository.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static readonly EFCoreAccountStore store = new(Harbor.Flag.Development);  
+        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Production);
+        private static readonly EFCoreAccountStore store = new(Harbor.Flag.Production);  
         
         private User subject;
 

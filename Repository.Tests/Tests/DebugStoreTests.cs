@@ -9,8 +9,8 @@ namespace Repository.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static readonly EFCoreDebugStore store = new(Harbor.Flag.Development);
+        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Production);
+        private static readonly EFCoreDebugStore store = new(Harbor.Flag.Production);
 
         private User subject;
 
@@ -29,11 +29,9 @@ namespace Repository.Tests
         [Fact]
         public async Task DrainDatabaseAsync_SUCCESS()
         {
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-
             await store.DrainDatabaseAsync();
 
-            int count = await sentry.ExecuteRead(ctx => ctx.Users.CountAsync());
+            int count = await sentry.ExecuteReadAsync(ctx => ctx.Users.CountAsync());
 
             Assert.Equal(0, count);
         }

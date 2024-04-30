@@ -79,7 +79,7 @@ namespace Repository
 
         public async Task SetUserStateAsync(ulong userId, ulong eventId, EventBond userState, DateTimeOffset time)
         {
-            await store.GetUserStateAsync(userId, eventId);
+            await store.SetUserStateAsync(userId, eventId, userState, time);
         }
 
         public async Task<List<(UserSilhouette User, EventBond State)>> GetAllUsersAsync(ulong eventId)
