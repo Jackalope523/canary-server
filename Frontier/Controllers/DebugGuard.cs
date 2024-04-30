@@ -58,8 +58,6 @@ namespace Frontier.Controllers
 					// Confirm user email
 					var token = await userManager.GenerateEmailConfirmationTokenAsync(userShard);
 					await userManager.ConfirmEmailAsync(userShard, token);
-
-					await accounts.UpdateUserLocationAsync(userShard.Id, 40.723279, -73.970895);
 				}
 
 				foreach (var @event in seed.Events)
