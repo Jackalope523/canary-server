@@ -219,7 +219,68 @@ namespace Repository
         }
         public async Task<List<EventShard>> FindWatchingEventsForUserAsync(ulong id) 
         {
-            throw new NotImplementedException("help");
+            return await storeSentry.ExecuteReadAsync(ctx =>
+             ctx.EventLinks.
+             Where(l => l.UserId == id && l.Type == EventBond.Watching).
+             Join(
+                ctx.Events,
+                l => l.EventId,
+                e => e.Id,
+                (l, e) => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.HostId,
+                    e.Description,
+                    e.StartTime,
+                    e.Location,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness,
+                    e.Radius,
+                    e.IsDynamic,
+                    e.IsPendingDeletion,
+                    e.NumberOfGuests
+                }).
+             Join(
+                 ctx.Users,
+                 e => e.HostId,
+                 u => u.Id,
+                 (e, u) => new EventShard
+                 (
+                    e.Id,
+                    new UserSilhouette(u.Id, u.Name),
+                    e.Name,
+                    e.Description,
+                    e.StartTime,
+                    e.Location.Y,
+                    e.Location.X,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    new Character(
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness),
+                    e.Radius,
+                    e.IsDynamic,
+                    e.IsPendingDeletion,
+                    e.NumberOfGuests
+                 )).
+               ToListAsync());
         }
         public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id)
         {
