@@ -14,7 +14,7 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public KeyGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public KeyGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
         { }
 
 		#endregion

@@ -16,7 +16,7 @@ namespace Repository
             return await store.GetNotesAsync(userId);
         }
 
-        public async Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId)
+        public async Task<DeviceShard> GetUserSubscriptionAsync(ulong userId)
         {
             return await store.GetUserSubscriptionAsync(userId);
         }

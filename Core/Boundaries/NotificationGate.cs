@@ -14,7 +14,7 @@ namespace Core.Boundaries
     public record NoteShard(ulong NotifierId, DateTimeOffset Time,
 		string Message, string Action);
 
-	public record DeviceSilhouette(DeviceType DeviceType, string DeviceToken);
+	public record DeviceShard(DeviceType DeviceType, string DeviceToken);
 
     #endregion
 
@@ -26,7 +26,7 @@ namespace Core.Boundaries
 		Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time,
 			string message, string action);
 
-		Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId);
+		Task<DeviceShard> GetUserSubscriptionAsync(ulong userId);
 		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
 		Task UnsubscribeUserAsync(ulong userId);
 	}

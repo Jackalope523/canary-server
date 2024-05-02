@@ -12,18 +12,18 @@ namespace Core.Boundaries
     public enum EventBond
     { Watching, Guest, Arrived, Left, Kicked }
 
-    public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
+    public record CoreEvent(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests);
 
-	public record OutgoingEvent(ulong Id, UserSilhouette Host, string Name, string Description,
+	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
         EventState State, int GroupMinimum, int GroupMaximum,
         double Radius, int NumberOfGuests);
 
-	public record OutgoingGuestList(int Watchers, int GuestCount,
-		List<(UserSilhouette, EventBond)> Guests);
+	public record GuestListShard(int Watchers, int GuestCount,
+		List<(UserSilhouette User, EventBond Bond)> Guests);
 
     #endregion
 
@@ -31,15 +31,15 @@ namespace Core.Boundaries
 
     public interface IEventDatabase
 	{
-        Task<EventShard> FindEventAsync(ulong eventId);
-		Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance);
-		Task<EventShard> FindCurrentEventForUserAsync(ulong userId);
-		Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong userId);
-		Task<List<EventShard>> FindWatchingEventsForUserAsync(ulong userId);
-		Task<List<EventShard>> FindPastEventsForUserAsync(ulong userId);
-		Task<List<EventShard>> FindEventsByUserAsync(ulong userId);
+        Task<CoreEvent> FindEventAsync(ulong eventId);
+		Task<List<CoreEvent>> FindEventsAsync(double latitude, double longitude, double distance);
+		Task<CoreEvent> FindCurrentEventForUserAsync(ulong userId);
+		Task<List<CoreEvent>> FindUpcomingEventsForUserAsync(ulong userId);
+		Task<List<CoreEvent>> FindWatchingEventsForUserAsync(ulong userId);
+		Task<List<CoreEvent>> FindPastEventsForUserAsync(ulong userId);
+		Task<List<CoreEvent>> FindEventsByUserAsync(ulong userId);
 
-		Task<EventShard> CreateEventAsync(ulong hostId, string name, string description,
+		Task<CoreEvent> CreateEventAsync(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude,
 			int groupMinimum, int groupMaximum, Character character,
 			double Radius, bool isDynamic);
@@ -79,7 +79,7 @@ namespace Core.Boundaries
 		Task JoinEventAsync(ulong userId, ulong eventId);
 		Task LeaveEventAsync(ulong userId, ulong eventId);
 
-		Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)> GetGuestListAsync(ulong userId, ulong eventId);
+		Task<GuestListShard> GetGuestListAsync(ulong userId, ulong eventId);
 		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong eventId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong eventId);
 		Task KickUserAsync(ulong hostId, ulong targetId, ulong eventId);

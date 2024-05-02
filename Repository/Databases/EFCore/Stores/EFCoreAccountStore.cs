@@ -66,16 +66,16 @@ namespace Repository
                ExecuteDelete());
         }
 
-        public async Task<UserShard> FindUserByIdAsync(ulong id) 
+        public async Task<CoreUser> FindUserByIdAsync(ulong id) 
         {            
             int numFollowers;
-            UserShard user;
+            CoreUser user;
             try 
             {
                user = await storeSentry.ExecuteReadAsync(ctx => 
                ctx.Users.
                Where(u => u.Id == id).
-               Select(u => new UserShard
+               Select(u => new CoreUser
                (
                    u.Id,
                    u.PhoneNumber,
@@ -111,16 +111,16 @@ namespace Repository
 
             return user with { NumberOfFollowers = numFollowers };
         }
-        public async Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber) 
+        public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
         { 
             int numFollowers;
-            UserShard user;
+            CoreUser user;
             try
             {
               user = await storeSentry.ExecuteReadAsync(ctx => 
               ctx.Users.
               Where(u => u.PhoneNumber == phoneNumber).
-              Select(u => new UserShard
+              Select(u => new CoreUser
               (
                   u.Id,
                   u.PhoneNumber,
@@ -156,16 +156,16 @@ namespace Repository
 
             return user with { NumberOfFollowers = numFollowers };
         }
-        public async Task<UserShard> FindUserByEmailAsync(string email) 
+        public async Task<CoreUser> FindUserByEmailAsync(string email) 
         { 
             int numFollowers;
-            UserShard user;
+            CoreUser user;
             try
             {
               user = await storeSentry.ExecuteReadAsync(ctx => 
               ctx.Users.
               Where(u => u.Email == email).
-              Select(u => new UserShard
+              Select(u => new CoreUser
               (
                   u.Id,
                   u.PhoneNumber,

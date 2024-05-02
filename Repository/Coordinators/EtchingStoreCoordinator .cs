@@ -12,22 +12,22 @@ namespace Repository
             store = new EFCoreEtchingStore(flag);
         }
 
-        public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted)
+        public async Task<EtchingShard> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted)
         { 
              return await store.AddEtchingAsync(eventId, posterId, timePosted);  
         }
 
-        public async Task<List<Etching>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
+        public async Task<List<EtchingShard>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
            return await store.GenerateFeedForUserAsync(id, depthCharge, lastDepthCharge);   
         }
 
-        public async Task<Etching> GetEtchingAsync(ulong id)
+        public async Task<EtchingShard> GetEtchingAsync(ulong id)
         {
             return await store.GetEtchingAsync(id);
         }
 
-        public async Task<List<Etching>> GetEtchingsByUserAsync(ulong id)
+        public async Task<List<EtchingShard>> GetEtchingsByUserAsync(ulong id)
         {
             return await store.GetEtchingsByUserAsync(id);
         }
@@ -47,7 +47,7 @@ namespace Repository
             await store.RemoveEtchingRatingAsync(postId, voterId);
         }
 
-        public async Task<List<Etching>> GetEtchingsForEventAsync(ulong id)
+        public async Task<List<EtchingShard>> GetEtchingsForEventAsync(ulong id)
         {
             return await store.GetEtchingsForEventAsync(id);
         }

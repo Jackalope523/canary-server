@@ -20,19 +20,24 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<UserShard> GetUserAsync(ulong userId)
+		public async Task<CoreUser> GetCoreUserAsync(ulong userId)
         {
-            return (await base.GetUserAsync(userId)).ToUserShard();
+            return (await GetUserAsync(userId)).ToCoreUser();
         }
 
-        public async Task<UserShard> GetUserAsync(string phoneNumber)
+        public async Task<CoreUser> GetCoreUserAsync(string phoneNumber)
 		{
             // Verify phone number is valid
             Try(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
                 new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
 
-            return (await GetUser(normalisedPhoneNumber)).ToUserShard();
+            return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
 		}
+
+		public async Task<UserShard> GetUserShardAsync(ulong userId)
+        {
+            return (await GetUserAsync(userId)).ToUserShard();
+        }
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
@@ -96,38 +101,38 @@ namespace Core.Controls
 			if (phoneNumberChanged)
             {
                 await ThrowIfPhoneNumberTaken(user.PhoneNumber);
-                edits.Add((nameof(UserShard.PhoneNumber), user.PhoneNumber));
+                edits.Add((nameof(CoreUser.PhoneNumber), user.PhoneNumber));
 			}
 			if (emailChanged)
 			{
                 await ThrowIfEmailTaken(user.Email);
-                edits.Add((nameof(UserShard.Email), email));
+                edits.Add((nameof(CoreUser.Email), email));
                 edits.Add(("NormalisedEmail", user.Email));
 			}
 			if (nameChanged)
 			{
-                edits.Add((nameof(UserShard.Name), user.Name));
+                edits.Add((nameof(CoreUser.Name), user.Name));
 			}
             // Internal attributes for account store
 			if (IsNotNull(isPhoneNumberConfirmed))
 			{
-                edits.Add((nameof(UserShard.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
+                edits.Add((nameof(CoreUser.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
 			}
 			if (IsNotNull(isEmailConfirmed))
 			{
-                edits.Add((nameof(UserShard.IsEmailConfirmed), isEmailConfirmed.Value));
+                edits.Add((nameof(CoreUser.IsEmailConfirmed), isEmailConfirmed.Value));
 			}
 			if (!string.IsNullOrEmpty(securityStamp))
 			{
-                edits.Add((nameof(UserShard.SecurityStamp), securityStamp));
+                edits.Add((nameof(CoreUser.SecurityStamp), securityStamp));
 			}
 			if (IsNotNull(lockoutDate))
 			{
-                edits.Add((nameof(UserShard.LockoutDate), lockoutDate.Value));
+                edits.Add((nameof(CoreUser.LockoutDate), lockoutDate.Value));
 			}
 			if (IsNotNull(accessTries))
 			{
-                edits.Add((nameof(UserShard.AccessTries), accessTries.Value));
+                edits.Add((nameof(CoreUser.AccessTries), accessTries.Value));
 			}
 
             // Push update

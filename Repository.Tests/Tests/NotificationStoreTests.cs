@@ -56,7 +56,7 @@ namespace Repository.Tests
             Subscription subscription = new SubscriptionFactory().Create(subject1);
             sentry.ExecuteWrite(ctx => ctx.Subscriptions.Add(subscription));
 
-            DeviceSilhouette device = await store.GetUserSubscriptionAsync(subject1.Id);
+            DeviceShard device = await store.GetUserSubscriptionAsync(subject1.Id);
 
             Assert.NotNull(device);
             Assert.Equal(subscription.DeviceType, device.DeviceType);

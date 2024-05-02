@@ -52,7 +52,7 @@ namespace Core.Controls
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-			DeviceSilhouette userSettings;
+			DeviceShard userSettings;
 
             // Check if user is subscribed
             try

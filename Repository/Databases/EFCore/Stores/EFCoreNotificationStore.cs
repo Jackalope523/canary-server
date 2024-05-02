@@ -19,12 +19,12 @@ namespace Repository
             Select(n => new NoteShard(n.NotifierId, n.Time, n.Message, n.Action)).
             ToListAsync());
         }
-        public async Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId)
+        public async Task<DeviceShard> GetUserSubscriptionAsync(ulong userId)
         {
            return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.Subscriptions.
            Where(s => s.UserId == userId).
-           Select(s => new DeviceSilhouette(s.DeviceType, s.DeviceToken)).
+           Select(s => new DeviceShard(s.DeviceType, s.DeviceToken)).
            SingleAsync());
 
         }

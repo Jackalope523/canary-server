@@ -135,7 +135,7 @@ namespace Core.Entities
             EventReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).EventReports);
         }
 
-        public User(UserShard fromUser) : this()
+        public User(CoreUser fromUser) : this()
         {
             Id = fromUser.Id;
             PhoneNumber = fromUser.PhoneNumber;
@@ -169,12 +169,18 @@ namespace Core.Entities
             NumberOfFollowers = fromUser.NumberOfFollowers;
         }
 
-        public UserShard ToUserShard()
+        public CoreUser ToCoreUser()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
+        }
+
+        public UserShard ToUserShard()
+        {
+            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+                Reputation, NumberOfFollowers);
         }
 
         public UserSilhouette ToUserSilhouette()
@@ -359,7 +365,7 @@ namespace Core.Entities
 				new InvalidEventException("Event has already ended."));
 		}
 
-		public bool Etched(Etching etching)
+		public bool Etched(EtchingShard etching)
         {
             return etching.User.Id.Equals(Id);
 		}

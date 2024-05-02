@@ -24,7 +24,7 @@ namespace Core.Tests.Controls
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			User user = new(await director.GetUserAsync(randomUser.Id));
+			User user = new(await director.GetCoreUserAsync(randomUser.Id));
 
 			// Assert
 			Assert.True(randomUser.Equals(user));
@@ -34,7 +34,7 @@ namespace Core.Tests.Controls
 		public async Task GetUserAsync_InvalidId_ThrowsException()
 		{
 			// Act
-			var userSync = director.GetUserAsync(ulong.MaxValue);
+			var userSync = director.GetCoreUserAsync(ulong.MaxValue);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await userSync);
@@ -47,7 +47,7 @@ namespace Core.Tests.Controls
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			User user = new(await director.GetUserAsync(randomUser.PhoneNumber));
+			User user = new(await director.GetCoreUserAsync(randomUser.PhoneNumber));
 
 			// Assert
 			Assert.True(randomUser.Equals(user));
@@ -57,7 +57,7 @@ namespace Core.Tests.Controls
 		public async Task GetUserAsync_InvalidPhoneNumber_ThrowsException()
 		{
 			// Act
-			var userSync = director.GetUserAsync("000");
+			var userSync = director.GetCoreUserAsync("000");
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await userSync);
@@ -100,7 +100,7 @@ namespace Core.Tests.Controls
 			await director.EditUserAsync(user.Id, name: newName);
 
 			// Assert
-			var updatedUser = await director.GetUserAsync(user.Id);
+			var updatedUser = await director.GetCoreUserAsync(user.Id);
 			Assert.Equal(newName, updatedUser.Name);
 		}
 
@@ -114,7 +114,7 @@ namespace Core.Tests.Controls
 			await director.DeleteUserAsync(user.Id);
 
 			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await director.GetUserAsync(user.Id));
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await director.GetCoreUserAsync(user.Id));
 		}
 
 		[Fact]
@@ -127,7 +127,7 @@ namespace Core.Tests.Controls
 
 			// Act
 			await director.UpdateUserLocationAsync(user.Id, newLocation.Latitude, newLocation.Longitude);
-			User updatedUser = new(await director.GetUserAsync(user.Id));
+			User updatedUser = new(await director.GetCoreUserAsync(user.Id));
 
 			// Assert
 			Assert.NotEqual(await user.LastKnownLocation,

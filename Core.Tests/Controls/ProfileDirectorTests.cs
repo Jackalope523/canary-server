@@ -188,7 +188,7 @@ namespace Core.Tests.Controls
 			var activity = await director.GetUserActivityAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(3, activity.Count);
+			Assert.Equal(3, activity.Activity.Count);
 		}
 
 		[Fact]
@@ -210,7 +210,7 @@ namespace Core.Tests.Controls
 			var activity = await director.GetUserActivityAsync(user.Id, friend.Id);
 
 			// Assert
-			Assert.Equal(4, activity.Count);
+			Assert.Equal(4, activity.Activity.Count);
 		}
 
 		[Fact]
@@ -263,8 +263,8 @@ namespace Core.Tests.Controls
 
 			// Assert
 			Assert.Equal(2, activity.Keys.Count);
-			Assert.Equal(4, activity[activeFriend.ToUserSilhouette()].Count);
-			Assert.Single(activity[sloadButChill.ToUserSilhouette()]);
+			Assert.Equal(4, activity[activeFriend.ToUserSilhouette()].Activity.Count);
+			Assert.Single(activity[sloadButChill.ToUserSilhouette()].Activity);
 		}
 
 		[Fact]

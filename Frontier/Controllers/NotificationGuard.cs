@@ -14,7 +14,7 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public NotificationGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public NotificationGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
@@ -26,11 +26,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var manifest = ManifestSeries<NoteManifest>.Create(
-					await notifications.GetNotesAsync(user.Id),
-					note => new NoteManifest(note));
-
-				return manifest;
+				return await notifications.GetNotesAsync(user.Id);
 			});
         }
 

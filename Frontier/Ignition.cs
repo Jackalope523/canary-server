@@ -146,7 +146,7 @@ namespace Frontier
             })
                 .AddIdentityCookies();
 
-            services.AddIdentityCore<UserShard>()
+            services.AddIdentityCore<CoreUser>()
                 .AddUserStore<UserAccountStore>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();

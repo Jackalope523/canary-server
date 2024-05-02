@@ -49,13 +49,13 @@ namespace Frontier.Controllers
 		public INotificationOperations notifications;
 		public IProfileOperations profiles;
 
-		public UserManager<UserShard> userManager;
+		public UserManager<CoreUser> userManager;
 
 		#endregion
 
 		#region Initialisation
 
-		public AbstractGuard(GuardBox box, UserManager<UserShard> aspUserManager)
+		public AbstractGuard(GuardBox box, UserManager<CoreUser> aspUserManager)
 		{
 			log = box.log;
 
@@ -119,7 +119,7 @@ namespace Frontier.Controllers
 		}
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<UserShard, Task> action, bool allowUnverified = false)
+		public async Task<IActionResult> Execute(Func<CoreUser, Task> action, bool allowUnverified = false)
 		{
 			return await Execute(async user =>
 			{
@@ -130,7 +130,7 @@ namespace Frontier.Controllers
 		}
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<UserShard, Task<object>> action, bool allowUnverified = false)
+		public async Task<IActionResult> Execute(Func<CoreUser, Task<object>> action, bool allowUnverified = false)
 		{
 			return await Execute(async () =>
 			{
@@ -144,11 +144,11 @@ namespace Frontier.Controllers
 		}
 
 		[NonAction]
-		public async Task<UserShard> GetCurrentUserAsync()
+		public async Task<CoreUser> GetCurrentUserAsync()
 			=> await userManager.GetUserAsync(HttpContext.User);
 
 		[NonAction]
-		public void ThrowIfUnverified(UserShard user)
+		public void ThrowIfUnverified(CoreUser user)
 		{
 			if (user.IsEmailConfirmed)
 			{ throw new InvalidUserException("User has not yet confirmed their email."); }

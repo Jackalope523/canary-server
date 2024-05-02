@@ -10,18 +10,11 @@ namespace Core.Boundaries
 	public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
         double Latitude, double Longitude);
 
-    public record OutgoingEventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
-        double Latitude, double Longitude);
-
-    public record Etching(ulong Id, ulong EventId, UserSilhouette User,
+    public record EtchingShard(ulong Id, ulong EventId, UserSilhouette User,
         DateTimeOffset TimeEtched,
         (int Positive, int Negative) Ratings, bool IsHidden);
 
-    public record OutgoingEtching(ulong Id, ulong EventId, UserSilhouette User,
-        DateTimeOffset TimeEtched,
-        (int Positive, int Negative) Ratings);
-
-    public record Feed(List<EventHeader> Headers, List<Etching> Etchings);
+    public record FeedShard(List<EventHeader> Headers, List<EtchingShard> Etchings);
 
     #endregion
 
@@ -29,10 +22,10 @@ namespace Core.Boundaries
 
     public interface IEtchingDatabase
     {
-        Task<List<Etching>> GetEtchingsForEventAsync(ulong eventId);
-        Task<List<Etching>> GetEtchingsByUserAsync(ulong userId);
-        Task<Etching> GetEtchingAsync(ulong etchingId);
-        Task<Etching> AddEtchingAsync(ulong eventId, ulong etcherId,
+        Task<List<EtchingShard>> GetEtchingsForEventAsync(ulong eventId);
+        Task<List<EtchingShard>> GetEtchingsByUserAsync(ulong userId);
+        Task<EtchingShard> GetEtchingAsync(ulong etchingId);
+        Task<EtchingShard> AddEtchingAsync(ulong eventId, ulong etcherId,
             DateTimeOffset timeEtched);
 		Task RemoveEtchingAsync(ulong etchingId);
 		Task HideEtchingAsync(ulong etchingId);
@@ -40,17 +33,17 @@ namespace Core.Boundaries
 		Task RateEtchingAsync(ulong etchingId, ulong voterId, UserRating rating);
 		Task RemoveEtchingRatingAsync(ulong etchingId, ulong voterId);
 
-        Task<List<Etching>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
+        Task<List<EtchingShard>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
     }
 
     public interface IEtchingOperations
     {
-        Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId);
-        Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image);
+        Task<List<EtchingShard>> GetEventEtchingsAsync(ulong userId, ulong eventId);
+        Task<EtchingShard> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image);
         Task RemoveEtchingAsync(ulong userId, ulong etchingId);
         Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating);
 
-        Task<Feed> GetUserFeedAsync(ulong userId, int depth, int lastDepth);
+        Task<FeedShard> GetUserFeedAsync(ulong userId, int depth, int lastDepth);
     }
 
 	#endregion

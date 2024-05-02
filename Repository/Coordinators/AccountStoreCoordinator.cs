@@ -21,17 +21,17 @@ namespace Repository
             await store.DeleteUserAsync(id);
         }
 
-        public async Task<UserShard> FindUserByIdAsync(ulong id) 
+        public async Task<CoreUser> FindUserByIdAsync(ulong id) 
         {
             return await store.FindUserByIdAsync(id);
         }
 
-        public async Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber) 
+        public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
         {
             return await store.FindUserByPhoneNumberAsync(phoneNumber);
         }
 
-        public async Task<UserShard> FindUserByEmailAsync(string email) 
+        public async Task<CoreUser> FindUserByEmailAsync(string email) 
         {
             return await store.FindUserByEmailAsync(email);
         }

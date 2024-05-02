@@ -21,7 +21,7 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<Etching>> GetEventEtchingsAsync(ulong userId, ulong eventId)
+		public async Task<List<EtchingShard>> GetEventEtchingsAsync(ulong userId, ulong eventId)
         {
             var user = await GetUserAsync(userId);
             var targetEvent = await GetEventAsync(eventId);
@@ -34,7 +34,7 @@ namespace Core.Controls
             return await targetEvent.Etchings;
         }
 
-        public async Task<Etching> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image)
+        public async Task<EtchingShard> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image)
         {
             var userSync = GetUserAsync(userId);
             var targetEventSync = GetEventAsync(eventId);
@@ -91,7 +91,7 @@ namespace Core.Controls
             }
         }
 
-        public async Task<Feed>
+        public async Task<FeedShard>
             GetUserFeedAsync(ulong userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
@@ -136,7 +136,7 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task<List<Etching>> RequestEventEtchingsAsync(Event @event)
+		internal async Task<List<EtchingShard>> RequestEventEtchingsAsync(Event @event)
             => await Etchings.GetEtchingsForEventAsync(@event.Id);
 
 		#endregion

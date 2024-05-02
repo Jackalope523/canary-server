@@ -15,7 +15,7 @@ namespace Frontier.Controllers
     {
 		#region Initialisation
 
-		public FeedGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public FeedGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
@@ -30,17 +30,7 @@ namespace Frontier.Controllers
             { return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-			{
-				var shard = await etchings.GetUserFeedAsync(user.Id, depth, lastDepth);
-
-				FeedManifest feed = new()
-				{
-					Headers = shard.Headers.ConvertAll(header => new EventHeaderManifest(header)),
-					Etchings = shard.Etchings.ConvertAll(etching => new EtchingManifest(etching))
-				};
-
-				return feed;
-			});
+				await etchings.GetUserFeedAsync(user.Id, depth, lastDepth));
         }
 
 		#endregion

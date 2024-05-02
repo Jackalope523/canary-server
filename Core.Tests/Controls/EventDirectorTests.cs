@@ -184,7 +184,6 @@ namespace Core.Tests.Controls
 			Assert.Equal(eventStub.Location.Latitude, returnedEvent.Latitude);
 			Assert.Equal(eventStub.Location.Longitude, returnedEvent.Longitude);
 			Assert.Equal(eventStub.Radius.Kilometres, returnedEvent.Radius);
-			Assert.Equal(eventStub.IsDynamic, returnedEvent.IsDynamic);
 
 			Assert.Equal(eventStub.GroupMinimum, returnedEvent.GroupMinimum);
 			Assert.Equal(eventStub.GroupMaximum, returnedEvent.GroupMaximum);
@@ -215,7 +214,7 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			await environment.UpdateUser(host, nameof(UserShard.AccountStatus), UserAccountStatus.Impotent);
+			await environment.UpdateUser(host, nameof(CoreUser.AccountStatus), UserAccountStatus.Impotent);
 
 			var eventStub = environment.CreateTestEvent(host);
 
@@ -280,7 +279,6 @@ namespace Core.Tests.Controls
 			Assert.Equal(newLatitude, returnedEvent.Latitude);
 			Assert.Equal(newLongitude, returnedEvent.Longitude);
 			Assert.Equal(newRadius, returnedEvent.Radius);
-			Assert.Equal(newIsDynamic, returnedEvent.IsDynamic);
 
 			Assert.Equal(newGroupMinimum, returnedEvent.GroupMinimum);
 			Assert.Equal(newGroupMaximum, returnedEvent.GroupMaximum);
@@ -435,10 +433,10 @@ namespace Core.Tests.Controls
 			Assert.Equal(1, Watchers);
 			Assert.Equal(2, GuestCount);
 
-			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventBond.Arrived)).Count());
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Guest)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Watching)));
+			Assert.Equal(2, Guests.Where(user => user.Bond.Equals(EventBond.Arrived)).Count());
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Left)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Guest)));
+			Assert.Empty(Guests.Where(user => user.Bond.Equals(EventBond.Watching)));
 		}
 
 		[Fact]
@@ -469,10 +467,10 @@ namespace Core.Tests.Controls
 			Assert.Equal(1, Watchers);
 			Assert.Equal(2, GuestCount);
 
-			Assert.Equal(2, Guests.Where(user => user.State.Equals(EventBond.Arrived)).Count());
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Guest)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Watching)));
+			Assert.Equal(2, Guests.Where(user => user.Bond.Equals(EventBond.Arrived)).Count());
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Left)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Guest)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Watching)));
 		}
 
 		[Fact]
@@ -506,10 +504,10 @@ namespace Core.Tests.Controls
 			Assert.Equal(1, Watchers);
 			Assert.Equal(2, GuestCount);
 
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Guest)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Watching)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Arrived)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Left)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Guest)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Watching)));
 		}
 
 		[Fact]
@@ -532,10 +530,10 @@ namespace Core.Tests.Controls
 			Assert.Equal(0, Watchers);
 			Assert.Equal(3, GuestCount);
 
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Arrived)));
-			Assert.Single(Guests.Where(user => user.State.Equals(EventBond.Left)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Guest)));
-			Assert.Empty(Guests.Where(user => user.State.Equals(EventBond.Watching)));
+			Assert.Empty(Guests.Where(user => user.Bond.Equals(EventBond.Arrived)));
+			Assert.Single(Guests.Where(user => user.Bond.Equals(EventBond.Left)));
+			Assert.Empty(Guests.Where(user => user.Bond.Equals(EventBond.Guest)));
+			Assert.Empty(Guests.Where(user => user.Bond.Equals(EventBond.Watching)));
 		}
 
 		[Fact]

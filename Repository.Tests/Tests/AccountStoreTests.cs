@@ -96,7 +96,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByIdAsync_SUCCESS()
         {
-            UserShard found = await store.FindUserByIdAsync(subject.Id);
+            CoreUser found = await store.FindUserByIdAsync(subject.Id);
 
             Assert.NotNull(found);
 
@@ -132,7 +132,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByPhoneNumberAsync_SUCCESS()
         {
-            UserShard found = await store.FindUserByPhoneNumberAsync(subject.PhoneNumber);
+            CoreUser found = await store.FindUserByPhoneNumberAsync(subject.PhoneNumber);
 
             Assert.NotNull(found);
 
@@ -168,7 +168,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByEmailAsync_SUCCESS()
         {
-            UserShard found = await store.FindUserByEmailAsync(subject.Email);
+            CoreUser found = await store.FindUserByEmailAsync(subject.Email);
 
             Assert.NotNull(found);
 

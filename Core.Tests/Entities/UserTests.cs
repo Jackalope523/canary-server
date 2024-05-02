@@ -315,7 +315,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
 
-			await environment.UpdateUser(user, nameof(UserShard.AccountStatus), UserAccountStatus.Limited);
+			await environment.UpdateUser(user, nameof(CoreUser.AccountStatus), UserAccountStatus.Limited);
 			user = new(await environment.Terminal.AccountDatabase.FindUserByIdAsync(user.Id));
 
 			// Act

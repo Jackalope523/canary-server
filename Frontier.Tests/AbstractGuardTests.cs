@@ -42,11 +42,11 @@ namespace Frontier.Tests
 		}
 
 		[Fact]
-		public async Task Execute_Manifest_Success()
+		public async Task Execute_Shard_Success()
 		{
 			// Arrange
-			var manifest = new UserSilhouetteManifest(new(117, "John"));
-			Func<Task<object>> action = async () => manifest;
+			var outgoing = new UserSilhouette(117, "John");
+			Func<Task<object>> action = async () => outgoing;
 
 			// Act
 			var result = await testGuard.Execute(action) as ObjectResult;
@@ -54,18 +54,18 @@ namespace Frontier.Tests
 			// Assert
 			Assert.NotNull(result);
 
-			var resultManifest = result.Value as UserSilhouetteManifest;
+			var resultManifest = result.Value as UserSilhouette;
 			Assert.NotNull(resultManifest);
-			Assert.Equal(manifest.Id, resultManifest.Id);
-			Assert.Equal(manifest.Name, resultManifest.Name);
+			Assert.Equal(outgoing.Id, resultManifest.Id);
+			Assert.Equal(outgoing.Name, resultManifest.Name);
 		}
 
 		[Fact]
 		public async Task Execute_List_Success()
 		{
 			// Arrange
-			ManifestSeries<UserSilhouetteManifest> manifest = new() { new UserSilhouetteManifest(new(117, "John")), new UserSilhouetteManifest(new(3, "Thel")) };
-			Func<Task<object>> action = async () => manifest;
+			List<UserSilhouette> outgoing = new() { new UserSilhouette(117, "John"), new UserSilhouette(3, "Thel") };
+			Func<Task<object>> action = async () => outgoing;
 
 			// Act
 			var result = await testGuard.Execute(action) as ObjectResult;
@@ -73,9 +73,9 @@ namespace Frontier.Tests
 			// Assert
 			Assert.NotNull(result);
 
-			var resultList = result.Value as ManifestSeries<UserSilhouetteManifest>;
+			var resultList = result.Value as List<UserSilhouette>;
 			Assert.NotNull(resultList);
-			Assert.Equal(manifest.Count, resultList.Count);
+			Assert.Equal(outgoing.Count, resultList.Count);
 		}
 
 		[Fact]

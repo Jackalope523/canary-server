@@ -18,7 +18,7 @@ namespace Frontier.Controllers
 
 		private IDebugOperations debug;
 
-		public DebugGuard(GuardBox box, UserManager<UserShard> aspUserManager, IDebugOperations debugOperations) :
+		public DebugGuard(GuardBox box, UserManager<CoreUser> aspUserManager, IDebugOperations debugOperations) :
 			base(box, aspUserManager)
 		{
 			debug = debugOperations;
@@ -42,7 +42,7 @@ namespace Frontier.Controllers
 
 				await debug.SeedDatabaseAsync();
 
-				List<UserShard> seedUsers = new();
+				List<CoreUser> seedUsers = new();
 				List<EventShard> seedEvents = new();
 
                 log.LogError("Adding users..");
@@ -52,28 +52,28 @@ namespace Frontier.Controllers
 					await debug.AddUserToBannerAsync(user.PhoneNumber, "debug");
 					await accounts.CreateUserAsync(user.PhoneNumber, user.Email, user.Name, user.DateOfBirth);
 
-					var userShard = await accounts.GetUserAsync(user.PhoneNumber);
+					var coreUser = await accounts.GetCoreUserAsync(user.PhoneNumber);
 
-                    seedUsers.Add(userShard);
+                    seedUsers.Add(coreUser);
 
 					// Confirm user phone
-					var code = await userManager.GenerateChangePhoneNumberTokenAsync(userShard, user.PhoneNumber);
-					await userManager.VerifyTwoFactorTokenAsync(userShard, TokenOptions.DefaultPhoneProvider, code);
+					var code = await userManager.GenerateChangePhoneNumberTokenAsync(coreUser, user.PhoneNumber);
+					await userManager.VerifyTwoFactorTokenAsync(coreUser, TokenOptions.DefaultPhoneProvider, code);
 
 					// Confirm user email
-					var token = await userManager.GenerateEmailConfirmationTokenAsync(userShard);
-					await userManager.ConfirmEmailAsync(userShard, token);
+					var token = await userManager.GenerateEmailConfirmationTokenAsync(coreUser);
+					await userManager.ConfirmEmailAsync(coreUser, token);
 				}
 
                 log.LogError("Creating events..");
 
                 foreach (var @event in seed.Events)
 				{
-					var host = await accounts.GetUserAsync(seedUsers[(int) @event.Host.Id - 1].PhoneNumber);
+					var host = await accounts.GetCoreUserAsync(seedUsers[(int) @event.Host.Id - 1].PhoneNumber);
 
                     // Move host to proposed event location
                     // await accounts.UpdateUserLocationAsync(host.Id, @event.Latitude, @event.Longitude);
-
+					
 					seedEvents.Add(await events.CreateEventAsync(host.Id,
 						@event.Name, @event.Description,
 						@event.StartTime, @event.Latitude, @event.Longitude,

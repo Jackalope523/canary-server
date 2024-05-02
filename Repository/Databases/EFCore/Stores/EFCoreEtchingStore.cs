@@ -12,7 +12,7 @@ namespace Repository
         {
         }
 
-        public async Task<Etching> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted)
+        public async Task<EtchingShard> AddEtchingAsync(ulong eventId, ulong posterId, DateTimeOffset timePosted)
         { 
             Post toAdd = new() 
             { 
@@ -28,10 +28,10 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return new Etching ( toAdd.Id, toAdd.EventId, new UserSilhouette(toAdd.OwnerId, ownerName), toAdd.PostedAt, new(0, 0), toAdd.IsHidden );
+            return new EtchingShard ( toAdd.Id, toAdd.EventId, new UserSilhouette(toAdd.OwnerId, ownerName), toAdd.PostedAt, new(0, 0), toAdd.IsHidden );
         }
 
-        public async Task<List<Etching>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
+        public async Task<List<EtchingShard>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
             // Get List of Friends.
             Task<List<ulong>> following = storeSentry.ExecuteReadAsync(ctx => 
@@ -48,21 +48,21 @@ namespace Repository
             List<ulong> friends = (await following).Intersect(await followingMe).ToList();
 
             // Get unseen posts by friends from certain depth.
-            List<Etching> friendPosts = await storeSentry.ExecuteReadAsync(ctx =>
+            List<EtchingShard> friendPosts = await storeSentry.ExecuteReadAsync(ctx =>
               ctx.Posts.
               Where(p => friends.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
               Join(
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
+                  (p, u) => new EtchingShard(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
                ).ToListAsync());
 
             List<Task<int>> friendPostsPositiveRatings = new();
             List<Task<int>> friendPostNegativeRatings = new();
             List<ulong> sitesToBeExplored = new();
             List<ulong> previouslyExtractedPosts = new();
-            foreach (Etching e in friendPosts)
+            foreach (EtchingShard e in friendPosts)
             {
                 friendPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
                     ctx.PostLinks.
@@ -80,19 +80,19 @@ namespace Repository
             }
 
             // Get remaining friend posts from same events as others even if outside time range.
-            List<Etching> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => 
+            List<EtchingShard> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Posts.
                 Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.EventId)).
                 Join(
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new Etching(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
+                  (p, u) => new EtchingShard(p.Id, p.EventId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
                 ).ToListAsync());
 
             List<Task<int>> nettedPostsPositiveRatings = new();
             List<Task<int>> nettedPostNegativeRatings = new();
-            foreach (Etching e in nettedPosts)
+            foreach (EtchingShard e in nettedPosts)
             {
                 nettedPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
                     ctx.PostLinks.
@@ -113,15 +113,15 @@ namespace Repository
             return friendPosts.Concat(nettedPosts).ToList();
         }
 
-        public async Task<Etching> GetEtchingAsync(ulong id)
+        public async Task<EtchingShard> GetEtchingAsync(ulong id)
         {
             Task<int> ups = storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == id && l.Type == PostLink.PostLinkType.RateUp).CountAsync());
             Task<int> downs = storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == id && l.Type == PostLink.PostLinkType.RateDown).CountAsync());
 
-            Etching etching = await storeSentry.ExecuteReadAsync(ctx => 
+            EtchingShard etching = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Posts.
             Where(p => p.Id == id).
-            Select(p => new Etching(p.Id, p.EventId, new UserSilhouette(p.OwnerId, null), p.PostedAt, new (0,0), p.IsHidden)).
+            Select(p => new EtchingShard(p.Id, p.EventId, new UserSilhouette(p.OwnerId, null), p.PostedAt, new (0,0), p.IsHidden)).
             SingleAsync());
 
             Task<string> name = storeSentry.ExecuteReadAsync(ctx => 
@@ -133,11 +133,11 @@ namespace Repository
             return etching with { User = new UserSilhouette(etching.User.Id, await name), Ratings = new (await ups, await downs) };
         }
 
-        public async Task<List<Etching>> GetEtchingsByUserAsync(ulong id)
+        public async Task<List<EtchingShard>> GetEtchingsByUserAsync(ulong id)
         {
-            List<Etching> etchings = await storeSentry.ExecuteReadAsync(ctx =>
+            List<EtchingShard> etchings = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Posts.Where(p => p.OwnerId == id).
-                 Select(a => new Etching(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
+                 Select(a => new EtchingShard(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(etchings.Count);
@@ -206,11 +206,11 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(query);
         }
 
-        public async Task<List<Etching>> GetEtchingsForEventAsync(ulong id)
+        public async Task<List<EtchingShard>> GetEtchingsForEventAsync(ulong id)
         {
-            List<Etching> etchings = await storeSentry.ExecuteReadAsync(ctx =>
+            List<EtchingShard> etchings = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Posts.Where(p => p.EventId == id).
-                 Select(a => new Etching(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
+                 Select(a => new EtchingShard(a.Id, a.EventId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(etchings.Count);

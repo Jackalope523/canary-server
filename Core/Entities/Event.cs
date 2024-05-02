@@ -82,7 +82,7 @@ namespace Core.Entities
 
         public Synced<List<EventReport>> EventReports { get; }
 
-        public Synced<List<Etching>> Etchings { get; }
+        public Synced<List<EtchingShard>> Etchings { get; }
 
         #endregion
 
@@ -102,7 +102,7 @@ namespace Core.Entities
             Etchings = new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));
         }
 
-        public Event(EventShard fromEvent) : this()
+        public Event(CoreEvent fromEvent) : this()
         {
             Id = fromEvent.Id;
             Host = new(fromEvent.Host);
@@ -122,12 +122,37 @@ namespace Core.Entities
             NumberOfGuests = fromEvent.NumberOfGuests;
         }
 
-        public EventShard ToEventShard()
+        public Event(EventShard fromEvent) : this()
+        {
+            Id = fromEvent.Id;
+            Host = new(fromEvent.Host);
+            Name = fromEvent.Name;
+            Description = fromEvent.Description;
+            StartTime = fromEvent.StartTime;
+            Location = new()
+                { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
+            EndTime = fromEvent.TimeEnded;
+            State = fromEvent.State;
+            GroupMinimum = fromEvent.GroupMinimum;
+            GroupMaximum = fromEvent.GroupMaximum;
+            Radius = new() { Kilometres = fromEvent.Radius };
+            NumberOfGuests = fromEvent.NumberOfGuests;
+        }
+
+        public CoreEvent ToCoreEvent()
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
+        }
+
+        public EventShard ToEventShard()
+        {
+            return new(Id, Host.ToUserSilhouette(), Name, Description,
+                StartTime, Location.Latitude, Location.Longitude, EndTime,
+                State, GroupMinimum, GroupMaximum,
+                Radius.Kilometres, NumberOfGuests);
         }
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
@@ -176,7 +201,7 @@ namespace Core.Entities
             return friends;
         }
 
-        public async Task<List<Etching>> GetEtchingsOf(User user)
+        public async Task<List<EtchingShard>> GetEtchingsOf(User user)
         {
             return (await Etchings).Where(etching => etching.User.Id.Equals(user.Id)).ToList();
         }

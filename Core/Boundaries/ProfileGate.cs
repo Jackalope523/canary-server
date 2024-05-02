@@ -11,8 +11,8 @@ namespace Core.Boundaries
 
     public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
     public record UserSilhouette(ulong Id, string Name);
-    public record NestShard(List<EventShard> Events, List<Etching> Etchings);
-    public record ActivityShard(IDictionary<UserSilhouette, List<EventShard>> Activity);
+    public record NestShard(List<EventShard> Events, List<EtchingShard> Etchings);
+    public record ActivityShard(List<(EventShard Event, EventBond Bond)> Activity);
 
 	#endregion
 
@@ -39,10 +39,10 @@ namespace Core.Boundaries
 	public interface IProfileOperations
     {
         Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId);
-        Task<(List<EventShard> Events, List<Etching> Etchings)> GetUserNestAsync(ulong userId, ulong targetId);
+        Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
-        Task<List<(EventShard, EventBond)>> GetUserActivityAsync(ulong userId, ulong targetId);
-        Task<IDictionary<UserSilhouette, List<(EventShard, EventBond)>>> GetFriendActivityAsync(ulong userId);
+        Task<ActivityShard> GetUserActivityAsync(ulong userId, ulong targetId);
+        Task<IDictionary<UserSilhouette, ActivityShard>> GetFriendActivityAsync(ulong userId);
 
         Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
         Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);

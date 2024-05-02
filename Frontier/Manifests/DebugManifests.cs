@@ -6,10 +6,6 @@ using Core.Boundaries;
 
 namespace Frontier.Manifests
 {
-    ////////
-    // Incoming Manifests
-    ///////////////////////
-
     public class SeedManifest
     {
         public List<AccountSignUpManifest> Users { get; set; }

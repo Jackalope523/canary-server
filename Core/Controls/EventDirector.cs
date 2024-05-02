@@ -43,9 +43,9 @@ namespace Core.Controls
 			var nearbyEvents = await Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove events from list that the user cannot access
-			nearbyEvents = await RemoveInaccessibleEventsAsync(user, nearbyEvents);
+			var filteredEvents = await RemoveInaccessibleEventsAsync(user, nearbyEvents);
 
-			return nearbyEvents;
+			return filteredEvents;
 		}
 
 		public async Task<List<EventShard>> GetPersonalisedEventsInAreaAsync(ulong userId,
@@ -55,9 +55,9 @@ namespace Core.Controls
 			var nearbyEvents = await Events.FindEventsAsync(latitude, longitude, distance);
 
 			// Remove inaccessible events and events with a large difference between event and user interest
-			nearbyEvents = await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
+			var filteredEvents = await RemoveUnattractiveEventsAsync(user, nearbyEvents, 1f);
 
-			return nearbyEvents;
+			return filteredEvents;
 		}
 
 		public async Task<EventShard> CreateEventAsync(ulong userId,
@@ -101,15 +101,15 @@ namespace Core.Controls
 			{ throw new InvalidEventException($"User has event {conflict.Id} conflict."); }
 
 			// Try to create an event
-			var newEvent = await Events.CreateEventAsync(user.Id, eventStub.Name, eventStub.Description,
+			Event newEvent = new(await Events.CreateEventAsync(user.Id, eventStub.Name, eventStub.Description,
 				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
 				eventStub.GroupMinimum, eventStub.GroupMaximum, user.Character.ToCharacter(),
-				eventStub.Radius.Kilometres, eventStub.IsDynamic);
+				eventStub.Radius.Kilometres, eventStub.IsDynamic));
 
 			// Notify followers of event
 			_ = user.NotifyFollowers($"New Sparrow Event", $"{user.Name} just created a new event {newEvent.Name}");
 
-			return newEvent;
+			return newEvent.ToEventShard();
 		}
 
 		public async Task EditEventAsync(ulong userId, ulong eventId,
@@ -156,15 +156,15 @@ namespace Core.Controls
 			// Gather individual edits
 			if (!string.IsNullOrEmpty(eventDescription))
 			{
-				edits.Add((nameof(EventShard.Description), editedEvent.Description));
+				edits.Add((nameof(CoreEvent.Description), editedEvent.Description));
 			}
 			if (IsNotNull(isOpen))
 			{
-				edits.Add((nameof(EventShard.State), editedEvent.State));
+				edits.Add((nameof(CoreEvent.State), editedEvent.State));
 			}
 			if (IsNotNull(startTime))
 			{
-				edits.Add((nameof(EventShard.StartTime), editedEvent.StartTime));
+				edits.Add((nameof(CoreEvent.StartTime), editedEvent.StartTime));
 			}
 			if (IsNotNull(latitude) && IsNotNull(longitude))
 			{
@@ -172,19 +172,19 @@ namespace Core.Controls
 			}
 			if (IsNotNull(radius))
 			{
-				edits.Add((nameof(EventShard.Radius), editedEvent.Radius.Kilometres));
+				edits.Add((nameof(CoreEvent.Radius), editedEvent.Radius.Kilometres));
 			}
 			if (IsNotNull(isDynamic))
 			{
-				edits.Add((nameof(EventShard.IsDynamic), editedEvent.IsDynamic));
+				edits.Add((nameof(CoreEvent.IsDynamic), editedEvent.IsDynamic));
 			}
 			if (IsNotNull(groupMinimum))
 			{
-				edits.Add((nameof(EventShard.GroupMinimum), editedEvent.GroupMinimum));
+				edits.Add((nameof(CoreEvent.GroupMinimum), editedEvent.GroupMinimum));
 			}
 			if (IsNotNull(groupMaximum))
 			{
-				edits.Add((nameof(EventShard.GroupMaximum), editedEvent.GroupMaximum));
+				edits.Add((nameof(CoreEvent.GroupMaximum), editedEvent.GroupMaximum));
 			}
 
 			// Push update
@@ -208,7 +208,7 @@ namespace Core.Controls
 				new InvalidEventException("Event cannot be started."));
 
 			// Try to start event
-			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(EventShard.State), EventState.Open) });
+			await Events.UpdateEventAsync(targetEvent.Id, new() { (nameof(CoreEvent.State), EventState.Open) });
 			await Events.SetUserStateAsync(user.Id, targetEvent.Id, EventBond.Arrived, Time);
 
 			await targetEvent.Started();
@@ -229,7 +229,7 @@ namespace Core.Controls
 			var participants = await targetEvent.Ended();
 
 			// Update all participants' vectors
-			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(UserShard.Character), user.Character) });
+			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(CoreUser.Character), user.Character) });
 		}
 
 		public async Task DeleteEventAsync(ulong userId, ulong eventId)
@@ -367,14 +367,13 @@ namespace Core.Controls
 			{ throw new InvalidOperationException($"Could not leave event, user currently {userIntention.Value} event."); }
 		}
 
-		public async Task<(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)>
+		public async Task<GuestListShard>
 			GetGuestListAsync(ulong userId, ulong eventId)
 		{
 			var user = await GetUserAsync(userId);
 			var targetEvent = await GetEventAsync(eventId);
 
-			(int Watchers, int GuestCount, List<(UserSilhouette User, EventBond State)> Guests)
-				guestList = new(0, 0, new());
+			GuestListShard guestList = new(0, 0, new());
 
 			// Check if user is host
 			if (targetEvent.IsModifiableBy(user))
@@ -389,8 +388,11 @@ namespace Core.Controls
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers,
 					user => !user.State.Equals(EventBond.Watching)));
 
-				guestList.GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count;
-				guestList.Watchers = (await targetEvent.Watching).Count;
+				guestList = guestList with
+				{
+					GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count,
+					Watchers = (await targetEvent.Watching).Count
+				};
 			}
 			// Check if user is a guest
 			else if (await targetEvent.WasAttendedBy(user))
@@ -405,19 +407,25 @@ namespace Core.Controls
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetEvent.AllUsers,
 					user => user.State.Equals(EventBond.Arrived) || user.State.Equals(EventBond.Left)));
 
-				guestList.GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count;
-				guestList.Watchers = guestList.Guests.Where(guest => guest.State.Equals(EventBond.Watching)).Count();
+				guestList = guestList with
+				{
+					GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count,
+					Watchers = guestList.Guests.Where(guest => guest.Bond.Equals(EventBond.Watching)).Count()
+				};
             }
 			// Check if user can view event
 			else if (await targetEvent.IsVisibleTo(user))
 			{
 				// Retrieve user's friends that will be, are, or were attending
 				var friends = await targetEvent.GetFriendsOf(user);
-				guestList.Guests = SelectAsSilhouette(friends, _ => true);
+				guestList = new(0, 0, SelectAsSilhouette(friends, _ => true));
 
 				// Add visible information
-				guestList.GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count;
-				guestList.Watchers = SelectAsSilhouette(friends, friend => friend.State.Equals(EventBond.Watching)).Count;
+				guestList = guestList with
+				{
+					GuestCount = targetEvent.IsOngoing ? (await targetEvent.Arrived).Count : (await targetEvent.Left).Count,
+					Watchers = SelectAsSilhouette(friends, friend => friend.State.Equals(EventBond.Watching)).Count
+				};
 			}
 			// User cannot recieve information about event
 			else
@@ -488,7 +496,7 @@ namespace Core.Controls
 			await Events.SetUserStateAsync(targetUser.Id, @event.Id, EventBond.Kicked, Time);
 
 			// Hide target user's etchings from event
-			foreach (Etching etching in await @event.Etchings)
+			foreach (EtchingShard etching in await @event.Etchings)
 			{
 				if (targetUser.Etched(etching))
 				{ _ = Etchings.HideEtchingAsync(etching.Id); }
@@ -537,57 +545,55 @@ namespace Core.Controls
 				.ConvertAll(userDetails => (userDetails.Joined, userDetails.Left, new User(userDetails.User)));
 		}
 
-		internal static async Task<List<EventShard>>
-			RemoveInaccessibleEventsAsync(User user, List<EventShard> events)
+		internal async Task<List<EventShard>>
+			RemoveInaccessibleEventsAsync(User user, List<CoreEvent> events)
 		{
 			List<EventShard> accessibleEvents = new();
 
-			foreach (EventShard e in events)
+			foreach (CoreEvent coreEvent in events)
 			{
-				Event targetEvent = new(e);
+				Event @event = new(coreEvent);
 
-				if (await user.CanJoin(targetEvent))
-				{ accessibleEvents.Add(e); }
+				if (await user.CanJoin(@event))
+				{ accessibleEvents.Add(@event.ToEventShard()); }
 			}
 
 			return accessibleEvents;
 		}
 
-		internal async Task<List<(EventShard, EventBond)>>
-			RemoveInaccessibleEventBondsAsync(User user, List<(EventShard, EventBond)> events)
+		internal async Task<ActivityShard>
+			RemoveInaccessibleEventBondsAsync(User user, ActivityShard activity)
 		{
-			List<(EventShard, EventBond)> accessibleEvents = new();
+			ActivityShard accessibleEvents = new(new());
 
-			foreach ((EventShard shard, EventBond bond) in events)
+			foreach ((EventShard shard, EventBond bond) in activity.Activity)
 			{
 				Event targetEvent = new(shard);
 
 				if (await user.CanJoin(targetEvent))
-				{ accessibleEvents.Add((shard, bond)); }
+				{ accessibleEvents.Activity.Add((shard, bond)); }
 			}
 
 			return accessibleEvents;
 		}
 
 		internal async Task<List<EventShard>>
-			RemoveUnattractiveEventsAsync(User user, List<EventShard> events, float maximumAngle)
+			RemoveUnattractiveEventsAsync(User user, List<CoreEvent> events, float maximumAngle)
         {
-            List<EventShard> inaccessibleEvents = new();
+            List<EventShard> accessibleEvents = new();
 
-            foreach (EventShard e in events)
+            foreach (CoreEvent coreEvent in events)
 			{
-				Event targetEvent = new(e);
+				Event @event = new(coreEvent);
 
-				if (!await user.CanJoin(targetEvent))
-				{ inaccessibleEvents.Add(e); continue; }
+				if (await user.CanJoin(@event))
+				{ accessibleEvents.Add(@event.ToEventShard()); continue; }
 
-				if (CharacterVector.AngleBetweenAffected(user.Character, targetEvent.Character) > maximumAngle)
-				{ inaccessibleEvents.Add(e); }
+				if (CharacterVector.AngleBetweenAffected(user.Character, @event.Character) < maximumAngle)
+				{ accessibleEvents.Add(@event.ToEventShard()); }
             }
 
-            events = events.Except(inaccessibleEvents).ToList();
-
-            return events;
+            return accessibleEvents;
 		}
 
 		#endregion

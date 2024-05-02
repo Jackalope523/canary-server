@@ -6,10 +6,6 @@ using Core.Boundaries;
 
 namespace Frontier.Manifests
 {
-	////////
-	// Incoming Manifests
-	///////////////////////
-
 	public class AccountDetailsManifest
     {
         public string Name { get; set; }
@@ -19,49 +15,6 @@ namespace Frontier.Manifests
     {
         [Required]
         public UserRating Rating { get; set; }
-    }
-
-    ////////
-    // Outgoing Manifests
-    ///////////////////////
-
-    public class UserProfileManifest : Manifest
-    {
-        public ulong Id { get; }
-        public string Name { get; }
-        public int Reputation { get; }
-        public int NumberOfFollowers { get; }
-
-        public UserProfileManifest(UserProfile profile)
-        {
-            Id = profile.Id;
-            Name = profile.Name;
-            Reputation = profile.Reputation;
-            NumberOfFollowers = profile.NumberOfFollowers;
-        }
-    }
-
-    public class UserSilhouetteManifest : Manifest
-    {
-        public ulong Id { get; }
-        public string Name { get; }
-
-        public UserSilhouetteManifest(UserSilhouette silhouette)
-        {
-            Id = silhouette.Id;
-            Name = silhouette.Name;
-        }
-    }
-
-    public class NestManifest : Manifest
-    {
-        public List<EventManifest> Events { get; set; }
-        public List<EtchingManifest> Etchings { get; set; }
-    }
-
-    public class FriendActivityManifest : Manifest
-    {
-        public IDictionary<UserSilhouetteManifest, List<EventManifest>> Activity { get; set; }
     }
 }
 

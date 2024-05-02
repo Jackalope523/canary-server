@@ -14,7 +14,7 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public MediaGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public MediaGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion

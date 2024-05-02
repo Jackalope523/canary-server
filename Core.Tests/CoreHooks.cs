@@ -31,7 +31,7 @@ namespace Core.Tests
         {
 			ContentValidation.TryNormalisePhoneNumber(phoneNumber, out phoneNumber);
             // Ensure no duplicate user exists
-            UserShard userCheck = null;
+            CoreUser userCheck = null;
 			try
 			{
 				userCheck = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
@@ -53,7 +53,7 @@ namespace Core.Tests
 
 			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character);
 
-			UserShard createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
+			CoreUser createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
 			generatedUserIds.Add(createdUser.Id);
         }
 
@@ -62,17 +62,17 @@ namespace Core.Tests
 			await accounts.DeleteUserAsync(userId);
         }
 
-        public async Task<UserShard> FindUserByEmailAsync(string normalisedEmail)
+        public async Task<CoreUser> FindUserByEmailAsync(string normalisedEmail)
         {
 			return await accounts.FindUserByEmailAsync(normalisedEmail);
         }
 
-        public async Task<UserShard> FindUserByIdAsync(ulong userId)
+        public async Task<CoreUser> FindUserByIdAsync(ulong userId)
         {
 			return await accounts.FindUserByIdAsync(userId);
         }
 
-        public async Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber)
+        public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber)
         {
             ContentValidation.TryNormalisePhoneNumber(phoneNumber, out phoneNumber);
             return await accounts.FindUserByPhoneNumberAsync(phoneNumber);
