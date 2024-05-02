@@ -15,7 +15,8 @@ namespace Core.Boundaries
     public record CoreEvent(ulong Id, UserSilhouette Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
 		EventState State, int GroupMinimum, int GroupMaximum, Character Character,
-		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests);
+		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests)
+		: CoreOnlyData();
 
 	public record EventShard(ulong Id, UserSilhouette Host, string Name, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,

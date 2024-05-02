@@ -5,13 +5,20 @@ using System.Threading.Tasks;
 
 namespace Core.Boundaries
 {
+    #region Schema
+
+    public record CoreOnlyData();
+
+    #endregion
+
     #region Gates
 
-	public interface IAdminDatabase
+    public interface IAdminDatabase
 	{
         Task VoidUserAsync(ulong userId);
         Task VoidEventAsync(ulong eventId);
     }
+
     #endregion
 }
 

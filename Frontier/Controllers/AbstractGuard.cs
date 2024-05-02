@@ -83,6 +83,16 @@ namespace Frontier.Controllers
 			{
 				var result = await action.Invoke();
 
+                // Check if there is a result
+                if (result == null)
+                {
+					Ok();
+                }
+
+                // Ensure outgoing type is generic or manifest
+                if (result is CoreOnlyData)
+                { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}."); }
+
                 return Ok(result);
 			}
 			catch (HollowFailureException ex)
@@ -95,7 +105,7 @@ namespace Frontier.Controllers
 			catch (UserErrorException ex)
 			{
 				// Log debug information
-				log.LogError("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+				log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
 
                 return BadRequest(ex.Message);
 			}
