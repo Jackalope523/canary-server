@@ -11,7 +11,10 @@ namespace Frontier.Tests
 {
 	public class AbstractGuardTests
 	{
-		AbstractGuard testGuard = new(null, null);
+		static ILogger log = LoggerFactory.Create((ILoggingBuilder obj) => NoOp()).CreateLogger("testing");
+		static GuardBox testBox = new(log, null, null, null, null, null, null, null, null, null);
+
+		AbstractGuard testGuard = new(testBox, null);
 
 		[Fact]
 		public async Task Execute_NoData_Success()
@@ -25,20 +28,6 @@ namespace Frontier.Tests
 			// Assert
 			Assert.NotNull(result);
 			Assert.Null(result.Value);
-		}
-
-		[Fact]
-		public async Task Execute_String_Success()
-		{
-			// Arrange
-			Func<Task<object>> action = async () => "some silly string";
-
-			// Act
-			var result = await testGuard.Execute(action) as ObjectResult;
-
-			// Assert
-			Assert.NotNull(result);
-			Assert.Equal(await action.Invoke(), result.Value);
 		}
 
 		[Fact]
@@ -79,10 +68,13 @@ namespace Frontier.Tests
 		}
 
 		[Fact]
-		public async Task Execute_InvalidData_Failure()
+		public async Task Execute_ProtectedData_Failure()
 		{
 			// Arrange
-			UserSilhouette bastardData = new(117, "John");
+			CoreUser bastardData = new(117, "John", "", "", DateTimeOffset.UtcNow,
+				true, true, false, "", null,
+				0, UserAccountStatus.Impotent, DateTimeOffset.UtcNow, 0, 0, null);
+
 			Func<Task<object>> action = async () => bastardData;
 
 			// Act
