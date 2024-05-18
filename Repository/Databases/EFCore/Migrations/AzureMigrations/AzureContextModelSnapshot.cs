@@ -58,7 +58,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notes");
+                    b.ToTable("Notes", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
@@ -82,7 +82,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties");
+                    b.ToTable("Penalties", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -107,7 +107,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Event", b =>
@@ -184,7 +184,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("Repository.EventLink", b =>
@@ -213,7 +213,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventLinks");
+                    b.ToTable("EventLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.EventReport", b =>
@@ -246,7 +246,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventReports");
+                    b.ToTable("EventReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Post", b =>
@@ -279,7 +279,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Repository.PostLink", b =>
@@ -309,7 +309,7 @@ namespace Repository.Migrations.AzureMigrations
                     b.HasIndex("UserId", "PostId")
                         .IsUnique();
 
-                    b.ToTable("PostLinks");
+                    b.ToTable("PostLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -412,7 +412,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Repository.UserLink", b =>
@@ -441,7 +441,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserLinks");
+                    b.ToTable("UserLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -479,7 +479,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports");
+                    b.ToTable("UserReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Note", b =>

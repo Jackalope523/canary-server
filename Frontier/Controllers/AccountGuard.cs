@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
-using Shared;
+
 using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
@@ -16,13 +16,13 @@ namespace Frontier.Controllers
 	{
         #region Initialisation
 
-        SignInManager<UserShard> signInManager;
+        SignInManager<CoreUser> signInManager;
 
         IEmailService emailService;
         ISMSService smsService;
 
-		public AccountGuard(GuardBox box, UserManager<UserShard> aspUserManager,
-            SignInManager<UserShard> aspSignInManager,
+		public AccountGuard(GuardBox box, UserManager<CoreUser> aspUserManager,
+            SignInManager<CoreUser> aspSignInManager,
             IEmailService externalEmailService, ISMSService externalSMSService) :
             base(box, aspUserManager)
 		{
@@ -42,7 +42,7 @@ namespace Frontier.Controllers
             return await Execute(async () =>
             {
                 // Get current user
-                UserManifest user = new(await GetCurrentUserAsync());
+                var user = await GetCurrentUserAsync();
 
                 return user;
             });
@@ -58,7 +58,7 @@ namespace Frontier.Controllers
 
             return await Execute(async () =>
             {
-                var user = await accounts.GetUserAsync(credentials.PhoneNumber);
+                var user = await accounts.GetCoreUserAsync(credentials.PhoneNumber);
                 string code;
 
                 // Verify that the account is activated
@@ -101,7 +101,7 @@ namespace Frontier.Controllers
 
             return await Execute(async () =>
             {
-                var user = await accounts.GetUserAsync(credentials.PhoneNumber);
+                var user = await accounts.GetCoreUserAsync(credentials.PhoneNumber);
 
                 if (await userManager.IsLockedOutAsync(user))
 				{
@@ -223,14 +223,14 @@ namespace Frontier.Controllers
                         details.Name, details.DateOfBirth.ToUniversalTime());
 
                     // Send an SMS to new user with a generated change number token
-                    var user = await accounts.GetUserAsync(details.PhoneNumber);
+                    var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
                     var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
                     await smsService.SendSMSAsync(user.PhoneNumber, $"Your Sparrow code is {code}");
                 }
                 catch (InvalidUserException e)
                 {
                     // Account already exists
-                    var user = await accounts.GetUserAsync(details.PhoneNumber);
+                    var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
 
                     // Check if account is activated
                     if (!await userManager.IsPhoneNumberConfirmedAsync(user))

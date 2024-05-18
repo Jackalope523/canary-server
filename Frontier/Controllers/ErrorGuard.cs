@@ -10,7 +10,7 @@ namespace Frontier.Controllers
     {
 		#region Initialisation
 
-		public ErrorGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public ErrorGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion

@@ -10,7 +10,7 @@ namespace Frontier.Controllers
     {
 		#region Initialisation
 
-		public RootGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public RootGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion

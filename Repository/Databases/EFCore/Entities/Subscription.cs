@@ -1,14 +1,14 @@
-﻿using Shared;
+﻿using Core.Boundaries;
 
 namespace Repository.Entities
 {
-    internal class Subscription
+    public class Subscription
     {
-        internal ulong Id { get; set; }
+        public ulong Id { get; set; }
 
-        internal ulong UserId { get; set; }
-        internal User User { get; set; }
-        internal DeviceType DeviceType { get; set; }
-        internal string DeviceToken { get; set; }
+        public ulong UserId { get; set; }
+        public User User { get; set; }
+        public DeviceType DeviceType { get; set; }
+        public string DeviceToken { get; set; }
     }
 }

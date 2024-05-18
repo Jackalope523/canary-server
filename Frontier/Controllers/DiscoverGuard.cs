@@ -14,7 +14,7 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public DiscoverGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public DiscoverGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
     { }
 
 		#endregion
@@ -27,11 +27,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve events personalised for the current user
-				var manifest = ManifestSeries<EventManifest>.Create(
-					await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance),
-					shard => new EventManifest(shard));
-
-				return manifest;
+				return await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
 			});
         }
 
@@ -40,12 +36,8 @@ namespace Frontier.Controllers
         {
 			return await Execute(async user =>
 			{
-                // Retrieve all events available to the current user
-                var manifest = ManifestSeries<EventManifest>.Create(
-					await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance),
-					shard => new EventManifest(shard));
-;
-				return manifest;
+				// Retrieve all events available to the current user
+				return await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
 			});
         }
 

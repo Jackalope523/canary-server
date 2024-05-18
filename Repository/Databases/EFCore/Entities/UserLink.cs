@@ -1,15 +1,15 @@
 ﻿namespace Repository
 {
-    internal class UserLink
+    public class UserLink
     {
-        internal enum UserLinkType { Follow, Block, RateUp, RateDown }
+        public enum UserLinkType { Follow, Block, RateUp, RateDown }
 
-        internal ulong Id { get; set; }
-        internal ulong SelfId { get; init; }
-        internal User Self { get; init; }
-        internal ulong OtherId { get; init; }
-        internal User Other { get; init; }
-        internal DateTimeOffset Time { get; init; }
-        internal UserLinkType Type { get; set; }
+        public ulong Id { get; set; }
+        public ulong SelfId { get; init; }
+        public User Self { get; init; }
+        public ulong OtherId { get; init; }
+        public User Other { get; init; }
+        public DateTimeOffset Time { get; init; }
+        public UserLinkType Type { get; set; }
     }
 }

@@ -148,7 +148,7 @@ namespace Repository.Tests
             Assert.NotNull(retrieved);
             Assert.Equal(9, retrieved.Count);
 
-            Etching e1Etching = retrieved.Find(etching => etching.Id.Equals(e1.Id));
+            EtchingShard e1Etching = retrieved.Find(etching => etching.Id.Equals(e1.Id));
             Assert.NotNull(e1Etching);
             //Assert.Equal(e1.OwnerId, e1Etching.UserId);
             Assert.Equal(e1.EventId, e1Etching.EventId);

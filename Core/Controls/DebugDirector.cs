@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-using Shared;
 
 namespace Core.Controls
 {
@@ -27,6 +26,11 @@ namespace Core.Controls
 		public async Task SeedDatabaseAsync()
 		{
 			await Debug.DrainDatabaseAsync();
+		}
+
+		public async Task AddUserToBannerAsync(string phoneNumber, string banner)
+		{
+			await Banners.AddBannerMemberAsync(phoneNumber, banner);
 		}
 
 		#endregion

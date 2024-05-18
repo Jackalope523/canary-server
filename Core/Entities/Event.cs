@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Shared;
 using Core.Boundaries;
 
 using static Core.Entities.Arbiter;
@@ -29,7 +28,7 @@ namespace Core.Entities
         public readonly TimeSpan MaximumEtchingLateness = OneDay;
 
         public static Event None
-            => new() { Id = 0 };
+            => new() { Id = 0, Exists = false };
 
 		///////
 		// Properties
@@ -66,6 +65,8 @@ namespace Core.Entities
         public bool IsEnded
             => EndTime.HasValue;
 
+        public bool Exists { get; set; } = true;
+
         ////////
         // Synced Properties
         //////////////////////
@@ -81,7 +82,7 @@ namespace Core.Entities
 
         public Synced<List<EventReport>> EventReports { get; }
 
-        public Synced<List<Etching>> Etchings { get; }
+        public Synced<List<EtchingShard>> Etchings { get; }
 
         #endregion
 
@@ -101,7 +102,7 @@ namespace Core.Entities
             Etchings = new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));
         }
 
-        public Event(EventShard fromEvent) : this()
+        public Event(CoreEvent fromEvent) : this()
         {
             Id = fromEvent.Id;
             Host = new(fromEvent.Host);
@@ -121,12 +122,37 @@ namespace Core.Entities
             NumberOfGuests = fromEvent.NumberOfGuests;
         }
 
-        public EventShard ToEventShard()
+        public Event(EventShard fromEvent) : this()
+        {
+            Id = fromEvent.Id;
+            Host = new(fromEvent.Host);
+            Name = fromEvent.Name;
+            Description = fromEvent.Description;
+            StartTime = fromEvent.StartTime;
+            Location = new()
+                { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
+            EndTime = fromEvent.TimeEnded;
+            State = fromEvent.State;
+            GroupMinimum = fromEvent.GroupMinimum;
+            GroupMaximum = fromEvent.GroupMaximum;
+            Radius = new() { Kilometres = fromEvent.Radius };
+            NumberOfGuests = fromEvent.NumberOfGuests;
+        }
+
+        public CoreEvent ToCoreEvent()
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
+        }
+
+        public EventShard ToEventShard()
+        {
+            return new(Id, Host.ToUserSilhouette(), Name, Description,
+                StartTime, Location.Latitude, Location.Longitude, EndTime,
+                State, GroupMinimum, GroupMaximum,
+                Radius.Kilometres, NumberOfGuests);
         }
 
         public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
@@ -138,21 +164,26 @@ namespace Core.Entities
 
 		#region Composition
 
-		public bool ValidateAndNormalise()
-        { 
+		public bool ValidateAndNormalise(out string issues)
+        {
+            issues = "";
+
             // Sanitise User content
             Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
 
+            // Verify Event is now or in the future
+            if (HappenedBefore(StartTime, Time)) { issues += "Event is in the past. "; }
+
             // Verify Event is within a reasonable time
-            if (After(StartTime, Time + OneWeek)) { return false; }
+            if (After(StartTime, Time + OneWeek)) { issues += "Event is too far in the future. "; }
 
             // Verify group bounds
             if (GroupMaximum != 0 &&
                 (GroupMaximum <= GroupMinimum ||
-                GroupMaximum < 4)) { return false; }
+                GroupMaximum < 4)) { issues += "Event group bounds invalid. "; }
 
-            return true;
+            return issues.Equals("");
         }
 
         public async Task<List<(User User, EventBond State)>> GetFriendsOf(User user)
@@ -170,7 +201,7 @@ namespace Core.Entities
             return friends;
         }
 
-        public async Task<List<Etching>> GetEtchingsOf(User user)
+        public async Task<List<EtchingShard>> GetEtchingsOf(User user)
         {
             return (await Etchings).Where(etching => etching.User.Id.Equals(user.Id)).ToList();
         }
@@ -362,7 +393,9 @@ namespace Core.Entities
 
 		public override bool Equals(object obj)
 		{
-			return obj is Event other && Id.Equals(other.Id);
+			return obj is Event other &&
+                Exists == other.Exists &&
+                Id.Equals(other.Id);
 		}
 
 		public override int GetHashCode()

@@ -1,5 +1,5 @@
 ﻿using Core.Boundaries;
-using Shared;
+
 
 namespace Repository
 {
@@ -11,12 +11,12 @@ namespace Repository
             store = new EFCoreNotificationStore(flag);
         }
 
-        public async Task<List<Note>> GetNotesAsync(ulong userId)
+        public async Task<List<NoteShard>> GetNotesAsync(ulong userId)
         {
             return await store.GetNotesAsync(userId);
         }
 
-        public async Task<DeviceSilhouette> GetUserSubscriptionAsync(ulong userId)
+        public async Task<DeviceShard> GetUserSubscriptionAsync(ulong userId)
         {
             return await store.GetUserSubscriptionAsync(userId);
         }

@@ -15,7 +15,9 @@ namespace Repository
         internal DbSet<Post> Posts { get; set; }
         internal DbSet<Note> Notes { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
-        internal DbSet<Penalty> Penalties { get; set; }
+        internal DbSet<Entities.Penalty> Penalties { get; set; }
+        //internal DbSet<Banner> Banners { get; set; }
+        //internal DbSet<BannerLink> BannerLinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,6 +53,8 @@ namespace Repository
             modelBuilder.Entity<User>()
                 .HasMany(u => u.PostLinks)
                 .WithOne(l => l.User);
+
+           
         }       
     }
 }

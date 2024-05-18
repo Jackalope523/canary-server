@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.Entities;
 using Xunit;
 using System.IO;
-using Shared;
+
 
 namespace Core.Tests.Entities
 {
@@ -26,7 +26,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = validUser.ValidateAndNormalise();
+			bool result = validUser.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.True(result);
@@ -44,7 +44,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = invalidUser.ValidateAndNormalise();
+			bool result = invalidUser.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.False(result);
@@ -315,7 +315,7 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var @event = await environment.GenerateUpcomingEventAsync(host);
 
-			await environment.UpdateUser(user, nameof(UserShard.AccountStatus), UserAccountStatus.Limited);
+			await environment.UpdateUser(user, nameof(CoreUser.AccountStatus), UserAccountStatus.Limited);
 			user = new(await environment.Terminal.AccountDatabase.FindUserByIdAsync(user.Id));
 
 			// Act

@@ -11,7 +11,7 @@ namespace Core
     {
         #region Variables
 
-        public static CoreTerminal Terminal { get; private set; }
+        public static CoreTerminal Terminal { get; protected set; }
         private static object initLock = new();
 
         public ILogger Log { get; init; }
@@ -84,7 +84,7 @@ namespace Core
             }
         }
 
-        private CoreTerminal(ILogger logger,
+        protected CoreTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
 			IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
 			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,

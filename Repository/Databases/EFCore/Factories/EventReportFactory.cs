@@ -11,7 +11,7 @@
             {
                 UserId = reporter.Id,
                 EventId = location.Id,
-                Type = Shared.EventReportType.Misleading,
+                Type = EventReportType.Misleading,
                 FilingDate = DateTimeOffset.MinValue,
                 Notes = "Test Event Report " + created
             };          

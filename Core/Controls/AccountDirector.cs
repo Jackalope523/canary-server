@@ -3,7 +3,6 @@ using Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shared;
 
 using static Core.Entities.Arbiter;
 using static Core.Entities.Artificer;
@@ -21,19 +20,24 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<UserShard> GetUserAsync(ulong userId)
+		public async Task<CoreUser> GetCoreUserAsync(ulong userId)
         {
-            return (await base.GetUserAsync(userId)).ToUserShard();
+            return (await GetUserAsync(userId)).ToCoreUser();
         }
 
-        public async Task<UserShard> GetUserAsync(string phoneNumber)
+        public async Task<CoreUser> GetCoreUserAsync(string phoneNumber)
 		{
             // Verify phone number is valid
             Try(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
                 new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
 
-            return (await GetUser(normalisedPhoneNumber)).ToUserShard();
+            return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
 		}
+
+		public async Task<UserShard> GetUserShardAsync(ulong userId)
+        {
+            return (await GetUserAsync(userId)).ToUserShard();
+        }
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
@@ -48,8 +52,8 @@ namespace Core.Controls
             };
 
             // Validate and normalise user
-            Try(newUser.ValidateAndNormalise(),
-                new InvalidInformationException("Invalid account details provided."));
+            Try(newUser.ValidateAndNormalise(out string issues),
+                new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
 
             // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
@@ -88,8 +92,8 @@ namespace Core.Controls
             user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
-            Try(user.ValidateAndNormalise(),
-                new InvalidInformationException("Invalid details provided."));
+            Try(user.ValidateAndNormalise(out string issues),
+                new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
 
             List<(string Property, object Value)> edits = new();
 
@@ -97,38 +101,38 @@ namespace Core.Controls
 			if (phoneNumberChanged)
             {
                 await ThrowIfPhoneNumberTaken(user.PhoneNumber);
-                edits.Add((nameof(UserShard.PhoneNumber), user.PhoneNumber));
+                edits.Add((nameof(CoreUser.PhoneNumber), user.PhoneNumber));
 			}
 			if (emailChanged)
 			{
                 await ThrowIfEmailTaken(user.Email);
-                edits.Add((nameof(UserShard.Email), email));
+                edits.Add((nameof(CoreUser.Email), email));
                 edits.Add(("NormalisedEmail", user.Email));
 			}
 			if (nameChanged)
 			{
-                edits.Add((nameof(UserShard.Name), user.Name));
+                edits.Add((nameof(CoreUser.Name), user.Name));
 			}
             // Internal attributes for account store
 			if (IsNotNull(isPhoneNumberConfirmed))
 			{
-                edits.Add((nameof(UserShard.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
+                edits.Add((nameof(CoreUser.IsPhoneConfirmed), isPhoneNumberConfirmed.Value));
 			}
 			if (IsNotNull(isEmailConfirmed))
 			{
-                edits.Add((nameof(UserShard.IsEmailConfirmed), isEmailConfirmed.Value));
+                edits.Add((nameof(CoreUser.IsEmailConfirmed), isEmailConfirmed.Value));
 			}
 			if (!string.IsNullOrEmpty(securityStamp))
 			{
-                edits.Add((nameof(UserShard.SecurityStamp), securityStamp));
+                edits.Add((nameof(CoreUser.SecurityStamp), securityStamp));
 			}
 			if (IsNotNull(lockoutDate))
 			{
-                edits.Add((nameof(UserShard.LockoutDate), lockoutDate.Value));
+                edits.Add((nameof(CoreUser.LockoutDate), lockoutDate.Value));
 			}
 			if (IsNotNull(accessTries))
 			{
-                edits.Add((nameof(UserShard.AccessTries), accessTries.Value));
+                edits.Add((nameof(CoreUser.AccessTries), accessTries.Value));
 			}
 
             // Push update
@@ -228,6 +232,10 @@ namespace Core.Controls
             RequestLastKnownUserLocationAsync(User user)
         {
             var result = await Accounts.GetRecentUserLocationAsync(user.Id);
+
+            if (result == null)
+            { return (GeoLocation.None, Distance.None); }
+
             return (new() { Latitude = result.Latitude, Longitude = result.Longitude }, new() { Metres = result.Radius });
         }
 

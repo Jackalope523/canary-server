@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+
 using Core.Boundaries;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
@@ -49,13 +49,13 @@ namespace Frontier.Controllers
 		public INotificationOperations notifications;
 		public IProfileOperations profiles;
 
-		public UserManager<UserShard> userManager;
+		public UserManager<CoreUser> userManager;
 
 		#endregion
 
 		#region Initialisation
 
-		public AbstractGuard(GuardBox box, UserManager<UserShard> aspUserManager)
+		public AbstractGuard(GuardBox box, UserManager<CoreUser> aspUserManager)
 		{
 			log = box.log;
 
@@ -83,33 +83,36 @@ namespace Frontier.Controllers
 			{
 				var result = await action.Invoke();
 
-				// Check if there is a result
-				if (result != null)
-				{
-					// Ensure outgoing type is generic or manifest
-					if (result is not Manifest &&
-						result is not string &&
-						result is not int)
-					{ throw new UnexpectedFailureException($"Server tried sending non-manifest object type {result.GetType()}."); }
-				}
+                // Check if there is a result
+                if (result == null)
+                {
+					Ok();
+                }
+
+                // Ensure outgoing type is generic or manifest
+                if (result is CoreOnlyData)
+                { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}."); }
 
                 return Ok(result);
 			}
 			catch (HollowFailureException ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
+				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
 
 				return StatusCode(500);
 			}
-			catch (UserErrorException ex) 
+			catch (UserErrorException ex)
 			{
-				return BadRequest(ex.Message);
+				// Log debug information
+				log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+
+                return BadRequest(ex.Message);
 			}
 			catch (Exception ex)
 			{
 				// Log failure
-				log.LogError(ex, "Exception Message: {message}\n{trace}", ex.Message, ex.StackTrace);
+				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
 
 				return StatusCode(500);
 			}
@@ -126,7 +129,7 @@ namespace Frontier.Controllers
 		}
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<UserShard, Task> action, bool allowUnverified = false)
+		public async Task<IActionResult> Execute(Func<CoreUser, Task> action, bool allowUnverified = false)
 		{
 			return await Execute(async user =>
 			{
@@ -137,7 +140,7 @@ namespace Frontier.Controllers
 		}
 
 		[NonAction]
-		public async Task<IActionResult> Execute(Func<UserShard, Task<object>> action, bool allowUnverified = false)
+		public async Task<IActionResult> Execute(Func<CoreUser, Task<object>> action, bool allowUnverified = false)
 		{
 			return await Execute(async () =>
 			{
@@ -151,11 +154,11 @@ namespace Frontier.Controllers
 		}
 
 		[NonAction]
-		public async Task<UserShard> GetCurrentUserAsync()
+		public async Task<CoreUser> GetCurrentUserAsync()
 			=> await userManager.GetUserAsync(HttpContext.User);
 
 		[NonAction]
-		public void ThrowIfUnverified(UserShard user)
+		public void ThrowIfUnverified(CoreUser user)
 		{
 			if (user.IsEmailConfirmed)
 			{ throw new InvalidUserException("User has not yet confirmed their email."); }

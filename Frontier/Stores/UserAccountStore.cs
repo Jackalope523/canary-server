@@ -6,23 +6,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Core.Boundaries;
+using Frontier.Controllers;
 
 namespace Frontier.Stores
 {
-	public class UserAccountStore : IUserStore<UserShard>,
-		IUserPhoneNumberStore<UserShard>,
-		IUserEmailStore<UserShard>,
-		IUserSecurityStampStore<UserShard>,
-		IUserLockoutStore<UserShard>
+	public class UserAccountStore : IUserStore<CoreUser>,
+		IUserPhoneNumberStore<CoreUser>,
+		IUserEmailStore<CoreUser>,
+		IUserSecurityStampStore<CoreUser>,
+		IUserLockoutStore<CoreUser>
 	{
 		private IAccountOperations accounts { get; init; }
 
-		public UserAccountStore(IAccountOperations accountOperations)
+		public UserAccountStore(GuardBox box)
 		{
-			accounts = accountOperations;
+			accounts = box.accounts;
 		}
 
-		public async Task<IdentityResult> CreateAsync(UserShard user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> CreateAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -30,7 +31,7 @@ namespace Frontier.Stores
 			return IdentityResult.Success;
 		}
 
-		public async Task<IdentityResult> DeleteAsync(UserShard user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> DeleteAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -38,56 +39,56 @@ namespace Frontier.Stores
 			return IdentityResult.Success;
 		}
 
-		public async Task<UserShard> FindByIdAsync(string userId, CancellationToken cancellationToken)
+		public async Task<CoreUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await accounts.GetUserAsync(GetId(userId));
+			return await accounts.GetCoreUserAsync(GetId(userId));
 		}
 
-		public async Task<UserShard> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+		public async Task<CoreUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await accounts.GetUserAsync(normalizedUserName);
+			return await accounts.GetCoreUserAsync(normalizedUserName);
 		}
 
-		public async Task<string> GetNormalizedUserNameAsync(UserShard user, CancellationToken cancellationToken)
+		public async Task<string> GetNormalizedUserNameAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await GetPhoneNumberAsync(user, cancellationToken);
 		}
 
-		public Task<string> GetUserIdAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<string> GetUserIdAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.Id.ToString());
 		}
 
-		public async Task<string> GetUserNameAsync(UserShard user, CancellationToken cancellationToken)
+		public async Task<string> GetUserNameAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await GetPhoneNumberAsync(user, cancellationToken);
 		}
 
-		public Task SetNormalizedUserNameAsync(UserShard user, string normalizedName, CancellationToken cancellationToken)
+		public Task SetNormalizedUserNameAsync(CoreUser user, string normalizedName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(0);
 		}
 
-		public Task SetUserNameAsync(UserShard user, string userName, CancellationToken cancellationToken)
+		public Task SetUserNameAsync(CoreUser user, string userName, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(0);
 		}
 
-		public async Task<IdentityResult> UpdateAsync(UserShard user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> UpdateAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -98,105 +99,105 @@ namespace Frontier.Stores
 			return IdentityResult.Success;
 		}
 
-		public async Task SetPhoneNumberAsync(UserShard user, string phoneNumber, CancellationToken cancellationToken)
+		public async Task SetPhoneNumberAsync(CoreUser user, string phoneNumber, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, phoneNumber: phoneNumber);
 		}
 
-		public Task<string> GetPhoneNumberAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<string> GetPhoneNumberAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.PhoneNumber);
 		}
 
-		public Task<bool> GetPhoneNumberConfirmedAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<bool> GetPhoneNumberConfirmedAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.IsPhoneConfirmed);
 		}
 
-		public async Task SetPhoneNumberConfirmedAsync(UserShard user, bool confirmed, CancellationToken cancellationToken)
+		public async Task SetPhoneNumberConfirmedAsync(CoreUser user, bool confirmed, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, isPhoneNumberConfirmed: confirmed);
 		}
 
-		public async Task SetEmailAsync(UserShard user, string email, CancellationToken cancellationToken)
+		public async Task SetEmailAsync(CoreUser user, string email, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, email: email);
 		}
 
-		public Task<string> GetEmailAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<string> GetEmailAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.Email);
 		}
 
-		public Task<bool> GetEmailConfirmedAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<bool> GetEmailConfirmedAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.IsEmailConfirmed);
 		}
 
-		public async Task SetEmailConfirmedAsync(UserShard user, bool confirmed, CancellationToken cancellationToken)
+		public async Task SetEmailConfirmedAsync(CoreUser user, bool confirmed, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, isEmailConfirmed: confirmed);
 		}
 
-		public async Task<UserShard> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+		public async Task<CoreUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await accounts.GetUserAsync(normalizedEmail);
+			return await accounts.GetCoreUserAsync(normalizedEmail);
 		}
 
-		public Task<string> GetNormalizedEmailAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<string> GetNormalizedEmailAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.Email);
 		}
 
-		public Task SetNormalizedEmailAsync(UserShard user, string normalizedEmail, CancellationToken cancellationToken)
+		public Task SetNormalizedEmailAsync(CoreUser user, string normalizedEmail, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(0);
 		}
 
-		public async Task SetSecurityStampAsync(UserShard user, string stamp, CancellationToken cancellationToken)
+		public async Task SetSecurityStampAsync(CoreUser user, string stamp, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, securityStamp: stamp);
 		}
 
-		public Task<string> GetSecurityStampAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<string> GetSecurityStampAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.SecurityStamp);
 		}
 
-		public Task<DateTimeOffset?> GetLockoutEndDateAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<DateTimeOffset?> GetLockoutEndDateAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.LockoutDate);
 		}
 
-		public async Task SetLockoutEndDateAsync(UserShard user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
+		public async Task SetLockoutEndDateAsync(CoreUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -207,7 +208,7 @@ namespace Frontier.Stores
 			await accounts.EditUserAsync(user.Id, lockoutDate: lockoutEnd.Value);
 		}
 
-		public async Task<int> IncrementAccessFailedCountAsync(UserShard user, CancellationToken cancellationToken)
+		public async Task<int> IncrementAccessFailedCountAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -216,28 +217,28 @@ namespace Frontier.Stores
 			return currentTries + 1;
 		}
 
-		public async Task ResetAccessFailedCountAsync(UserShard user, CancellationToken cancellationToken)
+		public async Task ResetAccessFailedCountAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await accounts.EditUserAsync(user.Id, accessTries: 0);
 		}
 
-		public Task<int> GetAccessFailedCountAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<int> GetAccessFailedCountAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(user.AccessTries);
 		}
 
-		public Task<bool> GetLockoutEnabledAsync(UserShard user, CancellationToken cancellationToken)
+		public Task<bool> GetLockoutEnabledAsync(CoreUser user, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return Task.FromResult(true);
 		}
 
-		public Task SetLockoutEnabledAsync(UserShard user, bool enabled, CancellationToken cancellationToken)
+		public Task SetLockoutEnabledAsync(CoreUser user, bool enabled, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 

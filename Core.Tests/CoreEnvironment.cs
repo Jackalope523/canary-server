@@ -8,7 +8,7 @@ using Core.Boundaries;
 using Core.Entities;
 using Xunit;
 using Xunit.Abstractions;
-using Shared;
+
 using NetTopologySuite.Utilities;
 using System.ComponentModel;
 using System.Collections.Concurrent;
@@ -63,6 +63,7 @@ namespace Core.Tests
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
+				harbor.BannerDatabaseAccess,
                 harbor.EventDatabaseAccess,
                 harbor.EtchingDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -204,7 +205,7 @@ namespace Core.Tests
 			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
-			await Terminal.EventDatabase.UpdateEventAsync(eventStub.Id, new() { (nameof(EventShard.State), EventState.Open) });
+			await Terminal.EventDatabase.UpdateEventAsync(eventStub.Id, new() { (nameof(CoreEvent.State), EventState.Open) });
 			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)
@@ -287,17 +288,17 @@ namespace Core.Tests
 		// Etching Helpers
 		////////////////////
 
-		internal async Task<Etching> GenerateEtchingAsync(Event etchedEvent, User etcher)
+		internal async Task<EtchingShard> GenerateEtchingAsync(Event etchedEvent, User etcher)
 		{
 			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime);
 		}
 
-		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, Etching etching)
+		internal async Task<EtchingShard> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, EtchingShard etching)
 		{
 			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, etching.TimeEtched);
 		}
 
-		internal async Task<Etching> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched)
+		internal async Task<EtchingShard> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched)
 		{
 			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched);
 		}
@@ -311,7 +312,7 @@ namespace Core.Tests
 			await Terminal.NotificationDatabase.SaveNoteAsync(user.Id, notifier.Id, new DateTime(0), message, action);
 		}
 
-		internal async Task<List<Note>> GetNotesAsync(User user)
+		internal async Task<List<NoteShard>> GetNotesAsync(User user)
 		{
 			return await Terminal.NotificationDatabase.GetNotesAsync(user.Id);
 		}
@@ -321,9 +322,9 @@ namespace Core.Tests
 			await Terminal.NotificationDatabase.SubscribeUserAsync(user.Id, deviceType, deviceToken);
 		}
 
-		internal async Task<DeviceSilhouette> GetUserSubscriptionAsync(User user)
+		internal async Task<DeviceShard> GetUserSubscriptionAsync(User user)
 		{
-			DeviceSilhouette subscription = null;
+			DeviceShard subscription = null;
 
 			try
 			{

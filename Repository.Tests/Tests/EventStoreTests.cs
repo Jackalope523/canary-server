@@ -2,7 +2,7 @@
 using Core.Boundaries;
 using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
-using Shared;
+
 using Microsoft.Extensions.Logging;
 
 namespace Repository.Tests
@@ -10,8 +10,8 @@ namespace Repository.Tests
     [Collection("Database Collection")]
     public class EventStoreTests : IDisposable
     {
-        private static EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static EFCoreEventStore store = new(Harbor.Flag.Development);
+        private static EFCoreSentry sentry = new(Harbor.Flag.Production);
+        private static EFCoreEventStore store = new(Harbor.Flag.Production);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -39,7 +39,7 @@ namespace Repository.Tests
         [Fact]
         public async Task CreateEventAsync_SUCCESS()
         {
-            EventShard createdShard = await store.CreateEventAsync(
+            CoreEvent createdShard = await store.CreateEventAsync(
                 testEvent.HostId,
                 testEvent.Name,
                 testEvent.Description,
@@ -79,7 +79,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindEventAsync_SUCCESS()
         {
-            EventShard found = await store.FindEventAsync(testEvent.Id);
+            CoreEvent found = await store.FindEventAsync(testEvent.Id);
 
             Assert.NotNull(found);
             Assert.Equal(testEvent.Id, found.Id);
@@ -99,7 +99,7 @@ namespace Repository.Tests
             string newDescription = "The Second of few.";
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.Description), newDescription));
+            updates.Add((nameof(CoreEvent.Description), newDescription));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -125,7 +125,7 @@ namespace Repository.Tests
             EventState newState = EventState.Ended;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.State), newState));
+            updates.Add((nameof(CoreEvent.State), newState));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -151,7 +151,7 @@ namespace Repository.Tests
             DateTimeOffset newTime = DateTimeOffset.UtcNow;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.StartTime), newTime));
+            updates.Add((nameof(CoreEvent.StartTime), newTime));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -229,7 +229,7 @@ namespace Repository.Tests
             double newRadius = 27.056;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.Radius), newRadius));
+            updates.Add((nameof(CoreEvent.Radius), newRadius));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -255,7 +255,7 @@ namespace Repository.Tests
             bool newType = true;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.IsDynamic), newType));
+            updates.Add((nameof(CoreEvent.IsDynamic), newType));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -281,7 +281,7 @@ namespace Repository.Tests
             int newMinimum = 6;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.GroupMinimum), newMinimum));
+            updates.Add((nameof(CoreEvent.GroupMinimum), newMinimum));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -307,7 +307,7 @@ namespace Repository.Tests
             int newMaximum = 6;
 
             List<(string, object)> updates = new List<(string, object)>();
-            updates.Add((nameof(EventShard.GroupMaximum), newMaximum));
+            updates.Add((nameof(CoreEvent.GroupMaximum), newMaximum));
 
             await store.UpdateEventAsync(testEvent.Id, updates);
 
@@ -334,7 +334,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentEvent, testEvent.Id)));
 
-            EventShard @event = await store.FindCurrentEventForUserAsync(testUser.Id);
+            CoreEvent @event = await store.FindCurrentEventForUserAsync(testUser.Id);
 
             Assert.NotNull(@event);
             Assert.Equal(testEvent.HostId, @event.Host.Id);
@@ -354,7 +354,7 @@ namespace Repository.Tests
             EventLink link = new EventLinkFactory().Create(testUser, testEvent, EventBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.EventLinks.Add(link));
 
-            EventShard @event = (await store.FindUpcomingEventsForUserAsync(testUser.Id)).First();
+            CoreEvent @event = (await store.FindUpcomingEventsForUserAsync(testUser.Id)).First();
 
             Assert.NotNull(@event);
             Assert.Equal(testEvent.HostId, @event.Host.Id);
@@ -377,7 +377,7 @@ namespace Repository.Tests
                    Where(e => e.Id == testEvent.Id).
                    ExecuteUpdate(setter => setter.SetProperty(e => e.State, EventState.Ended)));
 
-            EventShard @event = (await store.FindPastEventsForUserAsync(testUser.Id)).First();
+            CoreEvent @event = (await store.FindPastEventsForUserAsync(testUser.Id)).First();
 
             Assert.NotNull(@event);
             Assert.Equal(testEvent.HostId, @event.Host.Id);
@@ -493,7 +493,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindEventsByUserAsync_SUCCESS()
         {
-            EventShard @event  = (await store.FindEventsByUserAsync(testUser.Id)).Single();
+            CoreEvent @event  = (await store.FindEventsByUserAsync(testUser.Id)).Single();
 
             Assert.NotNull(@event);
             Assert.Equal(testEvent.HostId, @event.Host.Id);

@@ -1,6 +1,6 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
-using Shared;
+
 
 namespace Repository
 {
@@ -153,12 +153,12 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Penalties.Add(toAdd));
         }
 
-        public async Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
+        public async Task<List<PenaltyShard>> GetPenaltiesForUserAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Penalties.
             Where(p => p.PenalizedId == userId).
-            Select(p => new Penalty(p.Type, p.Time)).
+            Select(p => new PenaltyShard(p.Type, p.Time)).
             ToListAsync());
         }     
     }

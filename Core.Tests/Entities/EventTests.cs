@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.Entities;
 using Xunit;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-using Shared;
+
 using System.IO;
 using System.Collections.Concurrent;
 
@@ -30,7 +30,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = validEvent.ValidateAndNormalise();
+			bool result = validEvent.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.True(result);
@@ -50,7 +50,7 @@ namespace Core.Tests.Entities
 			};
 
 			// Act
-			bool result = invalidEvent.ValidateAndNormalise();
+			bool result = invalidEvent.ValidateAndNormalise(out string _);
 
 			// Assert
 			Assert.False(result);

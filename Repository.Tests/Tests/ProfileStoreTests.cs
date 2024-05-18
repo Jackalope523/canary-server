@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Xunit.Abstractions;
-using Shared;
+
 
 namespace Repository.Tests
 {

@@ -1,20 +1,20 @@
-﻿using Shared;
+﻿using Core.Boundaries;
 
 namespace Repository
 {
-    internal class EventReport
+    public class EventReport
     {
-        internal EventReportType Type { get; set; }
+        public EventReportType Type { get; set; }
 
-        internal ulong Id { get; init; }
+        public ulong Id { get; init; }
 
-        internal ulong UserId { get; init; }
-        internal User? Self { get; init; } // Navigation Property
+        public ulong UserId { get; init; }
+        public User? Self { get; init; } // Navigation Property
 
-        internal ulong EventId { get; init; }
-        internal Event? Event { get; init; } // Navigation Property
+        public ulong EventId { get; init; }
+        public Event? Event { get; init; } // Navigation Property
 
-        internal DateTimeOffset FilingDate { get; init; }
-        internal string Notes { get; init; }
+        public DateTimeOffset FilingDate { get; init; }
+        public string Notes { get; init; }
     }
 }

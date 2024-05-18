@@ -1,5 +1,4 @@
 ﻿using Core.Boundaries;
-using Shared;
 
 namespace Repository
 {
@@ -47,7 +46,7 @@ namespace Repository
             await store.PenaliseUserAsync(userId, offense, timeOfPenalty);
         }
 
-        public async Task<List<Penalty>> GetPenaltiesForUserAsync(ulong userId)
+        public async Task<List<PenaltyShard>> GetPenaltiesForUserAsync(ulong userId)
         {
             return await store.GetPenaltiesForUserAsync(userId);
         }     

@@ -67,7 +67,7 @@ namespace Repository.Tests
             Post testEtching = new EtchingFactory().Create(subject, testEvent);
             await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testEtching));
 
-            Etching retrieved = await etchingStore.GetEtchingAsync(testEtching.Id);
+            EtchingShard retrieved = await etchingStore.GetEtchingAsync(testEtching.Id);
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
@@ -84,7 +84,7 @@ namespace Repository.Tests
             int a = sentry.ExecuteRead(ctx => ctx.Posts.Count());
             _testOutputHelper.WriteLine(a.ToString());
 
-           Etching retrieved = (await etchingStore.GetEtchingsByUserAsync(subject.Id)).First();
+           EtchingShard retrieved = (await etchingStore.GetEtchingsByUserAsync(subject.Id)).First();
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
@@ -98,7 +98,7 @@ namespace Repository.Tests
             Post testEtching = new EtchingFactory().Create(subject, testEvent);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
 
-            Etching retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
+            EtchingShard retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
@@ -113,7 +113,7 @@ namespace Repository.Tests
             Post testEtching = new EtchingFactory().Create(subject, testEvent);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
 
-            await etchingStore.RateEtchingAsync(testEtching.Id, subject.Id, Shared.UserRating.Positive);
+            await etchingStore.RateEtchingAsync(testEtching.Id, subject.Id, UserRating.Positive);
 
             PostLink created = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.FirstAsync());
 
@@ -144,7 +144,7 @@ namespace Repository.Tests
 
             await etchingStore.HideEtchingAsync(testEtching.Id);
 
-            Etching retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
+            EtchingShard retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);

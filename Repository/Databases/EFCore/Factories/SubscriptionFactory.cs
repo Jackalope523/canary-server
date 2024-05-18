@@ -12,7 +12,7 @@ namespace Repository
             return new Subscription
             {
                 UserId = user.Id,
-                DeviceType = Shared.DeviceType.iOS,
+                DeviceType = DeviceType.iOS,
                 DeviceToken = produced.ToString()
             };
         }

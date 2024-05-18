@@ -2,7 +2,7 @@
 using Core.Boundaries;
 using Xunit.Abstractions;
 using NetTopologySuite.Geometries;
-using Shared;
+
 
 namespace Repository.Tests
 {
@@ -11,8 +11,8 @@ namespace Repository.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static readonly EFCoreAccountStore store = new(Harbor.Flag.Development);  
+        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Production);
+        private static readonly EFCoreAccountStore store = new(Harbor.Flag.Production);  
         
         private User subject;
 
@@ -96,7 +96,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByIdAsync_SUCCESS()
         {
-            UserShard found = await store.FindUserByIdAsync(subject.Id);
+            CoreUser found = await store.FindUserByIdAsync(subject.Id);
 
             Assert.NotNull(found);
 
@@ -132,7 +132,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByPhoneNumberAsync_SUCCESS()
         {
-            UserShard found = await store.FindUserByPhoneNumberAsync(subject.PhoneNumber);
+            CoreUser found = await store.FindUserByPhoneNumberAsync(subject.PhoneNumber);
 
             Assert.NotNull(found);
 
@@ -168,7 +168,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByEmailAsync_SUCCESS()
         {
-            UserShard found = await store.FindUserByEmailAsync(subject.Email);
+            CoreUser found = await store.FindUserByEmailAsync(subject.Email);
 
             Assert.NotNull(found);
 

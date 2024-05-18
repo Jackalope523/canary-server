@@ -1,7 +1,7 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Shared;
+
 
 namespace Repository
 {
@@ -11,7 +11,7 @@ namespace Repository
         {
         }
 
-        public async Task<EventShard> CreateEventAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character, double radius, bool isDynamic)
+        public async Task<CoreEvent> CreateEventAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character, double radius, bool isDynamic)
         {
             Event toCreate = new()
             {
@@ -49,7 +49,7 @@ namespace Repository
             UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync());
 
 
-            return new EventShard
+            return new CoreEvent
                 (
                    toCreate.Id,
                    host,
@@ -83,7 +83,7 @@ namespace Repository
                 Where(e => e.Id == eventId).
                 ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));       
         }
-        public async Task<EventShard> FindCurrentEventForUserAsync(ulong id) 
+        public async Task<CoreEvent> FindCurrentEventForUserAsync(ulong id) 
         {
             ulong? currentEvent = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Users.
@@ -91,13 +91,13 @@ namespace Repository
             Select(u => u.CurrentEvent).
             SingleAsync());
 
-            EventShard? @event = null;
+            CoreEvent? @event = null;
             if (currentEvent != null)
             {
                 @event = await storeSentry.ExecuteReadAsync(ctx =>
                     ctx.Events.
                     Where(e => e.Id == currentEvent).
-                    Select(e => new EventShard
+                    Select(e => new CoreEvent
                     (
                         e.Id,
                         new UserSilhouette(e.HostId, null),
@@ -135,9 +135,9 @@ namespace Repository
             }
             return @event;          
         }
-        public async Task<List<EventShard>> FindUpcomingEventsForUserAsync(ulong id) 
+        public async Task<List<CoreEvent>> FindUpcomingEventsForUserAsync(ulong id) 
         {
-             List<EventShard> upcomingEvents = await storeSentry.ExecuteReadAsync(ctx =>
+             List<CoreEvent> upcomingEvents = await storeSentry.ExecuteReadAsync(ctx =>
              ctx.EventLinks.
              Where(l => l.UserId == id && l.Type == EventBond.Guest).
              Join(
@@ -172,7 +172,7 @@ namespace Repository
                  ctx.Users,
                  e => e.HostId,
                  u => u.Id,
-                 (e, u) => new EventShard
+                 (e, u) => new CoreEvent
                  (
                     e.Id,
                     new UserSilhouette(u.Id, u.Name),
@@ -217,7 +217,72 @@ namespace Repository
 
             return upcomingEvents;
         }
-        public async Task<List<EventShard>> FindPastEventsForUserAsync(ulong id)
+        public async Task<List<CoreEvent>> FindWatchingEventsForUserAsync(ulong id) 
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+             ctx.EventLinks.
+             Where(l => l.UserId == id && l.Type == EventBond.Watching).
+             Join(
+                ctx.Events,
+                l => l.EventId,
+                e => e.Id,
+                (l, e) => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.HostId,
+                    e.Description,
+                    e.StartTime,
+                    e.Location,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness,
+                    e.Radius,
+                    e.IsDynamic,
+                    e.IsPendingDeletion,
+                    e.NumberOfGuests
+                }).
+             Join(
+                 ctx.Users,
+                 e => e.HostId,
+                 u => u.Id,
+                 (e, u) => new CoreEvent
+                 (
+                    e.Id,
+                    new UserSilhouette(u.Id, u.Name),
+                    e.Name,
+                    e.Description,
+                    e.StartTime,
+                    e.Location.Y,
+                    e.Location.X,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    new Character(
+                    e.Extroversion,
+                    e.Athleticisme,
+                    e.Chaos,
+                    e.Competitiveness,
+                    e.Industriousness,
+                    e.NightOwl,
+                    e.Openness),
+                    e.Radius,
+                    e.IsDynamic,
+                    e.IsPendingDeletion,
+                    e.NumberOfGuests
+                 )).
+               ToListAsync());
+        }
+        public async Task<List<CoreEvent>> FindPastEventsForUserAsync(ulong id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.EventLinks.
@@ -254,7 +319,7 @@ namespace Repository
                 ctx.Users,
                 e => e.HostId,
                 u => u.Id,
-                (e, u) => new EventShard
+                (e, u) => new CoreEvent
                 (
                    e.Id,
                    new UserSilhouette(u.Id, u.Name),
@@ -282,12 +347,12 @@ namespace Repository
                 )).
               ToListAsync());
         }
-        public async Task<EventShard> FindEventAsync(ulong id)
+        public async Task<CoreEvent> FindEventAsync(ulong id)
         {
-            EventShard @event = await storeSentry.ExecuteReadAsync(ctx => 
+            CoreEvent @event = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Events.
             Where(e => e.Id == id).
-            Select(e => new EventShard
+            Select(e => new CoreEvent
                (
                    e.Id,
                    new UserSilhouette(e.HostId, null),
@@ -319,7 +384,7 @@ namespace Repository
 
             return @event with {Host = host } ;
         }
-        public async Task<List<EventShard>> FindEventsAsync(double latitude, double longitude, double distance)
+        public async Task<List<CoreEvent>> FindEventsAsync(double latitude, double longitude, double distance)
         {
             Point currentLocation = new CoordinateFactory().Create(longitude, latitude);
             DateTimeOffset today = DateTimeOffset.UtcNow;
@@ -332,7 +397,7 @@ namespace Repository
                     ctx.Users, 
                     e => e.HostId, 
                     u => u.Id, 
-                    (e,u) => new EventShard
+                    (e,u) => new CoreEvent
                     (
                         e.Id,
                         new UserSilhouette(u.Id, u.Name),
@@ -425,29 +490,29 @@ namespace Repository
             {
                 switch (Property)
                 {
-                    case nameof(EventShard.Description):
+                    case nameof(CoreEvent.Description):
                         e.Description = (string)Value;
                         break;
-                    case nameof(EventShard.State):
+                    case nameof(CoreEvent.State):
                         e.State = (EventState)Value;
                         break;
-                    case nameof(EventShard.StartTime):
+                    case nameof(CoreEvent.StartTime):
                         e.StartTime = (DateTimeOffset)Value;
                         break;
                     case "Location":
                         var Location = ((double,double))Value;
                         e.Location = new CoordinateFactory().Create(Location.Item2, Location.Item1);
                         break;              
-                    case nameof(EventShard.Radius):
+                    case nameof(CoreEvent.Radius):
                         e.Radius = (double)Value;
                         break;
-                    case nameof(EventShard.IsDynamic):
+                    case nameof(CoreEvent.IsDynamic):
                         e.IsDynamic = (bool)Value;
                         break;
-                    case nameof(EventShard.GroupMinimum):
+                    case nameof(CoreEvent.GroupMinimum):
                         e.GroupMinimum = (int)Value;                    
                         break;
-                    case nameof(EventShard.GroupMaximum):
+                    case nameof(CoreEvent.GroupMaximum):
                         e.GroupMaximum = (int)Value;
                         break;
                     default:
@@ -500,7 +565,7 @@ namespace Repository
 
             return toReturn;
         }      
-        public async Task<List<EventShard>> FindEventsByUserAsync(ulong userId)
+        public async Task<List<CoreEvent>> FindEventsByUserAsync(ulong userId)
         {
            return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.Events.
@@ -509,7 +574,7 @@ namespace Repository
                ctx.Users,
                e => e.HostId,
                u => u.Id,
-               (e, u) => new EventShard(
+               (e, u) => new CoreEvent(
                     e.Id, 
                     new UserSilhouette(u.Id, u.Name), 
                     e.Name, 
@@ -545,7 +610,7 @@ namespace Repository
             Select(l => new { l.Type, l.Time }).
             ToListAsync());
 
-            states.Sort((x,y) => DateTimeOffset.Compare(x.Time, y.Time));
+            states.Sort((x, y) => DateTimeOffset.Compare(x.Time, y.Time));
 
             return states.Last().Type;
         }

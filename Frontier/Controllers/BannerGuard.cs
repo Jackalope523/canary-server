@@ -16,7 +16,7 @@ namespace Frontier.Controllers
 
 		ISMSService smsService;
 
-		public BannerGuard(GuardBox box, UserManager<UserShard> aspUserManager, ISMSService externalSMSService) : base(box, aspUserManager)
+		public BannerGuard(GuardBox box, UserManager<CoreUser> aspUserManager, ISMSService externalSMSService) : base(box, aspUserManager)
 		{
 			smsService = externalSMSService;
 		}

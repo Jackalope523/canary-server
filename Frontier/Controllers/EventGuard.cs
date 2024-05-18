@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Frontier.Manifests;
 using Core.Boundaries;
 using Microsoft.Extensions.Logging;
-using Shared;
+
 using System.Collections.Generic;
 
 namespace Frontier.Controllers
@@ -14,7 +14,7 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		public EventGuard(GuardBox box, UserManager<UserShard> aspUserManager) : base(box, aspUserManager)
+		public EventGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
@@ -27,9 +27,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Retrieve event information
-				EventManifest targetEvent = new (await events.GetEventInformationAsync(user.Id, eventId));
-
-				return targetEvent;
+				return await events.GetEventInformationAsync(user.Id, eventId);
 			});
         }
 
@@ -43,13 +41,11 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Create a new event
-				EventManifest newEvent = new(await events.CreateEventAsync(user.Id,
-					eventDetails.EventName, eventDetails.EventDescription,
+				return await events.CreateEventAsync(user.Id,
+					eventDetails.Name, eventDetails.Description,
 					eventDetails.StartTime, eventDetails.Latitude, eventDetails.Longitude,
 					eventDetails.Radius, eventDetails.IsDynamic,
-					eventDetails.GroupMinimum, eventDetails.GroupMaximum));
-
-				return newEvent;
+					eventDetails.GroupMinimum, eventDetails.GroupMaximum);
 			});
         }
 
@@ -63,7 +59,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await events.EditEventAsync(user.Id, eventId,
-					eventDescription: eventDetails.EventDescription ?? "",
+					eventDescription: eventDetails.Description ?? "",
 					isOpen: eventDetails.IsOpen,
 					startTime: eventDetails.StartTime,
 					latitude: eventDetails.Latitude, longitude: eventDetails.Longitude,
@@ -147,17 +143,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var shard = await events.GetGuestListAsync(user.Id, eventId);
-
-				GuestListManifest guestList = new()
-				{
-					Watchers = shard.Watchers,
-					GuestCount = shard.GuestCount,
-					Guests = shard.Guests
-						.ConvertAll(pair => (new UserSilhouetteManifest(pair.User), pair.State)),
-				};
-
-				return guestList;
+				return await events.GetGuestListAsync(user.Id, eventId);
 			});
 		}
 
@@ -166,11 +152,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var manifest = ManifestSeries<UserSilhouetteManifest>.Create(
-					await events.GetPotentialInviteesAsync(user.Id, eventId),
-					silhouette => new UserSilhouetteManifest(silhouette));
-
-				return manifest;
+				return await events.GetPotentialInviteesAsync(user.Id, eventId);
 			});
         }
 
@@ -210,11 +192,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				var manifest = ManifestSeries<EtchingManifest>.Create(
-					await etchings.GetEventEtchingsAsync(user.Id, eventId),
-					etching => new EtchingManifest(etching));
-
-				return manifest;
+				return await etchings.GetEventEtchingsAsync(user.Id, eventId);
 			});
 		}
 
@@ -227,9 +205,7 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				EtchingManifest newEtching = new(await etchings.AddEtchingAsync(user.Id, eventId, await StreamFirstFile()));
-
-				return newEtching;
+				return await etchings.AddEtchingAsync(user.Id, eventId, await StreamFirstFile());
 			});
 		}
 

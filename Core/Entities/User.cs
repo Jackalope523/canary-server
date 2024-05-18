@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Controls;
 using Microsoft.Extensions.Hosting;
-using Shared;
+using Microsoft.Extensions.Logging;
 
 using static Core.Entities.Psijic;
 using static Core.Entities.Arbiter;
@@ -89,8 +89,8 @@ namespace Core.Entities
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
-        public Synced<List<Note>> Notes { get; }
-        public Synced<List<Penalty>> Penalties { get; }
+        public Synced<List<NoteShard>> Notes { get; }
+        public Synced<List<PenaltyShard>> Penalties { get; }
 
         private Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync { get; }
         public Synced<List<UserReport>> Reports { get; }
@@ -135,7 +135,7 @@ namespace Core.Entities
             EventReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).EventReports);
         }
 
-        public User(UserShard fromUser) : this()
+        public User(CoreUser fromUser) : this()
         {
             Id = fromUser.Id;
             PhoneNumber = fromUser.PhoneNumber;
@@ -169,12 +169,18 @@ namespace Core.Entities
             NumberOfFollowers = fromUser.NumberOfFollowers;
         }
 
-        public UserShard ToUserShard()
+        public CoreUser ToCoreUser()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
+        }
+
+        public UserShard ToUserShard()
+        {
+            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+                Reputation, NumberOfFollowers);
         }
 
         public UserSilhouette ToUserSilhouette()
@@ -191,23 +197,26 @@ namespace Core.Entities
 
 		#region Composition
 
-		public bool ValidateAndNormalise()
+		public bool ValidateAndNormalise(out string issues)
         {
+            issues = "";
+
             // Verify phone number
-            if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber)) { return false; }
+            if (!ContentValidation.TryNormalisePhoneNumber(PhoneNumber, out string normalisedPhoneNumber))
+            { issues += "Invalid phone number. "; }
 
             // Verify email if it exists
             if (!string.IsNullOrEmpty(Email) &&
-                !ContentValidation.IsEmailValid(Email)) { return false; }
+                !ContentValidation.IsEmailValid(Email)) { issues += "Invalid email. "; }
 
             // Verify user age
-            if (HasYet(DateOfBirth + (OneYear * 18))) { return false; }
+            if (HasYet(DateOfBirth + (OneYear * 18))) { issues += "User is too young. "; }
 
             // Normalise
             Email = string.IsNullOrEmpty(Email) ? Email : Email.ToLower();
             PhoneNumber = normalisedPhoneNumber;
 
-            return true;
+            return issues.Equals("");
         }
 
         public void GenerateSecurityStamp()
@@ -356,7 +365,7 @@ namespace Core.Entities
 				new InvalidEventException("Event has already ended."));
 		}
 
-		public bool Etched(Etching etching)
+		public bool Etched(EtchingShard etching)
         {
             return etching.User.Id.Equals(Id);
 		}
@@ -378,6 +387,14 @@ namespace Core.Entities
         
         public async Task HandleHaunt()
         {
+            // Check if user has a haunt and recent location
+            if (!(await Haunt).Exists || !(await LastKnownLocation).Exists)
+            {
+                Haunt.Set(await LastKnownLocation);
+                HauntStability.Set(1);
+                return;
+            }
+
             // Check if recent location is within haunt area
             if (GeoLocation.DistanceBetween(await Haunt, await LastKnownLocation) < await HauntRadius)
             {

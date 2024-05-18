@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-using Shared;
 
 using static Core.Entities.Psijic;
 
@@ -21,7 +20,7 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<Note>> GetNotesAsync(ulong userId)
+		public async Task<List<NoteShard>> GetNotesAsync(ulong userId)
 		{
 			var user = await GetUserAsync(userId);
 
@@ -53,7 +52,7 @@ namespace Core.Controls
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-			DeviceSilhouette userSettings;
+			DeviceShard userSettings;
 
             // Check if user is subscribed
             try

@@ -9,27 +9,30 @@ namespace Core.Boundaries
 	public enum UserAccountStatus
 	{ Active, Impotent, Limited, Suspended, Blacklisted }
 
-	public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
+	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character);
+		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character)
+		: CoreOnlyData();
 
-	public record Character(int Extraversion, int Athleticism, int Chaoticness,
+    public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
+        DateTimeOffset DateOfBirth, int Reputation, int NumberOfFollowers);
+
+    public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
 
     public record RecentLocation(double Latitude, double Longitude, double Radius);
     public record Haunt(double Latitude, double Longitude, double Radius, int Stability);
 	
-
     #endregion
 
     #region Gates
 
     public interface IAccountDatabase
 	{
-		Task<UserShard> FindUserByIdAsync(ulong userId);
-        Task<UserShard> FindUserByPhoneNumberAsync(string phoneNumber);
-		Task<UserShard> FindUserByEmailAsync(string normalisedEmail);
+		Task<CoreUser> FindUserByIdAsync(ulong userId);
+        Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber);
+		Task<CoreUser> FindUserByEmailAsync(string normalisedEmail);
 		Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character);
 		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
@@ -44,8 +47,9 @@ namespace Core.Boundaries
 
 	public interface IAccountOperations
 	{
-		Task<UserShard> GetUserAsync(ulong userId);
-		Task<UserShard> GetUserAsync(string phoneNumber);
+		Task<CoreUser> GetCoreUserAsync(ulong userId);
+		Task<CoreUser> GetCoreUserAsync(string phoneNumber);
+		Task<UserShard> GetUserShardAsync(ulong userId);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
 		Task EditUserAsync(ulong userId,
