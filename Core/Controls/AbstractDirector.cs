@@ -22,7 +22,7 @@ namespace Core.Controls
 		protected IKeyDatabase Keys { get; private set; }
 		protected IMediaDatabase Media { get; private set; }
 		protected INotificationDatabase Notifications { get; private set; }
-		protected IProfileDatabase Profiles { get; private set; }
+		protected INestDatabase Nests { get; private set; }
 
 		#endregion
 
@@ -40,7 +40,7 @@ namespace Core.Controls
 			Keys = Terminal.KeyDatabase;
 			Media = Terminal.MediaDatabase;
 			Notifications = Terminal.NotificationDatabase;
-			Profiles = Terminal.ProfileDatabase;
+			Nests = Terminal.NestDatabase;
         }
 
 		#endregion

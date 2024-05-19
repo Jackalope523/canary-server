@@ -16,11 +16,11 @@ namespace Frontier.Controllers
 		public IDisciplineOperations reports;
 		public IMediaOperations media;
 		public INotificationOperations notifications;
-		public IProfileOperations profiles;
+		public INestOperations nests;
 
 		public GuardBox(ILogger logger,
 			IAccountOperations accountOperations, IBannerOperations bannerOperations,
-			IProfileOperations profileOperations, IGatheringOperations gatheringOperations,
+			INestOperations nestOperations, IGatheringOperations gatheringOperations,
 			ISnapshotOperations snapshotOperations, IKeyOperations keyOperations,
 			IDisciplineOperations disciplineOperations,IMediaOperations mediaOperations,
 			INotificationOperations notificationOperations)
@@ -29,7 +29,7 @@ namespace Frontier.Controllers
 
 			accounts = accountOperations;
 			banners = bannerOperations;
-			profiles = profileOperations;
+			nests = nestOperations;
 			gatherings = gatheringOperations;
 			snapshots = snapshotOperations;
 			keys = keyOperations;

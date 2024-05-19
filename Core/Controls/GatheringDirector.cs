@@ -106,8 +106,8 @@ namespace Core.Controls
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, user.Character.ToCharacter(),
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
 
-			// Notify followers of gathering
-			_ = user.NotifyFollowers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
+			// Notify appreciateers of gathering
+			_ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
 
 			return newGathering.ToGatheringShard();
 		}

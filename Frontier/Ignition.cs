@@ -116,14 +116,14 @@ namespace Frontier
                 harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
-                harbor.ProfileDatabaseAccess,
+                harbor.NestDatabaseAccess,
                 pushNotifications,
                 harbor.DebugDatabaseAccess);
 
             GuardBox box = new(frontierLogger,
                 terminal.AccountOperations,
                 terminal.BannerOperations,
-                terminal.ProfileOperations,
+                terminal.NestOperations,
                 terminal.GatheringOperations,
                 terminal.SnapshotOperations,
                 terminal.KeyOperations,

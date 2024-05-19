@@ -25,7 +25,7 @@ namespace Core
         public IKeyDatabase KeyDatabase { get; init; }
         public IMediaDatabase MediaDatabase { get; init; }
         public INotificationDatabase NotificationDatabase { get; init; }
-        public IProfileDatabase ProfileDatabase { get; init; }
+        public INestDatabase NestDatabase { get; init; }
 
         public IAccountOperations AccountOperations
             => AccountDirector;
@@ -43,8 +43,8 @@ namespace Core
             => MediaDirector;
         public INotificationOperations NotificationOperations
             => NotificationDirector;
-        public IProfileOperations ProfileOperations
-            => ProfileDirector;
+        public INestOperations NestOperations
+            => NestDirector;
 
         public INotificationService NotificationService { get; init; }
 
@@ -56,7 +56,7 @@ namespace Core
         internal KeyDirector KeyDirector { get; private set; }
         internal MediaDirector MediaDirector { get; private set; }
         internal NotificationDirector NotificationDirector { get; private set; }
-        internal ProfileDirector ProfileDirector { get; private set; }
+        internal NestDirector NestDirector { get; private set; }
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace Core
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService)
         {
             lock (initLock)
@@ -77,7 +77,7 @@ namespace Core
                         gatheringDatabase, snapshotDatabase,
                         disciplineDatabase, keyDatabase,
                         mediaDatabase, notificationDatabase,
-                        profileDatabase,
+                        nestDatabase,
                         notificationService);
 
                 return Terminal;
@@ -89,7 +89,7 @@ namespace Core
 			IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
 			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService)
         {
             Log = logger;
@@ -103,7 +103,7 @@ namespace Core
             KeyDatabase = keyDatabase;
             MediaDatabase = mediaDatabase;
             NotificationDatabase = notificationDatabase;
-            ProfileDatabase = profileDatabase;
+            NestDatabase = nestDatabase;
 
             NotificationService = notificationService;
 
@@ -120,7 +120,7 @@ namespace Core
             KeyDirector = new KeyDirector(this);
             MediaDirector = new MediaDirector(this);
             NotificationDirector = new NotificationDirector(this);
-            ProfileDirector = new ProfileDirector(this);
+            NestDirector = new NestDirector(this);
         }
 
         #endregion

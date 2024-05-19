@@ -68,7 +68,7 @@ namespace Core.Controls
             if (!string.IsNullOrEmpty(email))
             { await ThrowIfEmailTaken(newUser.Email); }
 
-            // Store profile
+            // Store nest
             await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
                 newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default.ToCharacter());
         }

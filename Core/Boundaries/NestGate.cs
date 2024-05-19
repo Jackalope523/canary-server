@@ -9,25 +9,25 @@ namespace Core.Boundaries
     public enum UserRating
     { Positive, Negative, Remove }
 
-    public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
+    public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfAppreciateers);
     public record UserSilhouette(ulong Id, string Name);
-    public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
+    public record NestShard(UserProfile User, List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
     public record AgendaShard(List<(GatheringShard Gathering, GatheringBond Bond)> Agenda);
 
 	#endregion
 
 	#region Gates
 
-	public interface IProfileDatabase
+	public interface INestDatabase
     {
         Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
-		Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
-        Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId);
+		Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId);
         Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
         Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId);
 
-        Task FollowUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
-		Task UnfollowUserAsync(ulong userId, ulong targetUserId);
+        Task AppreciateUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
+		Task UnappreciateUserAsync(ulong userId, ulong targetUserId);
 		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnblockUserAsync(ulong userId, ulong targetUserId);
 
@@ -36,20 +36,19 @@ namespace Core.Boundaries
 		Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong userId);
     }
 
-	public interface IProfileOperations
+	public interface INestOperations
     {
-        Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId);
         Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
         Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
         Task<IDictionary<UserSilhouette, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
 
         Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
-        Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
+        Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId);
         Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
 
-        Task FollowUserAsync(ulong userId, ulong targetId);
-        Task UnfollowUserAsync(ulong userId, ulong targetId);
+        Task AppreciateUserAsync(ulong userId, ulong targetId);
+        Task UnappreciateUserAsync(ulong userId, ulong targetId);
         Task BlockUserAsync(ulong userId, ulong targetId);
         Task UnblockUserAsync(ulong userId, ulong targetId);
 

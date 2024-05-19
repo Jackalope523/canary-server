@@ -10,12 +10,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
-    [Route("profile")]
-    public class ProfileGuard : AbstractGuard
+    [Route("nest")]
+    public class NestGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public ProfileGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
+		public NestGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
@@ -23,60 +23,53 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet("{targetIdentification}")]
-        public async Task<IActionResult> GetProfile(ulong targetIdentification)
-		{
-			return await Execute(async user =>
-				await profiles.GetUserProfileAsync(user.Id, targetIdentification));
-		}
-
-		[HttpGet("{targetIdentification}/nest")]
         public async Task<IActionResult> GetNest(ulong targetIdentification)
 		{
 			return await Execute(async user =>
-				await profiles.GetUserNestAsync(user.Id, targetIdentification));
+				await nests.GetUserNestAsync(user.Id, targetIdentification));
 		}
 
 		[HttpGet("companions")]
         public async Task<IActionResult> GetCompanions()
         {
             return await Execute(async user =>
-                await profiles.GetCompanionsAsync(user.Id));
+                await nests.GetCompanionsAsync(user.Id));
         }
 
-        [HttpGet("following")]
-        public async Task<IActionResult> GetFollowed()
+        [HttpGet("appreciating")]
+        public async Task<IActionResult> GetAppreciated()
 		{
 			return await Execute(async user =>
-				await profiles.GetFollowedUsersAsync(user.Id));
+				await nests.GetAppreciatedUsersAsync(user.Id));
 		}
 
-		[HttpPost("following")]
-		public async Task<IActionResult> FollowUser([FromBody] TargetManifest info)
+		[HttpPost("appreciating")]
+		public async Task<IActionResult> AppreciateUser([FromBody] TargetManifest info)
 		{
 			// Verify parameters
 			if (info == null || !ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await profiles.FollowUserAsync(user.Id, info.TargetId));
+				await nests.AppreciateUserAsync(user.Id, info.TargetId));
 		}
 
-		[HttpPut("following")]
-		public async Task<IActionResult> UnfollowUser([FromBody] TargetManifest info)
+		[HttpPut("appreciating")]
+		public async Task<IActionResult> UnappreciateUser([FromBody] TargetManifest info)
 		{
 			// Verify parameters
 			if (info == null || !ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await profiles.UnfollowUserAsync(user.Id, info.TargetId));
+				await nests.UnappreciateUserAsync(user.Id, info.TargetId));
 		}
 
 		[HttpGet("blocked")]
 		public async Task<IActionResult> GetBlocked()
 		{
 			return await Execute(async user =>
-				await profiles.GetBlockedUsersAsync(user.Id));
+				await nests.GetBlockedUsersAsync(user.Id));
 		}
 
 		[HttpPost("blocked")]
@@ -87,7 +80,7 @@ namespace Frontier.Controllers
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await profiles.BlockUserAsync(user.Id, info.TargetId));
+				await nests.BlockUserAsync(user.Id, info.TargetId));
 		}
 
 		[HttpPut("blocked")]
@@ -97,7 +90,7 @@ namespace Frontier.Controllers
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await profiles.UnblockUserAsync(user.Id, info.TargetId));
+				await nests.UnblockUserAsync(user.Id, info.TargetId));
 		}
 
 		[HttpPost("{targetIdentification}/report")]

@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM.
+// The appreciating GUID is for the ID of the typelib if this project is exposed to COM.
 
 [assembly: Guid("0225c9d2-71fb-4126-ac5e-145486140216")]
 [assembly: InternalsVisibleTo("Repository.Tests")]

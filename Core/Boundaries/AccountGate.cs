@@ -12,11 +12,11 @@ namespace Core.Boundaries
 	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int NumberOfFollowers, Character Character)
+		DateTimeOffset JoinDate, int Reputation, int NumberOfAppreciateers, Character Character)
 		: CoreOnlyData();
 
     public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
-        DateTimeOffset DateOfBirth, int Reputation, int NumberOfFollowers);
+        DateTimeOffset DateOfBirth, int Reputation, int NumberOfAppreciateers);
 
     public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);

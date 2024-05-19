@@ -34,18 +34,18 @@ namespace Repository
         public async Task<List<SnapshotShard>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
             // Get List of Companions.
-            Task<List<ulong>> following = storeSentry.ExecuteReadAsync(ctx => 
+            Task<List<ulong>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserLinks.
-                Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.OtherId).
+                Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).Select(l => l.OtherId).
                 ToListAsync());
 
-            Task<List<ulong>> followingMe = storeSentry.ExecuteReadAsync(ctx => 
+            Task<List<ulong>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserLinks.
-                Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow).
+                Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Appreciate).
                 Select(l => l.SelfId).
                 ToListAsync());
 
-            List<ulong> companions = (await following).Intersect(await followingMe).ToList();
+            List<ulong> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
 
             // Get unseen posts by companions from certain depth.
             List<SnapshotShard> companionPosts = await storeSentry.ExecuteReadAsync(ctx =>

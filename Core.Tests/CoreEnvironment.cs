@@ -70,7 +70,7 @@ namespace Core.Tests
 				harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
-                harbor.ProfileDatabaseAccess,
+                harbor.NestDatabaseAccess,
 				new NotificationServiceStub());
 			
 		}
@@ -131,7 +131,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.FollowUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
+					await Terminal.NestDatabase.AppreciateUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}
@@ -145,7 +145,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.BlockUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
+					await Terminal.NestDatabase.BlockUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}

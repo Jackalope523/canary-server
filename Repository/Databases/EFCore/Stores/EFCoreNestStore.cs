@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
-    public class EFCoreProfileStore : QueryStore, IProfileDatabase
+    public class EFCoreNestStore : QueryStore, INestDatabase
     {     
         private static readonly Func<QueryContext, ulong, ulong, UserLink.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
@@ -13,26 +13,26 @@ namespace Repository
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());
 
-        public EFCoreProfileStore(Harbor.Flag flag) : base(flag)
+        public EFCoreNestStore(Harbor.Flag flag) : base(flag)
         {
         }
         
-        public async Task FollowUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task AppreciateUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
             UserLink toAdd = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
                 Time = time,
-                Type = UserLink.UserLinkType.Follow
+                Type = UserLink.UserLinkType.Appreciate
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
         }
-        public async Task UnfollowUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Follow));
+            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Appreciate));
         }
         public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
@@ -51,10 +51,10 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Block));
         }
-        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong id) 
+        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).
+             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -77,8 +77,8 @@ namespace Repository
         }
         public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong id)
         {
-            Task<List<UserSilhouette>> following = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).
+            Task<List<UserSilhouette>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -87,8 +87,8 @@ namespace Repository
                  ).
              ToListAsync());
 
-            Task<List<UserSilhouette>> followingMe = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Follow).
+            Task<List<UserSilhouette>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+             ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.SelfId,
@@ -97,7 +97,7 @@ namespace Repository
                  ).
              ToListAsync());
 
-            return (await following).Intersect(await followingMe).ToList();
+            return (await appreciating).Intersect(await appreciatingMe).ToList();
         }
 
         public async Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong id)
@@ -153,10 +153,10 @@ namespace Repository
             ExecuteDelete());
         }
 
-        public async Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Follow).
+            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Appreciate).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,

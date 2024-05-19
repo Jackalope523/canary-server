@@ -77,20 +77,20 @@ namespace Repository.Tests
             // Companion making block
             UserLinkFactory factory = new UserLinkFactory();
 
-            UserLink link1 = factory.Create(subject, companionE, UserLink.UserLinkType.Follow);
-            UserLink link2 = factory.Create(companionE, subject, UserLink.UserLinkType.Follow);
+            UserLink link1 = factory.Create(subject, companionE, UserLink.UserLinkType.Appreciate);
+            UserLink link2 = factory.Create(companionE, subject, UserLink.UserLinkType.Appreciate);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            link1 = factory.Create(subject, companionJ, UserLink.UserLinkType.Follow);
-            link2 = factory.Create(companionJ, subject, UserLink.UserLinkType.Follow);
+            link1 = factory.Create(subject, companionJ, UserLink.UserLinkType.Appreciate);
+            link2 = factory.Create(companionJ, subject, UserLink.UserLinkType.Appreciate);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            link1 = factory.Create(subject, companionM, UserLink.UserLinkType.Follow);
-            link2 = factory.Create(companionM, subject, UserLink.UserLinkType.Follow);
+            link1 = factory.Create(subject, companionM, UserLink.UserLinkType.Appreciate);
+            link2 = factory.Create(companionM, subject, UserLink.UserLinkType.Appreciate);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));

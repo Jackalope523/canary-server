@@ -3,20 +3,20 @@
 
 namespace Repository
 {
-    public class ProfileStoreCoordinator : IProfileDatabase
+    public class NestStoreCoordinator : INestDatabase
     {
-        private readonly IProfileDatabase store;
+        private readonly INestDatabase store;
 
-        public ProfileStoreCoordinator(Harbor.Flag flag)
+        public NestStoreCoordinator(Harbor.Flag flag)
         {
-            store = new EFCoreProfileStore(flag);
+            store = new EFCoreNestStore(flag);
         }
         
-        public async Task FollowUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task AppreciateUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
-            await store.FollowUserAsync(selfId, targetId, time);
+            await store.AppreciateUserAsync(selfId, targetId, time);
         }
-        public async Task UnfollowUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
@@ -28,9 +28,9 @@ namespace Repository
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
-        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong id) 
+        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong id) 
         {
-            return await store.GetFollowedUsersAsync(id);
+            return await store.GetAppreciatedUsersAsync(id);
         }
         public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong id) 
         {
@@ -56,9 +56,9 @@ namespace Repository
             await store.RemoveUserRatingAsync(selfId, targetId);
         }
 
-        public async Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId)
         {
-            return await store.GetUsersFollowingAsync(userId);
+            return await store.GetUsersAppreciatingAsync(userId);
         }
 
         public async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)

@@ -72,7 +72,7 @@ namespace Core.Tests.Entities
 			var nemesis = await environment.GenerateUniqueUserAsync();
 
 			var oldReputation = user.Reputation;
-			await environment.Terminal.ProfileOperations.RateUserAsync(nemesis.Id, user.Id, UserRating.Negative);
+			await environment.Terminal.NestOperations.RateUserAsync(nemesis.Id, user.Id, UserRating.Negative);
 
 			// Act
 			await user.CalculateReputation();
@@ -160,7 +160,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task IsFollowing_FollowedUser_ReturnsTrue()
+		public async Task IsAppreciating_AppreciatedUser_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -168,24 +168,24 @@ namespace Core.Tests.Entities
 			await environment.ForceCompanionshipAsync(user, companion);
 
 			// Act
-			var isFollowing = await user.IsFollowing(companion);
+			var isAppreciating = await user.IsAppreciating(companion);
 
 			// Assert
-			Assert.True(isFollowing);
+			Assert.True(isAppreciating);
 		}
 
 		[Fact]
-		public async Task IsFollowing_Neutral_ReturnsFalse()
+		public async Task IsAppreciating_Neutral_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var isFollowing = await user.IsFollowing(randomUser);
+			var isAppreciating = await user.IsAppreciating(randomUser);
 
 			// Assert
-			Assert.False(isFollowing);
+			Assert.False(isAppreciating);
 		}
 
 		[Fact]
@@ -545,7 +545,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task NotifyFollowers_Succeeds()
+		public async Task NotifyAppreciateers_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -558,7 +558,7 @@ namespace Core.Tests.Entities
 			string notificationTitle = "gathering title", notificationMessage = "message test";
 
 			// Act
-			await user.NotifyFollowers(notificationTitle, notificationMessage);
+			await user.NotifyAppreciateers(notificationTitle, notificationMessage);
 
 			// Assert
 			var incomingUserMessages = environment.GetUserMessages(companion1);

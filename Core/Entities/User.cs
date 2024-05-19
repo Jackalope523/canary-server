@@ -39,7 +39,7 @@ namespace Core.Entities
         public string Name { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
-        public int NumberOfFollowers { get; set; }
+        public int NumberOfAppreciateers { get; set; }
         public DateTimeOffset JoinDate { get; init; }
         public int Reputation { get; set; }
 
@@ -84,8 +84,8 @@ namespace Core.Entities
         public Synced<List<Gathering>> SurveyingGatherings { get; }
 
         public Synced<List<User>> Companions { get; }
-        public Synced<List<User>> Following { get; }
-        public Synced<List<User>> FollowedBy { get; }
+        public Synced<List<User>> Appreciating { get; }
+        public Synced<List<User>> AppreciatedBy { get; }
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
@@ -105,7 +105,7 @@ namespace Core.Entities
         {
             Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
 
-            Ratings = new(() => Terminal.ProfileDirector.RequestAllRatingsAsync(this));
+            Ratings = new(() => Terminal.NestDirector.RequestAllRatingsAsync(this));
 
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
             LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
@@ -121,11 +121,11 @@ namespace Core.Entities
             UpcomingGatherings = new(() => Terminal.GatheringDirector.RequestUpcomingGatheringsForUserAsync(this));
             SurveyingGatherings = new(() => Terminal.GatheringDirector.RequestSurveyingGatheringsForUserAsync(this));
 
-            Companions = new(() => Terminal.ProfileDirector.RequestCompanionsAsync(this));
-            Following = new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));
-            FollowedBy = new(() => Terminal.ProfileDirector.RequestFollowersAsync(this));
-            Blocking = new(() => Terminal.ProfileDirector.RequestBlockedUsersAsync(this));
-            BlockedBy = new(() => Terminal.ProfileDirector.RequestUsersBlockingAsync(this));
+            Companions = new(() => Terminal.NestDirector.RequestCompanionsAsync(this));
+            Appreciating = new(() => Terminal.NestDirector.RequestAppreciatedUsersAsync(this));
+            AppreciatedBy = new(() => Terminal.NestDirector.RequestAppreciateersAsync(this));
+            Blocking = new(() => Terminal.NestDirector.RequestBlockedUsersAsync(this));
+            BlockedBy = new(() => Terminal.NestDirector.RequestUsersBlockingAsync(this));
 
             Notes = new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
             Penalties = new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
@@ -144,7 +144,7 @@ namespace Core.Entities
             DateOfBirth = fromUser.DateOfBirth;
             JoinDate = fromUser.JoinDate;
             Reputation = fromUser.Reputation;
-            NumberOfFollowers = fromUser.NumberOfFollowers;
+            NumberOfAppreciateers = fromUser.NumberOfAppreciateers;
             IsPhoneConfirmed = fromUser.IsPhoneConfirmed;
             IsEmailConfirmed = fromUser.IsEmailConfirmed;
             IsDeleted = fromUser.IsPendingDeletion;
@@ -166,7 +166,7 @@ namespace Core.Entities
             Id = fromUser.Id;
             Name = fromUser.Name;
             Reputation = fromUser.Reputation;
-            NumberOfFollowers = fromUser.NumberOfFollowers;
+            NumberOfAppreciateers = fromUser.NumberOfAppreciateers;
         }
 
         public CoreUser ToCoreUser()
@@ -174,13 +174,13 @@ namespace Core.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, NumberOfFollowers, Character.ToCharacter());
+                JoinDate, Reputation, NumberOfAppreciateers, Character.ToCharacter());
         }
 
         public UserShard ToUserShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-                Reputation, NumberOfFollowers);
+                Reputation, NumberOfAppreciateers);
         }
 
         public UserSilhouette ToUserSilhouette()
@@ -188,9 +188,9 @@ namespace Core.Entities
             return new(Id, Name);
         }
 
-        public UserProfile ToUserProfile()
+        public UserProfile ToUserNest()
         {
-            return new(Id, Name, Reputation, NumberOfFollowers);
+            return new(Id, Name, Reputation, NumberOfAppreciateers);
         }
 
 		#endregion
@@ -265,10 +265,10 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsFollowing(User otherUser)
+        public async Task<bool> IsAppreciating(User otherUser)
         {
-			// Check if user is following target
-			if ((await Following).Contains(otherUser))
+			// Check if user is appreciating target
+			if ((await Appreciating).Contains(otherUser))
 			{ return true; }
 
             return false;
@@ -457,9 +457,9 @@ namespace Core.Entities
             await Terminal.NotificationDirector.NotifyUserAsync(this, title, message);
         }
 
-        public async Task NotifyFollowers(string title, string message)
+        public async Task NotifyAppreciateers(string title, string message)
         {
-            (await FollowedBy).ForEach(follower => _ = follower.Notify(title, message));
+            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(title, message));
         }
 
 		#endregion

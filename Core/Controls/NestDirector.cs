@@ -10,17 +10,17 @@ using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
-    internal class ProfileDirector : AbstractDirector, IProfileOperations
+    internal class NestDirector : AbstractDirector, INestOperations
 	{
 		#region Initialisation
 
-		public ProfileDirector(CoreTerminal terminal) : base(terminal) { }
+		public NestDirector(CoreTerminal terminal) : base(terminal) { }
 
 		#endregion
 
 		#region Operations
 
-		public async Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId)
+		public async Task<UserProfile> GetUserNestAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -29,7 +29,7 @@ namespace Core.Controls
             Fail(await targetUser.IsBlocking(user),
                 new InvalidUserException("User is unable to view target."));
 
-            return targetUser.ToUserProfile();
+            return targetUser.ToUserNest();
         }
 
         public async Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId)
@@ -147,36 +147,36 @@ namespace Core.Controls
 
         public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId)
         {
-            return await Profiles.GetCompanionsAsync(userId);
+            return await Nests.GetCompanionsAsync(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId)
         {
-            return await Profiles.GetFollowedUsersAsync(userId);
+            return await Nests.GetAppreciatedUsersAsync(userId);
         }
 
         public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId)
         {
-            return await Profiles.GetBlockedUsersAsync(userId);
+            return await Nests.GetBlockedUsersAsync(userId);
         }
 
-        public async Task FollowUserAsync(ulong userId, ulong targetId)
+        public async Task AppreciateUserAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
             Fail(user.Equals(targetUser),
-                new InvalidUserException("User cannot follow themself."));
+                new InvalidUserException("User cannot appreciate themself."));
 
             Fail(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User cannot follow blocked/blocking user."));
+                new InvalidUserException("User cannot appreciate blocked/blocking user."));
 
-            await Profiles.FollowUserAsync(userId, targetId, Psijic.Time);
+            await Nests.AppreciateUserAsync(userId, targetId, Psijic.Time);
         }
 
-        public async Task UnfollowUserAsync(ulong userId, ulong targetId)
+        public async Task UnappreciateUserAsync(ulong userId, ulong targetId)
         {
-            await Profiles.UnfollowUserAsync(userId, targetId);
+            await Nests.UnappreciateUserAsync(userId, targetId);
         }
 
         public async Task BlockUserAsync(ulong userId, ulong targetId)
@@ -187,12 +187,12 @@ namespace Core.Controls
 			Fail(user.Equals(targetUser),
 				new InvalidUserException("User cannot block themself."));
 
-			await Profiles.BlockUserAsync(userId, targetId, Psijic.Time);
+			await Nests.BlockUserAsync(userId, targetId, Psijic.Time);
         }
 
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
         {
-            await Profiles.UnblockUserAsync(userId, targetId);
+            await Nests.UnblockUserAsync(userId, targetId);
         }
 
         public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
@@ -206,11 +206,11 @@ namespace Core.Controls
             // Check if rating is to remove
             if (rating != UserRating.Remove)
             {
-                await Profiles.RateUserAsync(userId, targetId, rating, Psijic.Time);
+                await Nests.RateUserAsync(userId, targetId, rating, Psijic.Time);
             }
             else
             {
-                await Profiles.RemoveUserRatingAsync(userId, targetId);
+                await Nests.RemoveUserRatingAsync(userId, targetId);
             }
 
             await targetUser.CalculateReputation();
@@ -223,36 +223,36 @@ namespace Core.Controls
 
         internal async Task<List<User>> RequestCompanionsAsync(User user)
         {
-            return (await Profiles.GetCompanionsAsync(user.Id))
+            return (await Nests.GetCompanionsAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
 
-        internal async Task<List<User>> RequestFollowedUsersAsync(User user)
+        internal async Task<List<User>> RequestAppreciatedUsersAsync(User user)
         {
-            return (await Profiles.GetFollowedUsersAsync(user.Id))
+            return (await Nests.GetAppreciatedUsersAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
 
-        internal async Task<List<User>> RequestFollowersAsync(User user)
+        internal async Task<List<User>> RequestAppreciateersAsync(User user)
         {
-            return (await Profiles.GetUsersFollowingAsync(user.Id))
+            return (await Nests.GetUsersAppreciatingAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
 
 		internal async Task<List<User>> RequestBlockedUsersAsync(User user)
         {
-            return (await Profiles.GetBlockedUsersAsync(user.Id))
+            return (await Nests.GetBlockedUsersAsync(user.Id))
 				.ConvertAll(user => new User(user));
         }
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)
         {
-            return (await Profiles.GetUsersBlockingAsync(user.Id))
+            return (await Nests.GetUsersBlockingAsync(user.Id))
 				.ConvertAll(user => new User(user));
         }
 
         internal async Task<(int Positive, int Negative)> RequestAllRatingsAsync(User user)
-            => await Profiles.GetUserRatingsAsync(user.Id);
+            => await Nests.GetUserRatingsAsync(user.Id);
 
 		#endregion
 

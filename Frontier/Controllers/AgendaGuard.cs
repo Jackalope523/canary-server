@@ -26,14 +26,14 @@ namespace Frontier.Controllers
         public async Task<IActionResult> GetUserAgenda(ulong targetIdentification)
         {
             return await Execute(async user =>
-                await profiles.GetUserAgendaAsync(user.Id, targetIdentification));
+                await nests.GetUserAgendaAsync(user.Id, targetIdentification));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCompanionAgenda()
         {
             return await Execute(async user =>
-                await profiles.GetCompanionAgendaAsync(user.Id));
+                await nests.GetCompanionAgendaAsync(user.Id));
         }
 
         #endregion

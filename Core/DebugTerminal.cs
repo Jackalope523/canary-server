@@ -29,7 +29,7 @@ namespace Core
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService, IDebugDatabase debugDatabase)
 		{
 			lock (initLock)
@@ -39,7 +39,7 @@ namespace Core
                         gatheringDatabase, snapshotDatabase,
                         disciplineDatabase, keyDatabase,
                         mediaDatabase, notificationDatabase,
-                        profileDatabase,
+                        nestDatabase,
                         notificationService,
 						debugDatabase);
 
@@ -52,14 +52,14 @@ namespace Core
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService, IDebugDatabase debugDatabase)
 			: base(logger,
 					accountDatabase, adminDatabase, bannerDatabase,
 					gatheringDatabase, snapshotDatabase,
 					disciplineDatabase, keyDatabase,
 					mediaDatabase, notificationDatabase,
-					profileDatabase,  notificationService)
+					nestDatabase,  notificationService)
 		{
 			DebugDatabase = debugDatabase;
 			DebugDirector = new DebugDirector(this);

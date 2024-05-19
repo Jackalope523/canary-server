@@ -47,7 +47,7 @@ namespace Frontier.Controllers
 		public IKeyOperations keys;
 		public IMediaOperations media;
 		public INotificationOperations notifications;
-		public IProfileOperations profiles;
+		public INestOperations nests;
 
 		public UserManager<CoreUser> userManager;
 
@@ -61,7 +61,7 @@ namespace Frontier.Controllers
 
 			accounts = box.accounts;
 			banners = box.banners;
-			profiles = box.profiles;
+			nests = box.nests;
 			gatherings = box.gatherings;
 			snapshots = box.snapshots;
 			keys = box.keys;

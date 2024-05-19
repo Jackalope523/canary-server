@@ -8,60 +8,60 @@ using Xunit;
 
 namespace Core.Tests.Controls
 {
-    public class ProfileDirectorTests : CoreTest
+    public class NestDirectorTests : CoreTest
     {
-		private ProfileDirector director;
+		private NestDirector director;
 
-        public ProfileDirectorTests()
+        public NestDirectorTests()
         {
-			director = environment.Terminal.ProfileDirector;
+			director = environment.Terminal.NestDirector;
         }
 
 		[Fact]
-		public async Task GetUserProfileAsync_Self_ReturnsProfile()
+		public async Task GetUserNestAsync_Self_ReturnsNest()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var profile = await director.GetUserProfileAsync(user.Id, user.Id);
+			var nest = await director.GetUserNestAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(user.ToUserProfile(), profile);
+			Assert.Equal(user.ToUserNest(), nest);
 		}
 
 		[Fact]
-		public async Task GetUserProfileAsync_Companion_ReturnsProfile()
+		public async Task GetUserNestAsync_Companion_ReturnsNest()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var companion = await environment.GenerateUniqueUserAsync();
 			await environment.ForceCompanionshipAsync(user, companion);
-			companion.NumberOfFollowers += 1;
+			companion.NumberOfAppreciateers += 1;
 
 			// Act
-			var profile = await director.GetUserProfileAsync(user.Id, companion.Id);
+			var nest = await director.GetUserNestAsync(user.Id, companion.Id);
 
 			// Assert
-			Assert.Equal(companion.ToUserProfile(), profile);
+			Assert.Equal(companion.ToUserNest(), nest);
 		}
 
 		[Fact]
-		public async Task GetUserProfileAsync_Neutral_ReturnsProfile()
+		public async Task GetUserNestAsync_Neutral_ReturnsNest()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var profile = await director.GetUserProfileAsync(user.Id, randomUser.Id);
+			var nest = await director.GetUserNestAsync(user.Id, randomUser.Id);
 
 			// Assert
-			Assert.Equal(randomUser.ToUserProfile(), profile);
+			Assert.Equal(randomUser.ToUserNest(), nest);
 		}
 
 		[Fact]
-		public async Task GetUserProfileAsync_Blocked_Fails()
+		public async Task GetUserNestAsync_Blocked_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -69,10 +69,10 @@ namespace Core.Tests.Controls
 			await environment.ForceEnemiesAsync(user, enemy);
 
 			// Act
-			var profile = director.GetUserProfileAsync(user.Id, enemy.Id);
+			var nest = director.GetUserNestAsync(user.Id, enemy.Id);
 
 			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await profile);
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await nest);
 		}
 
 		[Fact]
@@ -285,7 +285,7 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetFollowedUsersAsync_ReturnsUsers()
+		public async Task GetAppreciatedUsersAsync_ReturnsUsers()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -294,10 +294,10 @@ namespace Core.Tests.Controls
 			await environment.ForceCompanionshipAsync(user, companion, otherCompanion);
 
 			// Act
-			var followedUsers = await director.GetFollowedUsersAsync(user.Id);
+			var appreciatedUsers = await director.GetAppreciatedUsersAsync(user.Id);
 
 			// Assert
-			Assert.Equal(2, followedUsers.Count);
+			Assert.Equal(2, appreciatedUsers.Count);
 		}
 
 		[Fact]
@@ -317,19 +317,19 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task FollowUserAsync_Succeeds()
+		public async Task AppreciateUserAsync_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var stranger = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			await director.FollowUserAsync(user.Id, stranger.Id);
+			await director.AppreciateUserAsync(user.Id, stranger.Id);
 			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
-		public async Task FollowUserAsync_Blocked_Fails()
+		public async Task AppreciateUserAsync_Blocked_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -337,22 +337,22 @@ namespace Core.Tests.Controls
 			await environment.ForceEnemiesAsync(user, enemy);
 
 			// Act
-			var action = director.FollowUserAsync(user.Id, enemy.Id);
+			var action = director.AppreciateUserAsync(user.Id, enemy.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await action);
 		}
 
 		[Fact]
-		public async Task UnfollowUserAsync_FollowedUser_Succeeds()
+		public async Task UnappreciateUserAsync_AppreciatedUser_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var weirdDynamics = await environment.GenerateUniqueUserAsync();
-			await director.FollowUserAsync(user.Id, weirdDynamics.Id);
+			await director.AppreciateUserAsync(user.Id, weirdDynamics.Id);
 
 			// Act
-			await director.UnfollowUserAsync(user.Id, weirdDynamics.Id);
+			await director.UnappreciateUserAsync(user.Id, weirdDynamics.Id);
 			// If no exception is thrown, the test is successful
 		}
 
