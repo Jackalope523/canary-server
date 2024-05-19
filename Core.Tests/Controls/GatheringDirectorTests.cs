@@ -447,18 +447,18 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var left = await environment.GenerateUniqueUserAsync();
 			var incoming = await environment.GenerateUniqueUserAsync();
-			var incomingFriend = await environment.GenerateUniqueUserAsync();
+			var incomingCompanion = await environment.GenerateUniqueUserAsync();
 			var surveyer = await environment.GenerateUniqueUserAsync();
-			var surveyingFriend = await environment.GenerateUniqueUserAsync();
+			var surveyingCompanion = await environment.GenerateUniqueUserAsync();
 
-			await environment.ForceFriendshipAsync(user, incomingFriend, surveyingFriend);
+			await environment.ForceCompanionshipAsync(user, incomingCompanion, surveyingCompanion);
 
 			var @gathering = await environment.GenerateOngoingGatheringAsync(host, user);
 			await environment.AddUserToGatheringAsync(@gathering, left, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(@gathering, incoming, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, incomingFriend, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(@gathering, incomingCompanion, GatheringBond.Guest);
 			await environment.AddUserToGatheringAsync(@gathering, surveyer, GatheringBond.Surveying);
-			await environment.AddUserToGatheringAsync(@gathering, surveyingFriend, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(@gathering, surveyingCompanion, GatheringBond.Surveying);
 
 			// Act
 			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @gathering.Id);
@@ -474,28 +474,28 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetGuestListAsync_ViewingValidGathering_ReturnsFriends()
+		public async Task GetGuestListAsync_ViewingValidGathering_ReturnsCompanions()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
-			var guestFriend = await environment.GenerateUniqueUserAsync();
+			var guestCompanion = await environment.GenerateUniqueUserAsync();
 			var left = await environment.GenerateUniqueUserAsync();
-			var leftFriend = await environment.GenerateUniqueUserAsync();
+			var leftCompanion = await environment.GenerateUniqueUserAsync();
 			var incoming = await environment.GenerateUniqueUserAsync();
-			var incomingFriend = await environment.GenerateUniqueUserAsync();
+			var incomingCompanion = await environment.GenerateUniqueUserAsync();
 			var surveyer = await environment.GenerateUniqueUserAsync();
-			var surveyingFriend = await environment.GenerateUniqueUserAsync();
+			var surveyingCompanion = await environment.GenerateUniqueUserAsync();
 
-			await environment.ForceFriendshipAsync(user, guestFriend, leftFriend, incomingFriend, surveyingFriend);
+			await environment.ForceCompanionshipAsync(user, guestCompanion, leftCompanion, incomingCompanion, surveyingCompanion);
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guestFriend);
+			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guestCompanion);
 			await environment.AddUserToGatheringAsync(@gathering, left, GatheringBond.Left);
-			await environment.AddUserToGatheringAsync(@gathering, leftFriend, GatheringBond.Left);
+			await environment.AddUserToGatheringAsync(@gathering, leftCompanion, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(@gathering, incoming, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, incomingFriend, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(@gathering, incomingCompanion, GatheringBond.Guest);
 			await environment.AddUserToGatheringAsync(@gathering, surveyer, GatheringBond.Surveying);
-			await environment.AddUserToGatheringAsync(@gathering, surveyingFriend, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(@gathering, surveyingCompanion, GatheringBond.Surveying);
 
 			// Act
 			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @gathering.Id);
@@ -511,17 +511,17 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetGuestListAsync_ViewingPastGathering_ReturnsFriends()
+		public async Task GetGuestListAsync_ViewingPastGathering_ReturnsCompanions()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
+			var companion = await environment.GenerateUniqueUserAsync();
 			var stranger = await environment.GenerateUniqueUserAsync();
 
-			await environment.ForceFriendshipAsync(user, friend);
+			await environment.ForceCompanionshipAsync(user, companion);
 
-			var @gathering = await environment.GeneratePastGatheringAsync(host, friend, stranger);
+			var @gathering = await environment.GeneratePastGatheringAsync(host, companion, stranger);
 
 			// Act
 			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @gathering.Id);
@@ -559,11 +559,11 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion);
 
 			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, user);
-			await environment.UpdateUserLocationAsync(friend, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			await environment.UpdateUserLocationAsync(companion, @gathering.Location.Latitude, @gathering.Location.Longitude);
 
 			// Act
 			var invitees = await director.GetPotentialInviteesAsync(user.Id, @gathering.Id);
@@ -573,42 +573,42 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task InviteUserAsync_ValidFriendValidGathering_Succeeds()
+		public async Task InviteUserAsync_ValidCompanionValidGathering_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion);
 
 			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, user);
-            await environment.UpdateUserLocationAsync(friend, @gathering.Location.Latitude, @gathering.Location.Longitude);
+            await environment.UpdateUserLocationAsync(companion, @gathering.Location.Latitude, @gathering.Location.Longitude);
 
             // Act
-            await director.InviteUserAsync(user.Id, friend.Id, @gathering.Id);
+            await director.InviteUserAsync(user.Id, companion.Id, @gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
-		public async Task InviteUserAsync_ValidFriendInvalidGathering_Fails()
+		public async Task InviteUserAsync_ValidCompanionInvalidGathering_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion);
 
 			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var invite = director.InviteUserAsync(user.Id, friend.Id, @gathering.Id);
+			var invite = director.InviteUserAsync(user.Id, companion.Id, @gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await invite);
 		}
 
 		[Fact]
-		public async Task InviteUserAsync_InvalidFriendValidGathering_Fails()
+		public async Task InviteUserAsync_InvalidCompanionValidGathering_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();

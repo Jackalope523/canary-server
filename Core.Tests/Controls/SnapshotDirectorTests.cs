@@ -165,15 +165,15 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(host, friend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(host, companion);
 
 			var @gathering = await environment.GeneratePastGatheringAsync(host);
 			var someSnapshot = await environment.GenerateSnapshotAsync(@gathering, host);
 			var anotherSnapshot = await environment.GenerateSnapshotAsync(@gathering, host);
 
 			// Act
-			var feed = await director.GetUserFeedAsync(friend.Id, 100, 0);
+			var feed = await director.GetUserFeedAsync(companion.Id, 100, 0);
 
 			// Assert
 			Assert.Single(feed.Headers);
@@ -191,8 +191,8 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host1 = await environment.GenerateUniqueUserAsync();
 			var host2 = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(host1, host2, friend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(host1, host2, companion);
 
 			var gathering1 = await environment.GenerateOngoingGatheringAsync(host1);
 			var seenSnapshot = await environment.GenerateSnapshotAsync(gathering1, host1);
@@ -201,7 +201,7 @@ namespace Core.Tests.Controls
 			var unseenSnapshot = await environment.GenerateSnapshotAsync(gathering1, host2);
 
 			// Act
-			var feed = await director.GetUserFeedAsync(friend.Id, 100, 1);
+			var feed = await director.GetUserFeedAsync(companion.Id, 100, 1);
 
 			// Assert
 			Assert.Single(feed.Headers);

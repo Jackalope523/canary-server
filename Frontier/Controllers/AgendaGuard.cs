@@ -30,10 +30,10 @@ namespace Frontier.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetFriendAgenda()
+        public async Task<IActionResult> GetCompanionAgenda()
         {
             return await Execute(async user =>
-                await profiles.GetFriendAgendaAsync(user.Id));
+                await profiles.GetCompanionAgendaAsync(user.Id));
         }
 
         #endregion

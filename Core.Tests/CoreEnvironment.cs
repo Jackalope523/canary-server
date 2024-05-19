@@ -122,7 +122,7 @@ namespace Core.Tests
 			await Terminal.AccountDatabase.UpdateRecentLocationAsync(user.Id, latitude, longitude, radius);
 		}
 
-		internal async Task ForceFriendshipAsync(params User[] users)
+		internal async Task ForceCompanionshipAsync(params User[] users)
 		{
 			foreach (var user in users)
 			{

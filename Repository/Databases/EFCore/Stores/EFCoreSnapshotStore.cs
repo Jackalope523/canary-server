@@ -33,7 +33,7 @@ namespace Repository
 
         public async Task<List<SnapshotShard>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
-            // Get List of Friends.
+            // Get List of Companions.
             Task<List<ulong>> following = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserLinks.
                 Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).Select(l => l.OtherId).
@@ -45,12 +45,12 @@ namespace Repository
                 Select(l => l.SelfId).
                 ToListAsync());
 
-            List<ulong> friends = (await following).Intersect(await followingMe).ToList();
+            List<ulong> companions = (await following).Intersect(await followingMe).ToList();
 
-            // Get unseen posts by friends from certain depth.
-            List<SnapshotShard> friendPosts = await storeSentry.ExecuteReadAsync(ctx =>
+            // Get unseen posts by companions from certain depth.
+            List<SnapshotShard> companionPosts = await storeSentry.ExecuteReadAsync(ctx =>
               ctx.Posts.
-              Where(p => friends.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
+              Where(p => companions.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
               Join(
                   ctx.Users,
                   p => p.OwnerId,
@@ -58,31 +58,31 @@ namespace Repository
                   (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
                ).ToListAsync());
 
-            List<Task<int>> friendPostsPositiveRatings = new();
-            List<Task<int>> friendPostNegativeRatings = new();
+            List<Task<int>> companionPostsPositiveRatings = new();
+            List<Task<int>> companionPostNegativeRatings = new();
             List<ulong> sitesToBeExplored = new();
             List<ulong> previouslyExtractedPosts = new();
-            foreach (SnapshotShard e in friendPosts)
+            foreach (SnapshotShard e in companionPosts)
             {
-                friendPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
+                companionPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
                     ctx.PostLinks.
                     Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateUp).
                     CountAsync()));
 
-                friendPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
+                companionPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
                     ctx.PostLinks.
                     Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateDown).
                     CountAsync()));
 
-                // Compile unique list if gatherings spanned by friend posts and a list of already loaded posts. 
+                // Compile unique list if gatherings spanned by companion posts and a list of already loaded posts. 
                 if (!sitesToBeExplored.Contains(e.GatheringId)) sitesToBeExplored.Add(e.GatheringId);
                 previouslyExtractedPosts.Add(e.Id);
             }
 
-            // Get remaining friend posts from same gatherings as others even if outside time range.
+            // Get remaining companion posts from same gatherings as others even if outside time range.
             List<SnapshotShard> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Posts.
-                Where(p => friends.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
+                Where(p => companions.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
                 Join(
                   ctx.Users,
                   p => p.OwnerId,
@@ -105,12 +105,12 @@ namespace Repository
                     CountAsync()));
             }
 
-            await Task.WhenAll(friendPostsPositiveRatings);
-            await Task.WhenAll(friendPostNegativeRatings);
+            await Task.WhenAll(companionPostsPositiveRatings);
+            await Task.WhenAll(companionPostNegativeRatings);
             await Task.WhenAll(nettedPostsPositiveRatings);
             await Task.WhenAll(nettedPostNegativeRatings);
 
-            return friendPosts.Concat(nettedPosts).ToList();
+            return companionPosts.Concat(nettedPosts).ToList();
         }
 
         public async Task<SnapshotShard> GetSnapshotAsync(ulong id)

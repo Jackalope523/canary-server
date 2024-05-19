@@ -75,7 +75,7 @@ namespace Repository
                 ).
             ToListAsync());
         }
-        public async Task<List<UserSilhouette>> GetFriendsAsync(ulong id)
+        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong id)
         {
             Task<List<UserSilhouette>> following = storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Follow).

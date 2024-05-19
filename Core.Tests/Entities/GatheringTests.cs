@@ -57,23 +57,23 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task GetFriendsOf_ReturnsFriends()
+		public async Task GetCompanionsOf_ReturnsCompanions()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend1 = await environment.GenerateUniqueUserAsync();
-			var friend2 = await environment.GenerateUniqueUserAsync();
+			var companion1 = await environment.GenerateUniqueUserAsync();
+			var companion2 = await environment.GenerateUniqueUserAsync();
 			var randomGuest = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend1, friend2);
+			await environment.ForceCompanionshipAsync(user, companion1, companion2);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, user, friend1, friend2, randomGuest);
+			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, user, companion1, companion2, randomGuest);
 
 			// Act
-			var friends = await @gathering.GetFriendsOf(friend2);
+			var companions = await @gathering.GetCompanionsOf(companion2);
 
 			// Assert
-			Assert.Equal(2, friends.Count);
+			Assert.Equal(2, companions.Count);
 		}
 
 		/////

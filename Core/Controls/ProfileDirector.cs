@@ -64,8 +64,8 @@ namespace Core.Controls
                     nest.Snapshots.AddRange(await @gathering.Snapshots);
                 }
             }
-            // Check if users are friends
-            else if (await targetUser.IsFriendsWith(user))
+            // Check if users are companions
+            else if (await targetUser.IsCompanionsWith(user))
             {
                 // Gather active and upcoming gatherings visible to the user
                 var upcomingAgenda = await GetUserAgenda(targetUser);
@@ -114,8 +114,8 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
-            // Verify users are friends
-            Try(user.Equals(targetUser) || await targetUser.IsFriendsWith(user),
+            // Verify users are companions
+            Try(user.Equals(targetUser) || await targetUser.IsCompanionsWith(user),
                 new InvalidUserException("User is unable to view target."));
 
             // Gather active and upcoming gatherings
@@ -127,27 +127,27 @@ namespace Core.Controls
             return upcomingAgenda;
         }
 
-        public async Task<IDictionary<UserSilhouette, AgendaShard>> GetFriendAgendaAsync(ulong userId)
+        public async Task<IDictionary<UserSilhouette, AgendaShard>> GetCompanionAgendaAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
 
-            ConcurrentDictionary<UserSilhouette, AgendaShard> friendGatherings = new();
+            ConcurrentDictionary<UserSilhouette, AgendaShard> companionGatherings = new();
 
-            // Gather visible agenda of each friend
-            (await user.Friends).AsParallel()
-                .ForAll(async friend =>
+            // Gather visible agenda of each companion
+            (await user.Companions).AsParallel()
+                .ForAll(async companion =>
                 {
-                    var friendAgenda = await GetUserAgenda(friend);
-                    await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, friendAgenda);
-                    friendGatherings.TryAdd(friend.ToUserSilhouette(), friendAgenda);
+                    var companionAgenda = await GetUserAgenda(companion);
+                    await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, companionAgenda);
+                    companionGatherings.TryAdd(companion.ToUserSilhouette(), companionAgenda);
                 });
 
-            return friendGatherings;
+            return companionGatherings;
         }
 
-        public async Task<List<UserSilhouette>> GetFriendsAsync(ulong userId)
+        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId)
         {
-            return await Profiles.GetFriendsAsync(userId);
+            return await Profiles.GetCompanionsAsync(userId);
         }
 
         public async Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId)
@@ -221,9 +221,9 @@ namespace Core.Controls
 
 		#region Favours
 
-        internal async Task<List<User>> RequestFriendsAsync(User user)
+        internal async Task<List<User>> RequestCompanionsAsync(User user)
         {
-            return (await Profiles.GetFriendsAsync(user.Id))
+            return (await Profiles.GetCompanionsAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
 

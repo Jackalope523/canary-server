@@ -36,9 +36,9 @@ namespace Repository
         {
             return await store.GetBlockedUsersAsync(id);
         }
-        public async Task<List<UserSilhouette>> GetFriendsAsync(ulong id)
+        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong id)
         {
-            return await store.GetFriendsAsync(id);
+            return await store.GetCompanionsAsync(id);
         }
 
         public async Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong id)

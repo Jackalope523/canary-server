@@ -186,19 +186,19 @@ namespace Core.Entities
             return issues.Equals("");
         }
 
-        public async Task<List<(User User, GatheringBond State)>> GetFriendsOf(User user)
+        public async Task<List<(User User, GatheringBond State)>> GetCompanionsOf(User user)
         {
-            List<(User User, GatheringBond State)> friends = new();
+            List<(User User, GatheringBond State)> companions = new();
 
             foreach (var userDetails in await AllUsers)
             {
-                if (await user.IsFriendsWith(userDetails.User))
+                if (await user.IsCompanionsWith(userDetails.User))
                 {
-                    friends.Add(userDetails);
+                    companions.Add(userDetails);
                 }
             }
 
-            return friends;
+            return companions;
         }
 
         public async Task<List<SnapshotShard>> GetSnapshotsOf(User user)
@@ -230,8 +230,8 @@ namespace Core.Entities
 			if (!user.CanAttend)
 			{
 				// User cannot join normal gatherings
-                // Check if user can join friend gatherings and Host is friends with the user
-				if (!user.CanAttendFriends || !await Host.IsFriendsWith(user))
+                // Check if user can join companion gatherings and Host is companions with the user
+				if (!user.CanAttendCompanions || !await Host.IsCompanionsWith(user))
 				{ return false; }
 			}
 

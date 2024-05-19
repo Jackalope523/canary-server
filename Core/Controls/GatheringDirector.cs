@@ -378,11 +378,11 @@ namespace Core.Controls
 			// Check if user is host
 			if (targetGathering.IsModifiableBy(user))
 			{
-				// Retrieve user's friends that are surveying
-				var friends = await targetGathering.GetFriendsOf(user);
+				// Retrieve user's companions that are surveying
+				var companions = await targetGathering.GetCompanionsOf(user);
 
-				guestList.Guests.AddRange(SelectAsSilhouette(friends,
-					friend => friend.State.Equals(GatheringBond.Surveying)));
+				guestList.Guests.AddRange(SelectAsSilhouette(companions,
+					companion => companion.State.Equals(GatheringBond.Surveying)));
 
 				// Add visible users
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetGathering.AllUsers,
@@ -397,11 +397,11 @@ namespace Core.Controls
 			// Check if user is a guest
 			else if (await targetGathering.WasAttendedBy(user))
 			{
-				// Retrieve user's friends surveying or attending
-				var friends = await targetGathering.GetFriendsOf(user);
+				// Retrieve user's companions surveying or attending
+				var companions = await targetGathering.GetCompanionsOf(user);
 
-				guestList.Guests.AddRange(SelectAsSilhouette(friends,
-					friend => friend.State.Equals(GatheringBond.Surveying) || friend.State.Equals(GatheringBond.Guest)));
+				guestList.Guests.AddRange(SelectAsSilhouette(companions,
+					companion => companion.State.Equals(GatheringBond.Surveying) || companion.State.Equals(GatheringBond.Guest)));
 
 				// Add visible users
 				guestList.Guests.AddRange(SelectAsSilhouette(await targetGathering.AllUsers,
@@ -416,15 +416,15 @@ namespace Core.Controls
 			// Check if user can view gathering
 			else if (await targetGathering.IsVisibleTo(user))
 			{
-				// Retrieve user's friends that will be, are, or were attending
-				var friends = await targetGathering.GetFriendsOf(user);
-				guestList = new(0, 0, SelectAsSilhouette(friends, _ => true));
+				// Retrieve user's companions that will be, are, or were attending
+				var companions = await targetGathering.GetCompanionsOf(user);
+				guestList = new(0, 0, SelectAsSilhouette(companions, _ => true));
 
 				// Add visible information
 				guestList = guestList with
 				{
 					GuestCount = targetGathering.IsOngoing ? (await targetGathering.Arrived).Count : (await targetGathering.Left).Count,
-					Surveyers = SelectAsSilhouette(friends, friend => friend.State.Equals(GatheringBond.Surveying)).Count
+					Surveyers = SelectAsSilhouette(companions, companion => companion.State.Equals(GatheringBond.Surveying)).Count
 				};
 			}
 			// User cannot recieve information about gathering
@@ -441,11 +441,11 @@ namespace Core.Controls
 
 			List<User> potentialUsers = new();
 
-			// Add all friends that can join gathering
-			foreach (var friend in await user.Friends)
+			// Add all companions that can join gathering
+			foreach (var companion in await user.Companions)
 			{
-				if (await @gathering.IsJoinableBy(friend))
-				{ potentialUsers.Add(friend); }
+				if (await @gathering.IsJoinableBy(companion))
+				{ potentialUsers.Add(companion); }
 			}
 
 			return potentialUsers
@@ -466,9 +466,9 @@ namespace Core.Controls
 			Try(await @gathering.IsJoinableBy(invitee),
 				new InvalidUserException("Invited cannot join gathering."));
 
-			// Verify that inviter is friends with the invitee
-			Try(await inviter.IsFriendsWith(invitee),
-				new InvalidUserException("Cannot invite non-friends."));
+			// Verify that inviter is companions with the invitee
+			Try(await inviter.IsCompanionsWith(invitee),
+				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostNote(inviter, $"has invited you to {@gathering.Name}", $"{@gathering.Id}");
 			_ = invitee.Notify("Sparrow", "You were invited to ");

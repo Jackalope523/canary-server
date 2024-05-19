@@ -24,7 +24,7 @@ namespace Core.Controls
 			var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
 			Try(user.Etched(snapshot) ||
-				await user.IsFriendsWith(snapshotOwner) ||
+				await user.IsCompanionsWith(snapshotOwner) ||
 				await etchedGathering.WasAttendedBy(user),
 				new InvalidUserException("User cannot access this snapshot."));
 

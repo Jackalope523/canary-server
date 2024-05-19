@@ -35,7 +35,7 @@ namespace Repository.Tests
         public async Task GenerateFeedForUserAsync_SUCCESS()
         {
             /// Feed test layout
-            /// subject friends: e, j, m
+            /// subject companions: e, j, m
             /// bait: x
             ///                    depth charge
             ///                         v 
@@ -61,36 +61,36 @@ namespace Repository.Tests
 
             // User creating block
             UserFactory userFactory = new UserFactory();
-            User friendE = userFactory.Create();
-            User friendJ = userFactory.Create();
-            User friendM = userFactory.Create();
+            User companionE = userFactory.Create();
+            User companionJ = userFactory.Create();
+            User companionM = userFactory.Create();
             User baitX = userFactory.Create();
             User irrelevantHost = userFactory.Create();
 
-            sentry.ExecuteWrite(ctx => ctx.Users.Add(friendE));
-            sentry.ExecuteWrite(ctx => ctx.Users.Add(friendJ));
-            sentry.ExecuteWrite(ctx => ctx.Users.Add(friendM));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionE));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionJ));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionM));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(baitX));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(irrelevantHost));
 
 
-            // Friend making block
+            // Companion making block
             UserLinkFactory factory = new UserLinkFactory();
 
-            UserLink link1 = factory.Create(subject, friendE, UserLink.UserLinkType.Follow);
-            UserLink link2 = factory.Create(friendE, subject, UserLink.UserLinkType.Follow);
+            UserLink link1 = factory.Create(subject, companionE, UserLink.UserLinkType.Follow);
+            UserLink link2 = factory.Create(companionE, subject, UserLink.UserLinkType.Follow);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            link1 = factory.Create(subject, friendJ, UserLink.UserLinkType.Follow);
-            link2 = factory.Create(friendJ, subject, UserLink.UserLinkType.Follow);
+            link1 = factory.Create(subject, companionJ, UserLink.UserLinkType.Follow);
+            link2 = factory.Create(companionJ, subject, UserLink.UserLinkType.Follow);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            link1 = factory.Create(subject, friendM, UserLink.UserLinkType.Follow);
-            link2 = factory.Create(friendM, subject, UserLink.UserLinkType.Follow);
+            link1 = factory.Create(subject, companionM, UserLink.UserLinkType.Follow);
+            link2 = factory.Create(companionM, subject, UserLink.UserLinkType.Follow);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
@@ -114,28 +114,28 @@ namespace Repository.Tests
 
             // Post block
             // alpha
-            Post e1 = new SnapshotFactory().Create(friendE, alpha, timeA);
-            Post j1 = new SnapshotFactory().Create(friendJ, alpha, timeA);
-            Post e2 = new SnapshotFactory().Create(friendE, alpha, timeB);
+            Post e1 = new SnapshotFactory().Create(companionE, alpha, timeA);
+            Post j1 = new SnapshotFactory().Create(companionJ, alpha, timeA);
+            Post e2 = new SnapshotFactory().Create(companionE, alpha, timeB);
             Post x1 = new SnapshotFactory().Create(baitX, alpha, timeB);
-            Post e3 = new SnapshotFactory().Create(friendE, alpha, timeC);
-            Post m1 = new SnapshotFactory().Create(friendM, alpha, timeD);
+            Post e3 = new SnapshotFactory().Create(companionE, alpha, timeC);
+            Post m1 = new SnapshotFactory().Create(companionM, alpha, timeD);
 
             // echo
-            Post j2 = new SnapshotFactory().Create(friendJ, echo, timeA);
-            Post j3 = new SnapshotFactory().Create(friendJ, echo, timeB);
+            Post j2 = new SnapshotFactory().Create(companionJ, echo, timeA);
+            Post j3 = new SnapshotFactory().Create(companionJ, echo, timeB);
             Post x2 = new SnapshotFactory().Create(baitX, echo, timeB);
 
             // hotel
-            Post e4 = new SnapshotFactory().Create(friendE, hotel, timeC);
-            Post m2 = new SnapshotFactory().Create(friendM, hotel, timeC);
+            Post e4 = new SnapshotFactory().Create(companionE, hotel, timeC);
+            Post m2 = new SnapshotFactory().Create(companionM, hotel, timeC);
 
             // kilo
-            Post e5 = new SnapshotFactory().Create(friendE, kilo, timeZ);
+            Post e5 = new SnapshotFactory().Create(companionE, kilo, timeZ);
 
             // romeo
-            Post j4 = new SnapshotFactory().Create(friendJ, romeo, timeA);
-            Post m3 = new SnapshotFactory().Create(friendM, romeo, timeD);
+            Post j4 = new SnapshotFactory().Create(companionJ, romeo, timeA);
+            Post m3 = new SnapshotFactory().Create(companionM, romeo, timeD);
             Post x3 = new SnapshotFactory().Create(baitX, romeo, timeD);
 
             await BulkWritePost(e1, e2, e3, e4, e5, j1, j2, j3, j4, m1, m2, m3, x1, x2, x3);

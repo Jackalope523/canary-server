@@ -100,13 +100,13 @@ namespace Core.Controls
             // Enforce lastDepth < depth
             lastDepth = Math.Min(lastDepth, depth - 1);
 
-            // Retrieve friend-populated gathering snapshots after a specified time excluding previously viewed gatherings
+            // Retrieve companion-populated gathering snapshots after a specified time excluding previously viewed gatherings
             DateTimeOffset depthCharge = Time - TimeSpan.FromDays(depth);
             DateTimeOffset lastDepthCharge = Time - TimeSpan.FromDays(lastDepth);
-            var friendSnapshots = await Snapshots.GenerateFeedForUserAsync(user.Id, depthCharge, lastDepthCharge);
+            var companionSnapshots = await Snapshots.GenerateFeedForUserAsync(user.Id, depthCharge, lastDepthCharge);
 
             // Get the respective gathering headers for the snapshots
-            foreach (var snapshot in friendSnapshots)
+            foreach (var snapshot in companionSnapshots)
             {
                 var gatheringId = snapshot.GatheringId;
 
@@ -129,7 +129,7 @@ namespace Core.Controls
                 }
             }
 
-            return new(gatheringHeaders.Values.ToList(), friendSnapshots);
+            return new(gatheringHeaders.Values.ToList(), companionSnapshots);
         }
 
 		#endregion

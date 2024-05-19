@@ -20,7 +20,7 @@ namespace Core.Boundaries
 
 	public interface IProfileDatabase
     {
-        Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
+        Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
 		Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
         Task<List<UserSilhouette>> GetUsersFollowingAsync(ulong userId);
         Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
@@ -42,9 +42,9 @@ namespace Core.Boundaries
         Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
         Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
-        Task<IDictionary<UserSilhouette, AgendaShard>> GetFriendAgendaAsync(ulong userId);
+        Task<IDictionary<UserSilhouette, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
 
-        Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
+        Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
         Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);
         Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
 

@@ -54,7 +54,7 @@ namespace Core.Entities
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.Active ||
             AccountStatus == UserAccountStatus.Impotent;
-        public bool CanAttendFriends => CanAttend ||
+        public bool CanAttendCompanions => CanAttend ||
             AccountStatus == UserAccountStatus.Limited;
         public bool CanHost => AccountStatus == UserAccountStatus.Active;
         public bool IsLocked => AccountStatus == UserAccountStatus.Blacklisted;
@@ -83,7 +83,7 @@ namespace Core.Entities
         public Synced<List<Gathering>> UpcomingGatherings { get; }
         public Synced<List<Gathering>> SurveyingGatherings { get; }
 
-        public Synced<List<User>> Friends { get; }
+        public Synced<List<User>> Companions { get; }
         public Synced<List<User>> Following { get; }
         public Synced<List<User>> FollowedBy { get; }
         public Synced<List<User>> Blocking { get; }
@@ -121,7 +121,7 @@ namespace Core.Entities
             UpcomingGatherings = new(() => Terminal.GatheringDirector.RequestUpcomingGatheringsForUserAsync(this));
             SurveyingGatherings = new(() => Terminal.GatheringDirector.RequestSurveyingGatheringsForUserAsync(this));
 
-            Friends = new(() => Terminal.ProfileDirector.RequestFriendsAsync(this));
+            Companions = new(() => Terminal.ProfileDirector.RequestCompanionsAsync(this));
             Following = new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));
             FollowedBy = new(() => Terminal.ProfileDirector.RequestFollowersAsync(this));
             Blocking = new(() => Terminal.ProfileDirector.RequestBlockedUsersAsync(this));
@@ -256,10 +256,10 @@ namespace Core.Entities
 
 		#region Checks
 
-        public async Task<bool> IsFriendsWith(User otherUser)
+        public async Task<bool> IsCompanionsWith(User otherUser)
 		{
-			// Check if users are friends
-			if ((await Friends).Contains(otherUser))
+			// Check if users are companions
+			if ((await Companions).Contains(otherUser))
             { return true; }
 
             return false;
@@ -320,8 +320,8 @@ namespace Core.Entities
 			if (!CanAttend)
 			{
                 // User cannot join normal gatherings
-                // Check if user can join friend gatherings and Host is friends with the user
-				if (!CanAttendFriends || !await IsFriendsWith(@gathering.Host))
+                // Check if user can join companion gatherings and Host is companions with the user
+				if (!CanAttendCompanions || !await IsCompanionsWith(@gathering.Host))
 				{ return false; }
 			}
 

@@ -31,19 +31,19 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetUserProfileAsync_Friend_ReturnsProfile()
+		public async Task GetUserProfileAsync_Companion_ReturnsProfile()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
-			friend.NumberOfFollowers += 1;
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion);
+			companion.NumberOfFollowers += 1;
 
 			// Act
-			var profile = await director.GetUserProfileAsync(user.Id, friend.Id);
+			var profile = await director.GetUserProfileAsync(user.Id, companion.Id);
 
 			// Assert
-			Assert.Equal(friend.ToUserProfile(), profile);
+			Assert.Equal(companion.ToUserProfile(), profile);
 		}
 
 		[Fact]
@@ -107,27 +107,27 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetUserNestAsync_Friend_ReturnsNest()
+		public async Task GetUserNestAsync_Companion_ReturnsNest()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
+			var companion = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
+			await environment.ForceCompanionshipAsync(user, companion);
 
-			var hostedGathering = await environment.GeneratePastGatheringAsync(user, friend);
-			var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(host, user, friend);
-			var unattendedGathering = await environment.GeneratePastGatheringAsync(friend);
-			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, friend);
+			var hostedGathering = await environment.GeneratePastGatheringAsync(user, companion);
+			var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(host, user, companion);
+			var unattendedGathering = await environment.GeneratePastGatheringAsync(companion);
+			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, companion);
 
 			var userSnapshot = await environment.GenerateSnapshotAsync(hostedGathering, user);
-			var friendSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, friend);
+			var companionSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, companion);
 			var hostSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, host);
-			var ongoingGatheringFriendSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, friend);
-			var unattendedGatheringFriendSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, friend);
+			var ongoingGatheringCompanionSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, companion);
+			var unattendedGatheringCompanionSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, companion);
 
 			// Act
-			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, friend.Id);
+			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, companion.Id);
 
 			// Assert
 			Assert.Equal(4, Gatherings.Count);
@@ -192,22 +192,22 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetUserAgendaAsync_Friend_ReturnsAgenda()
+		public async Task GetUserAgendaAsync_Companion_ReturnsAgenda()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
+			var companion = await environment.GenerateUniqueUserAsync();
 			var randomHost = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
+			await environment.ForceCompanionshipAsync(user, companion);
 
-			var pastGathering = await environment.GeneratePastGatheringAsync(friend);
-			var ongoingGathering = await environment.GenerateOngoingGatheringAsync(friend);
-			var upcomingGathering = await environment.GenerateUpcomingGatheringAsync(user, friend);
-			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(randomHost, friend);
-			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(friend);
+			var pastGathering = await environment.GeneratePastGatheringAsync(companion);
+			var ongoingGathering = await environment.GenerateOngoingGatheringAsync(companion);
+			var upcomingGathering = await environment.GenerateUpcomingGatheringAsync(user, companion);
+			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(randomHost, companion);
+			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(companion);
 
 			// Act
-			var agenda = await director.GetUserAgendaAsync(user.Id, friend.Id);
+			var agenda = await director.GetUserAgendaAsync(user.Id, companion.Id);
 
 			// Assert
 			Assert.Equal(4, agenda.Agenda.Count);
@@ -243,44 +243,44 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetFriendAgendaAsync_ReturnsFriendAgenda()
+		public async Task GetCompanionAgendaAsync_ReturnsCompanionAgenda()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var activeFriend = await environment.GenerateUniqueUserAsync();
+			var activeCompanion = await environment.GenerateUniqueUserAsync();
 			var sloadButChill = await environment.GenerateUniqueUserAsync();
 			var randomHost = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, activeFriend, sloadButChill);
+			await environment.ForceCompanionshipAsync(user, activeCompanion, sloadButChill);
 
-			var pastGathering = await environment.GeneratePastGatheringAsync(activeFriend);
-			var ongoingGathering = await environment.GenerateOngoingGatheringAsync(activeFriend, sloadButChill);
-			var upcomingGathering = await environment.GenerateUpcomingGatheringAsync(user, activeFriend);
-			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(randomHost, activeFriend);
-			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(activeFriend);
+			var pastGathering = await environment.GeneratePastGatheringAsync(activeCompanion);
+			var ongoingGathering = await environment.GenerateOngoingGatheringAsync(activeCompanion, sloadButChill);
+			var upcomingGathering = await environment.GenerateUpcomingGatheringAsync(user, activeCompanion);
+			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(randomHost, activeCompanion);
+			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(activeCompanion);
 
 			// Act
-			var agenda = await director.GetFriendAgendaAsync(user.Id);
+			var agenda = await director.GetCompanionAgendaAsync(user.Id);
 
 			// Assert
 			Assert.Equal(2, agenda.Keys.Count);
-			Assert.Equal(4, agenda[activeFriend.ToUserSilhouette()].Agenda.Count);
+			Assert.Equal(4, agenda[activeCompanion.ToUserSilhouette()].Agenda.Count);
 			Assert.Single(agenda[sloadButChill.ToUserSilhouette()].Agenda);
 		}
 
 		[Fact]
-		public async Task GetFriendsAsync_ReturnsFriends()
+		public async Task GetCompanionsAsync_ReturnsCompanions()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			var otherFriend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend, otherFriend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			var otherCompanion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion, otherCompanion);
 
 			// Act
-			var friends = await director.GetFriendsAsync(user.Id);
+			var companions = await director.GetCompanionsAsync(user.Id);
 
 			// Assert
-			Assert.Equal(2, friends.Count);
+			Assert.Equal(2, companions.Count);
 
 		}
 
@@ -289,9 +289,9 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			var otherFriend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend, otherFriend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			var otherCompanion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion, otherCompanion);
 
 			// Act
 			var followedUsers = await director.GetFollowedUsersAsync(user.Id);
@@ -305,9 +305,9 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var notAFriend = await environment.GenerateUniqueUserAsync();
+			var notACompanion = await environment.GenerateUniqueUserAsync();
 			var archNemesis = await environment.GenerateUniqueUserAsync();
-			await environment.ForceEnemiesAsync(user, notAFriend, archNemesis);
+			await environment.ForceEnemiesAsync(user, notACompanion, archNemesis);
 
 			// Act
 			var blockedUsers = await director.GetBlockedUsersAsync(user.Id);

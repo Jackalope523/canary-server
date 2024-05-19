@@ -165,7 +165,7 @@ namespace Repository.Tests
             Assert.Equal(0, down);
         }
         [Fact]
-        public async Task GetFriendsAsync_SUCCESS()
+        public async Task GetCompanionsAsync_SUCCESS()
         {
             UserLinkFactory factory = new UserLinkFactory();
             UserLink link1 = factory.Create(subject1, subject2, UserLink.UserLinkType.Follow);
@@ -174,7 +174,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            UserSilhouette user = (await profileStore.GetFriendsAsync(subject1.Id)).Single();
+            UserSilhouette user = (await profileStore.GetCompanionsAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);

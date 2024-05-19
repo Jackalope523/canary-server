@@ -95,7 +95,7 @@ namespace Frontier.Controllers
 					await gatherings.JoinGatheringAsync(seedUsers[self - 1].Id, seedGatherings[@gathering - 1].Id);
 				}
 
-                log.LogError("Making friends..");
+                log.LogError("Making companions..");
 
                 for (int i = 0; i < seed.Follows.Count; i++)
 				{
