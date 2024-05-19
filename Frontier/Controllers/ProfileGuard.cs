@@ -36,18 +36,14 @@ namespace Frontier.Controllers
 				await profiles.GetUserNestAsync(user.Id, targetIdentification));
 		}
 
-		[HttpPost("{targetIdentification}")]
-		public async Task<IActionResult> RateUser(ulong targetIdentification, [FromBody] AccountRatingManifest details)
+		[HttpGet("companions")]
+        public async Task<IActionResult> GetCompanions()
         {
-			// Verify parameters
-            if (details != null && !ModelState.IsValid)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            return await Execute(async user =>
+                await profiles.GetCompanionsAsync(user.Id));
+        }
 
-			return await Execute(async user =>
-				await profiles.RateUserAsync(user.Id, targetIdentification, details.Rating));
-		}
-
-		[HttpGet("following")]
+        [HttpGet("following")]
         public async Task<IActionResult> GetFollowed()
 		{
 			return await Execute(async user =>
