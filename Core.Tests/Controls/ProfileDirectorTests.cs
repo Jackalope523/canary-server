@@ -173,7 +173,7 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetUserActivityAsync_Self_ReturnsActivity()
+		public async Task GetUserAgendaAsync_Self_ReturnsAgenda()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -185,14 +185,14 @@ namespace Core.Tests.Controls
 			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(user);
 
 			// Act
-			var activity = await director.GetUserActivityAsync(user.Id, user.Id);
+			var agenda = await director.GetUserAgendaAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(3, activity.Activity.Count);
+			Assert.Equal(3, agenda.Agenda.Count);
 		}
 
 		[Fact]
-		public async Task GetUserActivityAsync_Friend_ReturnsActivity()
+		public async Task GetUserAgendaAsync_Friend_ReturnsAgenda()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -207,28 +207,28 @@ namespace Core.Tests.Controls
 			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(friend);
 
 			// Act
-			var activity = await director.GetUserActivityAsync(user.Id, friend.Id);
+			var agenda = await director.GetUserAgendaAsync(user.Id, friend.Id);
 
 			// Assert
-			Assert.Equal(4, activity.Activity.Count);
+			Assert.Equal(4, agenda.Agenda.Count);
 		}
 
 		[Fact]
-		public async Task GetUserActivityAsync_Neutral_Fails()
+		public async Task GetUserAgendaAsync_Neutral_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var activity = director.GetUserActivityAsync(user.Id, randomUser.Id);
+			var agenda = director.GetUserAgendaAsync(user.Id, randomUser.Id);
 
 			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await activity);
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await agenda);
 		}
 
 		[Fact]
-		public async Task GetUserActivityAsync_Blocked_Fails()
+		public async Task GetUserAgendaAsync_Blocked_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -236,14 +236,14 @@ namespace Core.Tests.Controls
 			await environment.ForceEnemiesAsync(user, enemy);
 
 			// Act
-			var activity = director.GetUserActivityAsync(user.Id, enemy.Id);
+			var agenda = director.GetUserAgendaAsync(user.Id, enemy.Id);
 
 			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await activity);
+			await Assert.ThrowsAnyAsync<HollowException>(async () => await agenda);
 		}
 
 		[Fact]
-		public async Task GetFriendActivityAsync_ReturnsFriendActivity()
+		public async Task GetFriendAgendaAsync_ReturnsFriendAgenda()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -259,12 +259,12 @@ namespace Core.Tests.Controls
 			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(activeFriend);
 
 			// Act
-			var activity = await director.GetFriendActivityAsync(user.Id);
+			var agenda = await director.GetFriendAgendaAsync(user.Id);
 
 			// Assert
-			Assert.Equal(2, activity.Keys.Count);
-			Assert.Equal(4, activity[activeFriend.ToUserSilhouette()].Activity.Count);
-			Assert.Single(activity[sloadButChill.ToUserSilhouette()].Activity);
+			Assert.Equal(2, agenda.Keys.Count);
+			Assert.Equal(4, agenda[activeFriend.ToUserSilhouette()].Agenda.Count);
+			Assert.Single(agenda[sloadButChill.ToUserSilhouette()].Agenda);
 		}
 
 		[Fact]

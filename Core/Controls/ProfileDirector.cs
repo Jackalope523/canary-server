@@ -47,8 +47,8 @@ namespace Core.Controls
             if (user.Equals(targetUser))
             {
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingActivity = await GetUserActivity(targetUser);
-                upcomingActivity = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingActivity);
+                var upcomingAgenda = await GetUserAgenda(targetUser);
+                upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
                 // Get private gatherings and snapshots
                 nest = nest with
@@ -56,7 +56,7 @@ namespace Core.Controls
                     Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
                 };
 
-                nest.Gatherings.AddRange(upcomingActivity.Activity.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
+                nest.Gatherings.AddRange(upcomingAgenda.Agenda.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
 
                 foreach (var shard in nest.Gatherings)
                 {
@@ -68,8 +68,8 @@ namespace Core.Controls
             else if (await targetUser.IsFriendsWith(user))
             {
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingActivity = await GetUserActivity(targetUser);
-                upcomingActivity = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingActivity);
+                var upcomingAgenda = await GetUserAgenda(targetUser);
+                upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
                 // Get private gatherings and snapshots
                 nest = nest with
@@ -77,7 +77,7 @@ namespace Core.Controls
                     Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
                 };
 
-                nest.Gatherings.AddRange(upcomingActivity.Activity.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
+                nest.Gatherings.AddRange(upcomingAgenda.Agenda.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
 
                 nest = nest with
                 {
@@ -109,7 +109,7 @@ namespace Core.Controls
             return nest;
         }
 
-        public async Task<ActivityShard> GetUserActivityAsync(ulong userId, ulong targetId)
+        public async Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -119,27 +119,27 @@ namespace Core.Controls
                 new InvalidUserException("User is unable to view target."));
 
             // Gather active and upcoming gatherings
-            var upcomingActivity = await GetUserActivity(targetUser);
+            var upcomingAgenda = await GetUserAgenda(targetUser);
 
             // Remove active and upcoming gatherings if the user cannot view them
-            await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingActivity);
+            await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
-            return upcomingActivity;
+            return upcomingAgenda;
         }
 
-        public async Task<IDictionary<UserSilhouette, ActivityShard>> GetFriendActivityAsync(ulong userId)
+        public async Task<IDictionary<UserSilhouette, AgendaShard>> GetFriendAgendaAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
 
-            ConcurrentDictionary<UserSilhouette, ActivityShard> friendGatherings = new();
+            ConcurrentDictionary<UserSilhouette, AgendaShard> friendGatherings = new();
 
-            // Gather visible activity of each friend
+            // Gather visible agenda of each friend
             (await user.Friends).AsParallel()
                 .ForAll(async friend =>
                 {
-                    var friendActivity = await GetUserActivity(friend);
-                    await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, friendActivity);
-                    friendGatherings.TryAdd(friend.ToUserSilhouette(), friendActivity);
+                    var friendAgenda = await GetUserAgenda(friend);
+                    await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, friendAgenda);
+                    friendGatherings.TryAdd(friend.ToUserSilhouette(), friendAgenda);
                 });
 
             return friendGatherings;
@@ -258,22 +258,22 @@ namespace Core.Controls
 
 		#region Tools
 
-        private async Task<ActivityShard> GetUserActivity(User user)
+        private async Task<AgendaShard> GetUserAgenda(User user)
         {
             _ = user.UpcomingGatherings.Sync();
             _ = user.CurrentGathering.Sync();
 
             // Gather all user gathering data
-            ActivityShard activity = new((await user.UpcomingGatherings)
+            AgendaShard agenda = new((await user.UpcomingGatherings)
                 .ConvertAll(@gathering => (@gathering.ToGatheringShard(), GatheringBond.Guest)));
 
-            activity.Activity.AddRange((await user.SurveyingGatherings)
+            agenda.Agenda.AddRange((await user.SurveyingGatherings)
                 .ConvertAll(@gathering => (@gathering.ToGatheringShard(), GatheringBond.Surveying)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
-            { activity.Activity.Add(((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
+            { agenda.Agenda.Add(((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
 
-            return activity;
+            return agenda;
         }
 
         #endregion

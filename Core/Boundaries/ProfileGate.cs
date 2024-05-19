@@ -12,7 +12,7 @@ namespace Core.Boundaries
     public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfFollowers);
     public record UserSilhouette(ulong Id, string Name);
     public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
-    public record ActivityShard(List<(GatheringShard Gathering, GatheringBond Bond)> Activity);
+    public record AgendaShard(List<(GatheringShard Gathering, GatheringBond Bond)> Agenda);
 
 	#endregion
 
@@ -41,8 +41,8 @@ namespace Core.Boundaries
         Task<UserProfile> GetUserProfileAsync(ulong userId, ulong targetId);
         Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
-        Task<ActivityShard> GetUserActivityAsync(ulong userId, ulong targetId);
-        Task<IDictionary<UserSilhouette, ActivityShard>> GetFriendActivityAsync(ulong userId);
+        Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
+        Task<IDictionary<UserSilhouette, AgendaShard>> GetFriendAgendaAsync(ulong userId);
 
         Task<List<UserSilhouette>> GetFriendsAsync(ulong userId);
         Task<List<UserSilhouette>> GetFollowedUsersAsync(ulong userId);

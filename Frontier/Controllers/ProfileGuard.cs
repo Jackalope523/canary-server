@@ -47,20 +47,6 @@ namespace Frontier.Controllers
 				await profiles.RateUserAsync(user.Id, targetIdentification, details.Rating));
 		}
 
-		[HttpGet("{targetIdentification}/activity")]
-		public async Task<IActionResult> GetUserActivity(ulong targetIdentification)
-		{
-			return await Execute(async user =>
-				await profiles.GetUserActivityAsync(user.Id, targetIdentification));
-		}
-
-		[HttpGet("activity")]
-		public async Task<IActionResult> GetFriendActivity()
-		{
-			return await Execute(async user =>
-				await profiles.GetFriendActivityAsync(user.Id));
-		}
-
 		[HttpGet("following")]
         public async Task<IActionResult> GetFollowed()
 		{

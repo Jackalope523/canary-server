@@ -561,17 +561,17 @@ namespace Core.Controls
 			return accessibleGatherings;
 		}
 
-		internal async Task<ActivityShard>
-			RemoveInaccessibleGatheringBondsAsync(User user, ActivityShard activity)
+		internal async Task<AgendaShard>
+			RemoveInaccessibleGatheringBondsAsync(User user, AgendaShard agenda)
 		{
-			ActivityShard accessibleGatherings = new(new());
+			AgendaShard accessibleGatherings = new(new());
 
-			foreach ((GatheringShard shard, GatheringBond bond) in activity.Activity)
+			foreach ((GatheringShard shard, GatheringBond bond) in agenda.Agenda)
 			{
 				Gathering targetGathering = new(shard);
 
 				if (await user.CanJoin(targetGathering))
-				{ accessibleGatherings.Activity.Add((shard, bond)); }
+				{ accessibleGatherings.Agenda.Add((shard, bond)); }
 			}
 
 			return accessibleGatherings;
