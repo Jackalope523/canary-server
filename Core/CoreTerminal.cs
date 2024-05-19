@@ -20,7 +20,7 @@ namespace Core
         public IAdminDatabase AdminDatabase { get; init; }
         public IBannerDatabase BannerDatabase { get; init; }
         public IGatheringDatabase GatheringDatabase { get; init; }
-        public IEtchingDatabase EtchingDatabase { get; init; }
+        public ISnapshotDatabase SnapshotDatabase { get; init; }
         public IDisciplineDatabase DisciplineDatabase { get; init; }
         public IKeyDatabase KeyDatabase { get; init; }
         public IMediaDatabase MediaDatabase { get; init; }
@@ -33,8 +33,8 @@ namespace Core
             => BannerDirector;
         public IGatheringOperations GatheringOperations
             => GatheringDirector;
-        public IEtchingOperations EtchingOperations
-            => EtchingDirector;
+        public ISnapshotOperations SnapshotOperations
+            => SnapshotDirector;
         public IDisciplineOperations DisciplineOperations
             => DisciplineDirector;
         public IKeyOperations KeyOperations
@@ -51,7 +51,7 @@ namespace Core
         internal AccountDirector AccountDirector { get; private set; }
         internal BannerDirector BannerDirector { get; private set; }
         internal GatheringDirector GatheringDirector { get; private set; }
-        internal EtchingDirector EtchingDirector { get; private set; }
+        internal SnapshotDirector SnapshotDirector { get; private set; }
         internal DisciplineDirector DisciplineDirector { get; private set; }
         internal KeyDirector KeyDirector { get; private set; }
         internal MediaDirector MediaDirector { get; private set; }
@@ -64,7 +64,7 @@ namespace Core
 
         public static CoreTerminal CreateTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IGatheringDatabase gatheringDatabase, IEtchingDatabase etchingDatabase,
+            IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
             IProfileDatabase profileDatabase,
@@ -74,7 +74,7 @@ namespace Core
             {
                 Terminal ??= new CoreTerminal(logger,
                         accountDatabase, adminDatabase, bannerDatabase,
-                        gatheringDatabase, etchingDatabase,
+                        gatheringDatabase, snapshotDatabase,
                         disciplineDatabase, keyDatabase,
                         mediaDatabase, notificationDatabase,
                         profileDatabase,
@@ -86,7 +86,7 @@ namespace Core
 
         protected CoreTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-			IGatheringDatabase gatheringDatabase, IEtchingDatabase etchingDatabase,
+			IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
 			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
             IProfileDatabase profileDatabase,
@@ -98,7 +98,7 @@ namespace Core
             AdminDatabase = adminDatabase;
             BannerDatabase = bannerDatabase;
             GatheringDatabase = gatheringDatabase;
-            EtchingDatabase = etchingDatabase;
+            SnapshotDatabase = snapshotDatabase;
             DisciplineDatabase = disciplineDatabase;
             KeyDatabase = keyDatabase;
             MediaDatabase = mediaDatabase;
@@ -115,7 +115,7 @@ namespace Core
             AccountDirector = new AccountDirector(this);
             BannerDirector = new BannerDirector(this);
             GatheringDirector = new GatheringDirector(this);
-            EtchingDirector = new EtchingDirector(this);
+            SnapshotDirector = new SnapshotDirector(this);
             DisciplineDirector = new DisciplineDirector(this);
             KeyDirector = new KeyDirector(this);
             MediaDirector = new MediaDirector(this);

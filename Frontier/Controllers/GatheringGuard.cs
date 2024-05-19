@@ -187,17 +187,17 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpGet("{gatheringId}/etchings")]
-		public async Task<IActionResult> GetGatheringEtchings(ulong gatheringId)
+		[HttpGet("{gatheringId}/snapshots")]
+		public async Task<IActionResult> GetGatheringSnapshots(ulong gatheringId)
 		{
 			return await Execute(async user =>
 			{
-				return await etchings.GetGatheringEtchingsAsync(user.Id, gatheringId);
+				return await snapshots.GetGatheringSnapshotsAsync(user.Id, gatheringId);
 			});
 		}
 
-		[HttpPost("{gatheringId}/etchings")]
-		public async Task<IActionResult> EtchingToGathering(ulong gatheringId)
+		[HttpPost("{gatheringId}/snapshots")]
+		public async Task<IActionResult> SnapshotToGathering(ulong gatheringId)
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)
@@ -205,21 +205,21 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				return await etchings.AddEtchingAsync(user.Id, gatheringId, await StreamFirstFile());
+				return await snapshots.AddSnapshotAsync(user.Id, gatheringId, await StreamFirstFile());
 			});
 		}
 
-		[HttpPut("{gatheringId}/etchings")]
-		public async Task<IActionResult> RemoveEtching(ulong gatheringId, ulong etchingId)
+		[HttpPut("{gatheringId}/snapshots")]
+		public async Task<IActionResult> RemoveSnapshot(ulong gatheringId, ulong snapshotId)
 		{
 			return await Execute(async user =>
 			{
-				await etchings.RemoveEtchingAsync(user.Id, etchingId);
+				await snapshots.RemoveSnapshotAsync(user.Id, snapshotId);
 			});
 		}
 
-		[HttpPost("{gatheringId}/etchings/{etchingId}")]
-		public async Task<IActionResult> RateEtching(ulong gatheringId, ulong etchingId, [FromBody] AccountRatingManifest details)
+		[HttpPost("{gatheringId}/snapshots/{snapshotId}")]
+		public async Task<IActionResult> RateSnapshot(ulong gatheringId, ulong snapshotId, [FromBody] AccountRatingManifest details)
 		{
 			// Verify parameters
 			if (details == null || !ModelState.IsValid)
@@ -227,7 +227,7 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				await etchings.RateEtchingAsync(user.Id, etchingId, details.Rating);
+				await snapshots.RateSnapshotAsync(user.Id, snapshotId, details.Rating);
 			});
 		}
 

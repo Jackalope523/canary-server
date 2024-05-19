@@ -50,7 +50,7 @@ namespace Core.Controls
                 var upcomingActivity = await GetUserActivity(targetUser);
                 upcomingActivity = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingActivity);
 
-                // Get private gatherings and etchings
+                // Get private gatherings and snapshots
                 nest = nest with
                 {
                     Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
@@ -61,7 +61,7 @@ namespace Core.Controls
                 foreach (var shard in nest.Gatherings)
                 {
                     Gathering @gathering = new(shard);
-                    nest.Etchings.AddRange(await @gathering.Etchings);
+                    nest.Snapshots.AddRange(await @gathering.Snapshots);
                 }
             }
             // Check if users are friends
@@ -71,7 +71,7 @@ namespace Core.Controls
                 var upcomingActivity = await GetUserActivity(targetUser);
                 upcomingActivity = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingActivity);
 
-                // Get private gatherings and etchings
+                // Get private gatherings and snapshots
                 nest = nest with
                 {
                     Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
@@ -81,7 +81,7 @@ namespace Core.Controls
 
                 nest = nest with
                 {
-                    Etchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id)
+                    Snapshots = await Snapshots.GetSnapshotsByUserAsync(targetUser.Id)
                 };
             }
             else
@@ -101,9 +101,9 @@ namespace Core.Controls
 
                 nest.Gatherings.AddRange(commonGatherings);
 
-                var targetEtchings = await Etchings.GetEtchingsByUserAsync(targetUser.Id);
+                var targetSnapshots = await Snapshots.GetSnapshotsByUserAsync(targetUser.Id);
 
-                nest.Etchings.AddRange(targetEtchings.Where(etching => commonGatherings.Exists(e => e.Id.Equals(etching.GatheringId))));
+                nest.Snapshots.AddRange(targetSnapshots.Where(snapshot => commonGatherings.Exists(e => e.Id.Equals(snapshot.GatheringId))));
             }
 
             return nest;

@@ -373,33 +373,33 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task Etched_OwnedEtching_ReturnsTrue()
+		public async Task Etched_OwnedSnapshot_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
 			var @gathering = await environment.GenerateUpcomingGatheringAsync(user);
-			var etching = await environment.GenerateEtchingAsync(@gathering, user);
+			var snapshot = await environment.GenerateSnapshotAsync(@gathering, user);
 
 			// Act
-			var etched = user.Etched(etching);
+			var etched = user.Etched(snapshot);
 
 			// Assert
 			Assert.True(etched);
 		}
 
 		[Fact]
-		public async Task Etched_UnownedEtching_ReturnsFalse()
+		public async Task Etched_UnownedSnapshot_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
 			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			var etching = await environment.GenerateEtchingAsync(@gathering, host);
+			var snapshot = await environment.GenerateSnapshotAsync(@gathering, host);
 
 			// Act
-			var etched = user.Etched(etching);
+			var etched = user.Etched(snapshot);
 
 			// Assert
 			Assert.False(etched);

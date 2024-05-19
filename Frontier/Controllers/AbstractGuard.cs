@@ -42,7 +42,7 @@ namespace Frontier.Controllers
 		public IAccountOperations accounts;
 		public IBannerOperations banners;
 		public IGatheringOperations gatherings;
-		public IEtchingOperations etchings;
+		public ISnapshotOperations snapshots;
 		public IDisciplineOperations reports;
 		public IKeyOperations keys;
 		public IMediaOperations media;
@@ -63,7 +63,7 @@ namespace Frontier.Controllers
 			banners = box.banners;
 			profiles = box.profiles;
 			gatherings = box.gatherings;
-			etchings = box.etchings;
+			snapshots = box.snapshots;
 			keys = box.keys;
 			reports = box.reports;
 			media = box.media;

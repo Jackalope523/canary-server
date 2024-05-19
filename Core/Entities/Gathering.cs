@@ -25,7 +25,7 @@ namespace Core.Entities
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public readonly Distance ArrivalDistance = new() { Metres = 75 };
-        public readonly TimeSpan MaximumEtchingLateness = OneDay;
+        public readonly TimeSpan MaximumSnapshotLateness = OneDay;
 
         public static Gathering None
             => new() { Id = 0, Exists = false };
@@ -61,7 +61,7 @@ namespace Core.Entities
                 State.Equals(GatheringState.Sealed);
         public bool IsActive
             => !EndTime.HasValue ||
-                HasYet(EndTime.Value + MaximumEtchingLateness);
+                HasYet(EndTime.Value + MaximumSnapshotLateness);
         public bool IsEnded
             => EndTime.HasValue;
 
@@ -82,7 +82,7 @@ namespace Core.Entities
 
         public Synced<List<GatheringReport>> GatheringReports { get; }
 
-        public Synced<List<EtchingShard>> Etchings { get; }
+        public Synced<List<SnapshotShard>> Snapshots { get; }
 
         #endregion
 
@@ -99,7 +99,7 @@ namespace Core.Entities
 
             GuestHistory = new(() => Terminal.GatheringDirector.RequestGuestHistoryAsync(this));
             GatheringReports = new(() => Terminal.DisciplineDirector.RequestGatheringReportsAsync(this));
-            Etchings = new(() => Terminal.EtchingDirector.RequestGatheringEtchingsAsync(this));
+            Snapshots = new(() => Terminal.SnapshotDirector.RequestGatheringSnapshotsAsync(this));
         }
 
         public Gathering(CoreGathering fromGathering) : this()
@@ -201,9 +201,9 @@ namespace Core.Entities
             return friends;
         }
 
-        public async Task<List<EtchingShard>> GetEtchingsOf(User user)
+        public async Task<List<SnapshotShard>> GetSnapshotsOf(User user)
         {
-            return (await Etchings).Where(etching => etching.User.Id.Equals(user.Id)).ToList();
+            return (await Snapshots).Where(snapshot => snapshot.User.Id.Equals(user.Id)).ToList();
         }
 
 		#endregion
@@ -339,7 +339,7 @@ namespace Core.Entities
 
         public async Task Etched(User user)
         {
-            // Verify etching is not before gathering starting or user is host
+            // Verify snapshot is not before gathering starting or user is host
             Try(HasAlready(StartTime) || IsModifiableBy(user),
                 new InvalidGatheringException("Gathering has yet to start."));
 
@@ -347,7 +347,7 @@ namespace Core.Entities
             Try(await WasAttendedBy(user) || IsModifiableBy(user),
                 new InvalidGatheringException("User did not attend gathering."));
 
-            // Verify etching is added before gathering is closed
+            // Verify snapshot is added before gathering is closed
             Try(IsActive,
                 new InvalidGatheringException("Gathering has already ended."));
 		}

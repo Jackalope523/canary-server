@@ -8,7 +8,7 @@ namespace Repository.Tests
     public class FeedTests : IDisposable
     {
         private static EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static EFCoreEtchingStore store = new(Harbor.Flag.Development);
+        private static EFCoreSnapshotStore store = new(Harbor.Flag.Development);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
@@ -114,29 +114,29 @@ namespace Repository.Tests
 
             // Post block
             // alpha
-            Post e1 = new EtchingFactory().Create(friendE, alpha, timeA);
-            Post j1 = new EtchingFactory().Create(friendJ, alpha, timeA);
-            Post e2 = new EtchingFactory().Create(friendE, alpha, timeB);
-            Post x1 = new EtchingFactory().Create(baitX, alpha, timeB);
-            Post e3 = new EtchingFactory().Create(friendE, alpha, timeC);
-            Post m1 = new EtchingFactory().Create(friendM, alpha, timeD);
+            Post e1 = new SnapshotFactory().Create(friendE, alpha, timeA);
+            Post j1 = new SnapshotFactory().Create(friendJ, alpha, timeA);
+            Post e2 = new SnapshotFactory().Create(friendE, alpha, timeB);
+            Post x1 = new SnapshotFactory().Create(baitX, alpha, timeB);
+            Post e3 = new SnapshotFactory().Create(friendE, alpha, timeC);
+            Post m1 = new SnapshotFactory().Create(friendM, alpha, timeD);
 
             // echo
-            Post j2 = new EtchingFactory().Create(friendJ, echo, timeA);
-            Post j3 = new EtchingFactory().Create(friendJ, echo, timeB);
-            Post x2 = new EtchingFactory().Create(baitX, echo, timeB);
+            Post j2 = new SnapshotFactory().Create(friendJ, echo, timeA);
+            Post j3 = new SnapshotFactory().Create(friendJ, echo, timeB);
+            Post x2 = new SnapshotFactory().Create(baitX, echo, timeB);
 
             // hotel
-            Post e4 = new EtchingFactory().Create(friendE, hotel, timeC);
-            Post m2 = new EtchingFactory().Create(friendM, hotel, timeC);
+            Post e4 = new SnapshotFactory().Create(friendE, hotel, timeC);
+            Post m2 = new SnapshotFactory().Create(friendM, hotel, timeC);
 
             // kilo
-            Post e5 = new EtchingFactory().Create(friendE, kilo, timeZ);
+            Post e5 = new SnapshotFactory().Create(friendE, kilo, timeZ);
 
             // romeo
-            Post j4 = new EtchingFactory().Create(friendJ, romeo, timeA);
-            Post m3 = new EtchingFactory().Create(friendM, romeo, timeD);
-            Post x3 = new EtchingFactory().Create(baitX, romeo, timeD);
+            Post j4 = new SnapshotFactory().Create(friendJ, romeo, timeA);
+            Post m3 = new SnapshotFactory().Create(friendM, romeo, timeD);
+            Post x3 = new SnapshotFactory().Create(baitX, romeo, timeD);
 
             await BulkWritePost(e1, e2, e3, e4, e5, j1, j2, j3, j4, m1, m2, m3, x1, x2, x3);
 
@@ -148,13 +148,13 @@ namespace Repository.Tests
             Assert.NotNull(retrieved);
             Assert.Equal(9, retrieved.Count);
 
-            EtchingShard e1Etching = retrieved.Find(etching => etching.Id.Equals(e1.Id));
-            Assert.NotNull(e1Etching);
-            //Assert.Equal(e1.OwnerId, e1Etching.UserId);
-            Assert.Equal(e1.GatheringId, e1Etching.GatheringId);
-            Assert.Equal(e1.PostedAt, e1Etching.TimeEtched);
+            SnapshotShard e1Snapshot = retrieved.Find(snapshot => snapshot.Id.Equals(e1.Id));
+            Assert.NotNull(e1Snapshot);
+            //Assert.Equal(e1.OwnerId, e1Snapshot.UserId);
+            Assert.Equal(e1.GatheringId, e1Snapshot.GatheringId);
+            Assert.Equal(e1.PostedAt, e1Snapshot.TimeEtched);
 
-            var retrievedAsPostIds = retrieved.ConvertAll(etching => etching.Id);
+            var retrievedAsPostIds = retrieved.ConvertAll(snapshot => snapshot.Id);
 
             Assert.Contains(e1.Id, retrievedAsPostIds);
             Assert.Contains(e2.Id, retrievedAsPostIds);

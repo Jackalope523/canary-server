@@ -14,7 +14,7 @@ namespace Repository
         public IProfileDatabase ProfileDatabaseAccess { get; private set; }
         public INotificationDatabase NotificationDatabaseAccess { get; private set; }
         public IGatheringDatabase GatheringDatabaseAccess { get; private set; }
-        public IEtchingDatabase EtchingDatabaseAccess { get; private set; }
+        public ISnapshotDatabase SnapshotDatabaseAccess { get; private set; }
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
         public IMediaDatabase MediaDatabaseAccess { get; private set; }
@@ -28,7 +28,7 @@ namespace Repository
             ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
             NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
             GatheringDatabaseAccess = new GatheringStoreCoordinator(flag);
-            EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
+            SnapshotDatabaseAccess = new SnapshotStoreCoordinator(flag);
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             MediaDatabaseAccess = new MediaStoreCoordinator();

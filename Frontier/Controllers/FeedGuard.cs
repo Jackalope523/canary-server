@@ -30,7 +30,7 @@ namespace Frontier.Controllers
             { return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await etchings.GetUserFeedAsync(user.Id, depth, lastDepth));
+				await snapshots.GetUserFeedAsync(user.Id, depth, lastDepth));
         }
 
 		#endregion

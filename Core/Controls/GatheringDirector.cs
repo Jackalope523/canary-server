@@ -495,11 +495,11 @@ namespace Core.Controls
 			// Kick target user from gathering
 			await Gatherings.SetUserStateAsync(targetUser.Id, @gathering.Id, GatheringBond.Kicked, Time);
 
-			// Hide target user's etchings from gathering
-			foreach (EtchingShard etching in await @gathering.Etchings)
+			// Hide target user's snapshots from gathering
+			foreach (SnapshotShard snapshot in await @gathering.Snapshots)
 			{
-				if (targetUser.Etched(etching))
-				{ _ = Etchings.HideEtchingAsync(etching.Id); }
+				if (targetUser.Etched(snapshot))
+				{ _ = Snapshots.HideSnapshotAsync(snapshot.Id); }
 			}
 		}
 

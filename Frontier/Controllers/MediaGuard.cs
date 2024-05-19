@@ -21,12 +21,12 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{etchingId}")]
-		public async Task<IActionResult> GetImage(ulong etchingId)
+		[HttpGet("{snapshotId}")]
+		public async Task<IActionResult> GetImage(ulong snapshotId)
 		{
 			return await Execute(async user =>
 			{
-				var image = await media.GetImageStreamAsync(user.Id, etchingId);
+				var image = await media.GetImageStreamAsync(user.Id, snapshotId);
 
 				return image;
 			});

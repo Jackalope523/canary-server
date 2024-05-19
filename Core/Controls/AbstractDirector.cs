@@ -17,7 +17,7 @@ namespace Core.Controls
 		protected IAccountDatabase Accounts { get; private set; }
 		protected IBannerDatabase Banners { get; private set; }
 		protected IGatheringDatabase Gatherings { get; private set; }
-		protected IEtchingDatabase Etchings { get; private set; }
+		protected ISnapshotDatabase Snapshots { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
 		protected IKeyDatabase Keys { get; private set; }
 		protected IMediaDatabase Media { get; private set; }
@@ -35,7 +35,7 @@ namespace Core.Controls
 			Accounts = Terminal.AccountDatabase;
 			Banners = Terminal.BannerDatabase;
 			Gatherings = Terminal.GatheringDatabase;
-			Etchings = Terminal.EtchingDatabase;
+			Snapshots = Terminal.SnapshotDatabase;
 			Reports = Terminal.DisciplineDatabase;
 			Keys = Terminal.KeyDatabase;
 			Media = Terminal.MediaDatabase;

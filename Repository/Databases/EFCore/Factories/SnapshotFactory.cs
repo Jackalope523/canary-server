@@ -1,7 +1,7 @@
 ﻿
 namespace Repository
 {
-    internal class EtchingFactory
+    internal class SnapshotFactory
     {
         private int created = 0;
         

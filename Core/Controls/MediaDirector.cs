@@ -16,19 +16,19 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<MemoryStream> GetImageStreamAsync(ulong userId, ulong etchingId)
+		public async Task<MemoryStream> GetImageStreamAsync(ulong userId, ulong snapshotId)
 		{
 			var user = await GetUserAsync(userId);
-			var etching = await Etchings.GetEtchingAsync(etchingId);
-			Entities.User etchingOwner = new(etching.User);
-			var etchedGathering = await GetGatheringAsync(etching.GatheringId);
+			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+			Entities.User snapshotOwner = new(snapshot.User);
+			var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
-			Try(user.Etched(etching) ||
-				await user.IsFriendsWith(etchingOwner) ||
+			Try(user.Etched(snapshot) ||
+				await user.IsFriendsWith(snapshotOwner) ||
 				await etchedGathering.WasAttendedBy(user),
-				new InvalidUserException("User cannot access this etching."));
+				new InvalidUserException("User cannot access this snapshot."));
 
-			var stream = await Media.DownloadImageAsync(etching.Id, etching.User.Id);
+			var stream = await Media.DownloadImageAsync(snapshot.Id, snapshot.User.Id);
 
 			return stream;
 		}
@@ -37,12 +37,12 @@ namespace Core.Controls
 
 		#region Favours
 
-		public async Task UploadImageAsync(ulong userId, ulong etchingId, MemoryStream image)
+		public async Task UploadImageAsync(ulong userId, ulong snapshotId, MemoryStream image)
 		{
 			var user = await GetUserAsync(userId);
-			var etching = await Etchings.GetEtchingAsync(etchingId);
+			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
 
-			await Media.UploadImageAsync(etching.Id, user.Id, image);
+			await Media.UploadImageAsync(snapshot.Id, user.Id, image);
 		}
 
 		#endregion

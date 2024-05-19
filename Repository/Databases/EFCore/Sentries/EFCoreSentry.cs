@@ -29,7 +29,7 @@ namespace Repository
 
             UserFactory userFactory = new();
             GatheringFactory gatheringFactory = new();
-            EtchingFactory etchingFactory = new();
+            SnapshotFactory snapshotFactory = new();
             UserReportFactory userReportFactory = new();
             GatheringReportFactory gatheringReportFactory = new();
             PenaltyFactory penaltyFactory = new();
@@ -55,16 +55,16 @@ namespace Repository
             context.Gatherings.AddRange(gatherings);
             context.SaveChanges();
 
-            List<Post> etchings = new();
+            List<Post> snapshots = new();
             for (int i = 0; i < 10; i++)
             {
                 Gathering location;
                 if (i <= 6) location = gatherings[0];
                 else location = gatherings[1];
 
-                etchings.Add(etchingFactory.Create(users[i], location));
+                snapshots.Add(snapshotFactory.Create(users[i], location));
             }
-            context.Posts.AddRange(etchings);
+            context.Posts.AddRange(snapshots);
             context.SaveChanges();
         }
 

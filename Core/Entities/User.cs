@@ -352,7 +352,7 @@ namespace Core.Entities
 
         public async Task CanEtch(Gathering @gathering)
 		{
-			// Verify etching is not before gathering starting or user is host
+			// Verify snapshot is not before gathering starting or user is host
 			Try(HasAlready(@gathering.StartTime) || @gathering.IsModifiableBy(this),
 				new InvalidGatheringException("Gathering has yet to start."));
 
@@ -360,14 +360,14 @@ namespace Core.Entities
 			Try(await @gathering.WasAttendedBy(this) || @gathering.IsModifiableBy(this),
 				new InvalidGatheringException("User did not attend gathering."));
 
-			// Verify etching is added before gathering is closed
+			// Verify snapshot is added before gathering is closed
 			Try(@gathering.IsActive,
 				new InvalidGatheringException("Gathering has already ended."));
 		}
 
-		public bool Etched(EtchingShard etching)
+		public bool Etched(SnapshotShard snapshot)
         {
-            return etching.User.Id.Equals(Id);
+            return snapshot.User.Id.Equals(Id);
 		}
 
         public async Task<bool> CanReport()

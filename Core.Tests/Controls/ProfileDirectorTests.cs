@@ -87,12 +87,12 @@ namespace Core.Tests.Controls
 			var unattendedGathering = await environment.GeneratePastGatheringAsync(host);
 			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, user);
 
-			var funLovingEtching = await environment.GenerateEtchingAsync(attendedGathering, user);
-			var lessLovingEtching = await environment.GenerateEtchingAsync(attendedGathering, host);
-			var okEtching = await environment.GenerateEtchingAsync(ongoingGathering, user);
+			var funLovingSnapshot = await environment.GenerateSnapshotAsync(attendedGathering, user);
+			var lessLovingSnapshot = await environment.GenerateSnapshotAsync(attendedGathering, host);
+			var okSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, user);
 
 			// Act
-			var (Gatherings, Etchings) = await director.GetUserNestAsync(user.Id, user.Id);
+			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, user.Id);
 
 			// Assert
 			Assert.Equal(3, Gatherings.Count);
@@ -100,10 +100,10 @@ namespace Core.Tests.Controls
 			Assert.Equal(attendedGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(attendedGathering.Id)));
 			Assert.Equal(ongoingGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(ongoingGathering.Id)));
 
-			Assert.Equal(3, Etchings.Count);
-			Assert.Equal(funLovingEtching, Etchings.Find(e => e.Id.Equals(funLovingEtching.Id)));
-			Assert.Equal(lessLovingEtching, Etchings.Find(e => e.Id.Equals(lessLovingEtching.Id)));
-			Assert.Equal(okEtching, Etchings.Find(e => e.Id.Equals(okEtching.Id)));
+			Assert.Equal(3, Snapshots.Count);
+			Assert.Equal(funLovingSnapshot, Snapshots.Find(e => e.Id.Equals(funLovingSnapshot.Id)));
+			Assert.Equal(lessLovingSnapshot, Snapshots.Find(e => e.Id.Equals(lessLovingSnapshot.Id)));
+			Assert.Equal(okSnapshot, Snapshots.Find(e => e.Id.Equals(okSnapshot.Id)));
 		}
 
 		[Fact]
@@ -120,19 +120,19 @@ namespace Core.Tests.Controls
 			var unattendedGathering = await environment.GeneratePastGatheringAsync(friend);
 			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, friend);
 
-			var userEtching = await environment.GenerateEtchingAsync(hostedGathering, user);
-			var friendEtching = await environment.GenerateEtchingAsync(mutuallyAttendedGathering, friend);
-			var hostEtching = await environment.GenerateEtchingAsync(mutuallyAttendedGathering, host);
-			var ongoingGatheringFriendEtching = await environment.GenerateEtchingAsync(ongoingGathering, friend);
-			var unattendedGatheringFriendEtching = await environment.GenerateEtchingAsync(unattendedGathering, friend);
+			var userSnapshot = await environment.GenerateSnapshotAsync(hostedGathering, user);
+			var friendSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, friend);
+			var hostSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, host);
+			var ongoingGatheringFriendSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, friend);
+			var unattendedGatheringFriendSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, friend);
 
 			// Act
-			var (Gatherings, Etchings) = await director.GetUserNestAsync(user.Id, friend.Id);
+			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, friend.Id);
 
 			// Assert
 			Assert.Equal(4, Gatherings.Count);
 
-			Assert.Equal(3, Etchings.Count);
+			Assert.Equal(3, Snapshots.Count);
 		}
 
 		[Fact]
@@ -145,16 +145,16 @@ namespace Core.Tests.Controls
 			var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(user, randomUser);
 			var unattendedGathering = await environment.GeneratePastGatheringAsync(randomUser);
 
-			var mutualGatheringEtching = await environment.GenerateEtchingAsync(mutuallyAttendedGathering, randomUser);
-			var unattendedGatheringEtching = await environment.GenerateEtchingAsync(unattendedGathering, randomUser);
+			var mutualGatheringSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, randomUser);
+			var unattendedGatheringSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, randomUser);
 
 			// Act
-			var (Gatherings, Etchings) = await director.GetUserNestAsync(user.Id, randomUser.Id);
+			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, randomUser.Id);
 
 			// Assert
 			Assert.Equal(2, Gatherings.Count);
 
-			Assert.Single(Etchings);
+			Assert.Single(Snapshots);
 		}
 
 		[Fact]

@@ -45,7 +45,7 @@ namespace Core.Tests
 		private Distance testGatheringRadius = new() { Kilometres = 1 };
 		private bool testGatheringIsDynamic = false;
 
-		private DateTimeOffset testEtchingTime = new(DateTime.UtcNow);
+		private DateTimeOffset testSnapshotTime = new(DateTime.UtcNow);
 
 		/////
 		// Set-up
@@ -65,7 +65,7 @@ namespace Core.Tests
 				harbor.AdminDatabaseAccess,
 				harbor.BannerDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
-                harbor.EtchingDatabaseAccess,
+                harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
 				harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
@@ -285,22 +285,22 @@ namespace Core.Tests
 		}
 
 		/////////
-		// Etching Helpers
+		// Snapshot Helpers
 		////////////////////
 
-		internal async Task<EtchingShard> GenerateEtchingAsync(Gathering etchedGathering, User etcher)
+		internal async Task<SnapshotShard> GenerateSnapshotAsync(Gathering etchedGathering, User etcher)
 		{
-			return await GenerateEtchingUnsafeAsync(etchedGathering, etcher, testEtchingTime);
+			return await GenerateSnapshotUnsafeAsync(etchedGathering, etcher, testSnapshotTime);
 		}
 
-		internal async Task<EtchingShard> GenerateEtchingUnsafeAsync(Gathering etchedGathering, User etcher, EtchingShard etching)
+		internal async Task<SnapshotShard> GenerateSnapshotUnsafeAsync(Gathering etchedGathering, User etcher, SnapshotShard snapshot)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedGathering.Id, etcher.Id, etching.TimeEtched);
+			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, snapshot.TimeEtched);
 		}
 
-		internal async Task<EtchingShard> GenerateEtchingUnsafeAsync(Gathering etchedGathering, User etcher, DateTimeOffset timeEtched)
+		internal async Task<SnapshotShard> GenerateSnapshotUnsafeAsync(Gathering etchedGathering, User etcher, DateTimeOffset timeEtched)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedGathering.Id, etcher.Id, timeEtched);
+			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, timeEtched);
 		}
 
 		///////////
