@@ -16,7 +16,7 @@ namespace Repository.Migrations.TestMigrations
                 .Annotation("Sqlite:InitSpatialMetaData", true);
 
             migrationBuilder.CreateTable(
-                name: "Events",
+                name: "Gatherings",
                 columns: table => new
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
@@ -45,7 +45,7 @@ namespace Repository.Migrations.TestMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.PrimaryKey("PK_Gatherings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,7 +67,7 @@ namespace Repository.Migrations.TestMigrations
                     LockoutDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     AccessTries = table.Column<int>(type: "INTEGER", nullable: false),
                     AccountStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    CurrentEvent = table.Column<ulong>(type: "INTEGER", nullable: true),
+                    CurrentGathering = table.Column<ulong>(type: "INTEGER", nullable: true),
                     IsPendingDeletion = table.Column<bool>(type: "INTEGER", nullable: false),
                     Extroversion = table.Column<int>(type: "INTEGER", nullable: false),
                     Athleticisme = table.Column<int>(type: "INTEGER", nullable: false),
@@ -90,27 +90,27 @@ namespace Repository.Migrations.TestMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventLinks",
+                name: "GatheringLinks",
                 columns: table => new
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    EventId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventLinks", x => x.Id);
+                    table.PrimaryKey("PK_GatheringLinks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EventLinks_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_GatheringLinks_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EventLinks_Users_UserId",
+                        name: "FK_GatheringLinks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -118,28 +118,28 @@ namespace Repository.Migrations.TestMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventReports",
+                name: "GatheringReports",
                 columns: table => new
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    EventId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventReports", x => x.Id);
+                    table.PrimaryKey("PK_GatheringReports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EventReports_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_GatheringReports_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EventReports_Users_UserId",
+                        name: "FK_GatheringReports_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -198,7 +198,7 @@ namespace Repository.Migrations.TestMigrations
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     OwnerId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    EventId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     PhotoURL = table.Column<string>(type: "TEXT", nullable: false),
                     IsHidden = table.Column<bool>(type: "INTEGER", nullable: false)
@@ -207,9 +207,9 @@ namespace Repository.Migrations.TestMigrations
                 {
                     table.PrimaryKey("PK_Posts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Posts_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_Posts_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -278,7 +278,7 @@ namespace Repository.Migrations.TestMigrations
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     SelfId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     OtherId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    EventId = table.Column<ulong>(type: "INTEGER", nullable: true),
+                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: true),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", nullable: false)
                 },
@@ -286,9 +286,9 @@ namespace Repository.Migrations.TestMigrations
                 {
                     table.PrimaryKey("PK_UserReports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserReports_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_UserReports_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserReports_Users_OtherId",
@@ -333,23 +333,23 @@ namespace Repository.Migrations.TestMigrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventLinks_EventId",
-                table: "EventLinks",
-                column: "EventId");
+                name: "IX_GatheringLinks_GatheringId",
+                table: "GatheringLinks",
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventLinks_UserId",
-                table: "EventLinks",
+                name: "IX_GatheringLinks_UserId",
+                table: "GatheringLinks",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventReports_EventId",
-                table: "EventReports",
-                column: "EventId");
+                name: "IX_GatheringReports_GatheringId",
+                table: "GatheringReports",
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventReports_UserId",
-                table: "EventReports",
+                name: "IX_GatheringReports_UserId",
+                table: "GatheringReports",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -374,9 +374,9 @@ namespace Repository.Migrations.TestMigrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_EventId",
+                name: "IX_Posts_GatheringId",
                 table: "Posts",
-                column: "EventId");
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_OwnerId",
@@ -399,9 +399,9 @@ namespace Repository.Migrations.TestMigrations
                 column: "SelfId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserReports_EventId",
+                name: "IX_UserReports_GatheringId",
                 table: "UserReports",
-                column: "EventId");
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserReports_OtherId",
@@ -418,10 +418,10 @@ namespace Repository.Migrations.TestMigrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EventLinks");
+                name: "GatheringLinks");
 
             migrationBuilder.DropTable(
-                name: "EventReports");
+                name: "GatheringReports");
 
             migrationBuilder.DropTable(
                 name: "Notes");
@@ -445,7 +445,7 @@ namespace Repository.Migrations.TestMigrations
                 name: "Posts");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "Gatherings");
 
             migrationBuilder.DropTable(
                 name: "Users");

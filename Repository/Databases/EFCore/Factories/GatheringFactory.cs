@@ -2,22 +2,22 @@
 
 namespace Repository
 {
-    internal class EventFactory
+    internal class GatheringFactory
     {
         private int produced = 0;
         private readonly CoordinateFactory innerFactory = new();
-        internal Event Create(User host)
+        internal Gathering Create(User host)
         {          
             produced++;
-            return new Event
+            return new Gathering
             {
-                Name = "event" + produced,
+                Name = "gathering" + produced,
                 HostId = host.Id,
-                Description = "This is event number " + produced + ".",
+                Description = "This is gathering number " + produced + ".",
                 StartTime = DateTimeOffset.UtcNow.AddHours(produced),
                 GroupMinimum = 0 + produced,
                 GroupMaximum = 10 + produced,
-                State = EventState.Upcoming,
+                State = GatheringState.Upcoming,
                 Location = innerFactory.Create(17.544 + produced, -72.483 - produced),
                 Radius = 10.0,
                 IsDynamic = false,

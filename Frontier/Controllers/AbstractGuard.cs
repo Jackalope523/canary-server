@@ -30,7 +30,7 @@ namespace Frontier.Controllers
 			CouldNotCreateUser,
 			CouldNotModifyUser,
 			CouldNotFindUser,
-			CouldNotFindEvent,
+			CouldNotFindGathering,
 		}
 
 		#endregion
@@ -41,7 +41,7 @@ namespace Frontier.Controllers
 
 		public IAccountOperations accounts;
 		public IBannerOperations banners;
-		public IEventOperations events;
+		public IGatheringOperations gatherings;
 		public IEtchingOperations etchings;
 		public IDisciplineOperations reports;
 		public IKeyOperations keys;
@@ -62,7 +62,7 @@ namespace Frontier.Controllers
 			accounts = box.accounts;
 			banners = box.banners;
 			profiles = box.profiles;
-			events = box.events;
+			gatherings = box.gatherings;
 			etchings = box.etchings;
 			keys = box.keys;
 			reports = box.reports;

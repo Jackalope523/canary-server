@@ -10,7 +10,7 @@ using NetTopologySuite.Utilities;
 
 namespace Frontier.Manifests
 {
-	public class EventDetailsManifest
+	public class GatheringDetailsManifest
     {
         [Required]
         public string Name { get; set; }

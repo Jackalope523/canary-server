@@ -113,7 +113,7 @@ namespace Repository.Migrations.AzureMigrations
                     b.ToTable("Subscriptions");
                 });
 
-            modelBuilder.Entity("Repository.Event", b =>
+            modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -187,10 +187,10 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Gatherings");
                 });
 
-            modelBuilder.Entity("Repository.EventLink", b =>
+            modelBuilder.Entity("Repository.GatheringLink", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -198,7 +198,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("EventId")
+                    b.Property<decimal>("GatheringId")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<DateTimeOffset>("Time")
@@ -212,14 +212,14 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("GatheringId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventLinks");
+                    b.ToTable("GatheringLinks");
                 });
 
-            modelBuilder.Entity("Repository.EventReport", b =>
+            modelBuilder.Entity("Repository.GatheringReport", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -227,7 +227,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("EventId")
+                    b.Property<decimal>("GatheringId")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<DateTimeOffset>("FilingDate")
@@ -245,11 +245,11 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("GatheringId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventReports");
+                    b.ToTable("GatheringReports");
                 });
 
             modelBuilder.Entity("Repository.Post", b =>
@@ -260,7 +260,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("EventId")
+                    b.Property<decimal>("GatheringId")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<bool>("IsHidden")
@@ -278,7 +278,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("GatheringId");
 
                     b.HasIndex("OwnerId");
 
@@ -338,7 +338,7 @@ namespace Repository.Migrations.AzureMigrations
                     b.Property<int>("Competitiveness")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("CurrentEvent")
+                    b.Property<decimal?>("CurrentGathering")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<Point>("CurrentLocation")
@@ -455,7 +455,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal?>("EventId")
+                    b.Property<decimal?>("GatheringId")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<DateTimeOffset>("FilingDate")
@@ -476,7 +476,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("GatheringId");
 
                     b.HasIndex("OtherId");
 
@@ -512,30 +512,30 @@ namespace Repository.Migrations.AzureMigrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Repository.EventLink", b =>
+            modelBuilder.Entity("Repository.GatheringLink", b =>
                 {
-                    b.HasOne("Repository.Event", "Event")
+                    b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Links")
-                        .HasForeignKey("EventId")
+                        .HasForeignKey("GatheringId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
-                        .WithMany("EventLinks")
+                        .WithMany("GatheringLinks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
+                    b.Navigation("Gathering");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Repository.EventReport", b =>
+            modelBuilder.Entity("Repository.GatheringReport", b =>
                 {
-                    b.HasOne("Repository.Event", "Event")
+                    b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Reports")
-                        .HasForeignKey("EventId")
+                        .HasForeignKey("GatheringId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -545,16 +545,16 @@ namespace Repository.Migrations.AzureMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
+                    b.Navigation("Gathering");
 
                     b.Navigation("Self");
                 });
 
             modelBuilder.Entity("Repository.Post", b =>
                 {
-                    b.HasOne("Repository.Event", "Event")
+                    b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Posts")
-                        .HasForeignKey("EventId")
+                        .HasForeignKey("GatheringId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -564,7 +564,7 @@ namespace Repository.Migrations.AzureMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
+                    b.Navigation("Gathering");
 
                     b.Navigation("Owner");
                 });
@@ -609,9 +609,9 @@ namespace Repository.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.UserReport", b =>
                 {
-                    b.HasOne("Repository.Event", "Event")
+                    b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany()
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("GatheringId");
 
                     b.HasOne("Repository.User", "Other")
                         .WithMany("ReporteeList")
@@ -625,14 +625,14 @@ namespace Repository.Migrations.AzureMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
+                    b.Navigation("Gathering");
 
                     b.Navigation("Other");
 
                     b.Navigation("Self");
                 });
 
-            modelBuilder.Entity("Repository.Event", b =>
+            modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.Navigation("Links");
 
@@ -643,7 +643,7 @@ namespace Repository.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.User", b =>
                 {
-                    b.Navigation("EventLinks");
+                    b.Navigation("GatheringLinks");
 
                     b.Navigation("Notes");
 

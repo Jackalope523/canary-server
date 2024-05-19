@@ -12,10 +12,10 @@ namespace Frontier.Manifests
         public string ReportDetails { get; set; }
     }
 
-    public class EventReportManifest
+    public class GatheringReportManifest
     {
         [Required]
-        public EventReportType ReportType { get; set; }
+        public GatheringReportType ReportType { get; set; }
 
         public string ReportDetails { get; set; }
     }

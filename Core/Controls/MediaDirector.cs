@@ -21,11 +21,11 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 			var etching = await Etchings.GetEtchingAsync(etchingId);
 			Entities.User etchingOwner = new(etching.User);
-			var etchedEvent = await GetEventAsync(etching.EventId);
+			var etchedGathering = await GetGatheringAsync(etching.GatheringId);
 
 			Try(user.Etched(etching) ||
 				await user.IsFriendsWith(etchingOwner) ||
-				await etchedEvent.WasAttendedBy(user),
+				await etchedGathering.WasAttendedBy(user),
 				new InvalidUserException("User cannot access this etching."));
 
 			var stream = await Media.DownloadImageAsync(etching.Id, etching.User.Id);

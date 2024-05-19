@@ -10,7 +10,7 @@ namespace Frontier.Manifests
     {
         public List<AccountSignUpManifest> Users { get; set; }
 
-        public List<EventDetailsManifest> Events { get; set; }
+        public List<GatheringDetailsManifest> Gatherings { get; set; }
 
         public List<List<int>> Attendance { get; set; }
         public List<List<int>> Follows { get; set; }

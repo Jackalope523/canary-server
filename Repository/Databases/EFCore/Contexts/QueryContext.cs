@@ -6,12 +6,12 @@ namespace Repository
     internal abstract class QueryContext : DbContext
     {
         internal DbSet<User> Users { get; set; }
-        internal DbSet<Event> Events { get; set; }
+        internal DbSet<Gathering> Gatherings { get; set; }
         internal DbSet<UserLink> UserLinks { get; set; }
-        internal DbSet<EventLink> EventLinks { get; set; }
+        internal DbSet<GatheringLink> GatheringLinks { get; set; }
         internal DbSet<PostLink> PostLinks { get; set; }
         internal DbSet<UserReport> UserReports { get; set; }
-        internal DbSet<EventReport> EventReports { get; set; }
+        internal DbSet<GatheringReport> GatheringReports { get; set; }
         internal DbSet<Post> Posts { get; set; }
         internal DbSet<Note> Notes { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
@@ -27,7 +27,7 @@ namespace Repository
             modelBuilder.Entity<User>().Property(u => u.CurrentLocation)
             .HasSrid(4326);
 
-            modelBuilder.Entity<Event>().Property(e => e.Location)
+            modelBuilder.Entity<Gathering>().Property(e => e.Location)
             .HasSrid(4326);                                     
 
             modelBuilder.Entity<PostLink>()
@@ -47,7 +47,7 @@ namespace Repository
                .WithOne(l => l.Other);
 
             modelBuilder.Entity<User>()
-                .HasMany(u => u.EventLinks)
+                .HasMany(u => u.GatheringLinks)
                 .WithOne(l => l.User);
 
             modelBuilder.Entity<User>()

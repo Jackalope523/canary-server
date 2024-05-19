@@ -13,7 +13,7 @@ namespace Repository.Migrations.AzureMigrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Events",
+                name: "Gatherings",
                 columns: table => new
                 {
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
@@ -41,7 +41,7 @@ namespace Repository.Migrations.AzureMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.PrimaryKey("PK_Gatherings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,7 +63,7 @@ namespace Repository.Migrations.AzureMigrations
                     LockoutDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     AccessTries = table.Column<int>(type: "int", nullable: false),
                     AccountStatus = table.Column<int>(type: "int", nullable: false),
-                    CurrentEvent = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
+                    CurrentGathering = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
                     IsPendingDeletion = table.Column<bool>(type: "bit", nullable: false),
                     Extroversion = table.Column<int>(type: "int", nullable: false),
                     Athleticisme = table.Column<int>(type: "int", nullable: false),
@@ -84,27 +84,27 @@ namespace Repository.Migrations.AzureMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventLinks",
+                name: "GatheringLinks",
                 columns: table => new
                 {
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    EventId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventLinks", x => x.Id);
+                    table.PrimaryKey("PK_GatheringLinks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EventLinks_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_GatheringLinks_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_EventLinks_Users_UserId",
+                        name: "FK_GatheringLinks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -112,28 +112,28 @@ namespace Repository.Migrations.AzureMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventReports",
+                name: "GatheringReports",
                 columns: table => new
                 {
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    EventId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventReports", x => x.Id);
+                    table.PrimaryKey("PK_GatheringReports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EventReports_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_GatheringReports_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_EventReports_Users_UserId",
+                        name: "FK_GatheringReports_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -192,7 +192,7 @@ namespace Repository.Migrations.AzureMigrations
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OwnerId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    EventId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     PostedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     PhotoURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsHidden = table.Column<bool>(type: "bit", nullable: false)
@@ -201,9 +201,9 @@ namespace Repository.Migrations.AzureMigrations
                 {
                     table.PrimaryKey("PK_Posts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Posts_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_Posts_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
@@ -272,7 +272,7 @@ namespace Repository.Migrations.AzureMigrations
                     Type = table.Column<int>(type: "int", nullable: false),
                     SelfId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     OtherId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    EventId = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
+                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -280,9 +280,9 @@ namespace Repository.Migrations.AzureMigrations
                 {
                     table.PrimaryKey("PK_UserReports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserReports_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_UserReports_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserReports_Users_OtherId",
@@ -327,23 +327,23 @@ namespace Repository.Migrations.AzureMigrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventLinks_EventId",
-                table: "EventLinks",
-                column: "EventId");
+                name: "IX_GatheringLinks_GatheringId",
+                table: "GatheringLinks",
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventLinks_UserId",
-                table: "EventLinks",
+                name: "IX_GatheringLinks_UserId",
+                table: "GatheringLinks",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventReports_EventId",
-                table: "EventReports",
-                column: "EventId");
+                name: "IX_GatheringReports_GatheringId",
+                table: "GatheringReports",
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventReports_UserId",
-                table: "EventReports",
+                name: "IX_GatheringReports_UserId",
+                table: "GatheringReports",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -368,9 +368,9 @@ namespace Repository.Migrations.AzureMigrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_EventId",
+                name: "IX_Posts_GatheringId",
                 table: "Posts",
-                column: "EventId");
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_OwnerId",
@@ -393,9 +393,9 @@ namespace Repository.Migrations.AzureMigrations
                 column: "SelfId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserReports_EventId",
+                name: "IX_UserReports_GatheringId",
                 table: "UserReports",
-                column: "EventId");
+                column: "GatheringId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserReports_OtherId",
@@ -412,10 +412,10 @@ namespace Repository.Migrations.AzureMigrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EventLinks");
+                name: "GatheringLinks");
 
             migrationBuilder.DropTable(
-                name: "EventReports");
+                name: "GatheringReports");
 
             migrationBuilder.DropTable(
                 name: "Notes");
@@ -439,7 +439,7 @@ namespace Repository.Migrations.AzureMigrations
                 name: "Posts");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "Gatherings");
 
             migrationBuilder.DropTable(
                 name: "Users");

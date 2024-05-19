@@ -24,19 +24,19 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
-            var occuringEvent = await targetUser.CurrentEvent;
+            var occuringGathering = await targetUser.CurrentGathering;
 
             // Verify user can report
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            if (occuringEvent.Equals(Event.None))
+            if (occuringGathering.Equals(Gathering.None))
             {
                 await Reports.ReportUserAsync(userId, targetUser.Id, Time, reportType, reportDetails);
             }
             else
             {
-                await Reports.ReportUserAsync(userId, occuringEvent.Id, targetUser.Id, Time, reportType, reportDetails);
+                await Reports.ReportUserAsync(userId, occuringGathering.Id, targetUser.Id, Time, reportType, reportDetails);
             }
 
             // Compute user's standing
@@ -49,28 +49,28 @@ namespace Core.Controls
             }
         }
 
-        public async Task ReportEventAsync(ulong userId, ulong eventId,
-            EventReportType reportType, string reportDetails)
+        public async Task ReportGatheringAsync(ulong userId, ulong gatheringId,
+            GatheringReportType reportType, string reportDetails)
         {
             var user = await GetUserAsync(userId);
-            var targetEvent = await GetEventAsync(eventId);
+            var targetGathering = await GetGatheringAsync(gatheringId);
 
             // Verify user can report
             Try(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            await Reports.ReportEventAsync(user.Id, targetEvent.Id, Time, reportType, reportDetails);
+            await Reports.ReportGatheringAsync(user.Id, targetGathering.Id, Time, reportType, reportDetails);
 
             // Check if action is to be taken
-            if (await targetEvent.Reported())
+            if (await targetGathering.Reported())
             {
-                var host = await GetUserAsync(targetEvent.Host.Id);
+                var host = await GetUserAsync(targetGathering.Host.Id);
 
-                // Threshold hit, end event
-                _ = Terminal.EventDirector.EndEventAsync(host.Id, eventId);
+                // Threshold hit, end gathering
+                _ = Terminal.GatheringDirector.EndGatheringAsync(host.Id, gatheringId);
 
                 // Compute host's standing
-                var status = await host.EventReported();
+                var status = await host.GatheringReported();
 
                 // Check if host should be punished
                 if (host.AccountStatus != status)
@@ -90,12 +90,12 @@ namespace Core.Controls
         internal async Task PenaliseUserAsync(User user, PenaltyType offense, DateTimeOffset timeOfPenalty)
             => await Reports.PenaliseUserAsync(user.Id, offense, timeOfPenalty);
 
-		internal async Task<(List<UserReport> UserReports, List<EventReport> EventReports)>
+		internal async Task<(List<UserReport> UserReports, List<GatheringReport> GatheringReports)>
             RequestAllReportsAsync(User user)
             => await Reports.GetReportsForUserAsync(user.Id);
 
-        internal async Task<List<EventReport>> RequestEventReportsAsync(Event @event)
-            => await Reports.GetReportsForEventAsync(@event.Id);
+        internal async Task<List<GatheringReport>> RequestGatheringReportsAsync(Gathering @gathering)
+            => await Reports.GetReportsForGatheringAsync(@gathering.Id);
 
 		#endregion
 	}

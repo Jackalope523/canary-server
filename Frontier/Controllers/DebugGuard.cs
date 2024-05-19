@@ -43,7 +43,7 @@ namespace Frontier.Controllers
 				await debug.SeedDatabaseAsync();
 
 				List<CoreUser> seedUsers = new();
-				List<EventShard> seedEvents = new();
+				List<GatheringShard> seedGatherings = new();
 
                 log.LogError("Adding users..");
 
@@ -65,34 +65,34 @@ namespace Frontier.Controllers
 					await userManager.ConfirmEmailAsync(coreUser, token);
 				}
 
-                log.LogError("Creating events..");
+                log.LogError("Creating gatherings..");
 
-                foreach (var @event in seed.Events)
+                foreach (var @gathering in seed.Gatherings)
 				{
-					var host = await accounts.GetCoreUserAsync(seedUsers[(int) @event.Host.Id - 1].PhoneNumber);
+					var host = await accounts.GetCoreUserAsync(seedUsers[(int) @gathering.Host.Id - 1].PhoneNumber);
 
-                    // Move host to proposed event location
-                    // await accounts.UpdateUserLocationAsync(host.Id, @event.Latitude, @event.Longitude);
+                    // Move host to proposed gathering location
+                    // await accounts.UpdateUserLocationAsync(host.Id, @gathering.Latitude, @gathering.Longitude);
 					
-					seedEvents.Add(await events.CreateEventAsync(host.Id,
-						@event.Name, @event.Description,
-						@event.StartTime, @event.Latitude, @event.Longitude,
-						@event.Radius, @event.IsDynamic,
-						@event.GroupMinimum, @event.GroupMaximum));
+					seedGatherings.Add(await gatherings.CreateGatheringAsync(host.Id,
+						@gathering.Name, @gathering.Description,
+						@gathering.StartTime, @gathering.Latitude, @gathering.Longitude,
+						@gathering.Radius, @gathering.IsDynamic,
+						@gathering.GroupMinimum, @gathering.GroupMaximum));
 				}
 
-                log.LogError("Joining users to events..");
+                log.LogError("Joining users to gatherings..");
 
                 for (int i = 0; i < seed.Attendance.Count; i++)
 				{
 					var tuple = seed.Attendance[i];
-					var self = tuple[0]; var @event = tuple[1];
+					var self = tuple[0]; var @gathering = tuple[1];
 
-					// Move user to event location
-					await accounts.UpdateUserLocationAsync(seedUsers[self - 1].Id, seedEvents[@event - 1].Latitude, seedEvents[@event - 1].Longitude);
+					// Move user to gathering location
+					await accounts.UpdateUserLocationAsync(seedUsers[self - 1].Id, seedGatherings[@gathering - 1].Latitude, seedGatherings[@gathering - 1].Longitude);
 
-					// Attempt to join the event
-					await events.JoinEventAsync(seedUsers[self - 1].Id, seedEvents[@event - 1].Id);
+					// Attempt to join the gathering
+					await gatherings.JoinGatheringAsync(seedUsers[self - 1].Id, seedGatherings[@gathering - 1].Id);
 				}
 
                 log.LogError("Making friends..");

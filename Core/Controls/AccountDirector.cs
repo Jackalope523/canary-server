@@ -147,7 +147,7 @@ namespace Core.Controls
         public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
 		{
 			var user = await base.GetUserAsync(userId);
-            var userIsAtEvent = user.IsAtEvent();
+            var userIsAtGathering = user.IsAtGathering();
 
             user.LastKnownLocation.Set(new() { Latitude = latitude, Longitude = longitude });
             await user.HandleHaunt();
@@ -164,49 +164,49 @@ namespace Core.Controls
                 (await user.HauntRadius).Metres,
                 await user.HauntStability);
 
-            var nextEvent = await user.NextEvent();
+            var nextGathering = await user.NextGathering();
 
-            // Check if user is at an event
-            if (await userIsAtEvent)
+            // Check if user is at an gathering
+            if (await userIsAtGathering)
             {
-                var currentEvent = await user.CurrentEvent;
-                // Check if user left the event radius
-                if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentEvent.Location, currentEvent.Radius))
+                var currentGathering = await user.CurrentGathering;
+                // Check if user left the gathering radius
+                if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
                 {
                     // Check if user is a guest or the host
-                    if (currentEvent.IsHostedBy(user))
+                    if (currentGathering.IsHostedBy(user))
                     {
-                        // End the event if user is the host
-                        await Terminal.EventDirector.EndEventAsync(user.Id, currentEvent.Id);
+                        // End the gathering if user is the host
+                        await Terminal.GatheringDirector.EndGatheringAsync(user.Id, currentGathering.Id);
                     }
                     else
                     {
-                        // Leave the event if user is a guest
-                        await Terminal.EventDirector.LeaveEventAsync(user.Id, currentEvent.Id);
+                        // Leave the gathering if user is a guest
+                        await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
                     }
                 }
                 // Check if user is the host
-                else if (currentEvent.IsHostedBy(user) && currentEvent.IsDynamic)
+                else if (currentGathering.IsHostedBy(user) && currentGathering.IsDynamic)
                 {
-                    // Update the position of the event
-                    _ = Events.UpdateEventAsync(currentEvent.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
+                    // Update the position of the gathering
+                    _ = Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
                 }
             }
-            // Check if user is on their way to an event
-            else if (!await userIsAtEvent &&
-                !nextEvent.Equals(Event.None))
+            // Check if user is on their way to an gathering
+            else if (!await userIsAtGathering &&
+                !nextGathering.Equals(Gathering.None))
             {
-                // Check if user is host and can start event
-                if (nextEvent.IsWaiting &&
-                    nextEvent.IsHostedBy(user))
+                // Check if user is host and can start gathering
+                if (nextGathering.IsWaiting &&
+                    nextGathering.IsHostedBy(user))
                 {
-                    await Terminal.EventDirector.StartEventAsync(user.Id, nextEvent.Id);
+                    await Terminal.GatheringDirector.StartGatheringAsync(user.Id, nextGathering.Id);
                 }
                 // Check if user is close enough to be arrived
-                else if (nextEvent.IsOngoing &&
-                    await nextEvent.IsInRange(user))
+                else if (nextGathering.IsOngoing &&
+                    await nextGathering.IsInRange(user))
                 {
-                    await Events.SetUserStateAsync(user.Id, nextEvent.Id, EventBond.Arrived, Time);
+                    await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
 
                 }
             }

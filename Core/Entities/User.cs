@@ -78,10 +78,10 @@ namespace Core.Entities
         public Synced<Distance> HauntRadius { get; }
         public Synced<int> HauntStability { get; }
 
-        public Synced<Event> CurrentEvent { get; }
-        public Synced<List<Event>> PastEvents { get; }
-        public Synced<List<Event>> UpcomingEvents { get; }
-        public Synced<List<Event>> WatchingEvents { get; }
+        public Synced<Gathering> CurrentGathering { get; }
+        public Synced<List<Gathering>> PastGatherings { get; }
+        public Synced<List<Gathering>> UpcomingGatherings { get; }
+        public Synced<List<Gathering>> SurveyingGatherings { get; }
 
         public Synced<List<User>> Friends { get; }
         public Synced<List<User>> Following { get; }
@@ -92,9 +92,9 @@ namespace Core.Entities
         public Synced<List<NoteShard>> Notes { get; }
         public Synced<List<PenaltyShard>> Penalties { get; }
 
-        private Synced<(List<UserReport> UserReports, List<EventReport> EventReports)> ReportsSync { get; }
+        private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports)> ReportsSync { get; }
         public Synced<List<UserReport>> Reports { get; }
-        public Synced<List<EventReport>> EventReports { get; }
+        public Synced<List<GatheringReport>> GatheringReports { get; }
 
 
         #endregion
@@ -116,10 +116,10 @@ namespace Core.Entities
             HauntRadius = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Radius);
             HauntStability = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Stability);
 
-            CurrentEvent = new(() => Terminal.EventDirector.RequestCurrentEventForUserAsync(this));
-            PastEvents = new(() => Terminal.EventDirector.RequestPastEventsForUserAsync(this));
-            UpcomingEvents = new(() => Terminal.EventDirector.RequestUpcomingEventsForUserAsync(this));
-            WatchingEvents = new(() => Terminal.EventDirector.RequestWatchingEventsForUserAsync(this));
+            CurrentGathering = new(() => Terminal.GatheringDirector.RequestCurrentGatheringForUserAsync(this));
+            PastGatherings = new(() => Terminal.GatheringDirector.RequestPastGatheringsForUserAsync(this));
+            UpcomingGatherings = new(() => Terminal.GatheringDirector.RequestUpcomingGatheringsForUserAsync(this));
+            SurveyingGatherings = new(() => Terminal.GatheringDirector.RequestSurveyingGatheringsForUserAsync(this));
 
             Friends = new(() => Terminal.ProfileDirector.RequestFriendsAsync(this));
             Following = new(() => Terminal.ProfileDirector.RequestFollowedUsersAsync(this));
@@ -132,7 +132,7 @@ namespace Core.Entities
 
             ReportsSync = new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
             Reports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
-            EventReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).EventReports);
+            GatheringReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).GatheringReports);
         }
 
         public User(CoreUser fromUser) : this()
@@ -239,17 +239,17 @@ namespace Core.Entities
             Reputation = (int) (MathF.Atan(reputationRaw * normal) * (MaximumReputation / ReputationIntensity) + (MaximumReputation / 2));
         }
 
-        public void CalculateCharacter(Event eventAttended, TimeSpan timeAttended)
+        public void CalculateCharacter(Gathering gatheringAttended, TimeSpan timeAttended)
         {
             // Modified by time spent
             float modifier = (float) (Math.Log10(3 * timeAttended.TotalMinutes + 3) / 15d);
 
-            Character = Character.MoveTowards(eventAttended.Character, modifier);
+            Character = Character.MoveTowards(gatheringAttended.Character, modifier);
         }
 
-        public async Task<Event> NextEvent()
+        public async Task<Gathering> NextGathering()
         {
-            return (await UpcomingEvents).Count != 0 ? (await UpcomingEvents)[0] : Event.None;
+            return (await UpcomingGatherings).Count != 0 ? (await UpcomingGatherings)[0] : Gathering.None;
         }
 
 		#endregion
@@ -292,24 +292,24 @@ namespace Core.Entities
 			return false;
 		}
 
-        public async Task<bool> IsAtEvent()
+        public async Task<bool> IsAtGathering()
         {
-            if ((await CurrentEvent).Equals(Event.None))
+            if ((await CurrentGathering).Equals(Gathering.None))
             { return false; }
 
             return true;
         }
 
-		public async Task<bool> CanView(Event @event)
+		public async Task<bool> CanView(Gathering @gathering)
 		{
-            // Note: This is efficient with multiple events. For multiple users, see Event.IsVisibleTo
+            // Note: This is efficient with multiple gatherings. For multiple users, see Gathering.IsVisibleTo
 
             // Check if user is host
-            if (@event.IsHostedBy(this))
+            if (@gathering.IsHostedBy(this))
             { return true; }
 
-            // Check if event is deleted
-            if (@event.IsDeleted)
+            // Check if gathering is deleted
+            if (@gathering.IsDeleted)
             { return false; }
 
 			// Check if user account is locked
@@ -319,50 +319,50 @@ namespace Core.Entities
 			// Check if user's account is limited
 			if (!CanAttend)
 			{
-                // User cannot join normal events
-                // Check if user can join friend events and Host is friends with the user
-				if (!CanAttendFriends || !await IsFriendsWith(@event.Host))
+                // User cannot join normal gatherings
+                // Check if user can join friend gatherings and Host is friends with the user
+				if (!CanAttendFriends || !await IsFriendsWith(@gathering.Host))
 				{ return false; }
 			}
 
-            // Check if user is blocked by or blocking event host
-            if (await IsBlockedBy(@event.Host) || await IsBlocking(@event.Host))
+            // Check if user is blocked by or blocking gathering host
+            if (await IsBlockedBy(@gathering.Host) || await IsBlocking(@gathering.Host))
 			{ return false; }
 
 			return true;
 		}
 
-		public async Task<bool> CanJoin(Event @event)
+		public async Task<bool> CanJoin(Gathering @gathering)
 		{
-			// Check if event is joinable
-			if (!@event.IsOpen)
+			// Check if gathering is joinable
+			if (!@gathering.IsOpen)
 			{ return false; }
 
-			// Check if user can see event
-			if (!await CanView(@event))
+			// Check if user can see gathering
+			if (!await CanView(@gathering))
 			{ return false; }
 
 			// Check if user or user's haunt is within a reasonable distance
-			if (!GeoLocation.AreInRange(await LastKnownLocation, @event.Location, @event.MaximumJoinDistance) &&
-				!GeoLocation.AreInRange(await Haunt, @event.Location, @event.MaximumJoinDistance))
+			if (!GeoLocation.AreInRange(await LastKnownLocation, @gathering.Location, @gathering.MaximumJoinDistance) &&
+				!GeoLocation.AreInRange(await Haunt, @gathering.Location, @gathering.MaximumJoinDistance))
 			{ return false; }
 
 			return true;
 		}
 
-        public async Task CanEtch(Event @event)
+        public async Task CanEtch(Gathering @gathering)
 		{
-			// Verify etching is not before event starting or user is host
-			Try(HasAlready(@event.StartTime) || @event.IsModifiableBy(this),
-				new InvalidEventException("Event has yet to start."));
+			// Verify etching is not before gathering starting or user is host
+			Try(HasAlready(@gathering.StartTime) || @gathering.IsModifiableBy(this),
+				new InvalidGatheringException("Gathering has yet to start."));
 
-			// Verify user can etch into the event
-			Try(await @event.WasAttendedBy(this) || @event.IsModifiableBy(this),
-				new InvalidEventException("User did not attend event."));
+			// Verify user can etch into the gathering
+			Try(await @gathering.WasAttendedBy(this) || @gathering.IsModifiableBy(this),
+				new InvalidGatheringException("User did not attend gathering."));
 
-			// Verify etching is added before event is closed
-			Try(@event.IsActive,
-				new InvalidEventException("Event has already ended."));
+			// Verify etching is added before gathering is closed
+			Try(@gathering.IsActive,
+				new InvalidGatheringException("Gathering has already ended."));
 		}
 
 		public bool Etched(EtchingShard etching)
@@ -373,7 +373,7 @@ namespace Core.Entities
         public async Task<bool> CanReport()
         {
             var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - QuarterHour))
-                + (await EventReports).Count(report => After(report.ReportTime, Time - QuarterHour));
+                + (await GatheringReports).Count(report => After(report.ReportTime, Time - QuarterHour));
 
             if (recentReportCount > 3)
             { return false; }
@@ -416,10 +416,10 @@ namespace Core.Entities
         public async Task Penalised()
             => await CalculateReputation();
 
-		public async Task<UserAccountStatus> EventReported()
+		public async Task<UserAccountStatus> GatheringReported()
         {
 			// Check if there are enough reports
-			if ((await EventReports).Count < 4)
+			if ((await GatheringReports).Count < 4)
 			{ return AccountStatus; }
 
 			return UserAccountStatus.Impotent;

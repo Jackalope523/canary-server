@@ -13,23 +13,23 @@ namespace Repository.Tests
         private readonly ITestOutputHelper _testOutputHelper;
 
         private User subject;
-        private Event testEvent;
+        private Gathering testGathering;
         public EtchingStoreTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
             subject = new UserFactory().Create();
-            testEvent = new EventFactory().Create(subject);
+            testGathering = new GatheringFactory().Create(subject);
 
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(testGathering));
         }
         public void Dispose()
         {
             sentry.ExecuteWrite(ctx => ctx.PostLinks.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Posts.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.ExecuteDelete());
         }
 
         [Fact]
@@ -38,13 +38,13 @@ namespace Repository.Tests
             DateTimeOffset postTime = DateTimeOffset.MinValue;
             string url = "URL";
 
-            await etchingStore.AddEtchingAsync(testEvent.Id, subject.Id, postTime);
+            await etchingStore.AddEtchingAsync(testGathering.Id, subject.Id, postTime);
 
             Post created = await sentry.ExecuteReadAsync(ctx => ctx.Posts.FirstAsync());
 
             Assert.NotNull(created);
             Assert.Equal(subject.Id, created.OwnerId);
-            Assert.Equal(testEvent.Id, created.EventId);
+            Assert.Equal(testGathering.Id, created.GatheringId);
             Assert.Equal(postTime, created.PostedAt);
             Assert.Equal(url, created.PhotoURL);
             Assert.False(created.IsHidden);
@@ -52,7 +52,7 @@ namespace Repository.Tests
         [Fact]
         public async Task RemoveEtchingAsync_SUCCESS()
         {
-            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            Post testEtching = new EtchingFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testEtching));
 
             await etchingStore.RemoveEtchingAsync(testEtching.Id);
@@ -64,21 +64,21 @@ namespace Repository.Tests
         [Fact]
         public async Task GetEtchingAsync_SUCCESS()
         {
-            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            Post testEtching = new EtchingFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testEtching));
 
             EtchingShard retrieved = await etchingStore.GetEtchingAsync(testEtching.Id);
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
-            Assert.Equal(testEtching.EventId, retrieved.EventId);
+            Assert.Equal(testEtching.GatheringId, retrieved.GatheringId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task GetEtchingsByUserAsync_SUCCESS()
         {
-            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            Post testEtching = new EtchingFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
 
             int a = sentry.ExecuteRead(ctx => ctx.Posts.Count());
@@ -88,21 +88,21 @@ namespace Repository.Tests
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
-            Assert.Equal(testEtching.EventId, retrieved.EventId);
+            Assert.Equal(testEtching.GatheringId, retrieved.GatheringId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
         [Fact]
-        public async Task GetEtchingsForEventAsync_SUCCESS()
+        public async Task GetEtchingsForGatheringAsync_SUCCESS()
         {
-            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            Post testEtching = new EtchingFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
 
-            EtchingShard retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
+            EtchingShard retrieved = (await etchingStore.GetEtchingsForGatheringAsync(testGathering.Id)).First();
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
-            Assert.Equal(testEtching.EventId, retrieved.EventId);
+            Assert.Equal(testEtching.GatheringId, retrieved.GatheringId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.Equal(testEtching.IsHidden, retrieved.IsHidden);
         }
@@ -110,7 +110,7 @@ namespace Repository.Tests
         public async Task RateEtchingAsync_SUCCESS()
         {
             PostLink.PostLinkType rating = PostLink.PostLinkType.RateUp;
-            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            Post testEtching = new EtchingFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
 
             await etchingStore.RateEtchingAsync(testEtching.Id, subject.Id, UserRating.Positive);
@@ -124,7 +124,7 @@ namespace Repository.Tests
         [Fact]
         public async Task RemoveEtchingRatingAsync_SUCCESS()
         {
-            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            Post testEtching = new EtchingFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testEtching));
 
             PostLink rating = new PostLinkFactory().Create(subject, testEtching);
@@ -139,16 +139,16 @@ namespace Repository.Tests
         [Fact]
         public async Task HideEtchingAsync_SUCCESS()
         {
-            Post testEtching = new EtchingFactory().Create(subject, testEvent);
+            Post testEtching = new EtchingFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testEtching));
 
             await etchingStore.HideEtchingAsync(testEtching.Id);
 
-            EtchingShard retrieved = (await etchingStore.GetEtchingsForEventAsync(testEvent.Id)).First();
+            EtchingShard retrieved = (await etchingStore.GetEtchingsForGatheringAsync(testGathering.Id)).First();
 
             Assert.NotNull(retrieved);
             Assert.Equal(testEtching.OwnerId, retrieved.User.Id);
-            Assert.Equal(testEtching.EventId, retrieved.EventId);
+            Assert.Equal(testEtching.GatheringId, retrieved.GatheringId);
             Assert.Equal(testEtching.PostedAt, retrieved.TimeEtched);
             Assert.NotEqual(testEtching.IsHidden, retrieved.IsHidden);
             Assert.True(retrieved.IsHidden);

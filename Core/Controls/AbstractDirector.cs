@@ -16,7 +16,7 @@ namespace Core.Controls
 
 		protected IAccountDatabase Accounts { get; private set; }
 		protected IBannerDatabase Banners { get; private set; }
-		protected IEventDatabase Events { get; private set; }
+		protected IGatheringDatabase Gatherings { get; private set; }
 		protected IEtchingDatabase Etchings { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
 		protected IKeyDatabase Keys { get; private set; }
@@ -34,7 +34,7 @@ namespace Core.Controls
 			
 			Accounts = Terminal.AccountDatabase;
 			Banners = Terminal.BannerDatabase;
-			Events = Terminal.EventDatabase;
+			Gatherings = Terminal.GatheringDatabase;
 			Etchings = Terminal.EtchingDatabase;
 			Reports = Terminal.DisciplineDatabase;
 			Keys = Terminal.KeyDatabase;
@@ -67,9 +67,9 @@ namespace Core.Controls
             return new(await Accounts.FindUserByIdAsync(userId));
         }
 
-        protected async Task<Event> GetEventAsync(ulong eventId)
+        protected async Task<Gathering> GetGatheringAsync(ulong gatheringId)
         {
-            return new(await Events.FindEventAsync(eventId));
+            return new(await Gatherings.FindGatheringAsync(gatheringId));
         }
 
 		#endregion

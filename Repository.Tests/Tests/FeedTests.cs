@@ -13,16 +13,16 @@ namespace Repository.Tests
         private readonly ITestOutputHelper _testOutputHelper;
 
         private User subject;
-        private Event testEvent;
+        private Gathering testGathering;
         public FeedTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
             subject = new UserFactory().Create();
-            testEvent = new EventFactory().Create(subject);
+            testGathering = new GatheringFactory().Create(subject);
 
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(testGathering));
         }
         public void Dispose()
         {
@@ -39,7 +39,7 @@ namespace Repository.Tests
             /// bait: x
             ///                    depth charge
             ///                         v 
-            /// Event | Time Z | Time A | Time B | Time C | Time D
+            /// Gathering | Time Z | Time A | Time B | Time C | Time D
             /// alpha |        | e1 j1  | e2 x1  | e3     | m1
             /// echo  |        | j2 x2  | j3     |        |
             /// hotel |        |        |        | e4 m2  |
@@ -96,20 +96,20 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
 
-            // Event block
-            EventFactory eventFactory = new EventFactory();
+            // Gathering block
+            GatheringFactory gatheringFactory = new GatheringFactory();
 
-            Event alpha = eventFactory.Create(irrelevantHost);
-            Event echo = eventFactory.Create(irrelevantHost);
-            Event hotel = eventFactory.Create(irrelevantHost);
-            Event kilo = eventFactory.Create(irrelevantHost);
-            Event romeo = eventFactory.Create(irrelevantHost);
+            Gathering alpha = gatheringFactory.Create(irrelevantHost);
+            Gathering echo = gatheringFactory.Create(irrelevantHost);
+            Gathering hotel = gatheringFactory.Create(irrelevantHost);
+            Gathering kilo = gatheringFactory.Create(irrelevantHost);
+            Gathering romeo = gatheringFactory.Create(irrelevantHost);
 
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(alpha));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(echo));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(hotel));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(kilo));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(romeo));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(alpha));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(echo));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(hotel));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(kilo));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(romeo));
 
 
             // Post block
@@ -151,7 +151,7 @@ namespace Repository.Tests
             EtchingShard e1Etching = retrieved.Find(etching => etching.Id.Equals(e1.Id));
             Assert.NotNull(e1Etching);
             //Assert.Equal(e1.OwnerId, e1Etching.UserId);
-            Assert.Equal(e1.EventId, e1Etching.EventId);
+            Assert.Equal(e1.GatheringId, e1Etching.GatheringId);
             Assert.Equal(e1.PostedAt, e1Etching.TimeEtched);
 
             var retrievedAsPostIds = retrieved.ConvertAll(etching => etching.Id);

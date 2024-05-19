@@ -3,7 +3,7 @@ using Core.Boundaries;
 
 namespace Repository
 {
-    public class Event
+    public class Gathering
     {
         public ulong Id { get; set; }
 
@@ -16,7 +16,7 @@ namespace Repository
         // X = Longitude Y = Latitude
         public Point Location { get; set; } = DefaultLocation;
 
-        public EventState State { get; set; } = DefaultState;
+        public GatheringState State { get; set; } = DefaultState;
         public int GroupMinimum { get; set; } = DefaultGroupMinimum;
         public int GroupMaximum { get; set; } = DefaultGroupMaximum;
         public DateTimeOffset? EndTime { get; set; }
@@ -35,8 +35,8 @@ namespace Repository
         public int NightOwl { get; init; } = DefaultNightOwl;
 
         // Navigation Properties
-        public List<EventLink>? Links { get; set; }
-        public List<EventReport>? Reports { get; set; }
+        public List<GatheringLink>? Links { get; set; }
+        public List<GatheringReport>? Reports { get; set; }
         public List<Post>? Posts { get; set; }
 
         // Default Values
@@ -50,7 +50,7 @@ namespace Repository
         public static ulong DefaultHostId { get; set; } = ulong.MinValue;
         public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
 
-        public static EventState DefaultState { get; set; } = EventState.Upcoming;
+        public static GatheringState DefaultState { get; set; } = GatheringState.Upcoming;
         public static int DefaultGroupMinimum { get; set; } = 0;
         public static int DefaultGroupMaximum { get; set; } = 10;
         public static double DefaultRadius { get; set; } = 10.000;

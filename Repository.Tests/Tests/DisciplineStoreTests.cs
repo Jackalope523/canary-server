@@ -14,7 +14,7 @@ namespace Repository.Tests
 
         private User subject1;
         private User subject2;
-        private Event testEvent;
+        private Gathering testGathering;
 
         public DisciplineStoreTests(ITestOutputHelper testOutputHelper)
         {
@@ -27,30 +27,30 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject1));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject2));
 
-            EventFactory eventFactory = new EventFactory();
-            testEvent = eventFactory.Create(subject2);
+            GatheringFactory gatheringFactory = new GatheringFactory();
+            testGathering = gatheringFactory.Create(subject2);
 
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(testGathering));
         }
         public void Dispose()
         {
             sentry.ExecuteWrite(ctx => ctx.Penalties.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.UserReports.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.EventReports.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.GatheringReports.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Events.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.ExecuteDelete());
         }
 
         [Fact]
         public async Task GetReportsByUserAsync_SUCCESS()
         {
-            UserReport userReport = new UserReportFactory().Create(subject1, subject2, testEvent);
-            EventReport eventReport = new EventReportFactory().Create(subject1, testEvent);
+            UserReport userReport = new UserReportFactory().Create(subject1, subject2, testGathering);
+            GatheringReport gatheringReport = new GatheringReportFactory().Create(subject1, testGathering);
 
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
-            await sentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(eventReport));
+            await sentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(gatheringReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>) reports = await store.GetReportsByUserAsync(subject1.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>) reports = await store.GetReportsByUserAsync(subject1.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);
@@ -61,11 +61,11 @@ namespace Repository.Tests
             Assert.Equal(userReport.Type, reports.Item1.First().ReportType);
             Assert.Equal(userReport.Notes, reports.Item1.First().ReportDetails);
 
-            Assert.Equal(eventReport.UserId, reports.Item2.First().ReportingUserId);
-            Assert.Equal(eventReport.EventId, reports.Item2.First().ReportedEventId);
-            Assert.Equal(eventReport.FilingDate, reports.Item2.First().ReportTime);
-            Assert.Equal(eventReport.Type, reports.Item2.First().ReportType);
-            Assert.Equal(eventReport.Notes, reports.Item2.First().ReportDetails);
+            Assert.Equal(gatheringReport.UserId, reports.Item2.First().ReportingUserId);
+            Assert.Equal(gatheringReport.GatheringId, reports.Item2.First().ReportedGatheringId);
+            Assert.Equal(gatheringReport.FilingDate, reports.Item2.First().ReportTime);
+            Assert.Equal(gatheringReport.Type, reports.Item2.First().ReportType);
+            Assert.Equal(gatheringReport.Notes, reports.Item2.First().ReportDetails);
         }
         [Fact]
         public async Task ReportUserAsync_SUCCESS()
@@ -74,61 +74,61 @@ namespace Repository.Tests
             UserReportType type = UserReportType.Rude;
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            await store.ReportUserAsync(subject1.Id, testEvent.Id, subject2.Id, time, type, notes);
+            await store.ReportUserAsync(subject1.Id, testGathering.Id, subject2.Id, time, type, notes);
 
             UserReport created = await sentry.ExecuteReadAsync(ctx => ctx.UserReports.FirstAsync());
 
             Assert.NotNull(created);
             Assert.Equal(subject1.Id, created.SelfId);
             Assert.Equal(subject2.Id, created.OtherId);
-            Assert.Equal(testEvent.Id, created.EventId);
+            Assert.Equal(testGathering.Id, created.GatheringId);
             Assert.Equal(time, created.FilingDate);
             Assert.Equal(type, created.Type);
             Assert.Equal(notes, created.Notes);
         }
         [Fact]
-        public async Task ReportEventAsync_SUCCESS()
+        public async Task ReportGatheringAsync_SUCCESS()
         {
             string notes = "Test";
-            EventReportType type = EventReportType.Inappropriate;
+            GatheringReportType type = GatheringReportType.Inappropriate;
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            await store.ReportEventAsync(subject1.Id, testEvent.Id, time, type, notes);
+            await store.ReportGatheringAsync(subject1.Id, testGathering.Id, time, type, notes);
 
-            EventReport created = await sentry.ExecuteReadAsync(ctx => ctx.EventReports.FirstAsync());
+            GatheringReport created = await sentry.ExecuteReadAsync(ctx => ctx.GatheringReports.FirstAsync());
 
             Assert.NotNull(created);
             Assert.Equal(subject1.Id, created.UserId);
-            Assert.Equal(testEvent.Id, created.EventId);
+            Assert.Equal(testGathering.Id, created.GatheringId);
             Assert.Equal(time, created.FilingDate);
             Assert.Equal(type, created.Type);
             Assert.Equal(notes, created.Notes);
         }
         [Fact]
-        public async Task GetReportsForEventAsync_SUCCESS()
+        public async Task GetReportsForGatheringAsync_SUCCESS()
         {
-            EventReport eventReport = new EventReportFactory().Create(subject1, testEvent);
-            await sentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(eventReport));
+            GatheringReport gatheringReport = new GatheringReportFactory().Create(subject1, testGathering);
+            await sentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(gatheringReport));
 
-            List<Core.Boundaries.EventReport> reports = await store.GetReportsForEventAsync(testEvent.Id);
+            List<Core.Boundaries.GatheringReport> reports = await store.GetReportsForGatheringAsync(testGathering.Id);
 
             Assert.NotNull(reports);
-            Assert.Equal(eventReport.UserId, reports.First().ReportingUserId);
-            Assert.Equal(eventReport.EventId, reports.First().ReportedEventId);
-            Assert.Equal(eventReport.FilingDate, reports.First().ReportTime);
-            Assert.Equal(eventReport.Type, reports.First().ReportType);
-            Assert.Equal(eventReport.Notes, reports.First().ReportDetails);
+            Assert.Equal(gatheringReport.UserId, reports.First().ReportingUserId);
+            Assert.Equal(gatheringReport.GatheringId, reports.First().ReportedGatheringId);
+            Assert.Equal(gatheringReport.FilingDate, reports.First().ReportTime);
+            Assert.Equal(gatheringReport.Type, reports.First().ReportType);
+            Assert.Equal(gatheringReport.Notes, reports.First().ReportDetails);
         }
         [Fact]
         public async Task GetReportsForUserAsync_SUCCESS()
         {
-            UserReport userReport = new UserReportFactory().Create(subject1, subject2, testEvent);
-            EventReport eventReport = new EventReportFactory().Create(subject1, testEvent);
+            UserReport userReport = new UserReportFactory().Create(subject1, subject2, testGathering);
+            GatheringReport gatheringReport = new GatheringReportFactory().Create(subject1, testGathering);
 
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
-            await sentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(eventReport));
+            await sentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(gatheringReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>) reports = await store.GetReportsForUserAsync(subject2.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>) reports = await store.GetReportsForUserAsync(subject2.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);
@@ -139,11 +139,11 @@ namespace Repository.Tests
             Assert.Equal(userReport.Type, reports.Item1.First().ReportType);
             Assert.Equal(userReport.Notes, reports.Item1.First().ReportDetails);
 
-            Assert.Equal(eventReport.UserId, reports.Item2.First().ReportingUserId);
-            Assert.Equal(eventReport.EventId, reports.Item2.First().ReportedEventId);
-            Assert.Equal(eventReport.FilingDate, reports.Item2.First().ReportTime);
-            Assert.Equal(eventReport.Type, reports.Item2.First().ReportType);
-            Assert.Equal(eventReport.Notes, reports.Item2.First().ReportDetails);
+            Assert.Equal(gatheringReport.UserId, reports.Item2.First().ReportingUserId);
+            Assert.Equal(gatheringReport.GatheringId, reports.Item2.First().ReportedGatheringId);
+            Assert.Equal(gatheringReport.FilingDate, reports.Item2.First().ReportTime);
+            Assert.Equal(gatheringReport.Type, reports.Item2.First().ReportType);
+            Assert.Equal(gatheringReport.Notes, reports.Item2.First().ReportDetails);
         }
         [Fact]
         public async Task PenaliseUserAsync_SUCCESS()

@@ -10,7 +10,7 @@ namespace Repository
         {
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>)> GetReportsByUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsByUserAsync(ulong id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             UserReports.
@@ -26,33 +26,33 @@ namespace Repository
             )).
             ToListAsync());
 
-            Task<List<Core.Boundaries.EventReport>> eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
-            EventReports.
+            Task<List<Core.Boundaries.GatheringReport>> gatheringReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            GatheringReports.
             Where(r => r.UserId == id).
-            Select(r => new Core.Boundaries.EventReport
+            Select(r => new Core.Boundaries.GatheringReport
             (
                 r.Id,
                 r.UserId,
-                r.EventId,
+                r.GatheringId,
                 r.FilingDate,
                 r.Type,
                 r.Notes
             )).
             ToListAsync());
          
-            return (await userReportsToReturn, await eventReportsToReturn);
+            return (await userReportsToReturn, await gatheringReportsToReturn);
         }
 
-        public async Task<List<Core.Boundaries.EventReport>> GetReportsForEventAsync(ulong id)
+        public async Task<List<Core.Boundaries.GatheringReport>> GetReportsForGatheringAsync(ulong id)
         {
             return await storeSentry.ExecuteReadAsync(ctx => ctx.
-            EventReports.
-            Where(r => r.EventId == id).
-            Select(r => new Core.Boundaries.EventReport
+            GatheringReports.
+            Where(r => r.GatheringId == id).
+            Select(r => new Core.Boundaries.GatheringReport
             (
                 r.Id,
                 r.UserId,
-                r.EventId,
+                r.GatheringId,
                 r.FilingDate,
                 r.Type,
                 r.Notes
@@ -60,7 +60,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>)> GetReportsForUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsForUserAsync(ulong id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => 
              ctx.UserReports.
@@ -76,41 +76,41 @@ namespace Repository
              )).
             ToListAsync());       
 
-            List<ulong> eventsHosted = await storeSentry.ExecuteReadAsync(ctx => 
-                ctx.Events.
+            List<ulong> gatheringsHosted = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Gatherings.
                 Where(e => e.HostId == id).
                 Select(e => e.Id).
                 ToListAsync());
 
-            Task<List<Core.Boundaries.EventReport>>  eventReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
-            EventReports.
-            Where(r => eventsHosted.Contains(r.EventId)).
-            Select(r => new Core.Boundaries.EventReport
+            Task<List<Core.Boundaries.GatheringReport>>  gatheringReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            GatheringReports.
+            Where(r => gatheringsHosted.Contains(r.GatheringId)).
+            Select(r => new Core.Boundaries.GatheringReport
             (
                 r.Id,
                 r.UserId,
-                r.EventId,
+                r.GatheringId,
                 r.FilingDate,
                 r.Type,
                 r.Notes
             )).
             ToListAsync());
 
-            return (await userReportsToReturn, await eventReportsToReturn);
+            return (await userReportsToReturn, await gatheringReportsToReturn);
         }
 
-        public async Task ReportEventAsync(ulong userId, ulong eventId, DateTimeOffset timeOfReport, EventReportType reportType, string reportDetails)
+        public async Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport, GatheringReportType reportType, string reportDetails)
         {
-            EventReport toCreate = new()
+            GatheringReport toCreate = new()
             {
                 UserId = userId,
-                EventId = eventId,
+                GatheringId = gatheringId,
                 Type = reportType,
                 FilingDate = timeOfReport,
                 Notes = reportDetails
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.EventReports.Add(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(toCreate));
         }
 
         public async Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
@@ -127,13 +127,13 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(toCreate));
         }
 
-        public async Task ReportUserAsync(ulong selfId, ulong targetId, ulong eventId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(ulong selfId, ulong targetId, ulong gatheringId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
         {
             UserReport toCreate = new()
             {
                 SelfId = selfId,
                 OtherId = targetId,
-                EventId = eventId,
+                GatheringId = gatheringId,
                 Type = reportType,
                 FilingDate = timeOfReport,
                 Notes = reportDetails

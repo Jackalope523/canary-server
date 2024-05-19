@@ -18,69 +18,69 @@ namespace Core.Tests.Controls
         }
 
 		[Fact]
-		public async Task GetEventEtchingsAsync_HostedEvent_ReturnsEtchings()
+		public async Task GetGatheringEtchingsAsync_HostedGathering_ReturnsEtchings()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.GenerateEtchingAsync(@event, host);
-			await environment.GenerateEtchingAsync(@event, host);
+			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.GenerateEtchingAsync(@gathering, host);
+			await environment.GenerateEtchingAsync(@gathering, host);
 
 			// Act
-			var serverEtchings = await director.GetEventEtchingsAsync(host.Id, @event.Id);
+			var serverEtchings = await director.GetGatheringEtchingsAsync(host.Id, @gathering.Id);
 
 			// Assert
 			Assert.Equal(2, serverEtchings.Count);
 		}
 
 		[Fact]
-		public async Task GetEventEtchingsAsync_GuestAtEvent_ReturnsEtchings()
+		public async Task GetGatheringEtchingsAsync_GuestAtGathering_ReturnsEtchings()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateOngoingEventAsync(host, guest);
-			await environment.GenerateEtchingAsync(@event, host);
-			await environment.GenerateEtchingAsync(@event, host);
+			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
+			await environment.GenerateEtchingAsync(@gathering, host);
+			await environment.GenerateEtchingAsync(@gathering, host);
 
 			// Act
-			var serverEtchings = await director.GetEventEtchingsAsync(guest.Id, @event.Id);
+			var serverEtchings = await director.GetGatheringEtchingsAsync(guest.Id, @gathering.Id);
 
 			// Assert
 			Assert.Equal(2, serverEtchings.Count);
 		}
 
 		[Fact]
-		public async Task GetEventEtchingsAsync_InvalidEvent_Fails()
+		public async Task GetGatheringEtchingsAsync_InvalidGathering_Fails()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.GenerateEtchingAsync(@event, host);
-			await environment.GenerateEtchingAsync(@event, host);
+			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.GenerateEtchingAsync(@gathering, host);
+			await environment.GenerateEtchingAsync(@gathering, host);
 
 			// Act
-			var serverEtchings = director.GetEventEtchingsAsync(sneakyUser.Id, @event.Id);
+			var serverEtchings = director.GetGatheringEtchingsAsync(sneakyUser.Id, @gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await serverEtchings);
 		}
 
 		[Fact]
-		public async Task AddEtchingAsync_GuestAtEvent_Succeeds()
+		public async Task AddEtchingAsync_GuestAtGathering_Succeeds()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateOngoingEventAsync(host, guest);
+			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
 			byte[] image = { byte.MinValue, 0, 1, 3, byte.MaxValue, 7, 8 };
 
 			// Act
-			await director.AddEtchingAsync(guest.Id, @event.Id, new(image));
+			await director.AddEtchingAsync(guest.Id, @gathering.Id, new(image));
 
 			// Assert
-			var serverEtchings = await director.GetEventEtchingsAsync(guest.Id, @event.Id);
+			var serverEtchings = await director.GetGatheringEtchingsAsync(guest.Id, @gathering.Id);
 			Assert.Single(serverEtchings);
 
 			var etching = serverEtchings[0];
@@ -88,15 +88,15 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task AddEtchingAsync_InvalidEvent_Fails()
+		public async Task AddEtchingAsync_InvalidGathering_Fails()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
+			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var addEtchingSync = director.AddEtchingAsync(sneakyUser.Id, @event.Id, new(0));
+			var addEtchingSync = director.AddEtchingAsync(sneakyUser.Id, @gathering.Id, new(0));
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await addEtchingSync);
@@ -107,14 +107,14 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			var etching = await environment.GenerateEtchingAsync(@event, host);
+			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var etching = await environment.GenerateEtchingAsync(@gathering, host);
 
 			// Act
 			await director.RemoveEtchingAsync(host.Id, etching.Id);
 
 			// Assert
-			var serverEtchings = await director.GetEventEtchingsAsync(host.Id, @event.Id);
+			var serverEtchings = await director.GetGatheringEtchingsAsync(host.Id, @gathering.Id);
 			Assert.Empty(serverEtchings);
 		}
 
@@ -124,8 +124,8 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			var etching = await environment.GenerateEtchingAsync(@event, host);
+			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var etching = await environment.GenerateEtchingAsync(@gathering, host);
 
 			// Act
 			var removeEtchingSync = director.RemoveEtchingAsync(sneakyUser.Id, etching.Id);
@@ -140,16 +140,16 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateOngoingEventAsync(host, guest);
-			var coolEtching = await environment.GenerateEtchingAsync(@event, host);
-			var uglyEtching = await environment.GenerateEtchingAsync(@event, host);
+			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
+			var coolEtching = await environment.GenerateEtchingAsync(@gathering, host);
+			var uglyEtching = await environment.GenerateEtchingAsync(@gathering, host);
 
 			// Act
 			await director.RateEtchingAsync(guest.Id, coolEtching.Id, UserRating.Positive);
 			await director.RateEtchingAsync(guest.Id, uglyEtching.Id, UserRating.Negative);
 
 			// Assert
-			var serverEtchings = await director.GetEventEtchingsAsync(host.Id, @event.Id);
+			var serverEtchings = await director.GetGatheringEtchingsAsync(host.Id, @gathering.Id);
 			
 			var serverCoolEtching = serverEtchings.Find(etching => etching.Id.Equals(coolEtching.Id));
 			Assert.Equal(1, serverCoolEtching.Ratings.Positive);
@@ -168,25 +168,25 @@ namespace Core.Tests.Controls
 			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host, friend);
 
-			var @event = await environment.GeneratePastEventAsync(host);
-			var someEtching = await environment.GenerateEtchingAsync(@event, host);
-			var anotherEtching = await environment.GenerateEtchingAsync(@event, host);
+			var @gathering = await environment.GeneratePastGatheringAsync(host);
+			var someEtching = await environment.GenerateEtchingAsync(@gathering, host);
+			var anotherEtching = await environment.GenerateEtchingAsync(@gathering, host);
 
 			// Act
 			var feed = await director.GetUserFeedAsync(friend.Id, 100, 0);
 
 			// Assert
 			Assert.Single(feed.Headers);
-			Assert.Equal(@event.Id, feed.Headers[0].Id);
+			Assert.Equal(@gathering.Id, feed.Headers[0].Id);
 
 			Assert.Equal(2, feed.Etchings.Count);
 			var serverSomeEtching = feed.Etchings.Find(etching => etching.Id.Equals(someEtching.Id));
-			Assert.Equal(@event.Id, serverSomeEtching.EventId);
+			Assert.Equal(@gathering.Id, serverSomeEtching.GatheringId);
 			Assert.Equal(someEtching.Id, serverSomeEtching.Id);
 		}
 
 		[Fact]
-		public async Task GetUserFeedAsync_ExcludingEvent_ReturnsFeed()
+		public async Task GetUserFeedAsync_ExcludingGathering_ReturnsFeed()
 		{
 			// Arrange
 			var host1 = await environment.GenerateUniqueUserAsync();
@@ -194,22 +194,22 @@ namespace Core.Tests.Controls
 			var friend = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(host1, host2, friend);
 
-			var event1 = await environment.GenerateOngoingEventAsync(host1);
-			var seenEtching = await environment.GenerateEtchingAsync(event1, host1);
+			var gathering1 = await environment.GenerateOngoingGatheringAsync(host1);
+			var seenEtching = await environment.GenerateEtchingAsync(gathering1, host1);
 
-			var event2 = await environment.GeneratePastEventAsync(host2);
-			var unseenEtching = await environment.GenerateEtchingAsync(event1, host2);
+			var gathering2 = await environment.GeneratePastGatheringAsync(host2);
+			var unseenEtching = await environment.GenerateEtchingAsync(gathering1, host2);
 
 			// Act
 			var feed = await director.GetUserFeedAsync(friend.Id, 100, 1);
 
 			// Assert
 			Assert.Single(feed.Headers);
-			Assert.Equal(event2.Id, feed.Headers[0].Id);
+			Assert.Equal(gathering2.Id, feed.Headers[0].Id);
 
 			Assert.Single(feed.Etchings);
 			var serverSomeEtching = feed.Etchings.Find(etching => etching.Id.Equals(unseenEtching.Id));
-			Assert.Equal(event2.Id, serverSomeEtching.EventId);
+			Assert.Equal(gathering2.Id, serverSomeEtching.GatheringId);
 			Assert.Equal(unseenEtching.Id, serverSomeEtching.Id);
 		}
 	}

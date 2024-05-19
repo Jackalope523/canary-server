@@ -82,23 +82,23 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var hostedEvent = await environment.GeneratePastEventAsync(user);
-			var attendedEvent = await environment.GeneratePastEventAsync(host, user);
-			var unattendedEvent = await environment.GeneratePastEventAsync(host);
-			var ongoingEvent = await environment.GenerateUpcomingEventAsync(host, user);
+			var hostedGathering = await environment.GeneratePastGatheringAsync(user);
+			var attendedGathering = await environment.GeneratePastGatheringAsync(host, user);
+			var unattendedGathering = await environment.GeneratePastGatheringAsync(host);
+			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, user);
 
-			var funLovingEtching = await environment.GenerateEtchingAsync(attendedEvent, user);
-			var lessLovingEtching = await environment.GenerateEtchingAsync(attendedEvent, host);
-			var okEtching = await environment.GenerateEtchingAsync(ongoingEvent, user);
+			var funLovingEtching = await environment.GenerateEtchingAsync(attendedGathering, user);
+			var lessLovingEtching = await environment.GenerateEtchingAsync(attendedGathering, host);
+			var okEtching = await environment.GenerateEtchingAsync(ongoingGathering, user);
 
 			// Act
-			var (Events, Etchings) = await director.GetUserNestAsync(user.Id, user.Id);
+			var (Gatherings, Etchings) = await director.GetUserNestAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(3, Events.Count);
-			Assert.Equal(hostedEvent.ToEventShard(), Events.Find(e => e.Id.Equals(hostedEvent.Id)));
-			Assert.Equal(attendedEvent.ToEventShard(), Events.Find(e => e.Id.Equals(attendedEvent.Id)));
-			Assert.Equal(ongoingEvent.ToEventShard(), Events.Find(e => e.Id.Equals(ongoingEvent.Id)));
+			Assert.Equal(3, Gatherings.Count);
+			Assert.Equal(hostedGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(hostedGathering.Id)));
+			Assert.Equal(attendedGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(attendedGathering.Id)));
+			Assert.Equal(ongoingGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(ongoingGathering.Id)));
 
 			Assert.Equal(3, Etchings.Count);
 			Assert.Equal(funLovingEtching, Etchings.Find(e => e.Id.Equals(funLovingEtching.Id)));
@@ -115,22 +115,22 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, friend);
 
-			var hostedEvent = await environment.GeneratePastEventAsync(user, friend);
-			var mutuallyAttendedEvent = await environment.GeneratePastEventAsync(host, user, friend);
-			var unattendedEvent = await environment.GeneratePastEventAsync(friend);
-			var ongoingEvent = await environment.GenerateUpcomingEventAsync(host, friend);
+			var hostedGathering = await environment.GeneratePastGatheringAsync(user, friend);
+			var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(host, user, friend);
+			var unattendedGathering = await environment.GeneratePastGatheringAsync(friend);
+			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, friend);
 
-			var userEtching = await environment.GenerateEtchingAsync(hostedEvent, user);
-			var friendEtching = await environment.GenerateEtchingAsync(mutuallyAttendedEvent, friend);
-			var hostEtching = await environment.GenerateEtchingAsync(mutuallyAttendedEvent, host);
-			var ongoingEventFriendEtching = await environment.GenerateEtchingAsync(ongoingEvent, friend);
-			var unattendedEventFriendEtching = await environment.GenerateEtchingAsync(unattendedEvent, friend);
+			var userEtching = await environment.GenerateEtchingAsync(hostedGathering, user);
+			var friendEtching = await environment.GenerateEtchingAsync(mutuallyAttendedGathering, friend);
+			var hostEtching = await environment.GenerateEtchingAsync(mutuallyAttendedGathering, host);
+			var ongoingGatheringFriendEtching = await environment.GenerateEtchingAsync(ongoingGathering, friend);
+			var unattendedGatheringFriendEtching = await environment.GenerateEtchingAsync(unattendedGathering, friend);
 
 			// Act
-			var (Events, Etchings) = await director.GetUserNestAsync(user.Id, friend.Id);
+			var (Gatherings, Etchings) = await director.GetUserNestAsync(user.Id, friend.Id);
 
 			// Assert
-			Assert.Equal(4, Events.Count);
+			Assert.Equal(4, Gatherings.Count);
 
 			Assert.Equal(3, Etchings.Count);
 		}
@@ -142,17 +142,17 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
-			var mutuallyAttendedEvent = await environment.GeneratePastEventAsync(user, randomUser);
-			var unattendedEvent = await environment.GeneratePastEventAsync(randomUser);
+			var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(user, randomUser);
+			var unattendedGathering = await environment.GeneratePastGatheringAsync(randomUser);
 
-			var mutualEventEtching = await environment.GenerateEtchingAsync(mutuallyAttendedEvent, randomUser);
-			var unattendedEventEtching = await environment.GenerateEtchingAsync(unattendedEvent, randomUser);
+			var mutualGatheringEtching = await environment.GenerateEtchingAsync(mutuallyAttendedGathering, randomUser);
+			var unattendedGatheringEtching = await environment.GenerateEtchingAsync(unattendedGathering, randomUser);
 
 			// Act
-			var (Events, Etchings) = await director.GetUserNestAsync(user.Id, randomUser.Id);
+			var (Gatherings, Etchings) = await director.GetUserNestAsync(user.Id, randomUser.Id);
 
 			// Assert
-			Assert.Equal(2, Events.Count);
+			Assert.Equal(2, Gatherings.Count);
 
 			Assert.Single(Etchings);
 		}
@@ -179,10 +179,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var pastEvent = await environment.GeneratePastEventAsync(user);
-			var ongoingEvent = await environment.GenerateOngoingEventAsync(user);
-			var upcomingEvent = await environment.GenerateUpcomingEventAsync(host, user);
-			var anotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(user);
+			var pastGathering = await environment.GeneratePastGatheringAsync(user);
+			var ongoingGathering = await environment.GenerateOngoingGatheringAsync(user);
+			var upcomingGathering = await environment.GenerateUpcomingGatheringAsync(host, user);
+			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(user);
 
 			// Act
 			var activity = await director.GetUserActivityAsync(user.Id, user.Id);
@@ -200,11 +200,11 @@ namespace Core.Tests.Controls
 			var randomHost = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, friend);
 
-			var pastEvent = await environment.GeneratePastEventAsync(friend);
-			var ongoingEvent = await environment.GenerateOngoingEventAsync(friend);
-			var upcomingEvent = await environment.GenerateUpcomingEventAsync(user, friend);
-			var anotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(randomHost, friend);
-			var yetAnotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(friend);
+			var pastGathering = await environment.GeneratePastGatheringAsync(friend);
+			var ongoingGathering = await environment.GenerateOngoingGatheringAsync(friend);
+			var upcomingGathering = await environment.GenerateUpcomingGatheringAsync(user, friend);
+			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(randomHost, friend);
+			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(friend);
 
 			// Act
 			var activity = await director.GetUserActivityAsync(user.Id, friend.Id);
@@ -252,11 +252,11 @@ namespace Core.Tests.Controls
 			var randomHost = await environment.GenerateUniqueUserAsync();
 			await environment.ForceFriendshipAsync(user, activeFriend, sloadButChill);
 
-			var pastEvent = await environment.GeneratePastEventAsync(activeFriend);
-			var ongoingEvent = await environment.GenerateOngoingEventAsync(activeFriend, sloadButChill);
-			var upcomingEvent = await environment.GenerateUpcomingEventAsync(user, activeFriend);
-			var anotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(randomHost, activeFriend);
-			var yetAnotherUpcomingEvent = await environment.GenerateUpcomingEventAsync(activeFriend);
+			var pastGathering = await environment.GeneratePastGatheringAsync(activeFriend);
+			var ongoingGathering = await environment.GenerateOngoingGatheringAsync(activeFriend, sloadButChill);
+			var upcomingGathering = await environment.GenerateUpcomingGatheringAsync(user, activeFriend);
+			var anotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(randomHost, activeFriend);
+			var yetAnotherUpcomingGathering = await environment.GenerateUpcomingGatheringAsync(activeFriend);
 
 			// Act
 			var activity = await director.GetFriendActivityAsync(user.Id);

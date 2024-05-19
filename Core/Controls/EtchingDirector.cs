@@ -21,30 +21,30 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<EtchingShard>> GetEventEtchingsAsync(ulong userId, ulong eventId)
+		public async Task<List<EtchingShard>> GetGatheringEtchingsAsync(ulong userId, ulong gatheringId)
         {
             var user = await GetUserAsync(userId);
-            var targetEvent = await GetEventAsync(eventId);
-            _ = targetEvent.Etchings.Sync();
+            var targetGathering = await GetGatheringAsync(gatheringId);
+            _ = targetGathering.Etchings.Sync();
 
-            // Verify user can see the event
-            Try(await targetEvent.WasAttendedBy(user) || targetEvent.IsModifiableBy(user),
-                new InvalidEventException("User did not attend event."));
+            // Verify user can see the gathering
+            Try(await targetGathering.WasAttendedBy(user) || targetGathering.IsModifiableBy(user),
+                new InvalidGatheringException("User did not attend gathering."));
 
-            return await targetEvent.Etchings;
+            return await targetGathering.Etchings;
         }
 
-        public async Task<EtchingShard> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image)
+        public async Task<EtchingShard> AddEtchingAsync(ulong userId, ulong gatheringId, MemoryStream image)
         {
             var userSync = GetUserAsync(userId);
-            var targetEventSync = GetEventAsync(eventId);
+            var targetGatheringSync = GetGatheringAsync(gatheringId);
             var user = await userSync;
-            var targetEvent = await targetEventSync;
+            var targetGathering = await targetGatheringSync;
 
-            await user.CanEtch(targetEvent);
+            await user.CanEtch(targetGathering);
 
             // Try to etch
-            var etching = await Etchings.AddEtchingAsync(targetEvent.Id, user.Id, Time);
+            var etching = await Etchings.AddEtchingAsync(targetGathering.Id, user.Id, Time);
 
             // Save image
             await Terminal.MediaDirector.UploadImageAsync(user.Id, etching.Id, image);
@@ -56,11 +56,11 @@ namespace Core.Controls
         {
             var userSync = GetUserAsync(userId);
             var etching = await Etchings.GetEtchingAsync(etchingId);
-            var eventEtched = await GetEventAsync(etching.EventId);
+            var gatheringEtched = await GetGatheringAsync(etching.GatheringId);
             var user = await userSync;
 
-            // Verify user owns the etching or can modify the event
-            Try(user.Etched(etching) || eventEtched.IsModifiableBy(user),
+            // Verify user owns the etching or can modify the gathering
+            Try(user.Etched(etching) || gatheringEtched.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove etching."));
 
             await Etchings.RemoveEtchingAsync(etching.Id);
@@ -70,11 +70,11 @@ namespace Core.Controls
         {
             var userSync = GetUserAsync(userId);
             var etching = await Etchings.GetEtchingAsync(etchingId);
-            var eventEtched = await GetEventAsync(etching.EventId);
+            var gatheringEtched = await GetGatheringAsync(etching.GatheringId);
             var user = await userSync;
 
             // Verify user can interact with etching
-            Try(await eventEtched.WasAttendedBy(user),
+            Try(await gatheringEtched.WasAttendedBy(user),
                 new InvalidUserException("User cannot interact with etching."));
 
             Fail(user.Etched(etching),
@@ -95,49 +95,49 @@ namespace Core.Controls
             GetUserFeedAsync(ulong userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
-            Dictionary<ulong, EventHeader> eventHeaders = new();
+            Dictionary<ulong, GatheringHeader> gatheringHeaders = new();
 
             // Enforce lastDepth < depth
             lastDepth = Math.Min(lastDepth, depth - 1);
 
-            // Retrieve friend-populated event etchings after a specified time excluding previously viewed events
+            // Retrieve friend-populated gathering etchings after a specified time excluding previously viewed gatherings
             DateTimeOffset depthCharge = Time - TimeSpan.FromDays(depth);
             DateTimeOffset lastDepthCharge = Time - TimeSpan.FromDays(lastDepth);
             var friendEtchings = await Etchings.GenerateFeedForUserAsync(user.Id, depthCharge, lastDepthCharge);
 
-            // Get the respective event headers for the etchings
+            // Get the respective gathering headers for the etchings
             foreach (var etching in friendEtchings)
             {
-                var eventId = etching.EventId;
+                var gatheringId = etching.GatheringId;
 
-                // Add event header if it does not yet exist
-                if (!eventHeaders.ContainsKey(eventId))
+                // Add gathering header if it does not yet exist
+                if (!gatheringHeaders.ContainsKey(gatheringId))
                 {
-                    var etchedEvent = await GetEventAsync(eventId);
+                    var etchedGathering = await GetGatheringAsync(gatheringId);
 
-                    eventHeaders.Add(eventId, etchedEvent.ToEventHeader(etching.TimeEtched));
+                    gatheringHeaders.Add(gatheringId, etchedGathering.ToGatheringHeader(etching.TimeEtched));
                 }
-                // Update event header active time if etching is more recent
-                else if (HappenedBefore(eventHeaders[eventId].LastActiveTime, etching.TimeEtched))
+                // Update gathering header active time if etching is more recent
+                else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, etching.TimeEtched))
                 {
-                    eventHeaders[eventId] = new(eventId,
-                        eventHeaders[eventId].Name,
-                        eventHeaders[eventId].IsActive,
+                    gatheringHeaders[gatheringId] = new(gatheringId,
+                        gatheringHeaders[gatheringId].Name,
+                        gatheringHeaders[gatheringId].IsActive,
                         etching.TimeEtched,
-                        eventHeaders[eventId].Latitude,
-                        eventHeaders[eventId].Longitude);
+                        gatheringHeaders[gatheringId].Latitude,
+                        gatheringHeaders[gatheringId].Longitude);
                 }
             }
 
-            return new(eventHeaders.Values.ToList(), friendEtchings);
+            return new(gatheringHeaders.Values.ToList(), friendEtchings);
         }
 
 		#endregion
 
 		#region Favours
 
-		internal async Task<List<EtchingShard>> RequestEventEtchingsAsync(Event @event)
-            => await Etchings.GetEtchingsForEventAsync(@event.Id);
+		internal async Task<List<EtchingShard>> RequestGatheringEtchingsAsync(Gathering @gathering)
+            => await Etchings.GetEtchingsForGatheringAsync(@gathering.Id);
 
 		#endregion
 	}

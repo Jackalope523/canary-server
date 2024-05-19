@@ -11,9 +11,9 @@ namespace Repository
             store = new EFCoreAdminStore(flag);
         }
 
-        public async Task VoidEventAsync(ulong eventId)
+        public async Task VoidGatheringAsync(ulong gatheringId)
         {
-            await store.VoidEventAsync(eventId);
+            await store.VoidGatheringAsync(gatheringId);
         }
 
         public async Task VoidUserAsync(ulong userId)

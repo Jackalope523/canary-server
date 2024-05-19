@@ -106,13 +106,13 @@ namespace Core.Exceptions
     }
 
     [Serializable]
-    public class InvalidEventException : UserErrorException
+    public class InvalidGatheringException : UserErrorException
     {
-        public InvalidEventException()
+        public InvalidGatheringException()
             : base() { }
-        public InvalidEventException(string message)
+        public InvalidGatheringException(string message)
             : base(message) { }
-        public InvalidEventException(string message, Exception innerException)
+        public InvalidGatheringException(string message, Exception innerException)
             : base(message, innerException) { }
     }
 

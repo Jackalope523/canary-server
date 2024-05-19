@@ -7,14 +7,14 @@ namespace Core.Boundaries
 {
 	#region Schemas
 
-	public record EventHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
+	public record GatheringHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
         double Latitude, double Longitude);
 
-    public record EtchingShard(ulong Id, ulong EventId, UserSilhouette User,
+    public record EtchingShard(ulong Id, ulong GatheringId, UserSilhouette User,
         DateTimeOffset TimeEtched,
         (int Positive, int Negative) Ratings, bool IsHidden);
 
-    public record FeedShard(List<EventHeader> Headers, List<EtchingShard> Etchings);
+    public record FeedShard(List<GatheringHeader> Headers, List<EtchingShard> Etchings);
 
     #endregion
 
@@ -22,10 +22,10 @@ namespace Core.Boundaries
 
     public interface IEtchingDatabase
     {
-        Task<List<EtchingShard>> GetEtchingsForEventAsync(ulong eventId);
+        Task<List<EtchingShard>> GetEtchingsForGatheringAsync(ulong gatheringId);
         Task<List<EtchingShard>> GetEtchingsByUserAsync(ulong userId);
         Task<EtchingShard> GetEtchingAsync(ulong etchingId);
-        Task<EtchingShard> AddEtchingAsync(ulong eventId, ulong etcherId,
+        Task<EtchingShard> AddEtchingAsync(ulong gatheringId, ulong etcherId,
             DateTimeOffset timeEtched);
 		Task RemoveEtchingAsync(ulong etchingId);
 		Task HideEtchingAsync(ulong etchingId);
@@ -38,8 +38,8 @@ namespace Core.Boundaries
 
     public interface IEtchingOperations
     {
-        Task<List<EtchingShard>> GetEventEtchingsAsync(ulong userId, ulong eventId);
-        Task<EtchingShard> AddEtchingAsync(ulong userId, ulong eventId, MemoryStream image);
+        Task<List<EtchingShard>> GetGatheringEtchingsAsync(ulong userId, ulong gatheringId);
+        Task<EtchingShard> AddEtchingAsync(ulong userId, ulong gatheringId, MemoryStream image);
         Task RemoveEtchingAsync(ulong userId, ulong etchingId);
         Task RateEtchingAsync(ulong userId, ulong etchingId, UserRating rating);
 

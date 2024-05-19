@@ -13,7 +13,7 @@ namespace Repository
         public IAccountDatabase AccountDatabaseAccess { get; private set; }
         public IProfileDatabase ProfileDatabaseAccess { get; private set; }
         public INotificationDatabase NotificationDatabaseAccess { get; private set; }
-        public IEventDatabase EventDatabaseAccess { get; private set; }
+        public IGatheringDatabase GatheringDatabaseAccess { get; private set; }
         public IEtchingDatabase EtchingDatabaseAccess { get; private set; }
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
@@ -27,7 +27,7 @@ namespace Repository
             AccountDatabaseAccess = new AccountStoreCoordinator(flag);
             ProfileDatabaseAccess = new ProfileStoreCoordinator(flag);
             NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
-            EventDatabaseAccess = new EventStoreCoordinator(flag);
+            GatheringDatabaseAccess = new GatheringStoreCoordinator(flag);
             EtchingDatabaseAccess = new EtchingStoreCoordinator(flag);
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);

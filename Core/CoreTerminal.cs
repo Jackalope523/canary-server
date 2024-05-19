@@ -19,7 +19,7 @@ namespace Core
         public IAccountDatabase AccountDatabase { get; init; }
         public IAdminDatabase AdminDatabase { get; init; }
         public IBannerDatabase BannerDatabase { get; init; }
-        public IEventDatabase EventDatabase { get; init; }
+        public IGatheringDatabase GatheringDatabase { get; init; }
         public IEtchingDatabase EtchingDatabase { get; init; }
         public IDisciplineDatabase DisciplineDatabase { get; init; }
         public IKeyDatabase KeyDatabase { get; init; }
@@ -31,8 +31,8 @@ namespace Core
             => AccountDirector;
         public IBannerOperations BannerOperations
             => BannerDirector;
-        public IEventOperations EventOperations
-            => EventDirector;
+        public IGatheringOperations GatheringOperations
+            => GatheringDirector;
         public IEtchingOperations EtchingOperations
             => EtchingDirector;
         public IDisciplineOperations DisciplineOperations
@@ -50,7 +50,7 @@ namespace Core
 
         internal AccountDirector AccountDirector { get; private set; }
         internal BannerDirector BannerDirector { get; private set; }
-        internal EventDirector EventDirector { get; private set; }
+        internal GatheringDirector GatheringDirector { get; private set; }
         internal EtchingDirector EtchingDirector { get; private set; }
         internal DisciplineDirector DisciplineDirector { get; private set; }
         internal KeyDirector KeyDirector { get; private set; }
@@ -64,7 +64,7 @@ namespace Core
 
         public static CoreTerminal CreateTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+            IGatheringDatabase gatheringDatabase, IEtchingDatabase etchingDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
             IProfileDatabase profileDatabase,
@@ -74,7 +74,7 @@ namespace Core
             {
                 Terminal ??= new CoreTerminal(logger,
                         accountDatabase, adminDatabase, bannerDatabase,
-                        eventDatabase, etchingDatabase,
+                        gatheringDatabase, etchingDatabase,
                         disciplineDatabase, keyDatabase,
                         mediaDatabase, notificationDatabase,
                         profileDatabase,
@@ -86,7 +86,7 @@ namespace Core
 
         protected CoreTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-			IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+			IGatheringDatabase gatheringDatabase, IEtchingDatabase etchingDatabase,
 			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
             IProfileDatabase profileDatabase,
@@ -97,7 +97,7 @@ namespace Core
             AccountDatabase = accountDatabase;
             AdminDatabase = adminDatabase;
             BannerDatabase = bannerDatabase;
-            EventDatabase = eventDatabase;
+            GatheringDatabase = gatheringDatabase;
             EtchingDatabase = etchingDatabase;
             DisciplineDatabase = disciplineDatabase;
             KeyDatabase = keyDatabase;
@@ -114,7 +114,7 @@ namespace Core
         {
             AccountDirector = new AccountDirector(this);
             BannerDirector = new BannerDirector(this);
-            EventDirector = new EventDirector(this);
+            GatheringDirector = new GatheringDirector(this);
             EtchingDirector = new EtchingDirector(this);
             DisciplineDirector = new DisciplineDirector(this);
             KeyDirector = new KeyDirector(this);

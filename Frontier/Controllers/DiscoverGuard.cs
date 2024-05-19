@@ -22,22 +22,22 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet("{latitude}-{longitude}-{distance}")]
-        public async Task<IActionResult> GetEvents(float latitude, float longitude, float distance)
+        public async Task<IActionResult> GetGatherings(float latitude, float longitude, float distance)
         {
 			return await Execute(async user =>
 			{
-				// Retrieve events personalised for the current user
-				return await events.GetPersonalisedEventsInAreaAsync(user.Id, latitude, longitude, distance);
+				// Retrieve gatherings personalised for the current user
+				return await gatherings.GetPersonalisedGatheringsInAreaAsync(user.Id, latitude, longitude, distance);
 			});
         }
 
         [HttpGet("all/{latitude}-{longitude}-{distance}")]
-        public async Task<IActionResult> GetAllEvents(float latitude, float longitude, float distance)
+        public async Task<IActionResult> GetAllGatherings(float latitude, float longitude, float distance)
         {
 			return await Execute(async user =>
 			{
-				// Retrieve all events available to the current user
-				return await events.GetEventsInAreaAsync(user.Id, latitude, longitude, distance);
+				// Retrieve all gatherings available to the current user
+				return await gatherings.GetGatheringsInAreaAsync(user.Id, latitude, longitude, distance);
 			});
         }
 

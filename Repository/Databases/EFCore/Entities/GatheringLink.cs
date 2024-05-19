@@ -2,14 +2,14 @@
 
 namespace Repository
 {
-    public class EventLink
+    public class GatheringLink
     {
         public ulong Id { get; set; }
         public ulong UserId { get; set; }
         public User User { get; set; }
-        public ulong EventId { get; set; }
-        public Event? Event { get; set; }
+        public ulong GatheringId { get; set; }
+        public Gathering? Gathering { get; set; }
         public DateTimeOffset Time { get; set; }
-        public EventBond Type { get; set; }
+        public GatheringBond Type { get; set; }
     }
 }

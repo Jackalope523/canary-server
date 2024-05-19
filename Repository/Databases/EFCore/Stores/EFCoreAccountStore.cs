@@ -39,15 +39,15 @@ namespace Repository
                 Where(u => u.Id == id).
                 ExecuteUpdate(setter => setter.SetProperty(u => u.IsPendingDeletion, true)));
 
-            List<ulong> upcomingEvents = await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.Events.
-                Where(e => e.HostId == id && e.State == EventState.Upcoming).
+            List<ulong> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Gatherings.
+                Where(e => e.HostId == id && e.State == GatheringState.Upcoming).
                 Select(e => e.Id).
                 ToListAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Events.
-               Where(e => upcomingEvents.Contains(e.Id)).
+               ctx.Gatherings.
+               Where(e => upcomingGatherings.Contains(e.Id)).
                ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
         
             await storeSentry.ExecuteWriteAsync(ctx =>

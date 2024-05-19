@@ -12,7 +12,7 @@ namespace Core.Entities
 {
     using static CoreTerminal;
 
-    internal class Event
+    internal class Gathering
     {
 		#region Variables
 
@@ -27,7 +27,7 @@ namespace Core.Entities
         public readonly Distance ArrivalDistance = new() { Metres = 75 };
         public readonly TimeSpan MaximumEtchingLateness = OneDay;
 
-        public static Event None
+        public static Gathering None
             => new() { Id = 0, Exists = false };
 
 		///////
@@ -44,21 +44,21 @@ namespace Core.Entities
         public Distance Radius { get; set; }
         public bool IsDynamic { get; set; }
         public DateTimeOffset? EndTime { get; set; }
-        public EventState State { get; set; }
+        public GatheringState State { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public bool IsDeleted { get; set; }
         public int NumberOfGuests { get; set; }
 
         public bool IsWaiting
-            => State.Equals(EventState.Upcoming) &&
+            => State.Equals(GatheringState.Upcoming) &&
                 HasAlready(StartTime);
         public bool IsOpen
-            => State.Equals(EventState.Upcoming) ||
-                State.Equals(EventState.Open);
+            => State.Equals(GatheringState.Upcoming) ||
+                State.Equals(GatheringState.Open);
         public bool IsOngoing
-            => State.Equals(EventState.Open) ||
-                State.Equals(EventState.Sealed);
+            => State.Equals(GatheringState.Open) ||
+                State.Equals(GatheringState.Sealed);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumEtchingLateness);
@@ -71,8 +71,8 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
-        public Synced<List<(User User, EventBond State)>> AllUsers { get; }
-        public Synced<List<User>> Watching { get; }
+        public Synced<List<(User User, GatheringBond State)>> AllUsers { get; }
+        public Synced<List<User>> Surveying { get; }
         public Synced<List<User>> Guests { get; }
         public Synced<List<User>> Arrived { get; }
         public Synced<List<User>> Left { get; }
@@ -80,7 +80,7 @@ namespace Core.Entities
 
         public Synced<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>> GuestHistory { get; }
 
-        public Synced<List<EventReport>> EventReports { get; }
+        public Synced<List<GatheringReport>> GatheringReports { get; }
 
         public Synced<List<EtchingShard>> Etchings { get; }
 
@@ -88,58 +88,58 @@ namespace Core.Entities
 
         #region Initialisation & Extraction
 
-        public Event()
+        public Gathering()
         {
-            AllUsers = new(() => Terminal.EventDirector.RequestAllUsersFromEventAsync(this));
-            Watching = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Watching)).ConvertAll(user => user.User));
-            Guests = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Guest)).ConvertAll(user => user.User));
-            Arrived = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Arrived)).ConvertAll(user => user.User));
-            Left = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Left)).ConvertAll(user => user.User));
-            Kicked = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(EventBond.Kicked)).ConvertAll(user => user.User));
+            AllUsers = new(() => Terminal.GatheringDirector.RequestAllUsersFromGatheringAsync(this));
+            Surveying = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Surveying)).ConvertAll(user => user.User));
+            Guests = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Guest)).ConvertAll(user => user.User));
+            Arrived = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Arrived)).ConvertAll(user => user.User));
+            Left = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Left)).ConvertAll(user => user.User));
+            Kicked = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Kicked)).ConvertAll(user => user.User));
 
-            GuestHistory = new(() => Terminal.EventDirector.RequestGuestHistoryAsync(this));
-            EventReports = new(() => Terminal.DisciplineDirector.RequestEventReportsAsync(this));
-            Etchings = new(() => Terminal.EtchingDirector.RequestEventEtchingsAsync(this));
+            GuestHistory = new(() => Terminal.GatheringDirector.RequestGuestHistoryAsync(this));
+            GatheringReports = new(() => Terminal.DisciplineDirector.RequestGatheringReportsAsync(this));
+            Etchings = new(() => Terminal.EtchingDirector.RequestGatheringEtchingsAsync(this));
         }
 
-        public Event(CoreEvent fromEvent) : this()
+        public Gathering(CoreGathering fromGathering) : this()
         {
-            Id = fromEvent.Id;
-            Host = new(fromEvent.Host);
-            Name = fromEvent.Name;
-            Description = fromEvent.Description;
-            StartTime = fromEvent.StartTime;
+            Id = fromGathering.Id;
+            Host = new(fromGathering.Host);
+            Name = fromGathering.Name;
+            Description = fromGathering.Description;
+            StartTime = fromGathering.StartTime;
             Location = new()
-                { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
-            EndTime = fromEvent.TimeEnded;
-            State = fromEvent.State;
-            GroupMinimum = fromEvent.GroupMinimum;
-            GroupMaximum = fromEvent.GroupMaximum;
-            Character = new(fromEvent.Character);
-            Radius = new() { Kilometres = fromEvent.Radius };
-            IsDynamic = fromEvent.IsDynamic;
-            IsDeleted = fromEvent.IsPendingDeletion;
-            NumberOfGuests = fromEvent.NumberOfGuests;
+                { Latitude = fromGathering.Latitude, Longitude = fromGathering.Longitude };
+            EndTime = fromGathering.TimeEnded;
+            State = fromGathering.State;
+            GroupMinimum = fromGathering.GroupMinimum;
+            GroupMaximum = fromGathering.GroupMaximum;
+            Character = new(fromGathering.Character);
+            Radius = new() { Kilometres = fromGathering.Radius };
+            IsDynamic = fromGathering.IsDynamic;
+            IsDeleted = fromGathering.IsPendingDeletion;
+            NumberOfGuests = fromGathering.NumberOfGuests;
         }
 
-        public Event(EventShard fromEvent) : this()
+        public Gathering(GatheringShard fromGathering) : this()
         {
-            Id = fromEvent.Id;
-            Host = new(fromEvent.Host);
-            Name = fromEvent.Name;
-            Description = fromEvent.Description;
-            StartTime = fromEvent.StartTime;
+            Id = fromGathering.Id;
+            Host = new(fromGathering.Host);
+            Name = fromGathering.Name;
+            Description = fromGathering.Description;
+            StartTime = fromGathering.StartTime;
             Location = new()
-                { Latitude = fromEvent.Latitude, Longitude = fromEvent.Longitude };
-            EndTime = fromEvent.TimeEnded;
-            State = fromEvent.State;
-            GroupMinimum = fromEvent.GroupMinimum;
-            GroupMaximum = fromEvent.GroupMaximum;
-            Radius = new() { Kilometres = fromEvent.Radius };
-            NumberOfGuests = fromEvent.NumberOfGuests;
+                { Latitude = fromGathering.Latitude, Longitude = fromGathering.Longitude };
+            EndTime = fromGathering.TimeEnded;
+            State = fromGathering.State;
+            GroupMinimum = fromGathering.GroupMinimum;
+            GroupMaximum = fromGathering.GroupMaximum;
+            Radius = new() { Kilometres = fromGathering.Radius };
+            NumberOfGuests = fromGathering.NumberOfGuests;
         }
 
-        public CoreEvent ToCoreEvent()
+        public CoreGathering ToCoreGathering()
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
@@ -147,7 +147,7 @@ namespace Core.Entities
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
         }
 
-        public EventShard ToEventShard()
+        public GatheringShard ToGatheringShard()
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
@@ -155,7 +155,7 @@ namespace Core.Entities
                 Radius.Kilometres, NumberOfGuests);
         }
 
-        public EventHeader ToEventHeader(DateTimeOffset lastActiveTime)
+        public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
             return new(Id, Name, IsActive, lastActiveTime, Location.Latitude, Location.Longitude);
         }
@@ -172,23 +172,23 @@ namespace Core.Entities
             Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
 
-            // Verify Event is now or in the future
-            if (HappenedBefore(StartTime, Time)) { issues += "Event is in the past. "; }
+            // Verify Gathering is now or in the future
+            if (HappenedBefore(StartTime, Time)) { issues += "Gathering is in the past. "; }
 
-            // Verify Event is within a reasonable time
-            if (After(StartTime, Time + OneWeek)) { issues += "Event is too far in the future. "; }
+            // Verify Gathering is within a reasonable time
+            if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }
 
             // Verify group bounds
             if (GroupMaximum != 0 &&
                 (GroupMaximum <= GroupMinimum ||
-                GroupMaximum < 4)) { issues += "Event group bounds invalid. "; }
+                GroupMaximum < 4)) { issues += "Gathering group bounds invalid. "; }
 
             return issues.Equals("");
         }
 
-        public async Task<List<(User User, EventBond State)>> GetFriendsOf(User user)
+        public async Task<List<(User User, GatheringBond State)>> GetFriendsOf(User user)
         {
-            List<(User User, EventBond State)> friends = new();
+            List<(User User, GatheringBond State)> friends = new();
 
             foreach (var userDetails in await AllUsers)
             {
@@ -212,13 +212,13 @@ namespace Core.Entities
 
 		public async Task<bool> IsVisibleTo(User user)
 		{
-			// Note: This is efficient with multiple users. For multiple events, see User.CanView
+			// Note: This is efficient with multiple users. For multiple gatherings, see User.CanView
 
             // Check if user is host
             if (IsHostedBy(user))
             { return true; }
 
-            // Check if event is deleted
+            // Check if gathering is deleted
             if (IsDeleted)
             { return false; }
 
@@ -229,13 +229,13 @@ namespace Core.Entities
 			// Check if user's account is limited
 			if (!user.CanAttend)
 			{
-				// User cannot join normal events
-                // Check if user can join friend events and Host is friends with the user
+				// User cannot join normal gatherings
+                // Check if user can join friend gatherings and Host is friends with the user
 				if (!user.CanAttendFriends || !await Host.IsFriendsWith(user))
 				{ return false; }
 			}
 
-			// Check if user is blocked by or blocking event host
+			// Check if user is blocked by or blocking gathering host
 			if (await Host.IsBlockedBy(user) || await Host.IsBlocking(user))
 			{ return false; }
 
@@ -244,15 +244,15 @@ namespace Core.Entities
 
         public async Task<bool> IsJoinableBy(User user)
         {
-            // Check if event is joinable
+            // Check if gathering is joinable
             if (!IsOpen)
             { return false; }
 
-            // Check if user can see event
+            // Check if user can see gathering
             if (!await IsVisibleTo(user))
             { return false; }
 
-            // Check if user is kicked from event
+            // Check if user is kicked from gathering
             if ((await Kicked).Contains(user))
             { return false; }
 
@@ -266,7 +266,7 @@ namespace Core.Entities
 
         public bool IsModifiableBy(User user)
         {
-			// Check if user is event host
+			// Check if user is gathering host
 			if (Host.Id.Equals(user.Id))
 			{ return true; }
 
@@ -275,7 +275,7 @@ namespace Core.Entities
 
         public bool IsHostedBy(User user)
         {
-			// Check if user is event host
+			// Check if user is gathering host
 			if (Host.Equals(user))
 			{ return true; }
 
@@ -284,7 +284,7 @@ namespace Core.Entities
 
         public async Task<bool> HasUserRelationship(User user)
         {
-            // Check if user has interacted with event
+            // Check if user has interacted with gathering
             return IsHostedBy(user) || (await AllUsers).FindAll(x => x.User.Id == user.Id).Count == 1;
         }
 
@@ -299,7 +299,7 @@ namespace Core.Entities
 
         public async Task<bool> IsStartable()
         {
-            // Check if event has not yet started
+            // Check if gathering has not yet started
             if (!IsWaiting)
             { return false; }
 
@@ -316,7 +316,7 @@ namespace Core.Entities
 
         public async Task Started()
         {
-            _ = NotifyActive($"{Name}", "Event is active!");
+            _ = NotifyActive($"{Name}", "Gathering is active!");
         }
 
         public async Task<List<User>> Ended()
@@ -330,8 +330,8 @@ namespace Core.Entities
 
                 updatedGuests.Add(guest);
 
-				// Notify of event ending
-				_ = guest.Notify($"{Name}", $"Event has concluded.");
+				// Notify of gathering ending
+				_ = guest.Notify($"{Name}", $"Gathering has concluded.");
 			}
 
             return updatedGuests;
@@ -339,23 +339,23 @@ namespace Core.Entities
 
         public async Task Etched(User user)
         {
-            // Verify etching is not before event starting or user is host
+            // Verify etching is not before gathering starting or user is host
             Try(HasAlready(StartTime) || IsModifiableBy(user),
-                new InvalidEventException("Event has yet to start."));
+                new InvalidGatheringException("Gathering has yet to start."));
 
-            // Verify user can etch into the event
+            // Verify user can etch into the gathering
             Try(await WasAttendedBy(user) || IsModifiableBy(user),
-                new InvalidEventException("User did not attend event."));
+                new InvalidGatheringException("User did not attend gathering."));
 
-            // Verify etching is added before event is closed
+            // Verify etching is added before gathering is closed
             Try(IsActive,
-                new InvalidEventException("Event has already ended."));
+                new InvalidGatheringException("Gathering has already ended."));
 		}
 
 		public async Task<bool> Reported()
         {
             // Check if there are enough reports
-            if ((await EventReports).Count < 3)
+            if ((await GatheringReports).Count < 3)
             { return false; }
 
             return true;
@@ -393,7 +393,7 @@ namespace Core.Entities
 
 		public override bool Equals(object obj)
 		{
-			return obj is Event other &&
+			return obj is Gathering other &&
                 Exists == other.Exists &&
                 Id.Equals(other.Id);
 		}

@@ -2,27 +2,27 @@
 
 namespace Repository
 {
-    internal class EventLinkFactory
+    internal class GatheringLinkFactory
     {
         int created = 0;
-        internal EventLink Create(User user, Event @event, EventBond type)
+        internal GatheringLink Create(User user, Gathering @gathering, GatheringBond type)
         {
             created++;
-            return new EventLink
+            return new GatheringLink
             {
                 UserId = user.Id,
-                EventId = @event.Id,
+                GatheringId = @gathering.Id,
                 Type = type,
                 Time = DateTimeOffset.MinValue.AddHours(created)
             };
         }
-        internal EventLink Create(User user, Event @event, EventBond type, DateTimeOffset time)
+        internal GatheringLink Create(User user, Gathering @gathering, GatheringBond type, DateTimeOffset time)
         {
             created++;
-            return new EventLink
+            return new GatheringLink
             {
                 UserId = user.Id,
-                EventId = @event.Id,
+                GatheringId = @gathering.Id,
                 Type = type,
                 Time = time
             };

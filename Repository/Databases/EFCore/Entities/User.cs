@@ -20,7 +20,7 @@ namespace Repository
         public DateTimeOffset? LockoutDate { get; set; } = DefaultLockoutDate;
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
-        public ulong? CurrentEvent { get; set; } = DefaultCurrentEvent;
+        public ulong? CurrentGathering { get; set; } = DefaultCurrentGathering;
         public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
 
         // Vector
@@ -41,7 +41,7 @@ namespace Repository
 
         // Navigation Properties
         public List<UserLink>? UserLinks { get; set; }
-        public List<EventLink>? EventLinks { get; set; }
+        public List<GatheringLink>? GatheringLinks { get; set; }
         public List<PostLink>? PostLinks { get; set; }
         public List<UserReport>? ReporterList { get; set; }
         public List<UserReport>? ReporteeList { get; set; }
@@ -65,7 +65,7 @@ namespace Repository
         public static DateTimeOffset? DefaultLockoutDate { get; set; } = null;
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
-        public static ulong? DefaultCurrentEvent { get; set; } = null;
+        public static ulong? DefaultCurrentGathering { get; set; } = null;
         public static bool DefaultIsPendingDeletion { get; set; } = false;
 
         // Vector

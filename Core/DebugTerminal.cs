@@ -26,7 +26,7 @@ namespace Core
 
 		public static DebugTerminal CreateDebugTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+            IGatheringDatabase gatheringDatabase, IEtchingDatabase etchingDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
             IProfileDatabase profileDatabase,
@@ -36,7 +36,7 @@ namespace Core
 			{
 				Terminal ??= new DebugTerminal(logger,
                         accountDatabase, adminDatabase, bannerDatabase,
-                        eventDatabase, etchingDatabase,
+                        gatheringDatabase, etchingDatabase,
                         disciplineDatabase, keyDatabase,
                         mediaDatabase, notificationDatabase,
                         profileDatabase,
@@ -49,14 +49,14 @@ namespace Core
 
 		protected DebugTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+            IGatheringDatabase gatheringDatabase, IEtchingDatabase etchingDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
             IProfileDatabase profileDatabase,
             INotificationService notificationService, IDebugDatabase debugDatabase)
 			: base(logger,
 					accountDatabase, adminDatabase, bannerDatabase,
-					eventDatabase, etchingDatabase,
+					gatheringDatabase, etchingDatabase,
 					disciplineDatabase, keyDatabase,
 					mediaDatabase, notificationDatabase,
 					profileDatabase,  notificationService)
