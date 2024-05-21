@@ -67,10 +67,10 @@ namespace Core.Tests.Entities
 			var randomGuest = await environment.GenerateUniqueUserAsync();
 			await environment.ForceCompanionshipAsync(user, companion1, companion2);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, user, companion1, companion2, randomGuest);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host, user, companion1, companion2, randomGuest);
 
 			// Act
-			var companions = await @gathering.GetCompanionsOf(companion2);
+			var companions = await gathering.GetCompanionsOf(companion2);
 
 			// Assert
 			Assert.Equal(2, companions.Count);
@@ -86,10 +86,10 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = await @gathering.IsVisibleTo(user);
+			var result = await gathering.IsVisibleTo(user);
 
 			// Assert
 			Assert.True(result);
@@ -103,10 +103,10 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = await @gathering.IsVisibleTo(user);
+			var result = await gathering.IsVisibleTo(user);
 
 			// Assert
 			Assert.False(result);
@@ -118,11 +118,11 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.UpdateUserLocationAsync(user, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
 			// Act
-			var result = await @gathering.IsJoinableBy(user);
+			var result = await gathering.IsJoinableBy(user);
 
 			// Assert
 			Assert.True(result);
@@ -136,10 +136,10 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = await @gathering.IsJoinableBy(user);
+			var result = await gathering.IsJoinableBy(user);
 
 			// Assert
 			Assert.False(result);
@@ -151,10 +151,10 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = @gathering.IsModifiableBy(host);
+			var result = gathering.IsModifiableBy(host);
 
 			// Assert
 			Assert.True(result);
@@ -167,10 +167,10 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, guest);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host, guest);
 
 			// Act
-			var result = @gathering.IsModifiableBy(guest);
+			var result = gathering.IsModifiableBy(guest);
 
 			// Assert
 			Assert.False(result);
@@ -184,10 +184,10 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = @gathering.IsModifiableBy(user);
+			var result = gathering.IsModifiableBy(user);
 
 			// Assert
 			Assert.False(result);
@@ -200,10 +200,10 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = @gathering.IsHostedBy(host);
+			var result = gathering.IsHostedBy(host);
 
 			// Assert
 			Assert.True(result);
@@ -216,10 +216,10 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, guest);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host, guest);
 
 			// Act
-			var result = @gathering.IsHostedBy(guest);
+			var result = gathering.IsHostedBy(guest);
 
 			// Assert
 			Assert.False(result);
@@ -232,10 +232,10 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = @gathering.IsHostedBy(user);
+			var result = gathering.IsHostedBy(user);
 
 			// Assert
 			Assert.False(result);
@@ -247,10 +247,10 @@ namespace Core.Tests.Entities
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = await @gathering.HasUserRelationship(host);
+			var result = await gathering.HasUserRelationship(host);
 
 			// Assert
 			Assert.True(result);
@@ -263,11 +263,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var surveyingUser = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, surveyingUser, GatheringBond.Surveying);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, surveyingUser, GatheringBond.Surveying);
 
 			// Act
-			var result = await @gathering.HasUserRelationship(surveyingUser);
+			var result = await gathering.HasUserRelationship(surveyingUser);
 
 			// Assert
 			Assert.True(result);
@@ -280,11 +280,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var incomingGuest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, incomingGuest, GatheringBond.Guest);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, incomingGuest, GatheringBond.Guest);
 
 			// Act
-			var result = await @gathering.HasUserRelationship(incomingGuest);
+			var result = await gathering.HasUserRelationship(incomingGuest);
 
 			// Assert
 			Assert.True(result);
@@ -297,11 +297,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, guest, GatheringBond.Arrived);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, guest, GatheringBond.Arrived);
 
 			// Act
-			var result = await @gathering.HasUserRelationship(guest);
+			var result = await gathering.HasUserRelationship(guest);
 
 			// Assert
 			Assert.True(result);
@@ -314,11 +314,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var leftGuest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, leftGuest, GatheringBond.Left);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, leftGuest, GatheringBond.Left);
 
 			// Act
-			var result = await @gathering.HasUserRelationship(leftGuest);
+			var result = await gathering.HasUserRelationship(leftGuest);
 
 			// Assert
 			Assert.True(result);
@@ -331,11 +331,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var kickedGuest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, kickedGuest, GatheringBond.Kicked);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, kickedGuest, GatheringBond.Kicked);
 
 			// Act
-			var result = await @gathering.HasUserRelationship(kickedGuest);
+			var result = await gathering.HasUserRelationship(kickedGuest);
 
 			// Assert
 			Assert.True(result);
@@ -348,10 +348,10 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = await @gathering.HasUserRelationship(user);
+			var result = await gathering.HasUserRelationship(user);
 
 			// Assert
 			Assert.False(result);
@@ -364,11 +364,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, guest, GatheringBond.Arrived);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, guest, GatheringBond.Arrived);
 
 			// Act
-			var result = await @gathering.WasAttendedBy(guest);
+			var result = await gathering.WasAttendedBy(guest);
 
 			// Assert
 			Assert.True(result);
@@ -381,11 +381,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var leftGuest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, leftGuest, GatheringBond.Left);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, leftGuest, GatheringBond.Left);
 
 			// Act
-			var result = await @gathering.WasAttendedBy(leftGuest);
+			var result = await gathering.WasAttendedBy(leftGuest);
 
 			// Assert
 			Assert.True(result);
@@ -398,11 +398,11 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var kickedGuest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, kickedGuest, GatheringBond.Kicked);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, kickedGuest, GatheringBond.Kicked);
 
 			// Act
-			var result = await @gathering.WasAttendedBy(kickedGuest);
+			var result = await gathering.WasAttendedBy(kickedGuest);
 
 			// Assert
 			Assert.False(result);
@@ -415,10 +415,10 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var result = await @gathering.WasAttendedBy(user);
+			var result = await gathering.WasAttendedBy(user);
 
 			// Assert
 			Assert.False(result);
@@ -431,13 +431,13 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 			await environment.UpdateUserLocationAsync(user,
-				@gathering.Location.Latitude,
-				@gathering.Location.Longitude);
+				gathering.Location.Latitude,
+				gathering.Location.Longitude);
 
 			// Act
-			var result = await @gathering.IsInRange(user);
+			var result = await gathering.IsInRange(user);
 
 			// Assert
 			Assert.True(result);
@@ -450,13 +450,13 @@ namespace Core.Tests.Entities
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 			await environment.UpdateUserLocationAsync(user,
-				@gathering.Location.Latitude + 15,
-				@gathering.Location.Longitude + 15);
+				gathering.Location.Latitude + 15,
+				gathering.Location.Longitude + 15);
 
 			// Act
-			var result = await @gathering.IsInRange(user);
+			var result = await gathering.IsInRange(user);
 
 			// Assert
 			Assert.False(result);
@@ -467,17 +467,17 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = environment.CreateTestGathering(host);
-			@gathering.StartTime = Psijic.Time;
-			@gathering = await environment.GenerateGatheringUnsafeAsync(@gathering, host);
+			var gathering = environment.CreateTestGathering(host);
+			gathering.StartTime = Psijic.Time;
+			gathering = await environment.GenerateGatheringUnsafeAsync(gathering, host);
 
-			await environment.SetGatheringState(@gathering, GatheringState.Upcoming);
+			await environment.SetGatheringState(gathering, GatheringState.Upcoming);
 			await environment.UpdateUserLocationAsync(host,
-				@gathering.Location.Latitude,
-				@gathering.Location.Longitude);
+				gathering.Location.Latitude,
+				gathering.Location.Longitude);
 
 			// Act
-			var result = await @gathering.IsStartable();
+			var result = await gathering.IsStartable();
 
 			// Assert
 			Assert.True(result);
@@ -488,10 +488,10 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host);
 
 			// Act
-			var result = await @gathering.IsStartable();
+			var result = await gathering.IsStartable();
 
 			// Assert
 			Assert.False(result);
@@ -502,14 +502,14 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			await environment.UpdateUserLocationAsync(host,
-				@gathering.Location.Latitude + 15,
-				@gathering.Location.Longitude + 15);
+				gathering.Location.Latitude + 15,
+				gathering.Location.Longitude + 15);
 
 			// Act
-			var result = await @gathering.IsStartable();
+			var result = await gathering.IsStartable();
 
 			// Assert
 			Assert.False(result);
@@ -524,10 +524,10 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			await @gathering.Started();
+			await gathering.Started();
 			// If no exception is thrown, the test is successful
 		}
 
@@ -536,10 +536,10 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			await @gathering.Ended();
+			await gathering.Ended();
 			// If no exception is thrown, the test is successful
 		}
 
@@ -548,10 +548,10 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			await @gathering.Reported();
+			await gathering.Reported();
 			// If no exception is thrown, the test is successful
 		}
 
@@ -567,16 +567,16 @@ namespace Core.Tests.Entities
 			var incomingUser = await environment.GenerateUniqueUserAsync();
 			var activeGuest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, incomingUser, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, activeGuest, GatheringBond.Arrived);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, incomingUser, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(gathering, activeGuest, GatheringBond.Arrived);
 
 			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
 			await environment.SubscribeUserAsync(activeGuest, DeviceType.iOS, activeGuest.Id.ToString());
 			string notificationTitle = "gathering title", notificationMessage = "message test";
 
 			// Act
-			await @gathering.NotifyActive(notificationTitle, notificationMessage);
+			await gathering.NotifyActive(notificationTitle, notificationMessage);
 
 			// Assert
 			var incomingUserMessages = environment.GetUserMessages(incomingUser);
@@ -603,10 +603,10 @@ namespace Core.Tests.Entities
 			var leftGuest = await environment.GenerateUniqueUserAsync();
 			var activeGuest = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, incomingUser, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, leftGuest, GatheringBond.Left);
-			await environment.AddUserToGatheringAsync(@gathering, activeGuest, GatheringBond.Arrived);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, incomingUser, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(gathering, leftGuest, GatheringBond.Left);
+			await environment.AddUserToGatheringAsync(gathering, activeGuest, GatheringBond.Arrived);
 
 			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
 			await environment.SubscribeUserAsync(leftGuest, DeviceType.iOS, leftGuest.Id.ToString());
@@ -614,7 +614,7 @@ namespace Core.Tests.Entities
 			string notificationTitle = "gathering title", notificationMessage = "message test";
 
 			// Act
-			await @gathering.NotifyGuests(notificationTitle, notificationMessage);
+			await gathering.NotifyGuests(notificationTitle, notificationMessage);
 
 			// Assert
 			var incomingUserMessages = environment.GetUserMessages(incomingUser);

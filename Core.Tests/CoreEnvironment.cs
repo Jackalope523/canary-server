@@ -273,15 +273,15 @@ namespace Core.Tests
 			return gatherings;
 		}
 
-		internal async Task AddUserToGatheringAsync(Gathering @gathering, User user, GatheringBond state)
+		internal async Task AddUserToGatheringAsync(Gathering gathering, User user, GatheringBond state)
 		{
-			await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, @gathering.Id, state, DateTimeOffset.UtcNow);
+			await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, gathering.Id, state, DateTimeOffset.UtcNow);
 		}
 
-		internal async Task SetGatheringState(Gathering @gathering, GatheringState state)
+		internal async Task SetGatheringState(Gathering gathering, GatheringState state)
 		{
-			await Terminal.GatheringDatabase.UpdateGatheringAsync(@gathering.Id, new() { (nameof(Gathering.State), state) });
-			@gathering.State = state;
+			await Terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(Gathering.State), state) });
+			gathering.State = state;
 		}
 
 		/////////

@@ -300,16 +300,16 @@ namespace Core.Entities
             return true;
         }
 
-		public async Task<bool> CanView(Gathering @gathering)
+		public async Task<bool> CanView(Gathering gathering)
 		{
             // Note: This is efficient with multiple gatherings. For multiple users, see Gathering.IsVisibleTo
 
             // Check if user is host
-            if (@gathering.IsHostedBy(this))
+            if (gathering.IsHostedBy(this))
             { return true; }
 
             // Check if gathering is deleted
-            if (@gathering.IsDeleted)
+            if (gathering.IsDeleted)
             { return false; }
 
 			// Check if user account is locked
@@ -321,47 +321,47 @@ namespace Core.Entities
 			{
                 // User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!CanAttendCompanions || !await IsCompanionsWith(@gathering.Host))
+				if (!CanAttendCompanions || !await IsCompanionsWith(gathering.Host))
 				{ return false; }
 			}
 
             // Check if user is blocked by or blocking gathering host
-            if (await IsBlockedBy(@gathering.Host) || await IsBlocking(@gathering.Host))
+            if (await IsBlockedBy(gathering.Host) || await IsBlocking(gathering.Host))
 			{ return false; }
 
 			return true;
 		}
 
-		public async Task<bool> CanJoin(Gathering @gathering)
+		public async Task<bool> CanJoin(Gathering gathering)
 		{
 			// Check if gathering is joinable
-			if (!@gathering.IsOpen)
+			if (!gathering.IsOpen)
 			{ return false; }
 
 			// Check if user can see gathering
-			if (!await CanView(@gathering))
+			if (!await CanView(gathering))
 			{ return false; }
 
 			// Check if user or user's haunt is within a reasonable distance
-			if (!GeoLocation.AreInRange(await LastKnownLocation, @gathering.Location, @gathering.MaximumJoinDistance) &&
-				!GeoLocation.AreInRange(await Haunt, @gathering.Location, @gathering.MaximumJoinDistance))
+			if (!GeoLocation.AreInRange(await LastKnownLocation, gathering.Location, gathering.MaximumJoinDistance) &&
+				!GeoLocation.AreInRange(await Haunt, gathering.Location, gathering.MaximumJoinDistance))
 			{ return false; }
 
 			return true;
 		}
 
-        public async Task CanEtch(Gathering @gathering)
+        public async Task CanEtch(Gathering gathering)
 		{
 			// Verify snapshot is not before gathering starting or user is host
-			Try(HasAlready(@gathering.StartTime) || @gathering.IsModifiableBy(this),
+			Try(HasAlready(gathering.StartTime) || gathering.IsModifiableBy(this),
 				new InvalidGatheringException("Gathering has yet to start."));
 
 			// Verify user can etch into the gathering
-			Try(await @gathering.WasAttendedBy(this) || @gathering.IsModifiableBy(this),
+			Try(await gathering.WasAttendedBy(this) || gathering.IsModifiableBy(this),
 				new InvalidGatheringException("User did not attend gathering."));
 
 			// Verify snapshot is added before gathering is closed
-			Try(@gathering.IsActive,
+			Try(gathering.IsActive,
 				new InvalidGatheringException("Gathering has already ended."));
 		}
 

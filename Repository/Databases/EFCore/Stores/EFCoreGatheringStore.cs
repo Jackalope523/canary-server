@@ -91,10 +91,10 @@ namespace Repository
             Select(u => u.CurrentGathering).
             SingleAsync());
 
-            CoreGathering? @gathering = null;
+            CoreGathering? gathering = null;
             if (currentGathering != null)
             {
-                @gathering = await storeSentry.ExecuteReadAsync(ctx =>
+                gathering = await storeSentry.ExecuteReadAsync(ctx =>
                     ctx.Gatherings.
                     Where(e => e.Id == currentGathering).
                     Select(e => new CoreGathering
@@ -126,14 +126,14 @@ namespace Repository
 
                 UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Users.
-                Where(u => u.Id == @gathering.Host.Id).
+                Where(u => u.Id == gathering.Host.Id).
                 Select(u => new UserSilhouette(u.Id, u.Name)).
                 SingleAsync());
 
 
-                @gathering =  @gathering with { Host = host };
+                gathering =  gathering with { Host = host };
             }
-            return @gathering;          
+            return gathering;          
         }
         public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(ulong id) 
         {
@@ -349,7 +349,7 @@ namespace Repository
         }
         public async Task<CoreGathering> FindGatheringAsync(ulong id)
         {
-            CoreGathering @gathering = await storeSentry.ExecuteReadAsync(ctx => 
+            CoreGathering gathering = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Gatherings.
             Where(e => e.Id == id).
             Select(e => new CoreGathering
@@ -380,9 +380,9 @@ namespace Repository
                )).
              SingleAsync());
 
-            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == @gathering.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync()) ;
+            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == gathering.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync()) ;
 
-            return @gathering with {Host = host } ;
+            return gathering with {Host = host } ;
         }
         public async Task<List<CoreGathering>> FindGatheringsAsync(double latitude, double longitude, double distance)
         {

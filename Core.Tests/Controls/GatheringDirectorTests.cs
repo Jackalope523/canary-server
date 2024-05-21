@@ -23,13 +23,13 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			Gathering returnedGathering = new(await director.GetGatheringInformationAsync(host.Id, @gathering.Id));
+			Gathering returnedGathering = new(await director.GetGatheringInformationAsync(host.Id, gathering.Id));
 
 			// Assert
-			Assert.True(@gathering.Equals(returnedGathering));
+			Assert.True(gathering.Equals(returnedGathering));
 		}
 
 		[Fact]
@@ -39,13 +39,13 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			Gathering returnedGathering = new(await director.GetGatheringInformationAsync(user.Id, @gathering.Id));
+			Gathering returnedGathering = new(await director.GetGatheringInformationAsync(user.Id, gathering.Id));
 
 			// Assert
-			Assert.True(@gathering.Equals(returnedGathering));
+			Assert.True(gathering.Equals(returnedGathering));
 		}
 
 		[Fact]
@@ -56,10 +56,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var returnedGathering = director.GetGatheringInformationAsync(user.Id, @gathering.Id);
+			var returnedGathering = director.GetGatheringInformationAsync(user.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await returnedGathering);
@@ -72,10 +72,10 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUniqueGatheringAsync(host);
+			var gathering = await environment.GenerateUniqueGatheringAsync(host);
 
 			// Act
-			var nearbyGatherings = await director.GetGatheringsInAreaAsync(user.Id, @gathering.Location.Latitude, @gathering.Location.Longitude, 10);
+			var nearbyGatherings = await director.GetGatheringsInAreaAsync(user.Id, gathering.Location.Latitude, gathering.Location.Longitude, 10);
 
 			// Assert
 			Assert.Single(nearbyGatherings);
@@ -124,10 +124,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(host, user);
 
-			var @gathering = await environment.GenerateUniqueGatheringAsync(host);
+			var gathering = await environment.GenerateUniqueGatheringAsync(host);
 			
 			// Act
-			var nearbyGatherings = await director.GetGatheringsInAreaAsync(user.Id, @gathering.Location.Latitude, @gathering.Location.Longitude, 10);
+			var nearbyGatherings = await director.GetGatheringsInAreaAsync(user.Id, gathering.Location.Latitude, gathering.Location.Longitude, 10);
 
 			// Assert
 			Assert.Empty(nearbyGatherings);
@@ -153,10 +153,10 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var nearbyGatherings = await director.GetGatheringsInAreaAsync(user.Id, @gathering.Location.Latitude, @gathering.Location.Longitude, 10);
+			var nearbyGatherings = await director.GetGatheringsInAreaAsync(user.Id, gathering.Location.Latitude, gathering.Location.Longitude, 10);
 
 			// Assert
 			Assert.Single(nearbyGatherings);
@@ -233,7 +233,7 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = environment.GenerateUpcomingGatheringAsync(host);
 			var conflictingGathering = environment.CreateTestGathering(host);
 
 			// Act
@@ -290,18 +290,18 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = environment.CreateTestGathering(user);
-			@gathering.StartTime = DateTimeOffset.UtcNow;
+			var gathering = environment.CreateTestGathering(user);
+			gathering.StartTime = DateTimeOffset.UtcNow;
 
-			@gathering = await environment.GenerateGatheringUnsafeAsync(@gathering, user);
-			await environment.UpdateUserLocationAsync(user, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			gathering = await environment.GenerateGatheringUnsafeAsync(gathering, user);
+			await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
 			// Act
-			await director.StartGatheringAsync(user.Id, @gathering.Id);
+			await director.StartGatheringAsync(user.Id, gathering.Id);
 
 			// Assert
-			Gathering startedGathering = new(await environment.Terminal.GatheringDatabase.FindGatheringAsync(@gathering.Id));
-			Assert.Equal(@gathering, startedGathering);
+			Gathering startedGathering = new(await environment.Terminal.GatheringDatabase.FindGatheringAsync(gathering.Id));
+			Assert.Equal(gathering, startedGathering);
 			Assert.Equal(GatheringState.Open, startedGathering.State);
 		}
 
@@ -311,10 +311,10 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(user);
+			var gathering = await environment.GenerateOngoingGatheringAsync(user);
 
 			// Act
-			await director.EndGatheringAsync(user.Id, @gathering.Id);
+			await director.EndGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -325,10 +325,10 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			await director.SurveyGatheringAsync(user.Id, @gathering.Id);
+			await director.SurveyGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -339,10 +339,10 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GeneratePastGatheringAsync(host);
+			var gathering = await environment.GeneratePastGatheringAsync(host);
 
 			// Act
-			var surveySync = director.SurveyGatheringAsync(user.Id, @gathering.Id);
+			var surveySync = director.SurveyGatheringAsync(user.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await surveySync);
@@ -355,11 +355,11 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await director.SurveyGatheringAsync(user.Id, @gathering.Id);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await director.SurveyGatheringAsync(user.Id, gathering.Id);
 
 			// Act
-			await director.UnsurveyGatheringAsync(user.Id, @gathering.Id);
+			await director.UnsurveyGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -370,11 +370,11 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-            await environment.UpdateUserLocationAsync(user, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+            await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
             // Act
-            await director.JoinGatheringAsync(user.Id, @gathering.Id);
+            await director.JoinGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -385,11 +385,11 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GeneratePastGatheringAsync(host);
-            await environment.UpdateUserLocationAsync(user, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			var gathering = await environment.GeneratePastGatheringAsync(host);
+            await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
             // Act
-            var join = director.SurveyGatheringAsync(user.Id, @gathering.Id);
+            var join = director.SurveyGatheringAsync(user.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await join);
@@ -402,12 +402,12 @@ namespace Core.Tests.Controls
 			var host = await environment.GenerateUniqueUserAsync();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-            await environment.UpdateUserLocationAsync(user, @gathering.Location.Latitude, @gathering.Location.Longitude);
-            await director.JoinGatheringAsync(user.Id, @gathering.Id);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+            await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
+            await director.JoinGatheringAsync(user.Id, gathering.Id);
 
 			// Act
-			await director.LeaveGatheringAsync(user.Id, @gathering.Id);
+			await director.LeaveGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -421,13 +421,13 @@ namespace Core.Tests.Controls
 			var incoming = await environment.GenerateUniqueUserAsync();
 			var surveyer = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(user, guest);
-			await environment.AddUserToGatheringAsync(@gathering, left, GatheringBond.Left);
-			await environment.AddUserToGatheringAsync(@gathering, incoming, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, surveyer, GatheringBond.Surveying);
+			var gathering = await environment.GenerateOngoingGatheringAsync(user, guest);
+			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
+			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Surveying);
 
 			// Act
-			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @gathering.Id);
+			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
 			Assert.Equal(1, Surveyers);
@@ -453,15 +453,15 @@ namespace Core.Tests.Controls
 
 			await environment.ForceCompanionshipAsync(user, incomingCompanion, surveyingCompanion);
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host, user);
-			await environment.AddUserToGatheringAsync(@gathering, left, GatheringBond.Left);
-			await environment.AddUserToGatheringAsync(@gathering, incoming, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, incomingCompanion, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, surveyer, GatheringBond.Surveying);
-			await environment.AddUserToGatheringAsync(@gathering, surveyingCompanion, GatheringBond.Surveying);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host, user);
+			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
+			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(gathering, incomingCompanion, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Surveying);
 
 			// Act
-			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @gathering.Id);
+			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
 			Assert.Equal(1, Surveyers);
@@ -489,16 +489,16 @@ namespace Core.Tests.Controls
 
 			await environment.ForceCompanionshipAsync(user, guestCompanion, leftCompanion, incomingCompanion, surveyingCompanion);
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guestCompanion);
-			await environment.AddUserToGatheringAsync(@gathering, left, GatheringBond.Left);
-			await environment.AddUserToGatheringAsync(@gathering, leftCompanion, GatheringBond.Left);
-			await environment.AddUserToGatheringAsync(@gathering, incoming, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, incomingCompanion, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(@gathering, surveyer, GatheringBond.Surveying);
-			await environment.AddUserToGatheringAsync(@gathering, surveyingCompanion, GatheringBond.Surveying);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host, guestCompanion);
+			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
+			await environment.AddUserToGatheringAsync(gathering, leftCompanion, GatheringBond.Left);
+			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(gathering, incomingCompanion, GatheringBond.Guest);
+			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Surveying);
 
 			// Act
-			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @gathering.Id);
+			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
 			Assert.Equal(1, Surveyers);
@@ -521,10 +521,10 @@ namespace Core.Tests.Controls
 
 			await environment.ForceCompanionshipAsync(user, companion);
 
-			var @gathering = await environment.GeneratePastGatheringAsync(host, companion, stranger);
+			var gathering = await environment.GeneratePastGatheringAsync(host, companion, stranger);
 
 			// Act
-			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, @gathering.Id);
+			var (Surveyers, GuestCount, Guests) = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
 			Assert.Equal(0, Surveyers);
@@ -544,10 +544,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(user, host);
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host);
 
 			// Act
-			var guestList = director.GetGuestListAsync(user.Id, @gathering.Id);
+			var guestList = director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await guestList);
@@ -562,11 +562,11 @@ namespace Core.Tests.Controls
 			var companion = await environment.GenerateUniqueUserAsync();
 			await environment.ForceCompanionshipAsync(user, companion);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, user);
-			await environment.UpdateUserLocationAsync(companion, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host, user);
+			await environment.UpdateUserLocationAsync(companion, gathering.Location.Latitude, gathering.Location.Longitude);
 
 			// Act
-			var invitees = await director.GetPotentialInviteesAsync(user.Id, @gathering.Id);
+			var invitees = await director.GetPotentialInviteesAsync(user.Id, gathering.Id);
 
 			// Assert
 			Assert.Single(invitees);
@@ -581,11 +581,11 @@ namespace Core.Tests.Controls
 			var companion = await environment.GenerateUniqueUserAsync();
 			await environment.ForceCompanionshipAsync(user, companion);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host, user);
-            await environment.UpdateUserLocationAsync(companion, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host, user);
+            await environment.UpdateUserLocationAsync(companion, gathering.Location.Latitude, gathering.Location.Longitude);
 
             // Act
-            await director.InviteUserAsync(user.Id, companion.Id, @gathering.Id);
+            await director.InviteUserAsync(user.Id, companion.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -598,10 +598,10 @@ namespace Core.Tests.Controls
 			var companion = await environment.GenerateUniqueUserAsync();
 			await environment.ForceCompanionshipAsync(user, companion);
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var invite = director.InviteUserAsync(user.Id, companion.Id, @gathering.Id);
+			var invite = director.InviteUserAsync(user.Id, companion.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await invite);
@@ -614,10 +614,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var stranger = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(user);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(user);
 
 			// Act
-			var invite = director.InviteUserAsync(user.Id, stranger.Id, @gathering.Id);
+			var invite = director.InviteUserAsync(user.Id, stranger.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await invite);
@@ -630,10 +630,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var stranger = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(user, stranger);
+			var gathering = await environment.GenerateOngoingGatheringAsync(user, stranger);
 
 			// Act
-			await director.KickUserAsync(user.Id, stranger.Id, @gathering.Id);
+			await director.KickUserAsync(user.Id, stranger.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -645,10 +645,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 			var stranger = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host, user, stranger);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host, user, stranger);
 
 			// Act
-			var kick = director.KickUserAsync(user.Id, stranger.Id, @gathering.Id);
+			var kick = director.KickUserAsync(user.Id, stranger.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await kick);

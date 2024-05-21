@@ -437,14 +437,14 @@ namespace Core.Controls
 		public async Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var @gathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
 			List<User> potentialUsers = new();
 
 			// Add all companions that can join gathering
 			foreach (var companion in await user.Companions)
 			{
-				if (await @gathering.IsJoinableBy(companion))
+				if (await gathering.IsJoinableBy(companion))
 				{ potentialUsers.Add(companion); }
 			}
 
@@ -456,21 +456,21 @@ namespace Core.Controls
 		{
 			var inviter = await GetUserAsync(inviterId);
 			var invitee = await GetUserAsync(inviteeId);
-			var @gathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify inviter has relationship with gathering
-			Try(await @gathering.HasUserRelationship(inviter),
+			Try(await gathering.HasUserRelationship(inviter),
 				new InvalidGatheringException("User must be surveying, a guest, or arrived at gathering to invite."));
 
 			// Verify that the invitee can join the gathering
-			Try(await @gathering.IsJoinableBy(invitee),
+			Try(await gathering.IsJoinableBy(invitee),
 				new InvalidUserException("Invited cannot join gathering."));
 
 			// Verify that inviter is companions with the invitee
 			Try(await inviter.IsCompanionsWith(invitee),
 				new InvalidUserException("Cannot invite non-companions."));
 
-			_ = invitee.PostNote(inviter, $"has invited you to {@gathering.Name}", $"{@gathering.Id}");
+			_ = invitee.PostNote(inviter, $"has invited you to {gathering.Name}", $"{gathering.Id}");
 			_ = invitee.Notify("Sparrow", "You were invited to ");
 		}
 
@@ -478,14 +478,14 @@ namespace Core.Controls
 		{
 			var host = await GetUserAsync(hostId);
 			var targetUser = await GetUserAsync(targetId);
-			var @gathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify kicking user is the host
-			Try(@gathering.IsHostedBy(host),
+			Try(gathering.IsHostedBy(host),
 				new InvalidUserException("User cannot kick guests."));
 
 			// Verify gathering is active
-			Try(@gathering.IsActive,
+			Try(gathering.IsActive,
 				new InvalidGatheringException("Cannot kick users after gathering has been archived."));
 
 			// Verify host is not kicking themself
@@ -493,10 +493,10 @@ namespace Core.Controls
 				new InvalidUserException("Host cannot kick themself."));
 
 			// Kick target user from gathering
-			await Gatherings.SetUserStateAsync(targetUser.Id, @gathering.Id, GatheringBond.Kicked, Time);
+			await Gatherings.SetUserStateAsync(targetUser.Id, gathering.Id, GatheringBond.Kicked, Time);
 
 			// Hide target user's snapshots from gathering
-			foreach (SnapshotShard snapshot in await @gathering.Snapshots)
+			foreach (SnapshotShard snapshot in await gathering.Snapshots)
 			{
 				if (targetUser.Etched(snapshot))
 				{ _ = Snapshots.HideSnapshotAsync(snapshot.Id); }
@@ -517,31 +517,31 @@ namespace Core.Controls
 		internal async Task<List<Gathering>> RequestPastGatheringsForUserAsync(User user)
 		{
 			return (await Gatherings.FindPastGatheringsForUserAsync(user.Id))
-				.ConvertAll(@gathering => new Gathering(@gathering));
+				.ConvertAll(gathering => new Gathering(gathering));
 		}
 
 		internal async Task<List<Gathering>> RequestUpcomingGatheringsForUserAsync(User user)
 		{
 			return (await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id))
-				.ConvertAll(@gathering => new Gathering(@gathering));
+				.ConvertAll(gathering => new Gathering(gathering));
 		}
 
 		internal async Task<List<Gathering>> RequestSurveyingGatheringsForUserAsync(User user)
 		{
 			return (await Gatherings.FindSurveyingGatheringsForUserAsync(user.Id))
-				.ConvertAll(@gathering => new Gathering(@gathering));
+				.ConvertAll(gathering => new Gathering(gathering));
 		}
 		
-		internal async Task<List<(User User, GatheringBond State)>> RequestAllUsersFromGatheringAsync(Gathering @gathering)
+		internal async Task<List<(User User, GatheringBond State)>> RequestAllUsersFromGatheringAsync(Gathering gathering)
 		{
-			return (await Gatherings.GetAllUsersAsync(@gathering.Id))
+			return (await Gatherings.GetAllUsersAsync(gathering.Id))
 				.ConvertAll(userDetails => (new User(userDetails.User), userDetails.State));
 		}
 
 		internal async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>>
-			RequestGuestHistoryAsync(Gathering @gathering)
+			RequestGuestHistoryAsync(Gathering gathering)
 		{
-			return (await Gatherings.GetGuestHistoryAsync(@gathering.Id))
+			return (await Gatherings.GetGuestHistoryAsync(gathering.Id))
 				.ConvertAll(userDetails => (userDetails.Joined, userDetails.Left, new User(userDetails.User)));
 		}
 
@@ -552,10 +552,10 @@ namespace Core.Controls
 
 			foreach (CoreGathering coreGathering in gatherings)
 			{
-				Gathering @gathering = new(coreGathering);
+				Gathering gathering = new(coreGathering);
 
-				if (await user.CanJoin(@gathering))
-				{ accessibleGatherings.Add(@gathering.ToGatheringShard(user)); }
+				if (await user.CanJoin(gathering))
+				{ accessibleGatherings.Add(gathering.ToGatheringShard(user)); }
 			}
 
 			return accessibleGatherings;
@@ -584,15 +584,15 @@ namespace Core.Controls
 
             foreach (CoreGathering coreGathering in gatherings)
 			{
-				Gathering @gathering = new(coreGathering);
+				Gathering gathering = new(coreGathering);
 
-				gathering.RelativeAngle = CharacterVector.AngleBetweenAffected(user.Character, @gathering.Character);
+				gathering.RelativeAngle = CharacterVector.AngleBetweenAffected(user.Character, gathering.Character);
 
-                if (await user.CanJoin(@gathering))
-				{ accessibleGatherings.Add(@gathering.ToGatheringShard()); continue; }
+                if (await user.CanJoin(gathering))
+				{ accessibleGatherings.Add(gathering.ToGatheringShard()); continue; }
 
 				if (gathering.RelativeAngle < maximumAngle)
-				{ accessibleGatherings.Add(@gathering.ToGatheringShard()); }
+				{ accessibleGatherings.Add(gathering.ToGatheringShard()); }
             }
 
             return accessibleGatherings;

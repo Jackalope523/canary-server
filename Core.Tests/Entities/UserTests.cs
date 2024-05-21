@@ -57,12 +57,12 @@ namespace Core.Tests.Entities
 			var host = environment.CreateTestUser();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = environment.CreateTestGathering(host);
-			@gathering.Character = new(new(100,100,100,100,100,100,100));
+			var gathering = environment.CreateTestGathering(host);
+			gathering.Character = new(new(100,100,100,100,100,100,100));
 			var oldCharacter = user.Character;
 
 			// Act
-			user.CalculateCharacter(@gathering, TimeSpan.FromMinutes(45));
+			user.CalculateCharacter(gathering, TimeSpan.FromMinutes(45));
 
 			// Assert
 			Assert.NotEqual(oldCharacter, user.Character);
@@ -73,13 +73,13 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(user);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(user);
 
 			// Act
 			var returnedGathering = await user.NextGathering();
 
 			// Assert
-			Assert.Equal(@gathering, returnedGathering);
+			Assert.Equal(gathering, returnedGathering);
 		}
 
 		[Fact]
@@ -222,8 +222,8 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(@gathering, user, GatheringBond.Arrived);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, user, GatheringBond.Arrived);
 
 			// Act
 			var isAtGathering = await user.IsAtGathering();
@@ -251,10 +251,10 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var canView = await user.CanView(@gathering);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.True(canView);
@@ -267,10 +267,10 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(user, host);
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var canView = await user.CanView(@gathering);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.False(canView);
@@ -282,13 +282,13 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			await environment.UpdateUser(user, nameof(CoreUser.AccountStatus), UserAccountStatus.Limited);
 			user = new(await environment.Terminal.AccountDatabase.FindUserByIdAsync(user.Id));
 
 			// Act
-			var canView = await user.CanView(@gathering);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.False(canView);
@@ -302,11 +302,11 @@ namespace Core.Tests.Entities
 			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.Limited);
 			
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 			await environment.ForceCompanionshipAsync(user, host);
 
 			// Act
-			var canView = await user.CanView(@gathering);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.True(canView);
@@ -318,11 +318,11 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.UpdateUserLocationAsync(user, @gathering.Location.Latitude, @gathering.Location.Longitude);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
 			// Act
-			var canJoin = await user.CanJoin(@gathering);
+			var canJoin = await user.CanJoin(gathering);
 
 			// Assert
 			Assert.True(canJoin);
@@ -334,10 +334,10 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			await host.CanEtch(@gathering);
+			await host.CanEtch(gathering);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -347,8 +347,8 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(user);
-			var snapshot = await environment.GenerateSnapshotAsync(@gathering, user);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(user);
+			var snapshot = await environment.GenerateSnapshotAsync(gathering, user);
 
 			// Act
 			var etched = user.Etched(snapshot);
@@ -364,8 +364,8 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			var snapshot = await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var snapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
 			var etched = user.Etched(snapshot);

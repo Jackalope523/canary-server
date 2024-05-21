@@ -22,12 +22,12 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.GenerateSnapshotAsync(@gathering, host);
-			await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.GenerateSnapshotAsync(gathering, host);
+			await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, @gathering.Id);
+			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, gathering.Id);
 
 			// Assert
 			Assert.Equal(2, serverSnapshots.Count);
@@ -39,12 +39,12 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
-			await environment.GenerateSnapshotAsync(@gathering, host);
-			await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
+			await environment.GenerateSnapshotAsync(gathering, host);
+			await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var serverSnapshots = await director.GetGatheringSnapshotsAsync(guest.Id, @gathering.Id);
+			var serverSnapshots = await director.GetGatheringSnapshotsAsync(guest.Id, gathering.Id);
 
 			// Assert
 			Assert.Equal(2, serverSnapshots.Count);
@@ -56,12 +56,12 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.GenerateSnapshotAsync(@gathering, host);
-			await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.GenerateSnapshotAsync(gathering, host);
+			await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var serverSnapshots = director.GetGatheringSnapshotsAsync(sneakyUser.Id, @gathering.Id);
+			var serverSnapshots = director.GetGatheringSnapshotsAsync(sneakyUser.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await serverSnapshots);
@@ -73,14 +73,14 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
 			byte[] image = { byte.MinValue, 0, 1, 3, byte.MaxValue, 7, 8 };
 
 			// Act
-			await director.AddSnapshotAsync(guest.Id, @gathering.Id, new(image));
+			await director.AddSnapshotAsync(guest.Id, gathering.Id, new(image));
 
 			// Assert
-			var serverSnapshots = await director.GetGatheringSnapshotsAsync(guest.Id, @gathering.Id);
+			var serverSnapshots = await director.GetGatheringSnapshotsAsync(guest.Id, gathering.Id);
 			Assert.Single(serverSnapshots);
 
 			var snapshot = serverSnapshots[0];
@@ -93,10 +93,10 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var addSnapshotSync = director.AddSnapshotAsync(sneakyUser.Id, @gathering.Id, new(0));
+			var addSnapshotSync = director.AddSnapshotAsync(sneakyUser.Id, gathering.Id, new(0));
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await addSnapshotSync);
@@ -107,14 +107,14 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			var snapshot = await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var snapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
 			await director.RemoveSnapshotAsync(host.Id, snapshot.Id);
 
 			// Assert
-			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, @gathering.Id);
+			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, gathering.Id);
 			Assert.Empty(serverSnapshots);
 		}
 
@@ -124,8 +124,8 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var sneakyUser = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			var snapshot = await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var snapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
 			var removeSnapshotSync = director.RemoveSnapshotAsync(sneakyUser.Id, snapshot.Id);
@@ -140,16 +140,16 @@ namespace Core.Tests.Controls
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
 			var guest = await environment.GenerateUniqueUserAsync();
-			var @gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
-			var coolSnapshot = await environment.GenerateSnapshotAsync(@gathering, host);
-			var uglySnapshot = await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host, guest);
+			var coolSnapshot = await environment.GenerateSnapshotAsync(gathering, host);
+			var uglySnapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
 			await director.AcclaimSnapshotAsync(guest.Id, coolSnapshot.Id, UserRating.Positive);
 			await director.AcclaimSnapshotAsync(guest.Id, uglySnapshot.Id, UserRating.Negative);
 
 			// Assert
-			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, @gathering.Id);
+			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, gathering.Id);
 			
 			var serverCoolSnapshot = serverSnapshots.Find(snapshot => snapshot.Id.Equals(coolSnapshot.Id));
 			Assert.Equal(1, serverCoolSnapshot.Ratings.Positive);
@@ -168,20 +168,20 @@ namespace Core.Tests.Controls
 			var companion = await environment.GenerateUniqueUserAsync();
 			await environment.ForceCompanionshipAsync(host, companion);
 
-			var @gathering = await environment.GeneratePastGatheringAsync(host);
-			var someSnapshot = await environment.GenerateSnapshotAsync(@gathering, host);
-			var anotherSnapshot = await environment.GenerateSnapshotAsync(@gathering, host);
+			var gathering = await environment.GeneratePastGatheringAsync(host);
+			var someSnapshot = await environment.GenerateSnapshotAsync(gathering, host);
+			var anotherSnapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
 			var feed = await director.GetUserFeedAsync(companion.Id, 100, 0);
 
 			// Assert
 			Assert.Single(feed.Headers);
-			Assert.Equal(@gathering.Id, feed.Headers[0].Id);
+			Assert.Equal(gathering.Id, feed.Headers[0].Id);
 
 			Assert.Equal(2, feed.Snapshots.Count);
 			var serverSomeSnapshot = feed.Snapshots.Find(snapshot => snapshot.Id.Equals(someSnapshot.Id));
-			Assert.Equal(@gathering.Id, serverSomeSnapshot.GatheringId);
+			Assert.Equal(gathering.Id, serverSomeSnapshot.GatheringId);
 			Assert.Equal(someSnapshot.Id, serverSomeSnapshot.Id);
 		}
 

@@ -334,19 +334,19 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentGathering, testGathering.Id)));
 
-            CoreGathering @gathering = await store.FindCurrentGatheringForUserAsync(testUser.Id);
+            CoreGathering gathering = await store.FindCurrentGatheringForUserAsync(testUser.Id);
 
-            Assert.NotNull(@gathering);
-            Assert.Equal(testGathering.HostId, @gathering.Host.Id);
-            Assert.Equal(testUser.Name, @gathering.Host.Name);
-            Assert.Equal(testGathering.Name, @gathering.Name);
-            Assert.Equal(testGathering.Description, @gathering.Description);
-            Assert.Equal(testGathering.StartTime, @gathering.StartTime);
-            Assert.Equal(testGathering.Location.Y, @gathering.Latitude);
-            Assert.Equal(testGathering.Location.X, @gathering.Longitude);
-            Assert.Equal(testGathering.GroupMinimum, @gathering.GroupMinimum);
-            Assert.Equal(testGathering.GroupMaximum, @gathering.GroupMaximum);
-            Assert.Equal(testGathering.State, @gathering.State);
+            Assert.NotNull(gathering);
+            Assert.Equal(testGathering.HostId, gathering.Host.Id);
+            Assert.Equal(testUser.Name, gathering.Host.Name);
+            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Description, gathering.Description);
+            Assert.Equal(testGathering.StartTime, gathering.StartTime);
+            Assert.Equal(testGathering.Location.Y, gathering.Latitude);
+            Assert.Equal(testGathering.Location.X, gathering.Longitude);
+            Assert.Equal(testGathering.GroupMinimum, gathering.GroupMinimum);
+            Assert.Equal(testGathering.GroupMaximum, gathering.GroupMaximum);
+            Assert.Equal(testGathering.State, gathering.State);
         }
         [Fact]
         public async Task FindUpcomingGatheringsForUserAsync_SUCCESS()
@@ -354,18 +354,18 @@ namespace Repository.Tests
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
-            CoreGathering @gathering = (await store.FindUpcomingGatheringsForUserAsync(testUser.Id)).First();
+            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(testUser.Id)).First();
 
-            Assert.NotNull(@gathering);
-            Assert.Equal(testGathering.HostId, @gathering.Host.Id);
-            Assert.Equal(testGathering.Name, @gathering.Name);
-            Assert.Equal(testGathering.Description, @gathering.Description);
-            Assert.Equal(testGathering.StartTime, @gathering.StartTime);
-            Assert.Equal(testGathering.Location.Y, @gathering.Latitude);
-            Assert.Equal(testGathering.Location.X, @gathering.Longitude);
-            Assert.Equal(testGathering.GroupMinimum, @gathering.GroupMinimum);
-            Assert.Equal(testGathering.GroupMaximum, @gathering.GroupMaximum);
-            Assert.Equal(testGathering.State, @gathering.State);
+            Assert.NotNull(gathering);
+            Assert.Equal(testGathering.HostId, gathering.Host.Id);
+            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Description, gathering.Description);
+            Assert.Equal(testGathering.StartTime, gathering.StartTime);
+            Assert.Equal(testGathering.Location.Y, gathering.Latitude);
+            Assert.Equal(testGathering.Location.X, gathering.Longitude);
+            Assert.Equal(testGathering.GroupMinimum, gathering.GroupMinimum);
+            Assert.Equal(testGathering.GroupMaximum, gathering.GroupMaximum);
+            Assert.Equal(testGathering.State, gathering.State);
         }
         [Fact]
         public async Task FindPastGatheringsForUserAsync_SUCCESS()
@@ -377,19 +377,19 @@ namespace Repository.Tests
                    Where(e => e.Id == testGathering.Id).
                    ExecuteUpdate(setter => setter.SetProperty(e => e.State, GatheringState.Ended)));
 
-            CoreGathering @gathering = (await store.FindPastGatheringsForUserAsync(testUser.Id)).First();
+            CoreGathering gathering = (await store.FindPastGatheringsForUserAsync(testUser.Id)).First();
 
-            Assert.NotNull(@gathering);
-            Assert.Equal(testGathering.HostId, @gathering.Host.Id);
-            Assert.Equal(testUser.Name, @gathering.Host.Name);
-            Assert.Equal(testGathering.Name, @gathering.Name);
-            Assert.Equal(testGathering.Description, @gathering.Description);
-            Assert.Equal(testGathering.StartTime, @gathering.StartTime);
-            Assert.Equal(testGathering.Location.Y, @gathering.Latitude);
-            Assert.Equal(testGathering.Location.X, @gathering.Longitude);
-            Assert.Equal(testGathering.GroupMinimum, @gathering.GroupMinimum);
-            Assert.Equal(testGathering.GroupMaximum, @gathering.GroupMaximum);
-            Assert.Equal(GatheringState.Ended, @gathering.State);
+            Assert.NotNull(gathering);
+            Assert.Equal(testGathering.HostId, gathering.Host.Id);
+            Assert.Equal(testUser.Name, gathering.Host.Name);
+            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Description, gathering.Description);
+            Assert.Equal(testGathering.StartTime, gathering.StartTime);
+            Assert.Equal(testGathering.Location.Y, gathering.Latitude);
+            Assert.Equal(testGathering.Location.X, gathering.Longitude);
+            Assert.Equal(testGathering.GroupMinimum, gathering.GroupMinimum);
+            Assert.Equal(testGathering.GroupMaximum, gathering.GroupMaximum);
+            Assert.Equal(GatheringState.Ended, gathering.State);
         }       
         [Fact]
         public async Task RemoveUserAsync_SUCCESS()
@@ -493,18 +493,18 @@ namespace Repository.Tests
         [Fact]
         public async Task FindGatheringsByUserAsync_SUCCESS()
         {
-            CoreGathering @gathering  = (await store.FindGatheringsByUserAsync(testUser.Id)).Single();
+            CoreGathering gathering  = (await store.FindGatheringsByUserAsync(testUser.Id)).Single();
 
-            Assert.NotNull(@gathering);
-            Assert.Equal(testGathering.HostId, @gathering.Host.Id);
-            Assert.Equal(testGathering.Name, @gathering.Name);
-            Assert.Equal(testGathering.Description, @gathering.Description);
-            Assert.Equal(testGathering.StartTime, @gathering.StartTime);
-            Assert.Equal(testGathering.Location.Y, @gathering.Latitude);
-            Assert.Equal(testGathering.Location.X, @gathering.Longitude);
-            Assert.Equal(testGathering.GroupMinimum, @gathering.GroupMinimum);
-            Assert.Equal(testGathering.GroupMaximum, @gathering.GroupMaximum);
-            Assert.Equal(testGathering.State, @gathering.State);
+            Assert.NotNull(gathering);
+            Assert.Equal(testGathering.HostId, gathering.Host.Id);
+            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Description, gathering.Description);
+            Assert.Equal(testGathering.StartTime, gathering.StartTime);
+            Assert.Equal(testGathering.Location.Y, gathering.Latitude);
+            Assert.Equal(testGathering.Location.X, gathering.Longitude);
+            Assert.Equal(testGathering.GroupMinimum, gathering.GroupMinimum);
+            Assert.Equal(testGathering.GroupMaximum, gathering.GroupMaximum);
+            Assert.Equal(testGathering.State, gathering.State);
         }
         [Fact]
         public async Task GetUserStateAsync_SUCCESS()

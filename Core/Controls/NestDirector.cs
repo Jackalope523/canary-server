@@ -48,8 +48,8 @@ namespace Core.Controls
 
                 foreach (var shard in nest.Gatherings)
                 {
-                    Gathering @gathering = new(shard);
-                    nest.Snapshots.AddRange(await @gathering.Snapshots);
+                    Gathering gathering = new(shard);
+                    nest.Snapshots.AddRange(await gathering.Snapshots);
                 }
             }
             // Check if users are companions
@@ -231,10 +231,10 @@ namespace Core.Controls
 
             // Gather all user gathering data
             AgendaShard agenda = new((await user.UpcomingGatherings)
-                .ConvertAll(@gathering => (@gathering.ToGatheringShard(), GatheringBond.Guest)));
+                .ConvertAll(gathering => (gathering.ToGatheringShard(), GatheringBond.Guest)));
 
             agenda.Agenda.AddRange((await user.SurveyingGatherings)
-                .ConvertAll(@gathering => (@gathering.ToGatheringShard(), GatheringBond.Surveying)));
+                .ConvertAll(gathering => (gathering.ToGatheringShard(), GatheringBond.Surveying)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
             { agenda.Agenda.Add(((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }

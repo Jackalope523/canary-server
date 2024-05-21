@@ -136,8 +136,8 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task<List<SnapshotShard>> RequestGatheringSnapshotsAsync(Gathering @gathering)
-            => await Snapshots.GetSnapshotsForGatheringAsync(@gathering.Id);
+		internal async Task<List<SnapshotShard>> RequestGatheringSnapshotsAsync(Gathering gathering)
+            => await Snapshots.GetSnapshotsForGatheringAsync(gathering.Id);
 
 		#endregion
 	}
