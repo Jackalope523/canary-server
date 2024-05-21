@@ -44,6 +44,7 @@ namespace Frontier.Controllers
 
 				List<CoreUser> seedUsers = new();
 				List<GatheringShard> seedGatherings = new();
+				List<SnapshotShard> seedSnapshots = new();
 
                 log.LogError("Adding users..");
 
@@ -65,36 +66,6 @@ namespace Frontier.Controllers
 					await userManager.ConfirmEmailAsync(coreUser, token);
 				}
 
-                log.LogError("Creating gatherings..");
-
-                foreach (var gathering in seed.Gatherings)
-				{
-					var host = await accounts.GetCoreUserAsync(seedUsers[(int) gathering.Host.Id - 1].PhoneNumber);
-
-                    // Move host to proposed gathering location
-                    // await accounts.UpdateUserLocationAsync(host.Id, gathering.Latitude, gathering.Longitude);
-					
-					seedGatherings.Add(await gatherings.CreateGatheringAsync(host.Id,
-						gathering.Name, gathering.Description,
-						gathering.StartTime, gathering.Latitude, gathering.Longitude,
-						gathering.Radius, gathering.IsDynamic,
-						gathering.GroupMinimum, gathering.GroupMaximum));
-				}
-
-                log.LogError("Joining users to gatherings..");
-
-                for (int i = 0; i < seed.Attendance.Count; i++)
-				{
-					var tuple = seed.Attendance[i];
-					var self = tuple[0]; var gathering = tuple[1];
-
-					// Move user to gathering location
-					await accounts.UpdateUserLocationAsync(seedUsers[self - 1].Id, seedGatherings[gathering - 1].Latitude, seedGatherings[gathering - 1].Longitude);
-
-					// Attempt to join the gathering
-					await gatherings.JoinGatheringAsync(seedUsers[self - 1].Id, seedGatherings[gathering - 1].Id);
-				}
-
                 log.LogError("Making companions..");
 
                 for (int i = 0; i < seed.Appreciations.Count; i++)
@@ -113,8 +84,58 @@ namespace Frontier.Controllers
                     var self = tuple[0]; var other = tuple[1];
 
                     await nests.BlockUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
+                }
+
+                log.LogError("Creating gatherings..");
+
+                foreach (var gathering in seed.Gatherings)
+                {
+                    var host = await accounts.GetCoreUserAsync(seedUsers[(int)gathering.Host.Id - 1].PhoneNumber);
+
+                    // Move host to proposed gathering location
+                    // await accounts.UpdateUserLocationAsync(host.Id, gathering.Latitude, gathering.Longitude);
+
+                    seedGatherings.Add(await gatherings.CreateGatheringAsync(host.Id,
+                        gathering.Name, gathering.Description,
+                        gathering.StartTime, gathering.Latitude, gathering.Longitude,
+                        gathering.Radius, gathering.IsDynamic,
+                        gathering.GroupMinimum, gathering.GroupMaximum));
+                }
+
+                log.LogError("Joining users to gatherings..");
+
+                for (int i = 0; i < seed.Attendance.Count; i++)
+                {
+                    var tuple = seed.Attendance[i];
+                    var who = tuple[0]; var gathering = tuple[1];
+
+                    // Move user to gathering location
+                    await accounts.UpdateUserLocationAsync(seedUsers[who - 1].Id, seedGatherings[gathering - 1].Latitude, seedGatherings[gathering - 1].Longitude);
+
+                    // Attempt to join the gathering
+                    await gatherings.JoinGatheringAsync(seedUsers[who - 1].Id, seedGatherings[gathering - 1].Id);
+                }
+
+				log.LogError("Forging Snapshots...");
+
+				for (int i = 0; i < seed.Snapshots.Count; i++)
+				{
+                    var tuple = seed.Snapshots[i];
+                    var who = tuple[0]; var gathering = tuple[1];
+
+					seedSnapshots.Add(await snapshots.AddSnapshotAsync(seedUsers[who - 1].Id, seedGatherings[gathering - 1].Id, new() { }));
 				}
-			});
+
+				log.LogError("Acclaiming Snapshots...");
+
+				for (int i = 0; i < seed.Acclaims.Count; i++)
+                {
+                    var tuple = seed.Acclaims[i];
+                    var who = tuple[0]; var snapshot = tuple[1];
+
+					await snapshots.AcclaimSnapshotAsync(seedUsers[who - 1].Id, seedSnapshots[snapshot - 1].Id, UserRating.Positive);
+				}
+            });
 		}
 
 		#endregion

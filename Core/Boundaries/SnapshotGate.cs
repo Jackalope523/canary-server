@@ -11,8 +11,8 @@ namespace Core.Boundaries
         double Latitude, double Longitude);
 
     public record SnapshotShard(ulong Id, ulong GatheringId, UserSilhouette User,
-        DateTimeOffset TimeEtched,
-        (int Positive, int Negative) Ratings, bool IsHidden);
+        DateTimeOffset TimeTaken,
+        (int Positive, int Negative) Acclaim, bool IsHidden);
 
     public record FeedShard(List<GatheringHeader> Headers, List<SnapshotShard> Snapshots);
 
