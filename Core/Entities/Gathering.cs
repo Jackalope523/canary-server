@@ -49,6 +49,7 @@ namespace Core.Entities
         public int GroupMaximum { get; set; }
         public bool IsDeleted { get; set; }
         public int NumberOfGuests { get; set; }
+        public float RelativeAngle { get; set; } = 0;
 
         public bool IsWaiting
             => State.Equals(GatheringState.Upcoming) &&
@@ -152,7 +153,16 @@ namespace Core.Entities
             return new(Id, Host.ToUserSilhouette(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, EndTime,
                 State, GroupMinimum, GroupMaximum,
-                Radius.Kilometres, NumberOfGuests);
+                Radius.Kilometres, NumberOfGuests, RelativeAngle);
+        }
+
+        public GatheringShard ToGatheringShard(User relativeUser)
+        {
+            return new(Id, Host.ToUserSilhouette(), Name, Description,
+                StartTime, Location.Latitude, Location.Longitude, EndTime,
+                State, GroupMinimum, GroupMaximum,
+                Radius.Kilometres, NumberOfGuests,
+                CharacterVector.AngleBetweenAffected(relativeUser.Character, Character));
         }
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)

@@ -555,7 +555,7 @@ namespace Core.Controls
 				Gathering @gathering = new(coreGathering);
 
 				if (await user.CanJoin(@gathering))
-				{ accessibleGatherings.Add(@gathering.ToGatheringShard()); }
+				{ accessibleGatherings.Add(@gathering.ToGatheringShard(user)); }
 			}
 
 			return accessibleGatherings;
@@ -568,9 +568,9 @@ namespace Core.Controls
 
 			foreach ((GatheringShard shard, GatheringBond bond) in agenda.Agenda)
 			{
-				Gathering targetGathering = new(shard);
+				Gathering gathering = new(shard);
 
-				if (await user.CanJoin(targetGathering))
+				if (await user.CanJoin(gathering))
 				{ accessibleGatherings.Agenda.Add((shard, bond)); }
 			}
 
@@ -586,10 +586,12 @@ namespace Core.Controls
 			{
 				Gathering @gathering = new(coreGathering);
 
-				if (await user.CanJoin(@gathering))
+				gathering.RelativeAngle = CharacterVector.AngleBetweenAffected(user.Character, @gathering.Character);
+
+                if (await user.CanJoin(@gathering))
 				{ accessibleGatherings.Add(@gathering.ToGatheringShard()); continue; }
 
-				if (CharacterVector.AngleBetweenAffected(user.Character, @gathering.Character) < maximumAngle)
+				if (gathering.RelativeAngle < maximumAngle)
 				{ accessibleGatherings.Add(@gathering.ToGatheringShard()); }
             }
 

@@ -21,7 +21,7 @@ namespace Core.Boundaries
 	public record GatheringShard(ulong Id, UserSilhouette Host, string Name, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
         GatheringState State, int GroupMinimum, int GroupMaximum,
-        double Radius, int NumberOfGuests);
+        double Radius, int NumberOfGuests, float RelativeAngle);
 
 	public record GuestListShard(int Surveyers, int GuestCount,
 		List<(UserSilhouette User, GatheringBond Bond)> Guests);
