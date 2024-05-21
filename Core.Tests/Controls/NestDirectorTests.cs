@@ -22,64 +22,6 @@ namespace Core.Tests.Controls
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			var nest = await director.GetUserNestAsync(user.Id, user.Id);
-
-			// Assert
-			Assert.Equal(user.ToUserNest(), nest);
-		}
-
-		[Fact]
-		public async Task GetUserNestAsync_Companion_ReturnsNest()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var companion = await environment.GenerateUniqueUserAsync();
-			await environment.ForceCompanionshipAsync(user, companion);
-			companion.NumberOfAppreciateers += 1;
-
-			// Act
-			var nest = await director.GetUserNestAsync(user.Id, companion.Id);
-
-			// Assert
-			Assert.Equal(companion.ToUserNest(), nest);
-		}
-
-		[Fact]
-		public async Task GetUserNestAsync_Neutral_ReturnsNest()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var randomUser = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			var nest = await director.GetUserNestAsync(user.Id, randomUser.Id);
-
-			// Assert
-			Assert.Equal(randomUser.ToUserNest(), nest);
-		}
-
-		[Fact]
-		public async Task GetUserNestAsync_Blocked_Fails()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var enemy = await environment.GenerateUniqueUserAsync();
-			await environment.ForceEnemiesAsync(user, enemy);
-
-			// Act
-			var nest = director.GetUserNestAsync(user.Id, enemy.Id);
-
-			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await nest);
-		}
-
-		[Fact]
-		public async Task GetUserNestAsync_Self_ReturnsNest()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
 			var hostedGathering = await environment.GeneratePastGatheringAsync(user);
@@ -92,18 +34,20 @@ namespace Core.Tests.Controls
 			var okSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, user);
 
 			// Act
-			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, user.Id);
+			var nest = await director.GetUserNestAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(3, Gatherings.Count);
-			Assert.Equal(hostedGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(hostedGathering.Id)));
-			Assert.Equal(attendedGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(attendedGathering.Id)));
-			Assert.Equal(ongoingGathering.ToGatheringShard(), Gatherings.Find(e => e.Id.Equals(ongoingGathering.Id)));
+			Assert.Equal(user.ToUserProfile(), nest.User);
 
-			Assert.Equal(3, Snapshots.Count);
-			Assert.Equal(funLovingSnapshot, Snapshots.Find(e => e.Id.Equals(funLovingSnapshot.Id)));
-			Assert.Equal(lessLovingSnapshot, Snapshots.Find(e => e.Id.Equals(lessLovingSnapshot.Id)));
-			Assert.Equal(okSnapshot, Snapshots.Find(e => e.Id.Equals(okSnapshot.Id)));
+			Assert.Equal(3, nest.Gatherings.Count);
+			Assert.Equal(hostedGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(hostedGathering.Id)));
+			Assert.Equal(attendedGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(attendedGathering.Id)));
+			Assert.Equal(ongoingGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(ongoingGathering.Id)));
+
+			Assert.Equal(3, nest.Snapshots.Count);
+			Assert.Equal(funLovingSnapshot, nest.Snapshots.Find(e => e.Id.Equals(funLovingSnapshot.Id)));
+			Assert.Equal(lessLovingSnapshot, nest.Snapshots.Find(e => e.Id.Equals(lessLovingSnapshot.Id)));
+			Assert.Equal(okSnapshot, nest.Snapshots.Find(e => e.Id.Equals(okSnapshot.Id)));
 		}
 
 		[Fact]
@@ -127,12 +71,14 @@ namespace Core.Tests.Controls
 			var unattendedGatheringCompanionSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, companion);
 
 			// Act
-			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, companion.Id);
+			var nest = await director.GetUserNestAsync(user.Id, companion.Id);
 
-			// Assert
-			Assert.Equal(4, Gatherings.Count);
+            // Assert
+            Assert.Equal(companion.ToUserProfile(), nest.User);
 
-			Assert.Equal(3, Snapshots.Count);
+            Assert.Equal(4, nest.Gatherings.Count);
+
+			Assert.Equal(3, nest.Snapshots.Count);
 		}
 
 		[Fact]
@@ -149,12 +95,14 @@ namespace Core.Tests.Controls
 			var unattendedGatheringSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, randomUser);
 
 			// Act
-			var (Gatherings, Snapshots) = await director.GetUserNestAsync(user.Id, randomUser.Id);
+			var nest = await director.GetUserNestAsync(user.Id, randomUser.Id);
 
-			// Assert
-			Assert.Equal(2, Gatherings.Count);
+            // Assert
+            Assert.Equal(randomUser.ToUserProfile(), nest.User);
 
-			Assert.Single(Snapshots);
+            Assert.Equal(2, nest.Gatherings.Count);
+
+			Assert.Single(nest.Snapshots);
 		}
 
 		[Fact]
@@ -379,66 +327,6 @@ namespace Core.Tests.Controls
 			// Act
 			await director.UnblockUserAsync(user.Id, weirdDynamics.Id);
 			// If no exception is thrown, the test is successful
-		}
-
-		[Fact]
-		public async Task RateUserAsync_Self_Fails()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			var action = director.RateUserAsync(user.Id, user.Id, UserRating.Positive);
-
-			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await action);
-		}
-
-		[Fact]
-		public async Task RateUserAsync_Neutral_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var randomUser = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			await director.RateUserAsync(user.Id, randomUser.Id, UserRating.Positive);
-			await director.RateUserAsync(randomUser.Id, user.Id, UserRating.Positive);
-
-			// Assert
-			Assert.Equal(1, (await user.Ratings).Postitive);
-			Assert.Equal(1, (await randomUser.Ratings).Postitive);
-		}
-
-		[Fact]
-		public async Task RateUserAsync_OverwriteRating_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var randomUser = await environment.GenerateUniqueUserAsync();
-			await director.RateUserAsync(user.Id, randomUser.Id, UserRating.Positive);
-
-			// Act
-			await director.RateUserAsync(user.Id, randomUser.Id, UserRating.Negative);
-
-			// Assert
-			Assert.Equal(0, (await randomUser.Ratings).Postitive);
-			Assert.Equal(1, (await randomUser.Ratings).Negative);
-		}
-
-		[Fact]
-		public async Task RateUserAsync_MultipleRatings_Drops()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var randomUser = await environment.GenerateUniqueUserAsync();
-			await director.RateUserAsync(user.Id, randomUser.Id, UserRating.Positive);
-
-			// Act
-			await director.RateUserAsync(user.Id, randomUser.Id, UserRating.Positive);
-
-			// Assert
-			Assert.Equal(1, (await randomUser.Ratings).Postitive);
 		}
 	}
 }

@@ -188,7 +188,7 @@ namespace Core.Entities
             return new(Id, Name);
         }
 
-        public UserProfile ToUserNest()
+        public UserProfile ToUserProfile()
         {
             return new(Id, Name, Reputation, NumberOfAppreciateers);
         }

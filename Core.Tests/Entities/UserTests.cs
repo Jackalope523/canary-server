@@ -51,37 +51,6 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task CalculateReputation_NoChange_SameReputation()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var oldReputation = user.Reputation;
-
-			// Act
-			await user.CalculateReputation();
-
-			// Assert
-			Assert.Equal(oldReputation, user.Reputation);
-		}
-
-		[Fact]
-		public async Task CalculateReputation_Changed_NewReputation()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var nemesis = await environment.GenerateUniqueUserAsync();
-
-			var oldReputation = user.Reputation;
-			await environment.Terminal.NestOperations.RateUserAsync(nemesis.Id, user.Id, UserRating.Negative);
-
-			// Act
-			await user.CalculateReputation();
-
-			// Assert
-			Assert.NotEqual(oldReputation, user.Reputation);
-		}
-
-		[Fact]
 		public async Task CalculateCharacter_NewCharacter()
 		{
 			// Arrange

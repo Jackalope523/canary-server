@@ -20,18 +20,6 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<UserProfile> GetUserNestAsync(ulong userId, ulong targetId)
-        {
-            var user = await GetUserAsync(userId);
-            var targetUser = await GetUserAsync(targetId);
-
-            // Fail if user is blocked
-            Fail(await targetUser.IsBlocking(user),
-                new InvalidUserException("User is unable to view target."));
-
-            return targetUser.ToUserNest();
-        }
-
         public async Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
@@ -41,7 +29,7 @@ namespace Core.Controls
             Fail(await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User is unable to view target."));
 
-            NestShard nest = new(new(), new());
+            NestShard nest = new(user.ToUserProfile(), new(), new());
 
             // Check if user is themself
             if (user.Equals(targetUser))
@@ -193,28 +181,6 @@ namespace Core.Controls
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
         {
             await Nests.UnblockUserAsync(userId, targetId);
-        }
-
-        public async Task RateUserAsync(ulong userId, ulong targetId, UserRating rating)
-        {
-            var user = await GetUserAsync(userId);
-            var targetUser = await GetUserAsync(targetId);
-
-            Fail(user.Equals(targetUser),
-                new InvalidUserException("User cannot rate themself."));
-
-            // Check if rating is to remove
-            if (rating != UserRating.Remove)
-            {
-                await Nests.RateUserAsync(userId, targetId, rating, Psijic.Time);
-            }
-            else
-            {
-                await Nests.RemoveUserRatingAsync(userId, targetId);
-            }
-
-            await targetUser.CalculateReputation();
-            _ = Accounts.UpdateUserAsync(targetId, new() { (nameof(CoreUser.Reputation), targetUser.Reputation) });
         }
 
 		#endregion

@@ -51,8 +51,6 @@ namespace Core.Boundaries
         Task UnappreciateUserAsync(ulong userId, ulong targetId);
         Task BlockUserAsync(ulong userId, ulong targetId);
         Task UnblockUserAsync(ulong userId, ulong targetId);
-
-        Task RateUserAsync(ulong userId, ulong targetId, UserRating rating);
     }
 
 	#endregion
