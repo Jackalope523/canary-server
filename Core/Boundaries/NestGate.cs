@@ -11,7 +11,7 @@ namespace Core.Boundaries
 
     public record UserProfile(ulong Id, string Name, int Reputation, int NumberOfAppreciateers);
     public record UserSilhouette(ulong Id, string Name);
-    public record NestShard(UserProfile User, List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
+    public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
     public record AgendaShard(List<(GatheringShard Gathering, GatheringBond Bond)> Agenda);
 
 	#endregion

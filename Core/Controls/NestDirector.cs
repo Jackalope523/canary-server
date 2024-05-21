@@ -29,7 +29,7 @@ namespace Core.Controls
             Fail(await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User is unable to view target."));
 
-            NestShard nest = new(user.ToUserProfile(), new(), new());
+            NestShard nest = new(new(), new());
 
             // Check if user is themself
             if (user.Equals(targetUser))
