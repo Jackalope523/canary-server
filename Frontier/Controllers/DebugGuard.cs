@@ -97,9 +97,9 @@ namespace Frontier.Controllers
 
                 log.LogError("Making companions..");
 
-                for (int i = 0; i < seed.Appreciates.Count; i++)
+                for (int i = 0; i < seed.Appreciations.Count; i++)
 				{
-					var tuple = seed.Appreciates[i];
+					var tuple = seed.Appreciations[i];
 					var self = tuple[0]; var other = tuple[1];
 
 					await nests.AppreciateUserAsync(seedUsers[self - 1].Id, seedUsers[other - 1].Id);
