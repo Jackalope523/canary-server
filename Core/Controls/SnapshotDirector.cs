@@ -66,7 +66,7 @@ namespace Core.Controls
             await Snapshots.RemoveSnapshotAsync(snapshot.Id);
         }
 
-        public async Task RateSnapshotAsync(ulong userId, ulong snapshotId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, UserRating rating)
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -83,11 +83,11 @@ namespace Core.Controls
             // Check if removing a rating
             if (rating != UserRating.Remove)
             {
-                await Snapshots.RateSnapshotAsync(snapshot.Id, user.Id, rating);
+                await Snapshots.AcclaimSnapshotAsync(snapshot.Id, user.Id, rating);
             }
             else
             {
-                await Snapshots.RemoveSnapshotRatingAsync(snapshot.Id, user.Id);
+                await Snapshots.RemoveSnapshotAcclaimAsync(snapshot.Id, user.Id);
             }
         }
 

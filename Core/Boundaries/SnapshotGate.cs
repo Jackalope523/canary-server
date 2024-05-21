@@ -30,8 +30,8 @@ namespace Core.Boundaries
 		Task RemoveSnapshotAsync(ulong snapshotId);
 		Task HideSnapshotAsync(ulong snapshotId);
 
-		Task RateSnapshotAsync(ulong snapshotId, ulong voterId, UserRating rating);
-		Task RemoveSnapshotRatingAsync(ulong snapshotId, ulong voterId);
+		Task AcclaimSnapshotAsync(ulong snapshotId, ulong voterId, UserRating rating);
+		Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId);
 
         Task<List<SnapshotShard>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
     }
@@ -41,7 +41,7 @@ namespace Core.Boundaries
         Task<List<SnapshotShard>> GetGatheringSnapshotsAsync(ulong userId, ulong gatheringId);
         Task<SnapshotShard> AddSnapshotAsync(ulong userId, ulong gatheringId, MemoryStream image);
         Task RemoveSnapshotAsync(ulong userId, ulong snapshotId);
-        Task RateSnapshotAsync(ulong userId, ulong snapshotId, UserRating rating);
+        Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, UserRating rating);
 
         Task<FeedShard> GetUserFeedAsync(ulong userId, int depth, int lastDepth);
     }

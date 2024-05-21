@@ -162,7 +162,7 @@ namespace Repository
             return snapshots;
         }
 
-        public async Task RateSnapshotAsync(ulong postId, ulong voterId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId, UserRating rating)
         {
             PostLink.PostLinkType type;
             if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
@@ -195,7 +195,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Remove(new Post { Id = postId }));
         }
 
-        public async Task RemoveSnapshotRatingAsync(ulong postId, ulong voterId)
+        public async Task RemoveSnapshotAcclaimAsync(ulong postId, ulong voterId)
         {
             Func<QueryContext, Task> query = EF.CompileAsyncQuery(
                 (QueryContext ctx) =>

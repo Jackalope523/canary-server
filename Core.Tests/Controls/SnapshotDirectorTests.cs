@@ -145,8 +145,8 @@ namespace Core.Tests.Controls
 			var uglySnapshot = await environment.GenerateSnapshotAsync(@gathering, host);
 
 			// Act
-			await director.RateSnapshotAsync(guest.Id, coolSnapshot.Id, UserRating.Positive);
-			await director.RateSnapshotAsync(guest.Id, uglySnapshot.Id, UserRating.Negative);
+			await director.AcclaimSnapshotAsync(guest.Id, coolSnapshot.Id, UserRating.Positive);
+			await director.AcclaimSnapshotAsync(guest.Id, uglySnapshot.Id, UserRating.Negative);
 
 			// Assert
 			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, @gathering.Id);

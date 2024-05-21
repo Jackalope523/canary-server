@@ -32,9 +32,9 @@ namespace Repository
             return await store.GetSnapshotsByUserAsync(id);
         }
 
-        public async Task RateSnapshotAsync(ulong postId, ulong voterId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId, UserRating rating)
         {           
-          await store.RateSnapshotAsync(postId, voterId, rating);
+          await store.AcclaimSnapshotAsync(postId, voterId, rating);
         }
 
         public async Task RemoveSnapshotAsync(ulong postId)
@@ -42,9 +42,9 @@ namespace Repository
             await store.RemoveSnapshotAsync(postId);
         }
 
-        public async Task RemoveSnapshotRatingAsync(ulong postId, ulong voterId)
+        public async Task RemoveSnapshotAcclaimAsync(ulong postId, ulong voterId)
         {
-            await store.RemoveSnapshotRatingAsync(postId, voterId);
+            await store.RemoveSnapshotAcclaimAsync(postId, voterId);
         }
 
         public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(ulong id)
