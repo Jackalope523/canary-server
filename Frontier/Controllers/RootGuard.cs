@@ -2,10 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Core.Boundaries;
 using Microsoft.Extensions.Logging;
+using Frontier.Manifests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Frontier.Controllers
 {
     [Route("")]
+	[AllowAnonymous]
     public class RootGuard : AbstractGuard
     {
 		#region Initialisation
@@ -22,6 +25,12 @@ namespace Frontier.Controllers
         {
             return new StatusCodeResult(418);
         }
+
+		[HttpGet("req")]
+		public IActionResult SparrowMinimumVersion()
+		{
+			return Ok(new SparrowDetailsManifest() { MinimumVersion = "0.0.1" });
+		}
 
 		#endregion
 	}
