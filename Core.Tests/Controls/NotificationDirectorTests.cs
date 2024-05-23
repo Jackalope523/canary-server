@@ -76,7 +76,7 @@ namespace Core.Tests.Controls
 		}
 
 		//////////
-		// Push Notifications
+		// Push Telegrams
 		///////////////////////
 
 		[Fact]
@@ -154,7 +154,7 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task NotifyUserAsync_MultipleNotifications_Succeeds()
+		public async Task NotifyUserAsync_MultipleTelegrams_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();

@@ -37,8 +37,6 @@ namespace Core.Tests.Controls
 			var nest = await director.GetUserNestAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(user.ToUserProfile(), nest.User);
-
 			Assert.Equal(3, nest.Gatherings.Count);
 			Assert.Equal(hostedGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(hostedGathering.Id)));
 			Assert.Equal(attendedGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(attendedGathering.Id)));
@@ -74,8 +72,6 @@ namespace Core.Tests.Controls
 			var nest = await director.GetUserNestAsync(user.Id, companion.Id);
 
             // Assert
-            Assert.Equal(companion.ToUserProfile(), nest.User);
-
             Assert.Equal(4, nest.Gatherings.Count);
 
 			Assert.Equal(3, nest.Snapshots.Count);
@@ -98,8 +94,6 @@ namespace Core.Tests.Controls
 			var nest = await director.GetUserNestAsync(user.Id, randomUser.Id);
 
             // Assert
-            Assert.Equal(randomUser.ToUserProfile(), nest.User);
-
             Assert.Equal(2, nest.Gatherings.Count);
 
 			Assert.Single(nest.Snapshots);

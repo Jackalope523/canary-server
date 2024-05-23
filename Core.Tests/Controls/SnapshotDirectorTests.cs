@@ -152,16 +152,16 @@ namespace Core.Tests.Controls
 			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, gathering.Id);
 			
 			var serverCoolSnapshot = serverSnapshots.Find(snapshot => snapshot.Id.Equals(coolSnapshot.Id));
-			Assert.Equal(1, serverCoolSnapshot.Ratings.Positive);
-			Assert.Equal(0, serverCoolSnapshot.Ratings.Negative);
+			Assert.Equal(1, serverCoolSnapshot.Acclaim.Positive);
+			Assert.Equal(0, serverCoolSnapshot.Acclaim.Negative);
 
 			var serverUglySnapshot = serverSnapshots.Find(snapshot => snapshot.Id.Equals(uglySnapshot.Id));
-			Assert.Equal(0, serverUglySnapshot.Ratings.Positive);
-			Assert.Equal(1, serverUglySnapshot.Ratings.Negative);
+			Assert.Equal(0, serverUglySnapshot.Acclaim.Positive);
+			Assert.Equal(1, serverUglySnapshot.Acclaim.Negative);
 		}
 
 		[Fact]
-		public async Task GetUserFeedAsync_ReturnsFeed()
+		public async Task GetUserColumnAsync_ReturnsColumn()
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
@@ -173,20 +173,20 @@ namespace Core.Tests.Controls
 			var anotherSnapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var feed = await director.GetUserFeedAsync(companion.Id, 100, 0);
+			var column = await director.GetUserColumnAsync(companion.Id, 100, 0);
 
 			// Assert
-			Assert.Single(feed.Headers);
-			Assert.Equal(gathering.Id, feed.Headers[0].Id);
+			Assert.Single(column.Headers);
+			Assert.Equal(gathering.Id, column.Headers[0].Id);
 
-			Assert.Equal(2, feed.Snapshots.Count);
-			var serverSomeSnapshot = feed.Snapshots.Find(snapshot => snapshot.Id.Equals(someSnapshot.Id));
+			Assert.Equal(2, column.Snapshots.Count);
+			var serverSomeSnapshot = column.Snapshots.Find(snapshot => snapshot.Id.Equals(someSnapshot.Id));
 			Assert.Equal(gathering.Id, serverSomeSnapshot.GatheringId);
 			Assert.Equal(someSnapshot.Id, serverSomeSnapshot.Id);
 		}
 
 		[Fact]
-		public async Task GetUserFeedAsync_ExcludingGathering_ReturnsFeed()
+		public async Task GetUserColumnAsync_ExcludingGathering_ReturnsColumn()
 		{
 			// Arrange
 			var host1 = await environment.GenerateUniqueUserAsync();
@@ -201,14 +201,14 @@ namespace Core.Tests.Controls
 			var unseenSnapshot = await environment.GenerateSnapshotAsync(gathering1, host2);
 
 			// Act
-			var feed = await director.GetUserFeedAsync(companion.Id, 100, 1);
+			var column = await director.GetUserColumnAsync(companion.Id, 100, 1);
 
 			// Assert
-			Assert.Single(feed.Headers);
-			Assert.Equal(gathering2.Id, feed.Headers[0].Id);
+			Assert.Single(column.Headers);
+			Assert.Equal(gathering2.Id, column.Headers[0].Id);
 
-			Assert.Single(feed.Snapshots);
-			var serverSomeSnapshot = feed.Snapshots.Find(snapshot => snapshot.Id.Equals(unseenSnapshot.Id));
+			Assert.Single(column.Snapshots);
+			var serverSomeSnapshot = column.Snapshots.Find(snapshot => snapshot.Id.Equals(unseenSnapshot.Id));
 			Assert.Equal(gathering2.Id, serverSomeSnapshot.GatheringId);
 			Assert.Equal(unseenSnapshot.Id, serverSomeSnapshot.Id);
 		}

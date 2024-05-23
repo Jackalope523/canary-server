@@ -14,7 +14,7 @@ namespace Core.Boundaries
         DateTimeOffset TimeTaken,
         (int Positive, int Negative) Acclaim, bool IsHidden);
 
-    public record FeedShard(List<GatheringHeader> Headers, List<SnapshotShard> Snapshots);
+    public record ColumnShard(List<GatheringHeader> Headers, List<SnapshotShard> Snapshots);
 
     #endregion
 
@@ -26,14 +26,14 @@ namespace Core.Boundaries
         Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong userId);
         Task<SnapshotShard> GetSnapshotAsync(ulong snapshotId);
         Task<SnapshotShard> AddSnapshotAsync(ulong gatheringId, ulong etcherId,
-            DateTimeOffset timeEtched);
+            DateTimeOffset timeTaken);
 		Task RemoveSnapshotAsync(ulong snapshotId);
 		Task HideSnapshotAsync(ulong snapshotId);
 
 		Task AcclaimSnapshotAsync(ulong snapshotId, ulong voterId, UserRating rating);
 		Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId);
 
-        Task<List<SnapshotShard>> GenerateFeedForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
+        Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
     }
 
     public interface ISnapshotOperations
@@ -43,7 +43,7 @@ namespace Core.Boundaries
         Task RemoveSnapshotAsync(ulong userId, ulong snapshotId);
         Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, UserRating rating);
 
-        Task<FeedShard> GetUserFeedAsync(ulong userId, int depth, int lastDepth);
+        Task<ColumnShard> GetUserColumnAsync(ulong userId, int depth, int lastDepth);
     }
 
 	#endregion

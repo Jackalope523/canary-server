@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 namespace Repository.Tests
 {
     [Collection("Database Collection")]
-    public class FeedTests : IDisposable
+    public class ColumnTests : IDisposable
     {
         private static EFCoreSentry sentry = new(Harbor.Flag.Development);
         private static EFCoreSnapshotStore store = new(Harbor.Flag.Development);
@@ -14,7 +14,7 @@ namespace Repository.Tests
 
         private User subject;
         private Gathering testGathering;
-        public FeedTests(ITestOutputHelper testOutputHelper)
+        public ColumnTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
@@ -32,9 +32,9 @@ namespace Repository.Tests
 
     
         [Fact]
-        public async Task GenerateFeedForUserAsync_SUCCESS()
+        public async Task GenerateColumnForUserAsync_SUCCESS()
         {
-            /// Feed test layout
+            /// Column test layout
             /// subject companions: e, j, m
             /// bait: x
             ///                    depth charge
@@ -47,7 +47,7 @@ namespace Repository.Tests
             /// romeo |        | j4     |        |        | m3 x3
             /// 
             /// previously seen: kilo { e5 }
-            /// returned feed: alpha { e1, j1, e2, e3, m1 }, echo { j2, j3 }, romeo { j4, m3 }
+            /// returned column: alpha { e1, j1, e2, e3, m1 }, echo { j2, j3 }, romeo { j4, m3 }
             /// 
 
 
@@ -142,7 +142,7 @@ namespace Repository.Tests
 
 
             List<ulong> exclusionList = new() { kilo.Id };
-            var retrieved = await store.GenerateFeedForUserAsync(subject.Id, depthCharge, timeA);
+            var retrieved = await store.GenerateColumnForUserAsync(subject.Id, depthCharge, timeA);
 
 
             Assert.NotNull(retrieved);
@@ -152,7 +152,7 @@ namespace Repository.Tests
             Assert.NotNull(e1Snapshot);
             //Assert.Equal(e1.OwnerId, e1Snapshot.UserId);
             Assert.Equal(e1.GatheringId, e1Snapshot.GatheringId);
-            Assert.Equal(e1.PostedAt, e1Snapshot.TimeEtched);
+            Assert.Equal(e1.PostedAt, e1Snapshot.TimeTaken);
 
             var retrievedAsPostIds = retrieved.ConvertAll(snapshot => snapshot.Id);
 

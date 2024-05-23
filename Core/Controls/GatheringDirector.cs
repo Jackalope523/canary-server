@@ -498,7 +498,7 @@ namespace Core.Controls
 			// Hide target user's snapshots from gathering
 			foreach (SnapshotShard snapshot in await gathering.Snapshots)
 			{
-				if (targetUser.Etched(snapshot))
+				if (targetUser.Taken(snapshot))
 				{ _ = Snapshots.HideSnapshotAsync(snapshot.Id); }
 			}
 		}

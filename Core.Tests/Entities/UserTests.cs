@@ -342,7 +342,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task Etched_OwnedSnapshot_ReturnsTrue()
+		public async Task Taken_OwnedSnapshot_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -351,14 +351,14 @@ namespace Core.Tests.Entities
 			var snapshot = await environment.GenerateSnapshotAsync(gathering, user);
 
 			// Act
-			var etched = user.Etched(snapshot);
+			var etched = user.Taken(snapshot);
 
 			// Assert
 			Assert.True(etched);
 		}
 
 		[Fact]
-		public async Task Etched_UnownedSnapshot_ReturnsFalse()
+		public async Task Taken_UnownedSnapshot_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -368,7 +368,7 @@ namespace Core.Tests.Entities
 			var snapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var etched = user.Etched(snapshot);
+			var etched = user.Taken(snapshot);
 
 			// Assert
 			Assert.False(etched);

@@ -109,7 +109,7 @@ namespace Repository
             
             numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { NumberOfAppreciateers = numAppreciateers };
+            return user with { Appreciation = numAppreciateers };
         }
         public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
         { 
@@ -154,7 +154,7 @@ namespace Repository
          
             numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { NumberOfAppreciateers = numAppreciateers };
+            return user with { Appreciation = numAppreciateers };
         }
         public async Task<CoreUser> FindUserByEmailAsync(string email) 
         { 
@@ -199,7 +199,7 @@ namespace Repository
 
             numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { NumberOfAppreciateers = numAppreciateers };
+            return user with { Appreciation = numAppreciateers };
         }
 
         public async Task<Haunt> GetUserHauntAsync(ulong id)

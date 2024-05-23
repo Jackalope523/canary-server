@@ -72,7 +72,7 @@ namespace Repository.Tests
             Assert.NotNull(retrieved);
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
-            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeEtched);
+            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
             Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
@@ -89,7 +89,7 @@ namespace Repository.Tests
             Assert.NotNull(retrieved);
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
-            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeEtched);
+            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
             Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
@@ -103,7 +103,7 @@ namespace Repository.Tests
             Assert.NotNull(retrieved);
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
-            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeEtched);
+            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
             Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
@@ -149,7 +149,7 @@ namespace Repository.Tests
             Assert.NotNull(retrieved);
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
-            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeEtched);
+            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
             Assert.NotEqual(testSnapshot.IsHidden, retrieved.IsHidden);
             Assert.True(retrieved.IsHidden);
         }

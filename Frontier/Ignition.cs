@@ -81,7 +81,7 @@ namespace Frontier
             var coreLogger = loggerFactory.CreateLogger("Core");
             var repositoryLogger = loggerFactory.CreateLogger("Repository");
 
-            Services.CorePush pushNotifications = new();
+            Services.CorePush pushTelegrams = new();
             Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
                 "", "");
 
@@ -117,7 +117,7 @@ namespace Frontier
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
-                pushNotifications,
+                pushTelegrams,
                 harbor.DebugDatabaseAccess);
 
             GuardBox box = new(frontierLogger,

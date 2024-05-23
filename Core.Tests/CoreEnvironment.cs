@@ -295,12 +295,12 @@ namespace Core.Tests
 
 		internal async Task<SnapshotShard> GenerateSnapshotUnsafeAsync(Gathering etchedGathering, User etcher, SnapshotShard snapshot)
 		{
-			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, snapshot.TimeEtched);
+			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, snapshot.TimeTaken);
 		}
 
-		internal async Task<SnapshotShard> GenerateSnapshotUnsafeAsync(Gathering etchedGathering, User etcher, DateTimeOffset timeEtched)
+		internal async Task<SnapshotShard> GenerateSnapshotUnsafeAsync(Gathering etchedGathering, User etcher, DateTimeOffset timeTaken)
 		{
-			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, timeEtched);
+			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, timeTaken);
 		}
 
 		///////////

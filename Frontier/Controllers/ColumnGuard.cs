@@ -10,12 +10,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
-    [Route("feed")]
-    public class FeedGuard : AbstractGuard
+    [Route("column")]
+    public class ColumnGuard : AbstractGuard
     {
 		#region Initialisation
 
-		public FeedGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
+		public ColumnGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
@@ -23,14 +23,14 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet("{depth}-{lastDepth}")]
-        public async Task<IActionResult> GetFeed(int depth, int lastDepth)
+        public async Task<IActionResult> GetColumn(int depth, int lastDepth)
         {
 			// Verify parameters
             if (!ModelState.IsValid)
             { return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await snapshots.GetUserFeedAsync(user.Id, depth, lastDepth));
+				await snapshots.GetUserColumnAsync(user.Id, depth, lastDepth));
         }
 
 		#endregion

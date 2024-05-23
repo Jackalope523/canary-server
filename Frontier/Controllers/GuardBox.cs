@@ -15,7 +15,7 @@ namespace Frontier.Controllers
 		public IKeyOperations keys;
 		public IDisciplineOperations reports;
 		public IMediaOperations media;
-		public INotificationOperations notifications;
+		public INotificationOperations telegrams;
 		public INestOperations nests;
 
 		public GuardBox(ILogger logger,
@@ -35,7 +35,7 @@ namespace Frontier.Controllers
 			keys = keyOperations;
 			reports = disciplineOperations;
 			media = mediaOperations;
-			notifications = notificationOperations;
+			telegrams = notificationOperations;
 		}
 	}
 }

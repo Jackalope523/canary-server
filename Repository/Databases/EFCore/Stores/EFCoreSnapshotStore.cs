@@ -31,7 +31,7 @@ namespace Repository
             return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserSilhouette(toAdd.OwnerId, ownerName), toAdd.PostedAt, new(0, 0), toAdd.IsHidden );
         }
 
-        public async Task<List<SnapshotShard>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
+        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
             // Get List of Companions.
             Task<List<ulong>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
@@ -130,7 +130,7 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return snapshot with { User = new UserSilhouette(snapshot.User.Id, await name), Ratings = new (await ups, await downs) };
+            return snapshot with { User = new UserSilhouette(snapshot.User.Id, await name), Acclaim = new (await ups, await downs) };
         }
 
         public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong id)
@@ -156,7 +156,7 @@ namespace Repository
 
             for (int i = 0; i < snapshots.Count; i++)
             {
-                snapshots[i] = snapshots[i] with { Ratings = (ups[i], downs[i]), User = new UserSilhouette(snapshots[i].User.Id, names[i]) };
+                snapshots[i] = snapshots[i] with { Acclaim = (ups[i], downs[i]), User = new UserSilhouette(snapshots[i].User.Id, names[i]) };
             }
 
             return snapshots;
@@ -229,7 +229,7 @@ namespace Repository
 
             for (int i = 0; i < snapshots.Count; i++)
             {
-                snapshots[i] = snapshots[i] with { Ratings = (ups[i], downs[i]), User = new UserSilhouette(snapshots[i].User.Id, names[i]) };
+                snapshots[i] = snapshots[i] with { Acclaim = (ups[i], downs[i]), User = new UserSilhouette(snapshots[i].User.Id, names[i]) };
             }
 
             return snapshots;

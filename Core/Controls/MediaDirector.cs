@@ -23,7 +23,7 @@ namespace Core.Controls
 			Entities.User snapshotOwner = new(snapshot.User);
 			var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
-			Try(user.Etched(snapshot) ||
+			Try(user.Taken(snapshot) ||
 				await user.IsCompanionsWith(snapshotOwner) ||
 				await etchedGathering.WasAttendedBy(user),
 				new InvalidUserException("User cannot access this snapshot."));

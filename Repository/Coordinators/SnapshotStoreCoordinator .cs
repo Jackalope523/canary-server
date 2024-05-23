@@ -17,9 +17,9 @@ namespace Repository
              return await store.AddSnapshotAsync(gatheringId, posterId, timePosted);  
         }
 
-        public async Task<List<SnapshotShard>> GenerateFeedForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
+        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
-           return await store.GenerateFeedForUserAsync(id, depthCharge, lastDepthCharge);   
+           return await store.GenerateColumnForUserAsync(id, depthCharge, lastDepthCharge);   
         }
 
         public async Task<SnapshotShard> GetSnapshotAsync(ulong id)

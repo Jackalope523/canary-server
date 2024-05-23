@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
-	[Route("notifications")]
-	public class NotificationGuard : AbstractGuard
+	[Route("telegrams")]
+	public class TelegramGuard : AbstractGuard
 	{
 		#region Initialisation
 
-		public NotificationGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
+		public TelegramGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
@@ -22,11 +22,11 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet]
-		public async Task<IActionResult> GetNotes()
+		public async Task<IActionResult> GetTelegrams()
 		{
 			return await Execute(async user =>
 			{
-				return await notifications.GetNotesAsync(user.Id);
+				return await telegrams.GetNotesAsync(user.Id);
 			});
         }
 
@@ -39,7 +39,7 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				await notifications.SubscribeUserAsync(user.Id, subscription.DeviceType, subscription.DeviceToken);
+				await telegrams.SubscribeUserAsync(user.Id, subscription.DeviceType, subscription.DeviceToken);
 			}, allowUnverified: true);
 		}
 
@@ -48,7 +48,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				await notifications.UnsubscribeUserAsync(user.Id);
+				await telegrams.UnsubscribeUserAsync(user.Id);
 			}, allowUnverified: true);
 		}
 

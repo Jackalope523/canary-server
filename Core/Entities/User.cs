@@ -39,7 +39,7 @@ namespace Core.Entities
         public string Name { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
-        public int NumberOfAppreciateers { get; set; }
+        public int Appreciation { get; set; }
         public DateTimeOffset JoinDate { get; init; }
         public int Reputation { get; set; }
 
@@ -144,7 +144,7 @@ namespace Core.Entities
             DateOfBirth = fromUser.DateOfBirth;
             JoinDate = fromUser.JoinDate;
             Reputation = fromUser.Reputation;
-            NumberOfAppreciateers = fromUser.NumberOfAppreciateers;
+            Appreciation = fromUser.Appreciation;
             IsPhoneConfirmed = fromUser.IsPhoneConfirmed;
             IsEmailConfirmed = fromUser.IsEmailConfirmed;
             IsDeleted = fromUser.IsPendingDeletion;
@@ -166,7 +166,7 @@ namespace Core.Entities
             Id = fromUser.Id;
             Name = fromUser.Name;
             Reputation = fromUser.Reputation;
-            NumberOfAppreciateers = fromUser.NumberOfAppreciateers;
+            Appreciation = fromUser.Appreciation;
         }
 
         public CoreUser ToCoreUser()
@@ -174,13 +174,13 @@ namespace Core.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, NumberOfAppreciateers, Character.ToCharacter());
+                JoinDate, Reputation, Appreciation, Character.ToCharacter());
         }
 
         public UserShard ToUserShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-                Reputation, NumberOfAppreciateers);
+                Reputation, Appreciation);
         }
 
         public UserSilhouette ToUserSilhouette()
@@ -190,7 +190,7 @@ namespace Core.Entities
 
         public UserProfile ToUserProfile()
         {
-            return new(Id, Name, Reputation, NumberOfAppreciateers);
+            return new(Id, Name, Reputation, Appreciation);
         }
 
 		#endregion
@@ -365,7 +365,7 @@ namespace Core.Entities
 				new InvalidGatheringException("Gathering has already ended."));
 		}
 
-		public bool Etched(SnapshotShard snapshot)
+		public bool Taken(SnapshotShard snapshot)
         {
             return snapshot.User.Id.Equals(Id);
 		}

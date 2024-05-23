@@ -56,11 +56,11 @@ namespace Core.Controls
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-            var gatheringEtched = await GetGatheringAsync(snapshot.GatheringId);
+            var gatheringTaken = await GetGatheringAsync(snapshot.GatheringId);
             var user = await userSync;
 
             // Verify user owns the snapshot or can modify the gathering
-            Try(user.Etched(snapshot) || gatheringEtched.IsModifiableBy(user),
+            Try(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove snapshot."));
 
             await Snapshots.RemoveSnapshotAsync(snapshot.Id);
@@ -70,14 +70,14 @@ namespace Core.Controls
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-            var gatheringEtched = await GetGatheringAsync(snapshot.GatheringId);
+            var gatheringTaken = await GetGatheringAsync(snapshot.GatheringId);
             var user = await userSync;
 
             // Verify user can interact with snapshot
-            Try(await gatheringEtched.WasAttendedBy(user),
+            Try(await gatheringTaken.WasAttendedBy(user),
                 new InvalidUserException("User cannot interact with snapshot."));
 
-            Fail(user.Etched(snapshot),
+            Fail(user.Taken(snapshot),
                 new InvalidUserException("User cannot rate their own snapshot."));
 
             // Check if removing a rating
@@ -91,8 +91,8 @@ namespace Core.Controls
             }
         }
 
-        public async Task<FeedShard>
-            GetUserFeedAsync(ulong userId, int depth, int lastDepth)
+        public async Task<ColumnShard>
+            GetUserColumnAsync(ulong userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
             Dictionary<ulong, GatheringHeader> gatheringHeaders = new();
@@ -103,7 +103,7 @@ namespace Core.Controls
             // Retrieve companion-populated gathering snapshots after a specified time excluding previously viewed gatherings
             DateTimeOffset depthCharge = Time - TimeSpan.FromDays(depth);
             DateTimeOffset lastDepthCharge = Time - TimeSpan.FromDays(lastDepth);
-            var companionSnapshots = await Snapshots.GenerateFeedForUserAsync(user.Id, depthCharge, lastDepthCharge);
+            var companionSnapshots = await Snapshots.GenerateColumnForUserAsync(user.Id, depthCharge, lastDepthCharge);
 
             // Get the respective gathering headers for the snapshots
             foreach (var snapshot in companionSnapshots)
@@ -115,15 +115,15 @@ namespace Core.Controls
                 {
                     var etchedGathering = await GetGatheringAsync(gatheringId);
 
-                    gatheringHeaders.Add(gatheringId, etchedGathering.ToGatheringHeader(snapshot.TimeEtched));
+                    gatheringHeaders.Add(gatheringId, etchedGathering.ToGatheringHeader(snapshot.TimeTaken));
                 }
                 // Update gathering header active time if snapshot is more recent
-                else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, snapshot.TimeEtched))
+                else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, snapshot.TimeTaken))
                 {
                     gatheringHeaders[gatheringId] = new(gatheringId,
                         gatheringHeaders[gatheringId].Name,
                         gatheringHeaders[gatheringId].IsActive,
-                        snapshot.TimeEtched,
+                        snapshot.TimeTaken,
                         gatheringHeaders[gatheringId].Latitude,
                         gatheringHeaders[gatheringId].Longitude);
                 }

@@ -21,7 +21,7 @@ namespace Core.Controls
 		protected IDisciplineDatabase Reports { get; private set; }
 		protected IKeyDatabase Keys { get; private set; }
 		protected IMediaDatabase Media { get; private set; }
-		protected INotificationDatabase Notifications { get; private set; }
+		protected INotificationDatabase Telegrams { get; private set; }
 		protected INestDatabase Nests { get; private set; }
 
 		#endregion
@@ -39,7 +39,7 @@ namespace Core.Controls
 			Reports = Terminal.DisciplineDatabase;
 			Keys = Terminal.KeyDatabase;
 			Media = Terminal.MediaDatabase;
-			Notifications = Terminal.NotificationDatabase;
+			Telegrams = Terminal.NotificationDatabase;
 			Nests = Terminal.NestDatabase;
         }
 

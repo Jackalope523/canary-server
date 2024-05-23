@@ -347,7 +347,7 @@ namespace Core.Entities
             return updatedGuests;
 		}
 
-        public async Task Etched(User user)
+        public async Task Taken(User user)
         {
             // Verify snapshot is not before gathering starting or user is host
             Try(HasAlready(StartTime) || IsModifiableBy(user),
