@@ -11,24 +11,24 @@ namespace Repository
             store = new EFCoreDisciplineStore(flag);
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>)> GetReportsByUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsByUserAsync(ulong id)
         {
             return await store.GetReportsByUserAsync(id);
         }
 
-        public async Task<List<Core.Boundaries.EventReport>> GetReportsForEventAsync(ulong id)
+        public async Task<List<Core.Boundaries.GatheringReport>> GetReportsForGatheringAsync(ulong id)
         {
-            return await store.GetReportsForEventAsync(id);
+            return await store.GetReportsForGatheringAsync(id);
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.EventReport>)> GetReportsForUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsForUserAsync(ulong id)
         {
             return await store.GetReportsForUserAsync(id);
         }
 
-        public async Task ReportEventAsync(ulong userId, ulong eventId, DateTimeOffset timeOfReport, EventReportType reportType, string reportDetails)
+        public async Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport, GatheringReportType reportType, string reportDetails)
         {
-            await store.ReportEventAsync(userId, eventId, timeOfReport, reportType, reportDetails);
+            await store.ReportGatheringAsync(userId, gatheringId, timeOfReport, reportType, reportDetails);
         }
 
         public async Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
@@ -36,7 +36,7 @@ namespace Repository
             await store.ReportUserAsync(userId, targetUserId, timeOfReport, reportType, reportDetails);
         }
 
-        public async Task ReportUserAsync(ulong selfId, ulong targetId, ulong eventId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(ulong selfId, ulong targetId, ulong gatheringId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
         {
             await store.ReportUserAsync(selfId, targetId, timeOfReport, reportType, reportDetails);
         }

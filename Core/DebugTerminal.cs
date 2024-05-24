@@ -26,20 +26,20 @@ namespace Core
 
 		public static DebugTerminal CreateDebugTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+            IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService, IDebugDatabase debugDatabase)
 		{
 			lock (initLock)
 			{
 				Terminal ??= new DebugTerminal(logger,
                         accountDatabase, adminDatabase, bannerDatabase,
-                        eventDatabase, etchingDatabase,
+                        gatheringDatabase, snapshotDatabase,
                         disciplineDatabase, keyDatabase,
                         mediaDatabase, notificationDatabase,
-                        profileDatabase,
+                        nestDatabase,
                         notificationService,
 						debugDatabase);
 
@@ -49,17 +49,17 @@ namespace Core
 
 		protected DebugTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+            IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService, IDebugDatabase debugDatabase)
 			: base(logger,
 					accountDatabase, adminDatabase, bannerDatabase,
-					eventDatabase, etchingDatabase,
+					gatheringDatabase, snapshotDatabase,
 					disciplineDatabase, keyDatabase,
 					mediaDatabase, notificationDatabase,
-					profileDatabase,  notificationService)
+					nestDatabase,  notificationService)
 		{
 			DebugDatabase = debugDatabase;
 			DebugDirector = new DebugDirector(this);

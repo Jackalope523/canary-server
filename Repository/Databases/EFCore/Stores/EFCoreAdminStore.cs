@@ -10,11 +10,11 @@ namespace Repository
 
         }
 
-        public async Task VoidEventAsync(ulong eventId)
+        public async Task VoidGatheringAsync(ulong gatheringId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.Events.
-                Where(e => e.Id == eventId).
+                ctx.Gatherings.
+                Where(e => e.Id == gatheringId).
                 ExecuteDeleteAsync());
         }
 

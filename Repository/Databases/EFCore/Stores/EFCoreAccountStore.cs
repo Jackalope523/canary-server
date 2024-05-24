@@ -39,15 +39,15 @@ namespace Repository
                 Where(u => u.Id == id).
                 ExecuteUpdate(setter => setter.SetProperty(u => u.IsPendingDeletion, true)));
 
-            List<ulong> upcomingEvents = await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.Events.
-                Where(e => e.HostId == id && e.State == EventState.Upcoming).
+            List<ulong> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Gatherings.
+                Where(e => e.HostId == id && e.State == GatheringState.Upcoming).
                 Select(e => e.Id).
                 ToListAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Events.
-               Where(e => upcomingEvents.Contains(e.Id)).
+               ctx.Gatherings.
+               Where(e => upcomingGatherings.Contains(e.Id)).
                ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
         
             await storeSentry.ExecuteWriteAsync(ctx =>
@@ -68,7 +68,7 @@ namespace Repository
 
         public async Task<CoreUser> FindUserByIdAsync(ulong id) 
         {            
-            int numFollowers;
+            int numAppreciateers;
             CoreUser user;
             try 
             {
@@ -107,13 +107,13 @@ namespace Repository
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
             
-            numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
+            numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { NumberOfFollowers = numFollowers };
+            return user with { Appreciation = numAppreciateers };
         }
         public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
         { 
-            int numFollowers;
+            int numAppreciateers;
             CoreUser user;
             try
             {
@@ -152,13 +152,13 @@ namespace Repository
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
          
-            numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
+            numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { NumberOfFollowers = numFollowers };
+            return user with { Appreciation = numAppreciateers };
         }
         public async Task<CoreUser> FindUserByEmailAsync(string email) 
         { 
-            int numFollowers;
+            int numAppreciateers;
             CoreUser user;
             try
             {
@@ -197,9 +197,9 @@ namespace Repository
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
 
-            numFollowers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Follow).CountAsync());
+            numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { NumberOfFollowers = numFollowers };
+            return user with { Appreciation = numAppreciateers };
         }
 
         public async Task<Haunt> GetUserHauntAsync(ulong id)

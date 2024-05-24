@@ -55,26 +55,26 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task ReportEventAsync_ValidEvent_Succeeds()
+		public async Task ReportGatheringAsync_ValidGathering_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var reportedHost = await environment.GenerateUniqueUserAsync();
-			var reportedEvent = await environment.GenerateUpcomingEventAsync(reportedHost);
-			EventReportType report = EventReportType.Misleading;
+			var reportedGathering = await environment.GenerateUpcomingGatheringAsync(reportedHost);
+			GatheringReportType report = GatheringReportType.Misleading;
 			string reportDetails = "detailed report";
 
 			// Act
-			await director.ReportEventAsync(user.Id, reportedEvent.Id, report, reportDetails);
+			await director.ReportGatheringAsync(user.Id, reportedGathering.Id, report, reportDetails);
 
 			// Assert
-			Assert.Single(await reportedEvent.EventReports);
-			Assert.Equal(report, (await reportedEvent.EventReports)[0].ReportType);
-			Assert.Equal(reportDetails, (await reportedEvent.EventReports)[0].ReportDetails);
+			Assert.Single(await reportedGathering.GatheringReports);
+			Assert.Equal(report, (await reportedGathering.GatheringReports)[0].ReportType);
+			Assert.Equal(reportDetails, (await reportedGathering.GatheringReports)[0].ReportDetails);
 
-			Assert.Single(await reportedHost.EventReports);
-			Assert.Equal(report, (await reportedHost.EventReports)[0].ReportType);
-			Assert.Equal(reportDetails, (await reportedHost.EventReports)[0].ReportDetails);
+			Assert.Single(await reportedHost.GatheringReports);
+			Assert.Equal(report, (await reportedHost.GatheringReports)[0].ReportType);
+			Assert.Equal(reportDetails, (await reportedHost.GatheringReports)[0].ReportDetails);
 		}
 
 		[Fact]

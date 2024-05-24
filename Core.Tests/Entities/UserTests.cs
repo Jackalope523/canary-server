@@ -51,79 +51,48 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task CalculateReputation_NoChange_SameReputation()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var oldReputation = user.Reputation;
-
-			// Act
-			await user.CalculateReputation();
-
-			// Assert
-			Assert.Equal(oldReputation, user.Reputation);
-		}
-
-		[Fact]
-		public async Task CalculateReputation_Changed_NewReputation()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var nemesis = await environment.GenerateUniqueUserAsync();
-
-			var oldReputation = user.Reputation;
-			await environment.Terminal.ProfileOperations.RateUserAsync(nemesis.Id, user.Id, UserRating.Negative);
-
-			// Act
-			await user.CalculateReputation();
-
-			// Assert
-			Assert.NotEqual(oldReputation, user.Reputation);
-		}
-
-		[Fact]
 		public async Task CalculateCharacter_NewCharacter()
 		{
 			// Arrange
 			var host = environment.CreateTestUser();
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @event = environment.CreateTestEvent(host);
-			@event.Character = new(new(100,100,100,100,100,100,100));
+			var gathering = environment.CreateTestGathering(host);
+			gathering.Character = new(new(100,100,100,100,100,100,100));
 			var oldCharacter = user.Character;
 
 			// Act
-			user.CalculateCharacter(@event, TimeSpan.FromMinutes(45));
+			user.CalculateCharacter(gathering, TimeSpan.FromMinutes(45));
 
 			// Assert
 			Assert.NotEqual(oldCharacter, user.Character);
 		}
 
 		[Fact]
-		public async Task NextEvent_HasEvent_ReturnsEvent()
+		public async Task NextGathering_HasGathering_ReturnsGathering()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(user);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(user);
 
 			// Act
-			var returnedEvent = await user.NextEvent();
+			var returnedGathering = await user.NextGathering();
 
 			// Assert
-			Assert.Equal(@event, returnedEvent);
+			Assert.Equal(gathering, returnedGathering);
 		}
 
 		[Fact]
-		public async Task NextEvent_HasNone_ReturnsNoneEvent()
+		public async Task NextGathering_HasNone_ReturnsNoneGathering()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var returnedEvent = await user.NextEvent();
+			var returnedGathering = await user.NextGathering();
 
 			// Assert
-			Assert.Equal(Event.None, returnedEvent);
+			Assert.Equal(Gathering.None, returnedGathering);
 		}
 
 		/////
@@ -131,61 +100,61 @@ namespace Core.Tests.Entities
 		///////////
 
 		[Fact]
-		public async Task IsFriendsWith_Friend_ReturnsTrue()
+		public async Task IsCompanionsWith_Companion_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion);
 
 			// Act
-			var isFriends = await user.IsFriendsWith(friend);
+			var isCompanions = await user.IsCompanionsWith(companion);
 
 			// Assert
-			Assert.True(isFriends);
+			Assert.True(isCompanions);
 		}
 
 		[Fact]
-		public async Task IsFriendsWith_Neutral_ReturnsFalse()
+		public async Task IsCompanionsWith_Neutral_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var isFriends = await user.IsFriendsWith(randomUser);
+			var isCompanions = await user.IsCompanionsWith(randomUser);
 
 			// Assert
-			Assert.False(isFriends);
+			Assert.False(isCompanions);
 		}
 
 		[Fact]
-		public async Task IsFollowing_FollowedUser_ReturnsTrue()
+		public async Task IsAppreciating_AppreciatedUser_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend = await environment.GenerateUniqueUserAsync();
-			await environment.ForceFriendshipAsync(user, friend);
+			var companion = await environment.GenerateUniqueUserAsync();
+			await environment.ForceCompanionshipAsync(user, companion);
 
 			// Act
-			var isFollowing = await user.IsFollowing(friend);
+			var isAppreciating = await user.IsAppreciating(companion);
 
 			// Assert
-			Assert.True(isFollowing);
+			Assert.True(isAppreciating);
 		}
 
 		[Fact]
-		public async Task IsFollowing_Neutral_ReturnsFalse()
+		public async Task IsAppreciating_Neutral_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var isFollowing = await user.IsFollowing(randomUser);
+			var isAppreciating = await user.IsAppreciating(randomUser);
 
 			// Assert
-			Assert.False(isFollowing);
+			Assert.False(isAppreciating);
 		}
 
 		[Fact]
@@ -247,45 +216,45 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task IsAtEvent_AtEvent_ReturnsTrue()
+		public async Task IsAtGathering_AtGathering_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateOngoingEventAsync(host);
-			await environment.AddUserToEventAsync(@event, user, EventBond.Arrived);
+			var gathering = await environment.GenerateOngoingGatheringAsync(host);
+			await environment.AddUserToGatheringAsync(gathering, user, GatheringBond.Arrived);
 
 			// Act
-			var isAtEvent = await user.IsAtEvent();
+			var isAtGathering = await user.IsAtGathering();
 
 			// Assert
-			Assert.True(isAtEvent);
+			Assert.True(isAtGathering);
 		}
 
 		[Fact]
-		public async Task IsAtEvent_Sload_ReturnsFalse()
+		public async Task IsAtGathering_Sload_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var isAtEvent = await user.IsAtEvent();
+			var isAtGathering = await user.IsAtGathering();
 
 			// Assert
-			Assert.False(isAtEvent);
+			Assert.False(isAtGathering);
 		}
 
 		[Fact]
-		public async Task CanView_ValidEvent_ReturnsTrue()
+		public async Task CanView_ValidGathering_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var canView = await user.CanView(@event);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.True(canView);
@@ -298,10 +267,10 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(user, host);
-			var @event = await environment.GenerateUpcomingEventAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			var canView = await user.CanView(@event);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.False(canView);
@@ -313,47 +282,47 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			await environment.UpdateUser(user, nameof(CoreUser.AccountStatus), UserAccountStatus.Limited);
 			user = new(await environment.Terminal.AccountDatabase.FindUserByIdAsync(user.Id));
 
 			// Act
-			var canView = await user.CanView(@event);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.False(canView);
 		}
 
 		[Fact]
-		public async Task CanView_FriendLimited_ReturnsTrue()
+		public async Task CanView_CompanionLimited_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			await environment.UpdateUser(user, nameof(User.AccountStatus), UserAccountStatus.Limited);
 			
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.ForceFriendshipAsync(user, host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.ForceCompanionshipAsync(user, host);
 
 			// Act
-			var canView = await user.CanView(@event);
+			var canView = await user.CanView(gathering);
 
 			// Assert
 			Assert.True(canView);
 		}
 
 		[Fact]
-		public async Task CanJoin_JoinableEventAndVisibleUser_ReturnsTrue()
+		public async Task CanJoin_JoinableGatheringAndVisibleUser_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			await environment.UpdateUserLocationAsync(user, @event.Location.Latitude, @event.Location.Longitude);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
 			// Act
-			var canJoin = await user.CanJoin(@event);
+			var canJoin = await user.CanJoin(gathering);
 
 			// Assert
 			Assert.True(canJoin);
@@ -365,41 +334,41 @@ namespace Core.Tests.Entities
 		{
 			// Arrange
 			var host = await environment.GenerateUniqueUserAsync();
-			var @event = await environment.GenerateUpcomingEventAsync(host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			await host.CanEtch(@event);
+			await host.CanEtch(gathering);
 			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
-		public async Task Etched_OwnedEtching_ReturnsTrue()
+		public async Task Taken_OwnedSnapshot_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateUpcomingEventAsync(user);
-			var etching = await environment.GenerateEtchingAsync(@event, user);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(user);
+			var snapshot = await environment.GenerateSnapshotAsync(gathering, user);
 
 			// Act
-			var etched = user.Etched(etching);
+			var etched = user.Taken(snapshot);
 
 			// Assert
 			Assert.True(etched);
 		}
 
 		[Fact]
-		public async Task Etched_UnownedEtching_ReturnsFalse()
+		public async Task Taken_UnownedSnapshot_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var host = await environment.GenerateUniqueUserAsync();
 
-			var @event = await environment.GenerateUpcomingEventAsync(host);
-			var etching = await environment.GenerateEtchingAsync(@event, host);
+			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
+			var snapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var etched = user.Etched(etching);
+			var etched = user.Taken(snapshot);
 
 			// Assert
 			Assert.False(etched);
@@ -545,26 +514,26 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task NotifyFollowers_Succeeds()
+		public async Task NotifyAppreciateers_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
-			var friend1 = await environment.GenerateUniqueUserAsync();
-			var friend2 = await environment.GenerateUniqueUserAsync();
+			var companion1 = await environment.GenerateUniqueUserAsync();
+			var companion2 = await environment.GenerateUniqueUserAsync();
 
-			await environment.ForceFriendshipAsync(user, friend1, friend2);
-			await environment.SubscribeUserAsync(friend1, DeviceType.iOS, friend1.Id.ToString());
-			await environment.SubscribeUserAsync(friend2, DeviceType.iOS, friend2.Id.ToString());
-			string notificationTitle = "event title", notificationMessage = "message test";
+			await environment.ForceCompanionshipAsync(user, companion1, companion2);
+			await environment.SubscribeUserAsync(companion1, DeviceType.iOS, companion1.Id.ToString());
+			await environment.SubscribeUserAsync(companion2, DeviceType.iOS, companion2.Id.ToString());
+			string notificationTitle = "gathering title", notificationMessage = "message test";
 
 			// Act
-			await user.NotifyFollowers(notificationTitle, notificationMessage);
+			await user.NotifyAppreciateers(notificationTitle, notificationMessage);
 
 			// Assert
-			var incomingUserMessages = environment.GetUserMessages(friend1);
+			var incomingUserMessages = environment.GetUserMessages(companion1);
 			Assert.Single(incomingUserMessages);
 
-			var guestMessages = environment.GetUserMessages(friend2);
+			var guestMessages = environment.GetUserMessages(companion2);
 			Assert.Single(guestMessages);
 		}
 	}

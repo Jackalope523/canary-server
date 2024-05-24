@@ -16,7 +16,7 @@ namespace Core.Boundaries
     public interface IAdminDatabase
 	{
         Task VoidUserAsync(ulong userId);
-        Task VoidEventAsync(ulong eventId);
+        Task VoidGatheringAsync(ulong gatheringId);
     }
 
     #endregion

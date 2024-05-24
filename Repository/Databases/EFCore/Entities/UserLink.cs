@@ -2,7 +2,7 @@
 {
     public class UserLink
     {
-        public enum UserLinkType { Follow, Block, RateUp, RateDown }
+        public enum UserLinkType { Appreciate, Block, RateUp, RateDown }
 
         public ulong Id { get; set; }
         public ulong SelfId { get; init; }

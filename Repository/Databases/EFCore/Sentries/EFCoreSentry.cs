@@ -28,15 +28,15 @@ namespace Repository
             using AzureSQLContext context = new();
 
             UserFactory userFactory = new();
-            EventFactory eventFactory = new();
-            EtchingFactory etchingFactory = new();
+            GatheringFactory gatheringFactory = new();
+            SnapshotFactory snapshotFactory = new();
             UserReportFactory userReportFactory = new();
-            EventReportFactory eventReportFactory = new();
+            GatheringReportFactory gatheringReportFactory = new();
             PenaltyFactory penaltyFactory = new();
             SubscriptionFactory subscriptionFactory = new();
             NoteFactory noteFactory = new();
             UserLinkFactory userLinkFactory = new();
-            EventLinkFactory eventLinkFactory = new();
+            GatheringLinkFactory gatheringLinkFactory = new();
             PostLinkFactory postLinkFactory = new();
 
             List<User> users = new();
@@ -47,24 +47,24 @@ namespace Repository
             context.Users.AddRange(users);
             context.SaveChanges();
 
-            List<Event> events = new();
+            List<Gathering> gatherings = new();
             for (int i = 0; i < 2; i++)
             {
-                events.Add(eventFactory.Create(users[i]));
+                gatherings.Add(gatheringFactory.Create(users[i]));
             }
-            context.Events.AddRange(events);
+            context.Gatherings.AddRange(gatherings);
             context.SaveChanges();
 
-            List<Post> etchings = new();
+            List<Post> snapshots = new();
             for (int i = 0; i < 10; i++)
             {
-                Event location;
-                if (i <= 6) location = events[0];
-                else location = events[1];
+                Gathering location;
+                if (i <= 6) location = gatherings[0];
+                else location = gatherings[1];
 
-                etchings.Add(etchingFactory.Create(users[i], location));
+                snapshots.Add(snapshotFactory.Create(users[i], location));
             }
-            context.Posts.AddRange(etchings);
+            context.Posts.AddRange(snapshots);
             context.SaveChanges();
         }
 

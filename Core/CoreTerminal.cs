@@ -19,22 +19,22 @@ namespace Core
         public IAccountDatabase AccountDatabase { get; init; }
         public IAdminDatabase AdminDatabase { get; init; }
         public IBannerDatabase BannerDatabase { get; init; }
-        public IEventDatabase EventDatabase { get; init; }
-        public IEtchingDatabase EtchingDatabase { get; init; }
+        public IGatheringDatabase GatheringDatabase { get; init; }
+        public ISnapshotDatabase SnapshotDatabase { get; init; }
         public IDisciplineDatabase DisciplineDatabase { get; init; }
         public IKeyDatabase KeyDatabase { get; init; }
         public IMediaDatabase MediaDatabase { get; init; }
         public INotificationDatabase NotificationDatabase { get; init; }
-        public IProfileDatabase ProfileDatabase { get; init; }
+        public INestDatabase NestDatabase { get; init; }
 
         public IAccountOperations AccountOperations
             => AccountDirector;
         public IBannerOperations BannerOperations
             => BannerDirector;
-        public IEventOperations EventOperations
-            => EventDirector;
-        public IEtchingOperations EtchingOperations
-            => EtchingDirector;
+        public IGatheringOperations GatheringOperations
+            => GatheringDirector;
+        public ISnapshotOperations SnapshotOperations
+            => SnapshotDirector;
         public IDisciplineOperations DisciplineOperations
             => DisciplineDirector;
         public IKeyOperations KeyOperations
@@ -43,20 +43,20 @@ namespace Core
             => MediaDirector;
         public INotificationOperations NotificationOperations
             => NotificationDirector;
-        public IProfileOperations ProfileOperations
-            => ProfileDirector;
+        public INestOperations NestOperations
+            => NestDirector;
 
         public INotificationService NotificationService { get; init; }
 
         internal AccountDirector AccountDirector { get; private set; }
         internal BannerDirector BannerDirector { get; private set; }
-        internal EventDirector EventDirector { get; private set; }
-        internal EtchingDirector EtchingDirector { get; private set; }
+        internal GatheringDirector GatheringDirector { get; private set; }
+        internal SnapshotDirector SnapshotDirector { get; private set; }
         internal DisciplineDirector DisciplineDirector { get; private set; }
         internal KeyDirector KeyDirector { get; private set; }
         internal MediaDirector MediaDirector { get; private set; }
         internal NotificationDirector NotificationDirector { get; private set; }
-        internal ProfileDirector ProfileDirector { get; private set; }
+        internal NestDirector NestDirector { get; private set; }
 
         #endregion
 
@@ -64,20 +64,20 @@ namespace Core
 
         public static CoreTerminal CreateTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+            IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService)
         {
             lock (initLock)
             {
                 Terminal ??= new CoreTerminal(logger,
                         accountDatabase, adminDatabase, bannerDatabase,
-                        eventDatabase, etchingDatabase,
+                        gatheringDatabase, snapshotDatabase,
                         disciplineDatabase, keyDatabase,
                         mediaDatabase, notificationDatabase,
-                        profileDatabase,
+                        nestDatabase,
                         notificationService);
 
                 return Terminal;
@@ -86,10 +86,10 @@ namespace Core
 
         protected CoreTerminal(ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-			IEventDatabase eventDatabase, IEtchingDatabase etchingDatabase,
+			IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
 			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            IProfileDatabase profileDatabase,
+            INestDatabase nestDatabase,
             INotificationService notificationService)
         {
             Log = logger;
@@ -97,13 +97,13 @@ namespace Core
             AccountDatabase = accountDatabase;
             AdminDatabase = adminDatabase;
             BannerDatabase = bannerDatabase;
-            EventDatabase = eventDatabase;
-            EtchingDatabase = etchingDatabase;
+            GatheringDatabase = gatheringDatabase;
+            SnapshotDatabase = snapshotDatabase;
             DisciplineDatabase = disciplineDatabase;
             KeyDatabase = keyDatabase;
             MediaDatabase = mediaDatabase;
             NotificationDatabase = notificationDatabase;
-            ProfileDatabase = profileDatabase;
+            NestDatabase = nestDatabase;
 
             NotificationService = notificationService;
 
@@ -114,13 +114,13 @@ namespace Core
         {
             AccountDirector = new AccountDirector(this);
             BannerDirector = new BannerDirector(this);
-            EventDirector = new EventDirector(this);
-            EtchingDirector = new EtchingDirector(this);
+            GatheringDirector = new GatheringDirector(this);
+            SnapshotDirector = new SnapshotDirector(this);
             DisciplineDirector = new DisciplineDirector(this);
             KeyDirector = new KeyDirector(this);
             MediaDirector = new MediaDirector(this);
             NotificationDirector = new NotificationDirector(this);
-            ProfileDirector = new ProfileDirector(this);
+            NestDirector = new NestDirector(this);
         }
 
         #endregion

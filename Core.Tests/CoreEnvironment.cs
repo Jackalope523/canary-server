@@ -35,17 +35,17 @@ namespace Core.Tests
 		private DateTimeOffset subjectDateOfBirth = new(new DateTime(0));
 		private DateTimeOffset testJoinDate = new(new DateTime(0));
 
-		private static double uniqueEventDegree = -89;
-		private string testEventName = "event1";
-		private string testEventDescription = "The first of many.";
-		private DateTimeOffset testEventStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
-		private GeoLocation testEventLocation = new() { Latitude = 0, Longitude = 0 };
-		private int testEventGroupMinimum = 0;
-		private int testEventGroupMaximum = 10;
-		private Distance testEventRadius = new() { Kilometres = 1 };
-		private bool testEventIsDynamic = false;
+		private static double uniqueGatheringDegree = -89;
+		private string testGatheringName = "gathering1";
+		private string testGatheringDescription = "The first of many.";
+		private DateTimeOffset testGatheringStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
+		private GeoLocation testGatheringLocation = new() { Latitude = 0, Longitude = 0 };
+		private int testGatheringGroupMinimum = 0;
+		private int testGatheringGroupMaximum = 10;
+		private Distance testGatheringRadius = new() { Kilometres = 1 };
+		private bool testGatheringIsDynamic = false;
 
-		private DateTimeOffset testEtchingTime = new(DateTime.UtcNow);
+		private DateTimeOffset testSnapshotTime = new(DateTime.UtcNow);
 
 		/////
 		// Set-up
@@ -64,13 +64,13 @@ namespace Core.Tests
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
 				harbor.BannerDatabaseAccess,
-                harbor.EventDatabaseAccess,
-                harbor.EtchingDatabaseAccess,
+                harbor.GatheringDatabaseAccess,
+                harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
 				harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
-                harbor.ProfileDatabaseAccess,
+                harbor.NestDatabaseAccess,
 				new NotificationServiceStub());
 			
 		}
@@ -122,7 +122,7 @@ namespace Core.Tests
 			await Terminal.AccountDatabase.UpdateRecentLocationAsync(user.Id, latitude, longitude, radius);
 		}
 
-		internal async Task ForceFriendshipAsync(params User[] users)
+		internal async Task ForceCompanionshipAsync(params User[] users)
 		{
 			foreach (var user in users)
 			{
@@ -131,7 +131,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.FollowUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
+					await Terminal.NestDatabase.AppreciateUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}
@@ -145,162 +145,162 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.ProfileDatabase.BlockUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
+					await Terminal.NestDatabase.BlockUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}
 
 		////////
-		// Event Helpers
+		// Gathering Helpers
 		//////////////////
 
-		internal Event CreateTestEvent(User host)
+		internal Gathering CreateTestGathering(User host)
 		{
-			Event eventStub = new()
+			Gathering gatheringStub = new()
 			{
-				Name = testEventName,
-				Description = testEventDescription,
+				Name = testGatheringName,
+				Description = testGatheringDescription,
 				Host = host,
-				StartTime = testEventStartTime,
-				Location = testEventLocation,
-				GroupMinimum = testEventGroupMinimum,
-				GroupMaximum = testEventGroupMaximum,
-				Radius = testEventRadius,
-				IsDynamic = testEventIsDynamic
+				StartTime = testGatheringStartTime,
+				Location = testGatheringLocation,
+				GroupMinimum = testGatheringGroupMinimum,
+				GroupMaximum = testGatheringGroupMaximum,
+				Radius = testGatheringRadius,
+				IsDynamic = testGatheringIsDynamic
 			};
 
-			return eventStub;
+			return gatheringStub;
 		}
 
-		internal async Task<Event> GenerateEventUnsafeAsync(Event eventStub, User host)
+		internal async Task<Gathering> GenerateGatheringUnsafeAsync(Gathering gatheringStub, User host)
 		{
-			return new(await Terminal.EventDatabase.CreateEventAsync(host.Id, eventStub.Name, eventStub.Description,
-				eventStub.StartTime, eventStub.Location.Latitude, eventStub.Location.Longitude,
-				eventStub.GroupMinimum, eventStub.GroupMaximum, host.Character.ToCharacter(),
-				eventStub.Radius.Kilometres, eventStub.IsDynamic));
+			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
+				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
+				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
 		}
 
-		internal async Task<Event> GenerateUpcomingEventAsync(User host)
+		internal async Task<Gathering> GenerateUpcomingGatheringAsync(User host)
 		{
-			var eventStub = CreateTestEvent(host);
+			var gatheringStub = CreateTestGathering(host);
 
-			return await GenerateEventUnsafeAsync(eventStub, host);
+			return await GenerateGatheringUnsafeAsync(gatheringStub, host);
 		}
 
-		internal async Task<Event> GenerateUpcomingEventAsync(User host, params User[] guests)
+		internal async Task<Gathering> GenerateUpcomingGatheringAsync(User host, params User[] guests)
 		{
-			var eventStub = await GenerateUpcomingEventAsync(host);
+			var gatheringStub = await GenerateUpcomingGatheringAsync(host);
 
 			foreach (var guest in guests)
             {
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Guest, DateTimeOffset.UtcNow);
+				await Terminal.GatheringDatabase.SetUserStateAsync(guest.Id, gatheringStub.Id, GatheringBond.Guest, DateTimeOffset.UtcNow);
 			}
 
-			return eventStub;
+			return gatheringStub;
 		}
 
-		internal async Task<Event> GenerateOngoingEventAsync(User host, params User[] guests)
+		internal async Task<Gathering> GenerateOngoingGatheringAsync(User host, params User[] guests)
 		{
-			var eventStub = CreateTestEvent(host);
-			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
+			var gatheringStub = CreateTestGathering(host);
+			gatheringStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
-			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
-			await Terminal.EventDatabase.UpdateEventAsync(eventStub.Id, new() { (nameof(CoreEvent.State), EventState.Open) });
-			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
+			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
+			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
+			await Terminal.GatheringDatabase.SetUserStateAsync(host.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
+				await Terminal.GatheringDatabase.SetUserStateAsync(guest.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
-			return eventStub;
+			return gatheringStub;
 		}
 
-		internal async Task<Event> GeneratePastEventAsync(User host, params User[] guests)
+		internal async Task<Gathering> GeneratePastGatheringAsync(User host, params User[] guests)
 		{
-			var eventStub = CreateTestEvent(host);
-			eventStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
+			var gatheringStub = CreateTestGathering(host);
+			gatheringStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
-			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
-			await Terminal.EventDatabase.SetUserStateAsync(host.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
+			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
+			await Terminal.GatheringDatabase.SetUserStateAsync(host.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
+				await Terminal.GatheringDatabase.SetUserStateAsync(guest.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
-			await Terminal.EventDatabase.EndEventAsync(eventStub.Id, DateTimeOffset.UtcNow);
+			await Terminal.GatheringDatabase.EndGatheringAsync(gatheringStub.Id, DateTimeOffset.UtcNow);
 
-			return eventStub;
+			return gatheringStub;
 		}
 
-		internal async Task<Event> GenerateUniqueEventAsync(User host, params User[] guests)
+		internal async Task<Gathering> GenerateUniqueGatheringAsync(User host, params User[] guests)
 		{
-			var eventStub = CreateTestEvent(host);
-			eventStub.Location = new() { Latitude = SafeAdd(ref uniqueEventDegree, 1), Longitude = SafeAdd(ref uniqueEventDegree, 1) };
+			var gatheringStub = CreateTestGathering(host);
+			gatheringStub.Location = new() { Latitude = SafeAdd(ref uniqueGatheringDegree, 1), Longitude = SafeAdd(ref uniqueGatheringDegree, 1) };
 
-			if (uniqueEventDegree > 80)
-			{ uniqueEventDegree = -89.5; }
+			if (uniqueGatheringDegree > 80)
+			{ uniqueGatheringDegree = -89.5; }
 
-			eventStub = await GenerateEventUnsafeAsync(eventStub, host);
+			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
 
 			foreach (var guest in guests)
 			{
-				await Terminal.EventDatabase.SetUserStateAsync(guest.Id, eventStub.Id, EventBond.Arrived, DateTimeOffset.UtcNow);
+				await Terminal.GatheringDatabase.SetUserStateAsync(guest.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
-			return eventStub;
+			return gatheringStub;
 		}
 
-		internal async Task<List<Event>> GenerateMultipleUniqueEventAsync(params User[] hosts)
+		internal async Task<List<Gathering>> GenerateMultipleUniqueGatheringAsync(params User[] hosts)
 		{
-			double currentDegree = SafeAdd(ref uniqueEventDegree, 1);
+			double currentDegree = SafeAdd(ref uniqueGatheringDegree, 1);
 			GeoLocation location = new() { Latitude = currentDegree, Longitude = currentDegree };
 
-			if (uniqueEventDegree > 80)
-			{ uniqueEventDegree = -89.5; }
+			if (uniqueGatheringDegree > 80)
+			{ uniqueGatheringDegree = -89.5; }
 
-			List<Event> events = new();
+			List<Gathering> gatherings = new();
 
 			foreach (var host in hosts)
 			{
-				var eventStub = CreateTestEvent(host);
-				eventStub.Location = location;
+				var gatheringStub = CreateTestGathering(host);
+				gatheringStub.Location = location;
 
-				events.Add(await GenerateEventUnsafeAsync(eventStub, host));
+				gatherings.Add(await GenerateGatheringUnsafeAsync(gatheringStub, host));
 			}
 
-			return events;
+			return gatherings;
 		}
 
-		internal async Task AddUserToEventAsync(Event @event, User user, EventBond state)
+		internal async Task AddUserToGatheringAsync(Gathering gathering, User user, GatheringBond state)
 		{
-			await Terminal.EventDatabase.SetUserStateAsync(user.Id, @event.Id, state, DateTimeOffset.UtcNow);
+			await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, gathering.Id, state, DateTimeOffset.UtcNow);
 		}
 
-		internal async Task SetEventState(Event @event, EventState state)
+		internal async Task SetGatheringState(Gathering gathering, GatheringState state)
 		{
-			await Terminal.EventDatabase.UpdateEventAsync(@event.Id, new() { (nameof(Event.State), state) });
-			@event.State = state;
+			await Terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(Gathering.State), state) });
+			gathering.State = state;
 		}
 
 		/////////
-		// Etching Helpers
+		// Snapshot Helpers
 		////////////////////
 
-		internal async Task<EtchingShard> GenerateEtchingAsync(Event etchedEvent, User etcher)
+		internal async Task<SnapshotShard> GenerateSnapshotAsync(Gathering etchedGathering, User etcher)
 		{
-			return await GenerateEtchingUnsafeAsync(etchedEvent, etcher, testEtchingTime);
+			return await GenerateSnapshotUnsafeAsync(etchedGathering, etcher, testSnapshotTime);
 		}
 
-		internal async Task<EtchingShard> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, EtchingShard etching)
+		internal async Task<SnapshotShard> GenerateSnapshotUnsafeAsync(Gathering etchedGathering, User etcher, SnapshotShard snapshot)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, etching.TimeEtched);
+			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, snapshot.TimeTaken);
 		}
 
-		internal async Task<EtchingShard> GenerateEtchingUnsafeAsync(Event etchedEvent, User etcher, DateTimeOffset timeEtched)
+		internal async Task<SnapshotShard> GenerateSnapshotUnsafeAsync(Gathering etchedGathering, User etcher, DateTimeOffset timeTaken)
 		{
-			return await Terminal.EtchingDatabase.AddEtchingAsync(etchedEvent.Id, etcher.Id, timeEtched);
+			return await Terminal.SnapshotDatabase.AddSnapshotAsync(etchedGathering.Id, etcher.Id, timeTaken);
 		}
 
 		///////////

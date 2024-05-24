@@ -14,8 +14,8 @@ namespace Repository
         public ulong OtherId { get; init; }
         public User? Other { get; init; } // Navigation Property
 
-        public ulong? EventId { get; init; }
-        public Event? Event { get; init; } // Navigation Property
+        public ulong? GatheringId { get; init; }
+        public Gathering? Gathering { get; init; } // Navigation Property
 
         public DateTimeOffset FilingDate { get; init; }
         public string Notes { get; init; }

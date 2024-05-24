@@ -5,24 +5,24 @@ using Xunit.Abstractions;
 namespace Repository.Tests
 {
     [Collection("Database Collection")]
-    public class FeedTests : IDisposable
+    public class ColumnTests : IDisposable
     {
         private static EFCoreSentry sentry = new(Harbor.Flag.Development);
-        private static EFCoreEtchingStore store = new(Harbor.Flag.Development);
+        private static EFCoreSnapshotStore store = new(Harbor.Flag.Development);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
         private User subject;
-        private Event testEvent;
-        public FeedTests(ITestOutputHelper testOutputHelper)
+        private Gathering testGathering;
+        public ColumnTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
 
             subject = new UserFactory().Create();
-            testEvent = new EventFactory().Create(subject);
+            testGathering = new GatheringFactory().Create(subject);
 
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(testEvent));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(testGathering));
         }
         public void Dispose()
         {
@@ -32,14 +32,14 @@ namespace Repository.Tests
 
     
         [Fact]
-        public async Task GenerateFeedForUserAsync_SUCCESS()
+        public async Task GenerateColumnForUserAsync_SUCCESS()
         {
-            /// Feed test layout
-            /// subject friends: e, j, m
+            /// Column test layout
+            /// subject companions: e, j, m
             /// bait: x
             ///                    depth charge
             ///                         v 
-            /// Event | Time Z | Time A | Time B | Time C | Time D
+            /// Gathering | Time Z | Time A | Time B | Time C | Time D
             /// alpha |        | e1 j1  | e2 x1  | e3     | m1
             /// echo  |        | j2 x2  | j3     |        |
             /// hotel |        |        |        | e4 m2  |
@@ -47,7 +47,7 @@ namespace Repository.Tests
             /// romeo |        | j4     |        |        | m3 x3
             /// 
             /// previously seen: kilo { e5 }
-            /// returned feed: alpha { e1, j1, e2, e3, m1 }, echo { j2, j3 }, romeo { j4, m3 }
+            /// returned column: alpha { e1, j1, e2, e3, m1 }, echo { j2, j3 }, romeo { j4, m3 }
             /// 
 
 
@@ -61,100 +61,100 @@ namespace Repository.Tests
 
             // User creating block
             UserFactory userFactory = new UserFactory();
-            User friendE = userFactory.Create();
-            User friendJ = userFactory.Create();
-            User friendM = userFactory.Create();
+            User companionE = userFactory.Create();
+            User companionJ = userFactory.Create();
+            User companionM = userFactory.Create();
             User baitX = userFactory.Create();
             User irrelevantHost = userFactory.Create();
 
-            sentry.ExecuteWrite(ctx => ctx.Users.Add(friendE));
-            sentry.ExecuteWrite(ctx => ctx.Users.Add(friendJ));
-            sentry.ExecuteWrite(ctx => ctx.Users.Add(friendM));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionE));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionJ));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionM));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(baitX));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(irrelevantHost));
 
 
-            // Friend making block
+            // Companion making block
             UserLinkFactory factory = new UserLinkFactory();
 
-            UserLink link1 = factory.Create(subject, friendE, UserLink.UserLinkType.Follow);
-            UserLink link2 = factory.Create(friendE, subject, UserLink.UserLinkType.Follow);
+            UserLink link1 = factory.Create(subject, companionE, UserLink.UserLinkType.Appreciate);
+            UserLink link2 = factory.Create(companionE, subject, UserLink.UserLinkType.Appreciate);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            link1 = factory.Create(subject, friendJ, UserLink.UserLinkType.Follow);
-            link2 = factory.Create(friendJ, subject, UserLink.UserLinkType.Follow);
+            link1 = factory.Create(subject, companionJ, UserLink.UserLinkType.Appreciate);
+            link2 = factory.Create(companionJ, subject, UserLink.UserLinkType.Appreciate);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            link1 = factory.Create(subject, friendM, UserLink.UserLinkType.Follow);
-            link2 = factory.Create(friendM, subject, UserLink.UserLinkType.Follow);
+            link1 = factory.Create(subject, companionM, UserLink.UserLinkType.Appreciate);
+            link2 = factory.Create(companionM, subject, UserLink.UserLinkType.Appreciate);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
 
-            // Event block
-            EventFactory eventFactory = new EventFactory();
+            // Gathering block
+            GatheringFactory gatheringFactory = new GatheringFactory();
 
-            Event alpha = eventFactory.Create(irrelevantHost);
-            Event echo = eventFactory.Create(irrelevantHost);
-            Event hotel = eventFactory.Create(irrelevantHost);
-            Event kilo = eventFactory.Create(irrelevantHost);
-            Event romeo = eventFactory.Create(irrelevantHost);
+            Gathering alpha = gatheringFactory.Create(irrelevantHost);
+            Gathering echo = gatheringFactory.Create(irrelevantHost);
+            Gathering hotel = gatheringFactory.Create(irrelevantHost);
+            Gathering kilo = gatheringFactory.Create(irrelevantHost);
+            Gathering romeo = gatheringFactory.Create(irrelevantHost);
 
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(alpha));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(echo));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(hotel));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(kilo));
-            sentry.ExecuteWrite(ctx => ctx.Events.Add(romeo));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(alpha));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(echo));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(hotel));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(kilo));
+            sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(romeo));
 
 
             // Post block
             // alpha
-            Post e1 = new EtchingFactory().Create(friendE, alpha, timeA);
-            Post j1 = new EtchingFactory().Create(friendJ, alpha, timeA);
-            Post e2 = new EtchingFactory().Create(friendE, alpha, timeB);
-            Post x1 = new EtchingFactory().Create(baitX, alpha, timeB);
-            Post e3 = new EtchingFactory().Create(friendE, alpha, timeC);
-            Post m1 = new EtchingFactory().Create(friendM, alpha, timeD);
+            Post e1 = new SnapshotFactory().Create(companionE, alpha, timeA);
+            Post j1 = new SnapshotFactory().Create(companionJ, alpha, timeA);
+            Post e2 = new SnapshotFactory().Create(companionE, alpha, timeB);
+            Post x1 = new SnapshotFactory().Create(baitX, alpha, timeB);
+            Post e3 = new SnapshotFactory().Create(companionE, alpha, timeC);
+            Post m1 = new SnapshotFactory().Create(companionM, alpha, timeD);
 
             // echo
-            Post j2 = new EtchingFactory().Create(friendJ, echo, timeA);
-            Post j3 = new EtchingFactory().Create(friendJ, echo, timeB);
-            Post x2 = new EtchingFactory().Create(baitX, echo, timeB);
+            Post j2 = new SnapshotFactory().Create(companionJ, echo, timeA);
+            Post j3 = new SnapshotFactory().Create(companionJ, echo, timeB);
+            Post x2 = new SnapshotFactory().Create(baitX, echo, timeB);
 
             // hotel
-            Post e4 = new EtchingFactory().Create(friendE, hotel, timeC);
-            Post m2 = new EtchingFactory().Create(friendM, hotel, timeC);
+            Post e4 = new SnapshotFactory().Create(companionE, hotel, timeC);
+            Post m2 = new SnapshotFactory().Create(companionM, hotel, timeC);
 
             // kilo
-            Post e5 = new EtchingFactory().Create(friendE, kilo, timeZ);
+            Post e5 = new SnapshotFactory().Create(companionE, kilo, timeZ);
 
             // romeo
-            Post j4 = new EtchingFactory().Create(friendJ, romeo, timeA);
-            Post m3 = new EtchingFactory().Create(friendM, romeo, timeD);
-            Post x3 = new EtchingFactory().Create(baitX, romeo, timeD);
+            Post j4 = new SnapshotFactory().Create(companionJ, romeo, timeA);
+            Post m3 = new SnapshotFactory().Create(companionM, romeo, timeD);
+            Post x3 = new SnapshotFactory().Create(baitX, romeo, timeD);
 
             await BulkWritePost(e1, e2, e3, e4, e5, j1, j2, j3, j4, m1, m2, m3, x1, x2, x3);
 
 
             List<ulong> exclusionList = new() { kilo.Id };
-            var retrieved = await store.GenerateFeedForUserAsync(subject.Id, depthCharge, timeA);
+            var retrieved = await store.GenerateColumnForUserAsync(subject.Id, depthCharge, timeA);
 
 
             Assert.NotNull(retrieved);
             Assert.Equal(9, retrieved.Count);
 
-            EtchingShard e1Etching = retrieved.Find(etching => etching.Id.Equals(e1.Id));
-            Assert.NotNull(e1Etching);
-            //Assert.Equal(e1.OwnerId, e1Etching.UserId);
-            Assert.Equal(e1.EventId, e1Etching.EventId);
-            Assert.Equal(e1.PostedAt, e1Etching.TimeEtched);
+            SnapshotShard e1Snapshot = retrieved.Find(snapshot => snapshot.Id.Equals(e1.Id));
+            Assert.NotNull(e1Snapshot);
+            //Assert.Equal(e1.OwnerId, e1Snapshot.UserId);
+            Assert.Equal(e1.GatheringId, e1Snapshot.GatheringId);
+            Assert.Equal(e1.PostedAt, e1Snapshot.TimeTaken);
 
-            var retrievedAsPostIds = retrieved.ConvertAll(etching => etching.Id);
+            var retrievedAsPostIds = retrieved.ConvertAll(snapshot => snapshot.Id);
 
             Assert.Contains(e1.Id, retrievedAsPostIds);
             Assert.Contains(e2.Id, retrievedAsPostIds);

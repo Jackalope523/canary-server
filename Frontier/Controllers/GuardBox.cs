@@ -10,18 +10,18 @@ namespace Frontier.Controllers
 
 		public IAccountOperations accounts;
 		public IBannerOperations banners;
-		public IEventOperations events;
-		public IEtchingOperations etchings;
+		public IGatheringOperations gatherings;
+		public ISnapshotOperations snapshots;
 		public IKeyOperations keys;
 		public IDisciplineOperations reports;
 		public IMediaOperations media;
-		public INotificationOperations notifications;
-		public IProfileOperations profiles;
+		public INotificationOperations telegrams;
+		public INestOperations nests;
 
 		public GuardBox(ILogger logger,
 			IAccountOperations accountOperations, IBannerOperations bannerOperations,
-			IProfileOperations profileOperations, IEventOperations eventOperations,
-			IEtchingOperations etchingOperations, IKeyOperations keyOperations,
+			INestOperations nestOperations, IGatheringOperations gatheringOperations,
+			ISnapshotOperations snapshotOperations, IKeyOperations keyOperations,
 			IDisciplineOperations disciplineOperations,IMediaOperations mediaOperations,
 			INotificationOperations notificationOperations)
 		{
@@ -29,13 +29,13 @@ namespace Frontier.Controllers
 
 			accounts = accountOperations;
 			banners = bannerOperations;
-			profiles = profileOperations;
-			events = eventOperations;
-			etchings = etchingOperations;
+			nests = nestOperations;
+			gatherings = gatheringOperations;
+			snapshots = snapshotOperations;
 			keys = keyOperations;
 			reports = disciplineOperations;
 			media = mediaOperations;
-			notifications = notificationOperations;
+			telegrams = notificationOperations;
 		}
 	}
 }

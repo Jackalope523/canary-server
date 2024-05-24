@@ -24,17 +24,17 @@ namespace Core.Controls
 		{
 			var user = await GetUserAsync(userId);
 
-			return await Notifications.GetNotesAsync(user.Id);
+			return await Telegrams.GetNotesAsync(user.Id);
 		}
 
 		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
 		{
-			await Notifications.SubscribeUserAsync(userId, deviceType, deviceToken);
+			await Telegrams.SubscribeUserAsync(userId, deviceType, deviceToken);
 		}
 
 		public async Task UnsubscribeUserAsync(ulong userId)
 		{
-			await Notifications.UnsubscribeUserAsync(userId);
+			await Telegrams.UnsubscribeUserAsync(userId);
 		}
 
 		#endregion
@@ -47,7 +47,7 @@ namespace Core.Controls
 			if (await notifier.IsBlocking(user) || await notifier.IsBlockedBy(user))
 			{ return; }
 
-			await Notifications.SaveNoteAsync(user.Id, notifier.Id, Time, message, action);
+			await Telegrams.SaveNoteAsync(user.Id, notifier.Id, Time, message, action);
 		}
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
@@ -57,7 +57,7 @@ namespace Core.Controls
             // Check if user is subscribed
             try
             {
-				userSettings = await Notifications.GetUserSubscriptionAsync(user.Id);
+				userSettings = await Telegrams.GetUserSubscriptionAsync(user.Id);
             }
 			catch (Exception)
 			{
