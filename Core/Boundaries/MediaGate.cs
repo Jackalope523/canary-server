@@ -11,14 +11,19 @@ namespace Core.Boundaries
 
     public interface IMediaDatabase
     {
-        Task<MemoryStream> DownloadImageAsync(ulong snapshotId, ulong ownerId);
-        Task UploadImageAsync(ulong snapshotId, ulong ownerId, MemoryStream image);
-        Task DeleteImageAsync(ulong snapshotId, ulong ownerId);
+        Task<MemoryStream> DownloadSnapshotAsync(ulong snapshotId, ulong ownerId);
+        Task UploadSnapshotAsync(ulong snapshotId, ulong ownerId, MemoryStream image);
+        Task DeleteSnapshotAsync(ulong snapshotId, ulong ownerId);
+
+        Task<MemoryStream> DownloadAvatarAsync(ulong userId);
+        Task UploadAvatarAsync(ulong userId, MemoryStream image);
+        Task DeleteAvatarAsync(ulong userId);
     }
 
     public interface IMediaOperations
     {
-        Task<MemoryStream> GetImageStreamAsync(ulong userId, ulong snapshotId);
+        Task<MemoryStream> GetAvatarAsync(ulong userId, ulong targetId);
+        Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId);
     }
 
     #endregion

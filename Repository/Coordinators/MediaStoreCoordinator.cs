@@ -11,19 +11,19 @@ namespace Repository
             store = new AzureFileStore();
         }
         
-        public async Task<MemoryStream> DownloadImageAsync(ulong snapshotId, ulong ownerId)
+        public async Task<MemoryStream> DownloadSnapshotAsync(ulong snapshotId, ulong ownerId)
         {
-            return await store.DownloadImageAsync(snapshotId, ownerId);
+            return await store.DownloadSnapshotAsync(snapshotId, ownerId);
         }
 
-        public async Task UploadImageAsync(ulong snapshotId, ulong ownerId, MemoryStream image)
+        public async Task UploadSnapshotAsync(ulong snapshotId, ulong ownerId, MemoryStream image)
         {
-            await store.UploadImageAsync(snapshotId, ownerId, image);
+            await store.UploadSnapshotAsync(snapshotId, ownerId, image);
         }
 
-        public async Task DeleteImageAsync(ulong snapshotId, ulong ownerId)
+        public async Task DeleteSnapshotAsync(ulong snapshotId, ulong ownerId)
         {
-            await store.DeleteImageAsync(snapshotId, ownerId);
+            await store.DeleteSnapshotAsync(snapshotId, ownerId);
         }
     }
 }

@@ -84,7 +84,7 @@ namespace Core.Tests.Controls
 			Assert.Single(serverSnapshots);
 
 			var snapshot = serverSnapshots[0];
-			Assert.Equal(image, (await environment.Terminal.MediaDatabase.DownloadImageAsync(snapshot.Id, guest.Id)).ToArray());
+			Assert.Equal(image, (await environment.Terminal.MediaDatabase.DownloadSnapshotAsync(snapshot.Id, guest.Id)).ToArray());
 		}
 
 		[Fact]

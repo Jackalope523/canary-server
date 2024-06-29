@@ -21,12 +21,23 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{snapshotId}")]
-		public async Task<IActionResult> GetImage(ulong snapshotId)
+		[HttpGet("avatar/{userId}")]
+		public async Task<IActionResult> GetAvatar(ulong userId)
 		{
 			return await Execute(async user =>
 			{
-				var image = await media.GetImageStreamAsync(user.Id, snapshotId);
+				var image = await media.GetAvatarAsync(user.Id, userId);
+
+				return image;
+			});
+        }
+
+		[HttpGet("snapshot/{snapshotId}")]
+		public async Task<IActionResult> GetSnapshotImage(ulong snapshotId)
+		{
+			return await Execute(async user =>
+			{
+				var image = await media.GetSnapshotAsync(user.Id, snapshotId);
 
 				return image;
 			});

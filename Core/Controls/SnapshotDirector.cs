@@ -47,7 +47,7 @@ namespace Core.Controls
             var snapshot = await Snapshots.AddSnapshotAsync(targetGathering.Id, user.Id, Time);
 
             // Save image
-            await Terminal.MediaDirector.UploadImageAsync(user.Id, snapshot.Id, image);
+            await Terminal.MediaDirector.UploadSnapshotAsync(user.Id, snapshot.Id, image);
 
             return snapshot;
         }

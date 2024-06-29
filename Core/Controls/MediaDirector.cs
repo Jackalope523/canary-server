@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Core.Boundaries;
+using Core.Entities;
 
 using static Core.Entities.Arbiter;
 
@@ -16,11 +17,11 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<MemoryStream> GetImageStreamAsync(ulong userId, ulong snapshotId)
+		public async Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId)
 		{
 			var user = await GetUserAsync(userId);
 			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-			Entities.User snapshotOwner = new(snapshot.User);
+			User snapshotOwner = new(snapshot.User);
 			var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
 			Try(user.Taken(snapshot) ||
@@ -28,7 +29,20 @@ namespace Core.Controls
 				await etchedGathering.WasAttendedBy(user),
 				new InvalidUserException("User cannot access this snapshot."));
 
-			var stream = await Media.DownloadImageAsync(snapshot.Id, snapshot.User.Id);
+			var stream = await Media.DownloadSnapshotAsync(snapshot.Id, snapshot.User.Id);
+
+			return stream;
+		}
+
+		public async Task<MemoryStream> GetAvatarAsync(ulong userId, ulong otherId)
+		{
+			var user = await GetUserAsync(userId);
+			User otherUser = new() { Id = otherId };
+
+			Fail(await user.IsBlockedBy(otherUser),
+				new InvalidUserException("User cannot access this avatar."));
+
+			var stream = await Media.DownloadAvatarAsync(otherUser.Id);
 
 			return stream;
 		}
@@ -37,12 +51,19 @@ namespace Core.Controls
 
 		#region Favours
 
-		public async Task UploadImageAsync(ulong userId, ulong snapshotId, MemoryStream image)
+		public async Task UploadSnapshotAsync(ulong userId, ulong snapshotId, MemoryStream image)
 		{
 			var user = await GetUserAsync(userId);
 			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
 
-			await Media.UploadImageAsync(snapshot.Id, user.Id, image);
+			await Media.UploadSnapshotAsync(snapshot.Id, user.Id, image);
+		}
+
+		public async Task UploadAvatarAsync(ulong userId, MemoryStream image)
+		{
+			var user = await GetUserAsync(userId);
+
+			await Media.UploadAvatarAsync(user.Id, image);
 		}
 
 		#endregion
