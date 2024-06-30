@@ -21,7 +21,7 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("avatar/{userId}")]
+		[HttpGet("avatars/{userId}")]
 		public async Task<IActionResult> GetAvatar(ulong userId)
 		{
 			return await Execute(async user =>
@@ -32,7 +32,7 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpGet("snapshot/{snapshotId}")]
+		[HttpGet("snapshots/{snapshotId}")]
 		public async Task<IActionResult> GetSnapshotImage(ulong snapshotId)
 		{
 			return await Execute(async user =>
