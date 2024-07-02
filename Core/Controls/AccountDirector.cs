@@ -2,6 +2,7 @@
 using Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 using static Core.Entities.Arbiter;
@@ -138,6 +139,13 @@ namespace Core.Controls
             // Push update
             _ = Accounts.UpdateUserAsync(user.Id, edits);
 		}
+
+        public async Task EditAvatarAsync(ulong userId, MemoryStream image)
+        {
+            var user = await GetUserAsync(userId);
+
+            await Terminal.MediaDirector.UploadAvatarAsync(user.Id, image);
+        }
 
         public async Task DeleteUserAsync(ulong userId)
         {

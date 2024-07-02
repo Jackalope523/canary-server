@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Core.Boundaries
@@ -56,6 +57,7 @@ namespace Core.Boundaries
 			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null);
+		Task EditAvatarAsync(ulong userId, MemoryStream image);
 		Task DeleteUserAsync(ulong userId);
 
 		Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude);

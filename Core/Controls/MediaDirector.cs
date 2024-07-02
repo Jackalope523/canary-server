@@ -66,9 +66,7 @@ namespace Core.Controls
 
 		public async Task UploadAvatarAsync(ulong userId, MemoryStream image)
 		{
-			var user = await GetUserAsync(userId);
-
-			await Media.UploadAvatarAsync(user.Id, image);
+			await Media.UploadAvatarAsync(userId, image);
 		}
 
 		public async Task UploadHeroAsync(ulong gatheringId, MemoryStream image)
@@ -78,10 +76,7 @@ namespace Core.Controls
 
         public async Task UploadSnapshotAsync(ulong userId, ulong snapshotId, MemoryStream image)
 		{
-			var user = await GetUserAsync(userId);
-			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-
-			await Media.UploadSnapshotAsync(snapshot.Id, user.Id, image);
+			await Media.UploadSnapshotAsync(snapshotId, userId, image);
 		}
 
 		#endregion

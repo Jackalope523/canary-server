@@ -259,6 +259,16 @@ namespace Frontier.Controllers
             }, allowUnverified: true);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> ModifyAvatar()
+        {
+            return await Execute(async user =>
+            {
+                // Send avatar to account manager
+                await accounts.EditAvatarAsync(user.Id, await StreamFirstFile());
+            }, allowUnverified: true);
+        }
+
 		#endregion
 	}
 }
