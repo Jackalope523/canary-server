@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Core.Boundaries
@@ -66,7 +67,8 @@ namespace Core.Boundaries
 
 		Task<GatheringShard> CreateGatheringAsync(ulong userId, string gatheringName, string gatheringDescription,
 			DateTimeOffset startTime, double latitude, double longitude,
-			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum);
+			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum,
+			MemoryStream heroImage);
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
 			string gatheringDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null,

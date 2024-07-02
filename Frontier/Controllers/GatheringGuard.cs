@@ -45,7 +45,8 @@ namespace Frontier.Controllers
 					gatheringDetails.Name, gatheringDetails.Description,
 					gatheringDetails.StartTime, gatheringDetails.Latitude, gatheringDetails.Longitude,
 					gatheringDetails.Radius, gatheringDetails.IsDynamic,
-					gatheringDetails.GroupMinimum, gatheringDetails.GroupMaximum);
+					gatheringDetails.GroupMinimum, gatheringDetails.GroupMaximum,
+					await StreamFirstFile());
 			});
         }
 
@@ -197,7 +198,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{gatheringId}/snapshots")]
-		public async Task<IActionResult> SnapshotToGathering(ulong gatheringId)
+		public async Task<IActionResult> SnapshotGathering(ulong gatheringId)
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)

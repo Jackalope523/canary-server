@@ -32,6 +32,17 @@ namespace Frontier.Controllers
 			});
         }
 
+		[HttpGet("heros/{gatheringId}")]
+		public async Task<IActionResult> GetHero(ulong gatheringId)
+		{
+			return await Execute(async user =>
+			{
+				var image = await media.GetHeroAsync(user.Id, gatheringId);
+
+				return image;
+			});
+        }
+
 		[HttpGet("snapshots/{snapshotId}")]
 		public async Task<IActionResult> GetSnapshotImage(ulong snapshotId)
 		{

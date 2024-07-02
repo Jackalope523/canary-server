@@ -17,23 +17,6 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId)
-		{
-			var user = await GetUserAsync(userId);
-			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-			User snapshotOwner = new(snapshot.User);
-			var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
-
-			Try(user.Taken(snapshot) ||
-				await user.IsCompanionsWith(snapshotOwner) ||
-				await etchedGathering.WasAttendedBy(user),
-				new InvalidUserException("User cannot access this snapshot."));
-
-			var stream = await Media.DownloadSnapshotAsync(snapshot.Id, snapshot.User.Id);
-
-			return stream;
-		}
-
 		public async Task<MemoryStream> GetAvatarAsync(ulong userId, ulong otherId)
 		{
 			var user = await GetUserAsync(userId);
@@ -47,23 +30,58 @@ namespace Core.Controls
 			return stream;
 		}
 
-		#endregion
+		public async Task<MemoryStream> GetHeroAsync(ulong userId, ulong gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
-		#region Favours
+            Try(await gathering.IsVisibleTo(user),
+                new InvalidUserException("User cannot view this gathering."));
 
-		public async Task UploadSnapshotAsync(ulong userId, ulong snapshotId, MemoryStream image)
-		{
-			var user = await GetUserAsync(userId);
-			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+            var stream = await Media.DownloadHeroAsync(gathering.Id);
 
-			await Media.UploadSnapshotAsync(snapshot.Id, user.Id, image);
-		}
+            return stream;
+        }
+
+        public async Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId)
+        {
+            var user = await GetUserAsync(userId);
+            var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+            User snapshotOwner = new(snapshot.User);
+            var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
+
+            Try(user.Taken(snapshot) ||
+                await user.IsCompanionsWith(snapshotOwner) ||
+                await etchedGathering.WasAttendedBy(user),
+                new InvalidUserException("User cannot access this snapshot."));
+
+            var stream = await Media.DownloadSnapshotAsync(snapshot.Id, snapshot.User.Id);
+
+            return stream;
+        }
+
+        #endregion
+
+        #region Favours
 
 		public async Task UploadAvatarAsync(ulong userId, MemoryStream image)
 		{
 			var user = await GetUserAsync(userId);
 
 			await Media.UploadAvatarAsync(user.Id, image);
+		}
+
+		public async Task UploadHeroAsync(ulong gatheringId, MemoryStream image)
+		{
+			await Media.UploadAvatarAsync(gatheringId, image);
+		}
+
+        public async Task UploadSnapshotAsync(ulong userId, ulong snapshotId, MemoryStream image)
+		{
+			var user = await GetUserAsync(userId);
+			var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+
+			await Media.UploadSnapshotAsync(snapshot.Id, user.Id, image);
 		}
 
 		#endregion

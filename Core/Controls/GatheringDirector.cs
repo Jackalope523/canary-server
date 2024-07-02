@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
@@ -63,7 +64,9 @@ namespace Core.Controls
 		public async Task<GatheringShard> CreateGatheringAsync(ulong userId,
 			string gatheringName, string gatheringDescription, DateTimeOffset startTime,
 			double latitude, double longitude,
-			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum)
+			double radius, bool isDynamic,
+			int? groupMinimum, int? groupMaximum,
+			MemoryStream heroImage)
 		{
 			var user = await GetUserAsync(userId);
 			// Verify user is already at an gathering
@@ -105,6 +108,9 @@ namespace Core.Controls
 				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, user.Character.ToCharacter(),
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
+
+			// Upload hero
+			await Terminal.MediaDirector.UploadHeroAsync(newGathering.Id, heroImage);
 
 			// Notify appreciateers of gathering
 			_ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
@@ -217,16 +223,16 @@ namespace Core.Controls
 		public async Task EndGatheringAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is able to end the gathering
-			Try(targetGathering.IsModifiableBy(user),
+			Try(gathering.IsModifiableBy(user),
 				new InvalidUserException("User does not have permissions to end gathering."));
 
 			// Try to end to gathering
-			await Gatherings.EndGatheringAsync(gatheringId, Time);
+			await Gatherings.EndGatheringAsync(gathering.Id, Time);
 
-			var participants = await targetGathering.Ended();
+			var participants = await gathering.Ended();
 
 			// Update all participants' vectors
 			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(CoreUser.Character), user.Character) });
@@ -235,20 +241,23 @@ namespace Core.Controls
 		public async Task DeleteGatheringAsync(ulong userId, ulong gatheringId)
 		{
             var user = await GetUserAsync(userId);
-            var targetGathering = await GetGatheringAsync(gatheringId);
+            var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify gathering has not yet started
-			Fail(targetGathering.IsOngoing || targetGathering.IsEnded,
+			Fail(gathering.IsOngoing || gathering.IsEnded,
 				new InvalidGatheringException("Gathering cannot be deleted once it has started."));
 
             // Verify user is able to delete the gathering
-            Try(targetGathering.IsModifiableBy(user),
+            Try(gathering.IsModifiableBy(user),
                 new InvalidUserException("User does not have permissions to delete gathering."));
 
 			// Try to end to delete gathering
-			await Gatherings.DeleteGatheringAsync(gatheringId);
+			await Gatherings.DeleteGatheringAsync(gathering.Id);
 
-            _ = targetGathering.NotifyActive($"{targetGathering.Name}", "Uh oh! The gathering was deleted by the host.");
+			// Delete hero
+			await Media.DeleteHeroAsync(gathering.Id);
+
+            _ = gathering.NotifyActive($"{gathering.Name}", "Uh oh! The gathering was deleted by the host.");
         }
 
         public async Task SurveyGatheringAsync(ulong userId, ulong gatheringId)
