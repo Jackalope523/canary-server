@@ -43,7 +43,8 @@ namespace Frontier.Controllers
 				// Create a new gathering
 				return await gatherings.CreateGatheringAsync(user.Id,
 					gatheringDetails.Name, gatheringDetails.Description,
-					gatheringDetails.StartTime, gatheringDetails.Latitude, gatheringDetails.Longitude,
+					gatheringDetails.StartTime,
+					gatheringDetails.Latitude, gatheringDetails.Longitude, gatheringDetails.FriendlyName,
 					gatheringDetails.Radius, gatheringDetails.IsDynamic,
 					gatheringDetails.GroupMinimum, gatheringDetails.GroupMaximum,
 					await StreamFirstFile());
@@ -64,6 +65,7 @@ namespace Frontier.Controllers
 					isOpen: gatheringDetails.IsOpen,
 					startTime: gatheringDetails.StartTime,
 					latitude: gatheringDetails.Latitude, longitude: gatheringDetails.Longitude,
+					friendlyLocation: gatheringDetails.FriendlyName,
 					radius: gatheringDetails.Radius, isDynamic: gatheringDetails.IsDynamic,
 					groupMinimum: gatheringDetails.GroupMinimum, groupMaximum: gatheringDetails.GroupMaximum);
 			});

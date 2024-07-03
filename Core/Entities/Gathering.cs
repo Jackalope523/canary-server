@@ -41,6 +41,7 @@ namespace Core.Entities
         public CharacterVector Character { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public GeoLocation Location { get; set; }
+        public string FriendlyLocation { get; set; }
         public Distance Radius { get; set; }
         public bool IsDynamic { get; set; }
         public DateTimeOffset? EndTime { get; set; }
@@ -112,6 +113,7 @@ namespace Core.Entities
             StartTime = fromGathering.StartTime;
             Location = new()
                 { Latitude = fromGathering.Latitude, Longitude = fromGathering.Longitude };
+            FriendlyLocation = fromGathering.FriendlyLocation;
             EndTime = fromGathering.TimeEnded;
             State = fromGathering.State;
             GroupMinimum = fromGathering.GroupMinimum;
@@ -143,31 +145,31 @@ namespace Core.Entities
         public CoreGathering ToCoreGathering()
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
-                StartTime, Location.Latitude, Location.Longitude, EndTime,
-                State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
+                StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
+                EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
         }
 
         public GatheringShard ToGatheringShard()
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
-                StartTime, Location.Latitude, Location.Longitude, EndTime,
-                State, GroupMinimum, GroupMaximum,
+                StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
+                EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, NumberOfGuests, RelativeAngle);
         }
 
         public GatheringShard ToGatheringShard(User relativeUser)
         {
             return new(Id, Host.ToUserSilhouette(), Name, Description,
-                StartTime, Location.Latitude, Location.Longitude, EndTime,
-                State, GroupMinimum, GroupMaximum,
+                StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
+                EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, NumberOfGuests,
                 CharacterVector.AngleBetweenAffected(relativeUser.Character, Character));
         }
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Name, IsActive, lastActiveTime, Location.Latitude, Location.Longitude);
+            return new(Id, Name, IsActive, lastActiveTime, FriendlyLocation);
         }
 
 		#endregion

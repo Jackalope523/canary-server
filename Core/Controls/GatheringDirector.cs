@@ -63,7 +63,7 @@ namespace Core.Controls
 
 		public async Task<GatheringShard> CreateGatheringAsync(ulong userId,
 			string gatheringName, string gatheringDescription, DateTimeOffset startTime,
-			double latitude, double longitude,
+			double latitude, double longitude, string friendlyLocation,
 			double radius, bool isDynamic,
 			int? groupMinimum, int? groupMaximum,
 			MemoryStream heroImage)
@@ -105,7 +105,8 @@ namespace Core.Controls
 
 			// Try to create an gathering
 			Gathering newGathering = new(await Gatherings.CreateGatheringAsync(user.Id, gatheringStub.Name, gatheringStub.Description,
-				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+				gatheringStub.StartTime,
+				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, user.Character.ToCharacter(),
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
 
@@ -120,7 +121,8 @@ namespace Core.Controls
 
 		public async Task EditGatheringAsync(ulong userId, ulong gatheringId,
 			string gatheringDescription = "", bool? isOpen = null,
-			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null,
+			DateTimeOffset? startTime = null,
+			double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null)
 		{
 			var user = await GetUserAsync(userId);
@@ -136,9 +138,11 @@ namespace Core.Controls
 
 			// Fail if edits may not be done during the gathering
 			Fail(HasAlready(targetGathering.StartTime) &&
-				(!string.IsNullOrEmpty(gatheringDescription) || IsNotNull(startTime) ||
+				(!string.IsNullOrEmpty(gatheringDescription) ||
+				IsNotNull(startTime) ||
 				AreNotNull(latitude, longitude) ||
-				IsNotNull(radius) || IsNotNull(isDynamic)),
+                !string.IsNullOrEmpty(friendlyLocation) ||
+                IsNotNull(radius) || IsNotNull(isDynamic)),
 				new InvalidGatheringException("Cannot edit certain gathering attributes once it has started."));
 
 			Gathering editedGathering = new(targetGathering.ToGatheringShard())
@@ -147,6 +151,7 @@ namespace Core.Controls
 				State = IsNull(isOpen) ? targetGathering.State : (isOpen.Value ? GatheringState.Open : GatheringState.Sealed),
 				StartTime = startTime ?? targetGathering.StartTime,
 				Location = AreNull(latitude, longitude) ? targetGathering.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
+				FriendlyLocation = friendlyLocation,
 				Radius = IsNull(radius) ? targetGathering.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
 				IsDynamic = isDynamic ?? targetGathering.IsDynamic,
 				GroupMinimum = groupMinimum ?? targetGathering.GroupMinimum,
@@ -175,6 +180,10 @@ namespace Core.Controls
 			if (IsNotNull(latitude) && IsNotNull(longitude))
 			{
 				edits.Add(("Location", (editedGathering.Location.Latitude, editedGathering.Location.Longitude)));
+			}
+			if (!string.IsNullOrEmpty(friendlyLocation))
+			{
+				edits.Add((nameof(CoreGathering.FriendlyLocation), editedGathering.FriendlyLocation));
 			}
 			if (IsNotNull(radius))
 			{

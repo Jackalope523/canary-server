@@ -8,7 +8,7 @@ namespace Core.Boundaries
 	#region Schemas
 
 	public record GatheringHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
-        double Latitude, double Longitude);
+        string FriendlyLocation);
 
     public record SnapshotShard(ulong Id, ulong GatheringId, UserSilhouette User,
         DateTimeOffset TimeTaken,

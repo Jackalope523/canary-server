@@ -124,8 +124,7 @@ namespace Core.Controls
                         gatheringHeaders[gatheringId].Name,
                         gatheringHeaders[gatheringId].IsActive,
                         snapshot.TimeTaken,
-                        gatheringHeaders[gatheringId].Latitude,
-                        gatheringHeaders[gatheringId].Longitude);
+                        gatheringHeaders[gatheringId].FriendlyLocation);
                 }
             }
 

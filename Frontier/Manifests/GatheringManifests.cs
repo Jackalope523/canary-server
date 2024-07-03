@@ -27,6 +27,9 @@ namespace Frontier.Manifests
         public float Longitude { get; set; }
 
         [Required]
+        public string FriendlyName { get; set; }
+
+        [Required]
         public DateTimeOffset StartTime { get; set; }
 
         [Required]
