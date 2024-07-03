@@ -42,10 +42,10 @@ namespace Repository
         // Navigation Properties
         public List<UserLink>? UserLinks { get; set; }
         public List<GatheringLink>? GatheringLinks { get; set; }
-        public List<PostLink>? PostLinks { get; set; }
+        public List<SnapshotLink>? PostLinks { get; set; }
         public List<UserReport>? ReporterList { get; set; }
         public List<UserReport>? ReporteeList { get; set; }
-        public List<Post>? Posts { get; set; }
+        public List<Snapshot>? Posts { get; set; }
         public List<Entities.Note>? Notes { get; set; }
         public List<Subscription>? Subscriptions { get; set; }
         public List<Entities.Penalty>? Penalties { get; set; }

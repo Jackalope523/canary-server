@@ -9,10 +9,10 @@ namespace Repository
         internal DbSet<Gathering> Gatherings { get; set; }
         internal DbSet<UserLink> UserLinks { get; set; }
         internal DbSet<GatheringLink> GatheringLinks { get; set; }
-        internal DbSet<PostLink> PostLinks { get; set; }
+        internal DbSet<SnapshotLink> PostLinks { get; set; }
         internal DbSet<UserReport> UserReports { get; set; }
         internal DbSet<GatheringReport> GatheringReports { get; set; }
-        internal DbSet<Post> Posts { get; set; }
+        internal DbSet<Snapshot> Posts { get; set; }
         internal DbSet<Note> Notes { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
         internal DbSet<Entities.Penalty> Penalties { get; set; }
@@ -30,7 +30,7 @@ namespace Repository
             modelBuilder.Entity<Gathering>().Property(e => e.Location)
             .HasSrid(4326);                                     
 
-            modelBuilder.Entity<PostLink>()
+            modelBuilder.Entity<SnapshotLink>()
                .HasIndex(l => new { l.UserId, l.PostId })
                .IsUnique();
 

@@ -40,7 +40,7 @@ namespace Repository.Tests
 
             await snapshotStore.AddSnapshotAsync(testGathering.Id, subject.Id, postTime);
 
-            Post created = await sentry.ExecuteReadAsync(ctx => ctx.Posts.FirstAsync());
+            Snapshot created = await sentry.ExecuteReadAsync(ctx => ctx.Posts.FirstAsync());
 
             Assert.NotNull(created);
             Assert.Equal(subject.Id, created.OwnerId);
@@ -52,7 +52,7 @@ namespace Repository.Tests
         [Fact]
         public async Task RemoveSnapshotAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testSnapshot));
 
             await snapshotStore.RemoveSnapshotAsync(testSnapshot.Id);
@@ -64,7 +64,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetSnapshotAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testSnapshot));
 
             SnapshotShard retrieved = await snapshotStore.GetSnapshotAsync(testSnapshot.Id);
@@ -78,7 +78,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetSnapshotsByUserAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
 
             int a = sentry.ExecuteRead(ctx => ctx.Posts.Count());
@@ -95,7 +95,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetSnapshotsForGatheringAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
 
             SnapshotShard retrieved = (await snapshotStore.GetSnapshotsForGatheringAsync(testGathering.Id)).First();
@@ -109,13 +109,13 @@ namespace Repository.Tests
         [Fact]
         public async Task RateSnapshotAsync_SUCCESS()
         {
-            PostLink.PostLinkType rating = PostLink.PostLinkType.RateUp;
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            SnapshotLink.SnapshotLinkType rating = SnapshotLink.SnapshotLinkType.RateUp;
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
 
             await snapshotStore.AcclaimSnapshotAsync(testSnapshot.Id, subject.Id, UserRating.Positive);
 
-            PostLink created = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.FirstAsync());
+            SnapshotLink created = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.FirstAsync());
 
             Assert.Equal(subject.Id, created.UserId);
             Assert.Equal(testSnapshot.Id, created.PostId);
@@ -124,10 +124,10 @@ namespace Repository.Tests
         [Fact]
         public async Task RemoveSnapshotRatingAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testSnapshot));
 
-            PostLink rating = new PostLinkFactory().Create(subject, testSnapshot);
+            SnapshotLink rating = new PostLinkFactory().Create(subject, testSnapshot);
             await sentry.ExecuteWriteAsync(ctx => ctx.PostLinks.AddAsync(rating));
 
             await snapshotStore.RemoveSnapshotAcclaimAsync(testSnapshot.Id, subject.Id);
@@ -139,7 +139,7 @@ namespace Repository.Tests
         [Fact]
         public async Task HideSnapshotAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
 
             await snapshotStore.HideSnapshotAsync(testSnapshot.Id);

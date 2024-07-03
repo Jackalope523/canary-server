@@ -3,13 +3,13 @@ namespace Repository
 {
     internal class PostLinkFactory
     {
-        internal PostLink Create(User user, Post snapshot)
+        internal SnapshotLink Create(User user, Snapshot snapshot)
         {
-            return new PostLink
+            return new SnapshotLink
             {
                 UserId = user.Id,
                 PostId = snapshot.Id,
-                Type = PostLink.PostLinkType.RateUp,
+                Type = SnapshotLink.SnapshotLinkType.RateUp,
                 Time = DateTimeOffset.MinValue
             };
         }

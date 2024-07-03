@@ -55,7 +55,7 @@ namespace Repository
             context.Gatherings.AddRange(gatherings);
             context.SaveChanges();
 
-            List<Post> snapshots = new();
+            List<Snapshot> snapshots = new();
             for (int i = 0; i < 10; i++)
             {
                 Gathering location;

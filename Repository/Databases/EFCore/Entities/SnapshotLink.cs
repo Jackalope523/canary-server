@@ -1,15 +1,15 @@
 ﻿namespace Repository
 {
-    public class PostLink
+    public class SnapshotLink
     {
-        public enum PostLinkType { RateUp, RateDown }
+        public enum SnapshotLinkType { RateUp, RateDown }
 
         public ulong Id { get; set; }
         public ulong UserId { get; init; }
         public User User { get; init; }
         public ulong PostId { get; init; }
-        public Post Post { get; init; }
+        public Snapshot Post { get; init; }
         public DateTimeOffset Time { get; init; }
-        public PostLinkType Type { get; set; }
+        public SnapshotLinkType Type { get; set; }
     }
 }

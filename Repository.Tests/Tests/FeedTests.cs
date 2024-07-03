@@ -114,29 +114,29 @@ namespace Repository.Tests
 
             // Post block
             // alpha
-            Post e1 = new SnapshotFactory().Create(companionE, alpha, timeA);
-            Post j1 = new SnapshotFactory().Create(companionJ, alpha, timeA);
-            Post e2 = new SnapshotFactory().Create(companionE, alpha, timeB);
-            Post x1 = new SnapshotFactory().Create(baitX, alpha, timeB);
-            Post e3 = new SnapshotFactory().Create(companionE, alpha, timeC);
-            Post m1 = new SnapshotFactory().Create(companionM, alpha, timeD);
+            Snapshot e1 = new SnapshotFactory().Create(companionE, alpha, timeA);
+            Snapshot j1 = new SnapshotFactory().Create(companionJ, alpha, timeA);
+            Snapshot e2 = new SnapshotFactory().Create(companionE, alpha, timeB);
+            Snapshot x1 = new SnapshotFactory().Create(baitX, alpha, timeB);
+            Snapshot e3 = new SnapshotFactory().Create(companionE, alpha, timeC);
+            Snapshot m1 = new SnapshotFactory().Create(companionM, alpha, timeD);
 
             // echo
-            Post j2 = new SnapshotFactory().Create(companionJ, echo, timeA);
-            Post j3 = new SnapshotFactory().Create(companionJ, echo, timeB);
-            Post x2 = new SnapshotFactory().Create(baitX, echo, timeB);
+            Snapshot j2 = new SnapshotFactory().Create(companionJ, echo, timeA);
+            Snapshot j3 = new SnapshotFactory().Create(companionJ, echo, timeB);
+            Snapshot x2 = new SnapshotFactory().Create(baitX, echo, timeB);
 
             // hotel
-            Post e4 = new SnapshotFactory().Create(companionE, hotel, timeC);
-            Post m2 = new SnapshotFactory().Create(companionM, hotel, timeC);
+            Snapshot e4 = new SnapshotFactory().Create(companionE, hotel, timeC);
+            Snapshot m2 = new SnapshotFactory().Create(companionM, hotel, timeC);
 
             // kilo
-            Post e5 = new SnapshotFactory().Create(companionE, kilo, timeZ);
+            Snapshot e5 = new SnapshotFactory().Create(companionE, kilo, timeZ);
 
             // romeo
-            Post j4 = new SnapshotFactory().Create(companionJ, romeo, timeA);
-            Post m3 = new SnapshotFactory().Create(companionM, romeo, timeD);
-            Post x3 = new SnapshotFactory().Create(baitX, romeo, timeD);
+            Snapshot j4 = new SnapshotFactory().Create(companionJ, romeo, timeA);
+            Snapshot m3 = new SnapshotFactory().Create(companionM, romeo, timeD);
+            Snapshot x3 = new SnapshotFactory().Create(baitX, romeo, timeD);
 
             await BulkWritePost(e1, e2, e3, e4, e5, j1, j2, j3, j4, m1, m2, m3, x1, x2, x3);
 
@@ -166,7 +166,7 @@ namespace Repository.Tests
             Assert.Contains(m1.Id, retrievedAsPostIds);
             Assert.Contains(m3.Id, retrievedAsPostIds);
         }
-        private async Task BulkWritePost(params Post[] posts)
+        private async Task BulkWritePost(params Snapshot[] posts)
         {
             foreach (var post in posts)
             {

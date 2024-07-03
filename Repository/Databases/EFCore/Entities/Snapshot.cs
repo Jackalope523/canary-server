@@ -1,6 +1,6 @@
 namespace Repository
 {
-    public class Post
+    public class Snapshot
     {
         public ulong Id { get; set; }
 

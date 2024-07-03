@@ -5,10 +5,10 @@ namespace Repository
     {
         private int created = 0;
         
-        internal Post Create(User owner, Gathering location)
+        internal Snapshot Create(User owner, Gathering location)
         {
             created++;
-            return new Post
+            return new Snapshot
             {
                 OwnerId = owner.Id,
                 GatheringId = location.Id,
@@ -17,10 +17,10 @@ namespace Repository
                 IsHidden = false
             };
         }
-        internal Post Create(User owner, Gathering location, DateTimeOffset postedAt)
+        internal Snapshot Create(User owner, Gathering location, DateTimeOffset postedAt)
         {
             created++;
-            return new Post
+            return new Snapshot
             {
                 OwnerId = owner.Id,
                 GatheringId = location.Id,
