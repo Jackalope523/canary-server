@@ -172,12 +172,15 @@ namespace Core.Tests.Controls
 
 			// Act
 			var returnedGathering = await director.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
-				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
-				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
-				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum);
+				gatheringStub.StartTime,
+                gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+				gatheringStub.FriendlyLocation,
+                gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
+                gatheringStub.GroupMinimum, gatheringStub.GroupMaximum,
+                new System.IO.MemoryStream { });
 
-			// Assert
-			Assert.Equal(gatheringStub.Name, returnedGathering.Name);
+            // Assert
+            Assert.Equal(gatheringStub.Name, returnedGathering.Name);
 			Assert.Equal(gatheringStub.Description, returnedGathering.Description);
 			Assert.Equal(gatheringStub.StartTime, returnedGathering.StartTime);
 
@@ -201,9 +204,12 @@ namespace Core.Tests.Controls
 
 			// Act
 			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
-				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+				gatheringStub.StartTime,
+				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+				gatheringStub.FriendlyLocation,
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
-				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum);
+				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum,
+				new System.IO.MemoryStream { });
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await returnedGathering);
@@ -220,12 +226,15 @@ namespace Core.Tests.Controls
 
 			// Act
 			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
-				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
-				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
-				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum);
+				gatheringStub.StartTime,
+                gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+				gatheringStub.FriendlyLocation,
+                gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
+                gatheringStub.GroupMinimum, gatheringStub.GroupMaximum,
+                new System.IO.MemoryStream { });
 
-			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await returnedGathering);
+            // Assert
+            await Assert.ThrowsAnyAsync<HollowException>(async () => await returnedGathering);
 		}
 
 		[Fact]
@@ -238,9 +247,12 @@ namespace Core.Tests.Controls
 
 			// Act
 			var returnedGathering = director.CreateGatheringAsync(host.Id, conflictingGathering.Name, conflictingGathering.Description,
-				conflictingGathering.StartTime, conflictingGathering.Location.Latitude, conflictingGathering.Location.Longitude,
+				conflictingGathering.StartTime,
+				conflictingGathering.Location.Latitude, conflictingGathering.Location.Longitude,
+				conflictingGathering.FriendlyLocation,
 				conflictingGathering.Radius.Kilometres, conflictingGathering.IsDynamic,
-				conflictingGathering.GroupMinimum, conflictingGathering.GroupMaximum);
+				conflictingGathering.GroupMinimum, conflictingGathering.GroupMaximum,
+				new System.IO.MemoryStream { });
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await returnedGathering);

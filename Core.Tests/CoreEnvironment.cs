@@ -40,6 +40,7 @@ namespace Core.Tests
 		private string testGatheringDescription = "The first of many.";
 		private DateTimeOffset testGatheringStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
 		private GeoLocation testGatheringLocation = new() { Latitude = 0, Longitude = 0 };
+		private string testGatheringFriendlyLocation = "Somewhere, over the rainbow.";
 		private int testGatheringGroupMinimum = 0;
 		private int testGatheringGroupMaximum = 10;
 		private Distance testGatheringRadius = new() { Kilometres = 1 };
@@ -163,6 +164,7 @@ namespace Core.Tests
 				Host = host,
 				StartTime = testGatheringStartTime,
 				Location = testGatheringLocation,
+				FriendlyLocation = testGatheringFriendlyLocation,
 				GroupMinimum = testGatheringGroupMinimum,
 				GroupMaximum = testGatheringGroupMaximum,
 				Radius = testGatheringRadius,
