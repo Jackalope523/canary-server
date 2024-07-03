@@ -4,7 +4,7 @@ using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace Repository.Migrations.TestMigrations
+namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
     /// <inheritdoc />
     public partial class Init : Migration
@@ -14,39 +14,6 @@ namespace Repository.Migrations.TestMigrations
         {
             migrationBuilder.AlterDatabase()
                 .Annotation("Sqlite:InitSpatialMetaData", true);
-
-            migrationBuilder.CreateTable(
-                name: "Gatherings",
-                columns: table => new
-                {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    HostId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    Location = table.Column<Point>(type: "POINT", nullable: false)
-                        .Annotation("Sqlite:Srid", 4326),
-                    State = table.Column<int>(type: "INTEGER", nullable: false),
-                    GroupMinimum = table.Column<int>(type: "INTEGER", nullable: false),
-                    GroupMaximum = table.Column<int>(type: "INTEGER", nullable: false),
-                    EndTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    Radius = table.Column<double>(type: "REAL", nullable: false),
-                    IsDynamic = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsPendingDeletion = table.Column<bool>(type: "INTEGER", nullable: false),
-                    NumberOfGuests = table.Column<int>(type: "INTEGER", nullable: false),
-                    Extroversion = table.Column<int>(type: "INTEGER", nullable: false),
-                    Athleticisme = table.Column<int>(type: "INTEGER", nullable: false),
-                    Openness = table.Column<int>(type: "INTEGER", nullable: false),
-                    Chaos = table.Column<int>(type: "INTEGER", nullable: false),
-                    Competitiveness = table.Column<int>(type: "INTEGER", nullable: false),
-                    Industriousness = table.Column<int>(type: "INTEGER", nullable: false),
-                    NightOwl = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Gatherings", x => x.Id);
-                });
 
             migrationBuilder.CreateTable(
                 name: "Users",
@@ -87,6 +54,141 @@ namespace Repository.Migrations.TestMigrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Gatherings",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    HeroImageURL = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    HostId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    Location = table.Column<Point>(type: "POINT", nullable: false)
+                        .Annotation("Sqlite:Srid", 4326),
+                    FriendlyLocation = table.Column<string>(type: "TEXT", nullable: false),
+                    State = table.Column<int>(type: "INTEGER", nullable: false),
+                    GroupMinimum = table.Column<int>(type: "INTEGER", nullable: false),
+                    GroupMaximum = table.Column<int>(type: "INTEGER", nullable: false),
+                    EndTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
+                    Radius = table.Column<double>(type: "REAL", nullable: false),
+                    IsDynamic = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsPendingDeletion = table.Column<bool>(type: "INTEGER", nullable: false),
+                    NumberOfGuests = table.Column<int>(type: "INTEGER", nullable: false),
+                    Extroversion = table.Column<int>(type: "INTEGER", nullable: false),
+                    Athleticisme = table.Column<int>(type: "INTEGER", nullable: false),
+                    Openness = table.Column<int>(type: "INTEGER", nullable: false),
+                    Chaos = table.Column<int>(type: "INTEGER", nullable: false),
+                    Competitiveness = table.Column<int>(type: "INTEGER", nullable: false),
+                    Industriousness = table.Column<int>(type: "INTEGER", nullable: false),
+                    NightOwl = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Gatherings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Gatherings_Users_HostId",
+                        column: x => x.HostId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notes",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    NotifierId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    RecipientId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Action = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<ulong>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notes_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Penalties",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    PenalizedId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Penalties", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Penalties_Users_PenalizedId",
+                        column: x => x.PenalizedId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    DeviceType = table.Column<int>(type: "INTEGER", nullable: false),
+                    DeviceToken = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserLinks",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SelfId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    OtherId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserLinks_Users_OtherId",
+                        column: x => x.OtherId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserLinks_Users_SelfId",
+                        column: x => x.SelfId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -147,52 +249,7 @@ namespace Repository.Migrations.TestMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notes",
-                columns: table => new
-                {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    NotifierId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    RecipientId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Action = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notes_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Penalties",
-                columns: table => new
-                {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    PenalizedId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Penalties", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Penalties_Users_PenalizedId",
-                        column: x => x.PenalizedId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Posts",
+                name: "Snapshots",
                 columns: table => new
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
@@ -205,65 +262,16 @@ namespace Repository.Migrations.TestMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Posts", x => x.Id);
+                    table.PrimaryKey("PK_Snapshots", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Posts_Gatherings_GatheringId",
+                        name: "FK_Snapshots_Gatherings_GatheringId",
                         column: x => x.GatheringId,
                         principalTable: "Gatherings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Posts_Users_OwnerId",
+                        name: "FK_Snapshots_Users_OwnerId",
                         column: x => x.OwnerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Subscriptions",
-                columns: table => new
-                {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    DeviceType = table.Column<int>(type: "INTEGER", nullable: false),
-                    DeviceToken = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Subscriptions_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserLinks",
-                columns: table => new
-                {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SelfId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    OtherId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserLinks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserLinks_Users_OtherId",
-                        column: x => x.OtherId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserLinks_Users_SelfId",
-                        column: x => x.SelfId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -305,7 +313,7 @@ namespace Repository.Migrations.TestMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PostLinks",
+                name: "SnapshotLinks",
                 columns: table => new
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
@@ -317,15 +325,15 @@ namespace Repository.Migrations.TestMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PostLinks", x => x.Id);
+                    table.PrimaryKey("PK_SnapshotLinks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PostLinks_Posts_PostId",
+                        name: "FK_SnapshotLinks_Snapshots_PostId",
                         column: x => x.PostId,
-                        principalTable: "Posts",
+                        principalTable: "Snapshots",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PostLinks_Users_UserId",
+                        name: "FK_SnapshotLinks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -353,6 +361,11 @@ namespace Repository.Migrations.TestMigrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Gatherings_HostId",
+                table: "Gatherings",
+                column: "HostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notes_UserId",
                 table: "Notes",
                 column: "UserId");
@@ -363,24 +376,24 @@ namespace Repository.Migrations.TestMigrations
                 column: "PenalizedId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostLinks_PostId",
-                table: "PostLinks",
+                name: "IX_SnapshotLinks_PostId",
+                table: "SnapshotLinks",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostLinks_UserId_PostId",
-                table: "PostLinks",
+                name: "IX_SnapshotLinks_UserId_PostId",
+                table: "SnapshotLinks",
                 columns: new[] { "UserId", "PostId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_GatheringId",
-                table: "Posts",
+                name: "IX_Snapshots_GatheringId",
+                table: "Snapshots",
                 column: "GatheringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_OwnerId",
-                table: "Posts",
+                name: "IX_Snapshots_OwnerId",
+                table: "Snapshots",
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
@@ -430,7 +443,7 @@ namespace Repository.Migrations.TestMigrations
                 name: "Penalties");
 
             migrationBuilder.DropTable(
-                name: "PostLinks");
+                name: "SnapshotLinks");
 
             migrationBuilder.DropTable(
                 name: "Subscriptions");
@@ -442,7 +455,7 @@ namespace Repository.Migrations.TestMigrations
                 name: "UserReports");
 
             migrationBuilder.DropTable(
-                name: "Posts");
+                name: "Snapshots");
 
             migrationBuilder.DropTable(
                 name: "Gatherings");

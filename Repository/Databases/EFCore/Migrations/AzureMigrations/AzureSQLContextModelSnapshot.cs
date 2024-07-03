@@ -3,21 +3,18 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
 
 #nullable disable
 
-namespace Repository.Migrations.AzureMigrations
+namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 {
     [DbContext(typeof(AzureSQLContext))]
-    [Migration("20240314232337_Init")]
-    partial class Init
+    partial class AzureSQLContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,6 +22,55 @@ namespace Repository.Migrations.AzureMigrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Repository.Banner", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(20,0)");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Banners");
+                });
+
+            modelBuilder.Entity("Repository.BannerLink", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(20,0)");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+
+                    b.Property<decimal>("BannerId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("UserId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BannerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BannerLinks");
+                });
 
             modelBuilder.Entity("Repository.Entities.Note", b =>
                 {
@@ -36,10 +82,12 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Property<string>("Action")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Message")
                         .IsRequired()
+                        .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("NotifierId")
@@ -98,7 +146,8 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Property<string>("DeviceToken")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("DeviceType")
                         .HasColumnType("int");
@@ -132,7 +181,8 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTimeOffset?>("EndTime")
                         .HasColumnType("datetimeoffset");
@@ -140,11 +190,21 @@ namespace Repository.Migrations.AzureMigrations
                     b.Property<int>("Extroversion")
                         .HasColumnType("int");
 
+                    b.Property<string>("FriendlyLocation")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<int>("GroupMaximum")
                         .HasColumnType("int");
 
                     b.Property<int>("GroupMinimum")
                         .HasColumnType("int");
+
+                    b.Property<string>("HeroImageURL")
+                        .IsRequired()
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
 
                     b.Property<decimal>("HostId")
                         .HasColumnType("decimal(20,0)");
@@ -165,7 +225,8 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("NightOwl")
                         .HasColumnType("int");
@@ -187,6 +248,8 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("HostId");
+
                     b.ToTable("Gatherings");
                 });
 
@@ -197,6 +260,9 @@ namespace Repository.Migrations.AzureMigrations
                         .HasColumnType("decimal(20,0)");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+
+                    b.Property<decimal?>("BannerId")
+                        .HasColumnType("decimal(20,0)");
 
                     b.Property<decimal>("GatheringId")
                         .HasColumnType("decimal(20,0)");
@@ -211,6 +277,8 @@ namespace Repository.Migrations.AzureMigrations
                         .HasColumnType("decimal(20,0)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BannerId");
 
                     b.HasIndex("GatheringId");
 
@@ -227,15 +295,16 @@ namespace Repository.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
-
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<decimal>("GatheringId")
+                        .HasColumnType("decimal(20,0)");
+
                     b.Property<string>("Notes")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -252,7 +321,7 @@ namespace Repository.Migrations.AzureMigrations
                     b.ToTable("GatheringReports");
                 });
 
-            modelBuilder.Entity("Repository.Post", b =>
+            modelBuilder.Entity("Repository.Snapshot", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -271,7 +340,8 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Property<string>("PhotoURL")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
 
                     b.Property<DateTimeOffset>("PostedAt")
                         .HasColumnType("datetimeoffset");
@@ -282,10 +352,10 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Snapshots");
                 });
 
-            modelBuilder.Entity("Repository.PostLink", b =>
+            modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -312,7 +382,7 @@ namespace Repository.Migrations.AzureMigrations
                     b.HasIndex("UserId", "PostId")
                         .IsUnique();
 
-                    b.ToTable("PostLinks");
+                    b.ToTable("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -354,7 +424,8 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Extroversion")
                         .HasColumnType("int");
@@ -390,28 +461,32 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("NightOwl")
                         .HasColumnType("int");
 
                     b.Property<string>("NormalisedEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Openness")
                         .HasColumnType("int");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("Reputation")
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -455,15 +530,16 @@ namespace Repository.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal?>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
-
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<decimal?>("GatheringId")
+                        .HasColumnType("decimal(20,0)");
+
                     b.Property<string>("Notes")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<decimal>("OtherId")
                         .HasColumnType("decimal(20,0)");
@@ -483,6 +559,25 @@ namespace Repository.Migrations.AzureMigrations
                     b.HasIndex("SelfId");
 
                     b.ToTable("UserReports");
+                });
+
+            modelBuilder.Entity("Repository.BannerLink", b =>
+                {
+                    b.HasOne("Repository.Banner", "Banner")
+                        .WithMany()
+                        .HasForeignKey("BannerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Banner");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Entities.Note", b =>
@@ -505,15 +600,32 @@ namespace Repository.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
-                    b.HasOne("Repository.User", null)
+                    b.HasOne("Repository.User", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Gathering", b =>
+                {
+                    b.HasOne("Repository.User", "Host")
+                        .WithMany()
+                        .HasForeignKey("HostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Host");
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
                 {
+                    b.HasOne("Repository.Banner", null)
+                        .WithMany("Links")
+                        .HasForeignKey("BannerId");
+
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Links")
                         .HasForeignKey("GatheringId")
@@ -550,16 +662,16 @@ namespace Repository.Migrations.AzureMigrations
                     b.Navigation("Self");
                 });
 
-            modelBuilder.Entity("Repository.Post", b =>
+            modelBuilder.Entity("Repository.Snapshot", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("Posts")
+                        .WithMany("Snapshots")
                         .HasForeignKey("GatheringId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Owner")
-                        .WithMany("Posts")
+                        .WithMany("Snapshots")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -569,9 +681,9 @@ namespace Repository.Migrations.AzureMigrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Repository.PostLink", b =>
+            modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.HasOne("Repository.Post", "Post")
+                    b.HasOne("Repository.Snapshot", "Post")
                         .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -632,13 +744,18 @@ namespace Repository.Migrations.AzureMigrations
                     b.Navigation("Self");
                 });
 
+            modelBuilder.Entity("Repository.Banner", b =>
+                {
+                    b.Navigation("Links");
+                });
+
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.Navigation("Links");
 
-                    b.Navigation("Posts");
-
                     b.Navigation("Reports");
+
+                    b.Navigation("Snapshots");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -651,11 +768,11 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.Navigation("PostLinks");
 
-                    b.Navigation("Posts");
-
                     b.Navigation("ReporteeList");
 
                     b.Navigation("ReporterList");
+
+                    b.Navigation("Snapshots");
 
                     b.Navigation("Subscriptions");
 

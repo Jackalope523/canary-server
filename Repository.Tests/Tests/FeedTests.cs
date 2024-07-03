@@ -170,7 +170,7 @@ namespace Repository.Tests
         {
             foreach (var post in posts)
             {
-                sentry.ExecuteWrite(ctx => ctx.Posts.Add(post));
+                sentry.ExecuteWrite(ctx => ctx.Snapshots.Add(post));
             }
         }    
     }

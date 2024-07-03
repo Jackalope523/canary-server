@@ -64,7 +64,7 @@ namespace Repository
 
                 snapshots.Add(snapshotFactory.Create(users[i], location));
             }
-            context.Posts.AddRange(snapshots);
+            context.Snapshots.AddRange(snapshots);
             context.SaveChanges();
         }
 

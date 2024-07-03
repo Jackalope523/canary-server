@@ -12,12 +12,12 @@ namespace Repository
 
         public async Task DrainDatabaseAsync()
         {
-            storeSentry.ExecuteWrite(ctx => ctx.PostLinks.ExecuteDelete());
+            storeSentry.ExecuteWrite(ctx => ctx.SnapshotLinks.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.GatheringLinks.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.UserLinks.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.UserReports.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.GatheringReports.ExecuteDelete());
-            storeSentry.ExecuteWrite(ctx => ctx.Posts.ExecuteDelete());
+            storeSentry.ExecuteWrite(ctx => ctx.Snapshots.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Notes.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Subscriptions.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Penalties.ExecuteDelete());

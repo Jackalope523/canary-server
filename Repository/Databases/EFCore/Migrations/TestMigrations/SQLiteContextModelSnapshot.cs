@@ -8,10 +8,10 @@ using Repository;
 
 #nullable disable
 
-namespace Repository.Migrations.TestMigrations
+namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
     [DbContext(typeof(SQLiteContext))]
-    partial class TestContextModelSnapshot : ModelSnapshot
+    partial class SQLiteContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -124,11 +124,19 @@ namespace Repository.Migrations.TestMigrations
                     b.Property<int>("Extroversion")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("FriendlyLocation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("GroupMaximum")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("GroupMinimum")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("HeroImageURL")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<ulong>("HostId")
                         .HasColumnType("INTEGER");
@@ -171,6 +179,8 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("HostId");
+
                     b.ToTable("Gatherings");
                 });
 
@@ -207,11 +217,11 @@ namespace Repository.Migrations.TestMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("GatheringId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("TEXT");
+
+                    b.Property<ulong>("GatheringId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
                         .IsRequired()
@@ -232,7 +242,7 @@ namespace Repository.Migrations.TestMigrations
                     b.ToTable("GatheringReports");
                 });
 
-            modelBuilder.Entity("Repository.Post", b =>
+            modelBuilder.Entity("Repository.Snapshot", b =>
                 {
                     b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,10 +270,10 @@ namespace Repository.Migrations.TestMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Snapshots");
                 });
 
-            modelBuilder.Entity("Repository.PostLink", b =>
+            modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
                     b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
@@ -288,7 +298,7 @@ namespace Repository.Migrations.TestMigrations
                     b.HasIndex("UserId", "PostId")
                         .IsUnique();
 
-                    b.ToTable("PostLinks");
+                    b.ToTable("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -425,11 +435,11 @@ namespace Repository.Migrations.TestMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong?>("GatheringId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("TEXT");
+
+                    b.Property<ulong?>("GatheringId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
                         .IsRequired()
@@ -475,11 +485,24 @@ namespace Repository.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
-                    b.HasOne("Repository.User", null)
+                    b.HasOne("Repository.User", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Gathering", b =>
+                {
+                    b.HasOne("Repository.User", "Host")
+                        .WithMany()
+                        .HasForeignKey("HostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Host");
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -520,7 +543,7 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("Self");
                 });
 
-            modelBuilder.Entity("Repository.Post", b =>
+            modelBuilder.Entity("Repository.Snapshot", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Posts")
@@ -539,9 +562,9 @@ namespace Repository.Migrations.TestMigrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Repository.PostLink", b =>
+            modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.HasOne("Repository.Post", "Post")
+                    b.HasOne("Repository.Snapshot", "Post")
                         .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)

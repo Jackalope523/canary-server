@@ -39,7 +39,7 @@ namespace Repository
         // Navigation Properties
         public List<GatheringLink>? Links { get; set; }
         public List<GatheringReport>? Reports { get; set; }
-        public List<Snapshot>? Posts { get; set; }
+        public List<Snapshot>? Snapshots { get; set; }
 
         // Default Values
         private static readonly CoordinateFactory Factory = new();

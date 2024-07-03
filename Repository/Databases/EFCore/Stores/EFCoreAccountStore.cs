@@ -56,7 +56,7 @@ namespace Repository
                ExecuteDelete());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Posts.
+               ctx.Snapshots.
                Where(p => p.OwnerId == id).
                ExecuteDelete());
 

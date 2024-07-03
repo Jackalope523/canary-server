@@ -45,7 +45,7 @@ namespace Repository
         public List<SnapshotLink>? PostLinks { get; set; }
         public List<UserReport>? ReporterList { get; set; }
         public List<UserReport>? ReporteeList { get; set; }
-        public List<Snapshot>? Posts { get; set; }
+        public List<Snapshot>? Snapshots { get; set; }
         public List<Entities.Note>? Notes { get; set; }
         public List<Subscription>? Subscriptions { get; set; }
         public List<Entities.Penalty>? Penalties { get; set; }
