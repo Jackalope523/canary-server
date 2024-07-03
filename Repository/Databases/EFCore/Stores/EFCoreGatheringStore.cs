@@ -11,7 +11,7 @@ namespace Repository
         {
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character, double radius, bool isDynamic)
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, Character character, double Radius, bool isDynamic)
         {
             Gathering toCreate = new()
             {
@@ -20,9 +20,10 @@ namespace Repository
                 StartTime = startTime,
                 HostId = hostId,
                 Location = new CoordinateFactory().Create(longitude, latitude),
+                FriendlyLocation = friendlyLocation,
                 GroupMinimum = groupMinimum,
                 GroupMaximum = groupMaximum,
-                Radius = radius,
+                Radius = Radius,
                 IsDynamic = isDynamic,
                 Extroversion = character.Extraversion,
                 Athleticisme = character.Athleticism,
@@ -58,6 +59,7 @@ namespace Repository
                    toCreate.StartTime,
                    toCreate.Location.Y,
                    toCreate.Location.X,
+                   toCreate.FriendlyLocation,
                    toCreate.EndTime,
                    toCreate.State,
                    toCreate.GroupMinimum,
@@ -106,6 +108,7 @@ namespace Repository
                         e.StartTime,
                         e.Location.Y,
                         e.Location.X,
+                        e.FriendlyLocation,
                         e.EndTime,
                         e.State,
                         e.GroupMinimum,
@@ -152,6 +155,7 @@ namespace Repository
                     e.Description,
                     e.StartTime,
                     e.Location,
+                    e.FriendlyLocation,
                     e.EndTime,
                     e.State,
                     e.GroupMinimum,
@@ -181,6 +185,7 @@ namespace Repository
                     e.StartTime,
                     e.Location.Y,
                     e.Location.X,
+                    e.FriendlyLocation,
                     e.EndTime,
                     e.State,
                     e.GroupMinimum,
@@ -234,6 +239,7 @@ namespace Repository
                     e.Description,
                     e.StartTime,
                     e.Location,
+                    e.FriendlyLocation,
                     e.EndTime,
                     e.State,
                     e.GroupMinimum,
@@ -263,6 +269,7 @@ namespace Repository
                     e.StartTime,
                     e.Location.Y,
                     e.Location.X,
+                    e.FriendlyLocation,
                     e.EndTime,
                     e.State,
                     e.GroupMinimum,
@@ -299,6 +306,7 @@ namespace Repository
                   e.Description,
                   e.StartTime,
                   e.Location,
+                  e.FriendlyLocation,
                   e.EndTime,
                   e.State,
                   e.GroupMinimum,
@@ -328,6 +336,7 @@ namespace Repository
                    e.StartTime,
                    e.Location.Y,
                    e.Location.X,
+                   e.FriendlyLocation,
                    e.EndTime,
                    e.State,
                    e.GroupMinimum,
@@ -361,6 +370,7 @@ namespace Repository
                    e.StartTime,
                    e.Location.Y,
                    e.Location.X,
+                   e.FriendlyLocation,
                    e.EndTime,
                    e.State,
                    e.GroupMinimum,
@@ -406,6 +416,7 @@ namespace Repository
                         e.StartTime,
                         e.Location.Y,
                         e.Location.X,
+                        e.FriendlyLocation,
                         e.EndTime,
                         e.State,
                         e.GroupMinimum,
@@ -582,6 +593,7 @@ namespace Repository
                     e.StartTime, 
                     e.Location.Y, 
                     e.Location.X, 
+                    e.FriendlyLocation,
                     e.EndTime, 
                     e.State, 
                     e.GroupMinimum, 

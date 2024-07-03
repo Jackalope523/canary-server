@@ -12,9 +12,9 @@ namespace Repository
             store = new EFCoreGatheringStore(flag);
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, int groupMinimum, int groupMaximum, Character character, double radius, bool isDynamic)
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, Character character, double Radius, bool isDynamic)
         {
-            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, groupMinimum, groupMaximum, character, radius, isDynamic);
+            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic);
         }
 
         public async Task DeleteGatheringAsync(ulong gatheringId)

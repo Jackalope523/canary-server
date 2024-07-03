@@ -16,7 +16,7 @@ namespace Repository
 
         // X = Longitude Y = Latitude
         public Point Location { get; set; } = DefaultLocation;
-        public string FriendlyLocationName { get; set; } = DefaultFriendlyLocation;
+        public string FriendlyLocation { get; set; } = DefaultFriendlyLocation;
 
         public GatheringState State { get; set; } = DefaultState;
         public int GroupMinimum { get; set; } = DefaultGroupMinimum;
