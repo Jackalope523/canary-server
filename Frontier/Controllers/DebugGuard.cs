@@ -98,7 +98,7 @@ namespace Frontier.Controllers
                     seedGatherings.Add(await gatherings.CreateGatheringAsync(host.Id,
                         gathering.Name, gathering.Description,
                         gathering.StartTime,
-						gathering.Latitude, gathering.Longitude, gathering.FriendlyName,
+						gathering.Latitude, gathering.Longitude, gathering.,
                         gathering.Radius, gathering.IsDynamic,
                         gathering.GroupMinimum, gathering.GroupMaximum, new System.IO.MemoryStream { }));
                 }
