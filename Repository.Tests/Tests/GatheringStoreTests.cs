@@ -46,6 +46,7 @@ namespace Repository.Tests
                 testGathering.StartTime,
                 testGathering.Location.Y,
                 testGathering.Location.X,
+                testGathering.FriendlyLocation,
                 testGathering.GroupMinimum,
                 testGathering.GroupMaximum,
                 new Character(

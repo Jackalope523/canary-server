@@ -175,7 +175,7 @@ namespace Core.Tests
 		internal async Task<Gathering> GenerateGatheringUnsafeAsync(Gathering gatheringStub, User host)
 		{
 			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
-				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
 		}
