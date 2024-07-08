@@ -160,8 +160,8 @@ namespace Frontier.Controllers
 		[NonAction]
 		public void ThrowIfUnverified(CoreUser user)
 		{
-			if (user.IsEmailConfirmed)
-			{ throw new InvalidUserException("User has not yet confirmed their email."); }
+			if (user.IsPhoneConfirmed)
+			{ throw new InvalidUserException("User has not yet confirmed their phone number."); }
 		}
 
 		[NonAction]
