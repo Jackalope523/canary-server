@@ -28,15 +28,15 @@ namespace Repository
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
-        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(ulong id) 
         {
             return await store.GetAppreciatedUsersAsync(id);
         }
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetBlockedUsersAsync(ulong id) 
         {
             return await store.GetBlockedUsersAsync(id);
         }
-        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong id)
+        public async Task<List<UserShard>> GetCompanionsAsync(ulong id)
         {
             return await store.GetCompanionsAsync(id);
         }
@@ -56,12 +56,12 @@ namespace Repository
             await store.RemoveUserRatingAsync(selfId, targetId);
         }
 
-        public async Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId)
         {
             return await store.GetUsersAppreciatingAsync(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersBlockingAsync(ulong userId)
         {
            return await store.GetUsersBlockingAsync(userId);
         }

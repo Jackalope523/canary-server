@@ -155,18 +155,10 @@ namespace Core.Entities
             Character = new(fromUser.Character);
         }
 
-        public User(UserSilhouette fromUser) : this()
+        public User(UserShard fromUser) : this()
         {
             Id = fromUser.Id;
             Name = fromUser.Name;
-        }
-
-        public User(UserProfile fromUser) : this()
-        {
-            Id = fromUser.Id;
-            Name = fromUser.Name;
-            Reputation = fromUser.Reputation;
-            Appreciation = fromUser.Appreciation;
         }
 
         public CoreUser ToCoreUser()
@@ -177,20 +169,16 @@ namespace Core.Entities
                 JoinDate, Reputation, Appreciation, Character.ToCharacter());
         }
 
-        public UserShard ToUserShard()
+        public AccountShard ToAccountShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-                Reputation, Appreciation);
+                IsPhoneConfirmed, IsEmailConfirmed,
+                AccountStatus, JoinDate);
         }
 
-        public UserSilhouette ToUserSilhouette()
+        public UserShard ToUserShard()
         {
             return new(Id, Name);
-        }
-
-        public UserProfile ToUserProfile()
-        {
-            return new(Id, Name, Reputation, Appreciation);
         }
 
 		#endregion

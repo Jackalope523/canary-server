@@ -51,7 +51,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Block));
         }
-        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
@@ -59,11 +59,11 @@ namespace Repository
                  ctx.Users,
                  l => l.OtherId,
                  u => u.Id,
-                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 (l, u) => new UserShard(u.Id, u.Name)
                  ).
              ToListAsync());
         }
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetBlockedUsersAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block).
@@ -71,29 +71,29 @@ namespace Repository
                 ctx.Users, 
                 l => l.OtherId, 
                 u => u.Id, 
-                (l,u) => new UserSilhouette(u.Id, u.Name)
+                (l,u) => new UserShard(u.Id, u.Name)
                 ).
             ToListAsync());
         }
-        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong id)
+        public async Task<List<UserShard>> GetCompanionsAsync(ulong id)
         {
-            Task<List<UserSilhouette>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+            Task<List<UserShard>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.OtherId,
                  u => u.Id,
-                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 (l, u) => new UserShard(u.Id, u.Name)
                  ).
              ToListAsync());
 
-            Task<List<UserSilhouette>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+            Task<List<UserShard>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.SelfId,
                  u => u.Id,
-                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 (l, u) => new UserShard(u.Id, u.Name)
                  ).
              ToListAsync());
 
@@ -153,25 +153,25 @@ namespace Repository
             ExecuteDelete());
         }
 
-        public async Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Appreciate).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
-            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            (l, u) => new UserShard(u.Id, u.Name)).
             ToListAsync());
         }
 
-        public async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersBlockingAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Block).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
-            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            (l, u) => new UserShard(u.Id, u.Name)).
             ToListAsync());
         }
     }

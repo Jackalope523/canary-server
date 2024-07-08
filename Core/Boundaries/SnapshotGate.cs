@@ -10,7 +10,7 @@ namespace Core.Boundaries
 	public record GatheringHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
         string FriendlyLocation);
 
-    public record SnapshotShard(ulong Id, ulong GatheringId, UserSilhouette User,
+    public record SnapshotShard(ulong Id, ulong GatheringId, UserShard User,
         DateTimeOffset TimeTaken,
         (int Positive, int Negative) Acclaim, bool IsHidden);
 

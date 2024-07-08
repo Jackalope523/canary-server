@@ -47,7 +47,7 @@ namespace Repository
             
             await storeSentry.ExecuteWriteAsync(ctx => ctx.GatheringLinks.Add(hostLink));
 
-            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync());
+            UserShard host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserShard(u.Id, u.Name)).SingleAsync());
 
 
             return new CoreGathering
@@ -102,7 +102,7 @@ namespace Repository
                     Select(e => new CoreGathering
                     (
                         e.Id,
-                        new UserSilhouette(e.HostId, null),
+                        new UserShard(e.HostId, null),
                         e.Name,
                         e.Description,
                         e.StartTime,
@@ -127,10 +127,10 @@ namespace Repository
                         e.NumberOfGuests
                         )).SingleAsync());
 
-                UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx =>
+                UserShard host = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Users.
                 Where(u => u.Id == gathering.Host.Id).
-                Select(u => new UserSilhouette(u.Id, u.Name)).
+                Select(u => new UserShard(u.Id, u.Name)).
                 SingleAsync());
 
 
@@ -179,7 +179,7 @@ namespace Repository
                  (e, u) => new CoreGathering
                  (
                     e.Id,
-                    new UserSilhouette(u.Id, u.Name),
+                    new UserShard(u.Id, u.Name),
                     e.Name,
                     e.Description,
                     e.StartTime,
@@ -263,7 +263,7 @@ namespace Repository
                  (e, u) => new CoreGathering
                  (
                     e.Id,
-                    new UserSilhouette(u.Id, u.Name),
+                    new UserShard(u.Id, u.Name),
                     e.Name,
                     e.Description,
                     e.StartTime,
@@ -330,7 +330,7 @@ namespace Repository
                 (e, u) => new CoreGathering
                 (
                    e.Id,
-                   new UserSilhouette(u.Id, u.Name),
+                   new UserShard(u.Id, u.Name),
                    e.Name,
                    e.Description,
                    e.StartTime,
@@ -364,7 +364,7 @@ namespace Repository
             Select(e => new CoreGathering
                (
                    e.Id,
-                   new UserSilhouette(e.HostId, null),
+                   new UserShard(e.HostId, null),
                    e.Name,
                    e.Description,
                    e.StartTime,
@@ -390,7 +390,7 @@ namespace Repository
                )).
              SingleAsync());
 
-            UserSilhouette host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == gathering.Host.Id).Select(u => new UserSilhouette(u.Id, u.Name)).SingleAsync()) ;
+            UserShard host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == gathering.Host.Id).Select(u => new UserShard(u.Id, u.Name)).SingleAsync()) ;
 
             return gathering with {Host = host } ;
         }
@@ -410,7 +410,7 @@ namespace Repository
                     (e,u) => new CoreGathering
                     (
                         e.Id,
-                        new UserSilhouette(u.Id, u.Name),
+                        new UserShard(u.Id, u.Name),
                         e.Name,
                         e.Description,
                         e.StartTime,
@@ -435,7 +435,7 @@ namespace Repository
                         e.NumberOfGuests
                    )).ToListAsync());
         }     
-        public async Task<List<UserSilhouette>> GetGuestListAsync(ulong id)
+        public async Task<List<UserShard>> GetGuestListAsync(ulong id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -444,7 +444,7 @@ namespace Repository
                 ctx.Users,
                 l => l.UserId,
                 u => u.Id,
-                (_,u) => new UserSilhouette(u.Id, u.Name)
+                (_,u) => new UserShard(u.Id, u.Name)
                 ).
             ToListAsync());
         }    
@@ -533,7 +533,7 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }   
-        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong id)
+        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong id)
         {
             var times = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -553,7 +553,7 @@ namespace Repository
                 history[item.Id].Add((item.Name, item.Time, item.Type));               
             }
 
-            List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)> toReturn = new();
+            List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)> toReturn = new();
             ulong userId;
             string userName;
             DateTimeOffset arrivalTime;
@@ -571,7 +571,7 @@ namespace Repository
                 if (lastState == GatheringBond.Left) departureTime = lastTime;
                 else departureTime = null;
                 
-                toReturn.Add((arrivalTime, departureTime, new UserSilhouette(userId, userName)));
+                toReturn.Add((arrivalTime, departureTime, new UserShard(userId, userName)));
             }
 
             return toReturn;
@@ -587,7 +587,7 @@ namespace Repository
                u => u.Id,
                (e, u) => new CoreGathering(
                     e.Id, 
-                    new UserSilhouette(u.Id, u.Name), 
+                    new UserShard(u.Id, u.Name), 
                     e.Name, 
                     e.Description, 
                     e.StartTime, 
@@ -686,7 +686,7 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
-        public async Task<List<(UserSilhouette User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId)
+        public async Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId)
         {
             var users = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -706,7 +706,7 @@ namespace Repository
                 history[item.Id].Add((item.Name, item.Time, item.Type));
             }
 
-            List<(UserSilhouette User, GatheringBond State)> toReturn = new();
+            List<(UserShard User, GatheringBond State)> toReturn = new();
             ulong userId;
             string userName;
             GatheringBond userState;
@@ -718,7 +718,7 @@ namespace Repository
                 userName = entry.Value.Last().Item1;
                 userState = entry.Value.Last().Item3;
 
-                toReturn.Add((new UserSilhouette(userId, userName), userState));
+                toReturn.Add((new UserShard(userId, userName), userState));
             }
             return toReturn;
         }

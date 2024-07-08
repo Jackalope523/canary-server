@@ -41,7 +41,7 @@ namespace Frontier.Manifests
         public int? GroupMinimum { get; set; }
         public int? GroupMaximum { get; set; }
 
-        public UserSilhouette Host { get; set; }
+        public UserShard Host { get; set; }
 
         public uint NumberOfParticipants { get; set; }
     }

@@ -144,7 +144,7 @@ namespace Core.Entities
 
         public CoreGathering ToCoreGathering()
         {
-            return new(Id, Host.ToUserSilhouette(), Name, Description,
+            return new(Id, Host.ToUserShard(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
@@ -152,7 +152,7 @@ namespace Core.Entities
 
         public GatheringShard ToGatheringShard()
         {
-            return new(Id, Host.ToUserSilhouette(), Name, Description,
+            return new(Id, Host.ToUserShard(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, NumberOfGuests, RelativeAngle);
@@ -160,7 +160,7 @@ namespace Core.Entities
 
         public GatheringShard ToGatheringShard(User relativeUser)
         {
-            return new(Id, Host.ToUserSilhouette(), Name, Description,
+            return new(Id, Host.ToUserShard(), Name, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, NumberOfGuests,

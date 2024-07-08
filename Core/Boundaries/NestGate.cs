@@ -9,8 +9,6 @@ namespace Core.Boundaries
     public enum UserRating
     { Positive, Negative, Remove }
 
-    public record UserProfile(ulong Id, string Name, int Reputation, int Appreciation);
-    public record UserSilhouette(ulong Id, string Name);
     public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
     public record AgendaShard(List<(GatheringShard Gathering, GatheringBond Bond)> Agenda);
 
@@ -20,11 +18,11 @@ namespace Core.Boundaries
 
 	public interface INestDatabase
     {
-        Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
-		Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId);
-        Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId);
-        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
-        Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId);
+        Task<List<UserShard>> GetCompanionsAsync(ulong userId);
+		Task<List<UserShard>> GetAppreciatedUsersAsync(ulong userId);
+        Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId);
+        Task<List<UserShard>> GetBlockedUsersAsync(ulong userId);
+        Task<List<UserShard>> GetUsersBlockingAsync(ulong userId);
 
         Task AppreciateUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnappreciateUserAsync(ulong userId, ulong targetUserId);
@@ -41,11 +39,11 @@ namespace Core.Boundaries
         Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
         Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
-        Task<IDictionary<UserSilhouette, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
+        Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
 
-        Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
-        Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId);
-        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
+        Task<List<UserShard>> GetCompanionsAsync(ulong userId);
+        Task<List<UserShard>> GetAppreciatedUsersAsync(ulong userId);
+        Task<List<UserShard>> GetBlockedUsersAsync(ulong userId);
 
         Task AppreciateUserAsync(ulong userId, ulong targetId);
         Task UnappreciateUserAsync(ulong userId, ulong targetId);

@@ -62,7 +62,7 @@ namespace Repository
             await store.UpdateGatheringAsync(id, edits); 
         }   
 
-        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong id)
+        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong id)
         {
             return await store.GetGuestHistoryAsync(id);
         }   
@@ -82,7 +82,7 @@ namespace Repository
             await store.SetUserStateAsync(userId, gatheringId, userState, time);
         }
 
-        public async Task<List<(UserSilhouette User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId)
+        public async Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId)
         {
             return await store.GetAllUsersAsync(gatheringId);
         }

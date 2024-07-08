@@ -35,6 +35,11 @@ namespace Core.Controls
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
 		}
 
+		public async Task<AccountShard> GetAccountShardAsync(ulong userId)
+        {
+            return (await GetUserAsync(userId)).ToAccountShard();
+        }
+
 		public async Task<UserShard> GetUserShardAsync(ulong userId)
         {
             return (await GetUserAsync(userId)).ToUserShard();

@@ -39,13 +39,15 @@ namespace Frontier.Controllers
 		[HttpGet]
         public async Task<IActionResult> GetAccount()
         {
-            return await Execute(async () =>
-            {
-                // Get current user
-                var user = await GetCurrentUserAsync();
+            return await Execute(async user =>
+                await accounts.GetAccountShardAsync(user.Id));
+        }
 
-                return user;
-            });
+		[HttpGet("{userId}")]
+        public async Task<IActionResult> GetUser(ulong userId)
+        {
+            return await Execute(async user =>
+                await accounts.GetUserShardAsync(userId));
         }
 
         [HttpPost("login")]

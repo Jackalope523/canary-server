@@ -205,8 +205,8 @@ namespace Core.Tests.Controls
 
 			// Assert
 			Assert.Equal(2, agenda.Keys.Count);
-			Assert.Equal(4, agenda[activeCompanion.ToUserSilhouette()].Agenda.Count);
-			Assert.Single(agenda[sloadButChill.ToUserSilhouette()].Agenda);
+			Assert.Equal(4, agenda[activeCompanion.ToUserShard()].Agenda.Count);
+			Assert.Single(agenda[sloadButChill.ToUserShard()].Agenda);
 		}
 
 		[Fact]

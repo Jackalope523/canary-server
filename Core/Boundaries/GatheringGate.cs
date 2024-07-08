@@ -13,19 +13,19 @@ namespace Core.Boundaries
     public enum GatheringBond
     { Surveying, Guest, Arrived, Left, Kicked }
 
-    public record CoreGathering(ulong Id, UserSilhouette Host, string Name, string Description,
+    public record CoreGathering(ulong Id, UserShard Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, Character Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests)
 		: CoreOnlyData();
 
-	public record GatheringShard(ulong Id, UserSilhouette Host, string Name, string Description,
+	public record GatheringShard(ulong Id, UserShard Host, string Name, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
         double Radius, int NumberOfGuests, float RelativeAngle);
 
 	public record GuestListShard(int Surveyers, int GuestCount,
-		List<(UserSilhouette User, GatheringBond Bond)> Guests);
+		List<(UserShard User, GatheringBond Bond)> Guests);
 
     #endregion
 
@@ -53,8 +53,8 @@ namespace Core.Boundaries
 		Task SetUserStateAsync(ulong userId, ulong gatheringId, GatheringBond userState, DateTimeOffset time);
 		Task RemoveUserAsync(ulong userId, ulong gatheringId);
 
-		Task<List<(UserSilhouette User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId);
-		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong gatheringId);
+		Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId);
+		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong gatheringId);
 	}
 
 	public interface IGatheringOperations
@@ -83,7 +83,7 @@ namespace Core.Boundaries
 		Task LeaveGatheringAsync(ulong userId, ulong gatheringId);
 
 		Task<GuestListShard> GetGuestListAsync(ulong userId, ulong gatheringId);
-		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId);
+		Task<List<UserShard>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong gatheringId);
 		Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId);
 	}

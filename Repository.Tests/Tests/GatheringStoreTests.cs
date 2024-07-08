@@ -413,7 +413,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(arrivalLink));
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(departureLink));
 
-            (DateTimeOffset, DateTimeOffset?, UserSilhouette) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
+            (DateTimeOffset, DateTimeOffset?, UserShard) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
 
             Assert.NotNull(guest.Item3);
             Assert.Equal(DateTimeOffset.MinValue, guest.Item1);
@@ -427,7 +427,7 @@ namespace Repository.Tests
             GatheringLink arrivalLink = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Arrived, DateTimeOffset.MinValue);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(arrivalLink));
 
-            (DateTimeOffset, DateTimeOffset?, UserSilhouette) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
+            (DateTimeOffset, DateTimeOffset?, UserShard) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
 
             Assert.NotNull(guest.Item3);
             Assert.Equal(DateTimeOffset.MinValue, guest.Item1);
@@ -441,7 +441,7 @@ namespace Repository.Tests
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
-            UserSilhouette user = (await store.GetGuestListAsync(testGathering.Id)).Single();
+            UserShard user = (await store.GetGuestListAsync(testGathering.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(testUser.Id, user.Id);
@@ -536,7 +536,7 @@ namespace Repository.Tests
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Surveying, DateTimeOffset.MinValue);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
-            (UserSilhouette User, GatheringBond State) = (await store.GetAllUsersAsync(testGathering.Id)).Single();
+            (UserShard User, GatheringBond State) = (await store.GetAllUsersAsync(testGathering.Id)).Single();
 
             Assert.Equal(testUser.Id, User.Id);
             Assert.Equal(testUser.Name, User.Name);

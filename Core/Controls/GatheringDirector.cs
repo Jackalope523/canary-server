@@ -399,11 +399,11 @@ namespace Core.Controls
 				// Retrieve user's companions that are surveying
 				var companions = await targetGathering.GetCompanionsOf(user);
 
-				guestList.Guests.AddRange(SelectAsSilhouette(companions,
+				guestList.Guests.AddRange(SelectAsShard(companions,
 					companion => companion.State.Equals(GatheringBond.Surveying)));
 
 				// Add visible users
-				guestList.Guests.AddRange(SelectAsSilhouette(await targetGathering.AllUsers,
+				guestList.Guests.AddRange(SelectAsShard(await targetGathering.AllUsers,
 					user => !user.State.Equals(GatheringBond.Surveying)));
 
 				guestList = guestList with
@@ -418,11 +418,11 @@ namespace Core.Controls
 				// Retrieve user's companions surveying or attending
 				var companions = await targetGathering.GetCompanionsOf(user);
 
-				guestList.Guests.AddRange(SelectAsSilhouette(companions,
+				guestList.Guests.AddRange(SelectAsShard(companions,
 					companion => companion.State.Equals(GatheringBond.Surveying) || companion.State.Equals(GatheringBond.Guest)));
 
 				// Add visible users
-				guestList.Guests.AddRange(SelectAsSilhouette(await targetGathering.AllUsers,
+				guestList.Guests.AddRange(SelectAsShard(await targetGathering.AllUsers,
 					user => user.State.Equals(GatheringBond.Arrived) || user.State.Equals(GatheringBond.Left)));
 
 				guestList = guestList with
@@ -436,13 +436,13 @@ namespace Core.Controls
 			{
 				// Retrieve user's companions that will be, are, or were attending
 				var companions = await targetGathering.GetCompanionsOf(user);
-				guestList = new(0, 0, SelectAsSilhouette(companions, _ => true));
+				guestList = new(0, 0, SelectAsShard(companions, _ => true));
 
 				// Add visible information
 				guestList = guestList with
 				{
 					GuestCount = targetGathering.IsOngoing ? (await targetGathering.Arrived).Count : (await targetGathering.Left).Count,
-					Surveyers = SelectAsSilhouette(companions, companion => companion.State.Equals(GatheringBond.Surveying)).Count
+					Surveyers = SelectAsShard(companions, companion => companion.State.Equals(GatheringBond.Surveying)).Count
 				};
 			}
 			// User cannot recieve information about gathering
@@ -452,7 +452,7 @@ namespace Core.Controls
 			return guestList;
 		}
 
-		public async Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId)
+		public async Task<List<UserShard>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -467,7 +467,7 @@ namespace Core.Controls
 			}
 
 			return potentialUsers
-				.ConvertAll(u => u.ToUserSilhouette());
+				.ConvertAll(u => u.ToUserShard());
 		}
 
 		public async Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong gatheringId)
@@ -626,10 +626,10 @@ namespace Core.Controls
 				new InvalidUserException($"{user.Name} is currently attending the gathering {(await user.CurrentGathering).Name}."));
 		}
 
-		private List<(UserSilhouette User, GatheringBond State)>
-			SelectAsSilhouette(List<(User User, GatheringBond State)> users, Func<(User User, GatheringBond State), bool> predicate)
+		private List<(UserShard User, GatheringBond State)>
+			SelectAsShard(List<(User User, GatheringBond State)> users, Func<(User User, GatheringBond State), bool> predicate)
 		{
-			return users.Where(predicate).ToList().ConvertAll(userDetails => (userDetails.User.ToUserSilhouette(), userDetails.State));
+			return users.Where(predicate).ToList().ConvertAll(userDetails => (userDetails.User.ToUserShard(), userDetails.State));
 		}
 
 		#endregion

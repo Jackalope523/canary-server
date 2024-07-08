@@ -16,8 +16,11 @@ namespace Core.Boundaries
 		DateTimeOffset JoinDate, int Reputation, int Appreciation, Character Character)
 		: CoreOnlyData();
 
-    public record UserShard(ulong Id, string PhoneNumber, string Email, string Name,
-        DateTimeOffset DateOfBirth, int Reputation, int Appreciation);
+	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
+        DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
+		UserAccountStatus AccountStatus, DateTimeOffset JoinDate);
+
+    public record UserShard(ulong Id, string Name);
 
     public record Character(int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
@@ -50,6 +53,7 @@ namespace Core.Boundaries
 	{
 		Task<CoreUser> GetCoreUserAsync(ulong userId);
 		Task<CoreUser> GetCoreUserAsync(string phoneNumber);
+		Task<AccountShard> GetAccountShardAsync(ulong userId);
 		Task<UserShard> GetUserShardAsync(ulong userId);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);

@@ -115,35 +115,35 @@ namespace Core.Controls
             return upcomingAgenda;
         }
 
-        public async Task<IDictionary<UserSilhouette, AgendaShard>> GetCompanionAgendaAsync(ulong userId)
+        public async Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
 
-            ConcurrentDictionary<UserSilhouette, AgendaShard> companionGatherings = new();
+            ConcurrentDictionary<UserShard, AgendaShard> companionGatherings = new();
 
             // Gather visible agenda of each companion
             (await user.Companions).AsParallel()
-                .ForAll(async companion =>
+                .ForAll((Action<User>)(async companion =>
                 {
                     var companionAgenda = await GetUserAgenda(companion);
                     await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, companionAgenda);
-                    companionGatherings.TryAdd(companion.ToUserSilhouette(), companionAgenda);
-                });
+                    companionGatherings.TryAdd(companion.ToUserShard(), companionAgenda);
+                }));
 
             return companionGatherings;
         }
 
-        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId)
+        public async Task<List<UserShard>> GetCompanionsAsync(ulong userId)
         {
             return await Nests.GetCompanionsAsync(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId)
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(ulong userId)
         {
             return await Nests.GetAppreciatedUsersAsync(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId)
+        public async Task<List<UserShard>> GetBlockedUsersAsync(ulong userId)
         {
             return await Nests.GetBlockedUsersAsync(userId);
         }

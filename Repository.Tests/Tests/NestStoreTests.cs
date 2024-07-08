@@ -135,7 +135,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Appreciate);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
 
-            UserSilhouette user = (await nestStore.GetAppreciatedUsersAsync(subject1.Id)).Single();
+            UserShard user = (await nestStore.GetAppreciatedUsersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -147,7 +147,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Block);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(link));
 
-            UserSilhouette user = (await nestStore.GetBlockedUsersAsync(subject1.Id)).Single();
+            UserShard user = (await nestStore.GetBlockedUsersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -174,7 +174,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
 
-            UserSilhouette user = (await nestStore.GetCompanionsAsync(subject1.Id)).Single();
+            UserShard user = (await nestStore.GetCompanionsAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -186,7 +186,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Appreciate);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
-            UserSilhouette user = (await nestStore.GetUsersAppreciatingAsync(subject1.Id)).Single();
+            UserShard user = (await nestStore.GetUsersAppreciatingAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -198,7 +198,7 @@ namespace Repository.Tests
             UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Block);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
-            UserSilhouette user = (await nestStore.GetUsersBlockingAsync(subject1.Id)).Single();
+            UserShard user = (await nestStore.GetUsersBlockingAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
