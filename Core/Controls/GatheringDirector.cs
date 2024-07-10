@@ -88,6 +88,7 @@ namespace Core.Controls
 				Description = gatheringDescription,
 				StartTime = startTime,
 				Location = new() { Latitude = latitude, Longitude = longitude },
+				FriendlyLocation = friendlyLocation,
 				GroupMinimum = groupMinimum ?? 0,
 				GroupMaximum = groupMaximum ?? 0,
 				Radius = new() { Kilometres = Math.Clamp(radius, 0.1, radius) },
