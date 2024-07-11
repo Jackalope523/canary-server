@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
+using Microsoft.Extensions.Logging;
 
 using static Core.Entities.Arbiter;
 
@@ -108,10 +109,19 @@ namespace Core.Controls
             
             // Gather active and upcoming gatherings
             var upcomingAgenda = await GetUserAgenda(targetUser);
-            
+            Log.LogInformation("Agenda");
+            foreach (var item in upcomingAgenda.Agenda)
+            {
+                Log.LogInformation("Bond: {bond}. Gathering: {id}, {name}", item.Bond, item.Gathering.Id, item.Gathering.Name);
+            }
             // Remove active and upcoming gatherings if the user cannot view them
             await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
+            Log.LogInformation("After Processing");
+            foreach (var item in upcomingAgenda.Agenda)
+            {
+                Log.LogInformation("Bond: {bond}. Gathering: {id}, {name}", item.Bond, item.Gathering.Id, item.Gathering.Name);
+            }
             return upcomingAgenda;
         }
 
