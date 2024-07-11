@@ -98,7 +98,7 @@ namespace Core.Controls
             return nest;
         }
 
-        public async Task<List<(GatheringShard Gathering, GatheringBond Bond)>> GetUserAgendaAsync(ulong userId, ulong targetId)
+        public async Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -113,7 +113,7 @@ namespace Core.Controls
             // Remove active and upcoming gatherings if the user cannot view them
             await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
-            return upcomingAgenda.Agenda;
+            return upcomingAgenda;
         }
 
         public async Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId)
@@ -232,13 +232,13 @@ namespace Core.Controls
 
             // Gather all user gathering data
             AgendaShard agenda = new((await user.UpcomingGatherings)
-                .ConvertAll(gathering => (gathering.ToGatheringShard(), GatheringBond.Guest)));
+                .ConvertAll(gathering => new BondBond(gathering.ToGatheringShard(), GatheringBond.Guest)));
 
             agenda.Agenda.AddRange((await user.SurveyingGatherings)
-                .ConvertAll(gathering => (gathering.ToGatheringShard(), GatheringBond.Surveying)));
+                .ConvertAll(gathering => new BondBond(gathering.ToGatheringShard(), GatheringBond.Surveying)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
-            { agenda.Agenda.Add(((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
+            { agenda.Agenda.Add(new BondBond((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
 
             return agenda;
         }

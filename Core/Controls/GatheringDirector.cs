@@ -585,12 +585,12 @@ namespace Core.Controls
 		{
 			AgendaShard accessibleGatherings = new(new());
 
-			foreach ((GatheringShard shard, GatheringBond bond) in agenda.Agenda)
+			foreach (var bondBond in agenda.Agenda)
 			{
-				Gathering gathering = new(shard);
+				Gathering gathering = new(bondBond.Gathering);
 
 				if (await user.CanJoin(gathering))
-				{ accessibleGatherings.Agenda.Add((shard, bond)); }
+				{ accessibleGatherings.Agenda.Add(bondBond); }
 			}
 
 			return accessibleGatherings;

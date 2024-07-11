@@ -10,7 +10,9 @@ namespace Core.Boundaries
     { Positive, Negative, Remove }
 
     public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
-    public record AgendaShard(List<(GatheringShard Gathering, GatheringBond Bond)> Agenda);
+    public record AgendaShard(List<BondBond> Agenda);
+
+    public record BondBond(GatheringShard Gathering, GatheringBond Bond);
 
 	#endregion
 
@@ -38,7 +40,7 @@ namespace Core.Boundaries
     {
         Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
-        Task<List<(GatheringShard Gathering, GatheringBond Bond)>> GetUserAgendaAsync(ulong userId, ulong targetId);
+        Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
         Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
 
         Task<List<UserShard>> GetCompanionsAsync(ulong userId);
