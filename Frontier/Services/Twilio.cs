@@ -3,32 +3,34 @@ using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Core.Boundaries;
+using Microsoft.Extensions.Logging;
 
 namespace Frontier.Services
 {
 	public class TwilioService : ISMSService
 	{
 		private static string senderPhoneNumber = "";
+		private static ILogger log;
 
-		public static void Initialise(string accountId, string accountToken, string phoneNumber)
+		public static void Initialise(ILogger logger, string accountId, string accountToken, string phoneNumber)
 		{
-			TwilioClient.Init(accountId, accountToken);
+			log = logger;
+
+			// TwilioClient.Init(accountId, accountToken);
 
 			senderPhoneNumber = phoneNumber;
 		}
 
 		public async Task SendSMSAsync(string phoneNumber, string message)
 		{
-            if (phoneNumber[0] == '+')
+			log.LogInformation("SMS to {phoneNumber}: {message}", phoneNumber, message);
+
+			if (phoneNumber[0] == '+')
 			{
 				await MessageResource.CreateAsync(
 					from: new Twilio.Types.PhoneNumber(senderPhoneNumber),
 					to: new Twilio.Types.PhoneNumber(phoneNumber),
 					body: message);
-			}
-			else
-			{
-				Console.WriteLine($"SMS to {phoneNumber}: {message}");
 			}
 		}
 	}
