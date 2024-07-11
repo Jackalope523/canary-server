@@ -16,21 +16,35 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 .Annotation("Sqlite:InitSpatialMetaData", true);
 
             migrationBuilder.CreateTable(
+                name: "Banners",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Banners", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    NormalisedEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    NormalisedEmail = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     JoinDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Reputation = table.Column<int>(type: "INTEGER", nullable: false),
                     IsPhoneConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsEmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: false),
+                    SecurityStamp = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     LockoutDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     AccessTries = table.Column<int>(type: "INTEGER", nullable: false),
                     AccountStatus = table.Column<int>(type: "INTEGER", nullable: false),
@@ -57,19 +71,46 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BannerLinks",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    BannerId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BannerLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BannerLinks_Banners_BannerId",
+                        column: x => x.BannerId,
+                        principalTable: "Banners",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BannerLinks_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Gatherings",
                 columns: table => new
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    HeroImageURL = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    HeroImageURL = table.Column<string>(type: "TEXT", maxLength: 2083, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     HostId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     Location = table.Column<Point>(type: "POINT", nullable: false)
                         .Annotation("Sqlite:Srid", 4326),
-                    FriendlyLocation = table.Column<string>(type: "TEXT", nullable: false),
+                    FriendlyLocation = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     State = table.Column<int>(type: "INTEGER", nullable: false),
                     GroupMinimum = table.Column<int>(type: "INTEGER", nullable: false),
                     GroupMaximum = table.Column<int>(type: "INTEGER", nullable: false),
@@ -106,8 +147,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     NotifierId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     RecipientId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Action = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", maxLength: 5000, nullable: false),
+                    Action = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     Read = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<ulong>(type: "INTEGER", nullable: true)
                 },
@@ -150,7 +191,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     DeviceType = table.Column<int>(type: "INTEGER", nullable: false),
-                    DeviceToken = table.Column<string>(type: "TEXT", nullable: false)
+                    DeviceToken = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -229,7 +270,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", nullable: false)
+                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -257,7 +298,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     OwnerId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    PhotoURL = table.Column<string>(type: "TEXT", nullable: false),
+                    PhotoURL = table.Column<string>(type: "TEXT", maxLength: 2083, nullable: false),
                     IsHidden = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -288,7 +329,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     OtherId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<ulong>(type: "INTEGER", nullable: true),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", nullable: false)
+                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -339,6 +380,16 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BannerLinks_BannerId",
+                table: "BannerLinks",
+                column: "BannerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BannerLinks_UserId",
+                table: "BannerLinks",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GatheringLinks_GatheringId",
@@ -431,6 +482,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BannerLinks");
+
+            migrationBuilder.DropTable(
                 name: "GatheringLinks");
 
             migrationBuilder.DropTable(
@@ -453,6 +507,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             migrationBuilder.DropTable(
                 name: "UserReports");
+
+            migrationBuilder.DropTable(
+                name: "Banners");
 
             migrationBuilder.DropTable(
                 name: "Snapshots");

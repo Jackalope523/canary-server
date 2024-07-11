@@ -8,7 +8,7 @@
         public string Description { get; set; } = DefaultDescription;
 
         // Navigation Properties
-        public List<GatheringLink>? Links { get; set; }
+        public List<BannerLink>? Links { get; set; }
 
         // Default Values
         public static ulong DefaultId { get; set; } = ulong.MinValue;

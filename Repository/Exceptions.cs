@@ -94,7 +94,7 @@ namespace Repository.Exceptions
     [Serializable]
     public class DatabaseWriteException : HollowFailureException
     {
-        private static readonly string defaultMessage = "An unexpected error occured while writing to the database.";
+        private static readonly string defaultMessage = "An unexpected error occured while writing to the database:";
 
         public DatabaseWriteException()
         {
@@ -104,7 +104,7 @@ namespace Repository.Exceptions
         {
         }
         public DatabaseWriteException(Exception inner)
-           : base(defaultMessage, inner)
+           : base(defaultMessage + " " + inner.Message, inner)
         {
         }
         public DatabaseWriteException(string message, Exception inner)
@@ -125,7 +125,7 @@ namespace Repository.Exceptions
         {
         }
         public DatabaseReadException(Exception inner)
-            : base(defaultMessage, inner)
+            : base(defaultMessage + " " + inner.Message, inner)
         {
         }
         public DatabaseReadException(string message, Exception inner)
@@ -146,7 +146,7 @@ namespace Repository.Exceptions
         {
         }
         public BlobIOException(Exception inner)
-            : base(defaultMessage, inner)
+            : base(defaultMessage + " " + inner.Message, inner)
         {
         }
         public BlobIOException(string message, Exception inner)

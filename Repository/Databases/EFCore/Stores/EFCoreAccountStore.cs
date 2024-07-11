@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-
+using Serilog;
 
 namespace Repository
 {
@@ -12,6 +12,8 @@ namespace Repository
 
         public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
         {
+            Log.Error(phoneNumber);
+
             User toCreate = new()
             {
                 PhoneNumber = phoneNumber,
@@ -112,7 +114,9 @@ namespace Repository
             return user with { Appreciation = numAppreciateers };
         }
         public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
-        { 
+        {
+            Log.Error(phoneNumber);
+
             int numAppreciateers;
             CoreUser user;
             try

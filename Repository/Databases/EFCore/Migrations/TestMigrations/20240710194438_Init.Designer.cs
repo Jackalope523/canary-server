@@ -12,7 +12,7 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
     [DbContext(typeof(SQLiteContext))]
-    [Migration("20240703193924_Init")]
+    [Migration("20240710194438_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -20,6 +20,51 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
+
+            modelBuilder.Entity("Repository.Banner", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Banners");
+                });
+
+            modelBuilder.Entity("Repository.BannerLink", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("BannerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BannerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BannerLinks");
+                });
 
             modelBuilder.Entity("Repository.Entities.Note", b =>
                 {
@@ -29,10 +74,12 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("Action")
                         .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Message")
                         .IsRequired()
+                        .HasMaxLength(5000)
                         .HasColumnType("TEXT");
 
                     b.Property<ulong>("NotifierId")
@@ -87,6 +134,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("DeviceToken")
                         .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("DeviceType")
@@ -119,6 +167,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("EndTime")
@@ -129,6 +178,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("FriendlyLocation")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("GroupMaximum")
@@ -139,6 +189,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("HeroImageURL")
                         .IsRequired()
+                        .HasMaxLength(2083)
                         .HasColumnType("TEXT");
 
                     b.Property<ulong>("HostId")
@@ -160,6 +211,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("NightOwl")
@@ -228,6 +280,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("Notes")
                         .IsRequired()
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
@@ -262,6 +315,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("PhotoURL")
                         .IsRequired()
+                        .HasMaxLength(2083)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("PostedAt")
@@ -341,6 +395,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Extroversion")
@@ -377,6 +432,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("NightOwl")
@@ -384,6 +440,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("NormalisedEmail")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Openness")
@@ -391,6 +448,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Reputation")
@@ -398,6 +456,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("SecurityStamp")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -446,6 +505,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<string>("Notes")
                         .IsRequired()
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<ulong>("OtherId")
@@ -466,6 +526,25 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasIndex("SelfId");
 
                     b.ToTable("UserReports");
+                });
+
+            modelBuilder.Entity("Repository.BannerLink", b =>
+                {
+                    b.HasOne("Repository.Banner", "Banner")
+                        .WithMany("Links")
+                        .HasForeignKey("BannerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Banner");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Entities.Note", b =>
@@ -549,13 +628,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
             modelBuilder.Entity("Repository.Snapshot", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("Posts")
+                        .WithMany("Snapshots")
                         .HasForeignKey("GatheringId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Owner")
-                        .WithMany("Posts")
+                        .WithMany("Snapshots")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -628,13 +707,18 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("Self");
                 });
 
+            modelBuilder.Entity("Repository.Banner", b =>
+                {
+                    b.Navigation("Links");
+                });
+
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.Navigation("Links");
 
-                    b.Navigation("Posts");
-
                     b.Navigation("Reports");
+
+                    b.Navigation("Snapshots");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -647,11 +731,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Navigation("PostLinks");
 
-                    b.Navigation("Posts");
-
                     b.Navigation("ReporteeList");
 
                     b.Navigation("ReporterList");
+
+                    b.Navigation("Snapshots");
 
                     b.Navigation("Subscriptions");
 
