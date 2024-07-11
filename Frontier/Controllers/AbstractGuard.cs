@@ -177,7 +177,7 @@ namespace Frontier.Controllers
 				}
 			}
 
-			return "";
+			return null;
 		}
 
 		#endregion
