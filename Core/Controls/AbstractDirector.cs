@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-
+using Microsoft.Extensions.Logging;
 using static Core.Entities.Arbiter;
 
 namespace Core.Controls
@@ -13,6 +13,8 @@ namespace Core.Controls
 		#region Variables
 
 		protected CoreTerminal Terminal { get; init; }
+
+		protected ILogger Log { get; private set; }
 
 		protected IAccountDatabase Accounts { get; private set; }
 		protected IBannerDatabase Banners { get; private set; }
@@ -31,6 +33,8 @@ namespace Core.Controls
 		public AbstractDirector(CoreTerminal terminal)
 		{
 			Terminal = terminal;
+
+			Log = Terminal.Log;
 			
 			Accounts = Terminal.AccountDatabase;
 			Banners = Terminal.BannerDatabase;
@@ -50,7 +54,7 @@ namespace Core.Controls
 		protected async Task<User> GetUserAsync(ulong userId)
         {
             User user = new(await Accounts.FindUserByIdAsync(userId));
-
+			
 			// Fail if user account is locked
 			Fail(user.IsLocked,
 				new InvalidUserException("User account is locked."));

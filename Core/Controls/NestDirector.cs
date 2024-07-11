@@ -105,10 +105,10 @@ namespace Core.Controls
             // Verify users are companions
             Try(user.Equals(targetUser) || await targetUser.IsCompanionsWith(user),
                 new InvalidUserException("User is unable to view target."));
-
+            
             // Gather active and upcoming gatherings
             var upcomingAgenda = await GetUserAgenda(targetUser);
-
+            
             // Remove active and upcoming gatherings if the user cannot view them
             await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
