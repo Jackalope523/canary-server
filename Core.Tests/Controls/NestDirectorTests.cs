@@ -130,7 +130,7 @@ namespace Core.Tests.Controls
 			var agenda = await director.GetUserAgendaAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(3, agenda.Agenda.Count);
+			Assert.Equal(3, agenda.Count);
 		}
 
 		[Fact]
@@ -152,7 +152,7 @@ namespace Core.Tests.Controls
 			var agenda = await director.GetUserAgendaAsync(user.Id, companion.Id);
 
 			// Assert
-			Assert.Equal(4, agenda.Agenda.Count);
+			Assert.Equal(4, agenda.Count);
 		}
 
 		[Fact]
