@@ -98,7 +98,7 @@ namespace Core.Controls
             return nest;
         }
 
-        public async Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId)
+        public async Task<List<(GatheringShard Gathering, GatheringBond Bond)>> GetUserAgendaAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -109,20 +109,11 @@ namespace Core.Controls
             
             // Gather active and upcoming gatherings
             var upcomingAgenda = await GetUserAgenda(targetUser);
-            Log.LogInformation("Agenda");
-            foreach (var item in upcomingAgenda.Agenda)
-            {
-                Log.LogInformation("Bond: {bond}. Gathering: {id}, {name}", item.Bond, item.Gathering.Id, item.Gathering.Name);
-            }
+
             // Remove active and upcoming gatherings if the user cannot view them
             await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
-            Log.LogInformation("After Processing");
-            foreach (var item in upcomingAgenda.Agenda)
-            {
-                Log.LogInformation("Bond: {bond}. Gathering: {id}, {name}", item.Bond, item.Gathering.Id, item.Gathering.Name);
-            }
-            return upcomingAgenda;
+            return upcomingAgenda.Agenda;
         }
 
         public async Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId)

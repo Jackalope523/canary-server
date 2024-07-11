@@ -38,7 +38,7 @@ namespace Core.Boundaries
     {
         Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
-        Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
+        Task<List<(GatheringShard Gathering, GatheringBond Bond)>> GetUserAgendaAsync(ulong userId, ulong targetId);
         Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
 
         Task<List<UserShard>> GetCompanionsAsync(ulong userId);
