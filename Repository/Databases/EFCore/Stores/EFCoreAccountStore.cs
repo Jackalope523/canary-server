@@ -12,8 +12,6 @@ namespace Repository
 
         public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
         {
-            Log.Error(phoneNumber);
-
             User toCreate = new()
             {
                 PhoneNumber = phoneNumber,
@@ -115,8 +113,6 @@ namespace Repository
         }
         public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
         {
-            Log.Error(phoneNumber);
-
             int numAppreciateers;
             CoreUser user;
             try
