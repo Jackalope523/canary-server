@@ -124,7 +124,7 @@ namespace Frontier.Controllers
 			return await Execute(async () =>
 			{
 				await action.Invoke();
-				return "";
+				return null;
 			});
 		}
 
@@ -134,7 +134,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await action.Invoke(user);
-				return "";
+				return null;
 			},
 			allowUnverified);
 		}
@@ -160,7 +160,7 @@ namespace Frontier.Controllers
 		[NonAction]
 		public void ThrowIfUnverified(CoreUser user)
 		{
-			if (user.IsPhoneConfirmed)
+			if (!user.IsPhoneConfirmed)
 			{ throw new InvalidUserException("User has not yet confirmed their phone number."); }
 		}
 
