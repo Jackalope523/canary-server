@@ -124,7 +124,7 @@ namespace Frontier.Controllers
 			return await Execute(async () =>
 			{
 				await action.Invoke();
-				return null;
+				return "";
 			});
 		}
 
@@ -134,7 +134,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await action.Invoke(user);
-				return null;
+				return "";
 			},
 			allowUnverified);
 		}
