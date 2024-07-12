@@ -627,10 +627,10 @@ namespace Core.Controls
 				new InvalidUserException($"{user.Name} is currently attending the gathering {(await user.CurrentGathering).Name}."));
 		}
 
-		private List<(UserShard User, GatheringBond State)>
+		private List<GuestListBondPair>
 			SelectAsShard(List<(User User, GatheringBond State)> users, Func<(User User, GatheringBond State), bool> predicate)
 		{
-			return users.Where(predicate).ToList().ConvertAll(userDetails => (userDetails.User.ToUserShard(), userDetails.State));
+			return users.Where(predicate).ToList().ConvertAll(userDetails => new GuestListBondPair(userDetails.User.ToUserShard(), userDetails.State));
 		}
 
 		#endregion

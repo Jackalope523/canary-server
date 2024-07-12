@@ -146,18 +146,15 @@ namespace Core.Tests.Controls
 
 			// Act
 			await director.AcclaimSnapshotAsync(guest.Id, coolSnapshot.Id, SnapshotAcclaim.Acclaim);
-			await director.AcclaimSnapshotAsync(guest.Id, uglySnapshot.Id, SnapshotAcclaim.Acclaim);
 
 			// Assert
 			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, gathering.Id);
 			
 			var serverCoolSnapshot = serverSnapshots.Find(snapshot => snapshot.Id.Equals(coolSnapshot.Id));
-			Assert.Equal(1, serverCoolSnapshot.Acclaim.Positive);
-			Assert.Equal(0, serverCoolSnapshot.Acclaim.Negative);
+			Assert.Equal(1, serverCoolSnapshot.Acclaim);
 
 			var serverUglySnapshot = serverSnapshots.Find(snapshot => snapshot.Id.Equals(uglySnapshot.Id));
-			Assert.Equal(0, serverUglySnapshot.Acclaim.Positive);
-			Assert.Equal(1, serverUglySnapshot.Acclaim.Negative);
+			Assert.Equal(0, serverUglySnapshot.Acclaim);
 		}
 
 		[Fact]

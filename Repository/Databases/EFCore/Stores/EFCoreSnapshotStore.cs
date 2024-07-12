@@ -28,7 +28,7 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserShard(toAdd.OwnerId, ownerName), toAdd.PostedAt, new(0, 0), toAdd.IsHidden );
+            return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserShard(toAdd.OwnerId, ownerName), toAdd.PostedAt, 0, toAdd.IsHidden );
         }
 
         public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
@@ -55,7 +55,7 @@ namespace Repository
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
+                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1, p.IsHidden)
                ).ToListAsync());
 
             List<Task<int>> companionPostsPositiveRatings = new();
@@ -87,7 +87,7 @@ namespace Repository
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
+                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1, p.IsHidden)
                 ).ToListAsync());
 
             List<Task<int>> nettedPostsPositiveRatings = new();
@@ -121,7 +121,7 @@ namespace Repository
             SnapshotShard snapshot = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Snapshots.
             Where(p => p.Id == id).
-            Select(p => new SnapshotShard(p.Id, p.GatheringId, new UserShard(p.OwnerId, null), p.PostedAt, new (0,0), p.IsHidden)).
+            Select(p => new SnapshotShard(p.Id, p.GatheringId, new UserShard(p.OwnerId, null), p.PostedAt, 0, p.IsHidden)).
             SingleAsync());
 
             Task<string> name = storeSentry.ExecuteReadAsync(ctx => 
@@ -130,14 +130,14 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return snapshot with { User = new UserShard(snapshot.User.Id, await name), Acclaim = new (await ups, await downs) };
+            return snapshot with { User = new UserShard(snapshot.User.Id, await name), Acclaim = await ups };
         }
 
         public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong id)
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Snapshots.Where(p => p.OwnerId == id).
-                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
+                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0, a.IsHidden)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
@@ -156,7 +156,7 @@ namespace Repository
 
             for (int i = 0; i < snapshots.Count; i++)
             {
-                snapshots[i] = snapshots[i] with { Acclaim = (ups[i], downs[i]), User = new UserShard(snapshots[i].User.Id, names[i]) };
+                snapshots[i] = snapshots[i] with { Acclaim = ups[i], User = new UserShard(snapshots[i].User.Id, names[i]) };
             }
 
             return snapshots;
@@ -206,7 +206,7 @@ namespace Repository
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Snapshots.Where(p => p.GatheringId == id).
-                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
+                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0, a.IsHidden)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
@@ -225,7 +225,7 @@ namespace Repository
 
             for (int i = 0; i < snapshots.Count; i++)
             {
-                snapshots[i] = snapshots[i] with { Acclaim = (ups[i], downs[i]), User = new UserShard(snapshots[i].User.Id, names[i]) };
+                snapshots[i] = snapshots[i] with { Acclaim = ups[i], User = new UserShard(snapshots[i].User.Id, names[i]) };
             }
 
             return snapshots;

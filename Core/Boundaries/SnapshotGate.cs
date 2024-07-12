@@ -14,8 +14,7 @@ namespace Core.Boundaries
         string FriendlyLocation);
 
     public record SnapshotShard(ulong Id, ulong GatheringId, UserShard User,
-        DateTimeOffset TimeTaken,
-        (int Positive, int Negative) Acclaim, bool IsHidden);
+        DateTimeOffset TimeTaken, int Acclaim, bool IsHidden);
 
     public record ColumnShard(List<GatheringHeader> Headers, List<SnapshotShard> Snapshots);
 

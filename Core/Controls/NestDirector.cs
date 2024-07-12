@@ -229,13 +229,13 @@ namespace Core.Controls
 
             // Gather all user gathering data
             AgendaShard agenda = new((await user.UpcomingGatherings)
-                .ConvertAll(gathering => new BondBond(gathering.ToGatheringShard(), GatheringBond.Guest)));
+                .ConvertAll(gathering => new AgendaBondPair(gathering.ToGatheringShard(), GatheringBond.Guest)));
 
             agenda.Agenda.AddRange((await user.SurveyingGatherings)
-                .ConvertAll(gathering => new BondBond(gathering.ToGatheringShard(), GatheringBond.Surveying)));
+                .ConvertAll(gathering => new AgendaBondPair(gathering.ToGatheringShard(), GatheringBond.Surveying)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
-            { agenda.Agenda.Add(new BondBond((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
+            { agenda.Agenda.Add(new AgendaBondPair((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
 
             return agenda;
         }

@@ -7,9 +7,9 @@ namespace Core.Boundaries
     #region Schemas
 
     public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
-    public record AgendaShard(List<BondBond> Agenda);
+    public record AgendaShard(List<AgendaBondPair> Agenda);
 
-    public record BondBond(GatheringShard Gathering, GatheringBond Bond);
+    public record AgendaBondPair(GatheringShard Gathering, GatheringBond Bond);
 
 	#endregion
 

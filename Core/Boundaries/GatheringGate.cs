@@ -25,7 +25,9 @@ namespace Core.Boundaries
         double Radius, int NumberOfGuests, float RelativeAngle);
 
 	public record GuestListShard(int Surveyers, int GuestCount,
-		List<(UserShard User, GatheringBond Bond)> Guests);
+		List<GuestListBondPair> Guests);
+
+	public record GuestListBondPair(UserShard User, GatheringBond Bond);
 
     #endregion
 
