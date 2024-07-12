@@ -113,7 +113,7 @@ namespace Repository.Tests
             Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Snapshots.Add(testSnapshot));
 
-            await snapshotStore.AcclaimSnapshotAsync(testSnapshot.Id, subject.Id, UserRating.Positive);
+            await snapshotStore.AcclaimSnapshotAsync(testSnapshot.Id, subject.Id);
 
             SnapshotLink created = await sentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.FirstAsync());
 

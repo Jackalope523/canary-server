@@ -134,7 +134,7 @@ namespace Frontier.Controllers
                     var tuple = seed.Acclaims[i];
                     var who = tuple[0]; var snapshot = tuple[1];
 
-					await snapshots.AcclaimSnapshotAsync(seedUsers[who - 1].Id, seedSnapshots[snapshot - 1].Id, UserRating.Positive);
+					await snapshots.AcclaimSnapshotAsync(seedUsers[who - 1].Id, seedSnapshots[snapshot - 1].Id, SnapshotAcclaim.Acclaim);
 				}
             });
 		}

@@ -230,7 +230,7 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				await snapshots.AcclaimSnapshotAsync(user.Id, snapshotId, details.Rating);
+				await snapshots.AcclaimSnapshotAsync(user.Id, snapshotId, details.Action);
 			});
 		}
 
