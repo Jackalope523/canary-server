@@ -59,7 +59,7 @@ namespace Frontier.Controllers
 
 					// Confirm user phone
 					var code = await userManager.GenerateChangePhoneNumberTokenAsync(coreUser, user.PhoneNumber);
-					await userManager.VerifyTwoFactorTokenAsync(coreUser, TokenOptions.DefaultPhoneProvider, code);
+					await userManager.VerifyChangePhoneNumberTokenAsync(coreUser, TokenOptions.DefaultPhoneProvider, code);
 
 					// Confirm user email
 					var token = await userManager.GenerateEmailConfirmationTokenAsync(coreUser);
