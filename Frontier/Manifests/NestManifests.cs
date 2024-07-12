@@ -14,7 +14,7 @@ namespace Frontier.Manifests
     public class AccountRatingManifest
     {
         [Required]
-        public UserRating Rating { get; set; }
+        public SnapshotAcclaim Action { get; set; }
     }
 }
 

@@ -41,21 +41,6 @@ namespace Repository
             return await store.GetCompanionsAsync(id);
         }
 
-        public async Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong id)
-        {
-            return await store.GetUserRatingsAsync(id);
-        }
-
-        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating, DateTimeOffset time)
-        {
-            await store.RateUserAsync(selfId, targetId, rating, time);
-        }
-
-        public async Task RemoveUserRatingAsync(ulong selfId, ulong targetId)
-        {
-            await store.RemoveUserRatingAsync(selfId, targetId);
-        }
-
         public async Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId)
         {
             return await store.GetUsersAppreciatingAsync(userId);

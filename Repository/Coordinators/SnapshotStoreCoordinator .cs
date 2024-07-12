@@ -32,9 +32,9 @@ namespace Repository
             return await store.GetSnapshotsByUserAsync(id);
         }
 
-        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId)
         {           
-          await store.AcclaimSnapshotAsync(postId, voterId, rating);
+          await store.AcclaimSnapshotAsync(postId, voterId);
         }
 
         public async Task RemoveSnapshotAsync(ulong postId)

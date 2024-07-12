@@ -66,7 +66,7 @@ namespace Core.Controls
             await Snapshots.RemoveSnapshotAsync(snapshot.Id);
         }
 
-        public async Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, SnapshotAcclaim acclaim)
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -80,10 +80,10 @@ namespace Core.Controls
             Fail(user.Taken(snapshot),
                 new InvalidUserException("User cannot rate their own snapshot."));
 
-            // Check if removing a rating
-            if (rating != UserRating.Remove)
+            // Check action
+            if (acclaim == SnapshotAcclaim.Acclaim)
             {
-                await Snapshots.AcclaimSnapshotAsync(snapshot.Id, user.Id, rating);
+                await Snapshots.AcclaimSnapshotAsync(snapshot.Id, user.Id);
             }
             else
             {

@@ -88,48 +88,6 @@ namespace Repository.Tests
             Assert.Equal(0, numLinks);
         }
         [Fact]
-        public async Task RateUserAsync_UP()
-        {
-            DateTimeOffset time = DateTimeOffset.UtcNow;
-
-            await nestStore.RateUserAsync(subject1.Id, subject2.Id, UserRating.Positive, time);
-
-            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Single());
-
-            Assert.NotNull(link);
-            Assert.Equal(subject1.Id, link.SelfId);
-            Assert.Equal(subject2.Id, link.OtherId);
-            Assert.Equal(time, link.Time);
-            Assert.Equal(UserLink.UserLinkType.RateUp, link.Type);
-        }
-        [Fact]
-        public async Task RateUserAsync_Down()
-        {
-            DateTimeOffset time = DateTimeOffset.UtcNow;
-
-            await nestStore.RateUserAsync(subject1.Id, subject2.Id, UserRating.Negative, time);
-
-            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Single());
-
-            Assert.NotNull(link);
-            Assert.Equal(subject1.Id, link.SelfId);
-            Assert.Equal(subject2.Id, link.OtherId);
-            Assert.Equal(time, link.Time);
-            Assert.Equal(UserLink.UserLinkType.RateDown, link.Type);
-        }
-        [Fact]
-        public async Task RemoveUserRatingAsync_SUCCESS()
-        {
-            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.RateUp);
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
-
-            await nestStore.RemoveUserRatingAsync(subject1.Id, subject2.Id);
-
-            int count = await sentry.ExecuteReadAsync(ctx => ctx.UserLinks.CountAsync());
-
-            Assert.Equal(0, count);
-        }
-        [Fact]
         public async Task GetAppreciatedUsersAsync_SUCCESS()
         {
             UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Appreciate);
@@ -152,17 +110,6 @@ namespace Repository.Tests
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
             Assert.Equal(subject2.Name, user.Name);
-        }
-        [Fact]
-        public async Task GetUserRatingsAsync_SUCCESS()
-        {
-            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.RateUp);
-            await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(link));          
-
-            (int up,int down) = await nestStore.GetUserRatingsAsync(subject2.Id);
-
-            Assert.Equal(1, up);
-            Assert.Equal(0, down);
         }
         [Fact]
         public async Task GetCompanionsAsync_SUCCESS()

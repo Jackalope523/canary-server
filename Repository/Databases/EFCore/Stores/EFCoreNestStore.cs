@@ -100,59 +100,6 @@ namespace Repository
             return (await appreciating).Intersect(await appreciatingMe).ToList();
         }
 
-        public async Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong id)
-        {
-            Task<int> up = storeSentry.ExecuteReadAsync(ctx =>
-            ctx.UserLinks.
-            Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.RateUp).
-            CountAsync());
-
-            Task<int> down = storeSentry.ExecuteReadAsync(ctx =>
-            ctx.UserLinks.
-            Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.RateDown).
-            CountAsync()); ;
-
-            return (await up, await down);
-        }
-
-        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating, DateTimeOffset time)
-        {
-            UserLink.UserLinkType type;
-            if (rating.Equals(UserRating.Positive)) type = UserLink.UserLinkType.RateUp;
-            else type = UserLink.UserLinkType.RateDown;
-
-            UserLink toAdd = new()
-            {
-                SelfId = selfId,
-                OtherId = targetId,
-                Time = time,
-                Type = type
-            };
-
-            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
-                        ctx.UserLinks.
-                        Where(l => l.SelfId == selfId && l.OtherId == targetId).
-                        Select(l => l.Id).
-                        SingleOrDefaultAsync());
-
-            if (id != 0)
-            {
-                toAdd.Id = id;
-            }
-
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toAdd));
-        }
-
-        public async Task RemoveUserRatingAsync(ulong selfId, ulong targetId)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx => 
-            ctx.UserLinks.
-            Where(l => 
-            l.SelfId == selfId && l.OtherId == targetId && 
-            (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).
-            ExecuteDelete());
-        }
-
         public async Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 

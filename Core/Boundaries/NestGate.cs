@@ -6,9 +6,6 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-    public enum UserRating
-    { Positive, Negative, Remove }
-
     public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
     public record AgendaShard(List<BondBond> Agenda);
 
@@ -30,10 +27,6 @@ namespace Core.Boundaries
 		Task UnappreciateUserAsync(ulong userId, ulong targetUserId);
 		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnblockUserAsync(ulong userId, ulong targetUserId);
-
-		Task RateUserAsync(ulong userId, ulong targetUserId, UserRating rating, DateTimeOffset time);
-		Task RemoveUserRatingAsync(ulong userId, ulong targetUserId);
-		Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong userId);
     }
 
 	public interface INestOperations

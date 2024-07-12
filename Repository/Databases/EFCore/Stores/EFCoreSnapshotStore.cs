@@ -162,18 +162,14 @@ namespace Repository
             return snapshots;
         }
 
-        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId)
         {
-            SnapshotLink.SnapshotLinkType type;
-            if (rating.Equals(UserRating.Positive)) type = SnapshotLink.SnapshotLinkType.RateUp;
-            else type = SnapshotLink.SnapshotLinkType.RateDown;
-
             SnapshotLink toAdd = new()
             {
                 UserId = voterId,
                 PostId = postId,
                 Time = DateTimeOffset.UtcNow,
-                Type = type
+                Type = SnapshotLink.SnapshotLinkType.RateUp
             };
 
             ulong id = await storeSentry.ExecuteReadAsync(ctx =>

@@ -222,7 +222,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{gatheringId}/snapshots/{snapshotId}")]
-		public async Task<IActionResult> RateSnapshot(ulong gatheringId, ulong snapshotId, [FromBody] AccountRatingManifest details)
+		public async Task<IActionResult> AcclaimSnapshot(ulong gatheringId, ulong snapshotId, [FromBody] AccountRatingManifest details)
 		{
 			// Verify parameters
 			if (details == null || !ModelState.IsValid)

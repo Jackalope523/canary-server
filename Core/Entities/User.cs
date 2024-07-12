@@ -67,8 +67,6 @@ namespace Core.Entities
 
         public Synced<string> Banner { get; }
 
-        public Synced<(int Postitive, int Negative)> Ratings { get; }
-
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
 		public Synced<GeoLocation> LastKnownLocation { get; }
         public Synced<Distance> LastKnownRadius { get; }
@@ -104,8 +102,6 @@ namespace Core.Entities
         public User()
         {
             Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
-
-            Ratings = new(() => Terminal.NestDirector.RequestAllRatingsAsync(this));
 
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
             LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
@@ -214,13 +210,12 @@ namespace Core.Entities
 
 		public async Task CalculateReputation()
         {
-            _ = (Penalties.Sync(), Ratings.Sync());
+            _ = (Penalties.Sync(), AppreciatedBy.Sync());
 
             // Get all recent penalties
             var penalties = (await Penalties).Where(penalty => HasYet(penalty.TimeOfPenalty + OneYear)).ToList();
-            var ratings = await Ratings;
-            int ratingDiff = ratings.Postitive - ratings.Negative - penalties.Count/2;
-            int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
+            int appreciations = (await AppreciatedBy).Count;
+            int reputationRaw = Math.Clamp(appreciations, -ReputationPopulation, ReputationPopulation);
 
             float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
 

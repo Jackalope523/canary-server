@@ -218,9 +218,6 @@ namespace Core.Controls
 				.ConvertAll(user => new User(user));
         }
 
-        internal async Task<(int Positive, int Negative)> RequestAllRatingsAsync(User user)
-            => await Nests.GetUserRatingsAsync(user.Id);
-
 		#endregion
 
 		#region Tools
