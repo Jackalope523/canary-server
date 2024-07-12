@@ -47,7 +47,7 @@ namespace Frontier.Controllers
 					gatheringDetails.Latitude, gatheringDetails.Longitude, gatheringDetails.FriendlyLocation,
 					gatheringDetails.Radius, gatheringDetails.IsDynamic,
 					gatheringDetails.GroupMinimum, gatheringDetails.GroupMaximum,
-					await StreamFirstFile());
+					new System.IO.MemoryStream { });
 			});
         }
 
