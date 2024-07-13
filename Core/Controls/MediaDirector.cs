@@ -71,7 +71,7 @@ namespace Core.Controls
 
 		public async Task UploadHeroAsync(ulong gatheringId, MemoryStream image)
 		{
-			await Media.UploadAvatarAsync(gatheringId, image);
+			await Media.UploadHeroAsync(gatheringId, image);
 		}
 
         public async Task UploadSnapshotAsync(ulong userId, ulong snapshotId, MemoryStream image)
