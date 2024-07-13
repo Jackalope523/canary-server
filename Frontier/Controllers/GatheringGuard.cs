@@ -6,6 +6,7 @@ using Core.Boundaries;
 using Microsoft.Extensions.Logging;
 
 using System.Collections.Generic;
+using System.IO;
 
 namespace Frontier.Controllers
 {
@@ -32,23 +33,27 @@ namespace Frontier.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGathering([FromBody] GatheringDetailsManifest gatheringDetails)
+        public async Task<IActionResult> CreateGathering([FromForm] GatheringDetailsManifest gatheringDetails)
         {
 			// Verify parameters
-            if (gatheringDetails == null || !ModelState.IsValid)
+            if (gatheringDetails == null || !ModelState.IsValid ||
+				gatheringDetails.Image == null || gatheringDetails.Image.Length == 0)
             { return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-			{
-				// Create a new gathering
-				return await gatherings.CreateGatheringAsync(user.Id,
-					gatheringDetails.Name, gatheringDetails.Description,
-					gatheringDetails.StartTime,
-					gatheringDetails.Latitude, gatheringDetails.Longitude, gatheringDetails.FriendlyLocation,
-					gatheringDetails.Radius, gatheringDetails.IsDynamic,
-					gatheringDetails.GroupMinimum, gatheringDetails.GroupMaximum,
-					new System.IO.MemoryStream { });
-			});
+            {
+                using var stream = new MemoryStream();
+                await gatheringDetails.Image.CopyToAsync(stream);
+
+                // Create a new gathering
+                return await gatherings.CreateGatheringAsync(user.Id,
+                    gatheringDetails.Name, gatheringDetails.Description,
+                    gatheringDetails.StartTime,
+                    gatheringDetails.Latitude, gatheringDetails.Longitude, gatheringDetails.FriendlyLocation,
+                    gatheringDetails.Radius, gatheringDetails.IsDynamic,
+                    gatheringDetails.GroupMinimum, gatheringDetails.GroupMaximum,
+                    stream);
+            });
         }
 
         [HttpPost("{gatheringId}/edit")]
