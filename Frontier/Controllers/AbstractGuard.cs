@@ -72,50 +72,62 @@ namespace Frontier.Controllers
 			userManager = aspUserManager;
 		}
 
-		#endregion
+        #endregion
 
-		#region Favours
+        #region Favours
 
-		[NonAction]
-		public async Task<IActionResult> Execute(Func<Task<object>> action)
-		{
-			try
-			{
-				var result = await action.Invoke();
+
+        [NonAction]
+        public async Task<IActionResult> ExecuteUnsafe(Func<Task<IActionResult>> action)
+        {
+            try
+            {
+                var result = await action.Invoke();
 
                 // Check if there is a result
                 if (result == null)
                 {
-					Ok();
+                    Ok();
                 }
+
+                return result;
+            }
+            catch (HollowFailureException ex)
+            {
+                // Log failure
+                log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+
+                return StatusCode(500);
+            }
+            catch (UserErrorException ex)
+            {
+                // Log debug information
+                log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log failure
+                log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+
+                return StatusCode(500);
+            }
+        }
+
+        [NonAction]
+		public async Task<IActionResult> Execute(Func<Task<object>> action)
+		{
+			return await ExecuteUnsafe(async () =>
+			{
+				var result = await action.Invoke();
 
                 // Ensure outgoing type is generic or manifest
                 if (result is CoreOnlyData)
                 { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}."); }
 
                 return Ok(result);
-			}
-			catch (HollowFailureException ex)
-			{
-				// Log failure
-				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-				return StatusCode(500);
-			}
-			catch (UserErrorException ex)
-			{
-				// Log debug information
-				log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-                return BadRequest(ex.Message);
-			}
-			catch (Exception ex)
-			{
-				// Log failure
-				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-				return StatusCode(500);
-			}
+			});
 		}
 
 		[NonAction]

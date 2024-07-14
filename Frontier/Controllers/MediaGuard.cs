@@ -6,6 +6,9 @@ using Frontier.Manifests;
 using Core.Boundaries;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using System.Net.Http.Headers;
+using Repository;
 
 namespace Frontier.Controllers
 {
@@ -23,35 +26,77 @@ namespace Frontier.Controllers
 
 		[HttpGet("avatars/{userId}")]
 		public async Task<IActionResult> GetAvatar(ulong userId)
-		{
-			return await Execute(async user =>
-			{
-				var image = await media.GetAvatarAsync(user.Id, userId);
+        {
+            return await ExecuteUnsafe(async () =>
+            {
+                var user = await GetCurrentUserAsync();
 
-				return image;
-			});
+                ThrowIfUnverified(user);
+
+                var imageStream = await media.GetAvatarAsync(user.Id, userId);
+
+                if (imageStream != null)
+                {
+                    imageStream.Seek(0, SeekOrigin.Begin);
+
+                    return new FileStreamResult(imageStream, "image/jpeg")
+                    {
+                        FileDownloadName = "hero.jpg"
+                    };
+                }
+
+                throw new UnexpectedFailureException("Could not download image.");
+            });
         }
 
 		[HttpGet("heros/{gatheringId}")]
 		public async Task<IActionResult> GetHero(ulong gatheringId)
-		{
-			return await Execute(async user =>
+        {
+			return await ExecuteUnsafe(async () =>
 			{
-				var image = await media.GetHeroAsync(user.Id, gatheringId);
+				var user = await GetCurrentUserAsync();
 
-				return image;
+				ThrowIfUnverified(user);
+
+				var imageStream = await media.GetHeroAsync(user.Id, gatheringId);
+
+				if (imageStream != null)
+				{
+					imageStream.Seek(0, SeekOrigin.Begin);
+
+					return new FileStreamResult(imageStream, "image/jpeg")
+					{
+						FileDownloadName = "hero.jpg"
+					};
+				}
+				
+				throw new UnexpectedFailureException("Could not download image.");
 			});
         }
 
 		[HttpGet("snapshots/{snapshotId}")]
 		public async Task<IActionResult> GetSnapshotImage(ulong snapshotId)
-		{
-			return await Execute(async user =>
-			{
-				var image = await media.GetSnapshotAsync(user.Id, snapshotId);
+        {
+            return await ExecuteUnsafe(async () =>
+            {
+                var user = await GetCurrentUserAsync();
 
-				return image;
-			});
+                ThrowIfUnverified(user);
+
+                var imageStream = await media.GetSnapshotAsync(user.Id, snapshotId);
+
+                if (imageStream != null)
+                {
+                    imageStream.Seek(0, SeekOrigin.Begin);
+
+                    return new FileStreamResult(imageStream, "image/jpeg")
+                    {
+                        FileDownloadName = "hero.jpg"
+                    };
+                }
+
+                throw new UnexpectedFailureException("Could not download image.");
+            });
         }
 
 		#endregion
