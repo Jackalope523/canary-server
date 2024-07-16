@@ -25,13 +25,8 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetGathering = await GetGatheringAsync(gatheringId);
-            _ = targetGathering.Snapshots.Sync();
 
-            // Verify user can see the gathering
-            Try(await targetGathering.WasAttendedBy(user) || targetGathering.IsModifiableBy(user),
-                new InvalidGatheringException("User did not attend gathering."));
-
-            return await targetGathering.Snapshots;
+            return await RequestVisibleSnapshotsAsync(user, targetGathering);
         }
 
         public async Task<SnapshotShard> AddSnapshotAsync(ulong userId, ulong gatheringId, MemoryStream image)
@@ -137,6 +132,36 @@ namespace Core.Controls
 
 		internal async Task<List<SnapshotShard>> RequestGatheringSnapshotsAsync(Gathering gathering)
             => await Snapshots.GetSnapshotsForGatheringAsync(gathering.Id);
+
+		internal async Task<List<SnapshotShard>> RequestVisibleSnapshotsAsync(User user, Gathering gathering)
+        {
+            // Verify user can see the gathering
+            if (await user.CanView(gathering))
+            {
+                return new List<SnapshotShard> { };
+            }
+
+            _ = gathering.Snapshots.Sync();
+
+            // Determine the level of visibility to the user
+
+            // Check if the user attended the gathering
+            if (await gathering.WasAttendedBy(user) || gathering.IsModifiableBy(user))
+            {
+                return await gathering.Snapshots;
+            }
+            else
+            {
+                // Get all companion snapshots
+                var companions = await user.Companions;
+
+                var companionSnapshots = (await gathering.Snapshots)
+                    .Where(snapshot => companions.Exists(cmp => cmp.Id.Equals(snapshot.User.Id)))
+                    .ToList();
+
+                return companionSnapshots;
+            }
+        }
 
 		#endregion
 	}
