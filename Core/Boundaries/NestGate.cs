@@ -33,8 +33,8 @@ namespace Core.Boundaries
     {
         Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
 
-        Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
-        Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
+        Task<AgendaShard> GetUserAgendaAsync(ulong userId);
+        Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendasAsync(ulong userId);
 
         Task<List<UserShard>> GetCompanionsAsync(ulong userId);
         Task<List<UserShard>> GetAppreciatedUsersAsync(ulong userId);

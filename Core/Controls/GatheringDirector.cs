@@ -581,19 +581,19 @@ namespace Core.Controls
 		}
 
 		internal async Task<AgendaShard>
-			RemoveInaccessibleGatheringBondsAsync(User user, AgendaShard agenda)
+			RemoveUnviewableGatheringBondsAsync(User user, AgendaShard agenda)
 		{
-			AgendaShard accessibleGatherings = new(new());
+			AgendaShard viewableGatherings = new(new());
 
 			foreach (var bondBond in agenda.Agenda)
 			{
 				Gathering gathering = new(bondBond.Gathering);
 
-				if (await user.CanJoin(gathering))
-				{ accessibleGatherings.Agenda.Add(bondBond); }
+				if (await user.CanView(gathering))
+				{ viewableGatherings.Agenda.Add(bondBond); }
 			}
 
-			return accessibleGatherings;
+			return viewableGatherings;
 		}
 
 		internal async Task<List<GatheringShard>>
