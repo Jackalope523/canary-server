@@ -325,10 +325,12 @@ namespace Core.Entities
 			if (!await CanView(gathering))
 			{ return false; }
 
+            /*
 			// Check if user or user's haunt is within a reasonable distance
 			if (!GeoLocation.AreInRange(await LastKnownLocation, gathering.Location, gathering.MaximumJoinDistance) &&
 				!GeoLocation.AreInRange(await Haunt, gathering.Location, gathering.MaximumJoinDistance))
 			{ return false; }
+            */
 
 			return true;
 		}
