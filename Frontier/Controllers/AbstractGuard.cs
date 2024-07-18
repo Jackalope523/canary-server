@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Frontier.Manifests;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Frontier.Controllers
 {
@@ -94,8 +95,11 @@ namespace Frontier.Controllers
             }
             catch (HollowFailureException ex)
             {
+				// Get full exception message
+				var message = DrillExceptionDetails(ex);
+
                 // Log failure
-                log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
 
                 return StatusCode(500);
             }
@@ -108,8 +112,12 @@ namespace Frontier.Controllers
             }
             catch (Exception ex)
             {
+				// Get full exception message
+                var message = DrillExceptionDetails(ex);
+
                 // Log failure
-                log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
+
 
                 return StatusCode(500);
             }
@@ -190,6 +198,21 @@ namespace Frontier.Controllers
 			}
 
 			return null;
+		}
+
+		[NonAction]
+		public string DrillExceptionDetails(Exception ex)
+		{
+			StringBuilder builder = new();
+
+			while (ex != null)
+			{
+				builder.Append($"{ex.Message}, ");
+
+				ex = ex.InnerException;
+			}
+
+			return builder.ToString();
 		}
 
 		#endregion

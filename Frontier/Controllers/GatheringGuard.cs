@@ -164,8 +164,8 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPost("{gatheringId}/invite")]
-		public async Task<IActionResult> InviteUser(ulong inviteeId, ulong gatheringId)
+		[HttpPost("{gatheringId}/invite/{inviteeId}")]
+		public async Task<IActionResult> InviteUser(ulong gatheringId, ulong inviteeId)
 		{
 			return await Execute(async user =>
 			{
@@ -173,12 +173,12 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPut("{gatheringId}/guests")]
-		public async Task<IActionResult> KickUser(ulong targetId, ulong gatheringId)
+		[HttpPut("{gatheringId}/guests/{userId}")]
+		public async Task<IActionResult> KickUser(ulong gatheringId, ulong userId)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.KickUserAsync(user.Id, targetId, gatheringId);
+				await gatherings.KickUserAsync(user.Id, userId, gatheringId);
 			});
 		}
 
