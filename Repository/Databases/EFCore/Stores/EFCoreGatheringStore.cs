@@ -45,7 +45,7 @@ namespace Repository
                 Time = DateTimeOffset.UtcNow
             };
             
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.GatheringLinks.Add(hostLink));
+            await SetUserStateAsync(hostId, toCreate.Id, GatheringBond.Guest, DateTimeOffset.UtcNow);
 
             UserShard host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserShard(u.Id, u.Name)).SingleAsync());
 
