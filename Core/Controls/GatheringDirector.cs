@@ -412,13 +412,13 @@ namespace Core.Controls
 					Surveyers = (await gathering.Surveying).Count
 				};
 			}
-			// Check if user is a guest
+			// Check if user is attending
 			else if (await gathering.WasAttendedBy(user))
 			{
 				// Retrieve user's companions surveying or attending
 				var companions = await gathering.GetCompanionsOf(user);
 
-				guestList.Guests.AddRange(SelectAsShard(companions,
+                guestList.Guests.AddRange(SelectAsShard(companions,
 					companion => companion.State.Equals(GatheringBond.Surveying) || companion.State.Equals(GatheringBond.Guest)));
 
 				// Add visible users
@@ -446,6 +446,19 @@ namespace Core.Controls
 			// User cannot recieve information about gathering
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
+
+			// Add user to list if on it and not already on it
+			if (guestList.Guests.Find(pair => pair.User.Equals(user)) == default)
+			{
+				if ((await gathering.Guests).Contains(user) ||
+					(await gathering.Arrived).Contains(user) ||
+					(await gathering.Left).Contains(user))
+				{
+					var userPair = (await gathering.AllUsers).Find(guest => guest.Equals(user));
+
+                    guestList.Guests.Add(new(userPair.User.ToUserShard(), userPair.State));
+				}
+			}
 
 			return guestList;
 		}
