@@ -36,8 +36,8 @@ namespace Core.Controls
             if (user.Equals(targetUser))
             {
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingAgenda = await GetUserAgenda(targetUser);
-                upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
+                var upcomingAgenda = await RequestAgenda(user);
+                //upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
 
                 // Get private gatherings and snapshots
                 nest = nest with
@@ -57,8 +57,8 @@ namespace Core.Controls
             else if (await targetUser.IsCompanionsWith(user))
             {
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingAgenda = await GetUserAgenda(targetUser);
-                upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
+                var upcomingAgenda = await RequestAgenda(targetUser);
+                upcomingAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, upcomingAgenda);
 
                 // Get private gatherings and snapshots
                 nest = nest with
@@ -98,25 +98,20 @@ namespace Core.Controls
             return nest;
         }
 
-        public async Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId)
+        public async Task<AgendaShard> GetUserAgendaAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
-            var targetUser = await GetUserAsync(targetId);
 
-            // Verify users are companions
-            Try(user.Equals(targetUser) || await targetUser.IsCompanionsWith(user),
-                new InvalidUserException("User is unable to view target."));
-            
             // Gather active and upcoming gatherings
-            var upcomingAgenda = await GetUserAgenda(targetUser);
+            var upcomingAgenda = await RequestAgenda(user);
 
             // Remove active and upcoming gatherings if the user cannot view them
-            await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
+            upcomingAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, upcomingAgenda);
 
             return upcomingAgenda;
         }
 
-        public async Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendaAsync(ulong userId)
+        public async Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendasAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
 
@@ -124,12 +119,12 @@ namespace Core.Controls
 
             // Gather visible agenda of each companion
             (await user.Companions).AsParallel()
-                .ForAll((Action<User>)(async companion =>
+                .ForAll(async companion =>
                 {
-                    var companionAgenda = await GetUserAgenda(companion);
-                    await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, companionAgenda);
+                    var companionAgenda = await RequestAgenda(companion);
+                    companionAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, companionAgenda);
                     companionGatherings.TryAdd(companion.ToUserShard(), companionAgenda);
-                }));
+                });
 
             return companionGatherings;
         }
@@ -222,7 +217,7 @@ namespace Core.Controls
 
 		#region Tools
 
-        private async Task<AgendaShard> GetUserAgenda(User user)
+        private async Task<AgendaShard> RequestAgenda(User user)
         {
             _ = user.UpcomingGatherings.Sync();
             _ = user.CurrentGathering.Sync();

@@ -268,10 +268,12 @@ namespace Core.Entities
             if ((await Kicked).Contains(user))
             { return false; }
 
+            /*
             // Check if user or user's haunt is within a reasonable distance
             if (!GeoLocation.AreInRange(await user.LastKnownLocation, Location, MaximumJoinDistance) &&
                 !GeoLocation.AreInRange(await user.Haunt, Location, MaximumJoinDistance))
             { return false; }
+            */
 
             return true;
         }

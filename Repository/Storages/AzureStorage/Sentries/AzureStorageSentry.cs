@@ -39,10 +39,6 @@ namespace Repository
             {
                 throw new BlobIOException(ex);
             }
-            finally
-            {
-                stream.Dispose();
-            }
         }
 
         public async Task DeleteBlobAsync(string containerName, string blobName)

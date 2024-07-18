@@ -7,6 +7,7 @@ using Core.Boundaries;
 
 using Microsoft.Extensions.Hosting;
 using NetTopologySuite.Utilities;
+using Microsoft.AspNetCore.Http;
 
 namespace Frontier.Manifests
 {
@@ -41,8 +42,9 @@ namespace Frontier.Manifests
         public int? GroupMinimum { get; set; }
         public int? GroupMaximum { get; set; }
 
+        public IFormFile Image { get; set; }
+
         public UserShard Host { get; set; }
 
-        public uint NumberOfParticipants { get; set; }
     }
 }

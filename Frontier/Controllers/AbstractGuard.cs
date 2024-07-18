@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Frontier.Manifests;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Frontier.Controllers
 {
@@ -72,50 +73,69 @@ namespace Frontier.Controllers
 			userManager = aspUserManager;
 		}
 
-		#endregion
+        #endregion
 
-		#region Favours
+        #region Favours
 
-		[NonAction]
-		public async Task<IActionResult> Execute(Func<Task<object>> action)
-		{
-			try
-			{
-				var result = await action.Invoke();
+
+        [NonAction]
+        public async Task<IActionResult> ExecuteUnsafe(Func<Task<IActionResult>> action)
+        {
+            try
+            {
+                var result = await action.Invoke();
 
                 // Check if there is a result
                 if (result == null)
                 {
-					Ok();
+                    Ok();
                 }
+
+                return result;
+            }
+            catch (HollowFailureException ex)
+            {
+				// Get full exception message
+				var message = DrillExceptionDetails(ex);
+
+                // Log failure
+                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
+
+                return StatusCode(500);
+            }
+            catch (UserErrorException ex)
+            {
+                // Log debug information
+                log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+				// Get full exception message
+                var message = DrillExceptionDetails(ex);
+
+                // Log failure
+                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
+
+
+                return StatusCode(500);
+            }
+        }
+
+        [NonAction]
+		public async Task<IActionResult> Execute(Func<Task<object>> action)
+		{
+			return await ExecuteUnsafe(async () =>
+			{
+				var result = await action.Invoke();
 
                 // Ensure outgoing type is generic or manifest
                 if (result is CoreOnlyData)
                 { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}."); }
 
                 return Ok(result);
-			}
-			catch (HollowFailureException ex)
-			{
-				// Log failure
-				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-				return StatusCode(500);
-			}
-			catch (UserErrorException ex)
-			{
-				// Log debug information
-				log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-                return BadRequest(ex.Message);
-			}
-			catch (Exception ex)
-			{
-				// Log failure
-				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-				return StatusCode(500);
-			}
+			});
 		}
 
 		[NonAction]
@@ -178,6 +198,21 @@ namespace Frontier.Controllers
 			}
 
 			return null;
+		}
+
+		[NonAction]
+		public string DrillExceptionDetails(Exception ex)
+		{
+			StringBuilder builder = new();
+
+			while (ex != null)
+			{
+				builder.Append($"{ex.Message}, ");
+
+				ex = ex.InnerException;
+			}
+
+			return builder.ToString();
 		}
 
 		#endregion
