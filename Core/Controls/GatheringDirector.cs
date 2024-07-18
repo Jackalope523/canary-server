@@ -450,9 +450,10 @@ namespace Core.Controls
 			// Add user to list if on it and not already on it
 			if (guestList.Guests.Find(pair => pair.User.Equals(user)) == default)
 			{
-				if ((await gathering.Guests).Contains(user) ||
+				if (!(await gathering.Surveying).Contains(user) &&
+					((await gathering.Guests).Contains(user) ||
 					(await gathering.Arrived).Contains(user) ||
-					(await gathering.Left).Contains(user))
+					(await gathering.Left).Contains(user)))
 				{
 					var userPair = (await gathering.AllUsers).Find(guest => guest.Equals(user));
 
