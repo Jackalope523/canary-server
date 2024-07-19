@@ -414,7 +414,7 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
 
-            GuestListShard guestList = new(0, gathering.NumberOfGuests, new());
+            GuestListShard guestList = new(gathering.NumberOfGuests, new());
 
 			// Check if user is host
 			if (gathering.IsModifiableBy(user))
@@ -450,18 +450,13 @@ namespace Core.Controls
 
                 guestList.Guests.AddRange(SelectAsShard(companions,
                     companion => companion.State.Equals(GatheringBond.Guest)));
-
-				// Add host
-				var hostPair = (await gathering.AllUsers).Find(user => user.Equals(gathering.Host));
-				guestList.Guests.Add(new(hostPair.User.ToUserShard(), hostPair.State));
 			}
 			// User cannot recieve information about gathering
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
 
 			// Ensure host is added
-			var exists = guestList.Guests.Exists(bond => bond.User.Equals(gathering.Host));
-
+			var exists = guestList.Guests.Exists(bond => bond.User.Id.Equals(gathering.Host.Id));
             if (!exists)
 			{
 				var hostBond = (await gathering.AllUsers).Find(bond => bond.User.Equals(gathering.Host));
@@ -480,7 +475,8 @@ namespace Core.Controls
 			var isAtGathering = (await gathering.AllUsers).Exists(bond => bond.User.Equals(user));
 			if (isAtGathering)
 			{
-				exists = guestList.Guests.Exists(bond => bond.User.Equals(user));
+				exists = guestList.Guests.Exists(bond => bond.User.Id.Equals(user.Id)
+				&& bond.Bond != GatheringBond.Surveying && bond.Bond != GatheringBond.Kicked);
 
 				if (!exists)
 				{

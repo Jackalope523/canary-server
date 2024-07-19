@@ -24,7 +24,7 @@ namespace Core.Boundaries
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
         double Radius, int NumberOfGuests, float RelativeAngle);
 
-	public record GuestListShard(int Surveyers, int GuestCount,
+	public record GuestListShard(int GuestCount,
 		List<GuestListBondPair> Guests);
 
 	public record GuestListBondPair(UserShard User, GatheringBond Bond);
