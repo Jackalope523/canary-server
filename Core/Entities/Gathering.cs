@@ -318,11 +318,9 @@ namespace Core.Entities
             if (!IsWaiting)
             { return false; }
 
-            /*
             // Check if host is within range
             if (!await IsInRange(Host))
             { return false; }
-            */
 
             return true;
         }

@@ -212,22 +212,30 @@ namespace Core.Controls
 		public async Task StartGatheringAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
-			_ = targetGathering.Host.LastKnownLocation.Sync();
+			var gathering = await GetGatheringAsync(gatheringId);
+			_ = gathering.Host.LastKnownLocation.Sync();
 
 			// Verify user is host
-			Try(targetGathering.IsHostedBy(user),
+			Try(gathering.IsHostedBy(user),
 				new InvalidUserException("User is not the host of this gathering"));
 
+			/*
 			// Verify gathering can be started
 			Try(await targetGathering.IsStartable(),
 				new InvalidGatheringException("Gathering cannot be started."));
+			*/
 
 			// Try to start gathering
-			await Gatherings.UpdateGatheringAsync(targetGathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
-			await Gatherings.SetUserStateAsync(user.Id, targetGathering.Id, GatheringBond.Arrived, Time);
+			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
+			await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 
-			await targetGathering.Started();
+			// TEMP Remove
+			foreach (var guest in await gathering.Guests)
+			{
+				await Gatherings.SetUserStateAsync(guest.Id, gathering.Id, GatheringBond.Arrived, Time);
+			}
+
+			await gathering.Started();
 		}
 
 		public async Task EndGatheringAsync(ulong userId, ulong gatheringId)
@@ -415,7 +423,7 @@ namespace Core.Controls
 			// Check if user is attending
 			else if (await gathering.WasAttendedBy(user))
 			{
-				// Retrieve user's companions surveying or attending
+				// Retrieve user's companions
 				var companions = await gathering.GetCompanionsOf(user);
 
                 guestList.Guests.AddRange(SelectAsShard(companions,
@@ -437,6 +445,10 @@ namespace Core.Controls
 				var companions = await gathering.GetCompanionsOf(user);
 				guestList = new(0, 0, SelectAsShard(companions, _ => true));
 
+				// Add host
+				var hostPair = (await gathering.AllUsers).Find(user => user.Equals(gathering.Host));
+				guestList.Guests.Add(new(hostPair.User.ToUserShard(), hostPair.State));
+
 				// Add visible information
 				guestList = guestList with
 				{
@@ -446,20 +458,6 @@ namespace Core.Controls
 			// User cannot recieve information about gathering
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
-
-			// Add user to list if on it and not already on it
-			if (guestList.Guests.Find(pair => pair.User.Equals(user)) == default)
-			{
-				if (!(await gathering.Surveying).Contains(user) &&
-					((await gathering.Guests).Contains(user) ||
-					(await gathering.Arrived).Contains(user) ||
-					(await gathering.Left).Contains(user)))
-				{
-					var userPair = (await gathering.AllUsers).Find(guest => guest.Equals(user));
-
-                    guestList.Guests.Add(new(userPair.User.ToUserShard(), userPair.State));
-				}
-			}
 
 			return guestList;
 		}
