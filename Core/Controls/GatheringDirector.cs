@@ -339,8 +339,22 @@ namespace Core.Controls
 			Try(await gathering.IsJoinableBy(user),
 				new InvalidGatheringException($"User is unable to join gathering.\nAccount Status: {user.AccountStatus}"));
 
-			// Check if user has an active gathering conflict
-			if (HasAlready(gathering.StartTime))
+            GatheringBond? previousUserState = null;
+
+            try
+            {
+                previousUserState = await Gatherings.GetUserStateAsync(userId, gatheringId);
+            }
+            catch { }
+
+			// Check if user is already guest or arrived
+			if (previousUserState.HasValue &&
+				!previousUserState.Value.Equals(GatheringBond.Surveying))
+			{
+                throw new InvalidUserException($"User already joined gathering.");
+            }
+            // Check if user has an active gathering conflict
+            if (HasAlready(gathering.StartTime))
 			{ await ThrowIfUserAtGathering(user); }
 			else
 			{
