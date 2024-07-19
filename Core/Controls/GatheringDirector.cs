@@ -551,9 +551,15 @@ namespace Core.Controls
 
 		internal async Task<Gathering> RequestCurrentGatheringForUserAsync(User user)
 		{
-			var currentGathering = await Gatherings.FindCurrentGatheringForUserAsync(user.Id);
+			CoreGathering currentGathering;
 
-			return currentGathering != null ? new(currentGathering) : Gathering.None;
+			try
+			{
+				currentGathering = await Gatherings.FindCurrentGatheringForUserAsync(user.Id);
+			}
+			catch { return Gathering.None; }
+
+			return new(currentGathering);
 		}
 
 		internal async Task<List<Gathering>> RequestPastGatheringsForUserAsync(User user)
