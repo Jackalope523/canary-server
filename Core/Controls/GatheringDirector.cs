@@ -418,60 +418,76 @@ namespace Core.Controls
 
 			// Check if user is host
 			if (gathering.IsModifiableBy(user))
-			{
-				// Retrieve user's companions that are surveying
-				var companions = await gathering.GetCompanionsOf(user);
+            {
+                // Retrieve user's companions
+                var companions = await gathering.GetCompanionsOf(user);
 
-				guestList.Guests.AddRange(SelectAsShard(companions,
-					companion => companion.State.Equals(GatheringBond.Surveying)));
+                guestList.Guests.AddRange(SelectAsShard(companions,
+                    companion => companion.State.Equals(GatheringBond.Guest)));
 
-				// Add visible users
-				guestList.Guests.AddRange(SelectAsShard(await gathering.AllUsers,
-					user => !user.State.Equals(GatheringBond.Surveying)));
-
-				guestList = guestList with
-				{
-					Surveyers = (await gathering.Surveying).Count
-				};
+                // Add visible users
+                guestList.Guests.AddRange(SelectAsShard(await gathering.AllUsers,
+					user => user.State.Equals(GatheringBond.Arrived) || user.State.Equals(GatheringBond.Left)));
 			}
-			// Check if user is attending
+			// Check if user went
 			else if (await gathering.WasAttendedBy(user))
 			{
 				// Retrieve user's companions
 				var companions = await gathering.GetCompanionsOf(user);
 
                 guestList.Guests.AddRange(SelectAsShard(companions,
-					companion => companion.State.Equals(GatheringBond.Surveying) || companion.State.Equals(GatheringBond.Guest)));
+					companion => companion.State.Equals(GatheringBond.Guest)));
 
 				// Add visible users
 				guestList.Guests.AddRange(SelectAsShard(await gathering.AllUsers,
 					user => user.State.Equals(GatheringBond.Arrived) || user.State.Equals(GatheringBond.Left)));
-
-				guestList = guestList with
-				{
-					Surveyers = guestList.Guests.Where(guest => guest.Bond.Equals(GatheringBond.Surveying)).Count()
-				};
             }
 			// Check if user can view gathering
 			else if (await gathering.IsVisibleTo(user))
 			{
-				// Retrieve user's companions that will be, are, or were attending
-				var companions = await gathering.GetCompanionsOf(user);
-				guestList = new(0, 0, SelectAsShard(companions, _ => true));
+                // Retrieve user's companions
+                var companions = await gathering.GetCompanionsOf(user);
+
+                guestList.Guests.AddRange(SelectAsShard(companions,
+                    companion => companion.State.Equals(GatheringBond.Guest)));
 
 				// Add host
 				var hostPair = (await gathering.AllUsers).Find(user => user.Equals(gathering.Host));
 				guestList.Guests.Add(new(hostPair.User.ToUserShard(), hostPair.State));
-
-				// Add visible information
-				guestList = guestList with
-				{
-					Surveyers = SelectAsShard(companions, companion => companion.State.Equals(GatheringBond.Surveying)).Count
-				};
 			}
 			// User cannot recieve information about gathering
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
+
+			// Ensure host is added
+			var exists = guestList.Guests.Exists(bond => bond.User.Equals(gathering.Host));
+
+            if (!exists)
+			{
+				var hostBond = (await gathering.AllUsers).Find(bond => bond.User.Equals(gathering.Host));
+
+				if (hostBond == default)
+				{
+					Log.LogError("Host does not exist in guest list of gathering {id} {name}", gathering.Id, gathering.Name);
+				}
+				else
+				{
+					guestList.Guests.Add(new(hostBond.User.ToUserShard(), hostBond.State));
+				}
+			}
+
+			// Ensure user is added
+			var isAtGathering = (await gathering.AllUsers).Exists(bond => bond.User.Equals(user));
+			if (isAtGathering)
+			{
+				exists = guestList.Guests.Exists(bond => bond.User.Equals(user));
+
+				if (!exists)
+				{
+					var userBond = (await gathering.AllUsers).Find(bond => bond.User.Equals(user));
+					guestList.Guests.Add(new(userBond.User.ToUserShard(), userBond.State));
+				}
+			}
 
 			return guestList;
 		}
@@ -559,7 +575,7 @@ namespace Core.Controls
 			}
 			catch { return Gathering.None; }
 
-			return new(currentGathering);
+			return currentGathering != null ? new(currentGathering) : Gathering.None;
 		}
 
 		internal async Task<List<Gathering>> RequestPastGatheringsForUserAsync(User user)
