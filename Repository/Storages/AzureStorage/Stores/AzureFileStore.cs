@@ -9,17 +9,17 @@ namespace Repository
 
         public async Task UploadSnapshotAsync(ulong snapshotId, ulong ownerId, MemoryStream image)
         {
-            await sentry.UploadBlobAsync("user" + ownerId.ToString(), snapshotId.ToString(), image);
+            await sentry.UploadBlobAsync("users" + ownerId.ToString(), snapshotId.ToString(), image);
         }
 
         public async Task<MemoryStream> DownloadSnapshotAsync(ulong snapshotId, ulong ownerId)
         {
-            return await sentry.DownloadBlobAsync("user" + ownerId.ToString(), snapshotId.ToString());
+            return await sentry.DownloadBlobAsync("users" + ownerId.ToString(), snapshotId.ToString());
         }
 
         public async Task DeleteSnapshotAsync(ulong snapshotId, ulong ownerId)
         {
-            await sentry.DeleteBlobAsync("user" + ownerId.ToString(), snapshotId.ToString());
+            await sentry.DeleteBlobAsync("users" + ownerId.ToString(), snapshotId.ToString());
         }
 
         public async Task<MemoryStream> DownloadAvatarAsync(ulong userId)

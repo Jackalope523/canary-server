@@ -15,9 +15,9 @@ namespace Repository
             try
             {
                 await containerClient.CreateIfNotExistsAsync();
-
                 blob.Position = 0;
-                await containerClient.UploadBlobAsync(blobName, blob);
+
+                await containerClient.GetBlobClient(blobName).UploadAsync(blob, overwrite: true);
             }
             catch (Exception ex)
             {
