@@ -26,6 +26,7 @@ namespace Core.Entities
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public readonly Distance ArrivalDistance = new() { Metres = 75 };
         public readonly TimeSpan MaximumSnapshotLateness = OneDay;
+        public readonly TimeSpan MaximumEarlyBirdStart = new(0, 5, 0);
 
         public static Gathering None
             => new() { Id = 0, Exists = false };
@@ -54,7 +55,7 @@ namespace Core.Entities
 
         public bool IsWaiting
             => State.Equals(GatheringState.Upcoming) &&
-                HasAlready(StartTime);
+                HasAlready(StartTime - MaximumEarlyBirdStart);
         public bool IsOpen
             => State.Equals(GatheringState.Upcoming) ||
                 State.Equals(GatheringState.Open);
@@ -185,7 +186,7 @@ namespace Core.Entities
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
 
             // Verify Gathering is now or in the future
-            if (HappenedBefore(StartTime, Time)) { issues += "Gathering is in the past. "; }
+            if (HappenedBefore(StartTime, Time - MaximumEarlyBirdStart)) { issues += "Gathering is in the past. "; }
 
             // Verify Gathering is within a reasonable time
             if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }

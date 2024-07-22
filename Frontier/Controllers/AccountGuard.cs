@@ -8,6 +8,7 @@ using Frontier.Manifests;
 using Core.Boundaries;
 
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace Frontier.Controllers
 {
@@ -261,13 +262,21 @@ namespace Frontier.Controllers
             }, allowUnverified: true);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> ModifyAvatar()
+        [HttpPost("avatar")]
+        public async Task<IActionResult> ModifyAvatar([FromForm] AvatarManifest avatar)
         {
+            // Verify parameters
+            if (avatar == null || !ModelState.IsValid ||
+                avatar.Image == null || avatar.Image.Length == 0)
+            { return BadRequest(HollowError.MissingInformation.ToString()); }
+
             return await Execute(async user =>
             {
+                using var stream = new MemoryStream();
+                await avatar.Image.CopyToAsync(stream);
+
                 // Send avatar to account manager
-                await accounts.EditAvatarAsync(user.Id, await StreamFirstFile());
+                await accounts.EditAvatarAsync(user.Id, stream);
             }, allowUnverified: true);
         }
 

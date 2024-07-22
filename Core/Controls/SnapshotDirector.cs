@@ -34,12 +34,12 @@ namespace Core.Controls
             var userSync = GetUserAsync(userId);
             var targetGatheringSync = GetGatheringAsync(gatheringId);
             var user = await userSync;
-            var targetGathering = await targetGatheringSync;
+            var gathering = await targetGatheringSync;
 
-            await user.CanEtch(targetGathering);
+            await user.CanEtch(gathering);
 
             // Try to etch
-            var snapshot = await Snapshots.AddSnapshotAsync(targetGathering.Id, user.Id, Time);
+            var snapshot = await Snapshots.AddSnapshotAsync(gathering.Id, user.Id, Time);
 
             // Save image
             await Terminal.MediaDirector.UploadSnapshotAsync(user.Id, snapshot.Id, image);

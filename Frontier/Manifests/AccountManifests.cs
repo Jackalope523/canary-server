@@ -1,5 +1,5 @@
 ﻿using Core.Boundaries;
-
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -35,4 +35,10 @@ namespace Frontier.Manifests
 		[Required]
 		public DateTime DateOfBirth { get; set; }
     }
+
+	public class AvatarManifest
+	{
+		[Required]
+		public IFormFile Image { get; set; }
+	}
 }

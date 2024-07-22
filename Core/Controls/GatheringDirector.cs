@@ -124,7 +124,8 @@ namespace Core.Controls
 			string gatheringDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null,
 			double? latitude = null, double? longitude = null, string friendlyLocation = "",
-			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null)
+			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
+			MemoryStream heroImage = null)
 		{
 			var user = await GetUserAsync(userId);
 			var targetGathering = await GetGatheringAsync(gatheringId);
@@ -206,28 +207,42 @@ namespace Core.Controls
 			// Push update
 			await Gatherings.UpdateGatheringAsync(targetGathering.Id, edits);
 
-			_ = targetGathering.NotifyActive($"{targetGathering.Name}", "The gathering was edited by the host, check to see the updates.");
+			// Update hero image if provided
+			if (heroImage != null && heroImage.Length > 0)
+			{
+				await Terminal.MediaDirector.UploadHeroAsync(targetGathering.Id, heroImage);
+            }
+
+			_ = targetGathering.NotifyActive($"{targetGathering.Name}", "The gathering was edited by the host, check to see the updates!");
 		}
 
 		public async Task StartGatheringAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
-			_ = targetGathering.Host.LastKnownLocation.Sync();
+			var gathering = await GetGatheringAsync(gatheringId);
+			_ = gathering.Host.LastKnownLocation.Sync();
 
 			// Verify user is host
-			Try(targetGathering.IsHostedBy(user),
+			Try(gathering.IsHostedBy(user),
 				new InvalidUserException("User is not the host of this gathering"));
 
+			/*
 			// Verify gathering can be started
 			Try(await targetGathering.IsStartable(),
 				new InvalidGatheringException("Gathering cannot be started."));
+			*/
 
 			// Try to start gathering
-			await Gatherings.UpdateGatheringAsync(targetGathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
-			await Gatherings.SetUserStateAsync(user.Id, targetGathering.Id, GatheringBond.Arrived, Time);
+			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
+			await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 
-			await targetGathering.Started();
+			// TEMP Remove
+			foreach (var guest in await gathering.Guests)
+			{
+				await Gatherings.SetUserStateAsync(guest.Id, gathering.Id, GatheringBond.Arrived, Time);
+			}
+
+			await gathering.Started();
 		}
 
 		public async Task EndGatheringAsync(ulong userId, ulong gatheringId)
@@ -324,39 +339,53 @@ namespace Core.Controls
 		public async Task JoinGatheringAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 			_ = user.LastKnownLocation.Sync();
 
 			// Verify user is allowed to join gathering
-			Try(await targetGathering.IsJoinableBy(user),
+			Try(await gathering.IsJoinableBy(user),
 				new InvalidGatheringException($"User is unable to join gathering.\nAccount Status: {user.AccountStatus}"));
 
-			// Check if user has an active gathering conflict
-			if (HasAlready(targetGathering.StartTime))
+            GatheringBond? previousUserState = null;
+
+            try
+            {
+                previousUserState = await Gatherings.GetUserStateAsync(userId, gatheringId);
+            }
+            catch { }
+
+			// Check if user is already guest or arrived
+			if (previousUserState.HasValue &&
+				!previousUserState.Value.Equals(GatheringBond.Surveying))
+			{
+                throw new InvalidUserException($"User already joined gathering.");
+            }
+            // Check if user has an active gathering conflict
+            if (HasAlready(gathering.StartTime))
 			{ await ThrowIfUserAtGathering(user); }
 			else
 			{
 				// Check if user has an upcoming conflict
-				var conflict = (await user.UpcomingGatherings).Find(e => IsWithin(e.StartTime - targetGathering.StartTime, HalfHour));
+				var conflict = (await user.UpcomingGatherings).Find(e => IsWithin(e.StartTime - gathering.StartTime, HalfHour));
 				if (conflict != null)
 				{ throw new InvalidGatheringException($"User has gathering {conflict.Id} conflict."); }
 			}
 			// Check if gathering is active and user is already there
-			if (HasAlready(targetGathering.StartTime) &&
-				await targetGathering.IsInRange(user))
+			if (HasAlready(gathering.StartTime) &&
+				await gathering.IsInRange(user))
 			{
 				// Try to add user to the gathering
-				await Gatherings.SetUserStateAsync(user.Id, targetGathering.Id, GatheringBond.Arrived, Time);
+				await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 			}
 			else
 			{
 				// Try to add user to the gathering
 				await Gatherings.SetUserStateAsync(userId, gatheringId, GatheringBond.Guest, Time);
-			}			
+			}
 
 			// Notify host if gathering has already started
-			if (HasAlready(targetGathering.StartTime))
-			{ _ = targetGathering.Host.Notify($"Sparrower Inbound", $"{user.Name} is joining your gathering."); }
+			if (HasAlready(gathering.StartTime))
+			{ _ = gathering.Host.Notify($"Sparrower Inbound", $"{user.Name} is joining your gathering."); }
 		}
 
 		public async Task LeaveGatheringAsync(ulong userId, ulong gatheringId)
@@ -390,65 +419,78 @@ namespace Core.Controls
 			GetGuestListAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
-			GuestListShard guestList = new(0, 0, new());
+            GuestListShard guestList = new(gathering.NumberOfGuests, new());
 
 			// Check if user is host
-			if (targetGathering.IsModifiableBy(user))
-			{
-				// Retrieve user's companions that are surveying
-				var companions = await targetGathering.GetCompanionsOf(user);
+			if (gathering.IsModifiableBy(user))
+            {
+                // Retrieve user's companions
+                var companions = await gathering.GetCompanionsOf(user);
 
-				guestList.Guests.AddRange(SelectAsShard(companions,
-					companion => companion.State.Equals(GatheringBond.Surveying)));
+                guestList.Guests.AddRange(SelectAsShard(companions,
+                    companion => companion.State.Equals(GatheringBond.Guest)));
 
-				// Add visible users
-				guestList.Guests.AddRange(SelectAsShard(await targetGathering.AllUsers,
-					user => !user.State.Equals(GatheringBond.Surveying)));
-
-				guestList = guestList with
-				{
-					GuestCount = targetGathering.IsOngoing ? (await targetGathering.Arrived).Count : (await targetGathering.Left).Count,
-					Surveyers = (await targetGathering.Surveying).Count
-				};
-			}
-			// Check if user is a guest
-			else if (await targetGathering.WasAttendedBy(user))
-			{
-				// Retrieve user's companions surveying or attending
-				var companions = await targetGathering.GetCompanionsOf(user);
-
-				guestList.Guests.AddRange(SelectAsShard(companions,
-					companion => companion.State.Equals(GatheringBond.Surveying) || companion.State.Equals(GatheringBond.Guest)));
-
-				// Add visible users
-				guestList.Guests.AddRange(SelectAsShard(await targetGathering.AllUsers,
+                // Add visible users
+                guestList.Guests.AddRange(SelectAsShard(await gathering.AllUsers,
 					user => user.State.Equals(GatheringBond.Arrived) || user.State.Equals(GatheringBond.Left)));
+			}
+			// Check if user went
+			else if (await gathering.WasAttendedBy(user))
+			{
+				// Retrieve user's companions
+				var companions = await gathering.GetCompanionsOf(user);
 
-				guestList = guestList with
-				{
-					GuestCount = targetGathering.IsOngoing ? (await targetGathering.Arrived).Count : (await targetGathering.Left).Count,
-					Surveyers = guestList.Guests.Where(guest => guest.Bond.Equals(GatheringBond.Surveying)).Count()
-				};
+                guestList.Guests.AddRange(SelectAsShard(companions,
+					companion => companion.State.Equals(GatheringBond.Guest)));
+
+				// Add visible users
+				guestList.Guests.AddRange(SelectAsShard(await gathering.AllUsers,
+					user => user.State.Equals(GatheringBond.Arrived) || user.State.Equals(GatheringBond.Left)));
             }
 			// Check if user can view gathering
-			else if (await targetGathering.IsVisibleTo(user))
+			else if (await gathering.IsVisibleTo(user))
 			{
-				// Retrieve user's companions that will be, are, or were attending
-				var companions = await targetGathering.GetCompanionsOf(user);
-				guestList = new(0, 0, SelectAsShard(companions, _ => true));
+                // Retrieve user's companions
+                var companions = await gathering.GetCompanionsOf(user);
 
-				// Add visible information
-				guestList = guestList with
-				{
-					GuestCount = targetGathering.IsOngoing ? (await targetGathering.Arrived).Count : (await targetGathering.Left).Count,
-					Surveyers = SelectAsShard(companions, companion => companion.State.Equals(GatheringBond.Surveying)).Count
-				};
+                guestList.Guests.AddRange(SelectAsShard(companions,
+                    companion => companion.State.Equals(GatheringBond.Guest)));
 			}
 			// User cannot recieve information about gathering
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
+
+			// Ensure host is added
+			var exists = guestList.Guests.Exists(bond => bond.User.Id.Equals(gathering.Host.Id));
+            if (!exists)
+			{
+				var hostBond = (await gathering.AllUsers).Find(bond => bond.User.Equals(gathering.Host));
+
+				if (hostBond == default)
+				{
+					Log.LogError("Host does not exist in guest list of gathering {id} {name}", gathering.Id, gathering.Name);
+				}
+				else
+				{
+					guestList.Guests.Add(new(hostBond.User.ToUserShard(), hostBond.State));
+				}
+			}
+
+			// Ensure user is added
+			var isAtGathering = (await gathering.AllUsers).Exists(bond => bond.User.Equals(user));
+			if (isAtGathering)
+			{
+				exists = guestList.Guests.Exists(bond => bond.User.Id.Equals(user.Id)
+				&& bond.Bond != GatheringBond.Surveying && bond.Bond != GatheringBond.Kicked);
+
+				if (!exists)
+				{
+					var userBond = (await gathering.AllUsers).Find(bond => bond.User.Equals(user));
+					guestList.Guests.Add(new(userBond.User.ToUserShard(), userBond.State));
+				}
+			}
 
 			return guestList;
 		}
@@ -528,7 +570,13 @@ namespace Core.Controls
 
 		internal async Task<Gathering> RequestCurrentGatheringForUserAsync(User user)
 		{
-			var currentGathering = await Gatherings.FindCurrentGatheringForUserAsync(user.Id);
+			CoreGathering currentGathering;
+
+			try
+			{
+				currentGathering = await Gatherings.FindCurrentGatheringForUserAsync(user.Id);
+			}
+			catch { return Gathering.None; }
 
 			return currentGathering != null ? new(currentGathering) : Gathering.None;
 		}

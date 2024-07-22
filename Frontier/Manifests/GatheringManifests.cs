@@ -47,4 +47,10 @@ namespace Frontier.Manifests
         public UserShard Host { get; set; }
 
     }
+
+    public class SnapshotManifest
+    {
+        [Required]
+        public IFormFile Image { get; set; }
+    }
 }

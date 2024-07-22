@@ -20,9 +20,34 @@ namespace Frontier.Controllers
 		public MediaGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
-		#endregion
+        #endregion
 
-		#region Actions
+        #region Actions
+
+        [HttpGet("assets/{asset}")]
+		public async Task<IActionResult> GetAsset(string asset)
+        {
+            return await ExecuteUnsafe(async () =>
+            {
+                var user = await GetCurrentUserAsync();
+
+                ThrowIfUnverified(user);
+
+                var imageStream = await media.GetAssetAsync(asset);
+
+                if (imageStream != null)
+                {
+                    imageStream.Seek(0, SeekOrigin.Begin);
+
+                    return new FileStreamResult(imageStream, "image/jpeg")
+                    {
+                        FileDownloadName = $"{asset}.jpg"
+                    };
+                }
+
+                throw new UnexpectedFailureException("Could not download image.");
+            });
+        }
 
 		[HttpGet("avatars/{userId}")]
 		public async Task<IActionResult> GetAvatar(ulong userId)

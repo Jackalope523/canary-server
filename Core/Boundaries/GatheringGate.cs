@@ -24,7 +24,7 @@ namespace Core.Boundaries
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
         double Radius, int NumberOfGuests, float RelativeAngle);
 
-	public record GuestListShard(int Surveyers, int GuestCount,
+	public record GuestListShard(int GuestCount,
 		List<GuestListBondPair> Guests);
 
 	public record GuestListBondPair(UserShard User, GatheringBond Bond);
@@ -74,7 +74,8 @@ namespace Core.Boundaries
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
 			string gatheringDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
-			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
+			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
+			MemoryStream heroImage = null);
 		Task StartGatheringAsync(ulong userId, ulong gatheringId);
 		Task EndGatheringAsync(ulong userId, ulong gatheringId);
 		Task DeleteGatheringAsync(ulong userId, ulong gatheringId);
