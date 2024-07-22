@@ -17,6 +17,11 @@ namespace Core.Controls
 
 		#region Operations
 
+		public async Task<MemoryStream> GetAssetAsync(string asset)
+		{
+			return await Media.DownloadAssetAsync(asset);
+		}
+
 		public async Task<MemoryStream> GetAvatarAsync(ulong userId, ulong otherId)
 		{
 			var user = await GetUserAsync(userId);

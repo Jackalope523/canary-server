@@ -7,6 +7,11 @@ namespace Repository
     {
         private readonly AzureStorageSentry sentry = new();
 
+        public async Task<MemoryStream> DownloadAssetAsync(string asset)
+        {
+            return await sentry.DownloadBlobAsync("assets", asset);
+        }
+
         public async Task UploadSnapshotAsync(ulong snapshotId, ulong ownerId, MemoryStream image)
         {
             await sentry.UploadBlobAsync("user" + ownerId.ToString(), snapshotId.ToString(), image);

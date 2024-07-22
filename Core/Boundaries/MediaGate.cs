@@ -11,6 +11,8 @@ namespace Core.Boundaries
 
     public interface IMediaDatabase
     {
+        Task<MemoryStream> DownloadAssetAsync(string asset);
+
         Task<MemoryStream> DownloadAvatarAsync(ulong userId);
         Task UploadAvatarAsync(ulong userId, MemoryStream image);
         Task DeleteAvatarAsync(ulong userId);
@@ -26,6 +28,7 @@ namespace Core.Boundaries
 
     public interface IMediaOperations
     {
+        Task<MemoryStream> GetAssetAsync(string asset);
         Task<MemoryStream> GetAvatarAsync(ulong userId, ulong targetId);
         Task<MemoryStream> GetHeroAsync(ulong userId, ulong gatheringId);
         Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId);

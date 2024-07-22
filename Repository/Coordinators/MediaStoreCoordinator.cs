@@ -8,6 +8,11 @@
         {
             store = new AzureFileStore();
         }
+
+        public async Task<MemoryStream> DownloadAssetAsync(string asset)
+        {
+            return await store.DownloadAssetAsync(asset);
+        }
         
         public async Task<MemoryStream> DownloadSnapshotAsync(ulong snapshotId, ulong ownerId)
         {
