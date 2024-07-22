@@ -124,7 +124,8 @@ namespace Core.Controls
 			string gatheringDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null,
 			double? latitude = null, double? longitude = null, string friendlyLocation = "",
-			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null)
+			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
+			MemoryStream heroImage = null)
 		{
 			var user = await GetUserAsync(userId);
 			var targetGathering = await GetGatheringAsync(gatheringId);
@@ -206,7 +207,13 @@ namespace Core.Controls
 			// Push update
 			await Gatherings.UpdateGatheringAsync(targetGathering.Id, edits);
 
-			_ = targetGathering.NotifyActive($"{targetGathering.Name}", "The gathering was edited by the host, check to see the updates.");
+			// Update hero image if provided
+			if (heroImage != null && heroImage.Length > 0)
+			{
+				await Terminal.MediaDirector.UploadHeroAsync(targetGathering.Id, heroImage);
+            }
+
+			_ = targetGathering.NotifyActive($"{targetGathering.Name}", "The gathering was edited by the host, check to see the updates!");
 		}
 
 		public async Task StartGatheringAsync(ulong userId, ulong gatheringId)

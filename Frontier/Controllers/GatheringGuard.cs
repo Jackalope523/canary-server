@@ -57,14 +57,20 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{gatheringId}/edit")]
-        public async Task<IActionResult> EditGathering(ulong gatheringId, [FromBody] GatheringDetailsManifest gatheringDetails)
+        public async Task<IActionResult> EditGathering(ulong gatheringId, [FromForm] GatheringDetailsManifest gatheringDetails)
 		{
 			// Verify parameters
-			if (gatheringDetails == null || !ModelState.IsValid)
+			if (gatheringDetails == null)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
 			{
+                using var stream = new MemoryStream();
+				if (gatheringDetails.Image != null || gatheringDetails.Image.Length > 0)
+				{
+					await gatheringDetails.Image.CopyToAsync(stream);
+				}
+
 				await gatherings.EditGatheringAsync(user.Id, gatheringId,
 					gatheringDescription: gatheringDetails.Description ?? "",
 					isOpen: gatheringDetails.IsOpen,
@@ -72,7 +78,8 @@ namespace Frontier.Controllers
 					latitude: gatheringDetails.Latitude, longitude: gatheringDetails.Longitude,
 					friendlyLocation: gatheringDetails.FriendlyLocation,
 					radius: gatheringDetails.Radius, isDynamic: gatheringDetails.IsDynamic,
-					groupMinimum: gatheringDetails.GroupMinimum, groupMaximum: gatheringDetails.GroupMaximum);
+					groupMinimum: gatheringDetails.GroupMinimum, groupMaximum: gatheringDetails.GroupMaximum,
+					heroImage: stream);
 			});
 		}
 
@@ -205,15 +212,19 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{gatheringId}/snapshots")]
-		public async Task<IActionResult> SnapshotGathering(ulong gatheringId)
-		{
-			// Verify parameters
-			if (!ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+		public async Task<IActionResult> SnapshotGathering(ulong gatheringId, [FromForm] SnapshotManifest snapshot)
+        {
+            // Verify parameters
+            if (snapshot == null || !ModelState.IsValid ||
+                snapshot.Image == null || snapshot.Image.Length == 0)
+            { return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-			{
-				return await snapshots.AddSnapshotAsync(user.Id, gatheringId, await StreamFirstFile());
+            {
+                using var stream = new MemoryStream();
+                await snapshot.Image.CopyToAsync(stream);
+
+                return await snapshots.AddSnapshotAsync(user.Id, gatheringId, stream);
 			});
 		}
 

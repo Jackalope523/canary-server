@@ -74,7 +74,8 @@ namespace Core.Boundaries
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
 			string gatheringDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
-			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
+			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
+			MemoryStream heroImage = null);
 		Task StartGatheringAsync(ulong userId, ulong gatheringId);
 		Task EndGatheringAsync(ulong userId, ulong gatheringId);
 		Task DeleteGatheringAsync(ulong userId, ulong gatheringId);
