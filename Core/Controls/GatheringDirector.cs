@@ -415,7 +415,7 @@ namespace Core.Controls
 			{ throw new InvalidOperationException($"Could not leave gathering, user currently {userIntention.Value} gathering."); }
 		}
 
-		public async Task<GuestListShard>
+		public async Task<List<GuestListBondPair>>
 			GetGuestListAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
@@ -480,7 +480,7 @@ namespace Core.Controls
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
 
-            return new(allGuests);
+            return allGuests;
 		}
 
 		public async Task<List<UserShard>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId)

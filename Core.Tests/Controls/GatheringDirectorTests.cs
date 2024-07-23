@@ -442,12 +442,12 @@ namespace Core.Tests.Controls
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
-			Assert.Equal(2, guestList.GuestCount);
+			Assert.Equal(2, guestList.Count);
 
-			Assert.Equal(2, guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Left)));
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Equal(2, guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
 		}
 
 		[Fact]
@@ -475,12 +475,12 @@ namespace Core.Tests.Controls
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
-			Assert.Equal(2, guestList.GuestCount);
+			Assert.Equal(2, guestList.Count);
 
-			Assert.Equal(2, guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Left)));
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Equal(2, guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
 		}
 
 		[Fact]
@@ -511,12 +511,12 @@ namespace Core.Tests.Controls
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
-			Assert.Equal(2, guestList.GuestCount);
+			Assert.Equal(2, guestList.Count);
 
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Left)));
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
 		}
 
 		[Fact]
@@ -536,12 +536,12 @@ namespace Core.Tests.Controls
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
 
 			// Assert
-			Assert.Equal(3, guestList.GuestCount);
+			Assert.Equal(3, guestList.Count);
 
-			Assert.Empty(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
-			Assert.Single(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Left)));
-			Assert.Empty(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Guests.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
+			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
 		}
 
 		[Fact]
