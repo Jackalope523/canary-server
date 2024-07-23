@@ -490,10 +490,12 @@ namespace Core.Controls
 
 			List<User> potentialUsers = new();
 
-			// Add all companions that can join gathering
+			// Check companions
 			foreach (var companion in await user.Companions)
 			{
-				if (await gathering.IsJoinableBy(companion))
+				// Verify they can join and are not already on the guest list
+				if (await gathering.IsJoinableBy(companion) &&
+					!await gathering.HasOnGuestList(companion))
 				{ potentialUsers.Add(companion); }
 			}
 

@@ -305,6 +305,12 @@ namespace Core.Entities
             return IsHostedBy(user) || (await AllUsers).FindAll(x => x.User.Id == user.Id).Count == 1;
         }
 
+        public async Task<bool> HasOnGuestList(User user)
+        {
+            // Check if user is affiliated with the gathering
+            return (await Guests).Contains(user) || await WasAttendedBy(user);
+        }
+
         public async Task<bool> WasAttendedBy(User user)
         {
             // Check if user is or was on the guest list
