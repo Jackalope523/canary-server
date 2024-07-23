@@ -27,7 +27,7 @@ namespace Core.Controls
 
 		#region Favours
 
-		public async Task<string> RequestUserBannerAsync(User user)
+		public async Task<BannerShard> RequestUserBannerAsync(User user)
 		{
 			return await Banners.GetUserBannerAsync(user.Id);
 		}

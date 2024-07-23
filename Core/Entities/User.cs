@@ -67,7 +67,7 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
-        public Synced<string> Banner { get; }
+        public Synced<BannerShard> Banner { get; }
 
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
 		public Synced<GeoLocation> LastKnownLocation { get; }

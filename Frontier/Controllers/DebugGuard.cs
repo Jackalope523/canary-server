@@ -50,7 +50,6 @@ namespace Frontier.Controllers
 
                 foreach (var user in seed.Users)
 				{
-					await debug.AddUserToBannerAsync(user.PhoneNumber, "debug");
 					await accounts.CreateUserAsync(user.PhoneNumber, user.Email, user.Name, user.DateOfBirth);
 
 					var coreUser = await accounts.GetCoreUserAsync(user.PhoneNumber);

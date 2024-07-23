@@ -28,11 +28,6 @@ namespace Core.Controls
 			await Debug.DrainDatabaseAsync();
 		}
 
-		public async Task AddUserToBannerAsync(string phoneNumber, string banner)
-		{
-			await Banners.AddBannerMemberAsync(phoneNumber, banner);
-		}
-
 		#endregion
 
 		#region Favours
