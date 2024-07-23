@@ -22,6 +22,7 @@ namespace Core.Entities
 
 		public const int MaximumNameLength = 50;
         public const int MaximumDescLength = 400;
+        public const int MaximumLocationLength = 80;
 
         public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public readonly Distance ArrivalDistance = new() { Metres = 75 };
@@ -184,6 +185,7 @@ namespace Core.Entities
             // Sanitise User content
             Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
+            FriendlyLocation = ContentValidation.NormaliseText(FriendlyLocation, MaximumLocationLength);
 
             // Verify Gathering is now or in the future
             if (HappenedBefore(StartTime, Time - MaximumEarlyBirdStart)) { issues += "Gathering is in the past. "; }
