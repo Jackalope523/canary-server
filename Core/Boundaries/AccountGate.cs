@@ -10,7 +10,7 @@ namespace Core.Boundaries
 	public enum UserAccountStatus
 	{ Active, Impotent, Limited, Suspended, Blacklisted }
 
-	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name,
+	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name, string Pseudonym,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, int Appreciation, Character Character, DateTimeOffset TimeOfUserAgreement)

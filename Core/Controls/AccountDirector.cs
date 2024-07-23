@@ -228,7 +228,6 @@ namespace Core.Controls
                     await nextGathering.IsInRange(user))
                 {
                     await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
-
                 }
             }
         }

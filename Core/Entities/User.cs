@@ -37,6 +37,7 @@ namespace Core.Entities
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
+        public string Pseudonym { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
         public int Appreciation { get; set; }
@@ -138,6 +139,7 @@ namespace Core.Entities
             PhoneNumber = fromUser.PhoneNumber;
             Email = fromUser.Email;
             Name = fromUser.Name;
+            Pseudonym = fromUser.Pseudonym;
             DateOfBirth = fromUser.DateOfBirth;
             JoinDate = fromUser.JoinDate;
             Reputation = fromUser.Reputation;
@@ -161,7 +163,7 @@ namespace Core.Entities
 
         public CoreUser ToCoreUser()
         {
-            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+            return new(Id, PhoneNumber, Email, Name, Pseudonym, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation, Appreciation,
