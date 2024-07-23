@@ -50,6 +50,7 @@ namespace Core.Entities
         public string SecurityStamp { get; set; }
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
+        public DateTimeOffset TimeOfUserAgreement { get; set; }
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.Active ||
@@ -149,6 +150,7 @@ namespace Core.Entities
             AccessTries = fromUser.AccessTries;
             AccountStatus = fromUser.AccountStatus;
             Character = new(fromUser.Character);
+            TimeOfUserAgreement = fromUser.TimeOfUserAgreement;
         }
 
         public User(UserShard fromUser) : this()
@@ -162,7 +164,8 @@ namespace Core.Entities
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, Appreciation, Character.ToCharacter());
+                JoinDate, Reputation, Appreciation,
+                Character.ToCharacter(), TimeOfUserAgreement);
         }
 
         public AccountShard ToAccountShard()

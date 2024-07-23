@@ -262,6 +262,18 @@ namespace Frontier.Controllers
             }, allowUnverified: true);
         }
 
+        [HttpGet("agreement")]
+        public async Task<IActionResult> GetLastUserAgreement()
+        {
+            return await Execute(user => Task.FromResult(user.TimeOfUserAgreement), allowUnverified: true);
+        }
+
+        [HttpPost("agreement")]
+        public async Task<IActionResult> UpdateUserAgreement()
+        {
+            return await Execute(async user => await accounts.UpdateUserAgreement(user.Id), allowUnverified: true);
+        }
+
         [HttpPost("avatar")]
         public async Task<IActionResult> ModifyAvatar([FromForm] AvatarManifest avatar)
         {

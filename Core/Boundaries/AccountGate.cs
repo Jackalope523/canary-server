@@ -13,7 +13,7 @@ namespace Core.Boundaries
 	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int Appreciation, Character Character)
+		DateTimeOffset JoinDate, int Reputation, int Appreciation, Character Character, DateTimeOffset TimeOfUserAgreement)
 		: CoreOnlyData();
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
@@ -61,6 +61,7 @@ namespace Core.Boundaries
 			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null);
+		Task UpdateUserAgreement(ulong userId);
 		Task EditAvatarAsync(ulong userId, MemoryStream image);
 		Task DeleteUserAsync(ulong userId);
 

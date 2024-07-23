@@ -145,6 +145,14 @@ namespace Core.Controls
             _ = Accounts.UpdateUserAsync(user.Id, edits);
 		}
 
+        public async Task UpdateUserAgreement(ulong userId)
+        {
+            var user = await GetUserAsync(userId);
+
+            await Accounts.UpdateUserAsync(user.Id,
+                new() { (nameof(CoreUser.TimeOfUserAgreement), Time) });
+        }
+
         public async Task EditAvatarAsync(ulong userId, MemoryStream image)
         {
             var user = await GetUserAsync(userId);
