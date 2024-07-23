@@ -6,20 +6,23 @@ namespace Core.Boundaries
 {
 	#region Schema
 
+    public record BannerShard(ulong Id, string Banner, string Code);
+
 	#endregion
 
 	#region Gates
 
 	public interface IBannerDatabase
 	{
-        Task<string> GetUserBannerAsync(ulong userId);
-        Task<string> GetUserBannerAsync(string phoneNumber);
-        Task AddBannerMemberAsync(string phoneNumber, string banner);
+		Task<BannerShard> CheckCode(string code);
+
+        Task<BannerShard> GetUserBannerAsync(ulong userId);
+		Task AddUserToBannerAsync(ulong userId, ulong bannerId);
     }
 
 	public interface IBannerOperations
 	{
-        Task<string> InviteUserAsync(ulong userId, string invitedPhoneNumber);
+        Task<BannerShard> GetBannerAsync(ulong userId);
     }
 
     #endregion

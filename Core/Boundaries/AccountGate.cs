@@ -37,7 +37,7 @@ namespace Core.Boundaries
 		Task<CoreUser> FindUserByIdAsync(ulong userId);
         Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<CoreUser> FindUserByEmailAsync(string normalisedEmail);
-		Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
+		Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character);
 		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
 		Task DeleteUserAsync(ulong userId);
@@ -56,7 +56,8 @@ namespace Core.Boundaries
 		Task<AccountShard> GetAccountShardAsync(ulong userId);
 		Task<UserShard> GetUserShardAsync(ulong userId);
 
-		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
+		Task CreateUserAsync(string phoneNumber, string email, string name,
+			DateTimeOffset dateOfBirth, string code = "");
 		Task EditUserAsync(ulong userId,
 			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
