@@ -36,7 +36,7 @@ namespace Core.Tests.Controls
 			{ await environment.SaveNoteAsync(user, noter, message, action); }
 			
 			// Assert
-			var notes = await director.GetNotesAsync(user.Id);
+			var notes = await director.GetTelegramsAsync(user.Id);
 			Assert.Equal(messageCount, notes.Count);
 		}
 
@@ -52,7 +52,7 @@ namespace Core.Tests.Controls
 			await director.PostNoteAsync(user, noter, message, action);
 
 			// Assert
-			var notes = await director.GetNotesAsync(user.Id);
+			var notes = await director.GetTelegramsAsync(user.Id);
 			Assert.Single(notes);
 			Assert.Equal(message, notes[0].Message);
 			Assert.Equal(action, notes[0].Action);
@@ -71,7 +71,7 @@ namespace Core.Tests.Controls
 			await director.PostNoteAsync(userA, userB, message, action);
 
 			// Assert
-			var notes = await director.GetNotesAsync(userA.Id);
+			var notes = await director.GetTelegramsAsync(userA.Id);
 			Assert.Empty(notes);
 		}
 

@@ -521,7 +521,7 @@ namespace Core.Controls
 			Try(await inviter.IsCompanionsWith(invitee),
 				new InvalidUserException("Cannot invite non-companions."));
 
-			_ = invitee.PostNote(inviter, $"has invited you to {gathering.Name}", $"{gathering.Id}");
+			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
 			_ = invitee.Notify("Sparrow", "You were invited to ");
 		}
 
@@ -546,11 +546,11 @@ namespace Core.Controls
 			// Kick target user from gathering
 			await Gatherings.SetUserStateAsync(targetUser.Id, gathering.Id, GatheringBond.Kicked, Time);
 
-			// Hide target user's snapshots from gathering
+			// Remove target user's snapshots from gathering
 			foreach (SnapshotShard snapshot in await gathering.Snapshots)
 			{
 				if (targetUser.Taken(snapshot))
-				{ _ = Snapshots.HideSnapshotAsync(snapshot.Id); }
+				{ _ = Snapshots.RemoveSnapshotAsync(snapshot.Id); }
 			}
 		}
 

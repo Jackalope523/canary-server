@@ -11,12 +11,12 @@ namespace Repository
         {
         }
 
-        public async Task<List<NoteShard>> GetNotesAsync(ulong userId)
+        public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Notes.
             Where(n => n.RecipientId == userId).
-            Select(n => new NoteShard(n.NotifierId, n.Time, n.Message, n.Action)).
+            Select(n => new TelegramShard(n.NotifierId, n.Time, n.Message, n.Action)).
             ToListAsync());
         }
         public async Task<DeviceShard> GetUserSubscriptionAsync(ulong userId)
@@ -28,7 +28,7 @@ namespace Repository
            SingleAsync());
 
         }
-        public async Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, string message, string action)
+        public async Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, TelegramMessage message, string context)
         {
             Entities.Note toAdd = new() 
             {  
@@ -36,7 +36,7 @@ namespace Repository
                 RecipientId = recipientId,
                 Time = time, 
                 Message = message, 
-                Action =  action, 
+                Action =  context, 
                 Read = false
             };
 

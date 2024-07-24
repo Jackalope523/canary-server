@@ -89,7 +89,7 @@ namespace Core.Entities
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
-        public Synced<List<NoteShard>> Notes { get; }
+        public Synced<List<TelegramShard>> Notes { get; }
         public Synced<List<PenaltyShard>> Penalties { get; }
 
         private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports)> ReportsSync { get; }
@@ -125,7 +125,7 @@ namespace Core.Entities
             Blocking = new(() => Terminal.NestDirector.RequestBlockedUsersAsync(this));
             BlockedBy = new(() => Terminal.NestDirector.RequestUsersBlockingAsync(this));
 
-            Notes = new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
+            Notes = new(() => Terminal.NotificationDirector.GetTelegramsAsync(Id));
             Penalties = new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
 
             ReportsSync = new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
@@ -436,10 +436,10 @@ namespace Core.Entities
 
 		#region Actions
 
-        public async Task PostNote(User notifier, string message, string action)
+        public async Task PostTelegram(User notifier, TelegramMessage message, string context)
         {
-            await Terminal.NotificationDirector.PostNoteAsync(this, notifier,
-                message, action);
+            await Terminal.NotificationDirector.PostTelegramAsync(this, notifier,
+                message, context);
         }
 
 		public async Task Notify(string title, string message)
