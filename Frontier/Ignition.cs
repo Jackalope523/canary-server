@@ -105,11 +105,11 @@ namespace Frontier
                 harbor = new(Harbor.Flag.Production, repositoryLogger);
             }
 
-            DebugTerminal terminal = DebugTerminal.CreateDebugTerminal(
+            CoreTerminal terminal = CoreTerminal.CreateTerminal(
                 coreLogger,
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
-                new DebugBannerBypass(),
+                harbor.BannerDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -117,8 +117,7 @@ namespace Frontier
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
-                pushTelegrams,
-                harbor.DebugDatabaseAccess);
+                pushTelegrams);
 
             GuardBox box = new(frontierLogger,
                 terminal.AccountOperations,
@@ -132,7 +131,6 @@ namespace Frontier
                 terminal.NotificationOperations);
 
             services.AddSingleton(box);
-            services.AddSingleton(terminal.DebugOperations);
 
             /////////
             // Authentication Schema 

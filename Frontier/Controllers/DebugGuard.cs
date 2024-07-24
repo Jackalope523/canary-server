@@ -9,6 +9,7 @@ using Core.Boundaries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
+/*
 namespace Frontier.Controllers
 {
 	[Route("debug")]
@@ -141,3 +142,4 @@ namespace Frontier.Controllers
 		#endregion
 	}
 }
+*/
