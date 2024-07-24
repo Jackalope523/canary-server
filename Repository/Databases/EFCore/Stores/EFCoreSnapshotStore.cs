@@ -230,14 +230,5 @@ namespace Repository
 
             return snapshots;
         }
-        public async Task HideSnapshotAsync(ulong snapshotId)
-        {
-            Discussion currentDiscussion = storeSentry.BeginDiscussion();
-
-            Snapshot p = new() { Id = snapshotId, IsHidden = true };
-            storeSentry.DiscussWrite(ctx => ctx.Snapshots.Attach(p), currentDiscussion);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(p).Property(nameof(p.IsHidden)).IsModified = true, currentDiscussion);           
-            await storeSentry.EndDiscussionAsync(currentDiscussion);
-        }
     }
 }

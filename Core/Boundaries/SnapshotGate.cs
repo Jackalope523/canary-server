@@ -14,7 +14,7 @@ namespace Core.Boundaries
         string FriendlyLocation);
 
     public record SnapshotShard(ulong Id, ulong GatheringId, UserShard User,
-        DateTimeOffset TimeTaken, int Acclaim, bool IsHidden);
+        DateTimeOffset TimeTaken, int Acclaim);
 
     public record ColumnShard(List<GatheringHeader> Headers, List<SnapshotShard> Snapshots);
 
@@ -30,7 +30,6 @@ namespace Core.Boundaries
         Task<SnapshotShard> AddSnapshotAsync(ulong gatheringId, ulong etcherId,
             DateTimeOffset timeTaken);
 		Task RemoveSnapshotAsync(ulong snapshotId);
-		Task HideSnapshotAsync(ulong snapshotId);
 
 		Task AcclaimSnapshotAsync(ulong snapshotId, ulong voterId);
 		Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId);
