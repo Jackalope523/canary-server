@@ -18,7 +18,7 @@ namespace Core.Boundaries
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
         DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
-		UserAccountStatus AccountStatus, DateTimeOffset JoinDate);
+		UserAccountStatus AccountStatus, DateTimeOffset JoinDate, DateTimeOffset TimeOfUserAgreement);
 
     public record UserShard(ulong Id, string Name);
 

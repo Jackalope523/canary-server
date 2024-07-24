@@ -174,7 +174,7 @@ namespace Core.Entities
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
-                AccountStatus, JoinDate);
+                AccountStatus, JoinDate, TimeOfUserAgreement);
         }
 
         public UserShard ToUserShard()
