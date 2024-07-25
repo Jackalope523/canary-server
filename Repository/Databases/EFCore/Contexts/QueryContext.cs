@@ -28,6 +28,9 @@ namespace Repository
             modelBuilder.Entity<User>().Property(u => u.Name)
                 .HasMaxLength(100);
 
+            modelBuilder.Entity<User>().Property(u => u.Pseudonym)
+               .HasMaxLength(100);
+
             modelBuilder.Entity<User>().Property(u => u.NormalisedEmail)
                 .HasMaxLength(255);
 
@@ -65,9 +68,6 @@ namespace Repository
             modelBuilder.Entity<Gathering>().Property(g => g.FriendlyLocation)
                 .HasMaxLength(255);
 
-            modelBuilder.Entity<Gathering>().Property(g => g.HeroImageURL)
-                .HasMaxLength(2083); // URL length limit
-
             modelBuilder.Entity<Gathering>().Property(g => g.Name)
                 .HasMaxLength(100);
 
@@ -102,8 +102,7 @@ namespace Repository
               .HasMaxLength(2000);
 
             // Snapshot
-            modelBuilder.Entity<Snapshot>().Property(s => s.PhotoURL)
-             .HasMaxLength(2083); // URL length limit
+
 
             // Banner
             modelBuilder.Entity<Banner>().Property(b => b.Name)

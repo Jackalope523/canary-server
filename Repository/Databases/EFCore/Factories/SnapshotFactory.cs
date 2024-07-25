@@ -13,8 +13,6 @@ namespace Repository
                 OwnerId = owner.Id,
                 GatheringId = location.Id,
                 PostedAt = DateTime.MinValue,
-                PhotoURL = "URL " + created,
-                IsHidden = false
             };
         }
         internal Snapshot Create(User owner, Gathering location, DateTimeOffset postedAt)
@@ -25,8 +23,6 @@ namespace Repository
                 OwnerId = owner.Id,
                 GatheringId = location.Id,
                 PostedAt = postedAt,
-                PhotoURL = "URL " + created,
-                IsHidden = false
             };
         }
     }

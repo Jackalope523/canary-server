@@ -7,7 +7,6 @@ namespace Repository
     {
         public ulong Id { get; set; }
 
-        public string HeroImageURL { get; set; } = DefaultHeroImageURL;
         public string Name { get; set; } = DefaultName;
         public string Description { get; set; } = DefaultDescription;
         public DateTimeOffset StartTime { get; set; } = DefaultStartTime;

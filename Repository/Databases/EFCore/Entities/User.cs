@@ -11,6 +11,7 @@ namespace Repository
         public string Email { get; set; } = DefaultEmail;
         public string NormalisedEmail { get; set; } = DefaultNormalisedEmail;
         public string Name { get; set; } = DefaultName;
+        public string Pseudonym { get; set; } = DefaultPseudonym;
         public DateTimeOffset DateOfBirth { get; init; } = DefaultDateOfBirth;
         public DateTimeOffset JoinDate { get; init; } = DefaultJoinDate;
         public int Reputation { get; set; } = DefaultReputation;
@@ -22,6 +23,7 @@ namespace Repository
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
         public ulong? CurrentGathering { get; set; } = DefaultCurrentGathering;
         public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
+        public DateTimeOffset? TimeOfUserAgreement { get; set; } = DefaultTimeOfUserAgreement;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -31,6 +33,7 @@ namespace Repository
         public int Competitiveness { get; init; } = DefaultCompetitiveness;
         public int Industriousness { get; init; } = DefaultIndustriousness;
         public int NightOwl { get; init; } = DefaultNightOwl;
+        public int Age { get; init; } = DefaultAge;
 
         //Geolocation: X = Longitude Y = Latitude
         public Point Haunt { get; set; } = DefaultHaunt;
@@ -46,9 +49,9 @@ namespace Repository
         public List<UserReport>? ReporterList { get; set; }
         public List<UserReport>? ReporteeList { get; set; }
         public List<Snapshot>? Snapshots { get; set; }
-        public List<Entities.Note>? Notes { get; set; }
+        public List<Note>? Notes { get; set; }
         public List<Subscription>? Subscriptions { get; set; }
-        public List<Entities.Penalty>? Penalties { get; set; }
+        public List<Penalty>? Penalties { get; set; }
 
         // Default Values
         public static ulong DefaultId { get; set; } = ulong.MinValue;
@@ -56,6 +59,7 @@ namespace Repository
         public static string DefaultEmail { get; set; } = "JohnDoe@Test.com";
         public static string DefaultNormalisedEmail { get; set; } = "johndoe@test.com";
         public static string DefaultName { get; set; } = "John Doe";
+        public static string DefaultPseudonym { get; set; } = "JohnBoy";
         public static DateTimeOffset DefaultDateOfBirth { get; set; } = DateTimeOffset.MinValue;
         public static DateTimeOffset DefaultJoinDate { get; set; } = DateTimeOffset.MinValue;
         public static int DefaultReputation { get; set; } = 50;
@@ -67,6 +71,7 @@ namespace Repository
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
         public static ulong? DefaultCurrentGathering { get; set; } = null;
         public static bool DefaultIsPendingDeletion { get; set; } = false;
+        public static DateTimeOffset? DefaultTimeOfUserAgreement { get; set; } = null;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;
@@ -76,6 +81,7 @@ namespace Repository
         public static int DefaultCompetitiveness { get; set; } = 50;
         public static int DefaultIndustriousness { get; set; } = 50;
         public static int DefaultNightOwl { get; set; } = 50;
+        public static int DefaultAge { get; set; } = 25;
 
         private static readonly CoordinateFactory Factory = new();
 

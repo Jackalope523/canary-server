@@ -9,7 +9,5 @@ namespace Repository
         public ulong GatheringId { get; set; }
         public Gathering Gathering { get; set; }
         public DateTimeOffset PostedAt { get; init; }
-        public string PhotoURL { get; set; }
-        public bool IsHidden { get; set; }
     }
 }

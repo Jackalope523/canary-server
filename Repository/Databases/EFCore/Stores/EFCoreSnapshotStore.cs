@@ -28,7 +28,7 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserShard(toAdd.OwnerId, ownerName), toAdd.PostedAt, 0, toAdd.IsHidden );
+            return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserShard(toAdd.OwnerId, ownerName), toAdd.PostedAt, 0);
         }
 
         public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
@@ -55,7 +55,7 @@ namespace Repository
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1, p.IsHidden)
+                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1)
                ).ToListAsync());
 
             List<Task<int>> companionPostsPositiveRatings = new();
@@ -87,7 +87,7 @@ namespace Repository
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1, p.IsHidden)
+                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1)
                 ).ToListAsync());
 
             List<Task<int>> nettedPostsPositiveRatings = new();
@@ -121,7 +121,7 @@ namespace Repository
             SnapshotShard snapshot = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Snapshots.
             Where(p => p.Id == id).
-            Select(p => new SnapshotShard(p.Id, p.GatheringId, new UserShard(p.OwnerId, null), p.PostedAt, 0, p.IsHidden)).
+            Select(p => new SnapshotShard(p.Id, p.GatheringId, new UserShard(p.OwnerId, null), p.PostedAt, 0)).
             SingleAsync());
 
             Task<string> name = storeSentry.ExecuteReadAsync(ctx => 
@@ -137,7 +137,7 @@ namespace Repository
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Snapshots.Where(p => p.OwnerId == id).
-                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0, a.IsHidden)).
+                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
@@ -206,7 +206,7 @@ namespace Repository
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Snapshots.Where(p => p.GatheringId == id).
-                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0, a.IsHidden)).
+                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
@@ -229,15 +229,6 @@ namespace Repository
             }
 
             return snapshots;
-        }
-        public async Task HideSnapshotAsync(ulong snapshotId)
-        {
-            Discussion currentDiscussion = storeSentry.BeginDiscussion();
-
-            Snapshot p = new() { Id = snapshotId, IsHidden = true };
-            storeSentry.DiscussWrite(ctx => ctx.Snapshots.Attach(p), currentDiscussion);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(p).Property(nameof(p.IsHidden)).IsModified = true, currentDiscussion);           
-            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
     }
 }
