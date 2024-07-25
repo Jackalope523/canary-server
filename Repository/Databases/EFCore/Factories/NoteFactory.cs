@@ -5,15 +5,15 @@ namespace Repository
     {
         private int produced = 0;
 
-        internal Entities.Note Create(User Notifier, User Recipient)
+        internal Entities.Telegram Create(User Notifier, User Recipient)
         {
             produced++;
-            return new Entities.Note
+            return new Entities.Telegram
             {
                 NotifierId = Notifier.Id,
                 RecipientId = Recipient.Id,
                 Time = DateTimeOffset.MinValue,
-                Message = "Message " + produced,
+                Message = TelegramMessage.UserAppreciated,
                 Action = "Action " + produced,
                 Read = false
             };

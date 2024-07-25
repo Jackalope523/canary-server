@@ -14,7 +14,7 @@ namespace Repository
         public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.Notes.
+            ctx.Telegrams.
             Where(n => n.RecipientId == userId).
             Select(n => new TelegramShard(n.NotifierId, n.Time, n.Message, n.Action)).
             ToListAsync());
@@ -30,7 +30,7 @@ namespace Repository
         }
         public async Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, TelegramMessage message, string context)
         {
-            Entities.Note toAdd = new() 
+            Telegram toAdd = new() 
             {  
                 NotifierId = notifierId, 
                 RecipientId = recipientId,
@@ -40,7 +40,7 @@ namespace Repository
                 Read = false
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Notes.Add(toAdd));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Telegrams.Add(toAdd));
         }
         public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
         {

@@ -20,7 +20,7 @@ namespace Repository
             storeSentry.ExecuteWrite(ctx => ctx.UserReports.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.GatheringReports.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Snapshots.ExecuteDelete());
-            storeSentry.ExecuteWrite(ctx => ctx.Notes.ExecuteDelete());
+            storeSentry.ExecuteWrite(ctx => ctx.Telegrams.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Subscriptions.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Penalties.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Gatherings.ExecuteDelete());

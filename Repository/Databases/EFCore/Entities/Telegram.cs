@@ -1,7 +1,7 @@
 ﻿
 namespace Repository.Entities
 {
-    public class Note
+    public class Telegram
     {
         public ulong Id { get; set; }
        
@@ -10,7 +10,7 @@ namespace Repository.Entities
         public ulong RecipientId { get; set; }
         internal User Recipient { get; set; }
         public DateTimeOffset Time { get; set; }
-        public string Message { get; set; }
+        public TelegramMessage Message { get; set; }
         public string Action { get; set; }
         public bool Read { get; set; } 
     }

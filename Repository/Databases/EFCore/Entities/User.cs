@@ -23,7 +23,7 @@ namespace Repository
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
         public ulong? CurrentGathering { get; set; } = DefaultCurrentGathering;
         public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
-        public DateTimeOffset? TimeOfUserAgreement { get; set; } = DefaultTimeOfUserAgreement;
+        public DateTimeOffset TimeOfUserAgreement { get; set; } = DefaultTimeOfUserAgreement;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -49,7 +49,7 @@ namespace Repository
         public List<UserReport>? ReporterList { get; set; }
         public List<UserReport>? ReporteeList { get; set; }
         public List<Snapshot>? Snapshots { get; set; }
-        public List<Note>? Notes { get; set; }
+        public List<Telegram>? Notes { get; set; }
         public List<Subscription>? Subscriptions { get; set; }
         public List<Penalty>? Penalties { get; set; }
 
@@ -71,7 +71,7 @@ namespace Repository
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
         public static ulong? DefaultCurrentGathering { get; set; } = null;
         public static bool DefaultIsPendingDeletion { get; set; } = false;
-        public static DateTimeOffset? DefaultTimeOfUserAgreement { get; set; } = null;
+        public static DateTimeOffset DefaultTimeOfUserAgreement { get; set; } = DateTimeOffset.MinValue;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;

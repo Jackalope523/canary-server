@@ -65,6 +65,7 @@ namespace Repository
                    toCreate.GroupMinimum,
                    toCreate.GroupMaximum,
                    new Character(
+                   toCreate.Age,
                    toCreate.Extroversion,
                    toCreate.Athleticisme,
                    toCreate.Chaos,
@@ -120,7 +121,8 @@ namespace Repository
                         e.Competitiveness,
                         e.Industriousness,
                         e.NightOwl,
-                        e.Openness),
+                        e.Openness,
+                        e.Age),
                         e.Radius,
                         e.IsDynamic,
                         e.IsPendingDeletion,
@@ -166,6 +168,7 @@ namespace Repository
                     e.Competitiveness,
                     e.Industriousness,
                     e.NightOwl,
+                    e.Age,
                     e.Openness,
                     e.Radius,
                     e.IsDynamic,
@@ -191,6 +194,7 @@ namespace Repository
                     e.GroupMinimum,
                     e.GroupMaximum,
                     new Character(
+                    e.Age,
                     e.Extroversion,
                     e.Athleticisme,
                     e.Chaos,
@@ -250,6 +254,7 @@ namespace Repository
                     e.Competitiveness,
                     e.Industriousness,
                     e.NightOwl,
+                    e.Age,
                     e.Openness,
                     e.Radius,
                     e.IsDynamic,
@@ -275,6 +280,7 @@ namespace Repository
                     e.GroupMinimum,
                     e.GroupMaximum,
                     new Character(
+                    e.Age,
                     e.Extroversion,
                     e.Athleticisme,
                     e.Chaos,
@@ -317,6 +323,7 @@ namespace Repository
                   e.Competitiveness,
                   e.Industriousness,
                   e.NightOwl,
+                  e.Age,
                   e.Openness,
                   e.Radius,
                   e.IsDynamic,
@@ -342,6 +349,7 @@ namespace Repository
                    e.GroupMinimum,
                    e.GroupMaximum,
                    new Character(
+                   e.Age,
                    e.Extroversion,
                    e.Athleticisme,
                    e.Chaos,
@@ -376,6 +384,7 @@ namespace Repository
                    e.GroupMinimum,
                    e.GroupMaximum,
                    new Character(
+                   e.Age,
                    e.Extroversion,
                    e.Athleticisme,
                    e.Chaos,
@@ -422,6 +431,7 @@ namespace Repository
                         e.GroupMinimum,
                         e.GroupMaximum,
                         new Character(
+                        e.Age,
                         e.Extroversion,
                         e.Athleticisme,
                         e.Chaos,
@@ -605,7 +615,8 @@ namespace Repository
                         e.Competitiveness,
                         e.Industriousness, 
                         e.NightOwl,
-                        e.Openness
+                        e.Openness,
+                        e.Age
                         ), 
                     e.Radius, 
                     e.IsDynamic,

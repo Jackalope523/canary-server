@@ -50,6 +50,7 @@ namespace Repository.Tests
                 testGathering.GroupMinimum,
                 testGathering.GroupMaximum,
                 new Character(
+                    testGathering.Age,
                     testGathering.Extroversion,
                     testGathering.Athleticisme,
                     testGathering.Chaos,

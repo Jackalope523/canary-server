@@ -48,8 +48,8 @@ namespace Repository
                   toCreate.AccountStatus,
                   toCreate.JoinDate,
                   toCreate.Reputation,
-                  toCreate.TimeOfUserAgreement,
                   new Character(
+                  toCreate.Age,
                   toCreate.Extroversion,
                   toCreate.Athleticisme,
                   toCreate.Chaos,
@@ -80,7 +80,7 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
         
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Notes.
+               ctx.Telegrams.
                Where(n => n.NotifierId == id || n.RecipientId == id).
                ExecuteDelete());
 
@@ -110,6 +110,7 @@ namespace Repository
                    u.PhoneNumber,
                    u.Email,
                    u.Name,
+                   u.Pseudonym,
                    u.DateOfBirth,
                    u.IsPhoneConfirmed,
                    u.IsEmailConfirmed,
@@ -120,25 +121,24 @@ namespace Repository
                    u.AccountStatus,
                    u.JoinDate,
                    u.Reputation,
-                   -1,
                    new Character(
+                   u.Age,
                    u.Extroversion,
                    u.Athleticisme,
                    u.Chaos,
                    u.Competitiveness,
                    u.Industriousness,
                    u.NightOwl,
-                   u.Openness)
+                   u.Openness),
+                   u.TimeOfUserAgreement
                )).SingleAsync());
             }
             catch (InvalidOperationException ex)
             {
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
-            
-            numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { Appreciation = numAppreciateers };
+            return user;
         }
         public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
         {
@@ -166,8 +166,8 @@ namespace Repository
                   u.AccountStatus,
                   u.JoinDate,
                   u.Reputation,
-                  u.TimeOfUserAgreement,
                   new Character(
+                  u.Age,
                   u.Extroversion,
                   u.Athleticisme,
                   u.Chaos,
@@ -182,10 +182,8 @@ namespace Repository
             {
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
-         
-            numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
 
-            return user with { Appreciation = numAppreciateers };
+            return user;
         }
         public async Task<CoreUser> FindUserByEmailAsync(string email) 
         { 
@@ -213,8 +211,8 @@ namespace Repository
                   u.AccountStatus,
                   u.JoinDate,
                   u.Reputation,
-                  u.TimeOfUserAgreement,
                   new Character(
+                  u.Age,
                   u.Extroversion,
                   u.Athleticisme,
                   u.Chaos,
@@ -230,9 +228,7 @@ namespace Repository
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
 
-            numAppreciateers = await storeSentry.ExecuteReadAsync(ctx => ctx.UserLinks.Where(l => l.OtherId == user.Id && l.Type == UserLink.UserLinkType.Appreciate).CountAsync());
-
-            return user with { Appreciation = numAppreciateers };
+            return user;
         }
 
         public async Task<Haunt> GetUserHauntAsync(ulong id)

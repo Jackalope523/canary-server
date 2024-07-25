@@ -41,6 +41,7 @@ namespace Repository.Tests
                 subject.DateOfBirth,
                 subject.JoinDate,
                 new Character(
+                    subject.Age,
                     subject.Extroversion,
                     subject.Athleticisme,
                     subject.Chaos,

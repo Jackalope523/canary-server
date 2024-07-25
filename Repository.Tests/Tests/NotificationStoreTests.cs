@@ -31,7 +31,7 @@ namespace Repository.Tests
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.Notes.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Telegrams.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Subscriptions.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
         }
@@ -39,16 +39,15 @@ namespace Repository.Tests
         [Fact]
         public async Task GetNotesAsync_SUCCESS()
         {
-            Entities.Note note = new NoteFactory().Create(subject1, subject2);
-            sentry.ExecuteWrite(ctx => ctx.Notes.Add(note));
+            Telegram note = new NoteFactory().Create(subject1, subject2);
+            sentry.ExecuteWrite(ctx => ctx.Telegrams.Add(note));
 
-            Core.Boundaries.TelegramShard found = (await store.GetTelegramsAsync(subject2.Id)).Single();
+            TelegramShard found = (await store.GetTelegramsAsync(subject2.Id)).Single();
 
             Assert.NotNull(found);
             Assert.Equal(subject1.Id, found.NotifierId);
             Assert.Equal(note.Time, found.Time);
             Assert.Equal(note.Message, found.Message);
-            Assert.Equal(note.Action, found.Action);
         }
         [Fact]
         public async Task GetUserSubscriptionAsync_SUCCESS()
@@ -66,12 +65,12 @@ namespace Repository.Tests
         public async Task SaveNoteAsync_SUCCESS()
         {
             DateTimeOffset time = DateTimeOffset.MinValue;
-            string message = "message";
+            TelegramMessage message = TelegramMessage.GatheringInvitation;
             string action = "action";
 
             await store.SaveTelegramAsync(subject2.Id, subject1.Id, DateTimeOffset.MinValue, message, action);
 
-            Entities.Note saved = sentry.ExecuteRead(ctx => ctx.Notes.Single());
+            Entities.Telegram saved = sentry.ExecuteRead(ctx => ctx.Telegrams.Single());
 
             Assert.NotNull(saved);
             Assert.Equal(subject1.Id, saved.NotifierId);

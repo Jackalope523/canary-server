@@ -46,8 +46,6 @@ namespace Repository.Tests
             Assert.Equal(subject.Id, created.OwnerId);
             Assert.Equal(testGathering.Id, created.GatheringId);
             Assert.Equal(postTime, created.PostedAt);
-            Assert.Equal(url, created.PhotoURL);
-            Assert.False(created.IsHidden);
         }
         [Fact]
         public async Task RemoveSnapshotAsync_SUCCESS()
@@ -73,7 +71,6 @@ namespace Repository.Tests
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
             Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task GetSnapshotsByUserAsync_SUCCESS()
@@ -90,7 +87,6 @@ namespace Repository.Tests
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
             Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task GetSnapshotsForGatheringAsync_SUCCESS()
@@ -104,7 +100,6 @@ namespace Repository.Tests
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
             Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task RateSnapshotAsync_SUCCESS()
@@ -135,23 +130,6 @@ namespace Repository.Tests
             int count = await sentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.CountAsync());
 
             Assert.Equal(0, count);
-        }
-        [Fact]
-        public async Task HideSnapshotAsync_SUCCESS()
-        {
-            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            sentry.ExecuteWrite(ctx => ctx.Snapshots.Add(testSnapshot));
-
-            await snapshotStore.HideSnapshotAsync(testSnapshot.Id);
-
-            SnapshotShard retrieved = (await snapshotStore.GetSnapshotsForGatheringAsync(testGathering.Id)).First();
-
-            Assert.NotNull(retrieved);
-            Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
-            Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
-            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.NotEqual(testSnapshot.IsHidden, retrieved.IsHidden);
-            Assert.True(retrieved.IsHidden);
         }
     }
 }

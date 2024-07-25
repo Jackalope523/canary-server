@@ -13,7 +13,7 @@ namespace Repository
         internal DbSet<UserReport> UserReports { get; set; }
         internal DbSet<GatheringReport> GatheringReports { get; set; }
         internal DbSet<Snapshot> Snapshots { get; set; }
-        internal DbSet<Note> Notes { get; set; }
+        internal DbSet<Telegram> Telegrams { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
         internal DbSet<Penalty> Penalties { get; set; }
         internal DbSet<Banner> Banners { get; set; }
@@ -75,10 +75,10 @@ namespace Repository
                 .HasSrid(4326);
 
             // Note
-            modelBuilder.Entity<Note>().Property(n => n.Message)
+            modelBuilder.Entity<Telegram>().Property(n => n.Message)
                .HasMaxLength(5000);
 
-            modelBuilder.Entity<Note>().Property(n => n.Action)
+            modelBuilder.Entity<Telegram>().Property(n => n.Action)
                .HasMaxLength(500);
 
             // Subscription

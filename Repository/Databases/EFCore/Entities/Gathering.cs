@@ -34,6 +34,7 @@ namespace Repository
         public int Competitiveness { get; init; } = DefaultCompetitiveness;
         public int Industriousness { get; init; } = DefaultIndustriousness;
         public int NightOwl { get; init; } = DefaultNightOwl;
+        public int Age { get; init; } = DefaultAge;
 
         // Navigation Properties
         public List<GatheringLink>? Links { get; set; }
@@ -69,5 +70,6 @@ namespace Repository
         public static int DefaultCompetitiveness { get; set; } = 50;
         public static int DefaultIndustriousness { get; set; } = 50;
         public static int DefaultNightOwl { get; set; } = 50;
+        public static int DefaultAge { get; set; } = 25;
     }
 }
