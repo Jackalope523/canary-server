@@ -5,19 +5,19 @@ namespace Frontier
 {
 	public class DebugBannerBypass : IBannerDatabase
 	{
-        public Task AddBannerMemberAsync(string phoneNumber, string banner)
+        public Task AddUserToBannerAsync(ulong userId, ulong bannerId)
         {
             return Task.CompletedTask;
         }
 
-        public Task<string> GetUserBannerAsync(ulong userId)
+        public Task<BannerShard> CheckCode(string code)
         {
-            return Task.FromResult("debug");
+            return Task.FromResult<BannerShard>(new(0, "", code));
         }
 
-        public Task<string> GetUserBannerAsync(string phoneNumber)
+        public Task<BannerShard> GetUserBannerAsync(ulong userId)
         {
-            return Task.FromResult("debug");
+            return Task.FromResult<BannerShard>(new(0, "debug", "code"));
         }
     }
 }

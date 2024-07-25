@@ -99,7 +99,7 @@ namespace Core.Tests
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
         {
             await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
-				userStub.Name, userStub.DateOfBirth, DateTimeOffset.UtcNow, CharacterVector.Default.ToCharacter());
+				userStub.Name, userStub.DateOfBirth, DateTimeOffset.UtcNow, CharacterVector.Default(userStub.GetAge()).ToCharacter());
 
 			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
 
@@ -309,7 +309,7 @@ namespace Core.Tests
 		// Notification Helpers
 		/////////////////////////
 		
-		internal async Task SaveNoteAsync(User user, User notifier, string message, string action)
+		internal async Task SaveNoteAsync(User user, User notifier, TelegramMessage message, string action)
 		{
 			await Terminal.NotificationDatabase.SaveTelegramAsync(user.Id, notifier.Id, new DateTime(0), message, action);
 		}

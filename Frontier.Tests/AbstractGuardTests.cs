@@ -71,9 +71,9 @@ namespace Frontier.Tests
 		public async Task Execute_ProtectedData_Failure()
 		{
 			// Arrange
-			CoreUser bastardData = new(117, "John", "", "", DateTimeOffset.UtcNow,
+			CoreUser bastardData = new(117, "John", "", "", "", DateTimeOffset.UtcNow,
 				true, true, false, "", null,
-				0, UserAccountStatus.Impotent, DateTimeOffset.UtcNow, 0, 0, null);
+				0, UserAccountStatus.Impotent, DateTimeOffset.UtcNow, 0, null, DateTimeOffset.UtcNow);
 
 			Func<Task<object>> action = async () => bastardData;
 

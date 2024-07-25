@@ -27,7 +27,7 @@ namespace Core.Tests
 			generatedUserIds = userIdList;
 		}
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
+        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
         {
 			ContentValidation.TryNormalisePhoneNumber(phoneNumber, out phoneNumber);
             // Ensure no duplicate user exists
@@ -55,6 +55,8 @@ namespace Core.Tests
 
 			CoreUser createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
 			generatedUserIds.Add(createdUser.Id);
+
+			return createdUser;
         }
 
         public async Task DeleteUserAsync(ulong userId)

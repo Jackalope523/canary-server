@@ -28,7 +28,8 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string action = "action";
 			int messageCount = 3;
 
 			// Act
@@ -46,16 +47,17 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string context = "action";
 
 			// Act
-			await director.PostNoteAsync(user, noter, message, action);
+			await director.PostTelegramAsync(user, noter, message, context);
 
 			// Assert
 			var notes = await director.GetTelegramsAsync(user.Id);
 			Assert.Single(notes);
 			Assert.Equal(message, notes[0].Message);
-			Assert.Equal(action, notes[0].Action);
+			Assert.Equal(context, notes[0].Context);
 		}
 
 		[Fact]
@@ -65,10 +67,11 @@ namespace Core.Tests.Controls
 			var userA = await environment.GenerateUniqueUserAsync();
 			var userB = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(userA, userB);
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string context = "action";
 
 			// Act
-			await director.PostNoteAsync(userA, userB, message, action);
+			await director.PostTelegramAsync(userA, userB, message, context);
 
 			// Assert
 			var notes = await director.GetTelegramsAsync(userA.Id);

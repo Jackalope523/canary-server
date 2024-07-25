@@ -58,7 +58,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 
 			var gathering = environment.CreateTestGathering(host);
-			gathering.Character = new(new(100,100,100,100,100,100,100));
+			gathering.Character = new(new(20,100,100,100,100,100,100,100));
 			var oldCharacter = user.Character;
 
 			// Act
@@ -466,16 +466,17 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string context = "action";
 
 			// Act
-			await user.PostNote(noter, message, action);
+			await user.PostTelegram(noter, message, context);
 
 			// Assert
 			var notes = await environment.GetNotesAsync(user);
 			Assert.Single(notes);
 			Assert.Equal(message, notes[0].Message);
-			Assert.Equal(action, notes[0].Action);
+			Assert.Equal(context, notes[0].Context);
 		}
 
 		[Fact]
