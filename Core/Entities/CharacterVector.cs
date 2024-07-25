@@ -15,6 +15,7 @@ namespace Core.Entities
 		public static float AngleBetween(CharacterVector firstVector, CharacterVector secondVector)
 		{
 			int dotProduct =
+				firstVector.Age * secondVector.Age +
 				firstVector.Extraversion * secondVector.Extraversion +
 				firstVector.Athleticism * secondVector.Athleticism +
 				firstVector.Chaoticness * secondVector.Chaoticness +
@@ -36,13 +37,15 @@ namespace Core.Entities
 			return angle;
 		}
 
-		public static CharacterVector Default => new() { Extraversion = 50, Athleticism = 50,
+		public static CharacterVector Default(int age) => new() { Age = age, Extraversion = 50, Athleticism = 50,
 			Chaoticness = 50, Competitiveness = 50, Industriousness = 50, NightOwl = 50,
 			Openness = 50 };
 
 		#endregion
 
 		#region Variables
+
+		public int Age { get; init; }
 
 		public int Extraversion { get; init; }
 		public int Athleticism { get; init; }
@@ -53,9 +56,10 @@ namespace Core.Entities
 		
 		public int Openness { get; init; }
 
-		public float Magnitude => MathF.Sqrt(Extraversion * Extraversion + Athleticism * Athleticism +
-			Chaoticness * Chaoticness + Competitiveness * Competitiveness +
-			Industriousness * Industriousness + NightOwl * NightOwl);
+		public float Magnitude => MathF.Sqrt(Age * Age + Extraversion * Extraversion +
+			Athleticism * Athleticism + Chaoticness * Chaoticness +
+			Competitiveness * Competitiveness + Industriousness * Industriousness +
+			NightOwl * NightOwl);
 
 		#endregion
 
@@ -63,6 +67,7 @@ namespace Core.Entities
 
 		public CharacterVector(Character fromCharacter)
 		{
+			Age = fromCharacter.Age;
 			Extraversion = fromCharacter.Extraversion;
 			Athleticism = fromCharacter.Athleticism;
 			Chaoticness = fromCharacter.Chaoticness;
@@ -74,7 +79,7 @@ namespace Core.Entities
 
 		public Character ToCharacter()
 		{
-			return new(Extraversion, Athleticism, Chaoticness,
+			return new(Age, Extraversion, Athleticism, Chaoticness,
 				Competitiveness, Industriousness, NightOwl, Openness);
 		}
 
@@ -105,6 +110,7 @@ namespace Core.Entities
 		{
 			return new()
 			{
+				Age = a.Age,
 				Extraversion = a.Extraversion + b.Extraversion,
 				Athleticism = a.Athleticism + b.Athleticism,
 				Chaoticness = a.Chaoticness + b.Chaoticness,
@@ -119,6 +125,7 @@ namespace Core.Entities
 		{
 			return new()
 			{
+				Age = a.Age,
 				Extraversion = a.Extraversion - b.Extraversion,
 				Athleticism = a.Athleticism - b.Athleticism,
 				Chaoticness = a.Chaoticness - b.Chaoticness,
@@ -133,6 +140,7 @@ namespace Core.Entities
 		{
 			return new()
 			{
+				Age = a.Age,
 				Extraversion = (int) (a.Extraversion * f),
 				Athleticism = (int) (a.Athleticism * f),
 				Chaoticness = (int) (a.Chaoticness * f),

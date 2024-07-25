@@ -80,7 +80,7 @@ namespace Core.Controls
 
             // Store nest
             var user = await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
-                newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default.ToCharacter());
+                newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default(newUser.GetAge()).ToCharacter());
 
             // Add user to banner
             await Banners.AddUserToBannerAsync(user.Id, banner.Id);
