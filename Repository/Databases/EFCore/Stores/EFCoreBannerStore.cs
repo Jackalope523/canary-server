@@ -8,7 +8,7 @@ namespace Repository
         {
         }
 
-        public async Task AddBannerMemberAsync(string phoneNumber, string banner)
+        public Task AddUserToBannerAsync(ulong userId, ulong bannerId)
         {
             //ulong userId = await storeSentry.ExecuteReadAsync(ctx => ctx.Users
             //    .Where(u => u.PhoneNumber == phoneNumber)
@@ -25,12 +25,12 @@ namespace Repository
             throw new NotImplementedException();
         }
 
-        public async Task<string> GetUserBannerAsync(ulong userId)
+        public Task<BannerShard> CheckCode(string code)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<string> GetUserBannerAsync(string phoneNumber)
+        Task<BannerShard> IBannerDatabase.GetUserBannerAsync(ulong userId)
         {
             throw new NotImplementedException();
         }

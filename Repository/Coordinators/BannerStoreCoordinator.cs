@@ -9,19 +9,19 @@
             store = new EFCoreBannerStore(flag);
         }
 
-        public async Task AddBannerMemberAsync(string phoneNumber, string banner)
+        public async Task AddUserToBannerAsync(ulong userId, ulong bannerId)
         {
-            await store.AddBannerMemberAsync(phoneNumber, banner);
+            await store.AddUserToBannerAsync(userId, bannerId);
         }
 
-        public async Task<string> GetUserBannerAsync(ulong userId)
+        public async Task<BannerShard> CheckCode(string code)
+        {
+            return await store.CheckCode(code);
+        }
+
+        public async Task<BannerShard> GetUserBannerAsync(ulong userId)
         {
             return await store.GetUserBannerAsync(userId);
-        }
-
-        public async Task<string> GetUserBannerAsync(string phoneNumber)
-        {
-            return await store.GetUserBannerAsync(phoneNumber);
         }
     }
 }

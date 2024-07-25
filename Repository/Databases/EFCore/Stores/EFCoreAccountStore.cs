@@ -10,7 +10,7 @@ namespace Repository
         {
         }
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
+        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
         {
             User toCreate = new()
             {
@@ -30,6 +30,35 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
+
+            return new CoreUser
+              (
+                  toCreate.Id,
+                  toCreate.PhoneNumber,
+                  toCreate.Email,
+                  toCreate.Name,
+                  toCreate.Pseudonym,
+                  toCreate.DateOfBirth,
+                  toCreate.IsPhoneConfirmed,
+                  toCreate.IsEmailConfirmed,
+                  toCreate.IsPendingDeletion,
+                  toCreate.SecurityStamp,
+                  toCreate.LockoutDate,
+                  toCreate.AccessTries,
+                  toCreate.AccountStatus,
+                  toCreate.JoinDate,
+                  toCreate.Reputation,
+                  toCreate.TimeOfUserAgreement,
+                  new Character(
+                  toCreate.Extroversion,
+                  toCreate.Athleticisme,
+                  toCreate.Chaos,
+                  toCreate.Competitiveness,
+                  toCreate.Industriousness,
+                  toCreate.NightOwl,
+                  toCreate.Openness),
+                  toCreate.TimeOfUserAgreement
+              );
         }
 
         public async Task DeleteUserAsync(ulong id)
@@ -126,6 +155,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
+                  u.Pseudonym,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -136,7 +166,7 @@ namespace Repository
                   u.AccountStatus,
                   u.JoinDate,
                   u.Reputation,
-                  -1,
+                  u.TimeOfUserAgreement,
                   new Character(
                   u.Extroversion,
                   u.Athleticisme,
@@ -144,7 +174,8 @@ namespace Repository
                   u.Competitiveness,
                   u.Industriousness,
                   u.NightOwl,
-                  u.Openness)
+                  u.Openness),
+                  u.TimeOfUserAgreement
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -171,6 +202,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
+                  u.Pseudonym,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -181,7 +213,7 @@ namespace Repository
                   u.AccountStatus,
                   u.JoinDate,
                   u.Reputation,
-                  -1,
+                  u.TimeOfUserAgreement,
                   new Character(
                   u.Extroversion,
                   u.Athleticisme,
@@ -189,7 +221,8 @@ namespace Repository
                   u.Competitiveness,
                   u.Industriousness,
                   u.NightOwl,
-                  u.Openness)
+                  u.Openness),
+                  u.TimeOfUserAgreement
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)
