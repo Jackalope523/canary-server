@@ -311,12 +311,12 @@ namespace Core.Tests
 		
 		internal async Task SaveNoteAsync(User user, User notifier, string message, string action)
 		{
-			await Terminal.NotificationDatabase.SaveNoteAsync(user.Id, notifier.Id, new DateTime(0), message, action);
+			await Terminal.NotificationDatabase.SaveTelegramAsync(user.Id, notifier.Id, new DateTime(0), message, action);
 		}
 
-		internal async Task<List<NoteShard>> GetNotesAsync(User user)
+		internal async Task<List<TelegramShard>> GetNotesAsync(User user)
 		{
-			return await Terminal.NotificationDatabase.GetNotesAsync(user.Id);
+			return await Terminal.NotificationDatabase.GetTelegramsAsync(user.Id);
 		}
 
 		internal async Task SubscribeUserAsync(User user, DeviceType deviceType, string deviceToken)

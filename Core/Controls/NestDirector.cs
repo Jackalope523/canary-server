@@ -156,6 +156,8 @@ namespace Core.Controls
                 new InvalidUserException("User cannot appreciate blocked/blocking user."));
 
             await Nests.AppreciateUserAsync(userId, targetId, Psijic.Time);
+
+            _ = targetUser.PostTelegram(user, TelegramMessage.UserAppreciated, "");
         }
 
         public async Task UnappreciateUserAsync(ulong userId, ulong targetId)

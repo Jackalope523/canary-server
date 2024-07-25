@@ -10,15 +10,15 @@ namespace Core.Boundaries
 	public enum UserAccountStatus
 	{ Active, Impotent, Limited, Suspended, Blacklisted }
 
-	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name,
+	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name, string Pseudonym,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int Appreciation, Character Character)
+		DateTimeOffset JoinDate, int Reputation, int Appreciation, Character Character, DateTimeOffset TimeOfUserAgreement)
 		: CoreOnlyData();
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
         DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
-		UserAccountStatus AccountStatus, DateTimeOffset JoinDate);
+		UserAccountStatus AccountStatus, DateTimeOffset JoinDate, DateTimeOffset TimeOfUserAgreement);
 
     public record UserShard(ulong Id, string Name);
 
@@ -37,7 +37,7 @@ namespace Core.Boundaries
 		Task<CoreUser> FindUserByIdAsync(ulong userId);
         Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<CoreUser> FindUserByEmailAsync(string normalisedEmail);
-		Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
+		Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character);
 		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
 		Task DeleteUserAsync(ulong userId);
@@ -56,11 +56,13 @@ namespace Core.Boundaries
 		Task<AccountShard> GetAccountShardAsync(ulong userId);
 		Task<UserShard> GetUserShardAsync(ulong userId);
 
-		Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth);
+		Task CreateUserAsync(string phoneNumber, string email, string name,
+			DateTimeOffset dateOfBirth, string code = "");
 		Task EditUserAsync(ulong userId,
 			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null);
+		Task UpdateUserAgreement(ulong userId);
 		Task EditAvatarAsync(ulong userId, MemoryStream image);
 		Task DeleteUserAsync(ulong userId);
 

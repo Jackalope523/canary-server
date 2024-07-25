@@ -223,7 +223,8 @@ namespace Frontier.Controllers
                 {
                     // Persist a new user
                     await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
-                        details.Name, details.DateOfBirth.ToUniversalTime());
+                        details.Name, details.DateOfBirth.ToUniversalTime(),
+                        details.Code ?? "");
 
                     // Send an SMS to new user with a generated change number token
                     var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
@@ -260,6 +261,18 @@ namespace Frontier.Controllers
                 // Send updates to account manager
                 await accounts.EditUserAsync(user.Id, name: details.Name);
             }, allowUnverified: true);
+        }
+
+        [HttpGet("agreement")]
+        public async Task<IActionResult> GetLastUserAgreement()
+        {
+            return await Execute(user => Task.FromResult(user.TimeOfUserAgreement), allowUnverified: true);
+        }
+
+        [HttpPost("agreement")]
+        public async Task<IActionResult> UpdateUserAgreement()
+        {
+            return await Execute(async user => await accounts.UpdateUserAgreement(user.Id), allowUnverified: true);
         }
 
         [HttpPost("avatar")]

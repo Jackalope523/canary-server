@@ -51,10 +51,5 @@ namespace Repository
         {
             return await store.GetSnapshotsForGatheringAsync(id);
         }
-
-        public async Task HideSnapshotAsync(ulong snapshotId)
-        {
-            await store.HideSnapshotAsync(snapshotId);
-        }
     }
 }

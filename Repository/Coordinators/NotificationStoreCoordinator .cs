@@ -11,9 +11,9 @@ namespace Repository
             store = new EFCoreNotificationStore(flag);
         }
 
-        public async Task<List<NoteShard>> GetNotesAsync(ulong userId)
+        public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
         {
-            return await store.GetNotesAsync(userId);
+            return await store.GetTelegramsAsync(userId);
         }
 
         public async Task<DeviceShard> GetUserSubscriptionAsync(ulong userId)
@@ -21,9 +21,9 @@ namespace Repository
             return await store.GetUserSubscriptionAsync(userId);
         }
 
-        public async Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, string message, string action)
+        public async Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, TelegramMessage message, string context)
         {
-           await store.SaveNoteAsync(recipientId, notifierId, time, message, action);
+           await store.SaveTelegramAsync(recipientId, notifierId, time, message, context);
         }
 
         public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)

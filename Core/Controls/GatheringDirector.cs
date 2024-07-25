@@ -415,84 +415,72 @@ namespace Core.Controls
 			{ throw new InvalidOperationException($"Could not leave gathering, user currently {userIntention.Value} gathering."); }
 		}
 
-		public async Task<GuestListShard>
+		public async Task<List<GuestListBondPair>>
 			GetGuestListAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
 
-            GuestListShard guestList = new(gathering.NumberOfGuests, new());
+			// Gather
+			var allGuests = SelectAsShard(await gathering.AllUsers,
+				user => user.State != GatheringBond.Surveying);
 
-			// Check if user is host
-			if (gathering.IsModifiableBy(user))
-            {
-                // Retrieve user's companions
-                var companions = await gathering.GetCompanionsOf(user);
-
-                guestList.Guests.AddRange(SelectAsShard(companions,
-                    companion => companion.State.Equals(GatheringBond.Guest)));
-
-                // Add visible users
-                guestList.Guests.AddRange(SelectAsShard(await gathering.AllUsers,
-					user => user.State.Equals(GatheringBond.Arrived) || user.State.Equals(GatheringBond.Left)));
-			}
-			// Check if user went
-			else if (await gathering.WasAttendedBy(user))
+			// Sort
+			allGuests.Sort((bond1, bond2) =>
 			{
-				// Retrieve user's companions
-				var companions = await gathering.GetCompanionsOf(user);
+				return bond1.User.Name.CompareTo(bond2.User.Name);
+            });
 
-                guestList.Guests.AddRange(SelectAsShard(companions,
-					companion => companion.State.Equals(GatheringBond.Guest)));
+			// Hide
 
-				// Add visible users
-				guestList.Guests.AddRange(SelectAsShard(await gathering.AllUsers,
-					user => user.State.Equals(GatheringBond.Arrived) || user.State.Equals(GatheringBond.Left)));
-            }
+			// Check if user is host or attendee
+			if (gathering.IsModifiableBy(user) || await gathering.WasAttendedBy(user))
+            {
+				for (int i = 0; i < allGuests.Count; i++)
+				{
+					User guest = new(allGuests[i].User);
+					GatheringBond bond = allGuests[i].Bond;
+
+					// Might have to hide incoming guest
+					if (bond == GatheringBond.Guest)
+					{
+						bool isCompanion = await user.IsCompanionsWith(guest);
+						bool isHost = gathering.IsModifiableBy(guest);
+						bool isSelf = user.Equals(guest);
+
+						// Check if incoming guest is not a companion, host, or self
+						if (!(isCompanion || isHost || isSelf))
+						{
+							allGuests[i] = AsHiddenBondPair(bond);
+						}
+					}
+					// Else, guest is arrived or left (visible)
+				}
+			}
 			// Check if user can view gathering
 			else if (await gathering.IsVisibleTo(user))
 			{
-                // Retrieve user's companions
-                var companions = await gathering.GetCompanionsOf(user);
+                for (int i = 0; i < allGuests.Count; i++)
+                {
+                    User guest = new(allGuests[i].User);
 
-                guestList.Guests.AddRange(SelectAsShard(companions,
-                    companion => companion.State.Equals(GatheringBond.Guest)));
-			}
+                    bool isCompanion = await user.IsCompanionsWith(guest);
+                    bool isHost = gathering.IsModifiableBy(guest);
+                    bool isSelf = user.Equals(guest);
+
+					// Not attending so can only see select people
+                    // Check if guest is not a companion, host, or self
+                    if (!(isCompanion || isHost || isSelf))
+                    {
+                        allGuests[i] = AsHiddenBondPair(allGuests[i].Bond);
+                    }
+                }
+            }
 			// User cannot recieve information about gathering
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
 
-			// Ensure host is added
-			var exists = guestList.Guests.Exists(bond => bond.User.Id.Equals(gathering.Host.Id));
-            if (!exists)
-			{
-				var hostBond = (await gathering.AllUsers).Find(bond => bond.User.Equals(gathering.Host));
-
-				if (hostBond == default)
-				{
-					Log.LogError("Host does not exist in guest list of gathering {id} {name}", gathering.Id, gathering.Name);
-				}
-				else
-				{
-					guestList.Guests.Add(new(hostBond.User.ToUserShard(), hostBond.State));
-				}
-			}
-
-			// Ensure user is added
-			var isAtGathering = (await gathering.AllUsers).Exists(bond => bond.User.Equals(user));
-			if (isAtGathering)
-			{
-				exists = guestList.Guests.Exists(bond => bond.User.Id.Equals(user.Id)
-				&& bond.Bond != GatheringBond.Surveying && bond.Bond != GatheringBond.Kicked);
-
-				if (!exists)
-				{
-					var userBond = (await gathering.AllUsers).Find(bond => bond.User.Equals(user));
-					guestList.Guests.Add(new(userBond.User.ToUserShard(), userBond.State));
-				}
-			}
-
-			return guestList;
+            return allGuests;
 		}
 
 		public async Task<List<UserShard>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId)
@@ -502,10 +490,12 @@ namespace Core.Controls
 
 			List<User> potentialUsers = new();
 
-			// Add all companions that can join gathering
+			// Check companions
 			foreach (var companion in await user.Companions)
 			{
-				if (await gathering.IsJoinableBy(companion))
+				// Verify they can join and are not already on the guest list
+				if (await gathering.IsJoinableBy(companion) &&
+					!await gathering.HasOnGuestList(companion))
 				{ potentialUsers.Add(companion); }
 			}
 
@@ -531,7 +521,7 @@ namespace Core.Controls
 			Try(await inviter.IsCompanionsWith(invitee),
 				new InvalidUserException("Cannot invite non-companions."));
 
-			_ = invitee.PostNote(inviter, $"has invited you to {gathering.Name}", $"{gathering.Id}");
+			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
 			_ = invitee.Notify("Sparrow", "You were invited to ");
 		}
 
@@ -556,11 +546,11 @@ namespace Core.Controls
 			// Kick target user from gathering
 			await Gatherings.SetUserStateAsync(targetUser.Id, gathering.Id, GatheringBond.Kicked, Time);
 
-			// Hide target user's snapshots from gathering
+			// Remove target user's snapshots from gathering
 			foreach (SnapshotShard snapshot in await gathering.Snapshots)
 			{
 				if (targetUser.Taken(snapshot))
-				{ _ = Snapshots.HideSnapshotAsync(snapshot.Id); }
+				{ _ = Snapshots.RemoveSnapshotAsync(snapshot.Id); }
 			}
 		}
 
@@ -679,6 +669,11 @@ namespace Core.Controls
 			SelectAsShard(List<(User User, GatheringBond State)> users, Func<(User User, GatheringBond State), bool> predicate)
 		{
 			return users.Where(predicate).ToList().ConvertAll(userDetails => new GuestListBondPair(userDetails.User.ToUserShard(), userDetails.State));
+		}
+
+		private GuestListBondPair AsHiddenBondPair(GatheringBond bond)
+		{
+			return new(new(0, "hidden"), bond);
 		}
 
 		#endregion

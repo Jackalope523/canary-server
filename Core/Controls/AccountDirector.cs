@@ -45,8 +45,18 @@ namespace Core.Controls
             return (await GetUserAsync(userId)).ToUserShard();
         }
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
+        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, string code = "")
         {
+            BannerShard banner;
+
+            // Verify banner code
+            try
+            {
+                banner = await Banners.CheckCode(code);
+            }
+            catch
+            { throw new InvalidInformationException("Incorrect code."); }
+
             // Create user
             User newUser = new()
             {
@@ -64,19 +74,16 @@ namespace Core.Controls
             // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
 
-            // Verify if user is a banner member
-            try
-            {
-                await Banners.GetUserBannerAsync(newUser.PhoneNumber);
-            } catch { throw new InvalidUserException("User is not a member of a banner."); }
-
             // Check if email is in use
             if (!string.IsNullOrEmpty(email))
             { await ThrowIfEmailTaken(newUser.Email); }
 
             // Store nest
-            await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
+            var user = await Accounts.CreateUserAsync(newUser.PhoneNumber, email, newUser.Email,
                 newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default.ToCharacter());
+
+            // Add user to banner
+            await Banners.AddUserToBannerAsync(user.Id, banner.Id);
         }
 
         public async Task EditUserAsync(ulong userId,
@@ -144,6 +151,14 @@ namespace Core.Controls
             // Push update
             _ = Accounts.UpdateUserAsync(user.Id, edits);
 		}
+
+        public async Task UpdateUserAgreement(ulong userId)
+        {
+            var user = await GetUserAsync(userId);
+
+            await Accounts.UpdateUserAsync(user.Id,
+                new() { (nameof(CoreUser.TimeOfUserAgreement), Time) });
+        }
 
         public async Task EditAvatarAsync(ulong userId, MemoryStream image)
         {
@@ -220,7 +235,6 @@ namespace Core.Controls
                     await nextGathering.IsInRange(user))
                 {
                     await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
-
                 }
             }
         }

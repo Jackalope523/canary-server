@@ -37,6 +37,7 @@ namespace Core.Entities
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
+        public string Pseudonym { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
         public int Appreciation { get; set; }
@@ -50,6 +51,7 @@ namespace Core.Entities
         public string SecurityStamp { get; set; }
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
+        public DateTimeOffset TimeOfUserAgreement { get; set; }
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.Active ||
@@ -65,7 +67,7 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
-        public Synced<string> Banner { get; }
+        public Synced<BannerShard> Banner { get; }
 
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
 		public Synced<GeoLocation> LastKnownLocation { get; }
@@ -87,7 +89,7 @@ namespace Core.Entities
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
-        public Synced<List<NoteShard>> Notes { get; }
+        public Synced<List<TelegramShard>> Notes { get; }
         public Synced<List<PenaltyShard>> Penalties { get; }
 
         private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports)> ReportsSync { get; }
@@ -123,7 +125,7 @@ namespace Core.Entities
             Blocking = new(() => Terminal.NestDirector.RequestBlockedUsersAsync(this));
             BlockedBy = new(() => Terminal.NestDirector.RequestUsersBlockingAsync(this));
 
-            Notes = new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
+            Notes = new(() => Terminal.NotificationDirector.GetTelegramsAsync(Id));
             Penalties = new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
 
             ReportsSync = new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
@@ -137,6 +139,7 @@ namespace Core.Entities
             PhoneNumber = fromUser.PhoneNumber;
             Email = fromUser.Email;
             Name = fromUser.Name;
+            Pseudonym = fromUser.Pseudonym;
             DateOfBirth = fromUser.DateOfBirth;
             JoinDate = fromUser.JoinDate;
             Reputation = fromUser.Reputation;
@@ -149,6 +152,7 @@ namespace Core.Entities
             AccessTries = fromUser.AccessTries;
             AccountStatus = fromUser.AccountStatus;
             Character = new(fromUser.Character);
+            TimeOfUserAgreement = fromUser.TimeOfUserAgreement;
         }
 
         public User(UserShard fromUser) : this()
@@ -159,17 +163,18 @@ namespace Core.Entities
 
         public CoreUser ToCoreUser()
         {
-            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+            return new(Id, PhoneNumber, Email, Name, Pseudonym, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, Appreciation, Character.ToCharacter());
+                JoinDate, Reputation, Appreciation,
+                Character.ToCharacter(), TimeOfUserAgreement);
         }
 
         public AccountShard ToAccountShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed,
-                AccountStatus, JoinDate);
+                AccountStatus, JoinDate, TimeOfUserAgreement);
         }
 
         public UserShard ToUserShard()
@@ -431,10 +436,10 @@ namespace Core.Entities
 
 		#region Actions
 
-        public async Task PostNote(User notifier, string message, string action)
+        public async Task PostTelegram(User notifier, TelegramMessage message, string context)
         {
-            await Terminal.NotificationDirector.PostNoteAsync(this, notifier,
-                message, action);
+            await Terminal.NotificationDirector.PostTelegramAsync(this, notifier,
+                message, context);
         }
 
 		public async Task Notify(string title, string message)

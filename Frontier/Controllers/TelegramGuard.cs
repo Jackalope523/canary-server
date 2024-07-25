@@ -26,7 +26,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				return await telegrams.GetNotesAsync(user.Id);
+				return await telegrams.GetTelegramsAsync(user.Id);
 			});
         }
 

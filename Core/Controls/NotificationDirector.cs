@@ -20,11 +20,11 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<NoteShard>> GetNotesAsync(ulong userId)
+		public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
 		{
 			var user = await GetUserAsync(userId);
 
-			return await Telegrams.GetNotesAsync(user.Id);
+			return await Telegrams.GetTelegramsAsync(user.Id);
 		}
 
 		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
@@ -41,13 +41,13 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task PostNoteAsync(User user, User notifier, string message, string action)
+		internal async Task PostTelegramAsync(User user, User notifier, TelegramMessage message, string context)
 		{
 			// Check if notifier can notify user
 			if (await notifier.IsBlocking(user) || await notifier.IsBlockedBy(user))
 			{ return; }
 
-			await Telegrams.SaveNoteAsync(user.Id, notifier.Id, Time, message, action);
+			await Telegrams.SaveTelegramAsync(user.Id, notifier.Id, Time, message, context);
 		}
 
 		internal async Task NotifyUserAsync(User user, string title, string message)

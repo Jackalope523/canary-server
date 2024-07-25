@@ -42,7 +42,7 @@ namespace Repository.Tests
             Entities.Note note = new NoteFactory().Create(subject1, subject2);
             sentry.ExecuteWrite(ctx => ctx.Notes.Add(note));
 
-            Core.Boundaries.NoteShard found = (await store.GetNotesAsync(subject2.Id)).Single();
+            Core.Boundaries.TelegramShard found = (await store.GetTelegramsAsync(subject2.Id)).Single();
 
             Assert.NotNull(found);
             Assert.Equal(subject1.Id, found.NotifierId);
@@ -69,7 +69,7 @@ namespace Repository.Tests
             string message = "message";
             string action = "action";
 
-            await store.SaveNoteAsync(subject2.Id, subject1.Id, DateTimeOffset.MinValue, message, action);
+            await store.SaveTelegramAsync(subject2.Id, subject1.Id, DateTimeOffset.MinValue, message, action);
 
             Entities.Note saved = sentry.ExecuteRead(ctx => ctx.Notes.Single());
 

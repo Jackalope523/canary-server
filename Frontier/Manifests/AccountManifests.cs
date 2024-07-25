@@ -34,6 +34,8 @@ namespace Frontier.Manifests
 
 		[Required]
 		public DateTime DateOfBirth { get; set; }
+
+		public string Code { get; set; }
     }
 
 	public class AvatarManifest

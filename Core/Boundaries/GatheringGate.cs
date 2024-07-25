@@ -24,9 +24,6 @@ namespace Core.Boundaries
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
         double Radius, int NumberOfGuests, float RelativeAngle);
 
-	public record GuestListShard(int GuestCount,
-		List<GuestListBondPair> Guests);
-
 	public record GuestListBondPair(UserShard User, GatheringBond Bond);
 
     #endregion
@@ -85,7 +82,7 @@ namespace Core.Boundaries
 		Task JoinGatheringAsync(ulong userId, ulong gatheringId);
 		Task LeaveGatheringAsync(ulong userId, ulong gatheringId);
 
-		Task<GuestListShard> GetGuestListAsync(ulong userId, ulong gatheringId);
+		Task<List<GuestListBondPair>> GetGuestListAsync(ulong userId, ulong gatheringId);
 		Task<List<UserShard>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong gatheringId);
 		Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId);
