@@ -40,7 +40,6 @@ namespace Core.Entities
         public string Pseudonym { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
-        public int Appreciation { get; set; }
         public DateTimeOffset JoinDate { get; init; }
         public int Reputation { get; set; }
 
@@ -143,7 +142,6 @@ namespace Core.Entities
             DateOfBirth = fromUser.DateOfBirth;
             JoinDate = fromUser.JoinDate;
             Reputation = fromUser.Reputation;
-            Appreciation = fromUser.Appreciation;
             IsPhoneConfirmed = fromUser.IsPhoneConfirmed;
             IsEmailConfirmed = fromUser.IsEmailConfirmed;
             IsDeleted = fromUser.IsPendingDeletion;
@@ -166,7 +164,7 @@ namespace Core.Entities
             return new(Id, PhoneNumber, Email, Name, Pseudonym, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, Appreciation,
+                JoinDate, Reputation,
                 Character.ToCharacter(), TimeOfUserAgreement);
         }
 
@@ -206,6 +204,18 @@ namespace Core.Entities
             PhoneNumber = normalisedPhoneNumber;
 
             return issues.Equals("");
+        }
+
+        public int GetAge()
+        {
+            int age = Time.Year - DateOfBirth.Year;
+
+            if (Time < DateOfBirth.AddYears(age))
+            {
+                age--;
+            }
+
+            return age;
         }
 
         public void GenerateSecurityStamp()

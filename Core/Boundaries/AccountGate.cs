@@ -13,7 +13,7 @@ namespace Core.Boundaries
 	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name, string Pseudonym,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, int Appreciation, Character Character, DateTimeOffset TimeOfUserAgreement)
+		DateTimeOffset JoinDate, int Reputation, Character Character, DateTimeOffset TimeOfUserAgreement)
 		: CoreOnlyData();
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
@@ -22,7 +22,7 @@ namespace Core.Boundaries
 
     public record UserShard(ulong Id, string Name);
 
-    public record Character(int Extraversion, int Athleticism, int Chaoticness,
+    public record Character(int Age, int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
 
     public record RecentLocation(double Latitude, double Longitude, double Radius);
