@@ -74,10 +74,7 @@ namespace Repository
             modelBuilder.Entity<Gathering>().Property(g => g.Location)
                 .HasSrid(4326);
 
-            // Note
-            modelBuilder.Entity<Telegram>().Property(n => n.Message)
-               .HasMaxLength(5000);
-
+            // Telegram
             modelBuilder.Entity<Telegram>().Property(n => n.Action)
                .HasMaxLength(500);
 

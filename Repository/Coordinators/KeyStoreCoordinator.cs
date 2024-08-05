@@ -11,19 +11,19 @@ namespace Repository.Coordinators
             store = new AzureKeyStore();
         }
 
-        public async Task<byte[]> GetCertificateAsync(string certificateName)
+        public async Task<string> GetHollowTwilioAuthKeyAsync()
         {
-            return await store.GetCertificateAsync(certificateName);
+            return await store.GetHollowTwilioAuthKeyAsync();
         }
 
-        public async Task<object> GetKeyAsync(string keyName)
+        public async Task<string> GetHollowTwilioTokenKeyAsync()
         {
-            return await store.GetKeyAsync(keyName);
+            return await store.GetHollowTwilioTokenKeyAsync();
         }
 
-        public async Task<string> GetSecretAsync(string secretName)
+        public async Task<string> GetSparrowMapKeyAsync()
         {
-            return await store.GetSecretAsync(secretName);
+            return await store.GetSparrowMapKeyAsync();
         }
     }
 }

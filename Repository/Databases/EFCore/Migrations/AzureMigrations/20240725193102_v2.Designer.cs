@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
@@ -12,9 +13,11 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 {
     [DbContext(typeof(AzureSQLContext))]
-    partial class AzureSQLContextModelSnapshot : ModelSnapshot
+    [Migration("20240725193102_v2")]
+    partial class v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +46,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Banners", (string)null);
+                    b.ToTable("Banners");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -69,7 +72,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BannerLinks", (string)null);
+                    b.ToTable("BannerLinks");
                 });
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
@@ -93,7 +96,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties", (string)null);
+                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -119,7 +122,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions", (string)null);
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
@@ -158,7 +161,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Telegrams", (string)null);
+                    b.ToTable("Telegrams");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
@@ -247,7 +250,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings", (string)null);
+                    b.ToTable("Gatherings");
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -276,7 +279,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks", (string)null);
+                    b.ToTable("GatheringLinks");
                 });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
@@ -310,7 +313,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports", (string)null);
+                    b.ToTable("GatheringReports");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -336,7 +339,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots", (string)null);
+                    b.ToTable("Snapshots");
                 });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
@@ -366,7 +369,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasIndex("UserId", "PostId")
                         .IsUnique();
 
-                    b.ToTable("SnapshotLinks", (string)null);
+                    b.ToTable("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -485,7 +488,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Repository.UserLink", b =>
@@ -514,7 +517,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserLinks", (string)null);
+                    b.ToTable("UserLinks");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -553,7 +556,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports", (string)null);
+                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>

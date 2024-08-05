@@ -1,7 +1,4 @@
-﻿using Core.Boundaries;
-using Serilog;
-
-namespace Repository
+﻿namespace Repository
 {
     public class AzureKeyStore : IKeyDatabase
     {
@@ -12,19 +9,19 @@ namespace Repository
             sentry = new AzureKeySentry();
         }
 
-        public async Task<string> GetSecretAsync(string secretName)
+        public async Task<string> GetHollowTwilioAuthKeyAsync()
         {
-            return await sentry.GetSecretAsync(secretName);
+            return await sentry.GetSecretAsync("TwilioAccountSID");
         }
 
-        public async Task<object> GetKeyAsync(string keyName)
+        public async Task<string> GetHollowTwilioTokenKeyAsync()
         {
-            return await sentry.GetKeyAsync(keyName);
+            return await sentry.GetSecretAsync("TwilioAuthToken");
         }
 
-        public async Task<byte[]> GetCertificateAsync(string certificateName)
+        public async Task<string> GetSparrowMapKeyAsync()
         {
-            return await sentry.GetCertificateAsync(certificateName);
+            return await sentry.GetSecretAsync("MapboxSparrowMapToken");
         }
     }
 }
