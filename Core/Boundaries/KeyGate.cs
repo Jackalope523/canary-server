@@ -10,14 +10,18 @@ namespace Core.Boundaries
 
     public interface IKeyDatabase
     {
-        Task<string> GetSecretAsync(string secretName);
-        Task<object> GetKeyAsync(string keyName);
-        Task<byte[]> GetCertificateAsync(string keyName);
+		Task<string> GetHollowTwilioAuthKeyAsync();
+		Task<string> GetHollowTwilioTokenKeyAsync();
+
+		Task<string> GetSparrowMapKeyAsync();
     }
 
     public interface IKeyOperations
 	{
-		Task<string> GetSecretAsync(ulong userId, string secretName);
+		Task<string> GetHollowTwilioAuthKeyAsync();
+		Task<string> GetHollowTwilioTokenKeyAsync();
+
+		Task<string> GetSparrowMapKeyAsync(ulong userId);
 	}
 
     #endregion

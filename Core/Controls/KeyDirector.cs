@@ -12,22 +12,32 @@ namespace Core.Controls
 
 		public KeyDirector(CoreTerminal terminal) : base(terminal) { }
 
-		#endregion
+        #endregion
 
-		#region Operations
+        #region Operations
 
-		public async Task<string> GetSecretAsync(ulong userId, string secret)
-		{
-			await GetUserAsync(userId);
+        public async Task<string> GetHollowTwilioAuthKeyAsync()
+        {
+            return await Keys.GetHollowTwilioAuthKeyAsync();
+        }
 
-			return await Keys.GetSecretAsync(secret);
-		}
+        public async Task<string> GetHollowTwilioTokenKeyAsync()
+        {
+            return await Keys.GetHollowTwilioTokenKeyAsync();
+        }
 
-		#endregion
+        public async Task<string> GetSparrowMapKeyAsync(ulong userId)
+        {
+            await GetUserAsync(userId);
 
-		#region Favours
+            return await Keys.GetSparrowMapKeyAsync();
+        }
+
+        #endregion
+
+        #region Favours
 
 
-		#endregion
-	}
+        #endregion
+    }
 }
