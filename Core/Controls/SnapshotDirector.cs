@@ -136,7 +136,7 @@ namespace Core.Controls
 		internal async Task<List<SnapshotShard>> RequestVisibleSnapshotsAsync(User user, Gathering gathering)
         {
             // Verify user can see the gathering
-            if (await user.CanView(gathering))
+            if (!await user.CanView(gathering))
             {
                 return new List<SnapshotShard> { };
             }
