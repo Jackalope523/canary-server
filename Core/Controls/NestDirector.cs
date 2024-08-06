@@ -111,20 +111,19 @@ namespace Core.Controls
             return upcomingAgenda;
         }
 
-        public async Task<IDictionary<UserShard, AgendaShard>> GetCompanionAgendasAsync(ulong userId)
+        public async Task<IDictionary<ulong, AgendaShard>> GetCompanionAgendasAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
 
-            ConcurrentDictionary<UserShard, AgendaShard> companionGatherings = new();
+            Dictionary<ulong, AgendaShard> companionGatherings = new();
 
             // Gather visible agenda of each companion
-            (await user.Companions).AsParallel()
-                .ForAll(async companion =>
-                {
-                    var companionAgenda = await RequestAgenda(companion);
-                    companionAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, companionAgenda);
-                    companionGatherings.TryAdd(companion.ToUserShard(), companionAgenda);
-                });
+            foreach (var companion in await user.Companions)
+            {
+                var companionAgenda = await RequestAgenda(companion);
+                companionAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, companionAgenda);
+                companionGatherings.TryAdd(companion.Id, companionAgenda);
+            };
 
             return companionGatherings;
         }
