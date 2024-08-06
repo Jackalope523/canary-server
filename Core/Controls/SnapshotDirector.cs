@@ -117,6 +117,7 @@ namespace Core.Controls
                 {
                     gatheringHeaders[gatheringId] = new(gatheringId,
                         gatheringHeaders[gatheringId].Name,
+                        gatheringHeaders[gatheringId].Time,
                         gatheringHeaders[gatheringId].IsActive,
                         snapshot.TimeTaken,
                         gatheringHeaders[gatheringId].FriendlyLocation);

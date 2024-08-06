@@ -10,7 +10,7 @@ namespace Core.Boundaries
     public enum SnapshotAcclaim
     { Acclaim, Remove }
 
-	public record GatheringHeader(ulong Id, string Name, bool IsActive, DateTimeOffset LastActiveTime,
+	public record GatheringHeader(ulong Id, string Name, DateTimeOffset Time, bool IsActive, DateTimeOffset LastActiveTime,
         string FriendlyLocation);
 
     public record SnapshotShard(ulong Id, ulong GatheringId, UserShard User,
