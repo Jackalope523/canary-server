@@ -119,8 +119,17 @@ namespace Core.Controls
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, user.Character.ToCharacter(),
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
 
-			// Upload hero
-			await Terminal.MediaDirector.UploadHeroAsync(newGathering.Id, heroImage);
+			try
+			{
+				// Upload hero
+				await Terminal.MediaDirector.UploadHeroAsync(newGathering.Id, heroImage);
+			}
+			catch
+			{
+				// If failed, remove gathering
+				await Gatherings.DeleteGatheringAsync(newGathering.Id);
+				throw new UnexpectedFailureException("Failed to upload hero image.");
+			}
 
 			// Notify appreciateers of gathering
 			_ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
