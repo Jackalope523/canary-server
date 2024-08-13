@@ -46,6 +46,10 @@ namespace Core.Controls
 			// Remove gatherings from list that the user cannot access
 			var filteredGatherings = await RemoveInaccessibleGatheringsAsync(user, nearbyGatherings);
 
+			// Ensure user's own gatherings exist
+			var hostedGatherings = await Gatherings.FindGatheringsByUserAsync(user.Id);
+			filteredGatherings = EnsureExist(filteredGatherings, hostedGatherings);
+
 			return filteredGatherings;
 		}
 
@@ -58,7 +62,11 @@ namespace Core.Controls
 			// Remove inaccessible gatherings and gatherings with a large difference between gathering and user interest
 			var filteredGatherings = await RemoveUnattractiveGatheringsAsync(user, nearbyGatherings, 1f);
 
-			return filteredGatherings;
+            // Ensure user's own gatherings exist
+            var hostedGatherings = await Gatherings.FindGatheringsByUserAsync(user.Id);
+            filteredGatherings = EnsureExist(filteredGatherings, hostedGatherings);
+
+            return filteredGatherings;
 		}
 
 		public async Task<GatheringShard> CreateGatheringAsync(ulong userId,
@@ -305,14 +313,19 @@ namespace Core.Controls
 			}
 			catch { }
 
-			// Ensure correct state transition
-			if (!userIntention.HasValue)
+			// Check that user was not kicked
+			Fail(userIntention.HasValue &&
+				userIntention.Value.Equals(GatheringBond.Kicked),
+				new InvalidUserException($"Could not survey gathering, user was kicked."));
+
+            // Ensure correct state transition
+            if (!userIntention.HasValue)
 			{
 				// Try to add user to the gathering
 				await Gatherings.SetUserStateAsync(userId, gatheringId, GatheringBond.Surveying, Time);
 			}
 			else if (userIntention.HasValue)
-			{ throw new InvalidOperationException($"Could not survey gathering, user currently {userIntention.Value} gathering."); }
+			{ throw new InvalidOperationException($"Cannot survey gathering, user currently {userIntention.Value} gathering."); }
 		}
 
 		public async Task UnsurveyGatheringAsync(ulong userId, ulong gatheringId)
@@ -325,8 +338,13 @@ namespace Core.Controls
             }
             catch { }
 
-			// Ensure correct state transition
-			if (userIntention.HasValue &&
+            // Check that user was not kicked
+            Fail(userIntention.HasValue &&
+                userIntention.Value.Equals(GatheringBond.Kicked),
+                new InvalidUserException($"Cannot unsurvey gathering, user was kicked."));
+
+            // Ensure correct state transition
+            if (userIntention.HasValue &&
 				userIntention.Value.Equals(GatheringBond.Surveying))
 			{
 				// Try to remove user from gathering
@@ -354,8 +372,13 @@ namespace Core.Controls
             }
             catch { }
 
-			// Check if user is already guest or arrived
-			if (previousUserState.HasValue &&
+            // Check that user was not kicked
+            Fail(previousUserState.HasValue &&
+                previousUserState.Value.Equals(GatheringBond.Kicked),
+                new InvalidUserException($"Could not join gathering, user was kicked."));
+
+            // Check if user is already guest or arrived
+            if (previousUserState.HasValue &&
 				!previousUserState.Value.Equals(GatheringBond.Surveying))
 			{
                 throw new InvalidUserException($"User already joined gathering.");
@@ -399,9 +422,14 @@ namespace Core.Controls
 
             // Get the user's current status
             var userIntention = await Gatherings.GetUserStateAsync(userId, gatheringId);
-			
-			// Check if user is guest or arrived
-			if (userIntention.Equals(GatheringBond.Arrived))
+
+            // Check that user was not kicked
+            Fail(userIntention.HasValue &&
+                userIntention.Value.Equals(GatheringBond.Kicked),
+                new InvalidUserException($"Could not survey gathering, user was kicked."));
+
+            // Check if user is guest or arrived
+            if (userIntention.Equals(GatheringBond.Arrived))
 			{
 				// Try to remove user from gathering
 				await Gatherings.SetUserStateAsync(user.Id, targetGathering.Id, GatheringBond.Left, Time);
@@ -653,6 +681,25 @@ namespace Core.Controls
             }
 
             return accessibleGatherings;
+		}
+
+		internal List<GatheringShard>
+			EnsureExist(List<GatheringShard> list, List<CoreGathering> ensured)
+		{
+			foreach (CoreGathering gathering in ensured)
+			{
+				// Has match
+				var pair = list.Find(g => g.Id.Equals(gathering.Id));
+
+				// Add if null
+				if (pair == null)
+				{
+					Gathering gath = new(gathering);
+					list.Add(gath.ToGatheringShard());
+				}
+			}
+
+			return list;
 		}
 
 		#endregion
