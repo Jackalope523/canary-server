@@ -11,10 +11,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Repository;
-using Core;
 using Frontier.Controllers;
 using Microsoft.Extensions.Logging;
-using Frontier.Daemons;
+using Core;
+using Core.Daemons;
 
 namespace Frontier
 {
@@ -90,7 +90,7 @@ namespace Frontier
             services.AddTransient<IEmailService, SendGridService>();
             TwilioService.Initialise(frontierLogger, "", "", ""); // Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
-            services.AddHostedService<DatabaseCleanupService>();
+            services.AddHostedService<RepositoryCleanupService>();
 
             //////
             // Connections

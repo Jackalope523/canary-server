@@ -5,12 +5,12 @@ using Microsoft.Extensions.Hosting;
 
 namespace Core.Daemons
 {
-	public class DatabaseCleanupService : BackgroundService
+	public class RepositoryCleanupService : BackgroundService
     {
         private readonly TimeSpan interval = TimeSpan.FromMinutes(5);
         private readonly TimeSpan gatheringTimeout = TimeSpan.FromHours(1);
 
-        public DatabaseCleanupService()
+        public RepositoryCleanupService()
         {
         }
 
