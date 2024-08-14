@@ -14,6 +14,7 @@ using Repository;
 using Core;
 using Frontier.Controllers;
 using Microsoft.Extensions.Logging;
+using Frontier.Daemons;
 
 namespace Frontier
 {
@@ -89,6 +90,7 @@ namespace Frontier
             services.AddTransient<IEmailService, SendGridService>();
             TwilioService.Initialise(frontierLogger, "", "", ""); // Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
+            services.AddHostedService<DatabaseCleanupService>();
 
             //////
             // Connections
