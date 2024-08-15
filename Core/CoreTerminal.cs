@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Core.Boundaries;
 using Core.Controls;
+using Core.Daemons;
 using Microsoft.Extensions.Logging;
 
 namespace Core
@@ -72,41 +73,30 @@ namespace Core
         {
             lock (initLock)
             {
-                Terminal ??= new CoreTerminal(logger,
-                        accountDatabase, adminDatabase, bannerDatabase,
-                        gatheringDatabase, snapshotDatabase,
-                        disciplineDatabase, keyDatabase,
-                        mediaDatabase, notificationDatabase,
-                        nestDatabase,
-                        notificationService);
+                Terminal ??= new CoreTerminal()
+                {
+                    Log = logger,
+
+                    AccountDatabase = accountDatabase,
+                    AdminDatabase = adminDatabase,
+                    BannerDatabase = bannerDatabase,
+                    GatheringDatabase = gatheringDatabase,
+                    SnapshotDatabase = snapshotDatabase,
+                    DisciplineDatabase = disciplineDatabase,
+                    KeyDatabase = keyDatabase,
+                    MediaDatabase = mediaDatabase,
+                    NotificationDatabase = notificationDatabase,
+                    NestDatabase = nestDatabase,
+
+                    NotificationService = notificationService,
+                };
 
                 return Terminal;
             }
         }
 
-        protected CoreTerminal(ILogger logger,
-            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-			IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
-			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
-            IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase,
-            INotificationService notificationService)
+        protected CoreTerminal()
         {
-            Log = logger;
-
-            AccountDatabase = accountDatabase;
-            AdminDatabase = adminDatabase;
-            BannerDatabase = bannerDatabase;
-            GatheringDatabase = gatheringDatabase;
-            SnapshotDatabase = snapshotDatabase;
-            DisciplineDatabase = disciplineDatabase;
-            KeyDatabase = keyDatabase;
-            MediaDatabase = mediaDatabase;
-            NotificationDatabase = notificationDatabase;
-            NestDatabase = nestDatabase;
-
-            NotificationService = notificationService;
-
             CreateManagers();
         }
 
@@ -121,6 +111,15 @@ namespace Core
             MediaDirector = new MediaDirector(this);
             NotificationDirector = new NotificationDirector(this);
             NestDirector = new NestDirector(this);
+        }
+
+        #endregion
+
+        #region
+
+        public RepositoryCleanupService CreateRepositoryCleanupService()
+        {
+            return new(this);
         }
 
         #endregion

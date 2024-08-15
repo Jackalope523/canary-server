@@ -1,45 +1,61 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Entities;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+using static Core.Entities.Arbiter;
+using static Core.Entities.Psijic;
 
 namespace Core.Daemons
 {
 	public class RepositoryCleanupService : BackgroundService
     {
         private readonly TimeSpan interval = TimeSpan.FromMinutes(5);
-        private readonly TimeSpan gatheringTimeout = TimeSpan.FromHours(1);
+        private readonly TimeSpan gatheringTimeout = QuarterHour;
 
-        public RepositoryCleanupService()
+        private CoreTerminal terminal;
+
+        private ILogger log;
+
+        public RepositoryCleanupService(CoreTerminal coreTerminal)
         {
+            terminal = coreTerminal;
+
+            log = terminal.Log;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await KillZombieGatheringsAsync(stoppingToken);
+                try
+                {
+                    await KillZombieGatheringsAsync(stoppingToken);
+                }
+                catch (Exception e)
+                {
+                    log.LogError("Hob had trouble: {error}", e);
+                }
+
                 await Task.Delay(interval, stoppingToken);
             }
         }
 
         private async Task KillZombieGatheringsAsync(CancellationToken stoppingToken)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            log.LogInformation("Cleaning up repository.");
+
+            var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatherings();
+
+            foreach (var gathering in waitingGatherings)
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<GuardBox>();
-                var now = DateTime.UtcNow;
-
-                var eventsToClose = await dbContext.Events
-                    .Where(e => !e.IsClosed && e.StartedAt == null && now - e.CreatedAt >= _timeoutDuration)
-                    .ToListAsync(stoppingToken);
-
-                foreach (var evt in eventsToClose)
+                if (!IsWithin(gathering.StartTime - Time, gatheringTimeout))
                 {
-                    evt.IsClosed = true;
+                    log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Name);
+                    await terminal.GatheringDatabase.EndGatheringAsync(gathering.Id, Time);
                 }
-
-                await dbContext.SaveChangesAsync(stoppingToken);
             }
         }
     }

@@ -90,8 +90,6 @@ namespace Frontier
             services.AddTransient<IEmailService, SendGridService>();
             TwilioService.Initialise(frontierLogger, "", "", ""); // Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
 
-            services.AddHostedService<RepositoryCleanupService>();
-
             //////
             // Connections
             ////////////////
@@ -133,6 +131,12 @@ namespace Frontier
                 terminal.NotificationOperations);
 
             services.AddSingleton(box);
+
+            /////
+            // Daemons
+            ////////////
+
+            services.AddHostedService(services => terminal.CreateRepositoryCleanupService());
 
             /////////
             // Authentication Schema 

@@ -15,6 +15,7 @@ namespace Core.Boundaries
 
     public interface IAdminDatabase
 	{
+        Task<List<CoreGathering>> GetAllWaitingGatherings();
         Task VoidUserAsync(ulong userId);
         Task VoidGatheringAsync(ulong gatheringId);
     }
