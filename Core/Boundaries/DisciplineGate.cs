@@ -9,10 +9,16 @@ namespace Core.Boundaries
     public enum PenaltyType
     { Unreliable }
 
+    public enum UserReportType
+    {
+        Rude, HateSpeech, Harassment,
+        Violent, Assault
+    }
+
     public enum GatheringReportType
     { Inappropriate, Spam, Misleading, Promotion }
 
-    public enum UserReportType
+    public enum SnapshotReportType
     {
         Rude, HateSpeech, Harassment,
         Violent, Assault
@@ -26,6 +32,9 @@ namespace Core.Boundaries
     public record GatheringReport(ulong Id, ulong ReportingUserId, ulong ReportedGatheringId, DateTimeOffset ReportTime,
         GatheringReportType ReportType, string ReportDetails);
 
+    public record SnapshotReport(ulong Id, ulong ReportingUserId, ulong ReportedSnapshotId, DateTimeOffset ReportTime,
+        SnapshotReportType ReportType, string ReportDetails);
+
 	#endregion
 
 	#region Gates
@@ -35,8 +44,8 @@ namespace Core.Boundaries
         Task<List<PenaltyShard>> GetPenaltiesForUserAsync(ulong userId);
         Task PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
 
-        Task<(List<UserReport>, List<GatheringReport>)> GetReportsForUserAsync(ulong userId);
-        Task<(List<UserReport>, List<GatheringReport>)> GetReportsByUserAsync(ulong userId);
+        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>)> GetReportsForUserAsync(ulong userId);
+        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>)> GetReportsByUserAsync(ulong userId);
         Task ReportUserAsync(ulong userId, ulong targetUserId, ulong gatheringId, DateTimeOffset timeOfReport,
             UserReportType reportType, string reportDetails);
         Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport,
@@ -45,6 +54,10 @@ namespace Core.Boundaries
         Task<List<GatheringReport>> GetReportsForGatheringAsync(ulong gatheringId);
         Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport,
             GatheringReportType reportType, string reportDetails);
+
+        Task<List<GatheringReport>> GetReportsForSnapshotAsync(ulong snapshotId);
+        Task ReportSnapshotAsync(ulong snapshotId, DateTimeOffset timeOfReport,
+            SnapshotReportType reportType, string reportDetails);
     }
 
     public interface IDisciplineOperations
