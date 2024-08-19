@@ -12,7 +12,7 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
     [DbContext(typeof(SQLiteContext))]
-    [Migration("20240710194438_Init")]
+    [Migration("20240811001042_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -66,44 +66,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.ToTable("BannerLinks");
                 });
 
-            modelBuilder.Entity("Repository.Entities.Note", b =>
-                {
-                    b.Property<ulong>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(5000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("NotifierId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Read")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<ulong>("RecipientId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong?>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notes");
-                });
-
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
                 {
                     b.Property<ulong>("Id")
@@ -150,10 +112,49 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.ToTable("Subscriptions");
                 });
 
+            modelBuilder.Entity("Repository.Entities.Telegram", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Message")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("NotifierId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("RecipientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong?>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Telegrams");
+                });
+
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Age")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Athleticisme")
@@ -186,11 +187,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Property<int>("GroupMinimum")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("HeroImageURL")
-                        .IsRequired()
-                        .HasMaxLength(2083)
-                        .HasColumnType("TEXT");
 
                     b.Property<ulong>("HostId")
                         .HasColumnType("INTEGER");
@@ -307,16 +303,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<ulong>("GatheringId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsHidden")
-                        .HasColumnType("INTEGER");
-
                     b.Property<ulong>("OwnerId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("PhotoURL")
-                        .IsRequired()
-                        .HasMaxLength(2083)
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("PostedAt")
                         .HasColumnType("TEXT");
@@ -368,6 +356,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AccountStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Age")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Athleticisme")
@@ -451,12 +442,20 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Pseudonym")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Reputation")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("SecurityStamp")
                         .IsRequired()
                         .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("TimeOfUserAgreement")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -547,13 +546,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Repository.Entities.Note", b =>
-                {
-                    b.HasOne("Repository.User", null)
-                        .WithMany("Notes")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
                 {
                     b.HasOne("Repository.User", "Penalized")
@@ -574,6 +566,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Entities.Telegram", b =>
+                {
+                    b.HasOne("Repository.User", null)
+                        .WithMany("Notes")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>

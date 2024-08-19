@@ -116,7 +116,6 @@ namespace Repository
         public async Task<SnapshotShard> GetSnapshotAsync(ulong id)
         {
             Task<int> ups = storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.PostId == id && l.Type == SnapshotLink.SnapshotLinkType.RateUp).CountAsync());
-            Task<int> downs = storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.PostId == id && l.Type == SnapshotLink.SnapshotLinkType.RateDown).CountAsync());
 
             SnapshotShard snapshot = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Snapshots.

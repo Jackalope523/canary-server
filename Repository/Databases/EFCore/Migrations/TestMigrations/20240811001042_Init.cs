@@ -39,6 +39,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     NormalisedEmail = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Pseudonym = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     JoinDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Reputation = table.Column<int>(type: "INTEGER", nullable: false),
@@ -50,6 +51,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     AccountStatus = table.Column<int>(type: "INTEGER", nullable: false),
                     CurrentGathering = table.Column<ulong>(type: "INTEGER", nullable: true),
                     IsPendingDeletion = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TimeOfUserAgreement = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Extroversion = table.Column<int>(type: "INTEGER", nullable: false),
                     Athleticisme = table.Column<int>(type: "INTEGER", nullable: false),
                     Openness = table.Column<int>(type: "INTEGER", nullable: false),
@@ -57,6 +59,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Competitiveness = table.Column<int>(type: "INTEGER", nullable: false),
                     Industriousness = table.Column<int>(type: "INTEGER", nullable: false),
                     NightOwl = table.Column<int>(type: "INTEGER", nullable: false),
+                    Age = table.Column<int>(type: "INTEGER", nullable: false),
                     Haunt = table.Column<Point>(type: "POINT", nullable: false)
                         .Annotation("Sqlite:Srid", 4326),
                     HauntRadius = table.Column<double>(type: "REAL", nullable: false),
@@ -103,7 +106,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<ulong>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    HeroImageURL = table.Column<string>(type: "TEXT", maxLength: 2083, nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -125,7 +127,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Chaos = table.Column<int>(type: "INTEGER", nullable: false),
                     Competitiveness = table.Column<int>(type: "INTEGER", nullable: false),
                     Industriousness = table.Column<int>(type: "INTEGER", nullable: false),
-                    NightOwl = table.Column<int>(type: "INTEGER", nullable: false)
+                    NightOwl = table.Column<int>(type: "INTEGER", nullable: false),
+                    Age = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -136,30 +139,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Notes",
-                columns: table => new
-                {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    NotifierId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    RecipientId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Message = table.Column<string>(type: "TEXT", maxLength: 5000, nullable: false),
-                    Action = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notes_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -202,6 +181,30 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Telegrams",
+                columns: table => new
+                {
+                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    NotifierId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    RecipientId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    Message = table.Column<int>(type: "INTEGER", nullable: false),
+                    Action = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<ulong>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Telegrams", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Telegrams_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -297,9 +300,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .Annotation("Sqlite:Autoincrement", true),
                     OwnerId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    PhotoURL = table.Column<string>(type: "TEXT", maxLength: 2083, nullable: false),
-                    IsHidden = table.Column<bool>(type: "INTEGER", nullable: false)
+                    PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -417,11 +418,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "HostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notes_UserId",
-                table: "Notes",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Penalties_PenalizedId",
                 table: "Penalties",
                 column: "PenalizedId");
@@ -450,6 +446,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
             migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_UserId",
                 table: "Subscriptions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Telegrams_UserId",
+                table: "Telegrams",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -491,9 +492,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "GatheringReports");
 
             migrationBuilder.DropTable(
-                name: "Notes");
-
-            migrationBuilder.DropTable(
                 name: "Penalties");
 
             migrationBuilder.DropTable(
@@ -501,6 +499,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             migrationBuilder.DropTable(
                 name: "Subscriptions");
+
+            migrationBuilder.DropTable(
+                name: "Telegrams");
 
             migrationBuilder.DropTable(
                 name: "UserLinks");
