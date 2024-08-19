@@ -91,16 +91,16 @@ namespace Core
                     NotificationService = notificationService,
                 };
 
+                Terminal.CreateManagers();
+
                 return Terminal;
             }
         }
 
         protected CoreTerminal()
-        {
-            CreateManagers();
-        }
+        { }
 
-        private void CreateManagers()
+        protected void CreateManagers()
         {
             AccountDirector = new AccountDirector(this);
             BannerDirector = new BannerDirector(this);
