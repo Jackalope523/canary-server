@@ -55,8 +55,8 @@ namespace Core.Boundaries
         Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport,
             GatheringReportType reportType, string reportDetails);
 
-        Task<List<GatheringReport>> GetReportsForSnapshotAsync(ulong snapshotId);
-        Task ReportSnapshotAsync(ulong snapshotId, DateTimeOffset timeOfReport,
+        Task<List<SnapshotReport>> GetReportsForSnapshotAsync(ulong snapshotId);
+        Task ReportSnapshotAsync(ulong userId, ulong snapshotId, DateTimeOffset timeOfReport,
             SnapshotReportType reportType, string reportDetails);
     }
 

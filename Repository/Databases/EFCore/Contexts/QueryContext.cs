@@ -12,6 +12,7 @@ namespace Repository
         internal DbSet<SnapshotLink> SnapshotLinks { get; set; }
         internal DbSet<UserReport> UserReports { get; set; }
         internal DbSet<GatheringReport> GatheringReports { get; set; }
+        internal DbSet<SnapshotReport> SnapshotReports { get; set; }
         internal DbSet<Snapshot> Snapshots { get; set; }
         internal DbSet<Telegram> Telegrams { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
@@ -96,6 +97,10 @@ namespace Repository
 
             // Gathering Report
             modelBuilder.Entity<GatheringReport>().Property(r => r.Notes)
+              .HasMaxLength(2000);
+
+            // Gathering Report
+            modelBuilder.Entity<SnapshotReport>().Property(r => r.Notes)
               .HasMaxLength(2000);
 
             // Snapshot

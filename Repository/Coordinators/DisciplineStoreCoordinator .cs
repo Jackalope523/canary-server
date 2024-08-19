@@ -11,19 +11,9 @@ namespace Repository
             store = new EFCoreDisciplineStore(flag);
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsByUserAsync(ulong id)
-        {
-            return await store.GetReportsByUserAsync(id);
-        }
-
         public async Task<List<Core.Boundaries.GatheringReport>> GetReportsForGatheringAsync(ulong id)
         {
             return await store.GetReportsForGatheringAsync(id);
-        }
-
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsForUserAsync(ulong id)
-        {
-            return await store.GetReportsForUserAsync(id);
         }
 
         public async Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport, GatheringReportType reportType, string reportDetails)
@@ -49,6 +39,26 @@ namespace Repository
         public async Task<List<PenaltyShard>> GetPenaltiesForUserAsync(ulong userId)
         {
             return await store.GetPenaltiesForUserAsync(userId);
-        }     
+        }
+
+        public Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsForUserAsync(ulong userId)
+        {
+            return store.GetReportsForUserAsync(userId);
+        }
+
+        public Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsByUserAsync(ulong userId)
+        {
+            return store.GetReportsByUserAsync(userId);
+        }
+
+        public Task<List<Core.Boundaries.SnapshotReport>> GetReportsForSnapshotAsync(ulong snapshotId)
+        {
+            return store.GetReportsForSnapshotAsync(snapshotId);
+        }
+
+        public Task ReportSnapshotAsync(ulong userId, ulong snapshotId, DateTimeOffset timeOfReport, SnapshotReportType reportType, string reportDetails)
+        {
+            return store.ReportSnapshotAsync(userId, snapshotId, timeOfReport, reportType, reportDetails);
+        }
     }
 }

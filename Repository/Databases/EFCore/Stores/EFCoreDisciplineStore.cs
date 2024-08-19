@@ -10,7 +10,7 @@ namespace Repository
         {
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsByUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsByUserAsync(ulong id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             UserReports.
@@ -39,8 +39,22 @@ namespace Repository
                 r.Notes
             )).
             ToListAsync());
-         
-            return (await userReportsToReturn, await gatheringReportsToReturn);
+
+            Task<List<Core.Boundaries.SnapshotReport>> snapshotReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            SnapshotReports.
+            Where(r => r.UserId == id).
+            Select(r => new Core.Boundaries.SnapshotReport
+            (
+                r.Id,
+                r.UserId,
+                r.SnapshotId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
+
+            return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn);
         }
 
         public async Task<List<Core.Boundaries.GatheringReport>> GetReportsForGatheringAsync(ulong id)
@@ -60,7 +74,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>)> GetReportsForUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsForUserAsync(ulong id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => 
              ctx.UserReports.
@@ -96,7 +110,27 @@ namespace Repository
             )).
             ToListAsync());
 
-            return (await userReportsToReturn, await gatheringReportsToReturn);
+            List<ulong> snapshotsPosted = await storeSentry.ExecuteReadAsync(ctx =>
+               ctx.Snapshots.
+               Where(s => s.OwnerId == id).
+               Select(s => s.Id).
+               ToListAsync());
+
+            Task<List<Core.Boundaries.SnapshotReport>> snapshotReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            SnapshotReports.
+            Where(r => snapshotsPosted.Contains(r.SnapshotId)).
+            Select(r => new Core.Boundaries.SnapshotReport
+            (
+               r.Id,
+               r.UserId,
+               r.SnapshotId,
+               r.FilingDate,
+               r.Type,
+               r.Notes
+            )).
+            ToListAsync());
+
+            return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn);
         }
 
         public async Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport, GatheringReportType reportType, string reportDetails)
@@ -160,6 +194,37 @@ namespace Repository
             Where(p => p.PenalizedId == userId).
             Select(p => new PenaltyShard(p.Type, p.Time)).
             ToListAsync());
-        }     
+        }
+
+        public async Task<List<Core.Boundaries.SnapshotReport>> GetReportsForSnapshotAsync(ulong snapshotId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.
+            SnapshotReports.
+            Where(r => r.SnapshotId == snapshotId).
+            Select(r => new Core.Boundaries.SnapshotReport
+            (
+                r.Id,
+                r.UserId,
+                r.SnapshotId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
+        }
+
+        public async Task ReportSnapshotAsync(ulong userId, ulong snapshotId, DateTimeOffset timeOfReport, SnapshotReportType reportType, string reportDetails)
+        {
+            SnapshotReport toCreate = new()
+            {
+                UserId = userId,
+                SnapshotId = snapshotId,
+                Type = reportType,
+                FilingDate = timeOfReport,
+                Notes = reportDetails
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.SnapshotReports.Add(toCreate));
+        }
     }
 }
