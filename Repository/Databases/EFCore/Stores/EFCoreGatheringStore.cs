@@ -411,7 +411,7 @@ namespace Repository
 
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Gatherings.
-                Where(e => e.Location.Distance(currentLocation) <= distance && e.StartTime >= today && e.StartTime < inTwoWeeks && !e.EndTime.HasValue).
+                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.Open || e.State == GatheringState.Upcoming)).
                 Join(
                     ctx.Users, 
                     e => e.HostId, 
