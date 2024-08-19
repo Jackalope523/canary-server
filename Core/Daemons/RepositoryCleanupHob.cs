@@ -47,7 +47,7 @@ namespace Core.Daemons
         {
             log.LogInformation("Cleaning up repository.");
 
-            var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatherings();
+            var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatherings(DateTimeOffset.UtcNow);
 
             foreach (var gathering in waitingGatherings)
             {

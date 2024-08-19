@@ -1,7 +1,8 @@
 ﻿using Core.Boundaries;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Mathematics;
-
+using Serilog;
+using Serilog.Core;
 using System;
 
 namespace Repository
