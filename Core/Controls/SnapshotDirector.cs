@@ -41,8 +41,17 @@ namespace Core.Controls
             // Try to etch
             var snapshot = await Snapshots.AddSnapshotAsync(gathering.Id, user.Id, Time);
 
-            // Save image
-            await Terminal.MediaDirector.UploadSnapshotAsync(user.Id, snapshot.Id, image);
+            try
+            {
+                // Save image
+                await Terminal.MediaDirector.UploadSnapshotAsync(user.Id, snapshot.Id, image);
+            }
+            catch
+            {
+                // If failed, remove snapshot
+                await Snapshots.RemoveSnapshotAsync(snapshot.Id);
+                throw new UnexpectedFailureException("Image upload failed.");
+            }
 
             return snapshot;
         }
