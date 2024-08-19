@@ -9,9 +9,9 @@
             store = new EFCoreBannerStore(flag);
         }
 
-        public async Task AddUserToBannerAsync(ulong userId, ulong bannerId)
+        public async Task AddUserToBannerAsync(ulong userId, ulong bannerId, DateTimeOffset time)
         {
-            await store.AddUserToBannerAsync(userId, bannerId);
+            await store.AddUserToBannerAsync(userId, bannerId, time);
         }
 
         public async Task<BannerShard> CheckCode(string code)

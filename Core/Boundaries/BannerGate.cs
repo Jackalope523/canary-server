@@ -17,7 +17,7 @@ namespace Core.Boundaries
 		Task<BannerShard> CheckCode(string code);
 
         Task<BannerShard> GetUserBannerAsync(ulong userId);
-		Task AddUserToBannerAsync(ulong userId, ulong bannerId);
+		Task AddUserToBannerAsync(ulong userId, ulong bannerId, DateTimeOffset time);
     }
 
 	public interface IBannerOperations

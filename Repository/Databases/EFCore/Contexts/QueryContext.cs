@@ -113,6 +113,9 @@ namespace Repository
             modelBuilder.Entity<Banner>().Property(b => b.Description)
              .HasMaxLength(1000);
 
+            modelBuilder.Entity<Banner>().Property(b => b.Code)
+             .HasMaxLength(50);
+
             // Snapshot Link
             modelBuilder.Entity<SnapshotLink>()
                .HasIndex(l => new { l.UserId, l.PostId })
