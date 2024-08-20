@@ -46,9 +46,11 @@ namespace Core.Controls
 			// Remove gatherings from list that the user cannot access
 			var filteredGatherings = await RemoveInaccessibleGatheringsAsync(user, nearbyGatherings);
 
-			// Ensure user's own gatherings exist
-			var hostedGatherings = await Gatherings.FindGatheringsByUserAsync(user.Id);
-			filteredGatherings = EnsureExist(filteredGatherings, hostedGatherings);
+			// Ensure user's own and current gatherings show
+			var upcomingGatherings = await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id);
+			upcomingGatherings.Add(await Gatherings.FindCurrentGatheringForUserAsync(user.Id));
+
+			filteredGatherings = EnsureContains(filteredGatherings, upcomingGatherings);
 
 			return filteredGatherings;
 		}
@@ -62,9 +64,11 @@ namespace Core.Controls
 			// Remove inaccessible gatherings and gatherings with a large difference between gathering and user interest
 			var filteredGatherings = await RemoveUnattractiveGatheringsAsync(user, nearbyGatherings, 1f);
 
-            // Ensure user's own gatherings exist
-            var hostedGatherings = await Gatherings.FindGatheringsByUserAsync(user.Id);
-            filteredGatherings = EnsureExist(filteredGatherings, hostedGatherings);
+            // Ensure user's own and current gatherings show
+            var upcomingGatherings = await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id);
+            upcomingGatherings.Add(await Gatherings.FindCurrentGatheringForUserAsync(user.Id));
+
+            filteredGatherings = EnsureContains(filteredGatherings, upcomingGatherings);
 
             return filteredGatherings;
 		}
@@ -693,7 +697,7 @@ namespace Core.Controls
 		}
 
 		internal List<GatheringShard>
-			EnsureExist(List<GatheringShard> list, List<CoreGathering> ensured)
+			EnsureContains(List<GatheringShard> list, List<CoreGathering> ensured)
 		{
 			foreach (CoreGathering gathering in ensured)
 			{
