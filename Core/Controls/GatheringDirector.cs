@@ -431,8 +431,14 @@ namespace Core.Controls
 			else
 			{
 				// Try to add user to the gathering
-				await Gatherings.SetUserStateAsync(userId, gatheringId, GatheringBond.Guest, Time);
-			}
+				await Gatherings.SetUserStateAsync(user.Id, gatheringId, GatheringBond.Guest, Time);
+
+                // TEMP Remove
+				if (gathering.IsOngoing)
+				{
+                    await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
+				}
+            }
 
 			// Notify host if gathering has already started
 			if (HasAlready(gathering.StartTime))
