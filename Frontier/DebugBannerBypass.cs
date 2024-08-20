@@ -10,6 +10,11 @@ namespace Frontier
             return Task.CompletedTask;
         }
 
+        public Task AddUserToBannerAsync(ulong userId, ulong bannerId, DateTimeOffset time)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task<BannerShard> CheckCode(string code)
         {
             return Task.FromResult<BannerShard>(new(0, "", code));
