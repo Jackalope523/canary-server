@@ -13,7 +13,7 @@ namespace Core.Daemons
 	public class RepositoryCleanupService : BackgroundService
     {
         private readonly TimeSpan interval = TimeSpan.FromMinutes(5);
-        private readonly TimeSpan gatheringTimeout = QuarterHour;
+        private readonly TimeSpan gatheringTimeout = FifteenMinutes;
 
         private CoreTerminal terminal;
 

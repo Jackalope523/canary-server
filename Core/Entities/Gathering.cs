@@ -190,6 +190,9 @@ namespace Core.Entities
             // Verify Gathering is now or in the future
             if (HappenedBefore(StartTime, Time - MaximumEarlyBirdStart)) { issues += "Gathering is in the past. "; }
 
+            // If in the past, make it now
+            if (HappenedBefore(StartTime, Time)) { StartTime = Time; }
+
             // Verify Gathering is within a reasonable time
             if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }
 

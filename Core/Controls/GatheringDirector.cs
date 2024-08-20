@@ -81,8 +81,6 @@ namespace Core.Controls
 			MemoryStream heroImage)
 		{
 			var user = await GetUserAsync(userId);
-			// Verify user is already at an gathering
-			await ThrowIfUserAtGathering(user);
 
 			// Verify user can host
 			Try(user.CanHost,
@@ -116,7 +114,7 @@ namespace Core.Controls
 			if (conflict != null)
 			{ throw new InvalidGatheringException($"User has gathering {conflict.Id} conflict."); }
 
-			// Try to create an gathering
+			// Try to create a gathering
 			Gathering newGathering = new(await Gatherings.CreateGatheringAsync(user.Id, gatheringStub.Name, gatheringStub.Description,
 				gatheringStub.StartTime,
 				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
@@ -133,10 +131,27 @@ namespace Core.Controls
 				// If failed, remove gathering
 				await Gatherings.DeleteGatheringAsync(newGathering.Id);
 				throw new UnexpectedFailureException("Failed to upload hero image.");
+            }
+
+            // If now
+			if (IsWithin(Time - newGathering.StartTime, FiveMinutes))
+			{
+				// Ensure user removed from current gathering
+				if (await user.IsAtGathering())
+				{
+					await LeaveGatheringAsync(user.Id, (await user.CurrentGathering).Id);
+				}
+
+				// Try to start gathering
+				try
+				{
+					await StartGatheringAsync(user.Id, newGathering.Id);
+				}
+				catch { }
 			}
 
-			// Notify appreciateers of gathering
-			_ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
+            // Notify appreciateers of gathering
+            _ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
 
 			return newGathering.ToGatheringShard();
 		}

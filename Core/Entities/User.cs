@@ -372,8 +372,8 @@ namespace Core.Entities
 
         public async Task<bool> CanReport()
         {
-            var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - QuarterHour))
-                + (await GatheringReports).Count(report => After(report.ReportTime, Time - QuarterHour));
+            var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - FifteenMinutes))
+                + (await GatheringReports).Count(report => After(report.ReportTime, Time - FifteenMinutes));
 
             if (recentReportCount > 3)
             { return false; }
