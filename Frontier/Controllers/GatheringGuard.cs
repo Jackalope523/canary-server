@@ -250,6 +250,19 @@ namespace Frontier.Controllers
 			});
 		}
 
+		[HttpPost("{gatheringId}/snapshots/{snapshotId}/report")]
+		public async Task<IActionResult> ReportSnapshot(ulong gatheringId, ulong snapshotId, [FromBody] SnapshotReportManifest report)
+		{
+			// Verify parameters
+			if (report == null || !ModelState.IsValid)
+			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+
+			return await Execute(async user =>
+            {
+                await reports.ReportSnapshotAsync(user.Id, snapshotId, report.ReportType, report.ReportDetails);
+            });
+		}
+
 		#endregion
 	}
 }

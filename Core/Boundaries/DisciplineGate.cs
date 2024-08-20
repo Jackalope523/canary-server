@@ -67,6 +67,9 @@ namespace Core.Boundaries
 
         Task ReportGatheringAsync(ulong userId, ulong gatheringId,
             GatheringReportType reportType, string reportDetails);
+
+        Task ReportSnapshotAsync(ulong userId, ulong snapshotId,
+            SnapshotReportType reportType, string reportDetails);
     }
 
 	#endregion
