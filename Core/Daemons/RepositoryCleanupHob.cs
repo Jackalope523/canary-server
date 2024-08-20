@@ -13,7 +13,6 @@ namespace Core.Daemons
 	public class RepositoryCleanupService : BackgroundService
     {
         private readonly TimeSpan interval = TimeSpan.FromMinutes(5);
-        private readonly TimeSpan gatheringTimeout = FifteenMinutes;
 
         private CoreTerminal terminal;
 
@@ -51,7 +50,7 @@ namespace Core.Daemons
 
             foreach (var gathering in waitingGatherings)
             {
-                if (!IsWithin(gathering.StartTime - Time, gatheringTimeout))
+                if (!IsWithin(Time - gathering.StartTime, Gathering.MaximumEarlyBirdStart))
                 {
                     log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Name);
                     await terminal.GatheringDatabase.EndGatheringAsync(gathering.Id, Time);
