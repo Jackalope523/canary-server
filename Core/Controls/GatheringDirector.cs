@@ -47,10 +47,12 @@ namespace Core.Controls
 			var filteredGatherings = await RemoveInaccessibleGatheringsAsync(user, nearbyGatherings);
 
 			// Ensure user's own and current gatherings show
+			/*
 			var upcomingGatherings = await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id);
 			upcomingGatherings.Add(await Gatherings.FindCurrentGatheringForUserAsync(user.Id));
 
 			filteredGatherings = EnsureContains(filteredGatherings, upcomingGatherings);
+			*/
 
 			return filteredGatherings;
 		}
@@ -65,10 +67,12 @@ namespace Core.Controls
 			var filteredGatherings = await RemoveUnattractiveGatheringsAsync(user, nearbyGatherings, 1f);
 
             // Ensure user's own and current gatherings show
+			/*
             var upcomingGatherings = await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id);
             upcomingGatherings.Add(await Gatherings.FindCurrentGatheringForUserAsync(user.Id));
 
             filteredGatherings = EnsureContains(filteredGatherings, upcomingGatherings);
+			*/
 
             return filteredGatherings;
 		}
@@ -721,12 +725,12 @@ namespace Core.Controls
 			EnsureContains(List<GatheringShard> list, List<CoreGathering> ensured)
 		{
 			foreach (CoreGathering gathering in ensured)
-			{
-				// Has match
-				var pair = list.Find(g => g.Id.Equals(gathering.Id));
+            {
+                // Has match
+                var pair = list.Find(g => g.Id.Equals(gathering.Id));
 
-				// Add if null
-				if (pair == null)
+				// Add if not default
+				if (!pair.Equals(default))
 				{
 					Gathering gath = new(gathering);
 					list.Add(gath.ToGatheringShard());
