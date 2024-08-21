@@ -301,7 +301,7 @@ namespace Repository
             ctx.GatheringLinks.
             Where(l => l.UserId == id && l.Type == GatheringBond.Left).
             Join(
-               ctx.Gatherings.Where(e => e.State == GatheringState.Ended),
+               ctx.Gatherings,
                l => l.GatheringId,
                e => e.Id,
                (l, e) => new

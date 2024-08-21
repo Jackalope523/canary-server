@@ -83,7 +83,7 @@ namespace Core.Controls
                 newUser.Name, newUser.DateOfBirth, Time, CharacterVector.Default(newUser.GetAge()).ToCharacter());
 
             // Add user to banner
-            await Banners.AddUserToBannerAsync(user.Id, banner.Id);
+            await Banners.AddUserToBannerAsync(user.Id, banner.Id, DateTimeOffset.UtcNow);
         }
 
         public async Task EditUserAsync(ulong userId,
