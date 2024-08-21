@@ -411,7 +411,8 @@ namespace Core.Controls
 
             // Check if user is already guest or arrived
             if (previousUserState.HasValue &&
-				!previousUserState.Value.Equals(GatheringBond.Surveying))
+				(previousUserState.Value.Equals(GatheringBond.Guest) ||
+                previousUserState.Value.Equals(GatheringBond.Arrived)))
 			{
                 throw new InvalidUserException($"User already joined gathering.");
             }
