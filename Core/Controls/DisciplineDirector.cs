@@ -80,6 +80,29 @@ namespace Core.Controls
             }
         }
 
+        public async Task ReportSnapshotAsync(ulong userId, ulong snapshotId,
+            SnapshotReportType reportType, string reportDetails)
+        {
+            var user = await GetUserAsync(userId);
+            var targetSnapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+            User targetUser = new(targetSnapshot.User);
+
+            // Verify user can report
+            Try(await user.CanReport(),
+                new InvalidUserException("User has a cooldown to report."));
+
+            await Reports.ReportSnapshotAsync(user.Id, targetSnapshot.Id, Time, reportType, reportDetails);
+
+            // Compute user's standing
+            var status = await targetUser.Reported();
+
+            // Check if user should be punished
+            if (targetUser.AccountStatus != status)
+            {
+                _ = Accounts.UpdateUserAsync(targetUser.Id, new() { (nameof(CoreUser.AccountStatus), status) });
+            }
+        }
+
 		#endregion
 
 		#region Favours

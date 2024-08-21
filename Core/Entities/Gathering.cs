@@ -24,10 +24,10 @@ namespace Core.Entities
         public const int MaximumDescLength = 400;
         public const int MaximumLocationLength = 80;
 
-        public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
-        public readonly Distance ArrivalDistance = new() { Metres = 75 };
-        public readonly TimeSpan MaximumSnapshotLateness = OneDay;
-        public readonly TimeSpan MaximumEarlyBirdStart = new(0, 5, 0);
+        public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
+        public static readonly Distance ArrivalDistance = new() { Metres = 75 };
+        public static readonly TimeSpan MaximumSnapshotLateness = OneDay;
+        public static readonly TimeSpan MaximumEarlyBirdStart = new(0, 5, 0);
 
         public static Gathering None
             => new() { Id = 0, Exists = false };
@@ -189,6 +189,9 @@ namespace Core.Entities
 
             // Verify Gathering is now or in the future
             if (HappenedBefore(StartTime, Time - MaximumEarlyBirdStart)) { issues += "Gathering is in the past. "; }
+
+            // If in the past, make it now
+            if (HappenedBefore(StartTime, Time)) { StartTime = Time; }
 
             // Verify Gathering is within a reasonable time
             if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }

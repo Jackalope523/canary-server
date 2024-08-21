@@ -46,9 +46,13 @@ namespace Core.Controls
 			// Remove gatherings from list that the user cannot access
 			var filteredGatherings = await RemoveInaccessibleGatheringsAsync(user, nearbyGatherings);
 
-			// Ensure user's own gatherings exist
-			var hostedGatherings = await Gatherings.FindGatheringsByUserAsync(user.Id);
-			filteredGatherings = EnsureExist(filteredGatherings, hostedGatherings);
+			// Ensure user's own and current gatherings show
+			/*
+			var upcomingGatherings = await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id);
+			upcomingGatherings.Add(await Gatherings.FindCurrentGatheringForUserAsync(user.Id));
+
+			filteredGatherings = EnsureContains(filteredGatherings, upcomingGatherings);
+			*/
 
 			return filteredGatherings;
 		}
@@ -62,9 +66,13 @@ namespace Core.Controls
 			// Remove inaccessible gatherings and gatherings with a large difference between gathering and user interest
 			var filteredGatherings = await RemoveUnattractiveGatheringsAsync(user, nearbyGatherings, 1f);
 
-            // Ensure user's own gatherings exist
-            var hostedGatherings = await Gatherings.FindGatheringsByUserAsync(user.Id);
-            filteredGatherings = EnsureExist(filteredGatherings, hostedGatherings);
+            // Ensure user's own and current gatherings show
+			/*
+            var upcomingGatherings = await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id);
+            upcomingGatherings.Add(await Gatherings.FindCurrentGatheringForUserAsync(user.Id));
+
+            filteredGatherings = EnsureContains(filteredGatherings, upcomingGatherings);
+			*/
 
             return filteredGatherings;
 		}
@@ -77,8 +85,6 @@ namespace Core.Controls
 			MemoryStream heroImage)
 		{
 			var user = await GetUserAsync(userId);
-			// Verify user is already at an gathering
-			await ThrowIfUserAtGathering(user);
 
 			// Verify user can host
 			Try(user.CanHost,
@@ -112,7 +118,7 @@ namespace Core.Controls
 			if (conflict != null)
 			{ throw new InvalidGatheringException($"User has gathering {conflict.Id} conflict."); }
 
-			// Try to create an gathering
+			// Try to create a gathering
 			Gathering newGathering = new(await Gatherings.CreateGatheringAsync(user.Id, gatheringStub.Name, gatheringStub.Description,
 				gatheringStub.StartTime,
 				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
@@ -129,10 +135,27 @@ namespace Core.Controls
 				// If failed, remove gathering
 				await Gatherings.DeleteGatheringAsync(newGathering.Id);
 				throw new UnexpectedFailureException("Failed to upload hero image.");
+            }
+
+            // If now
+			if (IsWithin(Time - newGathering.StartTime, FiveMinutes))
+			{
+				// Ensure user removed from current gathering
+				if (await user.IsAtGathering())
+				{
+					await LeaveGatheringAsync(user.Id, (await user.CurrentGathering).Id);
+				}
+
+				// Try to start gathering
+				try
+				{
+					await StartGatheringAsync(user.Id, newGathering.Id);
+				}
+				catch { }
 			}
 
-			// Notify appreciateers of gathering
-			_ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
+            // Notify appreciateers of gathering
+            _ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
 
 			return newGathering.ToGatheringShard();
 		}
@@ -412,8 +435,14 @@ namespace Core.Controls
 			else
 			{
 				// Try to add user to the gathering
-				await Gatherings.SetUserStateAsync(userId, gatheringId, GatheringBond.Guest, Time);
-			}
+				await Gatherings.SetUserStateAsync(user.Id, gatheringId, GatheringBond.Guest, Time);
+
+                // TEMP Remove
+				if (gathering.IsOngoing)
+				{
+                    await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
+				}
+            }
 
 			// Notify host if gathering has already started
 			if (HasAlready(gathering.StartTime))
@@ -693,15 +722,15 @@ namespace Core.Controls
 		}
 
 		internal List<GatheringShard>
-			EnsureExist(List<GatheringShard> list, List<CoreGathering> ensured)
+			EnsureContains(List<GatheringShard> list, List<CoreGathering> ensured)
 		{
 			foreach (CoreGathering gathering in ensured)
-			{
-				// Has match
-				var pair = list.Find(g => g.Id.Equals(gathering.Id));
+            {
+                // Has match
+                var pair = list.Find(g => g.Id.Equals(gathering.Id));
 
-				// Add if null
-				if (pair == null)
+				// Add if not default
+				if (!pair.Equals(default))
 				{
 					Gathering gath = new(gathering);
 					list.Add(gath.ToGatheringShard());

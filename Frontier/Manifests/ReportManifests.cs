@@ -19,5 +19,13 @@ namespace Frontier.Manifests
 
         public string ReportDetails { get; set; }
     }
+
+    public class SnapshotReportManifest
+    {
+        [Required]
+        public SnapshotReportType ReportType { get; set; }
+
+        public string ReportDetails { get; set; }
+    }
 }
 

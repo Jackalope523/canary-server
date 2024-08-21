@@ -94,6 +94,7 @@ namespace Core.Entities
         private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports, List<SnapshotReport> SnapshotReports)> ReportsSync { get; }
         public Synced<List<UserReport>> Reports { get; }
         public Synced<List<GatheringReport>> GatheringReports { get; }
+        public Synced<List<SnapshotReport>> SnapshotReports { get; }
 
 
         #endregion
@@ -130,6 +131,7 @@ namespace Core.Entities
             ReportsSync = new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
             Reports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
             GatheringReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).GatheringReports);
+            SnapshotReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).SnapshotReports);
         }
 
         public User(CoreUser fromUser) : this()
@@ -372,8 +374,8 @@ namespace Core.Entities
 
         public async Task<bool> CanReport()
         {
-            var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - QuarterHour))
-                + (await GatheringReports).Count(report => After(report.ReportTime, Time - QuarterHour));
+            var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - FifteenMinutes))
+                + (await GatheringReports).Count(report => After(report.ReportTime, Time - FifteenMinutes));
 
             if (recentReportCount > 3)
             { return false; }

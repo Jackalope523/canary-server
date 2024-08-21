@@ -21,7 +21,7 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{latitude}-{longitude}-{distance}")]
+		[HttpGet("{latitude},{longitude},{distance}")]
         public async Task<IActionResult> GetGatherings(float latitude, float longitude, float distance)
         {
 			return await Execute(async user =>
@@ -31,7 +31,7 @@ namespace Frontier.Controllers
 			});
         }
 
-        [HttpGet("all/{latitude}-{longitude}-{distance}")]
+        [HttpGet("all/{latitude},{longitude},{distance}")]
         public async Task<IActionResult> GetAllGatherings(float latitude, float longitude, float distance)
         {
 			return await Execute(async user =>
@@ -41,7 +41,7 @@ namespace Frontier.Controllers
 			});
         }
 
-        [HttpPost("user/{latitude}-{longitude}")]
+        [HttpPost("user/{latitude},{longitude}")]
         public async Task<IActionResult> UpdateCurrentPosition(float latitude, float longitude)
         {
 			return await Execute(async user =>
