@@ -29,7 +29,7 @@ namespace Core.Controls
         public async Task<CoreUser> GetCoreUserAsync(string phoneNumber)
 		{
             // Verify phone number is valid
-            Try(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
+            PassIf(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
                 new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
 
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
@@ -68,7 +68,7 @@ namespace Core.Controls
             };
 
             // Validate and normalise user
-            Try(newUser.ValidateAndNormalise(out string issues),
+            PassIf(newUser.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
 
             // Verify phone number is not in use
@@ -105,7 +105,7 @@ namespace Core.Controls
             user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
-            Try(user.ValidateAndNormalise(out string issues),
+            PassIf(user.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
 
             List<(string Property, object Value)> edits = new();
@@ -275,7 +275,7 @@ namespace Core.Controls
             User user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
 
             // Check if user account is locked
-            Fail(user.IsLocked,
+            FailIf(user.IsLocked,
                 new InvalidUserException("User account is locked."));
 
             return user;
@@ -292,7 +292,7 @@ namespace Core.Controls
 			}
 			catch { }
 
-            Fail(numberTaken,
+            FailIf(numberTaken,
                 new InvalidUserException("Phone Number already registered."));
 		}
 
@@ -307,7 +307,7 @@ namespace Core.Controls
 			}
 			catch { }
 
-			Fail(emailTaken,
+			FailIf(emailTaken,
                 new InvalidUserException("Email already registered."));
         }
 

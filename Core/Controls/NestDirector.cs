@@ -27,7 +27,7 @@ namespace Core.Controls
             var targetUser = await GetUserAsync(targetId);
 
             // Fail if user is blocked
-            Fail(await user.IsBlockedBy(targetUser),
+            FailIf(await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User is unable to view target."));
 
             NestShard nest = new(new(), new());
@@ -148,10 +148,10 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
-            Fail(user.Equals(targetUser),
+            FailIf(user.Equals(targetUser),
                 new InvalidUserException("User cannot appreciate themself."));
 
-            Fail(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
+            FailIf(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User cannot appreciate blocked/blocking user."));
 
             await Nests.AppreciateUserAsync(userId, targetId, Psijic.Time);
@@ -169,7 +169,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
-			Fail(user.Equals(targetUser),
+			FailIf(user.Equals(targetUser),
 				new InvalidUserException("User cannot block themself."));
 
 			await Nests.BlockUserAsync(userId, targetId, Psijic.Time);

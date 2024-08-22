@@ -366,15 +366,15 @@ namespace Core.Entities
         public async Task Taken(User user)
         {
             // Verify snapshot is not before gathering starting or user is host
-            Try(HasAlready(StartTime) || IsModifiableBy(user),
+            PassIf(HasAlready(StartTime) || IsModifiableBy(user),
                 new InvalidGatheringException("Gathering has yet to start."));
 
             // Verify user can etch into the gathering
-            Try(await WasAttendedBy(user) || IsModifiableBy(user),
+            PassIf(await WasAttendedBy(user) || IsModifiableBy(user),
                 new InvalidGatheringException("User did not attend gathering."));
 
             // Verify snapshot is added before gathering is closed
-            Try(IsActive,
+            PassIf(IsActive,
                 new InvalidGatheringException("Gathering has already ended."));
 		}
 

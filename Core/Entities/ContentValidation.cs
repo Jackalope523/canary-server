@@ -95,7 +95,7 @@ namespace Core.Entities
 
 		public string CensorText(string text)
 		{
-			Fail(string.IsNullOrEmpty(text),
+			FailIf(string.IsNullOrEmpty(text),
 				new InvalidInformationException($"{nameof(text)} cannot be null or empty."));
 
 			string censoredText = text;

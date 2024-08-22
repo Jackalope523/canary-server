@@ -11,13 +11,13 @@ namespace Core.Entities
 	{
 		#region Skills
 
-		public static void Try<E>(bool success, E exception) where E : HollowException
+		public static void PassIf<E>(bool success, E exception) where E : HollowException
 		{
 			if (!success)
 			{ throw exception; }
 		}
 
-		public static void Fail<E>(bool failure, E exception) where E : HollowException
+		public static void FailIf<E>(bool failure, E exception) where E : HollowException
 		{
 			if (failure)
 			{ throw exception; }

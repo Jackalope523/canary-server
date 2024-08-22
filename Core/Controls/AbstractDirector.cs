@@ -56,11 +56,11 @@ namespace Core.Controls
             User user = new(await Accounts.FindUserByIdAsync(userId));
 			
 			// Fail if user account is locked
-			Fail(user.IsLocked,
+			FailIf(user.IsLocked,
 				new InvalidUserException("User account is locked."));
 
 			// Fail if user account is pending deletion
-			Fail(user.IsDeleted,
+			FailIf(user.IsDeleted,
 				new InvalidUserException("User account is deleted"));
 
             return user;

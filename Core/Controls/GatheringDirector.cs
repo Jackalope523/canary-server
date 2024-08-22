@@ -31,7 +31,7 @@ namespace Core.Controls
 			var targetGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is allowed to view gathering
-			Try(await targetGathering.IsVisibleTo(user),
+			PassIf(await targetGathering.IsVisibleTo(user),
 				new InvalidGatheringException("User is unable to view gathering."));
 
 			return targetGathering.ToGatheringShard();
@@ -87,12 +87,12 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 
 			// Verify user can host
-			Try(user.CanHost,
+			PassIf(user.CanHost,
 				new InvalidUserException("User cannot host.\n" +
 				$"Account Status: {user.AccountStatus}"));
 
 			// Verify user has position enabled
-			Try((await user.LastKnownLocation).Exists,
+			PassIf((await user.LastKnownLocation).Exists,
 				new InvalidUserException("User must have location enabled in order to host."));
 
 			// Create gathering
@@ -110,7 +110,7 @@ namespace Core.Controls
 			};
 
 			// Validate gathering
-			Try(gatheringStub.ValidateAndNormalise(out string issues),
+			PassIf(gatheringStub.ValidateAndNormalise(out string issues),
 				new InvalidInformationException($"Invalid gathering details provided. Issues: {issues}"));
 
 			// Verify user has no conflict
@@ -172,15 +172,15 @@ namespace Core.Controls
 			var targetGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is gathering host
-			Try(targetGathering.IsModifiableBy(user),
+			PassIf(targetGathering.IsModifiableBy(user),
 				new InvalidGatheringException("User is unable to edit gathering."));
 
 			// Verify gathering is still active
-			Try(targetGathering.IsActive,
+			PassIf(targetGathering.IsActive,
 				new InvalidGatheringException("Unable to edit gathering, gathering has ended."));
 
 			// Fail if edits may not be done during the gathering
-			Fail(HasAlready(targetGathering.StartTime) &&
+			FailIf(HasAlready(targetGathering.StartTime) &&
 				(!string.IsNullOrEmpty(gatheringDescription) ||
 				IsNotNull(startTime) ||
 				AreNotNull(latitude, longitude) ||
@@ -202,7 +202,7 @@ namespace Core.Controls
 			};
 
 			// Validate gathering
-			Try(editedGathering.ValidateAndNormalise(out string issues),
+			PassIf(editedGathering.ValidateAndNormalise(out string issues),
 				new InvalidInformationException($"Invalid gathering details provided. Issues: {issues}"));
 
 			List<(string Property, object Value)> edits = new();
@@ -264,7 +264,7 @@ namespace Core.Controls
 			_ = gathering.Host.LastKnownLocation.Sync();
 
 			// Verify user is host
-			Try(gathering.IsHostedBy(user),
+			PassIf(gathering.IsHostedBy(user),
 				new InvalidUserException("User is not the host of this gathering"));
 
 			/*
@@ -292,7 +292,7 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is able to end the gathering
-			Try(gathering.IsModifiableBy(user),
+			PassIf(gathering.IsModifiableBy(user),
 				new InvalidUserException("User does not have permissions to end gathering."));
 
 			// Try to end to gathering
@@ -310,11 +310,11 @@ namespace Core.Controls
             var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify gathering has not yet started
-			Fail(gathering.IsOngoing || gathering.IsEnded,
+			FailIf(gathering.IsOngoing || gathering.IsEnded,
 				new InvalidGatheringException("Gathering cannot be deleted once it has started."));
 
             // Verify user is able to delete the gathering
-            Try(gathering.IsModifiableBy(user),
+            PassIf(gathering.IsModifiableBy(user),
                 new InvalidUserException("User does not have permissions to delete gathering."));
 
 			// Try to end to delete gathering
@@ -332,10 +332,10 @@ namespace Core.Controls
 			var targetGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is allowed to view gathering
-			Try(await targetGathering.IsVisibleTo(user),
+			PassIf(await targetGathering.IsVisibleTo(user),
 				new InvalidGatheringException($"User is unable to survey gathering.\nAccount Status: {user.AccountStatus}"));
 
-			Fail(targetGathering.EndTime.HasValue,
+			FailIf(targetGathering.EndTime.HasValue,
 				new InvalidGatheringException("User is unable to survey gathering, gathering has ended."));
 
 			GatheringBond? userIntention = null;
@@ -347,7 +347,7 @@ namespace Core.Controls
 			catch { }
 
 			// Check that user was not kicked
-			Fail(userIntention.HasValue &&
+			FailIf(userIntention.HasValue &&
 				userIntention.Value.Equals(GatheringBond.Kicked),
 				new InvalidUserException($"Could not survey gathering, user was kicked."));
 
@@ -374,7 +374,7 @@ namespace Core.Controls
             catch { }
 
             // Check that user was not kicked
-            Fail(userIntention.HasValue &&
+            FailIf(userIntention.HasValue &&
                 userIntention.Value.Equals(GatheringBond.Kicked),
                 new InvalidUserException($"Cannot unsurvey gathering, user was kicked."));
 
@@ -396,7 +396,7 @@ namespace Core.Controls
 			_ = user.LastKnownLocation.Sync();
 
 			// Verify user is allowed to join gathering
-			Try(await gathering.IsJoinableBy(user),
+			PassIf(await gathering.IsJoinableBy(user),
 				new InvalidGatheringException($"User is unable to join gathering.\nAccount Status: {user.AccountStatus}"));
 
             GatheringBond? previousUserState = null;
@@ -408,7 +408,7 @@ namespace Core.Controls
             catch { }
 
             // Check that user was not kicked
-            Fail(previousUserState.HasValue &&
+            FailIf(previousUserState.HasValue &&
                 previousUserState.Value.Equals(GatheringBond.Kicked),
                 new InvalidUserException($"Could not join gathering, user was kicked."));
 
@@ -459,14 +459,14 @@ namespace Core.Controls
 			var targetGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is the host
-			Fail(targetGathering.IsHostedBy(user),
+			FailIf(targetGathering.IsHostedBy(user),
 				new InvalidUserException("Host cannot leave the gathering."));
 
             // Get the user's current status
             var userIntention = await Gatherings.GetUserStateAsync(userId, gatheringId);
 
             // Check that user was not kicked
-            Fail(userIntention.HasValue &&
+            FailIf(userIntention.HasValue &&
                 userIntention.Value.Equals(GatheringBond.Kicked),
                 new InvalidUserException($"Could not survey gathering, user was kicked."));
 
@@ -589,15 +589,15 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify inviter has relationship with gathering
-			Try(await gathering.HasUserRelationship(inviter),
+			PassIf(await gathering.HasUserRelationship(inviter),
 				new InvalidGatheringException("User must be surveying, a guest, or arrived at gathering to invite."));
 
 			// Verify that the invitee can join the gathering
-			Try(await gathering.IsJoinableBy(invitee),
+			PassIf(await gathering.IsJoinableBy(invitee),
 				new InvalidUserException("Invited cannot join gathering."));
 
 			// Verify that inviter is companions with the invitee
-			Try(await inviter.IsCompanionsWith(invitee),
+			PassIf(await inviter.IsCompanionsWith(invitee),
 				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
@@ -611,15 +611,15 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify kicking user is the host
-			Try(gathering.IsHostedBy(host),
+			PassIf(gathering.IsHostedBy(host),
 				new InvalidUserException("User cannot kick guests."));
 
 			// Verify gathering is active
-			Try(gathering.IsActive,
+			PassIf(gathering.IsActive,
 				new InvalidGatheringException("Cannot kick users after gathering has been archived."));
 
 			// Verify host is not kicking themself
-			Fail(host.Equals(targetUser),
+			FailIf(host.Equals(targetUser),
 				new InvalidUserException("Host cannot kick themself."));
 
 			// Kick target user from gathering
@@ -759,7 +759,7 @@ namespace Core.Controls
 
 		private async Task ThrowIfUserAtGathering(User user)
 		{
-			Fail(await user.IsAtGathering(),
+			FailIf(await user.IsAtGathering(),
 				new InvalidUserException($"{user.Name} is currently attending the gathering {(await user.CurrentGathering).Name}."));
 		}
 

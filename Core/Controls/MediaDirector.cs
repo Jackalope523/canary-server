@@ -27,7 +27,7 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 			User otherUser = new() { Id = otherId };
 
-			Fail(await user.IsBlockedBy(otherUser),
+			FailIf(await user.IsBlockedBy(otherUser),
 				new InvalidUserException("User cannot access this avatar."));
 
 			var stream = await Media.DownloadAvatarAsync(otherUser.Id);
@@ -40,7 +40,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
 
-            Try(await gathering.IsVisibleTo(user),
+            PassIf(await gathering.IsVisibleTo(user),
                 new InvalidUserException("User cannot view this gathering."));
 
             var stream = await Media.DownloadHeroAsync(gathering.Id);
@@ -55,7 +55,7 @@ namespace Core.Controls
             User snapshotOwner = new(snapshot.User);
             var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
-            Try(user.Taken(snapshot) ||
+            PassIf(user.Taken(snapshot) ||
                 await user.IsCompanionsWith(snapshotOwner) ||
                 await etchedGathering.WasAttendedBy(user),
                 new InvalidUserException("User cannot access this snapshot."));
