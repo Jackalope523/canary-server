@@ -363,6 +363,8 @@ namespace Core.Controls
 
 		public async Task UnsurveyGatheringAsync(ulong userId, ulong gatheringId)
 		{
+			var user = await GetUserAsync(userId);
+
             GatheringBond? userIntention = null;
 
             try
@@ -382,7 +384,7 @@ namespace Core.Controls
 			{
 				// Try to remove user from gathering
 				await Gatherings.RemoveUserAsync(userId, gatheringId);
-			}
+            }
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not unsurvey gathering, user currently {userIntention.Value} gathering."); }
 		}
@@ -476,8 +478,17 @@ namespace Core.Controls
 			}
 			else if (userIntention.Equals(GatheringBond.Guest))
 			{
-				// Try to remove user from gathering
-				await Gatherings.RemoveUserAsync(user.Id, targetGathering.Id);
+				// Check if user previously left gathering
+				if (await targetGathering.WasAttendedBy(user))
+				{
+					// TODO This should not create false data.
+					await Gatherings.SetUserStateAsync(user.Id, targetGathering.Id, GatheringBond.Left, Time);
+				}
+				else
+				{
+					// Try to remove user from gathering
+					await Gatherings.RemoveUserAsync(user.Id, targetGathering.Id);
+				}
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not leave gathering, user currently {userIntention.Value} gathering."); }
@@ -491,7 +502,8 @@ namespace Core.Controls
 
 			// Gather
 			var allGuests = SelectAsShard(await gathering.AllUsers,
-				user => user.State != GatheringBond.Surveying);
+				user => user.State != GatheringBond.Surveying &&
+						user.State != GatheringBond.None);
 
 			// Sort
 			allGuests.Sort((bond1, bond2) =>
