@@ -277,12 +277,6 @@ namespace Core.Controls
 			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
 			await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 
-			// TEMP Remove
-			foreach (var guest in await gathering.Guests)
-			{
-				await Gatherings.SetUserStateAsync(guest.Id, gathering.Id, GatheringBond.Arrived, Time);
-			}
-
 			await gathering.Started();
 		}
 
@@ -369,7 +363,7 @@ namespace Core.Controls
 
             try
             {
-                userIntention = await Gatherings.GetUserStateAsync(userId, gatheringId);
+                userIntention = await Gatherings.GetUserStateAsync(user.Id, gatheringId);
             }
             catch { }
 
@@ -383,7 +377,7 @@ namespace Core.Controls
 				userIntention.Value.Equals(GatheringBond.Surveying))
 			{
 				// Try to remove user from gathering
-				await Gatherings.RemoveUserAsync(userId, gatheringId);
+				await Gatherings.RemoveUserAsync(user.Id, gatheringId);
             }
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Could not unsurvey gathering, user currently {userIntention.Value} gathering."); }
@@ -440,12 +434,6 @@ namespace Core.Controls
 			{
 				// Try to add user to the gathering
 				await Gatherings.SetUserStateAsync(user.Id, gatheringId, GatheringBond.Guest, Time);
-
-                // TEMP Remove
-				if (gathering.IsOngoing)
-				{
-                    await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
-				}
             }
 
 			// Notify host if gathering has already started
