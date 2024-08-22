@@ -180,6 +180,9 @@ namespace Core.Controls
             user.LastKnownLocation.Set(new() { Latitude = latitude, Longitude = longitude });
             await user.HandleHaunt();
 
+            Log.LogWarning("Updating location for user {id} {name} to {latitude}, {longitude} at {time}",
+                user.Id, user.Name, latitude, longitude, Time);
+
             // Position update
             _ = Accounts.UpdateRecentLocationAsync(user.Id,
                 (await user.LastKnownLocation).Latitude,
@@ -198,23 +201,27 @@ namespace Core.Controls
             if (await userIsAtGathering)
             {
                 var currentGathering = await user.CurrentGathering;
+
                 // Check if user left the gathering radius
                 if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
                 {
                     // Check if user is a guest or the host
                     if (currentGathering.IsHostedBy(user))
                     {
-                        // End the gathering if user is the host
-                        await Terminal.GatheringDirector.EndGatheringAsync(user.Id, currentGathering.Id);
+                        Log.LogWarning("Host {name} left gathering {title} area, sealing...", user.Name, currentGathering.Name);
+                        // Seal the gathering if user is the host
+                        await Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Sealed)});
                     }
                     else
                     {
+                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Name);
                         // Leave the gathering if user is a guest
                         await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
                     }
                 }
+
                 // Check if user is the host
-                else if (currentGathering.IsHostedBy(user) && currentGathering.IsDynamic)
+                if (currentGathering.IsHostedBy(user) && currentGathering.IsDynamic)
                 {
                     // Update the position of the gathering
                     _ = Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
@@ -228,12 +235,14 @@ namespace Core.Controls
                 if (nextGathering.IsWaiting &&
                     nextGathering.IsHostedBy(user))
                 {
+                    Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Name);
                     await Terminal.GatheringDirector.StartGatheringAsync(user.Id, nextGathering.Id);
                 }
                 // Check if user is close enough to be arrived
                 else if (nextGathering.IsOngoing &&
                     await nextGathering.IsInRange(user))
                 {
+                    Log.LogWarning("Guest {name} entered gathering {title} area, marking as arrived...", user.Name, nextGathering.Name);
                     await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
                 }
             }
