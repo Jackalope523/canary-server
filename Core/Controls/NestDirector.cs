@@ -173,6 +173,21 @@ namespace Core.Controls
 				new InvalidUserException("User cannot block themself."));
 
 			await Nests.BlockUserAsync(userId, targetId, Psijic.Time);
+
+            // Ensure removal from upcoming hosted gatherings
+            foreach (var gathering in await user.UpcomingGatherings)
+            {
+                // Check if user is host
+                if (gathering.Host.Equals(user))
+                {
+                    try
+                    {
+                        // Blind-remove target
+                        await Gatherings.RemoveUserAsync(targetUser.Id, gathering.Id);
+                    }
+                    catch { }
+                }
+            }
         }
 
         public async Task UnblockUserAsync(ulong userId, ulong targetId)
