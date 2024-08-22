@@ -36,8 +36,7 @@ namespace Core.Controls
             if (user.Equals(targetUser))
             {
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingAgenda = await RequestAgenda(user);
-                //upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
+                var upcomingAgendaSync = RequestAgenda(user);
 
                 // Get private gatherings and snapshots
                 nest = nest with
@@ -45,7 +44,9 @@ namespace Core.Controls
                     Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
                 };
 
-                nest.Gatherings.AddRange(upcomingAgenda.Agenda.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
+                nest.Gatherings.AddRange((await upcomingAgendaSync).Agenda
+                    .Where(bond => !bond.Bond.Equals(GatheringBond.Surveying)).ToList()
+                    .ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
 
                 foreach (var shard in nest.Gatherings)
                 {
@@ -57,8 +58,8 @@ namespace Core.Controls
             else if (await targetUser.IsCompanionsWith(user))
             {
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingAgenda = await RequestAgenda(targetUser);
-                upcomingAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, upcomingAgenda);
+                var upcomingAgendaSync = RequestAgenda(targetUser);
+                var siftedAgendaSync = Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, await upcomingAgendaSync);
 
                 // Get private gatherings and snapshots
                 nest = nest with
@@ -66,7 +67,9 @@ namespace Core.Controls
                     Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
                 };
 
-                nest.Gatherings.AddRange(upcomingAgenda.Agenda.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
+                nest.Gatherings.AddRange((await siftedAgendaSync).Agenda
+                    .Where(bond => !bond.Bond.Equals(GatheringBond.Surveying)).ToList()
+                    .ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
 
                 nest = nest with
                 {
@@ -104,9 +107,6 @@ namespace Core.Controls
 
             // Gather active and upcoming gatherings
             var upcomingAgenda = await RequestAgenda(user);
-
-            // Remove active and upcoming gatherings if the user cannot view them
-            upcomingAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, upcomingAgenda);
 
             return upcomingAgenda;
         }

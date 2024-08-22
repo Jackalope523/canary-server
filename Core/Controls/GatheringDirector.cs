@@ -150,6 +150,7 @@ namespace Core.Controls
 				try
 				{
 					await StartGatheringAsync(user.Id, newGathering.Id);
+					newGathering = await GetGatheringAsync(newGathering.Id);
 				}
 				catch { }
 			}
