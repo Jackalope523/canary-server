@@ -31,8 +31,9 @@ namespace Repository
             SnapshotDatabaseAccess = new SnapshotStoreCoordinator(flag);
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
-            MediaDatabaseAccess = new MediaStoreCoordinator();
+            BannerDatabaseAccess = new BannerStoreCoordinator(flag);
             KeyDatabaseAccess = new KeyStoreCoordinator();
+            MediaDatabaseAccess = new MediaStoreCoordinator();
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
         }
 
