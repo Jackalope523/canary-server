@@ -502,8 +502,7 @@ namespace Core.Controls
 
 			// Gather
 			var allGuests = SelectAsShard(await gathering.AllUsers,
-				user => user.State != GatheringBond.Surveying &&
-						user.State != GatheringBond.None);
+				user => user.State != GatheringBond.Surveying);
 
 			// Sort
 			allGuests.Sort((bond1, bond2) =>

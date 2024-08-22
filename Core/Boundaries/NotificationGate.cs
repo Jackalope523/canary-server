@@ -16,7 +16,7 @@ namespace Core.Boundaries
     public enum DeviceType
     { iOS, Android }
 
-    public record TelegramShard(ulong NotifierId, DateTimeOffset Time,
+    public record TelegramShard(ulong Id, ulong NotifierId, DateTimeOffset Time,
 		TelegramMessage Message, string Context);
 
 	public record DeviceShard(DeviceType DeviceType, string DeviceToken);
@@ -26,10 +26,13 @@ namespace Core.Boundaries
     #region Gates
 
     public interface INotificationDatabase
-	{
-		Task<List<TelegramShard>> GetTelegramsAsync(ulong userId);
+    {
+        Task<List<TelegramShard>> GetAllTelegrams(TelegramMessage messageType);
+
+        Task<List<TelegramShard>> GetTelegramsAsync(ulong userId);
 		Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time,
 			TelegramMessage message, string context);
+		Task DeleteTelegramAsync(ulong telegramId);
 
 		Task<DeviceShard> GetUserSubscriptionAsync(ulong userId);
 		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);

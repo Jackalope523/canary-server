@@ -16,7 +16,7 @@ namespace Repository
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Telegrams.
             Where(n => n.RecipientId == userId).
-            Select(n => new TelegramShard(n.NotifierId, n.Time, n.Message, n.Action)).
+            Select(n => new TelegramShard(n.Id, n.NotifierId, n.Time, n.Message, n.Action)).
             ToListAsync());
         }
         public async Task<DeviceShard> GetUserSubscriptionAsync(ulong userId)

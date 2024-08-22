@@ -115,12 +115,14 @@ namespace Core
 
         #endregion
 
-        #region
+        #region Daemons
 
-        public RepositoryCleanupService CreateRepositoryCleanupService()
-        {
-            return new(this);
-        }
+        public RepositoryCleanupGoblin CreateRepositoryCleanupService()
+         => new(this);
+
+
+        public TelegramCleanupGoblin CreateTelegramCleanupService()
+         => new(this);
 
         #endregion
     }

@@ -137,6 +137,7 @@ namespace Frontier
             ////////////
 
             services.AddHostedService(services => terminal.CreateRepositoryCleanupService());
+            services.AddHostedService(services => terminal.CreateTelegramCleanupService());
 
             /////////
             // Authentication Schema 

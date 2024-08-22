@@ -11,6 +11,11 @@ namespace Repository
             store = new EFCoreNotificationStore(flag);
         }
 
+        public async Task<List<TelegramShard>> GetAllTelegrams(TelegramMessage messageType)
+        {
+            return await store.GetAllTelegrams(messageType);
+        }
+
         public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
         {
             return await store.GetTelegramsAsync(userId);
@@ -24,6 +29,11 @@ namespace Repository
         public async Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, TelegramMessage message, string context)
         {
            await store.SaveTelegramAsync(recipientId, notifierId, time, message, context);
+        }
+
+        public async Task DeleteTelegramAsync(ulong telegramId)
+        {
+           await store.DeleteTelegramAsync(telegramId);
         }
 
         public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)

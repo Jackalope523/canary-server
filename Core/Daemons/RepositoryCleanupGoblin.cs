@@ -3,14 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Entities;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
 
 namespace Core.Daemons
 {
-	public class RepositoryCleanupService : BackgroundService
+	public class RepositoryCleanupGoblin : BackgroundService
     {
         private readonly TimeSpan interval = TimeSpan.FromMinutes(5);
 
@@ -18,7 +16,7 @@ namespace Core.Daemons
 
         private ILogger log;
 
-        public RepositoryCleanupService(CoreTerminal coreTerminal)
+        public RepositoryCleanupGoblin(CoreTerminal coreTerminal)
         {
             terminal = coreTerminal;
 
@@ -31,11 +29,13 @@ namespace Core.Daemons
             {
                 try
                 {
+                    log.LogInformation("Gravekeeper goblin clocking in at {time}.", Time);
                     await KillZombieGatheringsAsync(stoppingToken);
+                    log.LogInformation("Gravekeeper goblin clocking out at {time}.", Time);
                 }
                 catch (Exception e)
                 {
-                    log.LogError("Hob had trouble: {error}", e);
+                    log.LogError("{goblin} had trouble: {error}", nameof(RepositoryCleanupGoblin), e);
                 }
 
                 await Task.Delay(interval, stoppingToken);
@@ -44,16 +44,19 @@ namespace Core.Daemons
 
         private async Task KillZombieGatheringsAsync(CancellationToken stoppingToken)
         {
-            log.LogInformation("Cleaning up repository.");
-
             var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatherings(DateTimeOffset.UtcNow);
 
             foreach (var gathering in waitingGatherings)
             {
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 if (!IsWithin(Time - gathering.StartTime, Gathering.MaximumEarlyBirdStart))
                 {
                     log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Name);
-                    await terminal.GatheringDatabase.EndGatheringAsync(gathering.Id, Time);
+                    await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);
                 }
             }
         }
