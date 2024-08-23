@@ -11,6 +11,20 @@ namespace Repository
         {
         }
 
+        public async Task DeleteTelegramAsync(ulong telegramId)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Telegrams.Remove(new Telegram { Id = telegramId }));
+        }
+
+        public async Task<List<TelegramShard>> GetAllTelegrams(TelegramMessage messageType)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Telegrams.
+            Where(n => n.Message == messageType).
+            Select(n => new TelegramShard(n.Id, n.NotifierId, n.Time, n.Message, n.Action)).
+            ToListAsync());
+        }
+
         public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
