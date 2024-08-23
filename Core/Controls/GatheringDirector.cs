@@ -149,6 +149,7 @@ namespace Core.Controls
 				// Try to start gathering
 				try
 				{
+					await Gatherings.UpdateGatheringAsync(newGathering.Id, new() { (nameof(CoreGathering.StartTime), Time) });
 					await StartGatheringAsync(user.Id, newGathering.Id);
 					newGathering = await GetGatheringAsync(newGathering.Id);
 				}
@@ -274,7 +275,7 @@ namespace Core.Controls
 			*/
 
 			// Try to start gathering
-			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
+			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open), (nameof(CoreGathering.StartTime), Time) });
 			await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 
 			await gathering.Started();

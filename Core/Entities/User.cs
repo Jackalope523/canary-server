@@ -249,7 +249,9 @@ namespace Core.Entities
 
         public async Task<Gathering> NextGathering()
         {
-            return (await UpcomingGatherings).Count != 0 ? (await UpcomingGatherings)[0] : Gathering.None;
+            var upcoming = await UpcomingGatherings;
+            upcoming.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+            return upcoming.Count != 0 ? upcoming.First() : Gathering.None;
         }
 
 		#endregion

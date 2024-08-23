@@ -27,7 +27,7 @@ namespace Core.Entities
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
         public static readonly TimeSpan MaximumSnapshotLateness = OneDay;
-        public static readonly TimeSpan MaximumEarlyBirdStart = new(0, 5, 0);
+        public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(5);
 
         public static Gathering None
             => new() { Id = 0, Exists = false };

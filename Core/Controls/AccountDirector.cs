@@ -201,10 +201,12 @@ namespace Core.Controls
             if (await userIsAtGathering)
             {
                 var currentGathering = await user.CurrentGathering;
+                Log.LogWarning("User {name} at gathering {title}.", user.Name, currentGathering.Name);
 
                 // Check if user left the gathering radius
                 if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
                 {
+                    Log.LogWarning("User {name} out of gathering {title} range.", user.Name, currentGathering.Name);
                     // Check if user is a guest or the host
                     if (currentGathering.IsHostedBy(user))
                     {
@@ -231,6 +233,9 @@ namespace Core.Controls
             else if (!await userIsAtGathering &&
                 !nextGathering.Equals(Gathering.None))
             {
+                Log.LogWarning("User {name} on way to gathering {title} ", user.Name, nextGathering.Name);
+                Log.LogWarning("Waiting? {waiting}\nHosted? {hosted}", nextGathering.IsWaiting, nextGathering.IsHostedBy(user));
+
                 // Check if user is host and can start gathering
                 if (nextGathering.IsWaiting &&
                     nextGathering.IsHostedBy(user))
