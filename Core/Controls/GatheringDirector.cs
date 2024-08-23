@@ -268,11 +268,9 @@ namespace Core.Controls
 			PassIf(gathering.IsHostedBy(user),
 				new InvalidUserException("User is not the host of this gathering"));
 
-			/*
 			// Verify gathering can be started
-			Try(await targetGathering.IsStartable(),
+			PassIf(await gathering.IsStartable(),
 				new InvalidGatheringException("Gathering cannot be started."));
-			*/
 
 			// Try to start gathering
 			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open), (nameof(CoreGathering.StartTime), Time) });
@@ -290,8 +288,12 @@ namespace Core.Controls
 			PassIf(gathering.IsModifiableBy(user),
 				new InvalidUserException("User does not have permissions to end gathering."));
 
-			// Try to end to gathering
-			await Gatherings.EndGatheringAsync(gathering.Id, Time);
+			// Verify gathering is able to be terminated
+            FailIf(gathering.IsTerminable(),
+                new InvalidGatheringException("Gathering cannot be terminated."));
+
+            // Try to end gathering
+            await Gatherings.EndGatheringAsync(gathering.Id, Time);
 
 			var participants = await gathering.Ended();
 
@@ -305,14 +307,14 @@ namespace Core.Controls
             var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify gathering has not yet started
-			FailIf(gathering.IsOngoing || gathering.IsTerminated,
+			PassIf(gathering.IsDeletable(),
 				new InvalidGatheringException("Gathering cannot be deleted once it has started."));
 
             // Verify user is able to delete the gathering
             PassIf(gathering.IsModifiableBy(user),
                 new InvalidUserException("User does not have permissions to delete gathering."));
 
-			// Try to end to delete gathering
+			// Try to delete gathering
 			await Gatherings.DeleteGatheringAsync(gathering.Id);
 
 			// Delete hero

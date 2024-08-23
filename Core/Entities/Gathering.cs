@@ -340,6 +340,24 @@ namespace Core.Entities
             return true;
         }
 
+        public bool IsTerminable()
+        {
+            // Ensure gathering is ongoing
+            if (!IsOngoing)
+            { return false; }
+
+            return true;
+        }
+
+        public bool IsDeletable()
+        {
+            // Ensure gathering has not already occurred
+            if (IsOngoing || IsTerminated)
+            { return false; }
+
+            return true;
+        }
+
 		#endregion
 
 		#region Effects
