@@ -27,7 +27,8 @@ namespace Core.Entities
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
         public static readonly TimeSpan MaximumSnapshotLateness = OneDay;
-        public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(15);
+        public static readonly TimeSpan MaximumAutoStart = TimeSpan.FromMinutes(5);
 
         public static Gathering None
             => new() { Id = 0, Exists = false };
@@ -57,6 +58,9 @@ namespace Core.Entities
         public bool IsWaiting
             => State.Equals(GatheringState.Upcoming) &&
                 HasAlready(StartTime - MaximumEarlyBirdStart);
+        public bool IsWaitingAuto
+            => State.Equals(GatheringState.Upcoming) &&
+                HasAlready(StartTime - MaximumAutoStart);
         public bool IsOpen
             => State.Equals(GatheringState.Upcoming) ||
                 State.Equals(GatheringState.Open);
@@ -66,7 +70,7 @@ namespace Core.Entities
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumSnapshotLateness);
-        public bool IsEnded
+        public bool IsTerminated
             => EndTime.HasValue;
 
         public bool Exists { get; set; } = true;

@@ -305,7 +305,7 @@ namespace Core.Controls
             var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify gathering has not yet started
-			FailIf(gathering.IsOngoing || gathering.IsEnded,
+			FailIf(gathering.IsOngoing || gathering.IsTerminated,
 				new InvalidGatheringException("Gathering cannot be deleted once it has started."));
 
             // Verify user is able to delete the gathering

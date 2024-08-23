@@ -237,7 +237,7 @@ namespace Core.Controls
                 Log.LogWarning("Waiting? {waiting}\nHosted? {hosted}", nextGathering.IsWaiting, nextGathering.IsHostedBy(user));
 
                 // Check if user is host and can start gathering
-                if (nextGathering.IsWaiting &&
+                if (nextGathering.IsWaitingAuto &&
                     nextGathering.IsHostedBy(user))
                 {
                     Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Name);
