@@ -11,7 +11,7 @@ namespace Core.Entities
 	{
 		#region Skills
 
-		public static void ContinueIf<E>(bool success, E exception) where E : HollowException
+		public static void Verify<E>(bool success, E exception) where E : HollowException
 		{
 			if (!success)
 			{ throw exception; }

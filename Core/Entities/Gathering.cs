@@ -253,7 +253,7 @@ namespace Core.Entities
 			{
 				// User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!user.CanAttendCompanions || !await Host.IsCompanionsWith(user))
+				if (!(user.CanAttendCompanions && await Host.IsCompanionsWith(user)))
 				{ return false; }
 			}
 
@@ -309,7 +309,7 @@ namespace Core.Entities
         public async Task<bool> HasUserRelationship(User user)
         {
             // Check if user has interacted with gathering
-            return IsHostedBy(user) || (await AllUsers).FindAll(x => x.User.Id == user.Id).Count == 1;
+            return IsHostedBy(user) || (await AllUsers).Exists(x => x.User.Id == user.Id);
         }
 
         public async Task<bool> HasOnGuestList(User user)
@@ -388,15 +388,15 @@ namespace Core.Entities
         public async Task Taken(User user)
         {
             // Verify snapshot is not before gathering starting or user is host
-            ContinueIf(HasAlready(StartTime) || IsModifiableBy(user),
+            Verify(HasAlready(StartTime) || IsModifiableBy(user),
                 new InvalidGatheringException("Gathering has yet to start."));
 
             // Verify user can etch into the gathering
-            ContinueIf(await WasAttendedBy(user) || IsModifiableBy(user),
+            Verify(await WasAttendedBy(user) || IsModifiableBy(user),
                 new InvalidGatheringException("User did not attend gathering."));
 
             // Verify snapshot is added before gathering is closed
-            ContinueIf(IsActive,
+            Verify(IsActive,
                 new InvalidGatheringException("Gathering has already ended."));
 		}
 

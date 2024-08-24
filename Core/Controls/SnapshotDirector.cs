@@ -64,7 +64,7 @@ namespace Core.Controls
             var user = await userSync;
 
             // Verify user owns the snapshot or can modify the gathering
-            ContinueIf(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
+            Verify(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove snapshot."));
 
             await Snapshots.DeleteSnapshotAsync(snapshot.Id);
@@ -78,7 +78,7 @@ namespace Core.Controls
             var user = await userSync;
 
             // Verify user can interact with snapshot
-            ContinueIf(await gatheringTaken.WasAttendedBy(user),
+            Verify(await gatheringTaken.WasAttendedBy(user),
                 new InvalidUserException("User cannot interact with snapshot."));
 
             FailIf(user.Taken(snapshot),

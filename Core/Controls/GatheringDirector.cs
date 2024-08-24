@@ -31,7 +31,7 @@ namespace Core.Controls
 			var targetGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is allowed to view gathering
-			ContinueIf(await targetGathering.IsVisibleTo(user),
+			Verify(await targetGathering.IsVisibleTo(user),
 				new InvalidGatheringException("User is unable to view gathering."));
 
 			return targetGathering.ToGatheringShard();
@@ -87,12 +87,12 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 
 			// Verify user can host
-			ContinueIf(user.CanHost,
+			Verify(user.CanHost,
 				new InvalidUserException("User cannot host.\n" +
 				$"Account Status: {user.AccountStatus}"));
 
 			// Verify user has position enabled
-			ContinueIf((await user.LastKnownLocation).Exists,
+			Verify((await user.LastKnownLocation).Exists,
 				new InvalidUserException("User must have location enabled in order to host."));
 
 			// Create gathering
@@ -110,7 +110,7 @@ namespace Core.Controls
 			};
 
 			// Validate gathering
-			ContinueIf(gatheringStub.ValidateAndNormalise(out string issues),
+			Verify(gatheringStub.ValidateAndNormalise(out string issues),
 				new InvalidInformationException($"Invalid gathering details provided. Issues: {issues}"));
 
 			// Verify user has no conflict
@@ -173,11 +173,11 @@ namespace Core.Controls
 			var targetGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is gathering host
-			ContinueIf(targetGathering.IsModifiableBy(user),
+			Verify(targetGathering.IsModifiableBy(user),
 				new InvalidGatheringException("User is unable to edit gathering."));
 
 			// Verify gathering is still active
-			ContinueIf(targetGathering.IsActive,
+			Verify(targetGathering.IsActive,
 				new InvalidGatheringException("Unable to edit gathering, gathering has ended."));
 
 			// Fail if edits may not be done during the gathering
@@ -203,7 +203,7 @@ namespace Core.Controls
 			};
 
 			// Validate gathering
-			ContinueIf(editedGathering.ValidateAndNormalise(out string issues),
+			Verify(editedGathering.ValidateAndNormalise(out string issues),
 				new InvalidInformationException($"Invalid gathering details provided. Issues: {issues}"));
 
 			List<(string Property, object Value)> edits = new();
@@ -265,11 +265,11 @@ namespace Core.Controls
 			_ = gathering.Host.LastKnownLocation.Sync();
 
 			// Verify user is host
-			ContinueIf(gathering.IsHostedBy(user),
+			Verify(gathering.IsHostedBy(user),
 				new InvalidUserException("User is not the host of this gathering"));
 
 			// Verify gathering can be started
-			ContinueIf(await gathering.IsStartable(),
+			Verify(await gathering.IsStartable(),
 				new InvalidGatheringException("Gathering cannot be started."));
 
 			// Try to start gathering
@@ -285,7 +285,7 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is able to end the gathering
-			ContinueIf(gathering.IsModifiableBy(user),
+			Verify(gathering.IsModifiableBy(user),
 				new InvalidUserException("User does not have permissions to end gathering."));
 
 			// Verify gathering is able to be terminated
@@ -307,11 +307,11 @@ namespace Core.Controls
             var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify gathering has not yet started
-			ContinueIf(gathering.IsDeletable(),
+			Verify(gathering.IsDeletable(),
 				new InvalidGatheringException("Gathering cannot be deleted once it has started."));
 
             // Verify user is able to delete the gathering
-            ContinueIf(gathering.IsModifiableBy(user),
+            Verify(gathering.IsModifiableBy(user),
                 new InvalidUserException("User does not have permissions to delete gathering."));
 
 			// Try to delete gathering
@@ -329,7 +329,7 @@ namespace Core.Controls
 			var targetGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is allowed to view gathering
-			ContinueIf(await targetGathering.IsVisibleTo(user),
+			Verify(await targetGathering.IsVisibleTo(user),
 				new InvalidGatheringException($"User is unable to watch gathering.\nAccount Status: {user.AccountStatus}"));
 
 			FailIf(targetGathering.EndTime.HasValue,
@@ -393,7 +393,7 @@ namespace Core.Controls
 			_ = user.LastKnownLocation.Sync();
 
 			// Verify user is allowed to join gathering
-			ContinueIf(await gathering.IsJoinableBy(user),
+			Verify(await gathering.IsJoinableBy(user),
 				new InvalidGatheringException($"User is unable to join gathering.\nAccount Status: {user.AccountStatus}"));
 
             GatheringBond? previousUserState = null;
@@ -580,15 +580,15 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify inviter has relationship with gathering
-			ContinueIf(await gathering.HasUserRelationship(inviter),
+			Verify(await gathering.HasUserRelationship(inviter),
 				new InvalidGatheringException("User must be surveying, a guest, or arrived at gathering to invite."));
 
 			// Verify that the invitee can join the gathering
-			ContinueIf(await gathering.IsJoinableBy(invitee),
+			Verify(await gathering.IsJoinableBy(invitee),
 				new InvalidUserException("Invited cannot join gathering."));
 
 			// Verify that inviter is companions with the invitee
-			ContinueIf(await inviter.IsCompanionsWith(invitee),
+			Verify(await inviter.IsCompanionsWith(invitee),
 				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
@@ -602,11 +602,11 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify kicking user is the host
-			ContinueIf(gathering.IsHostedBy(host),
+			Verify(gathering.IsHostedBy(host),
 				new InvalidUserException("User cannot kick guests."));
 
 			// Verify gathering is active
-			ContinueIf(gathering.IsActive,
+			Verify(gathering.IsActive,
 				new InvalidGatheringException("Cannot kick users after gathering has been archived."));
 
 			// Verify host is not kicking themself

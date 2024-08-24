@@ -323,7 +323,7 @@ namespace Core.Entities
 			{
                 // User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!CanAttendCompanions || !await IsCompanionsWith(gathering.Host))
+				if (!(CanAttendCompanions && await IsCompanionsWith(gathering.Host)))
 				{ return false; }
 			}
 
@@ -344,6 +344,10 @@ namespace Core.Entities
 			if (!await CanView(gathering))
 			{ return false; }
 
+            // Check if user is kicked from gathering
+            if ((await gathering.Kicked).Contains(this))
+            { return false; }
+
             /*
 			// Check if user or user's haunt is within a reasonable distance
 			if (!GeoLocation.AreInRange(await LastKnownLocation, gathering.Location, gathering.MaximumJoinDistance) &&
@@ -351,21 +355,21 @@ namespace Core.Entities
 			{ return false; }
             */
 
-			return true;
+            return true;
 		}
 
         public async Task CanEtch(Gathering gathering)
 		{
 			// Verify snapshot is not before gathering starting or user is host
-			ContinueIf(HasAlready(gathering.StartTime) || gathering.IsModifiableBy(this),
+			Verify(HasAlready(gathering.StartTime) || gathering.IsModifiableBy(this),
 				new InvalidGatheringException("Gathering has yet to start."));
 
 			// Verify user can etch into the gathering
-			ContinueIf(await gathering.WasAttendedBy(this) || gathering.IsModifiableBy(this),
+			Verify(await gathering.WasAttendedBy(this) || gathering.IsModifiableBy(this),
 				new InvalidGatheringException("User did not attend gathering."));
 
 			// Verify snapshot is added before gathering is closed
-			ContinueIf(gathering.IsActive,
+			Verify(gathering.IsActive,
 				new InvalidGatheringException("Gathering has already ended."));
 		}
 
