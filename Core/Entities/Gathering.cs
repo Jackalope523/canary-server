@@ -99,7 +99,7 @@ namespace Core.Entities
         public Gathering()
         {
             AllUsers = new(() => Terminal.GatheringDirector.RequestAllUsersFromGatheringAsync(this));
-            Surveying = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Surveying)).ConvertAll(user => user.User));
+            Surveying = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Watching)).ConvertAll(user => user.User));
             Guests = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Guest)).ConvertAll(user => user.User));
             Arrived = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Arrived)).ConvertAll(user => user.User));
             Left = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Left)).ConvertAll(user => user.User));
@@ -388,15 +388,15 @@ namespace Core.Entities
         public async Task Taken(User user)
         {
             // Verify snapshot is not before gathering starting or user is host
-            PassIf(HasAlready(StartTime) || IsModifiableBy(user),
+            ContinueIf(HasAlready(StartTime) || IsModifiableBy(user),
                 new InvalidGatheringException("Gathering has yet to start."));
 
             // Verify user can etch into the gathering
-            PassIf(await WasAttendedBy(user) || IsModifiableBy(user),
+            ContinueIf(await WasAttendedBy(user) || IsModifiableBy(user),
                 new InvalidGatheringException("User did not attend gathering."));
 
             // Verify snapshot is added before gathering is closed
-            PassIf(IsActive,
+            ContinueIf(IsActive,
                 new InvalidGatheringException("Gathering has already ended."));
 		}
 

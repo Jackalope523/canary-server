@@ -20,7 +20,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.BannerLinks.Add(toAdd));
         }
 
-        public async Task<BannerShard> CheckCode(string code)
+        public async Task<BannerShard> FindBannerByCodeAsync(string code)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Banners
@@ -29,7 +29,7 @@ namespace Repository
                 .SingleAsync());
         }
 
-        public async Task<BannerShard> GetUserBannerAsync(ulong userId)
+        public async Task<BannerShard> FindBannerForUserAsync(ulong userId)
         {
             ulong bannerId = await storeSentry.ExecuteReadAsync(ctx => 
                                 ctx.BannerLinks

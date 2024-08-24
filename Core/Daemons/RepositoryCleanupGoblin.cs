@@ -44,7 +44,7 @@ namespace Core.Daemons
 
         private async Task KillZombieGatheringsAsync(CancellationToken stoppingToken)
         {
-            var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatherings(DateTimeOffset.UtcNow);
+            var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatheringsAsync(DateTimeOffset.UtcNow);
 
             foreach (var gathering in waitingGatherings)
             {

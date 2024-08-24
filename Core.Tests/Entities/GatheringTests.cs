@@ -264,7 +264,7 @@ namespace Core.Tests.Entities
 			var surveyingUser = await environment.GenerateUniqueUserAsync();
 
 			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(gathering, surveyingUser, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(gathering, surveyingUser, GatheringBond.Watching);
 
 			// Act
 			var result = await gathering.HasUserRelationship(surveyingUser);

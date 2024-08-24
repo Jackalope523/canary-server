@@ -49,7 +49,7 @@ namespace Repository.Tests
                 testGathering.FriendlyLocation,
                 testGathering.GroupMinimum,
                 testGathering.GroupMaximum,
-                new Character(
+                new CharacterShard(
                     testGathering.Age,
                     testGathering.Extroversion,
                     testGathering.Athleticisme,
@@ -399,7 +399,7 @@ namespace Repository.Tests
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
-            await store.RemoveUserAsync(testUser.Id, testGathering.Id);
+            await store.DeleteUserStateAsync(testUser.Id, testGathering.Id);
 
             int count = await sentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.CountAsync());
 
@@ -460,7 +460,7 @@ namespace Repository.Tests
                 Where(u => u.Id == testUser.Id).
                 ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentGathering, testGathering.Id)));
 
-            await store.EndGatheringAsync(testGathering.Id, time);
+            await store.TerminateGatheringAsync(testGathering.Id, time);
 
             List<GatheringLink> links = await sentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.
@@ -534,14 +534,14 @@ namespace Repository.Tests
         [Fact]
         public async Task GetAllUsersAsync_SUCCESS()
         {
-            GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Surveying, DateTimeOffset.MinValue);
+            GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Watching, DateTimeOffset.MinValue);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
             (UserShard User, GatheringBond State) = (await store.GetAllUsersAsync(testGathering.Id)).Single();
 
             Assert.Equal(testUser.Id, User.Id);
             Assert.Equal(testUser.Name, User.Name);
-            Assert.Equal(GatheringBond.Surveying, State);
+            Assert.Equal(GatheringBond.Watching, State);
         }
         [Fact]
         public async Task DeleteGatheringAsync_SUCCESS()

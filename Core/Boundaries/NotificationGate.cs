@@ -27,7 +27,7 @@ namespace Core.Boundaries
 
     public interface INotificationDatabase
     {
-        Task<List<TelegramShard>> GetAllTelegrams(TelegramMessage messageType);
+        Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType);
 
         Task<List<TelegramShard>> GetTelegramsAsync(ulong userId);
 		Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time,

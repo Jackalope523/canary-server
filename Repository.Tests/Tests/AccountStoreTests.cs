@@ -40,7 +40,7 @@ namespace Repository.Tests
                 subject.Name,
                 subject.DateOfBirth,
                 subject.JoinDate,
-                new Character(
+                new CharacterShard(
                     subject.Age,
                     subject.Extroversion,
                     subject.Athleticisme,
@@ -817,7 +817,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetRecentUserLocationAsync_SUCCESS()
         {
-            (double latitude, double longitude, double radius) = await store.GetRecentUserLocationAsync(subject.Id);
+            (double latitude, double longitude, double radius) = await store.GetRecentLocationAsync(subject.Id);
 
             Assert.Equal(subject.Haunt.Y, latitude);
             Assert.Equal(subject.Haunt.X, longitude);
@@ -826,7 +826,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetRecentUserLocationAsync_UserNotFound()
         {
-            Func<Task> action = async () => await store.GetRecentUserLocationAsync(ulong.MaxValue);
+            Func<Task> action = async () => await store.GetRecentLocationAsync(ulong.MaxValue);
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 

@@ -27,7 +27,7 @@ namespace Core.Tests
 			generatedUserIds = userIdList;
 		}
 
-        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
+        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character)
         {
 			ContentValidation.TryNormalisePhoneNumber(phoneNumber, out phoneNumber);
             // Ensure no duplicate user exists
@@ -80,12 +80,12 @@ namespace Core.Tests
             return await accounts.FindUserByPhoneNumberAsync(phoneNumber);
         }
 
-        public async Task<RecentLocation> GetRecentUserLocationAsync(ulong userId)
+        public async Task<LocationShard> GetRecentLocationAsync(ulong userId)
         {
-			return await accounts.GetRecentUserLocationAsync(userId);
+			return await accounts.GetRecentLocationAsync(userId);
         }
 
-        public async Task<Haunt> GetUserHauntAsync(ulong userId)
+        public async Task<HauntShard> GetUserHauntAsync(ulong userId)
         {
 			return await accounts.GetUserHauntAsync(userId);
         }

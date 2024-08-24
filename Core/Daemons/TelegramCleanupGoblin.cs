@@ -45,7 +45,7 @@ namespace Core.Daemons
 
         private async Task ReclaimExpiredTelegramsAsync(CancellationToken stoppingToken)
         {
-            var telegrams = await terminal.NotificationDatabase.GetAllTelegrams(TelegramMessage.GatheringInvitation);
+            var telegrams = await terminal.NotificationDatabase.GetAllTelegramsAsync(TelegramMessage.GatheringInvitation);
 
             foreach (var telegram in telegrams)
             {

@@ -27,7 +27,7 @@ namespace Core.Controls
             var occuringGathering = await targetUser.CurrentGathering;
 
             // Verify user can report
-            PassIf(await user.CanReport(),
+            ContinueIf(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
             if (occuringGathering.Equals(Gathering.None))
@@ -56,7 +56,7 @@ namespace Core.Controls
             var targetGathering = await GetGatheringAsync(gatheringId);
 
             // Verify user can report
-            PassIf(await user.CanReport(),
+            ContinueIf(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
             await Reports.ReportGatheringAsync(user.Id, targetGathering.Id, Time, reportType, reportDetails);
@@ -67,7 +67,7 @@ namespace Core.Controls
                 var host = await GetUserAsync(targetGathering.Host.Id);
 
                 // Threshold hit, end gathering
-                _ = Terminal.GatheringDirector.EndGatheringAsync(host.Id, gatheringId);
+                _ = Terminal.GatheringDirector.TerminateGatheringAsync(host.Id, gatheringId);
 
                 // Compute host's standing
                 var status = await host.GatheringReported();
@@ -88,7 +88,7 @@ namespace Core.Controls
             User targetUser = new(targetSnapshot.User);
 
             // Verify user can report
-            PassIf(await user.CanReport(),
+            ContinueIf(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
             await Reports.ReportSnapshotAsync(user.Id, targetSnapshot.Id, Time, reportType, reportDetails);

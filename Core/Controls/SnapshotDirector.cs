@@ -49,14 +49,14 @@ namespace Core.Controls
             catch
             {
                 // If failed, remove snapshot
-                await Snapshots.RemoveSnapshotAsync(snapshot.Id);
+                await Snapshots.DeleteSnapshotAsync(snapshot.Id);
                 throw new UnexpectedFailureException("Image upload failed.");
             }
 
             return snapshot;
         }
 
-        public async Task RemoveSnapshotAsync(ulong userId, ulong snapshotId)
+        public async Task DeleteSnapshotAsync(ulong userId, ulong snapshotId)
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -64,10 +64,10 @@ namespace Core.Controls
             var user = await userSync;
 
             // Verify user owns the snapshot or can modify the gathering
-            PassIf(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
+            ContinueIf(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove snapshot."));
 
-            await Snapshots.RemoveSnapshotAsync(snapshot.Id);
+            await Snapshots.DeleteSnapshotAsync(snapshot.Id);
         }
 
         public async Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, SnapshotAcclaim acclaim)
@@ -78,7 +78,7 @@ namespace Core.Controls
             var user = await userSync;
 
             // Verify user can interact with snapshot
-            PassIf(await gatheringTaken.WasAttendedBy(user),
+            ContinueIf(await gatheringTaken.WasAttendedBy(user),
                 new InvalidUserException("User cannot interact with snapshot."));
 
             FailIf(user.Taken(snapshot),
@@ -91,7 +91,7 @@ namespace Core.Controls
             }
             else
             {
-                await Snapshots.RemoveSnapshotAcclaimAsync(snapshot.Id, user.Id);
+                await Snapshots.DeleteSnapshotAcclaimAsync(snapshot.Id, user.Id);
             }
         }
 

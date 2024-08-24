@@ -11,7 +11,7 @@ namespace Repository
 
         }
 
-        public async Task<List<CoreGathering>> GetAllWaitingGatherings(DateTimeOffset currentTime)
+        public async Task<List<CoreGathering>> GetAllWaitingGatheringsAsync(DateTimeOffset currentTime)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Gatherings
@@ -34,7 +34,7 @@ namespace Repository
                     g.State,
                     g.GroupMinimum,
                     g.GroupMaximum,
-                    new Character(
+                    new CharacterShard(
                     g.Age,
                     g.Extroversion,
                     g.Athleticisme,

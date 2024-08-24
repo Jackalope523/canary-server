@@ -14,14 +14,14 @@
             await store.AddUserToBannerAsync(userId, bannerId, time);
         }
 
-        public async Task<BannerShard> CheckCode(string code)
+        public async Task<BannerShard> FindBannerByCodeAsync(string code)
         {
-            return await store.CheckCode(code);
+            return await store.FindBannerByCodeAsync(code);
         }
 
-        public async Task<BannerShard> GetUserBannerAsync(ulong userId)
+        public async Task<BannerShard> FindBannerForUserAsync(ulong userId)
         {
-            return await store.GetUserBannerAsync(userId);
+            return await store.FindBannerForUserAsync(userId);
         }
     }
 }

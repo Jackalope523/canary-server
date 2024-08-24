@@ -45,7 +45,7 @@ namespace Core.Controls
                 };
 
                 nest.Gatherings.AddRange((await upcomingAgendaSync).Agenda
-                    .Where(bond => !bond.Bond.Equals(GatheringBond.Surveying)).ToList()
+                    .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
 
                 foreach (var shard in nest.Gatherings)
@@ -68,7 +68,7 @@ namespace Core.Controls
                 };
 
                 nest.Gatherings.AddRange((await siftedAgendaSync).Agenda
-                    .Where(bond => !bond.Bond.Equals(GatheringBond.Surveying)).ToList()
+                    .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
 
                 nest = nest with
@@ -183,7 +183,7 @@ namespace Core.Controls
                     try
                     {
                         // Blind-remove target
-                        await Gatherings.RemoveUserAsync(targetUser.Id, gathering.Id);
+                        await Gatherings.DeleteUserStateAsync(targetUser.Id, gathering.Id);
                     }
                     catch { }
                 }
@@ -243,7 +243,7 @@ namespace Core.Controls
                 .ConvertAll(gathering => new AgendaBondPair(gathering.ToGatheringShard(), GatheringBond.Guest)));
 
             agenda.Agenda.AddRange((await user.SurveyingGatherings)
-                .ConvertAll(gathering => new AgendaBondPair(gathering.ToGatheringShard(), GatheringBond.Surveying)));
+                .ConvertAll(gathering => new AgendaBondPair(gathering.ToGatheringShard(), GatheringBond.Watching)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
             { agenda.Agenda.Add(new AgendaBondPair((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }

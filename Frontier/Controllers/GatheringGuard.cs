@@ -99,7 +99,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// End gathering
-				await gatherings.EndGatheringAsync(user.Id, gatheringId);
+				await gatherings.TerminateGatheringAsync(user.Id, gatheringId);
 			});
         }
 
@@ -119,7 +119,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Watch gathering
-				await gatherings.SurveyGatheringAsync(user.Id, gatheringId);
+				await gatherings.WatchGatheringAsync(user.Id, gatheringId);
 			});
 		}
 
@@ -129,7 +129,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Unwatch gathering
-				await gatherings.UnsurveyGatheringAsync(user.Id, gatheringId);
+				await gatherings.UnwatchGatheringAsync(user.Id, gatheringId);
 			});
 		}
 
@@ -233,7 +233,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				await snapshots.RemoveSnapshotAsync(user.Id, snapshotId);
+				await snapshots.DeleteSnapshotAsync(user.Id, snapshotId);
 			});
 		}
 

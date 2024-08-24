@@ -13,7 +13,7 @@ namespace Core.Boundaries
 	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name, string Pseudonym,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, Character Character, DateTimeOffset TimeOfUserAgreement)
+		DateTimeOffset JoinDate, int Reputation, CharacterShard Character, DateTimeOffset TimeOfUserAgreement)
 		: CoreOnlyData();
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
@@ -22,11 +22,11 @@ namespace Core.Boundaries
 
     public record UserShard(ulong Id, string Name);
 
-    public record Character(int Age, int Extraversion, int Athleticism, int Chaoticness,
+    public record CharacterShard(int Age, int Extraversion, int Athleticism, int Chaoticness,
 		int Competitiveness, int Industriousness, int NightOwl, int Openness);
 
-    public record RecentLocation(double Latitude, double Longitude, double Radius);
-    public record Haunt(double Latitude, double Longitude, double Radius, int Stability);
+    public record LocationShard(double Latitude, double Longitude, double Radius);
+    public record HauntShard(double Latitude, double Longitude, double Radius, int Stability);
 	
     #endregion
 
@@ -38,14 +38,14 @@ namespace Core.Boundaries
         Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<CoreUser> FindUserByEmailAsync(string normalisedEmail);
 		Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
-			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character);
+			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character);
 		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
 		Task DeleteUserAsync(ulong userId);
 
-		Task<RecentLocation> GetRecentUserLocationAsync(ulong userId);
+		Task<LocationShard> GetRecentLocationAsync(ulong userId);
 		Task UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius);
 
-		Task<Haunt> GetUserHauntAsync(ulong userId);
+		Task<HauntShard> GetUserHauntAsync(ulong userId);
 		Task UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability);
 	}
 

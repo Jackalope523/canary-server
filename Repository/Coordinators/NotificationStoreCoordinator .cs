@@ -11,9 +11,9 @@ namespace Repository
             store = new EFCoreNotificationStore(flag);
         }
 
-        public async Task<List<TelegramShard>> GetAllTelegrams(TelegramMessage messageType)
+        public async Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType)
         {
-            return await store.GetAllTelegrams(messageType);
+            return await store.GetAllTelegramsAsync(messageType);
         }
 
         public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)

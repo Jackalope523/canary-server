@@ -16,7 +16,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Telegrams.Remove(new Telegram { Id = telegramId }));
         }
 
-        public async Task<List<TelegramShard>> GetAllTelegrams(TelegramMessage messageType)
+        public async Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Telegrams.

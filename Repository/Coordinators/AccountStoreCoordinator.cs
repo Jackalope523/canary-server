@@ -11,7 +11,7 @@ namespace Repository
             store = new EFCoreAccountStore(flag);
         }
 
-        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
+        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character)
         {
             return await store.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character);
         }
@@ -36,14 +36,14 @@ namespace Repository
             return await store.FindUserByEmailAsync(email);
         }
 
-        public async Task<Haunt> GetUserHauntAsync(ulong id)
+        public async Task<HauntShard> GetUserHauntAsync(ulong id)
         {
             return await store.GetUserHauntAsync(id);
         }
 
-        public async Task<RecentLocation> GetRecentUserLocationAsync(ulong id)
+        public async Task<LocationShard> GetRecentLocationAsync(ulong id)
         {
-            return await store.GetRecentUserLocationAsync(id);
+            return await store.GetRecentLocationAsync(id);
         }    
 
         public async Task UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)

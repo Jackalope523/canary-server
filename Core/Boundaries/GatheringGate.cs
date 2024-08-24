@@ -11,11 +11,11 @@ namespace Core.Boundaries
 	{ Upcoming, Open, Sealed, Ended }
 
     public enum GatheringBond
-    { Surveying, Guest, Arrived, Left, Kicked }
+    { Watching, Guest, Arrived, Left, Kicked }
 
     public record CoreGathering(ulong Id, UserShard Host, string Name, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
-		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, Character Character,
+		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests)
 		: CoreOnlyData();
 
@@ -42,15 +42,15 @@ namespace Core.Boundaries
 
 		Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description,
 			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
-			int groupMinimum, int groupMaximum, Character character,
+			int groupMinimum, int groupMaximum, CharacterShard character,
 			double Radius, bool isDynamic);
 		Task UpdateGatheringAsync(ulong gatheringId, List<(string Property, object Value)> edits);
-		Task EndGatheringAsync(ulong gatheringId, DateTimeOffset time);
+		Task TerminateGatheringAsync(ulong gatheringId, DateTimeOffset time);
 		Task DeleteGatheringAsync(ulong gatheringId);
 
 		Task<GatheringBond?> GetUserStateAsync(ulong userId, ulong gatheringId);
 		Task SetUserStateAsync(ulong userId, ulong gatheringId, GatheringBond userState, DateTimeOffset time);
-		Task RemoveUserAsync(ulong userId, ulong gatheringId);
+		Task DeleteUserStateAsync(ulong userId, ulong gatheringId);
 
 		Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId);
 		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong gatheringId);
@@ -74,11 +74,11 @@ namespace Core.Boundaries
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
 			MemoryStream heroImage = null);
 		Task StartGatheringAsync(ulong userId, ulong gatheringId);
-		Task EndGatheringAsync(ulong userId, ulong gatheringId);
+		Task TerminateGatheringAsync(ulong userId, ulong gatheringId);
 		Task DeleteGatheringAsync(ulong userId, ulong gatheringId);
 
-		Task SurveyGatheringAsync(ulong userId, ulong gatheringId);
-		Task UnsurveyGatheringAsync(ulong userId, ulong gatheringId);
+		Task WatchGatheringAsync(ulong userId, ulong gatheringId);
+		Task UnwatchGatheringAsync(ulong userId, ulong gatheringId);
 		Task JoinGatheringAsync(ulong userId, ulong gatheringId);
 		Task LeaveGatheringAsync(ulong userId, ulong gatheringId);
 

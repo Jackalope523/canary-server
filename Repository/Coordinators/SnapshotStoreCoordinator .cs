@@ -37,14 +37,14 @@ namespace Repository
           await store.AcclaimSnapshotAsync(postId, voterId);
         }
 
-        public async Task RemoveSnapshotAsync(ulong postId)
+        public async Task DeleteSnapshotAsync(ulong postId)
         {
-            await store.RemoveSnapshotAsync(postId);
+            await store.DeleteSnapshotAsync(postId);
         }
 
-        public async Task RemoveSnapshotAcclaimAsync(ulong postId, ulong voterId)
+        public async Task DeleteSnapshotAcclaimAsync(ulong postId, ulong voterId)
         {
-            await store.RemoveSnapshotAcclaimAsync(postId, voterId);
+            await store.DeleteSnapshotAcclaimAsync(postId, voterId);
         }
 
         public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(ulong id)

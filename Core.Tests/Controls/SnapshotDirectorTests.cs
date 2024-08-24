@@ -111,7 +111,7 @@ namespace Core.Tests.Controls
 			var snapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			await director.RemoveSnapshotAsync(host.Id, snapshot.Id);
+			await director.DeleteSnapshotAsync(host.Id, snapshot.Id);
 
 			// Assert
 			var serverSnapshots = await director.GetGatheringSnapshotsAsync(host.Id, gathering.Id);
@@ -128,7 +128,7 @@ namespace Core.Tests.Controls
 			var snapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var removeSnapshotSync = director.RemoveSnapshotAsync(sneakyUser.Id, snapshot.Id);
+			var removeSnapshotSync = director.DeleteSnapshotAsync(sneakyUser.Id, snapshot.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await removeSnapshotSync);

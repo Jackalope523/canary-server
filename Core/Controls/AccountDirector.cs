@@ -29,7 +29,7 @@ namespace Core.Controls
         public async Task<CoreUser> GetCoreUserAsync(string phoneNumber)
 		{
             // Verify phone number is valid
-            PassIf(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
+            ContinueIf(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
                 new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
 
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
@@ -52,7 +52,7 @@ namespace Core.Controls
             // Verify banner code
             try
             {
-                banner = await Banners.CheckCode(code);
+                banner = await Banners.FindBannerByCodeAsync(code);
             }
             catch
             { throw new InvalidInformationException("Incorrect code."); }
@@ -68,7 +68,7 @@ namespace Core.Controls
             };
 
             // Validate and normalise user
-            PassIf(newUser.ValidateAndNormalise(out string issues),
+            ContinueIf(newUser.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
 
             // Verify phone number is not in use
@@ -105,7 +105,7 @@ namespace Core.Controls
             user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
-            PassIf(user.ValidateAndNormalise(out string issues),
+            ContinueIf(user.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
 
             List<(string Property, object Value)> edits = new();
@@ -272,7 +272,7 @@ namespace Core.Controls
         internal async Task<(GeoLocation Location, Distance Radius)>
             RequestLastKnownUserLocationAsync(User user)
         {
-            var result = await Accounts.GetRecentUserLocationAsync(user.Id);
+            var result = await Accounts.GetRecentLocationAsync(user.Id);
 
             if (result == null)
             { return (GeoLocation.None, Distance.None); }

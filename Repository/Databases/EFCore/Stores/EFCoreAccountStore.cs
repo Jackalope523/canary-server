@@ -10,7 +10,7 @@ namespace Repository
         {
         }
 
-        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
+        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character)
         {
             User toCreate = new()
             {
@@ -48,7 +48,7 @@ namespace Repository
                   toCreate.AccountStatus,
                   toCreate.JoinDate,
                   toCreate.Reputation,
-                  new Character(
+                  new CharacterShard(
                   toCreate.Age,
                   toCreate.Extroversion,
                   toCreate.Athleticisme,
@@ -121,7 +121,7 @@ namespace Repository
                    u.AccountStatus,
                    u.JoinDate,
                    u.Reputation,
-                   new Character(
+                   new CharacterShard(
                    u.Age,
                    u.Extroversion,
                    u.Athleticisme,
@@ -166,7 +166,7 @@ namespace Repository
                   u.AccountStatus,
                   u.JoinDate,
                   u.Reputation,
-                  new Character(
+                  new CharacterShard(
                   u.Age,
                   u.Extroversion,
                   u.Athleticisme,
@@ -211,7 +211,7 @@ namespace Repository
                   u.AccountStatus,
                   u.JoinDate,
                   u.Reputation,
-                  new Character(
+                  new CharacterShard(
                   u.Age,
                   u.Extroversion,
                   u.Athleticisme,
@@ -231,14 +231,14 @@ namespace Repository
             return user;
         }
 
-        public async Task<Haunt> GetUserHauntAsync(ulong id)
+        public async Task<HauntShard> GetUserHauntAsync(ulong id)
         {
             try
             {
                 return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Users.
                 Where(u => u.Id == id).
-                Select(u => new Haunt(u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight)).
+                Select(u => new HauntShard(u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight)).
                 SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -246,14 +246,14 @@ namespace Repository
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
         }
-        public async Task<RecentLocation> GetRecentUserLocationAsync(ulong id)
+        public async Task<LocationShard> GetRecentLocationAsync(ulong id)
         {       
             try
             {
                 return await storeSentry.ExecuteReadAsync(ctx =>
                             ctx.Users.
                             Where(u => u.Id == id).
-                            Select(u => new RecentLocation(u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius)).
+                            Select(u => new LocationShard(u.CurrentLocation.Y, u.CurrentLocation.X, u.CurrentRadius)).
                             SingleAsync());
 
             }

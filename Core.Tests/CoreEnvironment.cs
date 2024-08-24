@@ -231,7 +231,7 @@ namespace Core.Tests
 				await Terminal.GatheringDatabase.SetUserStateAsync(guest.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
-			await Terminal.GatheringDatabase.EndGatheringAsync(gatheringStub.Id, DateTimeOffset.UtcNow);
+			await Terminal.GatheringDatabase.TerminateGatheringAsync(gatheringStub.Id, DateTimeOffset.UtcNow);
 
 			return gatheringStub;
 		}

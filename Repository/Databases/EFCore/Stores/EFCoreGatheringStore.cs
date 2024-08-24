@@ -11,7 +11,7 @@ namespace Repository
         {
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, Character character, double Radius, bool isDynamic)
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
         {
             Gathering toCreate = new()
             {
@@ -64,7 +64,7 @@ namespace Repository
                    toCreate.State,
                    toCreate.GroupMinimum,
                    toCreate.GroupMaximum,
-                   new Character(
+                   new CharacterShard(
                    toCreate.Age,
                    toCreate.Extroversion,
                    toCreate.Athleticisme,
@@ -114,7 +114,7 @@ namespace Repository
                         e.State,
                         e.GroupMinimum,
                         e.GroupMaximum,
-                        new Character(
+                        new CharacterShard(
                         e.Extroversion,
                         e.Athleticisme,
                         e.Chaos,
@@ -193,7 +193,7 @@ namespace Repository
                     e.State,
                     e.GroupMinimum,
                     e.GroupMaximum,
-                    new Character(
+                    new CharacterShard(
                     e.Age,
                     e.Extroversion,
                     e.Athleticisme,
@@ -230,7 +230,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
              ctx.GatheringLinks.
-             Where(l => l.UserId == id && l.Type == GatheringBond.Surveying).
+             Where(l => l.UserId == id && l.Type == GatheringBond.Watching).
              Join(
                 ctx.Gatherings,
                 l => l.GatheringId,
@@ -279,7 +279,7 @@ namespace Repository
                     e.State,
                     e.GroupMinimum,
                     e.GroupMaximum,
-                    new Character(
+                    new CharacterShard(
                     e.Age,
                     e.Extroversion,
                     e.Athleticisme,
@@ -348,7 +348,7 @@ namespace Repository
                    e.State,
                    e.GroupMinimum,
                    e.GroupMaximum,
-                   new Character(
+                   new CharacterShard(
                    e.Age,
                    e.Extroversion,
                    e.Athleticisme,
@@ -383,7 +383,7 @@ namespace Repository
                    e.State,
                    e.GroupMinimum,
                    e.GroupMaximum,
-                   new Character(
+                   new CharacterShard(
                    e.Age,
                    e.Extroversion,
                    e.Athleticisme,
@@ -430,7 +430,7 @@ namespace Repository
                         e.State,
                         e.GroupMinimum,
                         e.GroupMaximum,
-                        new Character(
+                        new CharacterShard(
                         e.Age,
                         e.Extroversion,
                         e.Athleticisme,
@@ -458,7 +458,7 @@ namespace Repository
                 ).
             ToListAsync());
         }    
-        public async Task RemoveUserAsync(ulong userId, ulong gatheringId) 
+        public async Task DeleteUserStateAsync(ulong userId, ulong gatheringId) 
         { 
             GatheringBond type = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.
@@ -474,7 +474,7 @@ namespace Repository
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
             switch (type)
             {
-                case GatheringBond.Surveying:
+                case GatheringBond.Watching:
                     break;
                 case GatheringBond.Guest:
                     int num = await storeSentry.ExecuteReadAsync(ctx =>
@@ -608,7 +608,7 @@ namespace Repository
                     e.State, 
                     e.GroupMinimum, 
                     e.GroupMaximum, 
-                    new Character(
+                    new CharacterShard(
                         e.Extroversion,
                         e.Athleticisme, 
                         e.Chaos, 
@@ -663,7 +663,7 @@ namespace Repository
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
             switch (userState)
             {
-                case GatheringBond.Surveying:
+                case GatheringBond.Watching:
                     break;
                 case GatheringBond.Guest:
                     int num = await storeSentry.ExecuteReadAsync(ctx => 
@@ -733,7 +733,7 @@ namespace Repository
             }
             return toReturn;
         }
-        public async Task EndGatheringAsync(ulong id, DateTimeOffset time)
+        public async Task TerminateGatheringAsync(ulong id, DateTimeOffset time)
         {
             List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Users.

@@ -12,7 +12,7 @@ namespace Repository
             store = new EFCoreGatheringStore(flag);
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, Character character, double Radius, bool isDynamic)
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
         {
             return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic);
         }
@@ -52,9 +52,9 @@ namespace Repository
             return await store.FindGatheringsAsync(latitude, longitude, distance);
         }       
         
-        public async Task RemoveUserAsync(ulong userId, ulong gatheringId) 
+        public async Task DeleteUserStateAsync(ulong userId, ulong gatheringId) 
         { 
-            await store.RemoveUserAsync(userId, gatheringId);
+            await store.DeleteUserStateAsync(userId, gatheringId);
         }
 
         public async Task UpdateGatheringAsync(ulong id, List<(string Property, object Value)> edits)
@@ -87,9 +87,9 @@ namespace Repository
             return await store.GetAllUsersAsync(gatheringId);
         }
 
-        public async Task EndGatheringAsync(ulong id, DateTimeOffset time)
+        public async Task TerminateGatheringAsync(ulong id, DateTimeOffset time)
         {
-            await store.EndGatheringAsync(id, time);
+            await store.TerminateGatheringAsync(id, time);
         }
     }
 }

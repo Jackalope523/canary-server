@@ -186,12 +186,12 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.SnapshotLinks.Update(toAdd));
         }
 
-        public async Task RemoveSnapshotAsync(ulong postId)
+        public async Task DeleteSnapshotAsync(ulong postId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = postId }));
         }
 
-        public async Task RemoveSnapshotAcclaimAsync(ulong postId, ulong voterId)
+        public async Task DeleteSnapshotAcclaimAsync(ulong postId, ulong voterId)
         {
             Func<QueryContext, Task> query = EF.CompileAsyncQuery(
                 (QueryContext ctx) =>

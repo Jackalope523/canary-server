@@ -326,7 +326,7 @@ namespace Core.Tests.Controls
 			var gathering = await environment.GenerateOngoingGatheringAsync(user);
 
 			// Act
-			await director.EndGatheringAsync(user.Id, gathering.Id);
+			await director.TerminateGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -340,7 +340,7 @@ namespace Core.Tests.Controls
 			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
 
 			// Act
-			await director.SurveyGatheringAsync(user.Id, gathering.Id);
+			await director.WatchGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -354,7 +354,7 @@ namespace Core.Tests.Controls
 			var gathering = await environment.GeneratePastGatheringAsync(host);
 
 			// Act
-			var surveySync = director.SurveyGatheringAsync(user.Id, gathering.Id);
+			var surveySync = director.WatchGatheringAsync(user.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await surveySync);
@@ -368,10 +368,10 @@ namespace Core.Tests.Controls
 			var user = await environment.GenerateUniqueUserAsync();
 
 			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await director.SurveyGatheringAsync(user.Id, gathering.Id);
+			await director.WatchGatheringAsync(user.Id, gathering.Id);
 
 			// Act
-			await director.UnsurveyGatheringAsync(user.Id, gathering.Id);
+			await director.UnwatchGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -401,7 +401,7 @@ namespace Core.Tests.Controls
             await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
             // Act
-            var join = director.SurveyGatheringAsync(user.Id, gathering.Id);
+            var join = director.WatchGatheringAsync(user.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await join);
@@ -436,7 +436,7 @@ namespace Core.Tests.Controls
 			var gathering = await environment.GenerateOngoingGatheringAsync(user, guest);
 			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Watching);
 
 			// Act
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
@@ -447,7 +447,7 @@ namespace Core.Tests.Controls
 			Assert.Equal(2, guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
 		}
 
 		[Fact]
@@ -468,8 +468,8 @@ namespace Core.Tests.Controls
 			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
 			await environment.AddUserToGatheringAsync(gathering, incomingCompanion, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Surveying);
-			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Watching);
+			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Watching);
 
 			// Act
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
@@ -480,7 +480,7 @@ namespace Core.Tests.Controls
 			Assert.Equal(2, guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
 		}
 
 		[Fact]
@@ -504,8 +504,8 @@ namespace Core.Tests.Controls
 			await environment.AddUserToGatheringAsync(gathering, leftCompanion, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
 			await environment.AddUserToGatheringAsync(gathering, incomingCompanion, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Surveying);
-			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Watching);
+			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Watching);
 
 			// Act
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
@@ -516,7 +516,7 @@ namespace Core.Tests.Controls
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
 		}
 
 		[Fact]
@@ -541,7 +541,7 @@ namespace Core.Tests.Controls
 			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
 			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Surveying)));
+			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
 		}
 
 		[Fact]

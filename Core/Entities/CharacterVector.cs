@@ -65,7 +65,7 @@ namespace Core.Entities
 
 		#region Initialisation & Extraction
 
-		public CharacterVector(Character fromCharacter)
+		public CharacterVector(CharacterShard fromCharacter)
 		{
 			Age = fromCharacter.Age;
 			Extraversion = fromCharacter.Extraversion;
@@ -77,7 +77,7 @@ namespace Core.Entities
 			Openness = fromCharacter.Openness;
 		}
 
-		public Character ToCharacter()
+		public CharacterShard ToCharacter()
 		{
 			return new(Age, Extraversion, Athleticism, Chaoticness,
 				Competitiveness, Industriousness, NightOwl, Openness);
