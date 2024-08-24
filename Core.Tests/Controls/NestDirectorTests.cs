@@ -18,7 +18,7 @@ namespace Core.Tests.Controls
         }
 
 		[Fact]
-		public async Task GetUserNestAsync_Self_ReturnsNest()
+		public async Task GetNestAsync_Self_ReturnsNest()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -29,27 +29,18 @@ namespace Core.Tests.Controls
 			var unattendedGathering = await environment.GeneratePastGatheringAsync(host);
 			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, user);
 
-			var funLovingSnapshot = await environment.GenerateSnapshotAsync(attendedGathering, user);
-			var lessLovingSnapshot = await environment.GenerateSnapshotAsync(attendedGathering, host);
-			var okSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, user);
-
 			// Act
-			var nest = await director.GetUserNestAsync(user.Id, user.Id);
+			var nest = await director.GetNestAsync(user.Id, user.Id);
 
 			// Assert
 			Assert.Equal(3, nest.Gatherings.Count);
 			Assert.Equal(hostedGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(hostedGathering.Id)));
 			Assert.Equal(attendedGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(attendedGathering.Id)));
 			Assert.Equal(ongoingGathering.ToGatheringShard(), nest.Gatherings.Find(e => e.Id.Equals(ongoingGathering.Id)));
-
-			Assert.Equal(3, nest.Snapshots.Count);
-			Assert.Equal(funLovingSnapshot, nest.Snapshots.Find(e => e.Id.Equals(funLovingSnapshot.Id)));
-			Assert.Equal(lessLovingSnapshot, nest.Snapshots.Find(e => e.Id.Equals(lessLovingSnapshot.Id)));
-			Assert.Equal(okSnapshot, nest.Snapshots.Find(e => e.Id.Equals(okSnapshot.Id)));
 		}
 
 		[Fact]
-		public async Task GetUserNestAsync_Companion_ReturnsNest()
+		public async Task GetNestAsync_Companion_ReturnsNest()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -62,23 +53,15 @@ namespace Core.Tests.Controls
 			var unattendedGathering = await environment.GeneratePastGatheringAsync(companion);
 			var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, companion);
 
-			var userSnapshot = await environment.GenerateSnapshotAsync(hostedGathering, user);
-			var companionSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, companion);
-			var hostSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, host);
-			var ongoingGatheringCompanionSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, companion);
-			var unattendedGatheringCompanionSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, companion);
-
 			// Act
-			var nest = await director.GetUserNestAsync(user.Id, companion.Id);
+			var nest = await director.GetNestAsync(user.Id, companion.Id);
 
             // Assert
             Assert.Equal(4, nest.Gatherings.Count);
-
-			Assert.Equal(3, nest.Snapshots.Count);
 		}
 
 		[Fact]
-		public async Task GetUserNestAsync_NeutralHost_ReturnsPublicNest()
+		public async Task GetNestAsync_NeutralHost_ReturnsPublicNest()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -87,20 +70,15 @@ namespace Core.Tests.Controls
 			var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(user, randomUser);
 			var unattendedGathering = await environment.GeneratePastGatheringAsync(randomUser);
 
-			var mutualGatheringSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, randomUser);
-			var unattendedGatheringSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, randomUser);
-
 			// Act
-			var nest = await director.GetUserNestAsync(user.Id, randomUser.Id);
+			var nest = await director.GetNestAsync(user.Id, randomUser.Id);
 
             // Assert
             Assert.Equal(2, nest.Gatherings.Count);
-
-			Assert.Single(nest.Snapshots);
 		}
 
 		[Fact]
-		public async Task GetUserNestAsync_Blocked_Fails()
+		public async Task GetNestAsync_Blocked_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -108,13 +86,122 @@ namespace Core.Tests.Controls
 			await environment.ForceEnemiesAsync(user, enemy);
 
 			// Act
-			var nest = director.GetUserNestAsync(user.Id, enemy.Id);
+			var nest = director.GetNestAsync(user.Id, enemy.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await nest);
 		}
 
-		[Fact]
+        [Fact]
+        public async Task GetNestGalleryAsync_Self_ReturnsGallery()
+        {
+            // Arrange
+            var user = await environment.GenerateUniqueUserAsync();
+            var host = await environment.GenerateUniqueUserAsync();
+
+            var hostedGathering = await environment.GeneratePastGatheringAsync(user);
+            var attendedGathering = await environment.GeneratePastGatheringAsync(host, user);
+            var unattendedGathering = await environment.GeneratePastGatheringAsync(host);
+            var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, user);
+
+            var funLovingSnapshot = await environment.GenerateSnapshotAsync(attendedGathering, user);
+            var lessLovingSnapshot = await environment.GenerateSnapshotAsync(attendedGathering, host);
+            var okSnapshot = await environment.GenerateSnapshotAsync(ongoingGathering, user);
+
+            // Act
+            var gallery = await director.GetNestGalleryAsync(user.Id, user.Id, attendedGathering.Id);
+
+            // Assert
+            Assert.Equal(2, gallery.Snapshots.Count);
+            Assert.Equal(funLovingSnapshot, gallery.Snapshots.Find(e => e.Id.Equals(funLovingSnapshot.Id)));
+            Assert.Equal(lessLovingSnapshot, gallery.Snapshots.Find(e => e.Id.Equals(lessLovingSnapshot.Id)));
+        }
+
+        [Fact]
+        public async Task GetNestGalleryAsync_Companion_ReturnsGallery()
+        {
+            // Arrange
+            var user = await environment.GenerateUniqueUserAsync();
+            var companion = await environment.GenerateUniqueUserAsync();
+            var host = await environment.GenerateUniqueUserAsync();
+            await environment.ForceCompanionshipAsync(user, companion);
+
+            var hostedGathering = await environment.GeneratePastGatheringAsync(user, companion);
+            var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(host, user, companion);
+            var unattendedGathering = await environment.GeneratePastGatheringAsync(companion);
+            var ongoingGathering = await environment.GenerateUpcomingGatheringAsync(host, companion);
+
+            var userSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, user);
+            var companionSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, companion);
+            var hostSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, host);
+            var yetAnotherCompanionSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, companion);
+            var unattendedGatheringCompanionSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, companion);
+
+            // Act
+            var gallery = await director.GetNestGalleryAsync(user.Id, companion.Id, mutuallyAttendedGathering.Id);
+
+            // Assert
+            Assert.Equal(2, gallery.Snapshots.Count);
+        }
+
+        [Fact]
+        public async Task GetNestGalleryAsync_NeutralHost_ReturnsNothing()
+        {
+            // Arrange
+            var user = await environment.GenerateUniqueUserAsync();
+            var randomUser = await environment.GenerateUniqueUserAsync();
+
+            var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(user, randomUser);
+            var unattendedGathering = await environment.GeneratePastGatheringAsync(randomUser);
+
+            var mutualGatheringSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, randomUser);
+            var unattendedGatheringSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, randomUser);
+
+            // Act
+            var gallery = await director.GetNestGalleryAsync(user.Id, randomUser.Id, unattendedGathering.Id);
+
+            // Assert
+            Assert.Empty(gallery.Snapshots);
+        }
+
+        [Fact]
+        public async Task GetNestGalleryAsync_MutualGuest_ReturnsGallery()
+        {
+            // Arrange
+            var user = await environment.GenerateUniqueUserAsync();
+            var randomUser = await environment.GenerateUniqueUserAsync();
+
+            var mutuallyAttendedGathering = await environment.GeneratePastGatheringAsync(user, randomUser);
+            var unattendedGathering = await environment.GeneratePastGatheringAsync(randomUser);
+
+            var mutualGatheringSnapshot = await environment.GenerateSnapshotAsync(mutuallyAttendedGathering, randomUser);
+            var unattendedGatheringSnapshot = await environment.GenerateSnapshotAsync(unattendedGathering, randomUser);
+
+            // Act
+            var gallery = await director.GetNestGalleryAsync(user.Id, randomUser.Id, mutuallyAttendedGathering.Id);
+
+            // Assert
+            Assert.Single(gallery.Snapshots);
+        }
+
+        [Fact]
+        public async Task GetNestGalleryAsync_Blocked_Fails()
+        {
+            // Arrange
+            var user = await environment.GenerateUniqueUserAsync();
+            var enemy = await environment.GenerateUniqueUserAsync();
+            await environment.ForceEnemiesAsync(user, enemy);
+
+            var randomGathering = await environment.GeneratePastGatheringAsync(enemy);
+
+            // Act
+            var nest = director.GetNestGalleryAsync(user.Id, enemy.Id, randomGathering.Id);
+
+            // Assert
+            await Assert.ThrowsAnyAsync<HollowException>(async () => await nest);
+        }
+
+        [Fact]
 		public async Task GetUserAgendaAsync_ReturnsAgenda()
 		{
 			// Arrange

@@ -22,11 +22,18 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{targetIdentification}")]
-        public async Task<IActionResult> GetNest(ulong targetIdentification)
+		[HttpGet("{targetId}")]
+        public async Task<IActionResult> GetNest(ulong targetId)
 		{
 			return await Execute(async user =>
-				await nests.GetUserNestAsync(user.Id, targetIdentification));
+				await nests.GetNestAsync(user.Id, targetId));
+		}
+
+		[HttpGet("{targetId}/{gatheringId}")]
+        public async Task<IActionResult> GetNestGallery(ulong targetId, ulong gatheringId)
+		{
+			return await Execute(async user =>
+				await nests.GetNestGalleryAsync(user.Id, targetId, gatheringId));
 		}
 
 		[HttpGet("companions")]
@@ -93,7 +100,7 @@ namespace Frontier.Controllers
 				await nests.UnblockUserAsync(user.Id, info.TargetId));
 		}
 
-		[HttpPost("{targetIdentification}/report")]
+		[HttpPost("{targetId}/report")]
 		public async Task<IActionResult> ReportUser(ulong targetId, [FromBody] AccountReportManifest report)
 		{
 			// Verify parameters

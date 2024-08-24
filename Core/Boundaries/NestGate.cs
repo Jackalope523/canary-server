@@ -6,7 +6,8 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-    public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
+    public record NestShard(List<GatheringShard> Gatherings);
+    public record NestGalleryShard(List<SnapshotShard> Snapshots);
     public record AgendaShard(List<AgendaBondPair> Agenda);
 
     public record AgendaBondPair(GatheringShard Gathering, GatheringBond Bond);
@@ -31,7 +32,8 @@ namespace Core.Boundaries
 
 	public interface INestOperations
     {
-        Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
+        Task<NestShard> GetNestAsync(ulong userId, ulong targetId);
+        Task<NestGalleryShard> GetNestGalleryAsync(ulong userId, ulong targetId, ulong gatheringId);
 
         Task<AgendaShard> GetUserAgendaAsync(ulong userId);
         Task<IDictionary<ulong, AgendaShard>> GetCompanionAgendasAsync(ulong userId);

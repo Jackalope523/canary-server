@@ -21,7 +21,7 @@ namespace Core.Controls
 
 		#region Operations
 
-        public async Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId)
+        public async Task<NestShard> GetNestAsync(ulong userId, ulong targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -30,7 +30,7 @@ namespace Core.Controls
             FailIf(await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User is unable to view target."));
 
-            NestShard nest = new(new(), new());
+            NestShard nest = new(new());
 
             // Check if user is themself
             if (user.Equals(targetUser))
@@ -47,12 +47,6 @@ namespace Core.Controls
                 nest.Gatherings.AddRange((await upcomingAgendaSync).Agenda
                     .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
-
-                foreach (var shard in nest.Gatherings)
-                {
-                    Gathering gathering = new(shard);
-                    nest.Snapshots.AddRange(await gathering.Snapshots);
-                }
             }
             // Check if users are companions
             else if (await targetUser.IsCompanionsWith(user))
@@ -70,12 +64,8 @@ namespace Core.Controls
                 nest.Gatherings.AddRange((await siftedAgendaSync).Agenda
                     .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
-
-                nest = nest with
-                {
-                    Snapshots = await Snapshots.GetSnapshotsByUserAsync(targetUser.Id)
-                };
             }
+            // User is a stranger
             else
             {
                 // Get public hosted gatherings
@@ -92,10 +82,39 @@ namespace Core.Controls
                     .ToList().ConvertAll(e => e.ToGatheringShard());
 
                 nest.Gatherings.AddRange(commonGatherings);
+            }
 
-                var targetSnapshots = await Snapshots.GetSnapshotsByUserAsync(targetUser.Id);
+            return nest;
+        }
 
-                nest.Snapshots.AddRange(targetSnapshots.Where(snapshot => commonGatherings.Exists(e => e.Id.Equals(snapshot.GatheringId))));
+        public async Task<NestGalleryShard> GetNestGalleryAsync(ulong userId, ulong targetId, ulong gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+            var gathering = await GetGatheringAsync(gatheringId);
+
+            // Fail if user is blocked
+            FailIf(await user.IsBlockedBy(targetUser),
+                new InvalidUserException("User is unable to view target."));
+
+            // Fail if user cannot view gathering
+            Verify(await user.CanView(gathering),
+                new InvalidUserException("User is unable to view gathering."));
+
+            NestGalleryShard nest = new(new());
+
+            // Check if user is themself
+            if (user.Equals(targetUser))
+            {
+                nest = new(await gathering.Snapshots);
+            }
+            // Check if users are companions or attended a common gathering
+            else if (await targetUser.IsCompanionsWith(user) || await gathering.WasAttendedBy(user))
+            {
+                var targetSnapshots = (await gathering.Snapshots)
+                    .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
+
+                nest = new(targetSnapshots);
             }
 
             return nest;
