@@ -267,7 +267,7 @@ namespace Core.Controls
         internal async Task<(GeoLocation Location, Distance Radius)>
             RequestLastKnownUserLocationAsync(User user)
         {
-            var result = await Accounts.GetRecentLocationAsync(user.Id);
+            var result = await Accounts.GetRecentUserLocationAsync(user.Id);
 
             if (result == null)
             { return (GeoLocation.None, Distance.None); }
