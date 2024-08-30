@@ -104,7 +104,7 @@ namespace Repository.Tests
         [Fact]
         public async Task RateSnapshotAsync_SUCCESS()
         {
-            SnapshotLink.SnapshotLinkType rating = SnapshotLink.SnapshotLinkType.RateUp;
+            SnapshotLink.SnapshotLinkType rating = SnapshotLink.SnapshotLinkType.Appreciate;
             Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             sentry.ExecuteWrite(ctx => ctx.Snapshots.Add(testSnapshot));
 

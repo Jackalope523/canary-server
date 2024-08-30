@@ -29,7 +29,7 @@ namespace Core.Controls
         public async Task<CoreUser> GetCoreUserAsync(string phoneNumber)
 		{
             // Verify phone number is valid
-            PassIf(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
+            Verify(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
                 new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
 
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
@@ -68,7 +68,7 @@ namespace Core.Controls
             };
 
             // Validate and normalise user
-            PassIf(newUser.ValidateAndNormalise(out string issues),
+            Verify(newUser.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
 
             // Verify phone number is not in use
@@ -105,7 +105,7 @@ namespace Core.Controls
             user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
-            PassIf(user.ValidateAndNormalise(out string issues),
+            Verify(user.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
 
             List<(string Property, object Value)> edits = new();

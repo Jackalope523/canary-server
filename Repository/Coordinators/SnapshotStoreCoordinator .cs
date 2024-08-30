@@ -39,14 +39,14 @@
             return await store.GetSnapshotsForGatheringAsync(id);
         }
 
-        public async Task RemoveSnapshotAsync(ulong snapshotId)
+        public async Task DeleteSnapshotAsync(ulong snapshotId)
         {
-            await store.RemoveSnapshotAsync(snapshotId);
+            await store.DeleteSnapshotAsync(snapshotId);
         }
 
-        public async Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId)
+        public async Task DeleteSnapshotAcclaimAsync(ulong snapshotId, ulong voterId)
         {
-            await store.RemoveSnapshotAcclaimAsync(snapshotId, voterId);
+            await store.DeleteSnapshotAcclaimAsync(snapshotId, voterId);
         }
     }
 }

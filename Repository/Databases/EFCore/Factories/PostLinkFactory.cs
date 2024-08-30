@@ -9,7 +9,7 @@ namespace Repository
             {
                 UserId = user.Id,
                 SnapshotId = snapshot.Id,
-                Type = SnapshotLink.SnapshotLinkType.RateUp,
+                Type = SnapshotLink.SnapshotLinkType.Appreciate,
                 Time = DateTimeOffset.MinValue
             };
         }
