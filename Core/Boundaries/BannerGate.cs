@@ -14,9 +14,9 @@ namespace Core.Boundaries
 
 	public interface IBannerDatabase
 	{
-		Task<BannerShard> FindBannerByCodeAsync(string code);
+		Task<BannerShard> CheckCodeAsync(string code);
 
-        Task<BannerShard> FindBannerForUserAsync(ulong userId);
+        Task<BannerShard> GetUserBannerAsync(ulong userId);
 		Task AddUserToBannerAsync(ulong userId, ulong bannerId, DateTimeOffset time);
     }
 

@@ -118,7 +118,7 @@ namespace Repository
 
             // Snapshot Link
             modelBuilder.Entity<SnapshotLink>()
-               .HasIndex(l => new { l.UserId, l.PostId })
+               .HasIndex(l => new { l.UserId, l.SnapshotId })
                .IsUnique();
         }
     }

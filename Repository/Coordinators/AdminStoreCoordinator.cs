@@ -11,9 +11,9 @@ namespace Repository
             store = new EFCoreAdminStore(flag);
         }
 
-        public Task<List<CoreGathering>> GetAllWaitingGatheringsAsync(DateTimeOffset currentTime)
+        public async Task<List<CoreGathering>> GetAllWaitingGatheringsAsync(DateTimeOffset currentTime)
         {
-            return store.GetAllWaitingGatheringsAsync(currentTime);
+            return await store.GetAllWaitingGatheringsAsync(currentTime);
         }
 
         public async Task VoidGatheringAsync(ulong gatheringId)

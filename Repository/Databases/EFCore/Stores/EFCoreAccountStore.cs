@@ -97,7 +97,6 @@ namespace Repository
 
         public async Task<CoreUser> FindUserByIdAsync(ulong id) 
         {            
-            int numAppreciateers;
             CoreUser user;
             try 
             {
@@ -142,7 +141,6 @@ namespace Repository
         }
         public async Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber) 
         {
-            int numAppreciateers;
             CoreUser user;
             try
             {
@@ -187,7 +185,6 @@ namespace Repository
         }
         public async Task<CoreUser> FindUserByEmailAsync(string email) 
         { 
-            int numAppreciateers;
             CoreUser user;
             try
             {

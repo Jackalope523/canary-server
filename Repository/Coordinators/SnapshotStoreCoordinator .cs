@@ -1,7 +1,4 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
-
-namespace Repository
+﻿namespace Repository
 {
     public class SnapshotStoreCoordinator : ISnapshotDatabase
     {
@@ -37,19 +34,19 @@ namespace Repository
           await store.AcclaimSnapshotAsync(postId, voterId);
         }
 
-        public async Task DeleteSnapshotAsync(ulong postId)
-        {
-            await store.DeleteSnapshotAsync(postId);
-        }
-
-        public async Task DeleteSnapshotAcclaimAsync(ulong postId, ulong voterId)
-        {
-            await store.DeleteSnapshotAcclaimAsync(postId, voterId);
-        }
-
         public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(ulong id)
         {
             return await store.GetSnapshotsForGatheringAsync(id);
+        }
+
+        public async Task RemoveSnapshotAsync(ulong snapshotId)
+        {
+            await store.RemoveSnapshotAsync(snapshotId);
+        }
+
+        public async Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId)
+        {
+            await store.RemoveSnapshotAcclaimAsync(snapshotId, voterId);
         }
     }
 }
