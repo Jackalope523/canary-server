@@ -20,24 +20,24 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.BannerLinks.Add(toAdd));
         }
 
-        public async Task<BannerShard> FindBannerByCodeAsync(string code)
+        public async Task<BannerShard> CheckCodeAsync(string code)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.Banners
-                .Where(b => b.Code == code)
-                .Select(b => new BannerShard(b.Id, b.Name, b.Code))
-                .SingleAsync());
+               ctx.Banners
+               .Where(b => b.Code == code)
+               .Select(b => new BannerShard(b.Id, b.Name, b.Code))
+               .SingleAsync());
         }
 
-        public async Task<BannerShard> FindBannerForUserAsync(ulong userId)
+        public async Task<BannerShard> GetUserBannerAsync(ulong userId)
         {
-            ulong bannerId = await storeSentry.ExecuteReadAsync(ctx => 
-                                ctx.BannerLinks
-                                .Where(l => l.UserId == userId)
-                                .Select(l => l.BannerId)
-                                .SingleAsync());
+            ulong bannerId = await storeSentry.ExecuteReadAsync(ctx =>
+                               ctx.BannerLinks
+                               .Where(l => l.UserId == userId)
+                               .Select(l => l.BannerId)
+                               .SingleAsync());
 
-            return await storeSentry.ExecuteReadAsync(ctx => 
+            return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Banners
                 .Where(b => b.Id == bannerId)
                 .Select(b => new BannerShard(b.Id, b.Name, b.Code))

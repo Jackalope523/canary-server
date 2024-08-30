@@ -29,7 +29,7 @@ namespace Core.Controls
         public async Task<CoreUser> GetCoreUserAsync(string phoneNumber)
 		{
             // Verify phone number is valid
-            Verify(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
+            PassIf(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
                 new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
 
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
@@ -52,7 +52,7 @@ namespace Core.Controls
             // Verify banner code
             try
             {
-                banner = await Banners.FindBannerByCodeAsync(code);
+                banner = await Banners.CheckCodeAsync(code);
             }
             catch
             { throw new InvalidInformationException("Incorrect code."); }
@@ -68,7 +68,7 @@ namespace Core.Controls
             };
 
             // Validate and normalise user
-            Verify(newUser.ValidateAndNormalise(out string issues),
+            PassIf(newUser.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
 
             // Verify phone number is not in use
@@ -105,7 +105,7 @@ namespace Core.Controls
             user.Name = nameChanged ? name : user.Name;
 
             // Validate and Normalise
-            Verify(user.ValidateAndNormalise(out string issues),
+            PassIf(user.ValidateAndNormalise(out string issues),
                 new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
 
             List<(string Property, object Value)> edits = new();
@@ -201,12 +201,10 @@ namespace Core.Controls
             if (await userIsAtGathering)
             {
                 var currentGathering = await user.CurrentGathering;
-                Log.LogWarning("User {name} at gathering {title}.", user.Name, currentGathering.Name);
 
                 // Check if user left the gathering radius
                 if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
                 {
-                    Log.LogWarning("User {name} out of gathering {title} range.", user.Name, currentGathering.Name);
                     // Check if user is a guest or the host
                     if (currentGathering.IsHostedBy(user))
                     {
@@ -233,11 +231,8 @@ namespace Core.Controls
             else if (!await userIsAtGathering &&
                 !nextGathering.Equals(Gathering.None))
             {
-                Log.LogWarning("User {name} on way to gathering {title} ", user.Name, nextGathering.Name);
-                Log.LogWarning("Waiting? {waiting}\nHosted? {hosted}", nextGathering.IsWaiting, nextGathering.IsHostedBy(user));
-
                 // Check if user is host and can start gathering
-                if (nextGathering.IsWaitingAuto &&
+                if (nextGathering.IsWaiting &&
                     nextGathering.IsHostedBy(user))
                 {
                     Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Name);
@@ -272,7 +267,7 @@ namespace Core.Controls
         internal async Task<(GeoLocation Location, Distance Radius)>
             RequestLastKnownUserLocationAsync(User user)
         {
-            var result = await Accounts.GetRecentLocationAsync(user.Id);
+            var result = await Accounts.GetRecentUserLocationAsync(user.Id);
 
             if (result == null)
             { return (GeoLocation.None, Distance.None); }

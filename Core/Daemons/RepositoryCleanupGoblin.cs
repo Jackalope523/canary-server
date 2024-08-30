@@ -53,7 +53,7 @@ namespace Core.Daemons
                     break;
                 }
 
-                if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart))
+                if (!IsWithin(Time - gathering.StartTime, Gathering.MaximumEarlyBirdStart))
                 {
                     log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Name);
                     await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);

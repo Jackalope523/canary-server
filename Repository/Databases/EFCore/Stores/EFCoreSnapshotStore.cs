@@ -1,9 +1,4 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Mathematics;
-using Serilog;
-using Serilog.Core;
-using System;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
@@ -49,7 +44,7 @@ namespace Repository
             List<ulong> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
 
             // Get unseen posts by companions from certain depth.
-            List<SnapshotShard> companionPosts = await storeSentry.ExecuteReadAsync(ctx =>
+            List<SnapshotShard> companionSnapshots = await storeSentry.ExecuteReadAsync(ctx =>
               ctx.Snapshots.
               Where(p => companions.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
               Join(
@@ -59,31 +54,27 @@ namespace Repository
                   (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1)
                ).ToListAsync());
 
-            List<Task<int>> companionPostsPositiveRatings = new();
-            List<Task<int>> companionPostNegativeRatings = new();
+            List<Task<int>> companionSnapshotsPositiveRatings = new();
+
             List<ulong> sitesToBeExplored = new();
-            List<ulong> previouslyExtractedPosts = new();
-            foreach (SnapshotShard e in companionPosts)
+            List<ulong> previouslyExtractedSnapshots = new();
+            foreach (SnapshotShard s in companionSnapshots)
             {
-                companionPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
+                companionSnapshotsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
                     ctx.SnapshotLinks.
-                    Where(l => l.PostId == e.Id && l.Type == SnapshotLink.SnapshotLinkType.RateUp).
+                    Where(l => l.SnapshotId == s.Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).
                     CountAsync()));
 
-                companionPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
-                    ctx.SnapshotLinks.
-                    Where(l => l.PostId == e.Id && l.Type == SnapshotLink.SnapshotLinkType.RateDown).
-                    CountAsync()));
 
                 // Compile unique list if gatherings spanned by companion posts and a list of already loaded posts. 
-                if (!sitesToBeExplored.Contains(e.GatheringId)) sitesToBeExplored.Add(e.GatheringId);
-                previouslyExtractedPosts.Add(e.Id);
+                if (!sitesToBeExplored.Contains(s.GatheringId)) sitesToBeExplored.Add(s.GatheringId);
+                previouslyExtractedSnapshots.Add(s.Id);
             }
 
             // Get remaining companion posts from same gatherings as others even if outside time range.
-            List<SnapshotShard> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => 
+            List<SnapshotShard> nettedSnapshots = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Snapshots.
-                Where(p => companions.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
+                Where(p => companions.Contains(p.OwnerId) && !previouslyExtractedSnapshots.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
                 Join(
                   ctx.Users,
                   p => p.OwnerId,
@@ -91,32 +82,33 @@ namespace Repository
                   (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1)
                 ).ToListAsync());
 
-            List<Task<int>> nettedPostsPositiveRatings = new();
-            List<Task<int>> nettedPostNegativeRatings = new();
-            foreach (SnapshotShard e in nettedPosts)
-            {
-                nettedPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
-                    ctx.SnapshotLinks.
-                    Where(l => l.PostId == e.Id && l.Type == SnapshotLink.SnapshotLinkType.RateUp).
-                    CountAsync()));
+            List<Task<int>> nettedSnapshotsPositiveRatings = new();
 
-                nettedPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
+            foreach (SnapshotShard s in nettedSnapshots)
+            {
+                nettedSnapshotsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
                     ctx.SnapshotLinks.
-                    Where(l => l.PostId == e.Id && l.Type == SnapshotLink.SnapshotLinkType.RateDown).
+                    Where(l => l.SnapshotId == s.Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).
                     CountAsync()));
             }
 
-            await Task.WhenAll(companionPostsPositiveRatings);
-            await Task.WhenAll(companionPostNegativeRatings);
-            await Task.WhenAll(nettedPostsPositiveRatings);
-            await Task.WhenAll(nettedPostNegativeRatings);
+            for (int i = 0; i < companionSnapshots.Count; i++)
+            {
+                companionSnapshots[i] = companionSnapshots[i] with { Acclaim = await companionSnapshotsPositiveRatings[i] };
+            }
 
-            return companionPosts.Concat(nettedPosts).ToList();
+            for (int i = 0; i < nettedSnapshots.Count; i++)
+            {
+                nettedSnapshots[i] = nettedSnapshots[i] with { Acclaim = await nettedSnapshotsPositiveRatings[i] };
+            }
+
+            return companionSnapshots.Concat(nettedSnapshots).ToList();
+
         }
 
         public async Task<SnapshotShard> GetSnapshotAsync(ulong id)
         {
-            Task<int> ups = storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.PostId == id && l.Type == SnapshotLink.SnapshotLinkType.RateUp).CountAsync());
+            Task<int> appreciates = storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.SnapshotId == id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).CountAsync());
 
             SnapshotShard snapshot = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Snapshots.
@@ -130,7 +122,7 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return snapshot with { User = new UserShard(snapshot.User.Id, await name), Acclaim = await ups };
+            return snapshot with { User = new UserShard(snapshot.User.Id, await name), Acclaim = await appreciates };
         }
 
         public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong id)
@@ -141,17 +133,14 @@ namespace Repository
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
-            List<Task<int>> negativeRatings = new(snapshots.Count);
             List<Task<string>> authorNames = new(snapshots.Count);
             for (int i = 0; i < snapshots.Count; i++)
             {
-                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.RateUp).CountAsync()));
-                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.RateDown).CountAsync()));
+                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.SnapshotId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).CountAsync()));
                 authorNames.Add(storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == snapshots[i].User.Id).Select(u => u.Name).SingleAsync()));
             }
 
             int[] ups = await Task.WhenAll(positiveRatings);
-            int[] downs = await Task.WhenAll(negativeRatings);
             string[] names = await Task.WhenAll(authorNames);
 
             for (int i = 0; i < snapshots.Count; i++)
@@ -167,14 +156,14 @@ namespace Repository
             SnapshotLink toAdd = new()
             {
                 UserId = voterId,
-                PostId = postId,
+                SnapshotId = postId,
                 Time = DateTimeOffset.UtcNow,
-                Type = SnapshotLink.SnapshotLinkType.RateUp
+                Type = SnapshotLink.SnapshotLinkType.Appreciate
             };
 
             ulong id = await storeSentry.ExecuteReadAsync(ctx =>
                         ctx.SnapshotLinks.
-                        Where(l => l.UserId == voterId && l.PostId == postId).
+                        Where(l => l.UserId == voterId && l.SnapshotId == postId).
                         Select(l => l.Id).
                         SingleOrDefaultAsync());
 
@@ -196,7 +185,7 @@ namespace Repository
             Func<QueryContext, Task> query = EF.CompileAsyncQuery(
                 (QueryContext ctx) =>
                 ctx.SnapshotLinks.
-                Where(l => l.UserId == voterId && l.PostId == postId).
+                Where(l => l.UserId == voterId && l.SnapshotId == postId).
                 ExecuteDelete());
 
             await storeSentry.ExecuteWriteAsync(query);
@@ -210,17 +199,14 @@ namespace Repository
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
-            List<Task<int>> negativeRatings = new(snapshots.Count);
             List<Task<string>> authorNames = new(snapshots.Count);
             for (int i = 0; i < snapshots.Count; i++)
             {            
-                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.RateUp).CountAsync()));
-                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.RateDown).CountAsync()));
+                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.SnapshotId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).CountAsync()));
                 authorNames.Add(storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == snapshots[i].User.Id).Select(u => u.Name).SingleAsync()));
             }
 
             int[] ups = await Task.WhenAll(positiveRatings);
-            int[] downs = await Task.WhenAll(negativeRatings);
             string[] names = await Task.WhenAll(authorNames);
 
             for (int i = 0; i < snapshots.Count; i++)
@@ -229,6 +215,22 @@ namespace Repository
             }
 
             return snapshots;
+        }
+
+        public async Task RemoveSnapshotAsync(ulong snapshotId)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = snapshotId }));
+        }
+
+        public async Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId)
+        {
+            Func<QueryContext, Task> query = EF.CompileAsyncQuery(
+                (QueryContext ctx) =>
+                ctx.SnapshotLinks.
+                Where(l => l.UserId == voterId && l.SnapshotId == snapshotId).
+                ExecuteDelete());
+
+            await storeSentry.ExecuteWriteAsync(query);
         }
     }
 }

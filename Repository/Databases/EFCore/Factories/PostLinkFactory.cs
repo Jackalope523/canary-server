@@ -8,7 +8,7 @@ namespace Repository
             return new SnapshotLink
             {
                 UserId = user.Id,
-                PostId = snapshot.Id,
+                SnapshotId = snapshot.Id,
                 Type = SnapshotLink.SnapshotLinkType.RateUp,
                 Time = DateTimeOffset.MinValue
             };
