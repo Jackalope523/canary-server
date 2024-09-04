@@ -15,12 +15,12 @@ namespace Frontier
             return Task.CompletedTask;
         }
 
-        public Task<BannerShard> CheckCodeAsync(string code)
+        public Task<BannerShard> FindBannerByCodeAsync(string code)
         {
             return Task.FromResult<BannerShard>(new(0, "", code));
         }
 
-        public Task<BannerShard> GetUserBannerAsync(ulong userId)
+        public Task<BannerShard> FindBannerForUserAsync(ulong userId)
         {
             return Task.FromResult<BannerShard>(new(0, "debug", "code"));
         }

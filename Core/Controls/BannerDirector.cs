@@ -18,7 +18,7 @@ namespace Core.Controls
 		public async Task<BannerShard> GetBannerAsync(ulong userId)
 		{
 			var user = await GetUserAsync(userId);
-			var userBanner = await Banners.GetUserBannerAsync(user.Id);
+			var userBanner = await Banners.FindBannerForUserAsync(user.Id);
 
 			return userBanner;
 		}
@@ -29,7 +29,7 @@ namespace Core.Controls
 
 		public async Task<BannerShard> RequestUserBannerAsync(User user)
 		{
-			return await Banners.GetUserBannerAsync(user.Id);
+			return await Banners.FindBannerForUserAsync(user.Id);
 		}
 
 		#endregion

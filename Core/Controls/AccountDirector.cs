@@ -52,7 +52,7 @@ namespace Core.Controls
             // Verify banner code
             try
             {
-                banner = await Banners.CheckCodeAsync(code);
+                banner = await Banners.FindBannerByCodeAsync(code);
             }
             catch
             { throw new InvalidInformationException("Incorrect code."); }
@@ -232,7 +232,7 @@ namespace Core.Controls
                 !nextGathering.Equals(Gathering.None))
             {
                 // Check if user is host and can start gathering
-                if (nextGathering.IsWaiting &&
+                if (nextGathering.IsWaitingAuto &&
                     nextGathering.IsHostedBy(user))
                 {
                     Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Name);
