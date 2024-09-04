@@ -143,13 +143,13 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpGet("{gatheringId}/checkin")]
-        public async Task<IActionResult> CheckInToGathering(ulong gatheringId)
+		[HttpGet("{gatheringId}/checkin?lat={latitude}&long={longitude}")]
+        public async Task<IActionResult> CheckInToGathering(ulong gatheringId, float latitude, float longitude)
 		{
 			return await Execute(async user =>
 			{
 				// Check in to gathering
-				await gatherings.CheckInToGatheringAsync(user.Id);
+				await gatherings.CheckInToGatheringAsync(user.Id, latitude, longitude);
 			});
 		}
 

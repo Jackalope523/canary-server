@@ -444,15 +444,23 @@ namespace Core.Controls
 			{ _ = gathering.Host.Notify($"Sparrower Inbound", $"{user.Name} is joining your gathering."); }
 		}
 
-		public async Task CheckInToGatheringAsync(ulong userId)
+		public async Task CheckInToGatheringAsync(ulong userId, double latitude, double longitude)
         {
             var user = await GetUserAsync(userId);
-
             var nextGathering = await user.NextGathering();
+
+            user.LastKnownLocation.Set(new() { Latitude = latitude, Longitude = longitude });
+
+            // Position update
+            _ = Accounts.UpdateRecentLocationAsync(user.Id,
+                (await user.LastKnownLocation).Latitude,
+                (await user.LastKnownLocation).Longitude,
+                (await user.LastKnownRadius).Metres);
 
             if (!await user.IsAtGathering() &&
                 !nextGathering.Equals(Gathering.None) &&
-				nextGathering.IsOngoing)
+				nextGathering.IsOngoing &&
+                await nextGathering.IsInRange(user))
 			{
 				await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
 			}

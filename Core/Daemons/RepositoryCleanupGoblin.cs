@@ -27,16 +27,18 @@ namespace Core.Daemons
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                log.LogInformation("Gravekeeper goblin clocking in at {time}.", Time);
+
                 try
                 {
-                    log.LogInformation("Gravekeeper goblin clocking in at {time}.", Time);
                     await KillZombieGatheringsAsync(stoppingToken);
-                    log.LogInformation("Gravekeeper goblin clocking out at {time}.", Time);
                 }
                 catch (Exception e)
                 {
                     log.LogError("{goblin} had trouble: {error}", nameof(RepositoryCleanupGoblin), e);
                 }
+
+                log.LogInformation("Gravekeeper goblin clocking out at {time}.", Time);
 
                 await Task.Delay(interval, stoppingToken);
             }
