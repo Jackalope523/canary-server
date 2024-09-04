@@ -6,7 +6,7 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-    public record NestShard(List<GatheringShard> Gatherings);
+    public record NestShard(List<ulong> GatheringIds);
     public record NestGalleryShard(List<SnapshotShard> Snapshots);
     public record AgendaShard(List<AgendaBondPair> Agenda);
 
