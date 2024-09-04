@@ -60,7 +60,7 @@ namespace Core.Daemons
                     var gathering = await terminal.GatheringDatabase.FindGatheringAsync(gatheringId);
 
                     // Check if gathering has ended
-                    if (gathering.State.Equals(GatheringState.Ended))
+                    if (gathering.IsPendingDeletion || gathering.State.Equals(GatheringState.Ended))
                     {
                         log.LogInformation("Telegram {id} expired, deleting.", telegram.Id);
                         await terminal.NotificationDatabase.DeleteTelegramAsync(telegram.Id);
