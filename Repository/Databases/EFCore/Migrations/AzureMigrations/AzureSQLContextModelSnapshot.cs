@@ -31,6 +31,11 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -346,7 +351,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("PostId")
+                    b.Property<decimal>("SnapshotId")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<DateTimeOffset>("Time")
@@ -360,9 +365,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId", "PostId")
+                    b.HasIndex("UserId", "SnapshotId")
                         .IsUnique();
 
                     b.ToTable("SnapshotLinks");
@@ -707,9 +712,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.HasOne("Repository.Snapshot", "Post")
+                    b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany()
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("SnapshotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -719,7 +724,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("Snapshot");
 
                     b.Navigation("User");
                 });

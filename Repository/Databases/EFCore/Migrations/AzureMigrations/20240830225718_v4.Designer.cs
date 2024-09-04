@@ -10,11 +10,11 @@ using Repository;
 
 #nullable disable
 
-namespace Repository.Migrations.AzureMigrations
+namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 {
     [DbContext(typeof(AzureSQLContext))]
-    [Migration("20240819172904_Snapshot Reporting")]
-    partial class SnapshotReporting
+    [Migration("20240830225718_v4")]
+    partial class v4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,11 @@ namespace Repository.Migrations.AzureMigrations
                         .HasColumnType("decimal(20,0)");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -349,7 +354,7 @@ namespace Repository.Migrations.AzureMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("PostId")
+                    b.Property<decimal>("SnapshotId")
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<DateTimeOffset>("Time")
@@ -363,9 +368,9 @@ namespace Repository.Migrations.AzureMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId", "PostId")
+                    b.HasIndex("UserId", "SnapshotId")
                         .IsUnique();
 
                     b.ToTable("SnapshotLinks");
@@ -710,9 +715,9 @@ namespace Repository.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.HasOne("Repository.Snapshot", "Post")
+                    b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany()
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("SnapshotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -722,7 +727,7 @@ namespace Repository.Migrations.AzureMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("Snapshot");
 
                     b.Navigation("User");
                 });
