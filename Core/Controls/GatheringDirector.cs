@@ -289,7 +289,7 @@ namespace Core.Controls
 				new InvalidUserException("User does not have permissions to end gathering."));
 
 			// Verify gathering is able to be terminated
-            FailIf(gathering.IsTerminable(),
+            Verify(gathering.IsTerminable(),
                 new InvalidGatheringException("Gathering cannot be terminated."));
 
             // Try to end gathering
