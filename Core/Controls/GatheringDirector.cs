@@ -444,6 +444,20 @@ namespace Core.Controls
 			{ _ = gathering.Host.Notify($"Sparrower Inbound", $"{user.Name} is joining your gathering."); }
 		}
 
+		public async Task CheckInToGatheringAsync(ulong userId)
+        {
+            var user = await GetUserAsync(userId);
+
+            var nextGathering = await user.NextGathering();
+
+            if (!await user.IsAtGathering() &&
+                !nextGathering.Equals(Gathering.None) &&
+				nextGathering.IsOngoing)
+			{
+				await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
+			}
+        }
+
 		public async Task LeaveGatheringAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);

@@ -143,6 +143,16 @@ namespace Frontier.Controllers
 			});
 		}
 
+		[HttpGet("{gatheringId}/checkin")]
+        public async Task<IActionResult> CheckInToGathering(ulong gatheringId)
+		{
+			return await Execute(async user =>
+			{
+				// Check in to gathering
+				await gatherings.CheckInToGatheringAsync(user.Id);
+			});
+		}
+
 		[HttpPut("{gatheringId}")]
 		public async Task<IActionResult> LeaveGathering(ulong gatheringId)
 		{

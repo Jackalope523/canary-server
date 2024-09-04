@@ -80,6 +80,7 @@ namespace Core.Boundaries
 		Task WatchGatheringAsync(ulong userId, ulong gatheringId);
 		Task UnwatchGatheringAsync(ulong userId, ulong gatheringId);
 		Task JoinGatheringAsync(ulong userId, ulong gatheringId);
+		Task CheckInToGatheringAsync(ulong userId);
 		Task LeaveGatheringAsync(ulong userId, ulong gatheringId);
 
 		Task<List<GuestListBondPair>> GetGuestListAsync(ulong userId, ulong gatheringId);
