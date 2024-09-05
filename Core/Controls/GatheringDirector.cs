@@ -289,7 +289,7 @@ namespace Core.Controls
 				new InvalidUserException("User does not have permissions to end gathering."));
 
 			// Verify gathering is able to be terminated
-            FailIf(gathering.IsTerminable(),
+            Verify(gathering.IsTerminable(),
                 new InvalidGatheringException("Gathering cannot be terminated."));
 
             // Try to end gathering
@@ -457,13 +457,14 @@ namespace Core.Controls
                 (await user.LastKnownLocation).Longitude,
                 (await user.LastKnownRadius).Metres);
 
-            if (!await user.IsAtGathering() &&
-                !nextGathering.Equals(Gathering.None) &&
-				nextGathering.IsOngoing &&
-                await nextGathering.IsInRange(user))
-			{
-				await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
-			}
+			FailIf(await user.IsAtGathering(),
+				new InvalidActionException("User is currently attending another gathering."));
+			FailIf(nextGathering.Equals(Gathering.None) || !nextGathering.IsOngoing,
+                new InvalidActionException("User does not have an available gathering to check-in to."));
+            FailIf(!await nextGathering.IsInRange(user),
+                new InvalidActionException("User is not in range of the gathering."));
+            
+			await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
         }
 
 		public async Task LeaveGatheringAsync(ulong userId, ulong gatheringId)
