@@ -73,6 +73,17 @@ namespace Core.Exceptions
     #region Core
 
     [Serializable]
+	public class InvalidActionException : UserErrorException
+	{
+		public InvalidActionException()
+            : base() { }
+		public InvalidActionException(string message)
+            : base(message) { }
+        public InvalidActionException(string message, Exception innerException)
+			: base(message, innerException) { }
+    }
+
+    [Serializable]
 	public class InvalidUserException : UserErrorException
 	{
 		public InvalidUserException()
