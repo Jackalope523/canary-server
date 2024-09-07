@@ -18,6 +18,8 @@ namespace Core.Boundaries
 
     public record ColumnShard(List<GatheringHeader> Headers, List<SnapshotShard> Snapshots);
 
+    public record GalleryShard(List<SnapshotShard> Snapshots);
+
     #endregion
 
     #region Gates
@@ -39,7 +41,7 @@ namespace Core.Boundaries
 
     public interface ISnapshotOperations
     {
-        Task<List<SnapshotShard>> GetGatheringSnapshotsAsync(ulong userId, ulong gatheringId);
+        Task<GalleryShard> GetGalleryAsync(ulong userId, ulong targetId, ulong gatheringId);
         Task<SnapshotShard> AddSnapshotAsync(ulong userId, ulong gatheringId, MemoryStream image);
         Task DeleteSnapshotAsync(ulong userId, ulong snapshotId);
         Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, SnapshotAcclaim acclaim);

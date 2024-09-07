@@ -29,13 +29,6 @@ namespace Frontier.Controllers
 				await nests.GetNestAsync(user.Id, targetId));
 		}
 
-		[HttpGet("{targetId}/{gatheringId}")]
-        public async Task<IActionResult> GetNestGallery(ulong targetId, ulong gatheringId)
-		{
-			return await Execute(async user =>
-				await nests.GetNestGalleryAsync(user.Id, targetId, gatheringId));
-		}
-
 		[HttpGet("companions")]
         public async Task<IActionResult> GetCompanions()
         {

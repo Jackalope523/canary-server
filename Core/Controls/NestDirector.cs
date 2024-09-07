@@ -87,39 +87,6 @@ namespace Core.Controls
             return nest;
         }
 
-        public async Task<NestGalleryShard> GetNestGalleryAsync(ulong userId, ulong targetId, ulong gatheringId)
-        {
-            var user = await GetUserAsync(userId);
-            var targetUser = await GetUserAsync(targetId);
-            var gathering = await GetGatheringAsync(gatheringId);
-
-            // Fail if user is blocked
-            FailIf(await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User is unable to view target."));
-
-            // Fail if user cannot view gathering
-            Verify(await user.CanView(gathering),
-                new InvalidUserException("User is unable to view gathering."));
-
-            NestGalleryShard nest = new(new());
-
-            // Check if user is themself
-            if (user.Equals(targetUser))
-            {
-                nest = new(await gathering.Snapshots);
-            }
-            // Check if users are companions or attended a common gathering
-            else if (await targetUser.IsCompanionsWith(user) || await gathering.WasAttendedBy(user))
-            {
-                var targetSnapshots = (await gathering.Snapshots)
-                    .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
-
-                nest = new(targetSnapshots);
-            }
-
-            return nest;
-        }
-
         public async Task<AgendaShard> GetUserAgendaAsync(ulong userId)
         {
             var user = await GetUserAsync(userId);
