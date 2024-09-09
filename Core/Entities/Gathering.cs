@@ -175,7 +175,7 @@ namespace Core.Entities
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Name, IsOngoing ? StartTime : EndTime.Value, IsActive, lastActiveTime, FriendlyLocation);
+            return new(Id, Name, IsOngoing ? StartTime : EndTime.Value, IsOngoing, lastActiveTime, FriendlyLocation);
         }
 
 		#endregion
