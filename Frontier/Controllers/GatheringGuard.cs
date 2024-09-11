@@ -202,28 +202,19 @@ namespace Frontier.Controllers
 		[HttpGet("{gatheringId}/authorisation/start")]
 		public async Task<IActionResult> CheckStartAuthorisation(ulong gatheringId)
 		{
-			return await Execute(async user =>
-			{
-				await gatherings.AuthorisedToStart(user.Id, gatheringId);
-			});
+			return await Execute(async user => await gatherings.AuthorisedToStart(user.Id, gatheringId));
 		}
 
 		[HttpGet("{gatheringId}/authorisation/join")]
 		public async Task<IActionResult> CheckJoinAuthorisation(ulong gatheringId)
 		{
-			return await Execute(async user =>
-			{
-				await gatherings.AuthorisedToJoin(user.Id, gatheringId);
-			});
+			return await Execute(async user => await gatherings.AuthorisedToJoin(user.Id, gatheringId));
 		}
 
 		[HttpGet("{gatheringId}/authorisation/upload")]
 		public async Task<IActionResult> CheckUploadAuthorisation(ulong gatheringId)
 		{
-			return await Execute(async user =>
-			{
-				await gatherings.AuthorisedToUpload(user.Id, gatheringId);
-			});
+			return await Execute(async user => await gatherings.AuthorisedToUpload(user.Id, gatheringId));
 		}
 
 		[HttpPost("{gatheringId}/report")]
