@@ -87,6 +87,10 @@ namespace Core.Boundaries
 		Task<List<UserShard>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId);
 		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong gatheringId);
 		Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId);
+
+		Task<bool> AuthorisedToStart(ulong userId, ulong gatheringId);
+		Task<bool> AuthorisedToJoin(ulong userId, ulong gatheringId);
+		Task<bool> AuthorisedToUpload(ulong userId, ulong gatheringId);
 	}
 
 	#endregion

@@ -647,6 +647,30 @@ namespace Core.Controls
 			}
 		}
 
+		public async Task<bool> AuthorisedToStart(ulong userId, ulong gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetGatheringAsync(gatheringId);
+
+			return await gathering.IsStartable();
+        }
+
+		public async Task<bool> AuthorisedToJoin(ulong userId, ulong gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetGatheringAsync(gatheringId);
+
+			return await user.CanJoin(gathering);
+        }
+
+		public async Task<bool> AuthorisedToUpload(ulong userId, ulong gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetGatheringAsync(gatheringId);
+
+			return gathering.IsActive;
+        }
+
 		#endregion
 
 		#region Favours
