@@ -1,5 +1,4 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
 
@@ -206,8 +205,7 @@ namespace Repository
                     e.IsDynamic,
                     e.IsPendingDeletion,
                     e.NumberOfGuests
-                 )).
-               ToListAsync());
+                 )).OrderByDescending(e => e.StartTime).ToListAsync());
 
             List<ulong> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.GatheringLinks.
@@ -292,8 +290,7 @@ namespace Repository
                     e.IsDynamic,
                     e.IsPendingDeletion,
                     e.NumberOfGuests
-                 )).
-               ToListAsync());
+                 )).OrderByDescending(e => e.StartTime).ToListAsync());
         }
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(ulong id)
         {
@@ -361,8 +358,7 @@ namespace Repository
                    e.IsDynamic,
                    e.IsPendingDeletion,
                    e.NumberOfGuests
-                )).
-              ToListAsync());
+                )).OrderByDescending(e => e.StartTime).ToListAsync());
         }
         public async Task<CoreGathering> FindGatheringAsync(ulong id)
         {
@@ -443,7 +439,7 @@ namespace Repository
                         e.IsDynamic,
                         e.IsPendingDeletion,
                         e.NumberOfGuests
-                   )).ToListAsync());
+                   )).OrderByDescending(e => e.StartTime).ToListAsync());
         }     
         public async Task<List<UserShard>> GetGuestListAsync(ulong id)
         {
@@ -622,8 +618,7 @@ namespace Repository
                     e.IsDynamic,
                     e.IsPendingDeletion,
                     e.NumberOfGuests
-                    )).
-           ToListAsync());
+                    )).OrderByDescending(e => e.StartTime).ToListAsync());
         }      
         public async Task<GatheringBond?> GetUserStateAsync(ulong userId, ulong gatheringId)
         {

@@ -47,7 +47,7 @@ namespace Repository
                     g.IsDynamic,
                     g.IsPendingDeletion,
                     g.NumberOfGuests
-                 )).ToListAsync());
+                 )).OrderByDescending(e => e.StartTime).ToListAsync());
         }
 
         public async Task VoidGatheringAsync(ulong gatheringId)
