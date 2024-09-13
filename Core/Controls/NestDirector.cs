@@ -41,12 +41,12 @@ namespace Core.Controls
                 // Get private gatherings and snapshots
                 nest = nest with
                 {
-                    GatheringIds = (await targetUser.PastGatherings).ConvertAll(e => e.Id)
+                    Twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard())
                 };
 
-                nest.GatheringIds.AddRange((await upcomingAgendaSync).Agenda
+                nest.Twigs.AddRange((await upcomingAgendaSync).Agenda
                     .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
-                    .ConvertAll(e => new Gathering(e.Gathering).Id));
+                    .ConvertAll(e => new Gathering(e.Gathering).ToTwigShard()));
             }
             // Check if users are companions
             else if (await targetUser.IsCompanionsWith(user))
@@ -58,12 +58,12 @@ namespace Core.Controls
                 // Get private gatherings and snapshots
                 nest = nest with
                 {
-                    GatheringIds = (await targetUser.PastGatherings).ConvertAll(e => e.Id)
+                    Twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard())
                 };
 
-                nest.GatheringIds.AddRange((await siftedAgendaSync).Agenda
+                nest.Twigs.AddRange((await siftedAgendaSync).Agenda
                     .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
-                    .ConvertAll(e => new Gathering(e.Gathering).Id));
+                    .ConvertAll(e => new Gathering(e.Gathering).ToTwigShard()));
             }
             // User is a stranger
             else
@@ -72,16 +72,16 @@ namespace Core.Controls
                 var hostedGatherings = (await Gatherings.FindGatheringsByUserAsync(targetUser.Id)).ConvertAll(e => new Gathering(e));
                 nest = nest with
                 {
-                    GatheringIds = hostedGatherings.ConvertAll(e => e.Id)
+                    Twigs = hostedGatherings.ConvertAll(e => e.ToTwigShard())
                 };
 
                 // Get common gatherings
                 var commonGatherings = (await targetUser.PastGatherings)
                     .Except(hostedGatherings)
                     .Intersect(await user.PastGatherings)
-                    .ToList().ConvertAll(e => e.Id);
+                    .ToList().ConvertAll(e => e.ToTwigShard());
 
-                nest.GatheringIds.AddRange(commonGatherings);
+                nest.Twigs.AddRange(commonGatherings);
             }
 
             return nest;

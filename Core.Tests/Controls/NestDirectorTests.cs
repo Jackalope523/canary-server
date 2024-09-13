@@ -33,10 +33,10 @@ namespace Core.Tests.Controls
 			var nest = await director.GetNestAsync(user.Id, user.Id);
 
 			// Assert
-			Assert.Equal(3, nest.GatheringIds.Count);
-			Assert.Equal(hostedGathering.Id, nest.GatheringIds.Find(e => e.Equals(hostedGathering.Id)));
-			Assert.Equal(attendedGathering.Id, nest.GatheringIds.Find(e => e.Equals(attendedGathering.Id)));
-			Assert.Equal(ongoingGathering.Id, nest.GatheringIds.Find(e => e.Equals(ongoingGathering.Id)));
+			Assert.Equal(3, nest.Twigs.Count);
+			Assert.Equal(hostedGathering.Id, nest.Twigs.Find(e => e.Id.Equals(hostedGathering.Id)).Id);
+			Assert.Equal(attendedGathering.Id, nest.Twigs.Find(e => e.Id.Equals(attendedGathering.Id)).Id);
+			Assert.Equal(ongoingGathering.Id, nest.Twigs.Find(e => e.Id.Equals(ongoingGathering.Id)).Id);
 		}
 
 		[Fact]
@@ -57,7 +57,7 @@ namespace Core.Tests.Controls
 			var nest = await director.GetNestAsync(user.Id, companion.Id);
 
             // Assert
-            Assert.Equal(4, nest.GatheringIds.Count);
+            Assert.Equal(4, nest.Twigs.Count);
 		}
 
 		[Fact]
@@ -74,7 +74,7 @@ namespace Core.Tests.Controls
 			var nest = await director.GetNestAsync(user.Id, randomUser.Id);
 
             // Assert
-            Assert.Equal(2, nest.GatheringIds.Count);
+            Assert.Equal(2, nest.Twigs.Count);
 		}
 
 		[Fact]

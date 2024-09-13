@@ -178,6 +178,11 @@ namespace Core.Entities
             return new(Id, Name, IsOngoing ? StartTime : EndTime.Value, IsOngoing, lastActiveTime, FriendlyLocation);
         }
 
+        public TwigShard ToTwigShard()
+        {
+            return new(Id, StartTime);
+        }
+
 		#endregion
 
 		#region Composition
