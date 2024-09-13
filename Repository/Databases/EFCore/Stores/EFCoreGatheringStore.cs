@@ -205,7 +205,7 @@ namespace Repository
                     e.IsDynamic,
                     e.IsPendingDeletion,
                     e.NumberOfGuests
-                 )).OrderByDescending(e => e.StartTime).ToListAsync());
+                 )).ToListAsync());
 
             List<ulong> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.GatheringLinks.
@@ -290,7 +290,7 @@ namespace Repository
                     e.IsDynamic,
                     e.IsPendingDeletion,
                     e.NumberOfGuests
-                 )).OrderByDescending(e => e.StartTime).ToListAsync());
+                 )).ToListAsync());
         }
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(ulong id)
         {
@@ -358,7 +358,7 @@ namespace Repository
                    e.IsDynamic,
                    e.IsPendingDeletion,
                    e.NumberOfGuests
-                )).OrderByDescending(e => e.StartTime).ToListAsync());
+                )).ToListAsync());
         }
         public async Task<CoreGathering> FindGatheringAsync(ulong id)
         {
@@ -439,7 +439,7 @@ namespace Repository
                         e.IsDynamic,
                         e.IsPendingDeletion,
                         e.NumberOfGuests
-                   )).OrderByDescending(e => e.StartTime).ToListAsync());
+                   )).ToListAsync());
         }     
         public async Task<List<UserShard>> GetGuestListAsync(ulong id)
         {
@@ -618,7 +618,7 @@ namespace Repository
                     e.IsDynamic,
                     e.IsPendingDeletion,
                     e.NumberOfGuests
-                    )).OrderByDescending(e => e.StartTime).ToListAsync());
+                    )).ToListAsync());
         }      
         public async Task<GatheringBond?> GetUserStateAsync(ulong userId, ulong gatheringId)
         {
