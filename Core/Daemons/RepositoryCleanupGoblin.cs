@@ -57,8 +57,13 @@ namespace Core.Daemons
 
                 if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart))
                 {
+                    // Purge gathering
                     log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Name);
                     await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);
+
+                    // Notify user
+                    User host = new(gathering.Host);
+                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.Generic, "");
                 }
             }
         }

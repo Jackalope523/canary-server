@@ -10,7 +10,7 @@ namespace Core.Boundaries
 
 	public enum TelegramMessage
 	{
-		UserAppreciated, GatheringInvitation
+		Generic, UserAppreciated, GatheringInvitation
 	}
 
     public enum DeviceType

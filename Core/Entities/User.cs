@@ -29,6 +29,9 @@ namespace Core.Entities
         public const int ReputationPopulation = 20;
         public const float ReputationIntensity = 2.2f;
 
+        public static User Hollow
+            => new() { Id = 0 };
+
         ///////
         // Properties
         ///////////////
