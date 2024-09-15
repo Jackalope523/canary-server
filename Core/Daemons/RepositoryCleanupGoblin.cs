@@ -63,7 +63,8 @@ namespace Core.Daemons
 
                     // Notify user
                     User host = new(gathering.Host);
-                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.Generic, "");
+                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.Generic,
+                        $"Your gathering {gathering.Name} was removed for being late.");
                 }
             }
         }
