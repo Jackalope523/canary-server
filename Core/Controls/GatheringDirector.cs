@@ -176,8 +176,8 @@ namespace Core.Controls
 			Verify(targetGathering.IsModifiableBy(user),
 				new InvalidGatheringException("User is unable to edit gathering."));
 
-			// Verify gathering is still active
-			Verify(targetGathering.IsActive,
+			// Ensure gathering is editable
+			FailIf(targetGathering.IsTerminated,
 				new InvalidGatheringException("Unable to edit gathering, gathering has ended."));
 
 			// Fail if edits may not be done during the gathering
