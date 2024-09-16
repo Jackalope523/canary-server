@@ -33,7 +33,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGathering([FromForm] GatheringDetailsManifest gatheringDetails)
+        public async Task<IActionResult> CreateGathering([FromForm] GatheringCreationManifest gatheringDetails)
         {
 			// Verify parameters
             if (gatheringDetails == null || !ModelState.IsValid ||
@@ -57,7 +57,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{gatheringId}/edit")]
-        public async Task<IActionResult> EditGathering(ulong gatheringId, [FromForm] GatheringDetailsManifest gatheringDetails)
+        public async Task<IActionResult> EditGathering(ulong gatheringId, [FromForm] GatheringEditManifest gatheringDetails)
 		{
 			// Verify parameters
 			if (gatheringDetails == null)

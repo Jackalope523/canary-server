@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Frontier.Manifests
 {
-	public class GatheringDetailsManifest
+	public class GatheringCreationManifest
     {
         [Required]
         public string Name { get; set; }
@@ -44,7 +44,31 @@ namespace Frontier.Manifests
 
         public IFormFile Image { get; set; }
 
-        public UserShard Host { get; set; }
+    }
+    public class GatheringEditManifest
+    {
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public bool? IsOpen { get; set; }
+
+        public float? Latitude { get; set; }
+
+        public float? Longitude { get; set; }
+
+        public string FriendlyLocation { get; set; }
+
+        public DateTimeOffset? StartTime { get; set; }
+
+        public float? Radius { get; set; }
+
+        public bool IsDynamic { get; set; }
+
+        public int? GroupMinimum { get; set; }
+        public int? GroupMaximum { get; set; }
+
+        public IFormFile Image { get; set; }
 
     }
 
