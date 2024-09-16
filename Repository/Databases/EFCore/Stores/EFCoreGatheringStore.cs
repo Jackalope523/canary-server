@@ -507,6 +507,9 @@ namespace Repository
             {
                 switch (Property)
                 {
+                    case nameof(CoreGathering.Name):
+                        e.Name = (string)Value;
+                        break;
                     case nameof(CoreGathering.Description):
                         e.Description = (string)Value;
                         break;
@@ -517,9 +520,9 @@ namespace Repository
                         e.StartTime = (DateTimeOffset)Value;
                         break;
                     case "Location":
-                        var Location = ((double,double))Value;
+                        var Location = ((double, double))Value;
                         e.Location = new CoordinateFactory().Create(Location.Item2, Location.Item1);
-                        break;              
+                        break;
                     case nameof(CoreGathering.Radius):
                         e.Radius = (double)Value;
                         break;
@@ -527,13 +530,13 @@ namespace Repository
                         e.IsDynamic = (bool)Value;
                         break;
                     case nameof(CoreGathering.GroupMinimum):
-                        e.GroupMinimum = (int)Value;                    
+                        e.GroupMinimum = (int)Value;
                         break;
                     case nameof(CoreGathering.GroupMaximum):
                         e.GroupMaximum = (int)Value;
                         break;
                     default:
-                        throw new InvalidInputException("Property named \"" + Property + "\" can not be updated using this method.");
+                        throw new InvalidInputException($"Property named \"{Property}\" can not be updated using this method.");
                 }
                 storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(Property).IsModified = true, currentDiscussion);
             }
