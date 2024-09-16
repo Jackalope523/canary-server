@@ -138,7 +138,7 @@ namespace Core.Controls
             }
 
             // If now
-			if (IsWithin(Time - newGathering.StartTime, FiveMinutes))
+			if (HasAlready(newGathering.StartTime))
 			{
 				// Ensure user removed from current gathering
 				if (await user.IsAtGathering())
@@ -149,8 +149,8 @@ namespace Core.Controls
 				// Try to start gathering
 				try
 				{
-					await Gatherings.UpdateGatheringAsync(newGathering.Id, new() { (nameof(CoreGathering.StartTime), Time) });
 					await StartGatheringAsync(user.Id, newGathering.Id);
+					await Gatherings.UpdateGatheringAsync(newGathering.Id, new() { (nameof(CoreGathering.StartTime), Time) });
 					newGathering = await GetGatheringAsync(newGathering.Id);
 				}
 				catch { }
