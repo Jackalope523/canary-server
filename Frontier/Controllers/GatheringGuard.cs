@@ -257,7 +257,7 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpPut("{gatheringId}/snapshots")]
+		[HttpPut("{gatheringId}/snapshots/{snapshotId}")]
 		public async Task<IActionResult> RemoveSnapshot(ulong gatheringId, ulong snapshotId)
 		{
 			return await Execute(async user =>
