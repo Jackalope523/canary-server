@@ -339,8 +339,10 @@ namespace Core.Entities
             { return false; }
 
             // Check if host is within range
+            /*
             if (!await IsInRange(Host))
             { return false; }
+            */
 
             return true;
         }
