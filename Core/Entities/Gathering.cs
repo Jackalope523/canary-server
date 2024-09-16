@@ -193,8 +193,13 @@ namespace Core.Entities
 
             // Sanitise User content
             Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
+            if (string.IsNullOrEmpty(Name)) { issues += "Name cannot be empty. "; }
+
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
+            if (string.IsNullOrEmpty(Description)) { issues += "Description cannot be empty. "; }
+
             FriendlyLocation = ContentValidation.NormaliseText(FriendlyLocation, MaximumLocationLength);
+            if (string.IsNullOrEmpty(FriendlyLocation)) { issues += "Friendly location cannot be empty. "; }
 
             // Verify Gathering is now or in the future
             if (HappenedBefore(StartTime, Time - MaximumEarlyBirdStart)) { issues += "Gathering is in the past. "; }

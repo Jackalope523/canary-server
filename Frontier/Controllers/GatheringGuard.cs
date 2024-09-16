@@ -72,7 +72,8 @@ namespace Frontier.Controllers
 				}
 
 				await gatherings.EditGatheringAsync(user.Id, gatheringId,
-					gatheringDescription: gatheringDetails.Description ?? "",
+					gatheringName: gatheringDetails.Name,
+					gatheringDescription: gatheringDetails.Description,
 					isOpen: gatheringDetails.IsOpen,
 					startTime: gatheringDetails.StartTime,
 					latitude: gatheringDetails.Latitude, longitude: gatheringDetails.Longitude,

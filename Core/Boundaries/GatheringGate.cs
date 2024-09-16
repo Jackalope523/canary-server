@@ -69,7 +69,7 @@ namespace Core.Boundaries
 			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum,
 			MemoryStream heroImage);
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
-			string gatheringDescription = "", bool? isOpen = null,
+			string gatheringName = "", string gatheringDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
 			MemoryStream heroImage = null);

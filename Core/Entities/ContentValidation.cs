@@ -95,8 +95,10 @@ namespace Core.Entities
 
 		public string CensorText(string text)
 		{
-			FailIf(string.IsNullOrEmpty(text),
-				new InvalidInformationException($"{nameof(text)} cannot be null or empty."));
+			if (string.IsNullOrEmpty(text))
+			{
+				return "";
+			}
 
 			string censoredText = text;
 
@@ -113,6 +115,11 @@ namespace Core.Entities
 
 		public string HideInformation(string text)
 		{
+			if (string.IsNullOrEmpty(text))
+			{
+				return "";
+			}
+
             // Regular expression to find links
             string linkPattern = @"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
 

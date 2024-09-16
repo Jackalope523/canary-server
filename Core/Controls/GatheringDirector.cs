@@ -163,7 +163,7 @@ namespace Core.Controls
 		}
 
 		public async Task EditGatheringAsync(ulong userId, ulong gatheringId,
-			string gatheringDescription = "", bool? isOpen = null,
+			string gatheringName = "", string gatheringDescription = "", bool? isOpen = null,
 			DateTimeOffset? startTime = null,
 			double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
@@ -182,7 +182,8 @@ namespace Core.Controls
 
 			// Fail if edits may not be done during the gathering
 			FailIf(targetGathering.IsOngoing &&
-				(!string.IsNullOrEmpty(gatheringDescription) ||
+				(!string.IsNullOrEmpty(gatheringName) ||
+				!string.IsNullOrEmpty(gatheringDescription) ||
 				IsNotNull(startTime) ||
 				AreNotNull(latitude, longitude) ||
                 !string.IsNullOrEmpty(friendlyLocation) ||
@@ -191,11 +192,12 @@ namespace Core.Controls
 
 			Gathering editedGathering = new(targetGathering.ToGatheringShard())
 			{
-				Description = gatheringDescription,
+                Name = string.IsNullOrEmpty(gatheringName) ? targetGathering.Name : gatheringName,
+                Description = string.IsNullOrEmpty(gatheringDescription) ? targetGathering.Description : gatheringDescription,
 				State = IsNull(isOpen) ? targetGathering.State : (isOpen.Value ? GatheringState.Open : GatheringState.Sealed),
 				StartTime = startTime ?? targetGathering.StartTime,
 				Location = AreNull(latitude, longitude) ? targetGathering.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
-				FriendlyLocation = friendlyLocation,
+				FriendlyLocation = string.IsNullOrEmpty(friendlyLocation) ? targetGathering.FriendlyLocation : friendlyLocation,
 				Radius = IsNull(radius) ? targetGathering.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
 				IsDynamic = isDynamic ?? targetGathering.IsDynamic,
 				GroupMinimum = groupMinimum ?? targetGathering.GroupMinimum,
@@ -209,6 +211,10 @@ namespace Core.Controls
 			List<(string Property, object Value)> edits = new();
 
 			// Gather individual edits
+			if (!string.IsNullOrEmpty(gatheringName))
+			{
+				edits.Add((nameof(CoreGathering.Name), editedGathering.Name));
+			}
 			if (!string.IsNullOrEmpty(gatheringDescription))
 			{
 				edits.Add((nameof(CoreGathering.Description), editedGathering.Description));
