@@ -332,13 +332,13 @@ namespace Core.Controls
         public async Task WatchGatheringAsync(ulong userId, ulong gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is allowed to view gathering
-			Verify(await targetGathering.IsVisibleTo(user),
+			Verify(await gathering.IsVisibleTo(user),
 				new InvalidGatheringException($"User is unable to watch gathering.\nAccount Status: {user.AccountStatus}"));
 
-			FailIf(targetGathering.EndTime.HasValue,
+			FailIf(gathering.EndTime.HasValue,
 				new InvalidGatheringException("User is unable to watch gathering, gathering has ended."));
 
 			GatheringBond? userIntention = null;
@@ -358,7 +358,7 @@ namespace Core.Controls
             if (!userIntention.HasValue)
 			{
 				// Try to add user to the gathering
-				await Gatherings.SetUserStateAsync(userId, gatheringId, GatheringBond.Watching, Time);
+				await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Watching, Time);
 			}
 			else if (userIntention.HasValue)
 			{ throw new InvalidOperationException($"Cannot watch gathering, user currently {userIntention.Value} gathering."); }
@@ -488,7 +488,7 @@ namespace Core.Controls
             // Check that user was not kicked
             FailIf(userIntention.HasValue &&
                 userIntention.Value.Equals(GatheringBond.Kicked),
-                new InvalidUserException($"Could not survey gathering, user was kicked."));
+                new InvalidUserException($"Could not leave gathering, user was kicked."));
 
             // Check if user is guest or arrived
             if (userIntention.Equals(GatheringBond.Arrived))
