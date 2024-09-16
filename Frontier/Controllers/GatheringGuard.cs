@@ -66,7 +66,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
                 using var stream = new MemoryStream();
-				if (gatheringDetails.Image != null || gatheringDetails.Image.Length > 0)
+				if (gatheringDetails.Image != null && gatheringDetails.Image.Length > 0)
 				{
 					await gatheringDetails.Image.CopyToAsync(stream);
 				}
