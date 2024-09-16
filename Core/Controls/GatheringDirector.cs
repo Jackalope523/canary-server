@@ -181,7 +181,7 @@ namespace Core.Controls
 				new InvalidGatheringException("Unable to edit gathering, gathering has ended."));
 
 			// Fail if edits may not be done during the gathering
-			FailIf(HasAlready(targetGathering.StartTime) &&
+			FailIf(targetGathering.IsOngoing &&
 				(!string.IsNullOrEmpty(gatheringDescription) ||
 				IsNotNull(startTime) ||
 				AreNotNull(latitude, longitude) ||
