@@ -407,7 +407,7 @@ namespace Repository
 
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Gatherings.
-                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.Open || e.State == GatheringState.Upcoming)).
+                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.Open || e.State == GatheringState.Upcoming) && !e.IsPendingDeletion).
                 Join(
                     ctx.Users, 
                     e => e.HostId, 
@@ -522,6 +522,9 @@ namespace Repository
                     case "Location":
                         var Location = ((double, double))Value;
                         e.Location = new CoordinateFactory().Create(Location.Item2, Location.Item1);
+                        break;
+                    case nameof(CoreGathering.FriendlyLocation):
+                        e.FriendlyLocation = (string)Value;
                         break;
                     case nameof(CoreGathering.Radius):
                         e.Radius = (double)Value;
