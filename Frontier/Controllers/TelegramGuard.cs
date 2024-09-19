@@ -48,7 +48,7 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPost]
+		[HttpPost("push")]
 		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
 		{
 			// Verify parameters
@@ -61,7 +61,7 @@ namespace Frontier.Controllers
 			}, allowUnverified: true);
 		}
 
-		[HttpDelete]
+		[HttpDelete("push")]
 		public async Task<IActionResult> Unsubscribe()
 		{
 			return await Execute(async user =>
