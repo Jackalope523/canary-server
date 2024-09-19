@@ -27,6 +27,35 @@ namespace Core.Controls
 			return await Telegrams.GetTelegramsAsync(user.Id);
 		}
 
+		public async Task ClearTelegramsAsync(ulong userId)
+		{
+			var user = await GetUserAsync(userId);
+
+			var telegrams = await Telegrams.GetTelegramsAsync(user.Id);
+			foreach (var telegram in telegrams)
+			{
+				try
+				{
+					await Telegrams.DeleteTelegramAsync(telegram.Id);
+				}
+				catch { }
+			}
+		}
+
+		public async Task ClearTelegramsAsync(ulong userId, List<ulong> telegramIds)
+		{
+			var user = await GetUserAsync(userId);
+
+			foreach (var id in telegramIds)
+			{
+				try
+				{
+					await Telegrams.DeleteTelegramAsync(id);
+				}
+				catch { }
+			}
+		}
+
 		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
 		{
 			await Telegrams.SubscribeUserAsync(userId, deviceType, deviceToken);

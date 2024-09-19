@@ -30,6 +30,24 @@ namespace Frontier.Controllers
 			});
         }
 
+		[HttpPut]
+		public async Task<IActionResult> ClearTelegram([FromBody] List<ulong> telegramIds)
+		{
+			return await Execute(async user =>
+			{
+				await telegrams.ClearTelegramsAsync(user.Id, telegramIds);
+			});
+        }
+
+		[HttpDelete]
+		public async Task<IActionResult> ClearTelegrams()
+		{
+			return await Execute(async user =>
+			{
+				await telegrams.ClearTelegramsAsync(user.Id);
+			});
+        }
+
 		[HttpPost]
 		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
 		{
