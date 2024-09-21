@@ -7,11 +7,10 @@ namespace Core.Boundaries
     #region Schemas
 
     public record NestShard(List<TwigShard> Twigs);
-    public record TwigShard(ulong Id, DateTimeOffset StartTime);
+    public record TwigShard(ulong GatheringId, DateTimeOffset StartTime);
 
-    public record AgendaShard(List<AgendaBondPair> Agenda);
-
-    public record AgendaBondPair(GatheringShard Gathering, GatheringBond Bond);
+    public record AgendaShard(List<CardShard> Cards);
+    public record CardShard(ulong GatheringId, DateTimeOffset StartTime, GatheringBond Bond);
 
 	#endregion
 
