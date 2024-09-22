@@ -149,7 +149,7 @@ namespace Core.Controls
 			}
 
             // Push update
-            _ = Accounts.UpdateUserAsync(user.Id, edits);
+            await Accounts.UpdateUserAsync(user.Id, edits);
 		}
 
         public async Task UpdateUserAgreement(ulong userId)
