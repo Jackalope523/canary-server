@@ -250,16 +250,17 @@ namespace Frontier.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> ModifyAccount([FromBody] AccountDetailsManifest details)
+        public async Task<IActionResult> ModifyAccount([FromForm] AccountEditManifest details)
         {
             // Verify parameters
-			if (details == null || !ModelState.IsValid)
+			if (details == null)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
             return await Execute(async user =>
             {
                 // Send updates to account manager
-                await accounts.EditUserAsync(user.Id, name: details.Name);
+                await accounts.EditUserAsync(user.Id,
+                    name: details.Name, email: details.Email);
             }, allowUnverified: true);
         }
 

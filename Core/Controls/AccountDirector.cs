@@ -116,15 +116,15 @@ namespace Core.Controls
                 await ThrowIfPhoneNumberTaken(user.PhoneNumber);
                 edits.Add((nameof(CoreUser.PhoneNumber), user.PhoneNumber));
 			}
+			if (nameChanged)
+			{
+                edits.Add((nameof(CoreUser.Name), user.Name));
+			}
 			if (emailChanged)
 			{
                 await ThrowIfEmailTaken(user.Email);
                 edits.Add((nameof(CoreUser.Email), email));
                 edits.Add(("NormalisedEmail", user.Email));
-			}
-			if (nameChanged)
-			{
-                edits.Add((nameof(CoreUser.Name), user.Name));
 			}
             // Internal attributes for account store
 			if (IsNotNull(isPhoneNumberConfirmed))
