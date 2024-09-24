@@ -19,15 +19,38 @@ namespace Repository
         
         public async Task AppreciateUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
-            UserLink toAdd = new()
-            {
-                SelfId = selfId,
-                OtherId = targetId,
-                Time = time,
-                Type = UserLink.UserLinkType.Appreciate
-            };
+            ulong id = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.UserLinks.
+                Where(l => l.SelfId == selfId && l.OtherId == targetId)
+                .Select(l => l.Id)
+                .SingleOrDefaultAsync()); 
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
+
+            if (id == 0)
+            {
+                UserLink toAdd = new()
+                {
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserLink.UserLinkType.Appreciate
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
+            }
+            else
+            {
+                UserLink toUpdate = new()
+                {
+                    Id = id,
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserLink.UserLinkType.Appreciate
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toUpdate));
+            }
         }
         public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
         {
@@ -36,15 +59,38 @@ namespace Repository
         }
         public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
-            UserLink toAdd = new()
-            {
-                SelfId = selfId,
-                OtherId = targetId,
-                Time = time,
-                Type = UserLink.UserLinkType.Block
-            };
+            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+               ctx.UserLinks.
+               Where(l => l.SelfId == selfId && l.OtherId == targetId)
+               .Select(l => l.Id)
+               .SingleOrDefaultAsync());
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));      
+
+            if (id == 0)
+            {
+                UserLink toAdd = new()
+                {
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserLink.UserLinkType.Block
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
+            }
+            else
+            {
+                UserLink toUpdate = new()
+                {
+                    Id = id,
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserLink.UserLinkType.Block
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toUpdate));
+            }
         }
         public async Task UnblockUserAsync(ulong selfId, ulong targetId) 
         {
