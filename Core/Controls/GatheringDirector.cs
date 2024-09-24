@@ -742,16 +742,16 @@ namespace Core.Controls
 		}
 
 		internal async Task<AgendaShard>
-			RemoveUnviewableGatheringBondsAsync(User user, AgendaShard agenda)
+			RemoveUnviewableAgendaCardsAsync(User user, AgendaShard agenda)
 		{
 			AgendaShard viewableGatherings = new(new());
 
-			foreach (var bondBond in agenda.Agenda)
+			foreach (var card in agenda.Cards)
 			{
-				Gathering gathering = new(bondBond.Gathering);
+				Gathering gathering = await GetGatheringAsync(card.GatheringId);
 
 				if (await user.CanView(gathering))
-				{ viewableGatherings.Agenda.Add(bondBond); }
+				{ viewableGatherings.Cards.Add(card); }
 			}
 
 			return viewableGatherings;

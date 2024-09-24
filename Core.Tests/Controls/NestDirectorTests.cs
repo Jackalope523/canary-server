@@ -34,9 +34,9 @@ namespace Core.Tests.Controls
 
 			// Assert
 			Assert.Equal(3, nest.Twigs.Count);
-			Assert.Equal(hostedGathering.Id, nest.Twigs.Find(e => e.Id.Equals(hostedGathering.Id)).Id);
-			Assert.Equal(attendedGathering.Id, nest.Twigs.Find(e => e.Id.Equals(attendedGathering.Id)).Id);
-			Assert.Equal(ongoingGathering.Id, nest.Twigs.Find(e => e.Id.Equals(ongoingGathering.Id)).Id);
+			Assert.Equal(hostedGathering.Id, nest.Twigs.Find(e => e.GatheringId.Equals(hostedGathering.Id)).GatheringId);
+			Assert.Equal(attendedGathering.Id, nest.Twigs.Find(e => e.GatheringId.Equals(attendedGathering.Id)).GatheringId);
+			Assert.Equal(ongoingGathering.Id, nest.Twigs.Find(e => e.GatheringId.Equals(ongoingGathering.Id)).GatheringId);
 		}
 
 		[Fact]
@@ -108,7 +108,7 @@ namespace Core.Tests.Controls
 			var agenda = await director.GetUserAgendaAsync(user.Id);
 
 			// Assert
-			Assert.Equal(3, agenda.Agenda.Count);
+			Assert.Equal(3, agenda.Cards.Count);
 		}
 
 		[Fact]
@@ -132,8 +132,8 @@ namespace Core.Tests.Controls
 
 			// Assert
 			Assert.Equal(2, agenda.Keys.Count);
-			Assert.Equal(4, agenda[activeCompanion.Id].Agenda.Count);
-			Assert.Single(agenda[sloadButChill.Id].Agenda);
+			Assert.Equal(4, agenda[activeCompanion.Id].Cards.Count);
+			Assert.Single(agenda[sloadButChill.Id].Cards);
 		}
 
 		[Fact]

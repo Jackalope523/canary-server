@@ -44,16 +44,16 @@ namespace Core.Controls
                     Twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard())
                 };
 
-                nest.Twigs.AddRange((await upcomingAgendaSync).Agenda
-                    .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
-                    .ConvertAll(e => new Gathering(e.Gathering).ToTwigShard()));
+                nest.Twigs.AddRange((await upcomingAgendaSync).Cards
+                    .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
+                    .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
             }
             // Check if users are companions
             else if (await targetUser.IsCompanionsWith(user))
             {
                 // Gather active and upcoming gatherings visible to the user
                 var upcomingAgendaSync = RequestAgenda(targetUser);
-                var siftedAgendaSync = Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, await upcomingAgendaSync);
+                var siftedAgendaSync = Terminal.GatheringDirector.RemoveUnviewableAgendaCardsAsync(user, await upcomingAgendaSync);
 
                 // Get private gatherings and snapshots
                 nest = nest with
@@ -61,9 +61,9 @@ namespace Core.Controls
                     Twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard())
                 };
 
-                nest.Twigs.AddRange((await siftedAgendaSync).Agenda
-                    .Where(bond => !bond.Bond.Equals(GatheringBond.Watching)).ToList()
-                    .ConvertAll(e => new Gathering(e.Gathering).ToTwigShard()));
+                nest.Twigs.AddRange((await siftedAgendaSync).Cards
+                    .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
+                    .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
             }
             // User is a stranger
             else
@@ -107,7 +107,7 @@ namespace Core.Controls
             foreach (var companion in await user.Companions)
             {
                 var companionAgenda = await RequestAgenda(companion);
-                companionAgenda = await Terminal.GatheringDirector.RemoveUnviewableGatheringBondsAsync(user, companionAgenda);
+                companionAgenda = await Terminal.GatheringDirector.RemoveUnviewableAgendaCardsAsync(user, companionAgenda);
                 companionGatherings.TryAdd(companion.Id, companionAgenda);
             };
 
@@ -226,13 +226,13 @@ namespace Core.Controls
 
             // Gather all user gathering data
             AgendaShard agenda = new((await user.UpcomingGatherings)
-                .ConvertAll(gathering => new AgendaBondPair(gathering.ToGatheringShard(), GatheringBond.Guest)));
+                .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Guest)));
 
-            agenda.Agenda.AddRange((await user.SurveyingGatherings)
-                .ConvertAll(gathering => new AgendaBondPair(gathering.ToGatheringShard(), GatheringBond.Watching)));
+            agenda.Cards.AddRange((await user.SurveyingGatherings)
+                .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Watching)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
-            { agenda.Agenda.Add(new AgendaBondPair((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
+            { agenda.Cards.Add(new CardShard((await user.CurrentGathering).Id, (await user.CurrentGathering).StartTime, GatheringBond.Arrived)); }
 
             return agenda;
         }

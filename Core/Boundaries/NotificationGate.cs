@@ -42,6 +42,8 @@ namespace Core.Boundaries
 	public interface INotificationOperations
 	{
 		Task<List<TelegramShard>> GetTelegramsAsync(ulong userId);
+		Task ClearTelegramsAsync(ulong userId);
+		Task ClearTelegramsAsync(ulong userId, List<ulong> telegramIds);
 
 		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
 		Task UnsubscribeUserAsync(ulong userId);

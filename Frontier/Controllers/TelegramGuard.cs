@@ -30,7 +30,25 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPost]
+		[HttpPut]
+		public async Task<IActionResult> ClearTelegram([FromBody] List<ulong> telegramIds)
+		{
+			return await Execute(async user =>
+			{
+				await telegrams.ClearTelegramsAsync(user.Id, telegramIds);
+			});
+        }
+
+		[HttpDelete]
+		public async Task<IActionResult> ClearTelegrams()
+		{
+			return await Execute(async user =>
+			{
+				await telegrams.ClearTelegramsAsync(user.Id);
+			});
+        }
+
+		[HttpPost("push")]
 		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
 		{
 			// Verify parameters
@@ -43,7 +61,7 @@ namespace Frontier.Controllers
 			}, allowUnverified: true);
 		}
 
-		[HttpDelete]
+		[HttpDelete("push")]
 		public async Task<IActionResult> Unsubscribe()
 		{
 			return await Execute(async user =>
