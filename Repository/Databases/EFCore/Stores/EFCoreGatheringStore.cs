@@ -145,7 +145,7 @@ namespace Repository
              ctx.GatheringLinks.
              Where(l => l.UserId == id && l.Type == GatheringBond.Guest).
              Join(
-                ctx.Gatherings.Where(e => e.State == GatheringState.Upcoming || e.State == GatheringState.Open),
+                ctx.Gatherings.Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.Open) && !e.IsPendingDeletion),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
@@ -230,7 +230,7 @@ namespace Repository
              ctx.GatheringLinks.
              Where(l => l.UserId == id && l.Type == GatheringBond.Watching).
              Join(
-                ctx.Gatherings,
+                ctx.Gatherings.Where(e => !e.IsPendingDeletion),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
@@ -298,7 +298,7 @@ namespace Repository
             ctx.GatheringLinks.
             Where(l => l.UserId == id && l.Type == GatheringBond.Left).
             Join(
-               ctx.Gatherings,
+               ctx.Gatherings.Where(e => !e.IsPendingDeletion),
                l => l.GatheringId,
                e => e.Id,
                (l, e) => new
@@ -592,7 +592,7 @@ namespace Repository
         {
            return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.Gatherings.
-           Where(e => e.HostId == userId).
+           Where(e => e.HostId == userId && !e.IsPendingDeletion).
            Join(
                ctx.Users,
                e => e.HostId,

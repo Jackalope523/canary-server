@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
@@ -12,9 +13,11 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 {
     [DbContext(typeof(AzureSQLContext))]
-    partial class AzureSQLContextModelSnapshot : ModelSnapshot
+    [Migration("20240924191818_v5")]
+    partial class v5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -550,8 +553,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId", "OtherId")
-                        .IsUnique();
+                    b.HasIndex("SelfId");
 
                     b.ToTable("UserLinks");
                 });

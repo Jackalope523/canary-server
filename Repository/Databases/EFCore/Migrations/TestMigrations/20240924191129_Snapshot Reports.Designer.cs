@@ -2,49 +2,45 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
 
 #nullable disable
 
-namespace Repository.Databases.EFCore.Migrations.AzureMigrations
+namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
-    [DbContext(typeof(AzureSQLContext))]
-    partial class AzureSQLContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SQLiteContext))]
+    [Migration("20240924191129_Snapshot Reports")]
+    partial class SnapshotReports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
 
             modelBuilder.Entity("Repository.Banner", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -53,20 +49,18 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.BannerLink", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("INTEGER");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
-
-                    b.Property<decimal>("BannerId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("BannerId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -79,20 +73,18 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("INTEGER");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
-
-                    b.Property<decimal>("PenalizedId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("PenalizedId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -103,22 +95,20 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("DeviceToken")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("DeviceType")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -129,34 +119,32 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Action")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Message")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("NotifierId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("NotifierId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("Read")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("RecipientId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("RecipientId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
-                    b.Property<decimal?>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong?>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -167,85 +155,83 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Age")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Athleticisme")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Chaos")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Competitiveness")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("EndTime")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Extroversion")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FriendlyLocation")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("GroupMaximum")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("GroupMinimum")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("HostId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("HostId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Industriousness")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDynamic")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Point>("Location")
                         .IsRequired()
-                        .HasColumnType("geography")
+                        .HasColumnType("POINT")
                         .HasAnnotation("Sqlite:Srid", 4326);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("NightOwl")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("NumberOfGuests")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Openness")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<double>("Radius")
-                        .HasColumnType("float");
+                        .HasColumnType("REAL");
 
                     b.Property<DateTimeOffset>("StartTime")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("State")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -256,23 +242,21 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("INTEGER");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
-
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("GatheringId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -285,28 +269,26 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("FilingDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("GatheringId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -319,20 +301,18 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.Snapshot", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("INTEGER");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    b.Property<ulong>("GatheringId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<decimal>("OwnerId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("OwnerId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("PostedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -345,23 +325,21 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("INTEGER");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
-
-                    b.Property<decimal>("SnapshotId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("SnapshotId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -375,28 +353,26 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("FilingDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("TEXT");
 
-                    b.Property<decimal>("SnapshotId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("SnapshotId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -409,117 +385,115 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.User", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("AccessTries")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("AccountStatus")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Age")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Athleticisme")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Chaos")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Competitiveness")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal?>("CurrentGathering")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong?>("CurrentGathering")
+                        .HasColumnType("INTEGER");
 
                     b.Property<Point>("CurrentLocation")
                         .IsRequired()
-                        .HasColumnType("geography")
+                        .HasColumnType("POINT")
                         .HasAnnotation("Sqlite:Srid", 4326);
 
                     b.Property<double>("CurrentRadius")
-                        .HasColumnType("float");
+                        .HasColumnType("REAL");
 
                     b.Property<DateTimeOffset>("DateOfBirth")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Extroversion")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Point>("Haunt")
                         .IsRequired()
-                        .HasColumnType("geography")
+                        .HasColumnType("POINT")
                         .HasAnnotation("Sqlite:Srid", 4326);
 
                     b.Property<double>("HauntRadius")
-                        .HasColumnType("float");
+                        .HasColumnType("REAL");
 
                     b.Property<int>("HauntWheight")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Industriousness")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsEmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsPhoneConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("JoinDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("LockoutDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("NightOwl")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("NormalisedEmail")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Openness")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Pseudonym")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Reputation")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("SecurityStamp")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("TimeOfUserAgreement")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -528,61 +502,56 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
             modelBuilder.Entity("Repository.UserLink", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("INTEGER");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    b.Property<ulong>("OtherId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("OtherId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<decimal>("SelfId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("SelfId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId", "OtherId")
-                        .IsUnique();
+                    b.HasIndex("SelfId");
 
                     b.ToTable("UserLinks");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("FilingDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
-                    b.Property<decimal?>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong?>("GatheringId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("TEXT");
 
-                    b.Property<decimal>("OtherId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("OtherId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("SelfId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<ulong>("SelfId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

@@ -99,7 +99,7 @@ namespace Repository
             modelBuilder.Entity<GatheringReport>().Property(r => r.Notes)
               .HasMaxLength(2000);
 
-            // Gathering Report
+            // Snapshot Report
             modelBuilder.Entity<SnapshotReport>().Property(r => r.Notes)
               .HasMaxLength(2000);
 
@@ -119,6 +119,11 @@ namespace Repository
             // Snapshot Link
             modelBuilder.Entity<SnapshotLink>()
                .HasIndex(l => new { l.UserId, l.SnapshotId })
+               .IsUnique();
+
+            // User Link
+            modelBuilder.Entity<UserLink>()
+               .HasIndex(l => new { l.SelfId, l.OtherId })
                .IsUnique();
         }
     }

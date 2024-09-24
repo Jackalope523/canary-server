@@ -24,6 +24,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -321,7 +326,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("PostId")
+                    b.Property<ulong>("SnapshotId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -335,12 +340,44 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId", "PostId")
+                    b.HasIndex("UserId", "SnapshotId")
                         .IsUnique();
 
                     b.ToTable("SnapshotLinks");
+                });
+
+            modelBuilder.Entity("Repository.SnapshotReport", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("FilingDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("SnapshotId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SnapshotId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SnapshotReports");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -610,7 +647,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Repository.User", "Self")
+                    b.HasOne("Repository.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -618,7 +655,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Navigation("Gathering");
 
-                    b.Navigation("Self");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -642,9 +679,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.HasOne("Repository.Snapshot", "Post")
+                    b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany()
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("SnapshotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -654,7 +691,26 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("Snapshot");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.SnapshotReport", b =>
+                {
+                    b.HasOne("Repository.Snapshot", "Snapshot")
+                        .WithMany()
+                        .HasForeignKey("SnapshotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Snapshot");
 
                     b.Navigation("User");
                 });
