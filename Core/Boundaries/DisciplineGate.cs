@@ -19,7 +19,10 @@ namespace Core.Boundaries
     { Inappropriate, Spam, Misleading, Promotion }
 
     public enum SnapshotReportType
-    { Inappropriate, Spam, Promotion }
+    {
+        Impersonation, Inappropriate,
+        Promotion, Other,
+    }
 
     public record PenaltyShard(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
 
