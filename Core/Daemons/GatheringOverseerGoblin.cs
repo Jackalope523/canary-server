@@ -64,7 +64,7 @@ namespace Core.Daemons
 
                     // Notify host
                     User host = new(gathering.Host);
-                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost);
+                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost, $"{gathering.Name}");
                 }
                 // Check if the next pass will delete the gathering
                 else if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart - interval))

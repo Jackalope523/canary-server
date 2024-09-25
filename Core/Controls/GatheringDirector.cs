@@ -313,7 +313,7 @@ namespace Core.Controls
 
 				foreach (var absent in absentUsers)
 				{
-					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee);
+					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee, $"{gathering.Name}");
 				}
 			}
 		}
