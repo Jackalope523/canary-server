@@ -457,7 +457,7 @@ namespace Core.Entities
 
 		#region Actions
 
-        public async Task PostTelegram(User notifier, TelegramMessage message, string context)
+        public async Task PostTelegram(User notifier, TelegramMessage message, string context = "")
         {
             await Terminal.NotificationDirector.PostTelegramAsync(this, notifier,
                 message, context);

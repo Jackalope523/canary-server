@@ -75,6 +75,12 @@ namespace Core.Entities
 
         public bool Exists { get; set; } = true;
 
+        public TimeSpan Duration
+            => State == GatheringState.Upcoming ?
+                TimeSpan.Zero
+            :
+                (EndTime ?? Time) - StartTime;
+
         ////////
         // Synced Properties
         //////////////////////
@@ -386,7 +392,10 @@ namespace Core.Entities
             // Update all participants' vectors and notify
 			foreach ((var joined, var left, var guest) in await GuestHistory)
 			{
-				guest.CalculateCharacter(this, left.Value - joined);
+                if (left.HasValue)
+                { guest.CalculateCharacter(this, left.Value - joined); }
+                else
+                { guest.CalculateCharacter(this, Time - joined); }
 
                 updatedGuests.Add(guest);
 

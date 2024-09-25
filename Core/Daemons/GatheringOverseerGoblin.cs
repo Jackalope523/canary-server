@@ -8,7 +8,7 @@ using static Core.Entities.Psijic;
 
 namespace Core.Daemons
 {
-	public class RepositoryCleanupGoblin : BackgroundService
+	public class GatheringOverseerGoblin : BackgroundService
     {
         private readonly TimeSpan interval = TimeSpan.FromMinutes(5);
 
@@ -16,7 +16,7 @@ namespace Core.Daemons
 
         private ILogger log;
 
-        public RepositoryCleanupGoblin(CoreTerminal coreTerminal)
+        public GatheringOverseerGoblin(CoreTerminal coreTerminal)
         {
             terminal = coreTerminal;
 
@@ -35,7 +35,7 @@ namespace Core.Daemons
                 }
                 catch (Exception e)
                 {
-                    log.LogError("{goblin} had trouble: {error}", nameof(RepositoryCleanupGoblin), e);
+                    log.LogError("{goblin} had trouble: {error}", nameof(GatheringOverseerGoblin), e);
                 }
 
                 log.LogInformation("Gravekeeper goblin clocking out at {time}.", Time);
@@ -55,16 +55,24 @@ namespace Core.Daemons
                     break;
                 }
 
+                // Check if gathering has expired
                 if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart))
                 {
                     // Purge gathering
                     log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Name);
                     await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);
 
-                    // Notify user
+                    // Notify host
                     User host = new(gathering.Host);
-                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.Generic,
-                        $"Your gathering {gathering.Name} was removed for being late.");
+                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost);
+                }
+                // Check if the next pass will delete the gathering
+                else if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart - interval))
+                {
+                    // Warn host
+                    User host = new(gathering.Host);
+                    await host.Notify("Your gathering is about to be deleted.",
+                        $"{gathering.Name} is going to be deleted if you do not start it!");
                 }
             }
         }

@@ -305,6 +305,17 @@ namespace Core.Controls
 
 			// Update all participants' vectors
 			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(CoreUser.Character), user.Character) });
+
+			if (gathering.Duration > TimeSpan.FromMinutes(30))
+			{
+				// Notify no-shows
+				var absentUsers = (await gathering.Guests).Except(await gathering.Arrived).Except(await gathering.Left);
+
+				foreach (var absent in absentUsers)
+				{
+					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee);
+				}
+			}
 		}
 
 		public async Task DeleteGatheringAsync(ulong userId, ulong gatheringId)
