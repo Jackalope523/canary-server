@@ -232,7 +232,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/snapshots,{targetId}")]
-		public async Task<IActionResult> GetGatheringSnapshots(ulong gatheringId, ulong targetId)
+		public async Task<IActionResult> GetGallery(ulong gatheringId, ulong targetId)
 		{
 			return await Execute(async user =>
 			{

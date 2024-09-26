@@ -632,7 +632,7 @@ namespace Core.Controls
 				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
-			_ = invitee.Notify("Sparrow", "You were invited to ");
+			_ = invitee.Notify("Canary", $"You were invited to {gathering.Name}");
 		}
 
 		public async Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId)
@@ -669,7 +669,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
 
-			return await gathering.IsStartable();
+			return gathering.IsHostedBy(user) && await gathering.IsStartable();
         }
 
 		public async Task<bool> AuthorisedToJoin(ulong userId, ulong gatheringId)
@@ -685,7 +685,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
 
-			return gathering.IsActive;
+			return gathering.IsActive && await gathering.WasAttendedBy(user);
         }
 
 		#endregion
