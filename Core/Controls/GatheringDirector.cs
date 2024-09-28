@@ -478,8 +478,8 @@ namespace Core.Controls
 				new InvalidActionException("User is currently attending another gathering."));
 			FailIf(nextGathering.Equals(Gathering.None) || !nextGathering.IsOngoing,
                 new InvalidActionException("User does not have an available gathering to check-in to."));
-            FailIf(!await nextGathering.IsInRange(user),
-                new InvalidActionException("User is not in range of the gathering."));
+            // FailIf(!await nextGathering.IsInRange(user),
+            //     new InvalidActionException("User is not in range of the gathering."));
             
 			await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
         }
