@@ -74,8 +74,8 @@ namespace Frontier.Controllers
             });
         }
 
-		[HttpGet("heros/{gatheringId}")]
-		public async Task<IActionResult> GetHero(ulong gatheringId)
+		[HttpGet("headers/{gatheringId}")]
+		public async Task<IActionResult> GetHeader(ulong gatheringId)
         {
 			return await ExecuteUnsafe(async () =>
 			{
@@ -83,7 +83,7 @@ namespace Frontier.Controllers
 
 				ThrowIfUnverified(user);
 
-				var imageStream = await media.GetHeroAsync(user.Id, gatheringId);
+				var imageStream = await media.GetHeaderAsync(user.Id, gatheringId);
 
 				if (imageStream != null)
 				{
@@ -91,7 +91,7 @@ namespace Frontier.Controllers
 
 					return new FileStreamResult(imageStream, "image/jpeg")
 					{
-						FileDownloadName = "hero.jpg"
+						FileDownloadName = "header.jpg"
 					};
 				}
 				

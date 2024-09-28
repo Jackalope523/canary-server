@@ -30,7 +30,7 @@ namespace Core.Boundaries
     {
         Task<MemoryStream> GetAssetAsync(string asset);
         Task<MemoryStream> GetAvatarAsync(ulong userId, ulong targetId);
-        Task<MemoryStream> GetHeroAsync(ulong userId, ulong gatheringId);
+        Task<MemoryStream> GetHeaderAsync(ulong userId, ulong gatheringId);
         Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId);
     }
 
