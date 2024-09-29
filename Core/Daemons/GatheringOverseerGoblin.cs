@@ -59,12 +59,12 @@ namespace Core.Daemons
                 if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart))
                 {
                     // Purge gathering
-                    log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Name);
+                    log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Title);
                     await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);
 
                     // Notify host
                     User host = new(gathering.Host);
-                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost, $"{gathering.Name}");
+                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
                 }
                 // Check if the next pass will delete the gathering
                 else if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart - interval))
@@ -72,7 +72,7 @@ namespace Core.Daemons
                     // Warn host
                     User host = new(gathering.Host);
                     await host.Notify("Your gathering is about to be deleted.",
-                        $"{gathering.Name} is going to be deleted if you do not start it!");
+                        $"{gathering.Title} is going to be deleted if you do not start it!");
                 }
             }
         }

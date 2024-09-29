@@ -22,7 +22,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var validGathering = new Gathering
 			{
-				Name = "Valid Gathering",
+				Title = "Valid Gathering",
 				Description = "A valid gathering description",
 				StartTime = DateTimeOffset.Now,
 				GroupMinimum = 5,
@@ -42,7 +42,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var invalidGathering = new Gathering
 			{
-				Name = "Invalid Gathering",
+				Title = "Invalid Gathering",
 				Description = "A".PadLeft(Gathering.MaximumDescLength + 1),
 				StartTime = DateTimeOffset.Now - TimeSpan.FromDays(8),
 				GroupMinimum = 5,

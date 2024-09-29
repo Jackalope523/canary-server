@@ -47,7 +47,7 @@ namespace Frontier.Controllers
 
                 // Create a new gathering
                 return await gatherings.CreateGatheringAsync(user.Id,
-                    gatheringDetails.Name, gatheringDetails.Description,
+                    gatheringDetails.Title, gatheringDetails.Description,
                     gatheringDetails.StartTime,
                     gatheringDetails.Latitude, gatheringDetails.Longitude, gatheringDetails.FriendlyLocation,
                     gatheringDetails.Radius, gatheringDetails.IsDynamic,
@@ -72,7 +72,7 @@ namespace Frontier.Controllers
 				}
 
 				await gatherings.EditGatheringAsync(user.Id, gatheringId,
-					gatheringName: gatheringDetails.Name,
+					gatheringTitle: gatheringDetails.Title,
 					gatheringDescription: gatheringDetails.Description,
 					startTime: gatheringDetails.StartTime,
 					latitude: gatheringDetails.Latitude, longitude: gatheringDetails.Longitude,

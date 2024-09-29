@@ -10,11 +10,11 @@ namespace Repository
         {
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
         {
             Gathering toCreate = new()
             {
-                Name = name,
+                Name = title,
                 Description = description,
                 StartTime = startTime,
                 HostId = hostId,
@@ -507,7 +507,7 @@ namespace Repository
             {
                 switch (Property)
                 {
-                    case nameof(CoreGathering.Name):
+                    case nameof(CoreGathering.Title):
                         e.Name = (string)Value;
                         break;
                     case nameof(CoreGathering.Description):

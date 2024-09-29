@@ -98,7 +98,7 @@ namespace Core.Controls
 			// Create gathering
 			Gathering gatheringStub = new()
 			{
-				Name = gatheringName,
+				Title = gatheringName,
 				Description = gatheringDescription,
 				StartTime = startTime,
 				Location = new() { Latitude = latitude, Longitude = longitude },
@@ -119,7 +119,7 @@ namespace Core.Controls
 			{ throw new InvalidGatheringException($"User has gathering {conflict.Id} conflict."); }
 
 			// Try to create a gathering
-			Gathering newGathering = new(await Gatherings.CreateGatheringAsync(user.Id, gatheringStub.Name, gatheringStub.Description,
+			Gathering newGathering = new(await Gatherings.CreateGatheringAsync(user.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime,
 				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, user.Character.ToCharacter(),
@@ -157,7 +157,7 @@ namespace Core.Controls
 			}
 
             // Notify appreciateers of gathering
-            _ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Name}");
+            _ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Title}");
 
 			return newGathering.ToGatheringShard();
 		}
@@ -192,7 +192,7 @@ namespace Core.Controls
 
 			Gathering editedGathering = new(targetGathering.ToGatheringShard())
 			{
-                Name = string.IsNullOrEmpty(gatheringName) ? targetGathering.Name : gatheringName,
+                Title = string.IsNullOrEmpty(gatheringName) ? targetGathering.Title : gatheringName,
                 Description = string.IsNullOrEmpty(gatheringDescription) ? targetGathering.Description : gatheringDescription,
 				StartTime = startTime ?? targetGathering.StartTime,
 				Location = AreNull(latitude, longitude) ? targetGathering.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
@@ -212,7 +212,7 @@ namespace Core.Controls
 			// Gather individual edits
 			if (!string.IsNullOrEmpty(gatheringName))
 			{
-				edits.Add((nameof(CoreGathering.Name), editedGathering.Name));
+				edits.Add((nameof(CoreGathering.Title), editedGathering.Title));
 			}
 			if (!string.IsNullOrEmpty(gatheringDescription))
 			{
@@ -256,7 +256,7 @@ namespace Core.Controls
 				await Terminal.MediaDirector.UploadHeroAsync(targetGathering.Id, heroImage);
             }
 
-			_ = targetGathering.NotifyActive($"{targetGathering.Name}", "The gathering was edited by the host, check to see the updates!");
+			_ = targetGathering.NotifyActive($"{targetGathering.Title}", "The gathering was edited by the host, check to see the updates!");
 		}
 
 		public async Task StartGatheringAsync(ulong userId, ulong gatheringId)
@@ -308,7 +308,7 @@ namespace Core.Controls
 
 				foreach (var absent in absentUsers)
 				{
-					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee, $"{gathering.Name}");
+					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee, $"{gathering.Title}");
 				}
 			}
 		}
@@ -332,7 +332,7 @@ namespace Core.Controls
 			// Delete hero
 			await Media.DeleteHeroAsync(gathering.Id);
 
-            _ = gathering.NotifyActive($"{gathering.Name}", "Uh oh! The gathering was deleted by the host.");
+            _ = gathering.NotifyActive($"{gathering.Title}", "Uh oh! The gathering was deleted by the host.");
         }
 
         public async Task ChangeGatheringVisibilityAsync(ulong userId, ulong gatheringId, bool hide)
@@ -648,7 +648,7 @@ namespace Core.Controls
 				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
-			_ = invitee.Notify("Canary", $"You were invited to {gathering.Name}");
+			_ = invitee.Notify("Canary", $"You were invited to {gathering.Title}");
 		}
 
 		public async Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId)
@@ -831,7 +831,7 @@ namespace Core.Controls
 		private async Task ThrowIfUserAtGathering(User user)
 		{
 			FailIf(await user.IsAtGathering(),
-				new InvalidUserException($"{user.Name} is currently attending the gathering {(await user.CurrentGathering).Name}."));
+				new InvalidUserException($"{user.Name} is currently attending the gathering {(await user.CurrentGathering).Title}."));
 		}
 
 		private List<GuestListBondPair>

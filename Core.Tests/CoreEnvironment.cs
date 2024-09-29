@@ -159,7 +159,7 @@ namespace Core.Tests
 		{
 			Gathering gatheringStub = new()
 			{
-				Name = testGatheringName,
+				Title = testGatheringName,
 				Description = testGatheringDescription,
 				Host = host,
 				StartTime = testGatheringStartTime,
@@ -176,7 +176,7 @@ namespace Core.Tests
 
 		internal async Task<Gathering> GenerateGatheringUnsafeAsync(Gathering gatheringStub, User host)
 		{
-			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
+			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));

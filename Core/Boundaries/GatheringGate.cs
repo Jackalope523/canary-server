@@ -13,13 +13,13 @@ namespace Core.Boundaries
     public enum GatheringBond
     { Watching, Guest, Arrived, Left, Kicked }
 
-    public record CoreGathering(ulong Id, UserShard Host, string Name, string Description,
+    public record CoreGathering(ulong Id, UserShard Host, string Title, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests)
 		: CoreOnlyData();
 
-	public record GatheringShard(ulong Id, UserShard Host, string Name, string Description,
+	public record GatheringShard(ulong Id, UserShard Host, string Title, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
         double Radius, int NumberOfGuests, float RelativeAngle);
@@ -40,7 +40,7 @@ namespace Core.Boundaries
 		Task<List<CoreGathering>> FindPastGatheringsForUserAsync(ulong userId);
 		Task<List<CoreGathering>> FindGatheringsByUserAsync(ulong userId);
 
-		Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description,
+		Task<CoreGathering> CreateGatheringAsync(ulong hostId, string title, string description,
 			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
 			int groupMinimum, int groupMaximum, CharacterShard character,
 			double Radius, bool isDynamic);
@@ -64,12 +64,12 @@ namespace Core.Boundaries
 		Task<List<GatheringShard>> GetPersonalisedGatheringsInAreaAsync(ulong userId,
 			double latitude, double longitude, double distance);
 
-		Task<GatheringShard> CreateGatheringAsync(ulong userId, string gatheringName, string gatheringDescription,
+		Task<GatheringShard> CreateGatheringAsync(ulong userId, string gatheringTitle, string gatheringDescription,
 			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
 			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum,
 			MemoryStream heroImage);
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
-			string gatheringName = "", string gatheringDescription = "",
+			string gatheringTitle = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
 			MemoryStream heroImage = null);

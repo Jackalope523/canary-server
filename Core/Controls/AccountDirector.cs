@@ -208,13 +208,13 @@ namespace Core.Controls
                     // Check if user is a guest or the host
                     if (currentGathering.IsHostedBy(user))
                     {
-                        Log.LogWarning("Host {name} left gathering {title} area, sealing...", user.Name, currentGathering.Name);
+                        Log.LogWarning("Host {name} left gathering {title} area, sealing...", user.Name, currentGathering.Title);
                         // Seal the gathering if user is the host
                         await Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingHidden)});
                     }
                     else
                     {
-                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Name);
+                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Title);
                         // Leave the gathering if user is a guest
                         await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
                     }
@@ -235,14 +235,14 @@ namespace Core.Controls
                 if (nextGathering.IsWaitingAuto &&
                     nextGathering.IsHostedBy(user))
                 {
-                    Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Name);
+                    Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Title);
                     await Terminal.GatheringDirector.StartGatheringAsync(user.Id, nextGathering.Id);
                 }
                 // Check if user is close enough to be arrived
                 else if (nextGathering.IsOngoing &&
                     await nextGathering.IsInRange(user))
                 {
-                    Log.LogWarning("Guest {name} entered gathering {title} area, marking as arrived...", user.Name, nextGathering.Name);
+                    Log.LogWarning("Guest {name} entered gathering {title} area, marking as arrived...", user.Name, nextGathering.Title);
                     await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
                 }
             }

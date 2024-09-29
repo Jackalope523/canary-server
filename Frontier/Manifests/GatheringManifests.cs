@@ -14,7 +14,7 @@ namespace Frontier.Manifests
 	public class GatheringCreationManifest
     {
         [Required]
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         [Required]
         public string Description { get; set; }
@@ -45,7 +45,7 @@ namespace Frontier.Manifests
     }
     public class GatheringEditManifest
     {
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         public string Description { get; set; }
 
