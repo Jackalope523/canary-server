@@ -175,7 +175,7 @@ namespace Core.Controls
                 else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, snapshot.TimeTaken))
                 {
                     gatheringHeaders[gatheringId] = new(gatheringId,
-                        gatheringHeaders[gatheringId].Name,
+                        gatheringHeaders[gatheringId].Title,
                         gatheringHeaders[gatheringId].Time,
                         gatheringHeaders[gatheringId].IsActive,
                         snapshot.TimeTaken,
