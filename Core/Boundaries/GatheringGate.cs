@@ -8,7 +8,7 @@ namespace Core.Boundaries
     #region Schemas
 
     public enum GatheringState
-	{ Upcoming, Open, Sealed, Ended }
+	{ Upcoming, OngoingOpen, OngoingHidden, Ended }
 
     public enum GatheringBond
     { Watching, Guest, Arrived, Left, Kicked }
@@ -69,13 +69,15 @@ namespace Core.Boundaries
 			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum,
 			MemoryStream heroImage);
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
-			string gatheringName = "", string gatheringDescription = "", bool? isOpen = null,
+			string gatheringName = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
 			MemoryStream heroImage = null);
 		Task StartGatheringAsync(ulong userId, ulong gatheringId);
 		Task TerminateGatheringAsync(ulong userId, ulong gatheringId);
 		Task DeleteGatheringAsync(ulong userId, ulong gatheringId);
+
+		Task ChangeGatheringVisibilityAsync(ulong userId, ulong gatheringId, bool hide);
 
 		Task WatchGatheringAsync(ulong userId, ulong gatheringId);
 		Task UnwatchGatheringAsync(ulong userId, ulong gatheringId);

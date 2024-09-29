@@ -63,10 +63,10 @@ namespace Core.Entities
                 HasAlready(StartTime - MaximumAutoStart);
         public bool IsOpen
             => State.Equals(GatheringState.Upcoming) ||
-                State.Equals(GatheringState.Open);
+                State.Equals(GatheringState.OngoingOpen);
         public bool IsOngoing
-            => State.Equals(GatheringState.Open) ||
-                State.Equals(GatheringState.Sealed);
+            => State.Equals(GatheringState.OngoingOpen) ||
+                State.Equals(GatheringState.OngoingHidden);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumSnapshotLateness);

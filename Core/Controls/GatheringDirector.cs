@@ -163,7 +163,7 @@ namespace Core.Controls
 		}
 
 		public async Task EditGatheringAsync(ulong userId, ulong gatheringId,
-			string gatheringName = "", string gatheringDescription = "", bool? isOpen = null,
+			string gatheringName = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null,
 			double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
@@ -194,7 +194,6 @@ namespace Core.Controls
 			{
                 Name = string.IsNullOrEmpty(gatheringName) ? targetGathering.Name : gatheringName,
                 Description = string.IsNullOrEmpty(gatheringDescription) ? targetGathering.Description : gatheringDescription,
-				State = IsNull(isOpen) ? targetGathering.State : (isOpen.Value ? GatheringState.Open : GatheringState.Sealed),
 				StartTime = startTime ?? targetGathering.StartTime,
 				Location = AreNull(latitude, longitude) ? targetGathering.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
 				FriendlyLocation = string.IsNullOrEmpty(friendlyLocation) ? targetGathering.FriendlyLocation : friendlyLocation,
@@ -218,10 +217,6 @@ namespace Core.Controls
 			if (!string.IsNullOrEmpty(gatheringDescription))
 			{
 				edits.Add((nameof(CoreGathering.Description), editedGathering.Description));
-			}
-			if (IsNotNull(isOpen))
-			{
-				edits.Add((nameof(CoreGathering.State), editedGathering.State));
 			}
 			if (IsNotNull(startTime))
 			{
@@ -279,7 +274,7 @@ namespace Core.Controls
 				new InvalidGatheringException("Gathering cannot be started."));
 
 			// Try to start gathering
-			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Open), (nameof(CoreGathering.StartTime), Time) });
+			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingOpen), (nameof(CoreGathering.StartTime), Time) });
 			await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 
 			await gathering.Started();
@@ -338,6 +333,24 @@ namespace Core.Controls
 			await Media.DeleteHeroAsync(gathering.Id);
 
             _ = gathering.NotifyActive($"{gathering.Name}", "Uh oh! The gathering was deleted by the host.");
+        }
+
+        public async Task ChangeGatheringVisibilityAsync(ulong userId, ulong gatheringId, bool hide)
+		{
+			var user = await GetUserAsync(userId);
+			var gathering = await GetGatheringAsync(gatheringId);
+
+            // Verify user is gathering host
+            Verify(gathering.IsModifiableBy(user),
+                new InvalidGatheringException("User is unable to modify gathering."));
+
+            // Ensure gathering is editable
+            Verify(gathering.IsOngoing,
+                new InvalidGatheringException("Unable to edit gathering, gathering has to be ongoing."));
+
+			var state = hide ? GatheringState.OngoingHidden : GatheringState.OngoingOpen;
+
+			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), state) });
         }
 
         public async Task WatchGatheringAsync(ulong userId, ulong gatheringId)

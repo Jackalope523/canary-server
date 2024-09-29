@@ -74,7 +74,6 @@ namespace Frontier.Controllers
 				await gatherings.EditGatheringAsync(user.Id, gatheringId,
 					gatheringName: gatheringDetails.Name,
 					gatheringDescription: gatheringDetails.Description,
-					isOpen: gatheringDetails.IsOpen,
 					startTime: gatheringDetails.StartTime,
 					latitude: gatheringDetails.Latitude, longitude: gatheringDetails.Longitude,
 					friendlyLocation: gatheringDetails.FriendlyLocation,
@@ -111,6 +110,15 @@ namespace Frontier.Controllers
 			{
 				// Delete gathering
 				await gatherings.DeleteGatheringAsync(user.Id, gatheringId);
+			});
+        }
+
+        [HttpPost("{gatheringId}/visibility")]
+        public async Task<IActionResult> HideGathering(ulong gatheringId, bool visible)
+		{
+			return await Execute(async user =>
+			{
+				await gatherings.ChangeGatheringVisibilityAsync(user.Id, gatheringId, visible);
 			});
         }
 
