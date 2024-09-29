@@ -46,9 +46,24 @@ namespace Core.Controls
             GalleryShard nest = new(new());
 
             // Check if user is themself
-            if (user.Equals(targetUser) && await gathering.WasAttendedBy(user))
+            if (user.Equals(targetUser))
             {
-                nest = new(await gathering.Snapshots);
+                // Check if user attended
+                if (await gathering.WasAttendedBy(user))
+                {
+                    nest = new(await gathering.Snapshots);
+                }
+                // Check if any companions attended
+                else
+                {
+                    var companionIds = (await user.Companions)
+                        .ConvertAll(companion => companion.Id);
+
+                    var companionSnapshots = (await gathering.Snapshots)
+                        .Where(snapshot => companionIds.Contains(snapshot.User.Id)).ToList();
+
+                    nest = new(companionSnapshots);
+                }
             }
             // Check if users are companions or attended a common gathering
             else if (await user.IsCompanionsWith(targetUser) ||
