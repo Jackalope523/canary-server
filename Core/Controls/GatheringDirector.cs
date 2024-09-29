@@ -550,7 +550,10 @@ namespace Core.Controls
 
 			// Sort
 			allGuests.Sort((bond1, bond2) =>
-			{
+            {
+                int bondComparison = GetBondPriority(bond1.Bond).CompareTo(GetBondPriority(bond2.Bond));
+                if (bondComparison != 0) return bondComparison;
+
 				return bond1.User.Name.CompareTo(bond2.User.Name);
             });
 
@@ -842,6 +845,17 @@ namespace Core.Controls
 			return new(new(0, "hidden"), bond);
 		}
 
-		#endregion
-	}
+        private int GetBondPriority(GatheringBond bond)
+        {
+            return bond switch
+            {
+                GatheringBond.Arrived => 0, // sorted first
+                GatheringBond.Guest => 1,   // sorted next
+                GatheringBond.Left => 2,    // sorted last
+                _ => 3
+            };
+        }
+
+        #endregion
+    }
 }
