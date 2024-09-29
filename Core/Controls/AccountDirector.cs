@@ -52,7 +52,7 @@ namespace Core.Controls
             // Verify banner code
             try
             {
-                banner = await Banners.FindBannerByCodeAsync(code);
+                banner = await Banners.FindBannerByCodeAsync(code.ToLower());
             }
             catch
             { throw new InvalidInformationException("Incorrect code."); }
