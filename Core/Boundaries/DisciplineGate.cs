@@ -12,16 +12,19 @@ namespace Core.Boundaries
     public enum UserReportType
     {
         Rude, HateSpeech, Harassment,
-        Violent, Assault
+        ViolenceOrAssault, Other
     }
 
     public enum GatheringReportType
-    { Inappropriate, Spam, Misleading, Promotion }
+    {
+        Inappropriate, Misleading,
+        Promotion, Spam, Other
+    }
 
     public enum SnapshotReportType
     {
-        Impersonation, Inappropriate,
-        Promotion, Other,
+        Inappropriate, GraphicContent, ManipulatedMedia,
+        Promotion, Spam, Other
     }
 
     public record PenaltyShard(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
