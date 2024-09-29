@@ -114,11 +114,11 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{gatheringId}/visibility")]
-        public async Task<IActionResult> HideGathering(ulong gatheringId, bool visible)
+        public async Task<IActionResult> HideGathering(ulong gatheringId, bool hide)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.ChangeGatheringVisibilityAsync(user.Id, gatheringId, visible);
+				await gatherings.ChangeGatheringVisibilityAsync(user.Id, gatheringId, hide);
 			});
         }
 
