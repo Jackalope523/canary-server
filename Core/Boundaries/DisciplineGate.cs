@@ -17,7 +17,7 @@ namespace Core.Boundaries
 
     public enum GatheringReportType
     {
-        Inappropriate, Misleading,
+        Inappropriate, Misleading, Illegal,
         Promotion, Spam, Other
     }
 
