@@ -41,12 +41,12 @@ namespace Repository
                 Select(l => l.SelfId).
                 ToListAsync());
 
-            List<ulong> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
+            List<ulong> owners = (await appreciating).Intersect(await appreciatingMe).Append(id).ToList();
 
             // Get unseen posts by companions from certain depth.
             List<SnapshotShard> companionSnapshots = await storeSentry.ExecuteReadAsync(ctx =>
               ctx.Snapshots.
-              Where(p => companions.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
+              Where(p => owners.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
               Join(
                   ctx.Users,
                   p => p.OwnerId,
@@ -74,7 +74,7 @@ namespace Repository
             // Get remaining companion posts from same gatherings as others even if outside time range.
             List<SnapshotShard> nettedSnapshots = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Snapshots.
-                Where(p => companions.Contains(p.OwnerId) && !previouslyExtractedSnapshots.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
+                Where(p => owners.Contains(p.OwnerId) && !previouslyExtractedSnapshots.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
                 Join(
                   ctx.Users,
                   p => p.OwnerId,

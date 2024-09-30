@@ -18,7 +18,7 @@ namespace Repository
         }
         public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
         {
-            await store.UnblockUserAsync(selfId, targetId);
+            await store.UnappreciateUserAsync(selfId, targetId);
         }
         public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
