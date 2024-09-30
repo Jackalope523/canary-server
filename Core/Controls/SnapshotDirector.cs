@@ -48,10 +48,26 @@ namespace Core.Controls
             // Check if user is themself
             if (user.Equals(targetUser))
             {
-                nest = new(await gathering.Snapshots);
+                // Check if user attended
+                if (await gathering.WasAttendedBy(user))
+                {
+                    nest = new(await gathering.Snapshots);
+                }
+                // Check if any companions attended
+                else
+                {
+                    var companionIds = (await user.Companions)
+                        .ConvertAll(companion => companion.Id);
+
+                    var companionSnapshots = (await gathering.Snapshots)
+                        .Where(snapshot => companionIds.Contains(snapshot.User.Id)).ToList();
+
+                    nest = new(companionSnapshots);
+                }
             }
             // Check if users are companions or attended a common gathering
-            else if (await targetUser.IsCompanionsWith(user) || await gathering.WasAttendedBy(user))
+            else if (await user.IsCompanionsWith(targetUser) ||
+                (await gathering.WasAttendedBy(user) && await gathering.WasAttendedBy(targetUser)))
             {
                 var targetSnapshots = (await gathering.Snapshots)
                     .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
@@ -159,7 +175,7 @@ namespace Core.Controls
                 else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, snapshot.TimeTaken))
                 {
                     gatheringHeaders[gatheringId] = new(gatheringId,
-                        gatheringHeaders[gatheringId].Name,
+                        gatheringHeaders[gatheringId].Title,
                         gatheringHeaders[gatheringId].Time,
                         gatheringHeaders[gatheringId].IsActive,
                         snapshot.TimeTaken,

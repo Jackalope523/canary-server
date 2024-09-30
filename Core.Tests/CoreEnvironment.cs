@@ -159,7 +159,7 @@ namespace Core.Tests
 		{
 			Gathering gatheringStub = new()
 			{
-				Name = testGatheringName,
+				Title = testGatheringName,
 				Description = testGatheringDescription,
 				Host = host,
 				StartTime = testGatheringStartTime,
@@ -176,7 +176,7 @@ namespace Core.Tests
 
 		internal async Task<Gathering> GenerateGatheringUnsafeAsync(Gathering gatheringStub, User host)
 		{
-			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
+			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
@@ -207,7 +207,7 @@ namespace Core.Tests
 			gatheringStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
-			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
+			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingOpen) });
 			await Terminal.GatheringDatabase.SetUserStateAsync(host.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)

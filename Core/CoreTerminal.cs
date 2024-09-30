@@ -117,7 +117,7 @@ namespace Core
 
         #region Daemons
 
-        public RepositoryCleanupGoblin CreateRepositoryCleanupService()
+        public GatheringOverseerGoblin CreateRepositoryCleanupService()
          => new(this);
 
 

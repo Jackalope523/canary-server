@@ -14,12 +14,10 @@ namespace Frontier.Manifests
 	public class GatheringCreationManifest
     {
         [Required]
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         [Required]
         public string Description { get; set; }
-        
-        public bool? IsOpen { get; set; }
 
         [Required]
         public float Latitude { get; set; }
@@ -47,11 +45,9 @@ namespace Frontier.Manifests
     }
     public class GatheringEditManifest
     {
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         public string Description { get; set; }
-
-        public bool? IsOpen { get; set; }
 
         public float? Latitude { get; set; }
 

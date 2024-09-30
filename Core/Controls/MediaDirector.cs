@@ -35,7 +35,7 @@ namespace Core.Controls
 			return stream;
 		}
 
-		public async Task<MemoryStream> GetHeroAsync(ulong userId, ulong gatheringId)
+		public async Task<MemoryStream> GetHeaderAsync(ulong userId, ulong gatheringId)
         {
             var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);

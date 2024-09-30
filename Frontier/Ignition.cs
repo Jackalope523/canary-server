@@ -56,6 +56,8 @@ namespace Frontier
 
         public IConfiguration Configuration { get; }
 
+        public static string HollowSpecificOrigins = "_HollowSpecificOrigins";
+
         public Ignition(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -63,6 +65,15 @@ namespace Frontier
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: HollowSpecificOrigins,
+                    policy =>
+                    {
+                        policy.WithOrigins("https://almostcanary.com");
+                    });
+            });
+
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -170,6 +181,8 @@ namespace Frontier
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(HollowSpecificOrigins);
 
             app.UseAuthentication();
             app.UseCookiePolicy();

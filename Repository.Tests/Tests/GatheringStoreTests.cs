@@ -87,7 +87,7 @@ namespace Repository.Tests
             Assert.Equal(testGathering.Id, found.Id);
             Assert.Equal(testUser.Id, found.Host.Id);
             Assert.Equal(testUser.Name, found.Host.Name);
-            Assert.Equal(testGathering.Name, found.Name);
+            Assert.Equal(testGathering.Name, found.Title);
             Assert.Equal(testGathering.Description, found.Description);
             Assert.Equal(testGathering.StartTime, found.StartTime);
             Assert.Equal(testGathering.Location.Y, found.Latitude);
@@ -341,7 +341,7 @@ namespace Repository.Tests
             Assert.NotNull(gathering);
             Assert.Equal(testGathering.HostId, gathering.Host.Id);
             Assert.Equal(testUser.Name, gathering.Host.Name);
-            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Name, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
             Assert.Equal(testGathering.Location.Y, gathering.Latitude);
@@ -360,7 +360,7 @@ namespace Repository.Tests
 
             Assert.NotNull(gathering);
             Assert.Equal(testGathering.HostId, gathering.Host.Id);
-            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Name, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
             Assert.Equal(testGathering.Location.Y, gathering.Latitude);
@@ -384,7 +384,7 @@ namespace Repository.Tests
             Assert.NotNull(gathering);
             Assert.Equal(testGathering.HostId, gathering.Host.Id);
             Assert.Equal(testUser.Name, gathering.Host.Name);
-            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Name, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
             Assert.Equal(testGathering.Location.Y, gathering.Latitude);
@@ -499,7 +499,7 @@ namespace Repository.Tests
 
             Assert.NotNull(gathering);
             Assert.Equal(testGathering.HostId, gathering.Host.Id);
-            Assert.Equal(testGathering.Name, gathering.Name);
+            Assert.Equal(testGathering.Name, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
             Assert.Equal(testGathering.Location.Y, gathering.Latitude);

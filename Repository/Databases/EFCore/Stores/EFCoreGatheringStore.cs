@@ -10,11 +10,11 @@ namespace Repository
         {
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
         {
             Gathering toCreate = new()
             {
-                Name = name,
+                Name = title,
                 Description = description,
                 StartTime = startTime,
                 HostId = hostId,
@@ -145,7 +145,7 @@ namespace Repository
              ctx.GatheringLinks.
              Where(l => l.UserId == id && l.Type == GatheringBond.Guest).
              Join(
-                ctx.Gatherings.Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.Open) && !e.IsPendingDeletion),
+                ctx.Gatherings.Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.OngoingOpen) && !e.IsPendingDeletion),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
@@ -407,7 +407,7 @@ namespace Repository
 
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Gatherings.
-                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.Open || e.State == GatheringState.Upcoming) && !e.IsPendingDeletion).
+                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.OngoingOpen || e.State == GatheringState.Upcoming) && !e.IsPendingDeletion).
                 Join(
                     ctx.Users, 
                     e => e.HostId, 
@@ -507,7 +507,7 @@ namespace Repository
             {
                 switch (Property)
                 {
-                    case nameof(CoreGathering.Name):
+                    case nameof(CoreGathering.Title):
                         e.Name = (string)Value;
                         break;
                     case nameof(CoreGathering.Description):

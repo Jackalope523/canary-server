@@ -39,7 +39,7 @@ namespace Core.Entities
 
 		public ulong Id { get; init; }
         public User Host { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string Description { get; set; }
         public CharacterVector Character { get; set; }
         public DateTimeOffset StartTime { get; set; }
@@ -63,10 +63,10 @@ namespace Core.Entities
                 HasAlready(StartTime - MaximumAutoStart);
         public bool IsOpen
             => State.Equals(GatheringState.Upcoming) ||
-                State.Equals(GatheringState.Open);
+                State.Equals(GatheringState.OngoingOpen);
         public bool IsOngoing
-            => State.Equals(GatheringState.Open) ||
-                State.Equals(GatheringState.Sealed);
+            => State.Equals(GatheringState.OngoingOpen) ||
+                State.Equals(GatheringState.OngoingHidden);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumSnapshotLateness);
@@ -74,6 +74,12 @@ namespace Core.Entities
             => EndTime.HasValue;
 
         public bool Exists { get; set; } = true;
+
+        public TimeSpan Duration
+            => State == GatheringState.Upcoming ?
+                TimeSpan.Zero
+            :
+                (EndTime ?? Time) - StartTime;
 
         ////////
         // Synced Properties
@@ -114,7 +120,7 @@ namespace Core.Entities
         {
             Id = fromGathering.Id;
             Host = new(fromGathering.Host);
-            Name = fromGathering.Name;
+            Title = fromGathering.Title;
             Description = fromGathering.Description;
             StartTime = fromGathering.StartTime;
             Location = new()
@@ -135,7 +141,7 @@ namespace Core.Entities
         {
             Id = fromGathering.Id;
             Host = new(fromGathering.Host);
-            Name = fromGathering.Name;
+            Title = fromGathering.Title;
             Description = fromGathering.Description;
             StartTime = fromGathering.StartTime;
             Location = new()
@@ -150,7 +156,7 @@ namespace Core.Entities
 
         public CoreGathering ToCoreGathering()
         {
-            return new(Id, Host.ToUserShard(), Name, Description,
+            return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
@@ -158,7 +164,7 @@ namespace Core.Entities
 
         public GatheringShard ToGatheringShard()
         {
-            return new(Id, Host.ToUserShard(), Name, Description,
+            return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, NumberOfGuests, RelativeAngle);
@@ -166,7 +172,7 @@ namespace Core.Entities
 
         public GatheringShard ToGatheringShard(User relativeUser)
         {
-            return new(Id, Host.ToUserShard(), Name, Description,
+            return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, NumberOfGuests,
@@ -175,7 +181,7 @@ namespace Core.Entities
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Name, IsOngoing ? StartTime : EndTime.Value, IsOngoing, lastActiveTime, FriendlyLocation);
+            return new(Id, Title, IsOngoing ? StartTime : EndTime.Value, IsOngoing, lastActiveTime, FriendlyLocation);
         }
 
         public TwigShard ToTwigShard()
@@ -192,8 +198,8 @@ namespace Core.Entities
             issues = "";
 
             // Sanitise User content
-            Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
-            if (string.IsNullOrEmpty(Name)) { issues += "Name cannot be empty. "; }
+            Title = ContentValidation.NormaliseText(Title, MaximumNameLength);
+            if (string.IsNullOrEmpty(Title)) { issues += "Title cannot be empty. "; }
 
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
             if (string.IsNullOrEmpty(Description)) { issues += "Description cannot be empty. "; }
@@ -376,7 +382,7 @@ namespace Core.Entities
 
         public async Task Started()
         {
-            _ = NotifyActive($"{Name}", "Gathering is active!");
+            _ = NotifyActive($"{Title}", "Gathering is active!");
         }
 
         public async Task<List<User>> Ended()
@@ -386,12 +392,15 @@ namespace Core.Entities
             // Update all participants' vectors and notify
 			foreach ((var joined, var left, var guest) in await GuestHistory)
 			{
-				guest.CalculateCharacter(this, left.Value - joined);
+                if (left.HasValue)
+                { guest.CalculateCharacter(this, left.Value - joined); }
+                else
+                { guest.CalculateCharacter(this, Time - joined); }
 
                 updatedGuests.Add(guest);
 
 				// Notify of gathering ending
-				_ = guest.Notify($"{Name}", $"Gathering has concluded.");
+				_ = guest.Notify($"{Title}", $"Gathering has concluded.");
 			}
 
             return updatedGuests;

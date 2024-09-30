@@ -171,7 +171,7 @@ namespace Core.Tests.Controls
 			gatheringStub.StartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
 
 			// Act
-			var returnedGathering = await director.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
+			var returnedGathering = await director.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime,
                 gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
 				gatheringStub.FriendlyLocation,
@@ -180,7 +180,7 @@ namespace Core.Tests.Controls
                 new System.IO.MemoryStream { });
 
             // Assert
-            Assert.Equal(gatheringStub.Name, returnedGathering.Name);
+            Assert.Equal(gatheringStub.Title, returnedGathering.Title);
 			Assert.Equal(gatheringStub.Description, returnedGathering.Description);
 			Assert.Equal(gatheringStub.StartTime, returnedGathering.StartTime);
 
@@ -203,7 +203,7 @@ namespace Core.Tests.Controls
 			gatheringStub.GroupMinimum = 5;
 
 			// Act
-			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
+			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime,
 				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
 				gatheringStub.FriendlyLocation,
@@ -225,7 +225,7 @@ namespace Core.Tests.Controls
 			var gatheringStub = environment.CreateTestGathering(host);
 
 			// Act
-			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
+			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime,
                 gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
 				gatheringStub.FriendlyLocation,
@@ -246,7 +246,7 @@ namespace Core.Tests.Controls
 			var conflictingGathering = environment.CreateTestGathering(host);
 
 			// Act
-			var returnedGathering = director.CreateGatheringAsync(host.Id, conflictingGathering.Name, conflictingGathering.Description,
+			var returnedGathering = director.CreateGatheringAsync(host.Id, conflictingGathering.Title, conflictingGathering.Description,
 				conflictingGathering.StartTime,
 				conflictingGathering.Location.Latitude, conflictingGathering.Location.Longitude,
 				conflictingGathering.FriendlyLocation,
@@ -275,8 +275,8 @@ namespace Core.Tests.Controls
 			int newGroupMinimum = 7, newGroupMaximum = 41;
 
 			// Act
-			await director.EditGatheringAsync(host.Id, gatheringStub.Id, gatheringDescription: newDescription,
-				isOpen: newIsOpen, startTime: newStartTime,
+			await director.EditGatheringAsync(host.Id, gatheringStub.Id,
+				gatheringDescription: newDescription, startTime: newStartTime,
 				latitude: newLatitude, longitude: newLongitude,
 				radius: newRadius, isDynamic: newIsDynamic,
 				groupMinimum: newGroupMinimum, groupMaximum: newGroupMaximum);
@@ -314,7 +314,7 @@ namespace Core.Tests.Controls
 			// Assert
 			Gathering startedGathering = new(await environment.Terminal.GatheringDatabase.FindGatheringAsync(gathering.Id));
 			Assert.Equal(gathering, startedGathering);
-			Assert.Equal(GatheringState.Open, startedGathering.State);
+			Assert.Equal(GatheringState.OngoingOpen, startedGathering.State);
 		}
 
 		[Fact]
