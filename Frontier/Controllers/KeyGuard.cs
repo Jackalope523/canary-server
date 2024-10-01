@@ -25,7 +25,7 @@ namespace Frontier.Controllers
 		public async Task<IActionResult> GetMapKey()
 		{
 			return await Execute(async user =>
-				await keys.GetSparrowMapKeyAsync(user.Id));
+				await keys.GetCanaryMapKeyAsync(user.Id));
         }
 
 		#endregion

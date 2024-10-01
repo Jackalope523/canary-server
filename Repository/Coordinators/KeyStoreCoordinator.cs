@@ -11,6 +11,16 @@ namespace Repository.Coordinators
             store = new AzureKeyStore();
         }
 
+        public async Task<string> GetHollowOneSignalApiKeyAsync()
+        {
+            return await store.GetHollowOneSignalApiKeyAsync();
+        }
+
+        public async Task<string> GetHollowOneSignalAppIdAsync()
+        {
+            return await store.GetHollowOneSignalAppIdAsync();
+        }
+
         public async Task<string> GetHollowTwilioAuthKeyAsync()
         {
             return await store.GetHollowTwilioAuthKeyAsync();
@@ -21,9 +31,9 @@ namespace Repository.Coordinators
             return await store.GetHollowTwilioTokenKeyAsync();
         }
 
-        public async Task<string> GetSparrowMapKeyAsync()
+        public async Task<string> GetCanaryMapKeyAsync()
         {
-            return await store.GetSparrowMapKeyAsync();
+            return await store.GetCanaryMapKeyAsync();
         }
     }
 }

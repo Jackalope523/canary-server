@@ -26,11 +26,11 @@ namespace Core.Controls
             return await Keys.GetHollowTwilioTokenKeyAsync();
         }
 
-        public async Task<string> GetSparrowMapKeyAsync(ulong userId)
+        public async Task<string> GetCanaryMapKeyAsync(ulong userId)
         {
             await GetUserAsync(userId);
 
-            return await Keys.GetSparrowMapKeyAsync();
+            return await Keys.GetCanaryMapKeyAsync();
         }
 
         #endregion

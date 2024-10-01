@@ -8,7 +8,6 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Web' " />
   <ItemGroup>
 	  <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
-	  <PackageReference Include="CorePush" Version="3.1.1" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,6 +27,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.3" />
     <PackageReference Include="Twilio" Version="6.2.2" />
+    <PackageReference Include="OneSignalApi" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -54,9 +54,9 @@ namespace Frontier
                     webBuilder.UseStartup<Ignition>();
                 });
 
-        public IConfiguration Configuration { get; }
-
         public static string HollowSpecificOrigins = "_HollowSpecificOrigins";
+
+        public IConfiguration Configuration { get; }
 
         public Ignition(IConfiguration configuration)
         {
@@ -81,29 +81,20 @@ namespace Frontier
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
+            /////
+            // Loggers
+            ////////////
+
             var loggerFactory = new LoggerFactory()
                 .AddSerilog(Log.Logger);
-
-
-            /////
-            // Services 
-            /////////////
 
             var frontierLogger = loggerFactory.CreateLogger("Frontier");
             var coreLogger = loggerFactory.CreateLogger("Core");
             var repositoryLogger = loggerFactory.CreateLogger("Repository");
 
-            Services.CorePush pushTelegrams = new();
-            Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
-                "", "");
-
-            services.AddTransient<ISMSService, TwilioService>();
-            services.AddTransient<IEmailService, SendGridService>();
-            TwilioService.Initialise(frontierLogger, "", "", ""); // Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
-
-            //////
-            // Connections
-            ////////////////
+            /////
+            // Database
+            /////////////
 
             Harbor harbor;
 
@@ -115,6 +106,26 @@ namespace Frontier
             {
                 harbor = new(Harbor.Flag.Production, repositoryLogger);
             }
+
+            var keyProvider = harbor.KeyDatabaseAccess;
+
+            /////
+            // Services 
+            /////////////
+
+            OneSignalService pushNotifications = new();
+            OneSignalService.Initialise(frontierLogger,
+                keyProvider.GetHollowOneSignalApiKeyAsync().Result,
+                keyProvider.GetHollowOneSignalAppIdAsync().Result);
+
+            TwilioService.Initialise(frontierLogger, "", "", ""); // Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+
+            services.AddTransient<ISMSService, TwilioService>();
+            services.AddTransient<IEmailService, SendGridService>();
+
+            //////
+            // Connections
+            ////////////////
 
             CoreTerminal terminal = CoreTerminal.CreateTerminal(
                 coreLogger,
@@ -128,7 +139,7 @@ namespace Frontier
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
-                pushTelegrams);
+                pushNotifications);
 
             GuardBox box = new(frontierLogger,
                 terminal.AccountOperations,
