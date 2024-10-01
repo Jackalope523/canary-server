@@ -46,7 +46,8 @@ namespace Repository
                     g.Radius,
                     g.IsDynamic,
                     g.IsPendingDeletion,
-                    g.NumberOfGuests
+                    g.NumberOfGuests,
+                    g.DegreeOfPrivacy
                  )).ToListAsync());
         }
 

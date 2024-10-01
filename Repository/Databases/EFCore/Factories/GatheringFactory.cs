@@ -21,6 +21,7 @@ namespace Repository
                 Location = innerFactory.Create(17.544 + produced, -72.483 - produced),
                 Radius = 10.0,
                 IsDynamic = false,
+                DegreeOfPrivacy = 3,
 
                 Extroversion = 8 + produced,
                 Athleticisme = 2 + produced,

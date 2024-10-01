@@ -171,11 +171,13 @@ namespace Core.Tests.Controls
 			gatheringStub.StartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
 
 			// Act
-			var returnedGathering = await director.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
+			var returnedGathering = await director.CreateGatheringAsync(host.Id,
+				gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime,
                 gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
 				gatheringStub.FriendlyLocation,
                 gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
+				gatheringStub.DegreeOfPrivacy,
                 gatheringStub.GroupMinimum, gatheringStub.GroupMaximum,
                 new System.IO.MemoryStream { });
 
@@ -203,11 +205,13 @@ namespace Core.Tests.Controls
 			gatheringStub.GroupMinimum = 5;
 
 			// Act
-			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
+			var returnedGathering = director.CreateGatheringAsync(host.Id,
+				gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime,
 				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
 				gatheringStub.FriendlyLocation,
 				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
+				gatheringStub.DegreeOfPrivacy,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum,
 				new System.IO.MemoryStream { });
 
@@ -225,11 +229,13 @@ namespace Core.Tests.Controls
 			var gatheringStub = environment.CreateTestGathering(host);
 
 			// Act
-			var returnedGathering = director.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
+			var returnedGathering = director.CreateGatheringAsync(host.Id,
+				gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime,
                 gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
 				gatheringStub.FriendlyLocation,
                 gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic,
+				gatheringStub.DegreeOfPrivacy,
                 gatheringStub.GroupMinimum, gatheringStub.GroupMaximum,
                 new System.IO.MemoryStream { });
 
@@ -246,11 +252,13 @@ namespace Core.Tests.Controls
 			var conflictingGathering = environment.CreateTestGathering(host);
 
 			// Act
-			var returnedGathering = director.CreateGatheringAsync(host.Id, conflictingGathering.Title, conflictingGathering.Description,
+			var returnedGathering = director.CreateGatheringAsync(host.Id,
+				conflictingGathering.Title, conflictingGathering.Description,
 				conflictingGathering.StartTime,
 				conflictingGathering.Location.Latitude, conflictingGathering.Location.Longitude,
 				conflictingGathering.FriendlyLocation,
 				conflictingGathering.Radius.Kilometres, conflictingGathering.IsDynamic,
+				conflictingGathering.DegreeOfPrivacy,
 				conflictingGathering.GroupMinimum, conflictingGathering.GroupMaximum,
 				new System.IO.MemoryStream { });
 

@@ -50,7 +50,7 @@ namespace Frontier.Controllers
                     gatheringDetails.Title, gatheringDetails.Description,
                     gatheringDetails.StartTime,
                     gatheringDetails.Latitude, gatheringDetails.Longitude, gatheringDetails.FriendlyLocation,
-                    gatheringDetails.Radius, gatheringDetails.IsDynamic,
+                    gatheringDetails.Radius, gatheringDetails.IsDynamic, gatheringDetails.DegreeOfPrivacy,
                     gatheringDetails.GroupMinimum, gatheringDetails.GroupMaximum,
                     stream);
             });
@@ -78,6 +78,7 @@ namespace Frontier.Controllers
 					latitude: gatheringDetails.Latitude, longitude: gatheringDetails.Longitude,
 					friendlyLocation: gatheringDetails.FriendlyLocation,
 					radius: gatheringDetails.Radius, isDynamic: gatheringDetails.IsDynamic,
+					degreeOfPrivacy: gatheringDetails.DegreeOfPrivacy,
 					groupMinimum: gatheringDetails.GroupMinimum, groupMaximum: gatheringDetails.GroupMaximum,
 					heroImage: stream);
 			});

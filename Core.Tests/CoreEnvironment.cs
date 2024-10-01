@@ -168,7 +168,8 @@ namespace Core.Tests
 				GroupMinimum = testGatheringGroupMinimum,
 				GroupMaximum = testGatheringGroupMaximum,
 				Radius = testGatheringRadius,
-				IsDynamic = testGatheringIsDynamic
+				IsDynamic = testGatheringIsDynamic,
+				DegreeOfPrivacy = 3,
 			};
 
 			return gatheringStub;
@@ -179,7 +180,7 @@ namespace Core.Tests
 			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
-				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
+				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic, gatheringStub.DegreeOfPrivacy));
 		}
 
 		internal async Task<Gathering> GenerateUpcomingGatheringAsync(User host)

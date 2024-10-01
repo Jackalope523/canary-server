@@ -37,6 +37,7 @@ namespace Core.Entities
 		// Properties
 		///////////////
 
+        // Core
 		public ulong Id { get; init; }
         public User Host { get; set; }
         public string Title { get; set; }
@@ -47,11 +48,13 @@ namespace Core.Entities
         public string FriendlyLocation { get; set; }
         public Distance Radius { get; set; }
         public bool IsDynamic { get; set; }
+        public int DegreeOfPrivacy { get; set; }
         public DateTimeOffset? EndTime { get; set; }
         public GatheringState State { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public bool IsDeleted { get; set; }
+
         public int NumberOfGuests { get; set; }
         public float RelativeAngle { get; set; } = 0;
 
@@ -133,6 +136,7 @@ namespace Core.Entities
             Character = new(fromGathering.Character);
             Radius = new() { Kilometres = fromGathering.Radius };
             IsDynamic = fromGathering.IsDynamic;
+            DegreeOfPrivacy = fromGathering.DegreeOfPrivacy;
             IsDeleted = fromGathering.IsPendingDeletion;
             NumberOfGuests = fromGathering.NumberOfGuests;
         }
@@ -159,7 +163,7 @@ namespace Core.Entities
             return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
-                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
+                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests, DegreeOfPrivacy);
         }
 
         public GatheringShard ToGatheringShard()
@@ -215,6 +219,9 @@ namespace Core.Entities
 
             // Verify Gathering is within a reasonable time
             if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }
+
+            // Force degree to be sensible
+            DegreeOfPrivacy = Math.Clamp(DegreeOfPrivacy, 1, 3);
 
             // Verify group bounds
             if (GroupMaximum != 0 &&

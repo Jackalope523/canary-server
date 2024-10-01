@@ -16,7 +16,7 @@ namespace Core.Boundaries
     public record CoreGathering(ulong Id, UserShard Host, string Title, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
-		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests, int degreeOfPrivacy)
+		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests, int DegreeOfPrivacy)
 		: CoreOnlyData();
 
 	public record GatheringShard(ulong Id, UserShard Host, string Title, string Description,
@@ -68,13 +68,13 @@ namespace Core.Boundaries
 
 		Task<GatheringShard> CreateGatheringAsync(ulong userId, string gatheringTitle, string gatheringDescription,
 			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
-			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum,
-			MemoryStream heroImage, int degreeOfPrivacy);
+			double radius, bool isDynamic, int degreeOfPrivacy, int? groupMinimum, int? groupMaximum,
+			MemoryStream heroImage);
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
 			string gatheringTitle = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
-			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
-			MemoryStream heroImage = null);
+			double? radius = null, bool? isDynamic = null, int? degreeOfPrivacy = null,
+			int? groupMinimum = null, int? groupMaximum = null, MemoryStream heroImage = null);
 		Task StartGatheringAsync(ulong userId, ulong gatheringId);
 		Task TerminateGatheringAsync(ulong userId, ulong gatheringId);
 		Task DeleteGatheringAsync(ulong userId, ulong gatheringId);

@@ -59,7 +59,8 @@ namespace Repository.Tests
                     testGathering.NightOwl,
                     testGathering.Openness),
                 testGathering.Radius,
-                testGathering.IsDynamic
+                testGathering.IsDynamic,
+                testGathering.DegreeOfPrivacy
                 );
 
             Gathering created = sentry.ExecuteRead(ctx => ctx.Gatherings.Where(e => e.Id == createdShard.Id).Single());

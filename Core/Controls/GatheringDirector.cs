@@ -80,7 +80,7 @@ namespace Core.Controls
 		public async Task<GatheringShard> CreateGatheringAsync(ulong userId,
 			string gatheringName, string gatheringDescription, DateTimeOffset startTime,
 			double latitude, double longitude, string friendlyLocation,
-			double radius, bool isDynamic,
+			double radius, bool isDynamic, int degreeOfPrivacy,
 			int? groupMinimum, int? groupMaximum,
 			MemoryStream heroImage)
 		{
@@ -107,6 +107,7 @@ namespace Core.Controls
 				GroupMaximum = groupMaximum ?? 0,
 				Radius = new() { Kilometres = Math.Clamp(radius, 0.1, radius) },
 				IsDynamic = isDynamic,
+				DegreeOfPrivacy = degreeOfPrivacy,
 			};
 
 			// Validate gathering
@@ -119,11 +120,11 @@ namespace Core.Controls
 			{ throw new InvalidGatheringException($"User has gathering {conflict.Id} conflict."); }
 
 			// Try to create a gathering
-			Gathering newGathering = new(await Gatherings.CreateGatheringAsync(user.Id, gatheringStub.Title, gatheringStub.Description,
-				gatheringStub.StartTime,
+			Gathering newGathering = new(await Gatherings.CreateGatheringAsync(user.Id,
+				gatheringStub.Title, gatheringStub.Description, gatheringStub.StartTime,
 				gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, user.Character.ToCharacter(),
-				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
+				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic, gatheringStub.DegreeOfPrivacy));
 
 			try
 			{
@@ -166,7 +167,8 @@ namespace Core.Controls
 			string gatheringName = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null,
 			double? latitude = null, double? longitude = null, string friendlyLocation = "",
-			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null,
+			double? radius = null, bool? isDynamic = null, int? degreeOfPrivacy = null,
+			int? groupMinimum = null, int? groupMaximum = null,
 			MemoryStream heroImage = null)
 		{
 			var user = await GetUserAsync(userId);
@@ -199,6 +201,7 @@ namespace Core.Controls
 				FriendlyLocation = string.IsNullOrEmpty(friendlyLocation) ? targetGathering.FriendlyLocation : friendlyLocation,
 				Radius = IsNull(radius) ? targetGathering.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
 				IsDynamic = isDynamic ?? targetGathering.IsDynamic,
+				DegreeOfPrivacy = degreeOfPrivacy ?? targetGathering.DegreeOfPrivacy,
 				GroupMinimum = groupMinimum ?? targetGathering.GroupMinimum,
 				GroupMaximum = groupMaximum ?? targetGathering.GroupMaximum,
 			};
@@ -237,6 +240,10 @@ namespace Core.Controls
 			if (IsNotNull(isDynamic))
 			{
 				edits.Add((nameof(CoreGathering.IsDynamic), editedGathering.IsDynamic));
+			}
+			if (IsNotNull(degreeOfPrivacy))
+			{
+				edits.Add((nameof(CoreGathering.DegreeOfPrivacy), editedGathering.DegreeOfPrivacy));
 			}
 			if (IsNotNull(groupMinimum))
 			{

@@ -37,6 +37,9 @@ namespace Frontier.Manifests
         [Required]
         public bool IsDynamic { get; set; }
 
+        [Required]
+        public int DegreeOfPrivacy { get; set; }
+
         public int? GroupMinimum { get; set; }
         public int? GroupMaximum { get; set; }
 
@@ -59,7 +62,9 @@ namespace Frontier.Manifests
 
         public float? Radius { get; set; }
 
-        public bool IsDynamic { get; set; }
+        public bool? IsDynamic { get; set; }
+
+        public int? DegreeOfPrivacy { get; set; }
 
         public int? GroupMinimum { get; set; }
         public int? GroupMaximum { get; set; }
