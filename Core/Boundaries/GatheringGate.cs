@@ -56,6 +56,7 @@ namespace Core.Boundaries
 		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong gatheringId);
         Task<bool> CanJoin(ulong gatheringId, ulong userId);
         Task<List<ulong>> GetAuthorizedGuests(ulong gatheringId);
+        Task AddGuestAuthorization(ulong gatheringId, ulong userId);
     }
 
 	public interface IGatheringOperations

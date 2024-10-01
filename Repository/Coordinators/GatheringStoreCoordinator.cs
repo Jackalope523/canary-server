@@ -101,6 +101,11 @@ namespace Repository
         {
             return await store.GetAuthorizedGuests(gatheringId);
         }
+
+        public async Task AddGuestAuthorization(ulong gatheringId, ulong userId)
+        {
+            await store.AddGuestAuthorization(gatheringId, userId);
+        }
     }
 }
 

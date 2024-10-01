@@ -19,7 +19,7 @@ namespace Repository
         internal DbSet<Penalty> Penalties { get; set; }
         internal DbSet<Banner> Banners { get; set; }
         internal DbSet<BannerLink> BannerLinks { get; set; }
-        internal DbSet<ClearanceLink> ClearanceLinks { get; set; }
+        internal DbSet<GuestClearance> GuestClearances { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -128,8 +128,8 @@ namespace Repository
                .IsUnique();
 
             // Clearance Link
-            modelBuilder.Entity<ClearanceLink>()
-               .HasIndex(l => new { l.Id })
+            modelBuilder.Entity<GuestClearance>()
+               .HasIndex(l => new { l.UserId, l.GatheringId})
                .IsUnique();
         }
     }
