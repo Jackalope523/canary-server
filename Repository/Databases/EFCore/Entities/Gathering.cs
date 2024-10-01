@@ -25,6 +25,7 @@ namespace Repository
         public bool IsDynamic { get; set; } = DefaultIsDynamic;
         public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
         public int NumberOfGuests { get; set; } = DefaultNumberOfGuests;
+        public int DegreeOfPrivacy { get; set; } = DefaultDegreeOfPrivacy;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -61,6 +62,7 @@ namespace Repository
         public static bool DefaultIsDynamic { get; set; } = false;
         public static bool DefaultIsPendingDeletion { get; set; } = false;
         public static int DefaultNumberOfGuests { get; set; } = 0;
+        public static int DefaultDegreeOfPrivacy { get; set; } = 3;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;

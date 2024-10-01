@@ -40,18 +40,18 @@ namespace Repository.Tests
 
             await nestStore.AppreciateUserAsync(subject1.Id, subject2.Id, time);
 
-            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).Single());
+            UserRelationship link = sentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).Single());
 
             Assert.NotNull(link);
             Assert.Equal(subject1.Id, link.SelfId);
             Assert.Equal(subject2.Id, link.OtherId);
             Assert.Equal(time, link.Time);
-            Assert.Equal(UserLink.UserLinkType.Appreciate, link.Type);
+            Assert.Equal(UserRelationship.UserLinkType.Appreciate, link.Type);
         }
         [Fact]
         public async Task UnappreciateUserAsync_SUCCESS()
         {
-            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Appreciate);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Appreciate);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
             await nestStore.UnappreciateUserAsync(subject1.Id, subject2.Id);
@@ -67,18 +67,18 @@ namespace Repository.Tests
 
             await nestStore.BlockUserAsync(subject1.Id, subject2.Id, time);
 
-            UserLink link = sentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).Single());
+            UserRelationship link = sentry.ExecuteRead(ctx => ctx.UserLinks.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).Single());
 
             Assert.NotNull(link);
             Assert.Equal(subject1.Id, link.SelfId);
             Assert.Equal(subject2.Id, link.OtherId);
             Assert.Equal(time, link.Time);
-            Assert.Equal(UserLink.UserLinkType.Block, link.Type);
+            Assert.Equal(UserRelationship.UserLinkType.Block, link.Type);
         }
         [Fact]
         public async Task UnblockUserAsync_SUCCESS()
         {
-            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Block);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Block);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
             await nestStore.UnblockUserAsync(subject1.Id, subject2.Id);
@@ -90,7 +90,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetAppreciatedUsersAsync_SUCCESS()
         {
-            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Appreciate);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Appreciate);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.AddAsync(link));
 
             UserShard user = (await nestStore.GetAppreciatedUsersAsync(subject1.Id)).Single();
@@ -102,7 +102,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetBlockedUsersAsync_SUCCESS()
         {
-            UserLink link = new UserLinkFactory().Create(subject1, subject2, UserLink.UserLinkType.Block);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Block);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(link));
 
             UserShard user = (await nestStore.GetBlockedUsersAsync(subject1.Id)).Single();
@@ -115,8 +115,8 @@ namespace Repository.Tests
         public async Task GetCompanionsAsync_SUCCESS()
         {
             UserLinkFactory factory = new UserLinkFactory();
-            UserLink link1 = factory.Create(subject1, subject2, UserLink.UserLinkType.Appreciate);
-            UserLink link2 = factory.Create(subject2, subject1, UserLink.UserLinkType.Appreciate);
+            UserRelationship link1 = factory.Create(subject1, subject2, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship link2 = factory.Create(subject2, subject1, UserRelationship.UserLinkType.Appreciate);
 
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
@@ -130,7 +130,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetUsersAppreciatingAsync_SUCCESS()
         {
-            UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Appreciate);
+            UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserLinkType.Appreciate);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
             UserShard user = (await nestStore.GetUsersAppreciatingAsync(subject1.Id)).Single();
@@ -142,7 +142,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetUsersBlockingAsync_SUCCESS()
         {
-            UserLink link = new UserLinkFactory().Create(subject2, subject1, UserLink.UserLinkType.Block);
+            UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserLinkType.Block);
             sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link));
 
             UserShard user = (await nestStore.GetUsersBlockingAsync(subject1.Id)).Single();

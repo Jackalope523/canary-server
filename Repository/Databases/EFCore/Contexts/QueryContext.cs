@@ -7,7 +7,7 @@ namespace Repository
     {
         internal DbSet<User> Users { get; set; }
         internal DbSet<Gathering> Gatherings { get; set; }
-        internal DbSet<UserLink> UserLinks { get; set; }
+        internal DbSet<UserRelationship> UserLinks { get; set; }
         internal DbSet<GatheringLink> GatheringLinks { get; set; }
         internal DbSet<SnapshotLink> SnapshotLinks { get; set; }
         internal DbSet<UserReport> UserReports { get; set; }
@@ -19,6 +19,7 @@ namespace Repository
         internal DbSet<Penalty> Penalties { get; set; }
         internal DbSet<Banner> Banners { get; set; }
         internal DbSet<BannerLink> BannerLinks { get; set; }
+        internal DbSet<ClearanceLink> ClearanceLinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -122,8 +123,13 @@ namespace Repository
                .IsUnique();
 
             // User Link
-            modelBuilder.Entity<UserLink>()
+            modelBuilder.Entity<UserRelationship>()
                .HasIndex(l => new { l.SelfId, l.OtherId })
+               .IsUnique();
+
+            // Clearance Link
+            modelBuilder.Entity<ClearanceLink>()
+               .HasIndex(l => new { l.Id })
                .IsUnique();
         }
     }

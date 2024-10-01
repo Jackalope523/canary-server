@@ -12,9 +12,9 @@ namespace Repository
             store = new EFCoreGatheringStore(flag);
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy)
         {
-            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic);
+            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy);
         }
 
         public async Task DeleteGatheringAsync(ulong gatheringId)
@@ -90,6 +90,16 @@ namespace Repository
         public async Task TerminateGatheringAsync(ulong id, DateTimeOffset time)
         {
             await store.TerminateGatheringAsync(id, time);
+        }
+
+        public async Task<bool> CanJoin(ulong gatheringId, ulong userId)
+        {
+            return await store.CanJoin(gatheringId, userId);
+        }
+
+        public async Task<List<ulong>> GetAuthorizedGuests(ulong gatheringId)
+        {
+            return await store.GetAuthorizedGuests(gatheringId);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Repository
         public double CurrentRadius { get; set; } = DefaultCurrentRadius;
 
         // Navigation Properties
-        public List<UserLink>? UserLinks { get; set; }
+        public List<UserRelationship>? UserLinks { get; set; }
         public List<GatheringLink>? GatheringLinks { get; set; }
         public List<SnapshotLink>? PostLinks { get; set; }
         public List<UserReport>? ReporterList { get; set; }

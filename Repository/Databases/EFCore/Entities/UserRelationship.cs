@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    public class UserLink
+    public class UserRelationship
     {
         public enum UserLinkType { Appreciate, Block }
 

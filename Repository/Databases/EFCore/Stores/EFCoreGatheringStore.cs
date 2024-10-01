@@ -10,7 +10,53 @@ namespace Repository
         {
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic)
+        private async Task PropagateClearance(ulong userId, ulong gatheringId, int degree, List<ulong> previousCompanions)
+        {
+            if (degree == 0) return;
+
+            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.ClearanceLinks.
+                Where(c => c.GatheringId == gatheringId && c.UserId == userId && c.Type == ClearanceLink.ClearanceType.Guest).
+                Select(c => c.Id).
+                SingleOrDefaultAsync());
+
+            if (id != 0)
+            {
+               await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.ClearanceLinks.
+               AddAsync(new ClearanceLink
+               {
+                   UserId = userId,
+                   GatheringId = gatheringId,
+                   Type = ClearanceLink.ClearanceType.Guest
+               }
+               ));
+            }
+            else return;
+
+            Task<List<ulong>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+                ctx.UserLinks.
+                Where(l => !previousCompanions.Contains(l.OtherId) && l.SelfId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
+                Select(l => l.OtherId).
+                ToListAsync());
+
+            Task<List<ulong>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+                ctx.UserLinks.
+                Where(l => !previousCompanions.Contains(l.SelfId) && l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
+                Select(l => l.SelfId).
+                ToListAsync());
+
+            List<ulong> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
+
+            List<Task> tasks = new();
+            foreach (ulong companion in companions)
+            {
+                tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(previousCompanions).ToList()));
+            }
+            await Task.WhenAll(tasks);
+        } 
+
+        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy)
         {
             Gathering toCreate = new()
             {
@@ -31,8 +77,8 @@ namespace Repository
                 Competitiveness = character.Competitiveness,
                 Industriousness = character.Industriousness,
                 NightOwl = character.NightOwl,
+                DegreeOfPrivacy = degreeOfPrivacy,
             };
-
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Gatherings.Add(toCreate));
 
@@ -48,6 +94,10 @@ namespace Repository
 
             UserShard host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserShard(u.Id, u.Name)).SingleAsync());
 
+            if (degreeOfPrivacy < 3)
+            {
+                await PropagateClearance(hostId, toCreate.Id, degreeOfPrivacy, new());
+            }
 
             return new CoreGathering
                 (
@@ -75,7 +125,8 @@ namespace Repository
                    toCreate.Radius,
                    toCreate.IsDynamic,
                    toCreate.IsPendingDeletion,
-                   toCreate.NumberOfGuests
+                   toCreate.NumberOfGuests,
+                   toCreate.DegreeOfPrivacy
                    );
         }
         public async Task DeleteGatheringAsync(ulong gatheringId)
@@ -125,7 +176,8 @@ namespace Repository
                         e.Radius,
                         e.IsDynamic,
                         e.IsPendingDeletion,
-                        e.NumberOfGuests
+                        e.NumberOfGuests,
+                        e.DegreeOfPrivacy
                         )).SingleAsync());
 
                 UserShard host = await storeSentry.ExecuteReadAsync(ctx =>
@@ -172,7 +224,8 @@ namespace Repository
                     e.Radius,
                     e.IsDynamic,
                     e.IsPendingDeletion,
-                    e.NumberOfGuests
+                    e.NumberOfGuests,
+                    e.DegreeOfPrivacy
                 }).
              Join(
                  ctx.Users,
@@ -204,7 +257,8 @@ namespace Repository
                     e.Radius,
                     e.IsDynamic,
                     e.IsPendingDeletion,
-                    e.NumberOfGuests
+                    e.NumberOfGuests,
+                    e.DegreeOfPrivacy
                  )).ToListAsync());
 
             List<ulong> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
@@ -257,7 +311,8 @@ namespace Repository
                     e.Radius,
                     e.IsDynamic,
                     e.IsPendingDeletion,
-                    e.NumberOfGuests
+                    e.NumberOfGuests,
+                    e.DegreeOfPrivacy
                 }).
              Join(
                  ctx.Users,
@@ -289,7 +344,8 @@ namespace Repository
                     e.Radius,
                     e.IsDynamic,
                     e.IsPendingDeletion,
-                    e.NumberOfGuests
+                    e.NumberOfGuests,
+                    e.DegreeOfPrivacy
                  )).ToListAsync());
         }
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(ulong id)
@@ -325,7 +381,8 @@ namespace Repository
                   e.Radius,
                   e.IsDynamic,
                   e.IsPendingDeletion,
-                  e.NumberOfGuests
+                  e.NumberOfGuests,
+                  e.DegreeOfPrivacy
                }).
             Join(
                 ctx.Users,
@@ -357,7 +414,8 @@ namespace Repository
                    e.Radius,
                    e.IsDynamic,
                    e.IsPendingDeletion,
-                   e.NumberOfGuests
+                   e.NumberOfGuests,
+                   e.DegreeOfPrivacy
                 )).ToListAsync());
         }
         public async Task<CoreGathering> FindGatheringAsync(ulong id)
@@ -391,7 +449,8 @@ namespace Repository
                    e.Radius,
                    e.IsDynamic,
                    e.IsPendingDeletion,
-                   e.NumberOfGuests
+                   e.NumberOfGuests,
+                   e.DegreeOfPrivacy
                )).
              SingleAsync());
 
@@ -438,7 +497,8 @@ namespace Repository
                         e.Radius,
                         e.IsDynamic,
                         e.IsPendingDeletion,
-                        e.NumberOfGuests
+                        e.NumberOfGuests,
+                        e.DegreeOfPrivacy
                    )).ToListAsync());
         }     
         public async Task<List<UserShard>> GetGuestListAsync(ulong id)
@@ -623,7 +683,8 @@ namespace Repository
                     e.Radius, 
                     e.IsDynamic,
                     e.IsPendingDeletion,
-                    e.NumberOfGuests
+                    e.NumberOfGuests,
+                    e.DegreeOfPrivacy
                     )).ToListAsync());
         }      
         public async Task<GatheringBond?> GetUserStateAsync(ulong userId, ulong gatheringId)
@@ -757,6 +818,26 @@ namespace Repository
             storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.State)).IsModified = true, currentDiscussion);
 
             await storeSentry.EndDiscussionAsync(currentDiscussion);         
+        }
+
+        public async Task<bool> CanJoin(ulong gatheringId, ulong userId)
+        {
+            ulong id = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.ClearanceLinks.
+                Where(c => c.GatheringId == gatheringId && c.UserId == userId && c.Type == ClearanceLink.ClearanceType.Guest).
+                Select(c => c.Id).
+                SingleOrDefaultAsync());
+            
+            return id != 0;
+        }
+
+        public async Task<List<ulong>> GetAuthorizedGuests(ulong gatheringId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.ClearanceLinks.
+                Where(c => c.GatheringId == gatheringId).
+                Select(c => c.UserId).
+                ToListAsync());
         }
     }
 }

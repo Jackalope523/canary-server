@@ -6,9 +6,9 @@ namespace Repository
 {
     public class EFCoreNestStore : QueryStore, INestDatabase
     {     
-        private static readonly Func<QueryContext, ulong, ulong, UserLink.UserLinkType, Task> RemoveLinkOperation =
+        private static readonly Func<QueryContext, ulong, ulong, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
-                (QueryContext ctx, ulong selfId, ulong otherId, UserLink.UserLinkType type) =>
+                (QueryContext ctx, ulong selfId, ulong otherId, UserRelationship.UserLinkType type) =>
                 ctx.UserLinks
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());
@@ -28,25 +28,25 @@ namespace Repository
 
             if (id == 0)
             {
-                UserLink toAdd = new()
+                UserRelationship toAdd = new()
                 {
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserLink.UserLinkType.Appreciate
+                    Type = UserRelationship.UserLinkType.Appreciate
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
             }
             else
             {
-                UserLink toUpdate = new()
+                UserRelationship toUpdate = new()
                 {
                     Id = id,
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserLink.UserLinkType.Appreciate
+                    Type = UserRelationship.UserLinkType.Appreciate
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toUpdate));
@@ -55,7 +55,7 @@ namespace Repository
         public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Appreciate));
+            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Appreciate));
         }
         public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
         {
@@ -68,25 +68,25 @@ namespace Repository
 
             if (id == 0)
             {
-                UserLink toAdd = new()
+                UserRelationship toAdd = new()
                 {
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserLink.UserLinkType.Block
+                    Type = UserRelationship.UserLinkType.Block
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
             }
             else
             {
-                UserLink toUpdate = new()
+                UserRelationship toUpdate = new()
                 {
                     Id = id,
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserLink.UserLinkType.Block
+                    Type = UserRelationship.UserLinkType.Block
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toUpdate));
@@ -95,12 +95,12 @@ namespace Repository
         public async Task UnblockUserAsync(ulong selfId, ulong targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Block));
+            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Block));
         }
         public async Task<List<UserShard>> GetAppreciatedUsersAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
+             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -112,7 +112,7 @@ namespace Repository
         public async Task<List<UserShard>> GetBlockedUsersAsync(ulong id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block).
+            ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Block).
             Join(
                 ctx.Users, 
                 l => l.OtherId, 
@@ -124,7 +124,7 @@ namespace Repository
         public async Task<List<UserShard>> GetCompanionsAsync(ulong id)
         {
             Task<List<UserShard>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
+             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -134,7 +134,7 @@ namespace Repository
              ToListAsync());
 
             Task<List<UserShard>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Appreciate).
+             ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.SelfId,
@@ -149,7 +149,7 @@ namespace Repository
         public async Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Appreciate).
+            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
@@ -160,7 +160,7 @@ namespace Repository
         public async Task<List<UserShard>> GetUsersBlockingAsync(ulong userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Block).
+            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Block).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,

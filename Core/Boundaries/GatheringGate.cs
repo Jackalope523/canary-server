@@ -16,7 +16,7 @@ namespace Core.Boundaries
     public record CoreGathering(ulong Id, UserShard Host, string Title, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
-		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests)
+		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests, int degreeOfPrivacy)
 		: CoreOnlyData();
 
 	public record GatheringShard(ulong Id, UserShard Host, string Title, string Description,
@@ -43,7 +43,7 @@ namespace Core.Boundaries
 		Task<CoreGathering> CreateGatheringAsync(ulong hostId, string title, string description,
 			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
 			int groupMinimum, int groupMaximum, CharacterShard character,
-			double Radius, bool isDynamic);
+			double Radius, bool isDynamic, int degreeOfPrivacy);
 		Task UpdateGatheringAsync(ulong gatheringId, List<(string Property, object Value)> edits);
 		Task TerminateGatheringAsync(ulong gatheringId, DateTimeOffset time);
 		Task DeleteGatheringAsync(ulong gatheringId);
@@ -54,7 +54,9 @@ namespace Core.Boundaries
 
 		Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId);
 		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong gatheringId);
-	}
+        Task<bool> CanJoin(ulong gatheringId, ulong userId);
+        Task<List<ulong>> GetAuthorizedGuests(ulong gatheringId);
+    }
 
 	public interface IGatheringOperations
 	{
@@ -67,7 +69,7 @@ namespace Core.Boundaries
 		Task<GatheringShard> CreateGatheringAsync(ulong userId, string gatheringTitle, string gatheringDescription,
 			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
 			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum,
-			MemoryStream heroImage);
+			MemoryStream heroImage, int degreeOfPrivacy);
 		Task EditGatheringAsync(ulong userId, ulong gatheringId,
 			string gatheringTitle = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",

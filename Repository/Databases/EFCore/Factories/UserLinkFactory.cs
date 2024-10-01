@@ -2,9 +2,9 @@
 {
     internal class UserLinkFactory
     {      
-        internal UserLink Create(User self, User other, UserLink.UserLinkType type)
+        internal UserRelationship Create(User self, User other, UserRelationship.UserLinkType type)
         {
-            return new UserLink
+            return new UserRelationship
             {
                 SelfId = self.Id,
                 OtherId = other.Id,
