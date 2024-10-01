@@ -155,6 +155,7 @@ namespace Core.Entities
             GroupMinimum = fromGathering.GroupMinimum;
             GroupMaximum = fromGathering.GroupMaximum;
             Radius = new() { Kilometres = fromGathering.Radius };
+            DegreeOfPrivacy = fromGathering.DegreeOfPrivacy;
             NumberOfGuests = fromGathering.NumberOfGuests;
         }
 
@@ -171,7 +172,7 @@ namespace Core.Entities
             return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
-                Radius.Kilometres, NumberOfGuests, RelativeAngle);
+                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests, RelativeAngle);
         }
 
         public GatheringShard ToGatheringShard(User relativeUser)
@@ -179,7 +180,7 @@ namespace Core.Entities
             return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
-                Radius.Kilometres, NumberOfGuests,
+                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests,
                 CharacterVector.AngleBetweenAffected(relativeUser.Character, Character));
         }
 

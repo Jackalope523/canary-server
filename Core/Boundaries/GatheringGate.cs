@@ -22,7 +22,7 @@ namespace Core.Boundaries
 	public record GatheringShard(ulong Id, UserShard Host, string Title, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
-        double Radius, int NumberOfGuests, float RelativeAngle);
+        double Radius, int DegreeOfPrivacy, int NumberOfGuests, float RelativeAngle);
 
 	public record GuestListBondPair(UserShard User, GatheringBond Bond);
 
