@@ -9,6 +9,7 @@ namespace Repository
         public string Name { get; set; } = DefaultName;
         public string Description { get; set; } = DefaultDescription;
         public string Code { get; set; } = DefaultCode;
+        public string Color { get; set; } = DefaultColor;
 
         // Navigation Properties
         public List<BannerLink>? Links { get; set; }
@@ -19,5 +20,6 @@ namespace Repository
         public static string DefaultName { get; set; } = "Turtles";
         public static string DefaultDescription { get; set; } = "The OG Skinny minny ahhhhh!!!!";
         public static string DefaultCode { get; set; } = "WildTurtles";
+        public static string DefaultColor { get; set; } = "#FF0000";
     }
 }
