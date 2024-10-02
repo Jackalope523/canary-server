@@ -27,6 +27,12 @@ namespace Frontier.Controllers
 			return await Execute(async user => await banners.GetBannerAsync(user.Id), allowUnverified: true);
         }
 
+		[HttpGet("members")]
+		public async Task<IActionResult> GetMembers()
+		{
+			return await Execute(async user => await banners.GetBannerMembersAsync(user.Id), allowUnverified: true);
+		}
+
 		#endregion
 	}
 }

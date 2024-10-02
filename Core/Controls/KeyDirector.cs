@@ -16,16 +16,6 @@ namespace Core.Controls
 
         #region Operations
 
-        public async Task<string> GetHollowTwilioAuthKeyAsync()
-        {
-            return await Keys.GetHollowTwilioAuthKeyAsync();
-        }
-
-        public async Task<string> GetHollowTwilioTokenKeyAsync()
-        {
-            return await Keys.GetHollowTwilioTokenKeyAsync();
-        }
-
         public async Task<string> GetCanaryMapKeyAsync(ulong userId)
         {
             await GetUserAsync(userId);

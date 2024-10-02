@@ -20,16 +20,16 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.BannerLinks.Add(toAdd));
         }
 
-        public async Task<BannerShard> FindBannerByCodeAsync(string code)
+        public async Task<CoreBanner> FindBannerByCodeAsync(string code)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
                ctx.Banners
                .Where(b => b.Code == code)
-               .Select(b => new BannerShard(b.Id, b.Name, b.Code))
+               .Select(b => new CoreBanner(b.Id, b.Name, b.Code))
                .SingleAsync());
         }
 
-        public async Task<BannerShard> FindBannerForUserAsync(ulong userId)
+        public async Task<CoreBanner> FindBannerForUserAsync(ulong userId)
         {
             ulong bannerId = await storeSentry.ExecuteReadAsync(ctx =>
                                ctx.BannerLinks
@@ -40,7 +40,7 @@ namespace Repository
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Banners
                 .Where(b => b.Id == bannerId)
-                .Select(b => new BannerShard(b.Id, b.Name, b.Code))
+                .Select(b => new CoreBanner(b.Id, b.Name, b.Code))
                 .SingleAsync());
         }
     }

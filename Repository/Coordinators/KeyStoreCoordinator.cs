@@ -21,14 +21,19 @@ namespace Repository.Coordinators
             return await store.GetHollowOneSignalAppIdAsync();
         }
 
-        public async Task<string> GetHollowTwilioAuthKeyAsync()
+        public async Task<string> GetHollowTwilioAccountKeyAsync()
         {
-            return await store.GetHollowTwilioAuthKeyAsync();
+            return await store.GetHollowTwilioAccountKeyAsync();
         }
 
-        public async Task<string> GetHollowTwilioTokenKeyAsync()
+        public async Task<string> GetHollowTwilioAuthTokenAsync()
         {
-            return await store.GetHollowTwilioTokenKeyAsync();
+            return await store.GetHollowTwilioAuthTokenAsync();
+        }
+
+        public async Task<string> GetHollowTwilioMessagingServiceAsync()
+        {
+            return await store.GetHollowTwilioMessagingServiceAsync();
         }
 
         public async Task<string> GetCanaryMapKeyAsync()

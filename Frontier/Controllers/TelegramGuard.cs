@@ -48,28 +48,6 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPost("push")]
-		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
-		{
-			// Verify parameters
-			if (subscription == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
-
-			return await Execute(async user =>
-			{
-				await telegrams.SubscribeUserAsync(user.Id, subscription.DeviceType, subscription.DeviceToken);
-			}, allowUnverified: true);
-		}
-
-		[HttpDelete("push")]
-		public async Task<IActionResult> Unsubscribe()
-		{
-			return await Execute(async user =>
-			{
-				await telegrams.UnsubscribeUserAsync(user.Id);
-			}, allowUnverified: true);
-		}
-
 		#endregion
 	}
 }

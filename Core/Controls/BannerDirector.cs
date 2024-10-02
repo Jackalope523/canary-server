@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
@@ -15,7 +16,7 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<BannerShard> GetBannerAsync(ulong userId)
+		public async Task<CoreBanner> GetBannerAsync(ulong userId)
 		{
 			var user = await GetUserAsync(userId);
 			var userBanner = await Banners.FindBannerForUserAsync(user.Id);
@@ -23,11 +24,20 @@ namespace Core.Controls
 			return userBanner;
 		}
 
+		public async Task<List<ulong>> GetBannerMembersAsync(ulong userId)
+		{
+			var user = await GetUserAsync(userId);
+			var userBanner = await Banners.FindBannerForUserAsync(user.Id);
+
+			return (await Banners.GetBannerMembersAsync(userBanner.Id))
+				.ConvertAll(member => member.Id);
+		}
+
 		#endregion
 
 		#region Favours
 
-		public async Task<BannerShard> RequestUserBannerAsync(User user)
+		public async Task<CoreBanner> RequestUserBannerAsync(User user)
 		{
 			return await Banners.FindBannerForUserAsync(user.Id);
 		}

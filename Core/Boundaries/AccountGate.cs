@@ -13,12 +13,14 @@ namespace Core.Boundaries
 	public record CoreUser(ulong Id, string PhoneNumber, string Email, string Name, string Pseudonym,
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
-		DateTimeOffset JoinDate, int Reputation, CharacterShard Character, DateTimeOffset TimeOfUserAgreement)
+		DateTimeOffset JoinDate, int Reputation, CharacterShard Character, DateTimeOffset TimeOfUserAgreement,
+		string NotificationId)
 		: CoreOnlyData();
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
         DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
-		UserAccountStatus AccountStatus, DateTimeOffset JoinDate, DateTimeOffset TimeOfUserAgreement);
+		UserAccountStatus AccountStatus, DateTimeOffset JoinDate, DateTimeOffset TimeOfUserAgreement,
+		string NotificationId);
 
     public record UserShard(ulong Id, string Name);
 

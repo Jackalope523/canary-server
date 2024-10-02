@@ -13,17 +13,15 @@ namespace Core.Boundaries
 		Task<string> GetHollowOneSignalApiKeyAsync();
 		Task<string> GetHollowOneSignalAppIdAsync();
 
-		Task<string> GetHollowTwilioAuthKeyAsync();
-		Task<string> GetHollowTwilioTokenKeyAsync();
+		Task<string> GetHollowTwilioAccountKeyAsync();
+		Task<string> GetHollowTwilioAuthTokenAsync();
+		Task<string> GetHollowTwilioMessagingServiceAsync();
 
 		Task<string> GetCanaryMapKeyAsync();
     }
 
     public interface IKeyOperations
 	{
-		Task<string> GetHollowTwilioAuthKeyAsync();
-		Task<string> GetHollowTwilioTokenKeyAsync();
-
 		Task<string> GetCanaryMapKeyAsync(ulong userId);
 	}
 

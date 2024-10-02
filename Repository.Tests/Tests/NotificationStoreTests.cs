@@ -50,18 +50,6 @@ namespace Repository.Tests
             Assert.Equal(note.Message, found.Message);
         }
         [Fact]
-        public async Task GetUserSubscriptionAsync_SUCCESS()
-        {
-            Subscription subscription = new SubscriptionFactory().Create(subject1);
-            sentry.ExecuteWrite(ctx => ctx.Subscriptions.Add(subscription));
-
-            DeviceShard device = await store.GetUserSubscriptionAsync(subject1.Id);
-
-            Assert.NotNull(device);
-            Assert.Equal(subscription.DeviceType, device.DeviceType);
-            Assert.Equal(subscription.DeviceToken, device.DeviceToken);
-        }
-        [Fact]
         public async Task SaveNoteAsync_SUCCESS()
         {
             DateTimeOffset time = DateTimeOffset.MinValue;
@@ -80,32 +68,6 @@ namespace Repository.Tests
             Assert.Equal(action, saved.Action);
             Assert.False(saved.Read);
         }
-        [Fact]
-        public async Task SubscribeUserAsync_SUCCESS()
-        {
-            DeviceType type = DeviceType.Android;
-            string token = "token";
-
-            await store.SubscribeUserAsync(subject1.Id, type, token);
-
-            Subscription saved = sentry.ExecuteRead(ctx => ctx.Subscriptions.Single());
-
-            Assert.NotNull(saved);
-            Assert.Equal(subject1.Id, saved.UserId);
-            Assert.Equal(type, saved.DeviceType);
-            Assert.Equal(token, saved.DeviceToken);
-        }
-        [Fact]
-        public async Task UnsubscribeUserAsync_SUCCESS()
-        {
-            Subscription subscription = new SubscriptionFactory().Create(subject1);
-            sentry.ExecuteWrite(ctx => ctx.Subscriptions.Add(subscription)); 
-
-            await store.UnsubscribeUserAsync(subject1.Id);
-
-            int count = sentry.ExecuteRead(ctx => ctx.Subscriptions.Count());
-
-            Assert.Equal(0, count);
-        }
+        
     }
 }

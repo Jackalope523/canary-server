@@ -320,24 +320,6 @@ namespace Core.Tests
 			return await Terminal.NotificationDatabase.GetTelegramsAsync(user.Id);
 		}
 
-		internal async Task SubscribeUserAsync(User user, DeviceType deviceType, string deviceToken)
-		{
-			await Terminal.NotificationDatabase.SubscribeUserAsync(user.Id, deviceType, deviceToken);
-		}
-
-		internal async Task<DeviceShard> GetUserSubscriptionAsync(User user)
-		{
-			DeviceShard subscription = null;
-
-			try
-			{
-				subscription = await Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
-			}
-			catch { }
-
-			return subscription;
-		}
-
 		internal List<NotificationServiceStub.NotificationStub> GetUserMessages(User user)
 		{
 			ConcurrentBag<NotificationServiceStub.NotificationStub> userMessages;

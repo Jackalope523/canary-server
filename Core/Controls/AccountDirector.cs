@@ -47,7 +47,7 @@ namespace Core.Controls
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, string code = "")
         {
-            BannerShard banner;
+            CoreBanner banner;
 
             // Verify banner code
             try

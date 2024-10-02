@@ -27,8 +27,6 @@ namespace Core.Boundaries
     public record TelegramShard(ulong Id, ulong NotifierId, DateTimeOffset Time,
 		TelegramMessage Message, string Context);
 
-	public record DeviceShard(DeviceType DeviceType, string DeviceToken);
-
     #endregion
 
     #region Gates
@@ -41,10 +39,6 @@ namespace Core.Boundaries
 		Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time,
 			TelegramMessage message, string context);
 		Task DeleteTelegramAsync(ulong telegramId);
-
-		Task<DeviceShard> GetUserSubscriptionAsync(ulong userId);
-		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
-		Task UnsubscribeUserAsync(ulong userId);
 	}
 
 	public interface INotificationOperations
@@ -52,14 +46,11 @@ namespace Core.Boundaries
 		Task<List<TelegramShard>> GetTelegramsAsync(ulong userId);
 		Task ClearTelegramsAsync(ulong userId);
 		Task ClearTelegramsAsync(ulong userId, List<ulong> telegramIds);
-
-		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
-		Task UnsubscribeUserAsync(ulong userId);
 	}
 
 	public interface INotificationService
 	{
-		Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message);
+		Task PushNotification(string notificationId, string title, string message);
 	}
 
 	#endregion

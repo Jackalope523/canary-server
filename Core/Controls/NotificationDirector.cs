@@ -56,16 +56,6 @@ namespace Core.Controls
 			}
 		}
 
-		public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
-		{
-			await Telegrams.SubscribeUserAsync(userId, deviceType, deviceToken);
-		}
-
-		public async Task UnsubscribeUserAsync(ulong userId)
-		{
-			await Telegrams.UnsubscribeUserAsync(userId);
-		}
-
 		#endregion
 
 		#region Favours
@@ -81,19 +71,7 @@ namespace Core.Controls
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-			DeviceShard userSettings;
-
-            // Check if user is subscribed
-            try
-            {
-				userSettings = await Telegrams.GetUserSubscriptionAsync(user.Id);
-            }
-			catch (Exception)
-			{
-				return;
-			}
-				
-            await Terminal.NotificationService.PushNotification(userSettings.DeviceType, userSettings.DeviceToken, title, message);
+            await Terminal.NotificationService.PushNotification(user.NotificationId, title, message);
 		}
 
 		#endregion
