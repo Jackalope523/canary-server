@@ -117,8 +117,11 @@ namespace Frontier
             OneSignalService.Initialise(frontierLogger,
                 keyProvider.GetHollowOneSignalApiKeyAsync().Result,
                 keyProvider.GetHollowOneSignalAppIdAsync().Result);
-
-            TwilioService.Initialise(frontierLogger, "", "", ""); // Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
+            
+            TwilioService.Initialise(frontierLogger,
+                keyProvider.GetHollowTwilioAccountKeyAsync().Result,
+                keyProvider.GetHollowTwilioAuthTokenAsync().Result,
+                keyProvider.GetHollowTwilioMessagingServiceAsync().Result);
 
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();

@@ -8,29 +8,30 @@ namespace Frontier.Services
 {
 	public class TwilioService : ISMSService
 	{
-		private static string senderPhoneNumber = "";
 		private static ILogger log;
 
-		public static void Initialise(ILogger logger, string accountId, string accountToken, string phoneNumber)
+		private static string messagingServiceSid = "";
+
+		public static void Initialise(ILogger logger, string accountId, string accountToken, string messagingService)
 		{
 			log = logger;
+			messagingServiceSid = messagingService;
 
-			// TwilioClient.Init(accountId, accountToken);
-
-			senderPhoneNumber = phoneNumber;
+			TwilioClient.Init(accountId, accountToken);
 		}
 
 		public async Task SendSMSAsync(string phoneNumber, string message)
 		{
 			log.LogInformation("SMS to {phoneNumber}: {message}", phoneNumber, message);
-
+			/*
 			if (phoneNumber[0] == '+')
 			{
 				await MessageResource.CreateAsync(
-					from: new Twilio.Types.PhoneNumber(senderPhoneNumber),
+					messagingServiceSid: messagingServiceSid,
 					to: new Twilio.Types.PhoneNumber(phoneNumber),
 					body: message);
 			}
+			*/
 		}
 	}
 }

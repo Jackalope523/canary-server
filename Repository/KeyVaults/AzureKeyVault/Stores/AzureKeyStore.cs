@@ -19,14 +19,19 @@
             return await sentry.GetSecretAsync("OneSignalAppId");
         }
 
-        public async Task<string> GetHollowTwilioAuthKeyAsync()
+        public async Task<string> GetHollowTwilioAccountKeyAsync()
         {
             return await sentry.GetSecretAsync("TwilioAccountSID");
         }
 
-        public async Task<string> GetHollowTwilioTokenKeyAsync()
+        public async Task<string> GetHollowTwilioAuthTokenAsync()
         {
             return await sentry.GetSecretAsync("TwilioAuthToken");
+        }
+
+        public async Task<string> GetHollowTwilioMessagingServiceAsync()
+        {
+            return await sentry.GetSecretAsync("TwilioMessagingServiceSID");
         }
 
         public async Task<string> GetCanaryMapKeyAsync()
