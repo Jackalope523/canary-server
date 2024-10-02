@@ -56,7 +56,8 @@ namespace Repository
                   toCreate.Industriousness,
                   toCreate.NightOwl,
                   toCreate.Openness),
-                  toCreate.TimeOfUserAgreement
+                  toCreate.TimeOfUserAgreement,
+                  toCreate.NotificationId.ToString()
               );
         }
 
@@ -128,7 +129,8 @@ namespace Repository
                    u.Industriousness,
                    u.NightOwl,
                    u.Openness),
-                   u.TimeOfUserAgreement
+                   u.TimeOfUserAgreement,
+                   u.NotificationId.ToString()
                )).SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -172,7 +174,8 @@ namespace Repository
                   u.Industriousness,
                   u.NightOwl,
                   u.Openness),
-                  u.TimeOfUserAgreement
+                  u.TimeOfUserAgreement,
+                  u.NotificationId.ToString()
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -216,7 +219,8 @@ namespace Repository
                   u.Industriousness,
                   u.NightOwl,
                   u.Openness),
-                  u.TimeOfUserAgreement
+                  u.TimeOfUserAgreement,
+                  u.NotificationId.ToString()
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)

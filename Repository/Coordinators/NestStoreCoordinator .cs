@@ -1,7 +1,4 @@
-﻿using Core.Boundaries;
-
-
-namespace Repository
+﻿namespace Repository
 {
     public class NestStoreCoordinator : INestDatabase
     {
@@ -49,6 +46,10 @@ namespace Repository
         public async Task<List<UserShard>> GetUsersBlockingAsync(ulong userId)
         {
            return await store.GetUsersBlockingAsync(userId);
+        }
+        public async Task<bool> CanAppreciate(ulong userId, ulong targetId)
+        {
+            return await store.CanAppreciate(userId, targetId);
         }
     }
 }

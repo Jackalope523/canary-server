@@ -19,9 +19,19 @@
             return await store.FindBannerByCodeAsync(code);
         }
 
+        public async Task<CoreBanner> FindBannerByIdAsync(ulong bannerId)
+        {
+            return await store.FindBannerByIdAsync(bannerId);
+        }
+
         public async Task<CoreBanner> FindBannerForUserAsync(ulong userId)
         {
             return await store.FindBannerForUserAsync(userId);
+        }
+
+        public async Task<List<UserShard>> GetBannerMembersAsync(ulong bannerId)
+        {
+            return await store.GetBannerMembersAsync(bannerId);
         }
     }
 }

@@ -25,8 +25,17 @@ namespace Repository
             return await storeSentry.ExecuteReadAsync(ctx =>
                ctx.Banners
                .Where(b => b.Code == code)
-               .Select(b => new CoreBanner(b.Id, b.Name, b.Code))
+               .Select(b => new CoreBanner(b.Id, b.Name, b.Code, b.Color))
                .SingleAsync());
+        }
+
+        public async Task<CoreBanner> FindBannerByIdAsync(ulong bannerId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+              ctx.Banners
+              .Where(b => b.Id == bannerId)
+              .Select(b => new CoreBanner(b.Id, b.Name, b.Code, b.Color))
+              .SingleAsync());
         }
 
         public async Task<CoreBanner> FindBannerForUserAsync(ulong userId)
@@ -40,8 +49,21 @@ namespace Repository
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Banners
                 .Where(b => b.Id == bannerId)
-                .Select(b => new CoreBanner(b.Id, b.Name, b.Code))
+                .Select(b => new CoreBanner(b.Id, b.Name, b.Code, b.Color))
                 .SingleAsync());
+        }
+
+        public async Task<List<UserShard>> GetBannerMembersAsync(ulong bannerId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.BannerLinks
+                .Where(l => l.BannerId == bannerId)
+                .Join(
+                    ctx.Users.Where(u => u.IsPendingDeletion != true), 
+                    l => l.UserId, 
+                    u => u.Id, 
+                    (l,u) => new UserShard(u.Id, u.Name))
+                .ToListAsync());
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
@@ -166,6 +164,21 @@ namespace Repository
             u => u.Id,
             (l, u) => new UserShard(u.Id, u.Name)).
             ToListAsync());
+        }
+
+        public Task<bool> CanAppreciate(ulong userId, ulong targetId)
+        {
+            return storeSentry.ExecuteReadAsync(ctx => 
+                ctx.GatheringLinks.
+                Where(l => l.UserId == userId).
+                Join(
+                      ctx.GatheringLinks.
+                      Where(l => l.UserId == targetId),
+                      x => x.GatheringId,
+                      y => y.GatheringId,
+                      (x,y) => x.GatheringId
+                    ).
+                AnyAsync());
         }
     }
 }

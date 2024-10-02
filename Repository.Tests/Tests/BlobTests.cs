@@ -20,13 +20,13 @@ namespace Repository.Tests
         }
 
         [Fact]
-        public async Task UploadBlob_SUCCESS()
+        public Task UploadBlob_SUCCESS()
         {
             throw new NotImplementedException();
         }
 
         [Fact]
-        public async Task DownloadBlobAsync_SUCCESS()
+        public Task DownloadBlobAsync_SUCCESS()
         {
             throw new NotImplementedException();
         }
