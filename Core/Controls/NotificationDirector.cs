@@ -71,7 +71,7 @@ namespace Core.Controls
 
 		internal async Task NotifyUserAsync(User user, string title, string message)
 		{
-            await Terminal.NotificationService.PushNotification(user.Id, title, message);
+            await Terminal.NotificationService.PushNotification(user.NotificationId, title, message);
 		}
 
 		#endregion

@@ -32,17 +32,7 @@ namespace Frontier.Services
             instance = new DefaultApi(appConfig);
         }
 
-        public async Task TagPlayerAsUser(ulong userId, string playerId)
-        {
-            var player = new Player(appId: appId)
-            {
-                ExternalUserId = userId.ToString(),
-            };
-
-            await instance.UpdatePlayerAsync(playerId, player);
-        }
-
-        public async Task PushNotification(ulong userId, string title, string message)
+        public async Task PushNotification(string notificationId, string title, string message)
         {
             var notification = new Notification(appId: appId)
             {
@@ -50,7 +40,7 @@ namespace Frontier.Services
                 Contents = new StringMap(en: message),
                 TargetChannel = Notification.TargetChannelEnum.Push,
                 ChannelForExternalUserIds = "push",
-                IncludeExternalUserIds = new() { userId.ToString() } // Deprecated is a mistake
+                IncludeExternalUserIds = new() { notificationId } // Deprecated is a mistake
             };
 
             var response = await instance.CreateNotificationAsync(notification);

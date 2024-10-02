@@ -50,8 +50,7 @@ namespace Core.Boundaries
 
 	public interface INotificationService
 	{
-		Task TagPlayerAsUser(ulong userId, string playerId);
-		Task PushNotification(ulong userId, string title, string message);
+		Task PushNotification(string notificationId, string title, string message);
 	}
 
 	#endregion

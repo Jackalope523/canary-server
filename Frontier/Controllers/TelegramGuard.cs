@@ -14,13 +14,8 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		INotificationService notificationService;
-
-		public TelegramGuard(GuardBox box, UserManager<CoreUser> aspUserManager,
-			INotificationService externalNotificationService) : base(box, aspUserManager)
-		{
-			notificationService = externalNotificationService;
-		}
+		public TelegramGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
+		{ }
 
 		#endregion
 
@@ -52,18 +47,6 @@ namespace Frontier.Controllers
 				await telegrams.ClearTelegramsAsync(user.Id);
 			});
         }
-
-		[HttpPost("push")]
-		public async Task<IActionResult> HookPlayerToUser(string playerId)
-		{
-			if (string.IsNullOrEmpty(playerId))
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
-
-			return await Execute(async user =>
-			{
-				await notificationService.TagPlayerAsUser(user.Id, playerId);
-			}, allowUnverified: true);
-		}
 
 		#endregion
 	}

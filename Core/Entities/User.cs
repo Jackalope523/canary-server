@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Core.Boundaries;
-using Core.Controls;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using static Core.Entities.Psijic;
 using static Core.Entities.Arbiter;
@@ -54,6 +50,7 @@ namespace Core.Entities
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
         public DateTimeOffset TimeOfUserAgreement { get; set; }
+        public string NotificationId { get; set; }
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.Active ||
@@ -170,14 +167,15 @@ namespace Core.Entities
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation,
-                Character.ToCharacter(), TimeOfUserAgreement);
+                Character.ToCharacter(), TimeOfUserAgreement,
+                NotificationId);
         }
 
         public AccountShard ToAccountShard()
         {
             return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-                IsPhoneConfirmed, IsEmailConfirmed,
-                AccountStatus, JoinDate, TimeOfUserAgreement);
+                IsPhoneConfirmed, IsEmailConfirmed, AccountStatus,
+                JoinDate, TimeOfUserAgreement, NotificationId);
         }
 
         public UserShard ToUserShard()
