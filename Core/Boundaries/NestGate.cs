@@ -28,6 +28,8 @@ namespace Core.Boundaries
 		Task UnappreciateUserAsync(ulong userId, ulong targetUserId);
 		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnblockUserAsync(ulong userId, ulong targetUserId);
+
+        Task<List<CoreGathering>> GetMutualGatheringsAsync(ulong userId, ulong targetId);
     }
 
 	public interface INestOperations
