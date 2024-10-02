@@ -32,13 +32,25 @@ namespace Frontier.Services
             instance = new DefaultApi(appConfig);
         }
 
-        public async Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message)
+        public async Task TagPlayerAsUser(ulong userId, string playerId)
+        {
+            var player = new Player(appId: appId)
+            {
+                ExternalUserId = userId.ToString(),
+            };
+
+            await instance.UpdatePlayerAsync(playerId, player);
+        }
+
+        public async Task PushNotification(ulong userId, string title, string message)
         {
             var notification = new Notification(appId: appId)
             {
                 Headings = new StringMap(en: title),
                 Contents = new StringMap(en: message),
-                IncludedSegments = new List<string> { "Subscribed Users" }
+                TargetChannel = Notification.TargetChannelEnum.Push,
+                ChannelForExternalUserIds = "push",
+                IncludeExternalUserIds = new() { userId.ToString() } // Deprecated is a mistake
             };
 
             var response = await instance.CreateNotificationAsync(notification);
