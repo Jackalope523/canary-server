@@ -17,7 +17,7 @@ namespace Core.Boundaries
     public interface IMiscellaneousOperations
     {
 		Task ReceiveFeedback(ulong userId, string comments);
-		Task ReceiveAnonymousFeedback(string pseudonym, string comments);
+		Task ReceiveAnonymousFeedback(ulong userId, string pseudonym, string comments);
 	}
 
     #endregion

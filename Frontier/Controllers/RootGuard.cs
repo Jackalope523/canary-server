@@ -48,7 +48,7 @@ namespace Frontier.Controllers
 				}
 				else
 				{
-					return miscellaneous.ReceiveAnonymousFeedback(feedback.Pseudonym, feedback.Comments);
+					return miscellaneous.ReceiveAnonymousFeedback(user.Id, feedback.Pseudonym, feedback.Comments);
 				}
 			});
         }

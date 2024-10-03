@@ -23,8 +23,10 @@ namespace Core.Controls
             await Miscellaneous.SaveFeedback($"{user.Id} {user.Name}", Time, comments);
         }
 
-        public async Task ReceiveAnonymousFeedback(string pseudonym, string comments)
+        public async Task ReceiveAnonymousFeedback(ulong userId, string pseudonym, string comments)
         {
+            await GetUserAsync(userId); // Just to verify account, promise :)
+
             await Miscellaneous.SaveFeedback(pseudonym, Time, comments);
         }
 
