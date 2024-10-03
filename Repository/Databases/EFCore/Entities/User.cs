@@ -24,7 +24,7 @@ namespace Repository
         public ulong? CurrentGathering { get; set; } = DefaultCurrentGathering;
         public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
         public DateTimeOffset TimeOfUserAgreement { get; set; } = DefaultTimeOfUserAgreement;
-        public Guid? NotificationId { get; set; }
+        public Guid NotificationId { get; set; }
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;

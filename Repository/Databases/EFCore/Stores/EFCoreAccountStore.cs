@@ -131,7 +131,7 @@ namespace Repository
                    u.NightOwl,
                    u.Openness),
                    u.TimeOfUserAgreement,
-                   u.NotificationId.Value
+                   u.NotificationId
                )).SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -176,7 +176,7 @@ namespace Repository
                   u.NightOwl,
                   u.Openness),
                   u.TimeOfUserAgreement,
-                  u.NotificationId.Value
+                  u.NotificationId
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -221,7 +221,7 @@ namespace Repository
                   u.NightOwl,
                   u.Openness),
                   u.TimeOfUserAgreement,
-                  u.NotificationId.Value
+                  u.NotificationId
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)

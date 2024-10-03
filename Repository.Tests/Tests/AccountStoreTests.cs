@@ -50,7 +50,7 @@ namespace Repository.Tests
                     subject.NightOwl,
                     subject.Openness
                     ),
-                subject.NotificationId.Value);
+                subject.NotificationId);
 
             User created = sentry.ExecuteRead(ctx => ctx.Users.Single());
 

@@ -14,13 +14,13 @@ namespace Core.Boundaries
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, CharacterShard Character, DateTimeOffset TimeOfUserAgreement,
-		string NotificationId)
+		Guid NotificationId)
 		: CoreOnlyData();
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
         DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		UserAccountStatus AccountStatus, DateTimeOffset JoinDate, DateTimeOffset TimeOfUserAgreement,
-		string NotificationId);
+		Guid NotificationId);
 
     public record UserShard(ulong Id, string Name);
 
