@@ -28,7 +28,7 @@ namespace Core.Boundaries
 
 	public interface IBannerOperations
 	{
-        Task<BannerShard> GetBannerAsync(ulong userId);
+        Task<BannerShard> GetBannerAsync(ulong userId, ulong targetId);
 		Task<string> GetBannerCodeAsync(ulong userId);
 
 		Task<List<ulong>> GetBannerMembersAsync(ulong userId);

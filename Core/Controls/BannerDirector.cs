@@ -16,11 +16,12 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<BannerShard> GetBannerAsync(ulong userId)
+		public async Task<BannerShard> GetBannerAsync(ulong userId, ulong targetId)
 		{
 			var user = await GetUserAsync(userId);
+			var targetUser = await GetUserAsync(targetId);
 
-			return (await user.Banner).ToBannerShard();
+			return (await targetUser.Banner).ToBannerShard();
 		}
 
 		public async Task<string> GetBannerCodeAsync(ulong userId)
