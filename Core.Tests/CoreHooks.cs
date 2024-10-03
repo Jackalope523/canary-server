@@ -116,15 +116,15 @@ namespace Core.Tests
 
 		public static ConcurrentDictionary<string, ConcurrentBag<NotificationStub>> messages = new();
 
-		public Task PushNotification(ulong userId, string title, string message)
+		public Task PushNotification(string notificationId, string title, string message)
 		{
 			ConcurrentBag<NotificationStub> userBag;
-			var exists = messages.TryGetValue(userId.ToString(), out userBag);
+			var exists = messages.TryGetValue(notificationId, out userBag);
 
 			if (!exists)
 			{ 
 				userBag = new();
-				messages.TryAdd(userId.ToString(), userBag);
+				messages.TryAdd(notificationId, userBag);
 			}
 
 			userBag.Add(new NotificationStub() { Title = title, Message = message });
