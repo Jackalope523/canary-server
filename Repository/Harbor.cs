@@ -21,6 +21,7 @@ namespace Repository
         public IKeyDatabase KeyDatabaseAccess { get; private set; }
         public IBannerDatabase BannerDatabaseAccess { get; private set; }
         public IDebugDatabase DebugDatabaseAccess { get; private set; }
+        public IMiscellaneousDatabase MiscellaneousDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -35,6 +36,7 @@ namespace Repository
             KeyDatabaseAccess = new KeyStoreCoordinator();
             MediaDatabaseAccess = new MediaStoreCoordinator();
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
+            MiscellaneousDatabaseAccess = new;
         }
 
         public Harbor(Flag flag, ILogger logger) : this(flag)

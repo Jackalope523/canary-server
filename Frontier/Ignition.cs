@@ -143,6 +143,7 @@ namespace Frontier
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
+                harbor.MiscellaneousDatabaseAccess,
                 pushNotifications);
 
             GuardBox box = new(frontierLogger,
@@ -154,7 +155,8 @@ namespace Frontier
                 terminal.KeyOperations,
                 terminal.DisciplineOperations,
                 terminal.MediaOperations,
-                terminal.NotificationOperations);
+                terminal.NotificationOperations,
+                terminal.MiscellaneousOperations);
 
             services.AddSingleton(box);
 

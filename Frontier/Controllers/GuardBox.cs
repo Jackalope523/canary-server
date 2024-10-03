@@ -17,13 +17,14 @@ namespace Frontier.Controllers
 		public IMediaOperations media;
 		public INotificationOperations telegrams;
 		public INestOperations nests;
+        public IMiscellaneousOperations miscellaneous;
 
-		public GuardBox(ILogger logger,
+        public GuardBox(ILogger logger,
 			IAccountOperations accountOperations, IBannerOperations bannerOperations,
 			INestOperations nestOperations, IGatheringOperations gatheringOperations,
 			ISnapshotOperations snapshotOperations, IKeyOperations keyOperations,
 			IDisciplineOperations disciplineOperations,IMediaOperations mediaOperations,
-			INotificationOperations notificationOperations)
+			INotificationOperations notificationOperations, IMiscellaneousOperations miscellaneousOperations)
 		{
 			log = logger;
 
@@ -36,6 +37,7 @@ namespace Frontier.Controllers
 			reports = disciplineOperations;
 			media = mediaOperations;
 			telegrams = notificationOperations;
+			miscellaneous = miscellaneousOperations;
 		}
 	}
 }

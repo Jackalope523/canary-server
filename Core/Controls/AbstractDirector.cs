@@ -25,12 +25,13 @@ namespace Core.Controls
 		protected IMediaDatabase Media { get; private set; }
 		protected INotificationDatabase Telegrams { get; private set; }
 		protected INestDatabase Nests { get; private set; }
+        protected IMiscellaneousDatabase Miscellaneous { get; private set; }
 
-		#endregion
+        #endregion
 
-		#region Initialisation
+        #region Initialisation
 
-		public AbstractDirector(CoreTerminal terminal)
+        public AbstractDirector(CoreTerminal terminal)
 		{
 			Terminal = terminal;
 
@@ -45,6 +46,7 @@ namespace Core.Controls
 			Media = Terminal.MediaDatabase;
 			Telegrams = Terminal.NotificationDatabase;
 			Nests = Terminal.NestDatabase;
+			Miscellaneous = Terminal.MiscellaneousDatabase;
         }
 
 		#endregion

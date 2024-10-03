@@ -27,6 +27,7 @@ namespace Core
         public IMediaDatabase MediaDatabase { get; init; }
         public INotificationDatabase NotificationDatabase { get; init; }
         public INestDatabase NestDatabase { get; init; }
+        public IMiscellaneousDatabase MiscellaneousDatabase { get; init; }
 
         public IAccountOperations AccountOperations
             => AccountDirector;
@@ -46,6 +47,8 @@ namespace Core
             => NotificationDirector;
         public INestOperations NestOperations
             => NestDirector;
+        public IMiscellaneousOperations MiscellaneousOperations
+            => MiscellaneousDirector;
 
         public INotificationService NotificationService { get; init; }
 
@@ -58,6 +61,7 @@ namespace Core
         internal MediaDirector MediaDirector { get; private set; }
         internal NotificationDirector NotificationDirector { get; private set; }
         internal NestDirector NestDirector { get; private set; }
+        internal MiscellaneousDirector MiscellaneousDirector { get; private set; }
 
         #endregion
 
@@ -68,7 +72,7 @@ namespace Core
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase,
+            INestDatabase nestDatabase, IMiscellaneousDatabase miscellaneousDatabase,
             INotificationService notificationService)
         {
             lock (initLock)
@@ -87,6 +91,7 @@ namespace Core
                     MediaDatabase = mediaDatabase,
                     NotificationDatabase = notificationDatabase,
                     NestDatabase = nestDatabase,
+                    MiscellaneousDatabase = miscellaneousDatabase,
 
                     NotificationService = notificationService,
                 };
@@ -111,6 +116,7 @@ namespace Core
             MediaDirector = new MediaDirector(this);
             NotificationDirector = new NotificationDirector(this);
             NestDirector = new NestDirector(this);
+            MiscellaneousDirector = new MiscellaneousDirector(this);
         }
 
         #endregion

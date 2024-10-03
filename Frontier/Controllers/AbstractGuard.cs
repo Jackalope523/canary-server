@@ -49,6 +49,7 @@ namespace Frontier.Controllers
 		public IMediaOperations media;
 		public INotificationOperations telegrams;
 		public INestOperations nests;
+		public IMiscellaneousOperations miscellaneous;
 
 		public UserManager<CoreUser> userManager;
 
@@ -69,6 +70,7 @@ namespace Frontier.Controllers
 			reports = box.reports;
 			media = box.media;
 			telegrams = box.telegrams;
+			miscellaneous = box.miscellaneous;
 
 			userManager = aspUserManager;
 		}
