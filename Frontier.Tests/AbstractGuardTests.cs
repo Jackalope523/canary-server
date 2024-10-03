@@ -73,7 +73,8 @@ namespace Frontier.Tests
 			// Arrange
 			CoreUser bastardData = new(117, "John", "", "", "", DateTimeOffset.UtcNow,
 				true, true, false, "", null,
-				0, UserAccountStatus.Impotent, DateTimeOffset.UtcNow, 0, null, DateTimeOffset.UtcNow, "117");
+				0, UserAccountStatus.Impotent, DateTimeOffset.UtcNow, 0, null, DateTimeOffset.UtcNow,
+				Guid.NewGuid());
 
 			Func<Task<object>> action = async () => bastardData;
 

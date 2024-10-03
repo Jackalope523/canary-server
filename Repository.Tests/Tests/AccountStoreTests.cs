@@ -49,7 +49,8 @@ namespace Repository.Tests
                     subject.Industriousness,
                     subject.NightOwl,
                     subject.Openness
-                    ));
+                    ),
+                subject.NotificationId.Value);
 
             User created = sentry.ExecuteRead(ctx => ctx.Users.Single());
 

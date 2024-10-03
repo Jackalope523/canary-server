@@ -50,7 +50,7 @@ namespace Core.Entities
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
         public DateTimeOffset TimeOfUserAgreement { get; set; }
-        public string NotificationId { get; set; }
+        public Guid NotificationId { get; set; }
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.Active ||

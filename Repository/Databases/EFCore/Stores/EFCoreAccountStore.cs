@@ -9,7 +9,7 @@ namespace Repository
         {
         }
 
-        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character)
+        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character, Guid notificationId)
         {
             User toCreate = new()
             {
@@ -25,7 +25,8 @@ namespace Repository
                 Chaos = character.Chaoticness,
                 Competitiveness = character.Competitiveness,
                 Industriousness = character.Industriousness,
-                NightOwl = character.NightOwl,              
+                NightOwl = character.NightOwl,
+                NotificationId = notificationId,
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
@@ -57,7 +58,7 @@ namespace Repository
                   toCreate.NightOwl,
                   toCreate.Openness),
                   toCreate.TimeOfUserAgreement,
-                  toCreate.NotificationId.ToString()
+                  toCreate.NotificationId.Value
               );
         }
 
@@ -130,7 +131,7 @@ namespace Repository
                    u.NightOwl,
                    u.Openness),
                    u.TimeOfUserAgreement,
-                   u.NotificationId.ToString()
+                   u.NotificationId.Value
                )).SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -175,7 +176,7 @@ namespace Repository
                   u.NightOwl,
                   u.Openness),
                   u.TimeOfUserAgreement,
-                  u.NotificationId.ToString()
+                  u.NotificationId.Value
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -220,7 +221,7 @@ namespace Repository
                   u.NightOwl,
                   u.Openness),
                   u.TimeOfUserAgreement,
-                  u.NotificationId.ToString()
+                  u.NotificationId.Value
               )).SingleAsync());
             }
             catch (InvalidOperationException ex)
