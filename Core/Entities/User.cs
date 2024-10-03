@@ -153,6 +153,7 @@ namespace Core.Entities
             AccountStatus = fromUser.AccountStatus;
             Character = new(fromUser.Character);
             TimeOfUserAgreement = fromUser.TimeOfUserAgreement;
+            NotificationId = fromUser.NotificationId;
         }
 
         public User(UserShard fromUser) : this()
