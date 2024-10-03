@@ -1,5 +1,4 @@
 ﻿using NetTopologySuite.Geometries;
-using Core.Boundaries;
 using Repository.Entities;
 
 namespace Repository

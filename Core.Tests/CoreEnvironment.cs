@@ -72,6 +72,7 @@ namespace Core.Tests
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
+				harbor.MiscellaneousDatabaseAccess,
 				new NotificationServiceStub());
 			
 		}

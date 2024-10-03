@@ -20,14 +20,14 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            await Miscellaneous.SaveFeedback($"{user.Id} {user.Name}", Time, comments);
+            await Miscellaneous.SaveFeedbackAsync(comments, Time, user.Id);
         }
 
         public async Task ReceiveAnonymousFeedback(ulong userId, string pseudonym, string comments)
         {
             await GetUserAsync(userId); // Just to verify account, promise :)
 
-            await Miscellaneous.SaveFeedback(pseudonym, Time, comments);
+            await Miscellaneous.SaveFeedbackAsync(comments, Time);
         }
 
         #endregion

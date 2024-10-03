@@ -20,6 +20,7 @@ namespace Repository
         internal DbSet<Banner> Banners { get; set; }
         internal DbSet<BannerLink> BannerLinks { get; set; }
         internal DbSet<GuestClearance> GuestClearances { get; set; }
+        internal DbSet<Feedback> Feedback { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -119,6 +120,10 @@ namespace Repository
 
             modelBuilder.Entity<Banner>().Property(b => b.Color)
             .HasMaxLength(7);
+
+            // Feedback
+            modelBuilder.Entity<Feedback>().Property(f => f.Comments)
+            .HasMaxLength(300);
 
             // Snapshot Link
             modelBuilder.Entity<SnapshotLink>()

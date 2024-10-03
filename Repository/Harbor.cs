@@ -36,7 +36,7 @@ namespace Repository
             KeyDatabaseAccess = new KeyStoreCoordinator();
             MediaDatabaseAccess = new MediaStoreCoordinator();
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
-            MiscellaneousDatabaseAccess = new;
+            MiscellaneousDatabaseAccess = new MiscellaneousStoreCoordinator(flag);
         }
 
         public Harbor(Flag flag, ILogger logger) : this(flag)

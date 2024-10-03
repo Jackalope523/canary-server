@@ -11,7 +11,8 @@ namespace Core.Boundaries
 
     public interface IMiscellaneousDatabase
     {
-		Task SaveFeedback(string name, DateTimeOffset time, string comments);
+		Task SaveFeedbackAsync(string comments, DateTimeOffset time);
+        Task SaveFeedbackAsync(string comments, DateTimeOffset time, ulong userId);
     }
 
     public interface IMiscellaneousOperations
