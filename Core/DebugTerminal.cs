@@ -29,25 +29,26 @@ namespace Core
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase,
+            INestDatabase nestDatabase, IMiscellaneousDatabase miscellaneousDatabase,
             INotificationService notificationService, IDebugDatabase debugDatabase)
 		{
 			lock (initLock)
 			{
 				Terminal ??= new DebugTerminal()
-                {
-                    Log = logger,
+				{
+					Log = logger,
 
-                    AccountDatabase = accountDatabase,
-                    AdminDatabase = adminDatabase,
-                    BannerDatabase = bannerDatabase,
-                    GatheringDatabase = gatheringDatabase,
-                    SnapshotDatabase = snapshotDatabase,
-                    DisciplineDatabase = disciplineDatabase,
-                    KeyDatabase = keyDatabase,
-                    MediaDatabase = mediaDatabase,
-                    NotificationDatabase = notificationDatabase,
-                    NestDatabase = nestDatabase,
+					AccountDatabase = accountDatabase,
+					AdminDatabase = adminDatabase,
+					BannerDatabase = bannerDatabase,
+					GatheringDatabase = gatheringDatabase,
+					SnapshotDatabase = snapshotDatabase,
+					DisciplineDatabase = disciplineDatabase,
+					KeyDatabase = keyDatabase,
+					MediaDatabase = mediaDatabase,
+					NotificationDatabase = notificationDatabase,
+					NestDatabase = nestDatabase,
+					MiscellaneousDatabase = miscellaneousDatabase,
 
                     NotificationService = notificationService,
 					DebugDatabase = debugDatabase,

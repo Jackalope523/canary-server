@@ -4,6 +4,7 @@ using Core.Boundaries;
 using Microsoft.Extensions.Logging;
 using Frontier.Manifests;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace Frontier.Controllers
 {
@@ -27,10 +28,30 @@ namespace Frontier.Controllers
         }
 
 		[HttpGet("req")]
-		public IActionResult SparrowMinimumVersion()
+		public IActionResult CanaryMinimumVersion()
 		{
-			return Ok(new SparrowDetailsManifest() { MinimumVersion = "0.0.1" });
+			return Ok(new CanaryDetailsManifest() { MinimumVersion = "0.0.1" });
 		}
+
+		[HttpPost("feedback")]
+		public async Task<IActionResult> Feedback([FromBody] FeedbackManifest feedback)
+        {
+            // Verify parameters
+            if (feedback == null || !ModelState.IsValid)
+            { return BadRequest(HollowError.MissingInformation.ToString()); }
+
+            return await Execute(user =>
+			{
+				if (string.IsNullOrEmpty(feedback.Pseudonym))
+				{
+					return miscellaneous.ReceiveFeedback(user.Id, feedback.Comments);
+				}
+				else
+				{
+					return miscellaneous.ReceiveAnonymousFeedback(feedback.Pseudonym, feedback.Comments);
+				}
+			});
+        }
 
 		#endregion
 	}
