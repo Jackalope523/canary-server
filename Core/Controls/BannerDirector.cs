@@ -16,20 +16,25 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<CoreBanner> GetBannerAsync(ulong userId)
+		public async Task<BannerShard> GetBannerAsync(ulong userId)
 		{
 			var user = await GetUserAsync(userId);
-			var userBanner = await Banners.FindBannerForUserAsync(user.Id);
 
-			return userBanner;
+			return (await user.Banner).ToBannerShard();
+		}
+
+		public async Task<string> GetBannerCodeAsync(ulong userId)
+		{
+			var user = await GetUserAsync(userId);
+
+			return (await user.Banner).Code;
 		}
 
 		public async Task<List<ulong>> GetBannerMembersAsync(ulong userId)
 		{
 			var user = await GetUserAsync(userId);
-			var userBanner = await Banners.FindBannerForUserAsync(user.Id);
 
-			return (await Banners.GetBannerMembersAsync(userBanner.Id))
+			return (await (await user.Banner).Members)
 				.ConvertAll(member => member.Id);
 		}
 
@@ -37,9 +42,15 @@ namespace Core.Controls
 
 		#region Favours
 
-		public async Task<CoreBanner> RequestUserBannerAsync(User user)
+		public async Task<Banner> RequestUserBannerAsync(User user)
 		{
-			return await Banners.FindBannerForUserAsync(user.Id);
+			return new(await Banners.FindBannerForUserAsync(user.Id));
+		}
+
+		public async Task<List<User>> RequestBannerMembersAsync(Banner banner)
+		{
+			return (await Banners.GetBannerMembersAsync(banner.Id))
+				.ConvertAll(user => new User(user));
 		}
 
 		#endregion

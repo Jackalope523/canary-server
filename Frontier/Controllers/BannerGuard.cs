@@ -24,13 +24,22 @@ namespace Frontier.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetBanner()
 		{
-			return await Execute(async user => await banners.GetBannerAsync(user.Id), allowUnverified: true);
+			return await Execute(async user => await banners.GetBannerAsync(user.Id),
+				allowUnverified: true);
+        }
+
+		[HttpGet("code")]
+		public async Task<IActionResult> GetBannerCode()
+		{
+			return await Execute(async user => await banners.GetBannerCodeAsync(user.Id),
+				allowUnverified: true);
         }
 
 		[HttpGet("members")]
 		public async Task<IActionResult> GetMembers()
 		{
-			return await Execute(async user => await banners.GetBannerMembersAsync(user.Id), allowUnverified: true);
+			return await Execute(async user => await banners.GetBannerMembersAsync(user.Id),
+				allowUnverified: true);
 		}
 
 		#endregion
