@@ -22,9 +22,9 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet]
-		public async Task<IActionResult> GetBanner(ulong userId)
+		public async Task<IActionResult> GetBanner(ulong targetId)
 		{
-			return await Execute(async user => await banners.GetBannerAsync(user.Id, userId),
+			return await Execute(async user => await banners.GetBannerAsync(user.Id, targetId),
 				allowUnverified: true);
         }
 

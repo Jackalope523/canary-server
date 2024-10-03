@@ -10,20 +10,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Frontier.Controllers
 {
-    [Route("column")]
-    public class ColumnGuard : AbstractGuard
+    [Route("wall")]
+    public class WallGuard : AbstractGuard
     {
 		#region Initialisation
 
-		public ColumnGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
+		public WallGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
 		{ }
 
 		#endregion
 
 		#region Actions
 
-		[HttpGet("{depth}-{lastDepth}")]
-        public async Task<IActionResult> GetColumn(int depth, int lastDepth)
+		[HttpGet]
+        public async Task<IActionResult> GetWall(int depth, int lastDepth)
         {
 			// Verify parameters
             if (!ModelState.IsValid)

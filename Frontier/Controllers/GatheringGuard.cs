@@ -153,7 +153,7 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpGet("{gatheringId}/checkin/{latitude},{longitude}")]
+		[HttpGet("{gatheringId}/checkin")]
         public async Task<IActionResult> CheckInToGathering(ulong gatheringId, float latitude, float longitude)
 		{
 			return await Execute(async user =>
@@ -191,21 +191,21 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPost("{gatheringId}/invite/{inviteeId}")]
-		public async Task<IActionResult> InviteUser(ulong gatheringId, ulong inviteeId)
+		[HttpPost("{gatheringId}/invite")]
+		public async Task<IActionResult> InviteUser(ulong gatheringId, ulong targetId)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.InviteUserAsync(user.Id, inviteeId, gatheringId);
+				await gatherings.InviteUserAsync(user.Id, targetId, gatheringId);
 			});
         }
 
-		[HttpPut("{gatheringId}/guests/{userId}")]
-		public async Task<IActionResult> KickUser(ulong gatheringId, ulong userId)
+		[HttpPut("{gatheringId}/guests")]
+		public async Task<IActionResult> KickUser(ulong gatheringId, ulong targetId)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.KickUserAsync(user.Id, userId, gatheringId);
+				await gatherings.KickUserAsync(user.Id, targetId, gatheringId);
 			});
 		}
 
@@ -240,7 +240,7 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpGet("{gatheringId}/snapshots,{targetId}")]
+		[HttpGet("{gatheringId}/snapshots")]
 		public async Task<IActionResult> GetGallery(ulong gatheringId, ulong targetId)
 		{
 			return await Execute(async user =>
