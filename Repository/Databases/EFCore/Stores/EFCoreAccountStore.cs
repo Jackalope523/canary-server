@@ -58,7 +58,7 @@ namespace Repository
                   toCreate.NightOwl,
                   toCreate.Openness),
                   toCreate.TimeOfUserAgreement,
-                  toCreate.NotificationId.Value
+                  toCreate.NotificationId
               );
         }
 

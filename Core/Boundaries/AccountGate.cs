@@ -14,13 +14,13 @@ namespace Core.Boundaries
 		DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed, bool IsPendingDeletion,
 		string SecurityStamp, DateTimeOffset? LockoutDate, int AccessTries, UserAccountStatus AccountStatus,
 		DateTimeOffset JoinDate, int Reputation, CharacterShard Character, DateTimeOffset TimeOfUserAgreement,
-		Guid NotificationId)
+		string NotificationId)
 		: CoreOnlyData();
 
 	public record AccountShard(ulong Id, string PhoneNumber, string Email, string Name,
         DateTimeOffset DateOfBirth, bool IsPhoneConfirmed, bool IsEmailConfirmed,
 		UserAccountStatus AccountStatus, DateTimeOffset JoinDate, DateTimeOffset TimeOfUserAgreement,
-		Guid NotificationId);
+		string NotificationId);
 
     public record UserShard(ulong Id, string Name);
 
@@ -40,8 +40,7 @@ namespace Core.Boundaries
         Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<CoreUser> FindUserByEmailAsync(string normalisedEmail);
 		Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
-			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate,
-			CharacterShard character, Guid notificationId);
+			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character, Guid notificationId);
 		Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits);
 		Task DeleteUserAsync(ulong userId);
 
