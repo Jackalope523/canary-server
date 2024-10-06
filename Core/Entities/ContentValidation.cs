@@ -47,6 +47,9 @@ namespace Core.Entities
 
 			content = content[..maximumLength];
 
+			// Sanitise text
+			content = filter.Sanitise(content);
+
             // Check if text contains inappropriate phrases
             content = filter.CensorText(content);
 
@@ -92,6 +95,17 @@ namespace Core.Entities
 		#endregion
 
 		#region Operations
+
+		public string Sanitise(string text)
+		{
+			// First, remove anything above a double line break
+            string result = Regex.Replace(text, @"(\r?\n){3,}", "\n\n");
+
+            // Second, remove line breaks between single letters
+            result = Regex.Replace(result, @"(?<=\w)\r?\n(?=\w)", "");
+
+			return result;
+        }
 
 		public string CensorText(string text)
 		{
