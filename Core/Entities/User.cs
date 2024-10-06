@@ -333,6 +333,10 @@ namespace Core.Entities
             if (await IsBlockedBy(gathering.Host) || await IsBlocking(gathering.Host))
 			{ return false; }
 
+            // Check if user is within degree of privacy
+            if (!await Terminal.GatheringDirector.RequestUserIsAuthorisedGuest(this, gathering))
+            { return false; }
+
 			return true;
 		}
 

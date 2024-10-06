@@ -831,6 +831,11 @@ namespace Core.Controls
 			return list;
 		}
 
+		internal async Task<bool> RequestUserIsAuthorisedGuest(User user, Gathering gathering)
+		{
+			return await Gatherings.UserIsAuthorizedGuest(user.Id, gathering.Id);
+		}
+
 		#endregion
 
 		#region Tools
