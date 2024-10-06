@@ -11,6 +11,7 @@ namespace Core.Boundaries
 	public enum TelegramMessage
 	{
 		UserAgreementsUpdated,
+		AccountStatusChanged,
 
 		UserAppreciated,
 
