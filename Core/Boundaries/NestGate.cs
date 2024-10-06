@@ -29,7 +29,7 @@ namespace Core.Boundaries
 		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnblockUserAsync(ulong userId, ulong targetUserId);
 
-        Task<bool> CanAppreciate(ulong userId, ulong targetId);
+        Task<bool> HaveMutualGathering(ulong userId, ulong targetId);
     }
 
 	public interface INestOperations
@@ -47,6 +47,8 @@ namespace Core.Boundaries
         Task UnappreciateUserAsync(ulong userId, ulong targetId);
         Task BlockUserAsync(ulong userId, ulong targetId);
         Task UnblockUserAsync(ulong userId, ulong targetId);
+
+        Task<bool> AuthorisedToAppreciate(ulong userId, ulong targetId);
     }
 
 	#endregion

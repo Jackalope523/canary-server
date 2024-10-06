@@ -391,6 +391,14 @@ namespace Core.Entities
             return true;
         }
 
+        public async Task<bool> CanAppreciate(User target)
+        {
+            var haveMutualGatheringSync = Terminal.NestDirector.RequestAttendedMutualGatheringAsync(this, target);
+            bool blockAppreciate = await IsBlocking(target) || await IsBlockedBy(target);
+
+            return !blockAppreciate && await haveMutualGatheringSync;
+        }
+
 		#endregion
 
 		#region Effects

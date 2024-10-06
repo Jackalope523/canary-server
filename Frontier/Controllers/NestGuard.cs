@@ -93,6 +93,13 @@ namespace Frontier.Controllers
 				await nests.UnblockUserAsync(user.Id, info.TargetId));
 		}
 
+		[HttpGet("{targetId}/authorisation/appreciate")]
+		public async Task<IActionResult> CheckAppreciateAuthorisation(ulong targetId)
+		{
+			return await Execute(async user =>
+				await nests.AuthorisedToAppreciate(user.Id, targetId));
+		}
+
 		[HttpPost("{targetId}/report")]
 		public async Task<IActionResult> ReportUser(ulong targetId, [FromBody] AccountReportManifest report)
 		{

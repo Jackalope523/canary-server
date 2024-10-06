@@ -47,9 +47,9 @@
         {
            return await store.GetUsersBlockingAsync(userId);
         }
-        public async Task<bool> CanAppreciate(ulong userId, ulong targetId)
+        public async Task<bool> HaveMutualGathering(ulong userId, ulong targetId)
         {
-            return await store.CanAppreciate(userId, targetId);
+            return await store.HaveMutualGathering(userId, targetId);
         }
     }
 }
