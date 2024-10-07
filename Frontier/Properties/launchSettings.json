@@ -15,7 +15,6 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "HOME": "C:..\\Repository\\Databases\\EFCore\\"
       }
     },
     "Web": {
@@ -25,7 +24,6 @@
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "HOME": "C:..\\Repository\\Databases\\EFCore\\"
       }
     }
   }

@@ -133,7 +133,7 @@ namespace Repository.Tests
 
         [Fact]
         public async Task FindUserByPhoneNumberAsync_SUCCESS()
-        {
+        { 
             CoreUser found = await store.FindUserByPhoneNumberAsync(subject.PhoneNumber);
 
             Assert.NotNull(found);
