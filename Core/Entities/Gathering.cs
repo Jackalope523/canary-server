@@ -285,6 +285,10 @@ namespace Core.Entities
 			if (await Host.IsBlockedBy(user) || await Host.IsBlocking(user))
 			{ return false; }
 
+            // Check if user is within degree of privacy
+            if (!await Terminal.GatheringDirector.RequestUserIsAuthorisedGuest(user, this))
+            { return false; }
+
             return true;
 		}
 

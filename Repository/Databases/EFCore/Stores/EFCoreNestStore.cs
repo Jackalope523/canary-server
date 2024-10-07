@@ -166,7 +166,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public Task<bool> CanAppreciate(ulong userId, ulong targetId)
+        public Task<bool> HaveMutualGathering(ulong userId, ulong targetId)
         {
             return storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.

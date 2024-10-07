@@ -333,6 +333,10 @@ namespace Core.Entities
             if (await IsBlockedBy(gathering.Host) || await IsBlocking(gathering.Host))
 			{ return false; }
 
+            // Check if user is within degree of privacy
+            if (!await Terminal.GatheringDirector.RequestUserIsAuthorisedGuest(this, gathering))
+            { return false; }
+
 			return true;
 		}
 
@@ -391,6 +395,14 @@ namespace Core.Entities
             return true;
         }
 
+        public async Task<bool> CanAppreciate(User target)
+        {
+            var haveMutualGatheringSync = Terminal.NestDirector.RequestAttendedMutualGatheringAsync(this, target);
+            bool blockAppreciate = await IsBlocking(target) || await IsBlockedBy(target);
+
+            return !blockAppreciate && await haveMutualGatheringSync;
+        }
+
 		#endregion
 
 		#region Effects
@@ -437,19 +449,24 @@ namespace Core.Entities
 
         public async Task<UserAccountStatus> Reported()
         {
+            var currentStatus = AccountStatus;
+            UserAccountStatus nextStatus;
+
 			// Check if there are enough reports
 			if ((await Reports).Count < 4)
 			{ return AccountStatus; }
+			else if ((await Reports).Count < 6)
+			{ nextStatus = UserAccountStatus.Limited; }
+            else if ((await Reports).Count < 10)
+			{ nextStatus = UserAccountStatus.Suspended; }
+            else
+            { nextStatus = UserAccountStatus.Blacklisted; }
 
-			// Check if there are enough reports
-			if ((await Reports).Count < 6)
-			{ return UserAccountStatus.Limited; }
-            
-			// Check if there are enough reports
-			if ((await Reports).Count < 10)
-			{ return UserAccountStatus.Suspended; }
+            // Notify user of change
+            if (!currentStatus.Equals(nextStatus))
+            { _ = PostTelegram(Hollow, TelegramMessage.AccountStatusChanged);  }
 
-            return UserAccountStatus.Blacklisted;
+            return nextStatus;
         }
 
 		#endregion

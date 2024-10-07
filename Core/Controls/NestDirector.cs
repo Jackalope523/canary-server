@@ -137,8 +137,8 @@ namespace Core.Controls
             FailIf(user.Equals(targetUser),
                 new InvalidUserException("User cannot appreciate themself."));
 
-            FailIf(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User cannot appreciate blocked/blocking user."));
+            Verify(await user.CanAppreciate(targetUser),
+                new InvalidUserException("User cannot appreciate this user."));
 
             await Nests.AppreciateUserAsync(userId, targetId, Psijic.Time);
 
@@ -181,6 +181,14 @@ namespace Core.Controls
             await Nests.UnblockUserAsync(userId, targetId);
         }
 
+        public async Task<bool> AuthorisedToAppreciate(ulong userId, ulong targetId)
+        {
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+            return await user.CanAppreciate(targetUser);
+        }
+
 		#endregion
 
 		#region Favours
@@ -213,6 +221,11 @@ namespace Core.Controls
         {
             return (await Nests.GetUsersBlockingAsync(user.Id))
 				.ConvertAll(user => new User(user));
+        }
+
+        internal async Task<bool> RequestAttendedMutualGatheringAsync(User user, User target)
+        {
+            return await Nests.HaveMutualGathering(user.Id, target.Id);
         }
 
 		#endregion

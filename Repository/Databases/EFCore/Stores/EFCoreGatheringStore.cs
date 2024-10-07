@@ -863,7 +863,7 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(currentDiscussion);         
         }
 
-        public async Task<bool> CanJoin(ulong gatheringId, ulong userId)
+        public async Task<bool> UserIsAuthorizedGuest(ulong userId, ulong gatheringId)
         {
             ulong id = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GuestClearances.

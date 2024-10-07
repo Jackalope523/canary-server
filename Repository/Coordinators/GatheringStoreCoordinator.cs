@@ -92,9 +92,9 @@ namespace Repository
             await store.TerminateGatheringAsync(id, time);
         }
 
-        public async Task<bool> CanJoin(ulong gatheringId, ulong userId)
+        public async Task<bool> UserIsAuthorizedGuest(ulong userId, ulong gatheringId)
         {
-            return await store.CanJoin(gatheringId, userId);
+            return await store.UserIsAuthorizedGuest(userId, gatheringId);
         }
 
         public async Task<List<ulong>> GetAuthorizedGuests(ulong gatheringId)

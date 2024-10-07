@@ -54,7 +54,8 @@ namespace Core.Boundaries
 
 		Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId);
 		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong gatheringId);
-        Task<bool> CanJoin(ulong gatheringId, ulong userId);
+
+        Task<bool> UserIsAuthorizedGuest(ulong userId, ulong gatheringId);
         Task<List<ulong>> GetAuthorizedGuests(ulong gatheringId);
         Task AddGuestAuthorization(ulong gatheringId, ulong userId);
     }
