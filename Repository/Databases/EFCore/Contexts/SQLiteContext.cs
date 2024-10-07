@@ -8,7 +8,9 @@ namespace Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=..\\Repository.Tests\\TestDB.db", x => x.UseNetTopologySuite());
+            string absolutePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, "Repository.Tests","TestDB.db");
+
+            optionsBuilder.UseSqlite($"Data Source={absolutePath}", x => x.UseNetTopologySuite());
             optionsBuilder.UseExceptionProcessor();
         }
 
