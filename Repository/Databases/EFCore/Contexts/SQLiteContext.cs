@@ -8,7 +8,10 @@ namespace Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=C:..\\Repository\\Databases\\EFCore\\TestDB.db", x => x.UseNetTopologySuite());
+            string databaseDirectory = Environment.GetEnvironmentVariable("HOME") ?? "C:..\\Repository\\Databases\\EFCore";
+
+            Console.WriteLine("HOME: " + Environment.GetEnvironmentVariable("HOME"));
+            optionsBuilder.UseSqlite("Data Source=" + databaseDirectory + "TestDB.db", x => x.UseNetTopologySuite());
             optionsBuilder.UseExceptionProcessor();
         }
 

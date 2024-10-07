@@ -29,6 +29,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -150,6 +155,30 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.ToTable("Telegrams");
                 });
 
+            modelBuilder.Entity("Repository.Feedback", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong?>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedback");
+                });
+
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.Property<ulong>("Id")
@@ -166,6 +195,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Competitiveness")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DegreeOfPrivacy")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
@@ -294,6 +326,34 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasIndex("UserId");
 
                     b.ToTable("GatheringReports");
+                });
+
+            modelBuilder.Entity("Repository.GuestClearance", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Degree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("GatheringId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GatheringId");
+
+                    b.HasIndex("UserId", "GatheringId")
+                        .IsUnique();
+
+                    b.ToTable("GuestClearances");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -468,6 +528,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("NotificationId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Openness")
                         .HasColumnType("INTEGER");
 
@@ -497,7 +560,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Repository.UserLink", b =>
+            modelBuilder.Entity("Repository.UserRelationship", b =>
                 {
                     b.Property<ulong>("Id")
                         .ValueGeneratedOnAdd()
@@ -519,7 +582,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId");
+                    b.HasIndex("SelfId", "OtherId")
+                        .IsUnique();
 
                     b.ToTable("UserLinks");
                 });
@@ -609,6 +673,15 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("Repository.Feedback", b =>
+                {
+                    b.HasOne("Repository.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.HasOne("Repository.User", "Host")
@@ -643,6 +716,25 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Reports")
+                        .HasForeignKey("GatheringId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gathering");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.GuestClearance", b =>
+                {
+                    b.HasOne("Repository.Gathering", "Gathering")
+                        .WithMany()
                         .HasForeignKey("GatheringId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -715,7 +807,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Repository.UserLink", b =>
+            modelBuilder.Entity("Repository.UserRelationship", b =>
                 {
                     b.HasOne("Repository.User", "Other")
                         .WithMany("UserLinks")

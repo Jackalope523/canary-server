@@ -10,8 +10,8 @@ namespace Repository.Tests
     [Collection("Database Collection")]
     public class GatheringStoreTests : IDisposable
     {
-        private static EFCoreSentry sentry = new(Harbor.Flag.Production);
-        private static EFCoreGatheringStore store = new(Harbor.Flag.Production);
+        private static EFCoreSentry sentry = new(Harbor.Flag.Development);
+        private static EFCoreGatheringStore store = new(Harbor.Flag.Development);
 
         private readonly ITestOutputHelper _testOutputHelper;
 
