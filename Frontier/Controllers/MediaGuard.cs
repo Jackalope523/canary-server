@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Net.Http.Headers;
 using Repository;
+using Twilio.TwiML.Voice;
+using System.Security.Cryptography;
 
 namespace Frontier.Controllers
 {
@@ -74,6 +76,28 @@ namespace Frontier.Controllers
             });
         }
 
+		[HttpGet("avatars/{userId}/hash")]
+		public async Task<IActionResult> GetAvatarHash(ulong userId)
+        {
+            return await Execute(async user =>
+            {
+                var imageStream = await media.GetAvatarAsync(user.Id, userId);
+
+                if (imageStream != null)
+                {
+                    imageStream.Seek(0, SeekOrigin.Begin);
+
+                    using SHA256 sha256 = SHA256.Create();
+
+                    byte[] hashBytes = sha256.ComputeHash(imageStream);
+
+                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                }
+
+                throw new UnexpectedFailureException("Could not get image hash.");
+            });
+        }
+
 		[HttpGet("headers/{gatheringId}")]
 		public async Task<IActionResult> GetHeader(ulong gatheringId)
         {
@@ -99,7 +123,29 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpGet("snapshots/{snapshotId}")]
+        [HttpGet("headers/{gatheringId}/hash")]
+        public async Task<IActionResult> GetHeaderHash(ulong gatheringId)
+        {
+            return await Execute(async user =>
+            {
+                var imageStream = await media.GetHeaderAsync(user.Id, gatheringId);
+
+                if (imageStream != null)
+                {
+                    imageStream.Seek(0, SeekOrigin.Begin);
+
+                    using SHA256 sha256 = SHA256.Create();
+
+                    byte[] hashBytes = sha256.ComputeHash(imageStream);
+
+                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                }
+
+                throw new UnexpectedFailureException("Could not get image hash.");
+            });
+        }
+
+        [HttpGet("snapshots/{snapshotId}")]
 		public async Task<IActionResult> GetSnapshotImage(ulong snapshotId)
         {
             return await ExecuteUnsafe(async () =>
