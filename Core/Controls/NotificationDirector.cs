@@ -69,9 +69,9 @@ namespace Core.Controls
 			await Telegrams.SaveTelegramAsync(user.Id, notifier.Id, Time, message, context);
 		}
 
-		internal async Task NotifyUserAsync(User user, string title, string message)
+		internal async Task NotifyUserAsync(User user, NotificationGroup group, string title, string message, string collapseId = "")
 		{
-            await Terminal.NotificationService.PushNotification(user.NotificationId.ToString(), title, message);
+            await Terminal.NotificationService.PushNotification(user.NotificationId.ToString(), group, title, message, collapseId);
 		}
 
 		#endregion

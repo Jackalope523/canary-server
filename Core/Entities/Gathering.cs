@@ -394,7 +394,7 @@ namespace Core.Entities
 
         public async Task Started()
         {
-            _ = NotifyActive($"{Title}", "Gathering is active!");
+            _ = NotifyActive(NotificationGroup.GatheringReminder, $"{Title}", "Gathering is live!", "20");
         }
 
         public async Task<List<User>> Ended()
@@ -412,7 +412,7 @@ namespace Core.Entities
                 updatedGuests.Add(guest);
 
 				// Notify of gathering ending
-				_ = guest.Notify($"{Title}", $"Gathering has concluded.");
+				_ = guest.Notify(NotificationGroup.GatheringAlert, $"{Title}", $"Gathering has concluded, thank you for joining.");
 			}
 
             return updatedGuests;
@@ -446,25 +446,25 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task NotifyActive(string title, string message)
+        public async Task NotifyActive(NotificationGroup group, string title, string message, string collapseId = "")
         {
             foreach (var user in (await Guests).Concat(await Arrived))
             {
                 if (IsHostedBy(user))
                 { continue; }
 
-                _ = user.Notify(title, message);
+                _ = user.Notify(group, title, message, collapseId);
             }
         }
 
-        public async Task NotifyGuests(string title, string message)
+        public async Task NotifyGuests(NotificationGroup group, string title, string message, string collapseId = "")
         {
             foreach (var guest in await Arrived)
             {
                 if (IsHostedBy(guest))
                 { continue; }
 
-                _ = guest.Notify(title, message);
+                _ = guest.Notify(group, title, message, collapseId);
             }
         }
 

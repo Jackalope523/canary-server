@@ -116,7 +116,7 @@ namespace Core.Tests
 
 		public static ConcurrentDictionary<string, ConcurrentBag<NotificationStub>> messages = new();
 
-		public Task PushNotification(string notificationId, string title, string message)
+		public Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collapseId = "")
 		{
 			ConcurrentBag<NotificationStub> userBag;
 			var exists = messages.TryGetValue(notificationId, out userBag);

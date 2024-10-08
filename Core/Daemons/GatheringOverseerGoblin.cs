@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Boundaries;
 using Core.Entities;
 using Microsoft.Extensions.Hosting;
 
@@ -71,8 +72,8 @@ namespace Core.Daemons
                 {
                     // Warn host
                     User host = new(gathering.Host);
-                    await host.Notify("Your gathering is about to be deleted.",
-                        $"{gathering.Title} is going to be deleted if you do not start it!");
+                    await host.Notify(NotificationGroup.GatheringAlert, "Your gathering is about to be deleted.",
+                        $"{gathering.Title} is going to be deleted if you do not start it!", "30");
                 }
             }
         }

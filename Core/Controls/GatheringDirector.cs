@@ -158,7 +158,7 @@ namespace Core.Controls
 			}
 
             // Notify appreciateers of gathering
-            _ = user.NotifyAppreciateers($"New Sparrow Gathering", $"{user.Name} just created a new gathering {newGathering.Title}");
+            _ = user.NotifyAppreciateers(NotificationGroup.CompanionGathering, $"New Canary Gathering", $"{user.Name} just created {newGathering.Title}");
 
 			return newGathering.ToGatheringShard();
 		}
@@ -263,7 +263,7 @@ namespace Core.Controls
 				await Terminal.MediaDirector.UploadHeroAsync(targetGathering.Id, heroImage);
             }
 
-			_ = targetGathering.NotifyActive($"{targetGathering.Title}", "The gathering was edited by the host, check to see the updates!");
+			_ = targetGathering.NotifyActive(NotificationGroup.GatheringReminder, $"{targetGathering.Title}", "The gathering was edited by the host, check to see the updates!", "20");
 		}
 
 		public async Task StartGatheringAsync(ulong userId, ulong gatheringId)
@@ -339,7 +339,7 @@ namespace Core.Controls
 			// Delete hero
 			await Media.DeleteHeroAsync(gathering.Id);
 
-            _ = gathering.NotifyActive($"{gathering.Title}", "Uh oh! The gathering was deleted by the host.");
+            _ = gathering.NotifyActive(NotificationGroup.GatheringReminder, $"{gathering.Title}", "Uh oh! The gathering was cancelled by the host.", "20");
         }
 
         public async Task ChangeGatheringVisibilityAsync(ulong userId, ulong gatheringId, bool hide)
@@ -478,7 +478,7 @@ namespace Core.Controls
 
 			// Notify host if gathering has already started
 			if (HasAlready(gathering.StartTime))
-			{ _ = gathering.Host.Notify($"Sparrower Inbound", $"{user.Name} is joining your gathering."); }
+			{ _ = gathering.Host.Notify(NotificationGroup.GatheringAlert, $"Guest Inbound", $"{user.Name} is joining your gathering."); }
 		}
 
 		public async Task CheckInToGatheringAsync(ulong userId, double latitude, double longitude)
@@ -655,7 +655,7 @@ namespace Core.Controls
 				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
-			_ = invitee.Notify("Canary", $"You were invited to {gathering.Title}");
+			_ = invitee.Notify(NotificationGroup.CompanionCommunication, $"{gathering.Title}", $"You were invited by {inviter.Name}");
 		}
 
 		public async Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId)
