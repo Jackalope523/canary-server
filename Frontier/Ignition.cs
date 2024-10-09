@@ -66,7 +66,7 @@ namespace Frontier
         public void ConfigureServices(IServiceCollection services)
         {
             string environment = Configuration["ASPNETCORE_ENVIRONMENT"];
-            bool isDevelopment = environment.Equals("Staging");
+            bool isProduction = environment.Equals("Production");
 
             services.AddCors(options =>
             {
@@ -94,20 +94,20 @@ namespace Frontier
             var frontierLogger = loggerFactory.CreateLogger("Frontier");
             var coreLogger = loggerFactory.CreateLogger("Core");
             var repositoryLogger = loggerFactory.CreateLogger("Repository");
-
+            
             /////
             // Database
             /////////////
 
             Harbor harbor;
 
-            if (isDevelopment)
+            if (isProduction)
             {
-                harbor = new(Harbor.Flag.Development, repositoryLogger);
+                harbor = new(Harbor.Flag.Production, repositoryLogger);
             }
             else
             {
-                harbor = new(Harbor.Flag.Production, repositoryLogger);
+                harbor = new(Harbor.Flag.Development, repositoryLogger);
             }
 
             var keyProvider = harbor.KeyDatabaseAccess;
