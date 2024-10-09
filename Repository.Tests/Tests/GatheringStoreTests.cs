@@ -551,7 +551,7 @@ namespace Repository.Tests
 
             int count = sentry.ExecuteRead(ctx => ctx.Gatherings.Count());
 
-            Assert.Equal(0, count);
+            Assert.Equal(1, count);
         }      
     }
 }

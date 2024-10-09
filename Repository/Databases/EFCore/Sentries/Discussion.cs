@@ -5,9 +5,9 @@ namespace Repository
 {
     internal class Discussion
     {
-        internal QueryContext SharedContext { get; private set; }
+        internal CanaryContext SharedContext { get; private set; }
 
-        internal Discussion(QueryContext sharedContext)
+        internal Discussion(CanaryContext sharedContext)
         {
             SharedContext = sharedContext;
         }

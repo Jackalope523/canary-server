@@ -1,12 +1,15 @@
 ﻿using Azure.Storage.Blobs;
 
-
 namespace Repository
 {
     internal class AzureStorageSentry
     {
-        AzureStorageContext context = new();
+        AzureStorageContext context;
 
+        public AzureStorageSentry(Harbor.Flag flag)
+        {
+            context = new(flag);
+        }
 
         public async Task UploadBlobAsync(string containerName, string blobName, MemoryStream blob)
         {

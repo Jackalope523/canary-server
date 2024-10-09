@@ -4,9 +4,9 @@
     {
         private readonly IMediaDatabase store;
 
-        public MediaStoreCoordinator()
+        public MediaStoreCoordinator(Harbor.Flag flag)
         {
-            store = new AzureFileStore();
+            store = new AzureFileStore(flag);
         }
 
         public async Task<MemoryStream> DownloadAssetAsync(string asset)

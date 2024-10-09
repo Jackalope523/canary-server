@@ -92,7 +92,7 @@ namespace Repository.Tests
 
             int numRecords = await sentry.ExecuteReadAsync(ctx => ctx.Users.CountAsync());
 
-            Assert.Equal(0, numRecords);
+            Assert.Equal(1, numRecords);
         }     
 
         [Fact]

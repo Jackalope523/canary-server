@@ -182,8 +182,8 @@ namespace Repository
 
         public async Task DeleteSnapshotAcclaimAsync(ulong postId, ulong voterId)
         {
-            Func<QueryContext, Task> query = EF.CompileAsyncQuery(
-                (QueryContext ctx) =>
+            Func<CanaryContext, Task> query = EF.CompileAsyncQuery(
+                (CanaryContext ctx) =>
                 ctx.SnapshotLinks.
                 Where(l => l.UserId == voterId && l.SnapshotId == postId).
                 ExecuteDelete());
@@ -224,8 +224,8 @@ namespace Repository
 
         public async Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId)
         {
-            Func<QueryContext, Task> query = EF.CompileAsyncQuery(
-                (QueryContext ctx) =>
+            Func<CanaryContext, Task> query = EF.CompileAsyncQuery(
+                (CanaryContext ctx) =>
                 ctx.SnapshotLinks.
                 Where(l => l.UserId == voterId && l.SnapshotId == snapshotId).
                 ExecuteDelete());

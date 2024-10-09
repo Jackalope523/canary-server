@@ -19,9 +19,9 @@ namespace Repository.Tests
             _testOutputHelper = testOutputHelper;
 
             subject = new UserFactory().Create();
-            testGathering = new GatheringFactory().Create(subject);
-
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
+
+            testGathering = new GatheringFactory().Create(subject);
             sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(testGathering));
         }
         public void Dispose()

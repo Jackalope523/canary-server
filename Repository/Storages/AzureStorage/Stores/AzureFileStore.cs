@@ -5,7 +5,12 @@ namespace Repository
 {
     public class AzureFileStore : IMediaDatabase
     {
-        private readonly AzureStorageSentry sentry = new();
+        private readonly AzureStorageSentry sentry;
+
+        public AzureFileStore(Harbor.Flag flag) 
+        {
+            sentry = new(flag);
+        }
 
         public async Task<MemoryStream> DownloadAssetAsync(string asset)
         {

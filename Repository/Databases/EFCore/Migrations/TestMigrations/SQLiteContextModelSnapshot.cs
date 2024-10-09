@@ -10,7 +10,7 @@ using Repository;
 
 namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
-    [DbContext(typeof(SQLiteContext))]
+    [DbContext(typeof(DevelopmentContext))]
     partial class SQLiteContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -7,7 +7,7 @@ namespace Repository
 {
     public class Harbor
     {
-        public enum Flag { Development, Production }
+        public enum Flag { Development, Staging, Production }
 
         internal static ILogger logger;
 
@@ -35,7 +35,7 @@ namespace Repository
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             BannerDatabaseAccess = new BannerStoreCoordinator(flag);
             KeyDatabaseAccess = new KeyStoreCoordinator();
-            MediaDatabaseAccess = new MediaStoreCoordinator();
+            MediaDatabaseAccess = new MediaStoreCoordinator(flag);
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
             MiscellaneousDatabaseAccess = new MiscellaneousStoreCoordinator(flag);
         }

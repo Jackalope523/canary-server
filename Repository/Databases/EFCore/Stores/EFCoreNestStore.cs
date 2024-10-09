@@ -4,9 +4,9 @@ namespace Repository
 {
     public class EFCoreNestStore : QueryStore, INestDatabase
     {     
-        private static readonly Func<QueryContext, ulong, ulong, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
+        private static readonly Func<CanaryContext, ulong, ulong, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
-                (QueryContext ctx, ulong selfId, ulong otherId, UserRelationship.UserLinkType type) =>
+                (CanaryContext ctx, ulong selfId, ulong otherId, UserRelationship.UserLinkType type) =>
                 ctx.UserLinks
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());

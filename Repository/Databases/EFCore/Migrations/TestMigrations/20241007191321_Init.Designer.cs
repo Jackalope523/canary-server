@@ -11,7 +11,7 @@ using Repository;
 
 namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
-    [DbContext(typeof(SQLiteContext))]
+    [DbContext(typeof(DevelopmentContext))]
     [Migration("20241007191321_Init")]
     partial class Init
     {

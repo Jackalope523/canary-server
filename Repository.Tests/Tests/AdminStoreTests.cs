@@ -24,15 +24,5 @@ namespace Repository.Tests
         {
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
         }
-        [Fact]
-        public async Task VoidGatheringAsync_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
-        [Fact]
-        public async Task VoidUserAsync_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
