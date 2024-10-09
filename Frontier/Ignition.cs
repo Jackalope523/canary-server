@@ -65,6 +65,9 @@ namespace Frontier
 
         public void ConfigureServices(IServiceCollection services)
         {
+            string environment = Configuration["ASPNETCORE_ENVIRONMENT"];
+            bool isDevelopment = environment.Equals("Staging");
+
             services.AddCors(options =>
             {
                 options.AddPolicy(name: HollowSpecificOrigins,
@@ -98,7 +101,7 @@ namespace Frontier
 
             Harbor harbor;
 
-            if (IsDebug)
+            if (isDevelopment)
             {
                 harbor = new(Harbor.Flag.Development, repositoryLogger);
             }
