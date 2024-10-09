@@ -12,8 +12,6 @@ namespace Repository
             return new Subscription
             {
                 UserId = user.Id,
-                DeviceType = DeviceType.iOS,
-                DeviceToken = produced.ToString()
             };
         }
     }

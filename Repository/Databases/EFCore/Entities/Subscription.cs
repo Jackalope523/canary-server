@@ -8,7 +8,6 @@ namespace Repository.Entities
 
         public ulong UserId { get; set; }
         public User User { get; set; }
-        public DeviceType DeviceType { get; set; }
         public string DeviceToken { get; set; }
     }
 }

@@ -22,8 +22,28 @@ namespace Core.Boundaries
 		GatheringMissedAttendee,
 	}
 
-    public enum DeviceType
-    { iOS, Android }
+	public enum NotificationGroup
+	{
+        CompanionCommunication,
+		CompanionGathering,
+		GatheringReminder,
+		GatheringAlert,
+    }
+
+    public static class NotificationGroupExtensions
+    {
+        public static string GetString(this NotificationGroup group)
+        {
+            return group switch
+            {
+                NotificationGroup.CompanionCommunication => "preference_companion_communications",
+                NotificationGroup.CompanionGathering => "preference_companion_gatherings",
+                NotificationGroup.GatheringReminder => "preference_gathering_reminders",
+                NotificationGroup.GatheringAlert => "preference_gathering_alerts",
+                _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
+            };
+        }
+    }
 
     public record TelegramShard(ulong Id, ulong NotifierId, DateTimeOffset Time,
 		TelegramMessage Message, string Context);
@@ -51,7 +71,8 @@ namespace Core.Boundaries
 
 	public interface INotificationService
 	{
-		Task PushNotification(string notificationId, string title, string message);
+		Task PushNotification(string notificationId, NotificationGroup notificationGroup,
+			string title, string message, string collapseId = "");
 	}
 
 	#endregion

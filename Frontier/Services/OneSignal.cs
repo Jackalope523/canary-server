@@ -32,7 +32,7 @@ namespace Frontier.Services
             instance = new DefaultApi(appConfig);
         }
 
-        public async Task PushNotification(string notificationId, string title, string message)
+        public async Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collpaseId = "")
         {
             var notification = new Notification(appId: appId)
             {
@@ -40,12 +40,20 @@ namespace Frontier.Services
                 Contents = new StringMap(en: message),
                 TargetChannel = Notification.TargetChannelEnum.Push,
                 ChannelForExternalUserIds = "push",
-                IncludeExternalUserIds = new() { notificationId } // Deprecated is a mistake
+                IncludeExternalUserIds = new() { notificationId }, // Deprecated is a mistake
+
+                Filters = new()
+                {
+                    new(field: "tag", key: notificationGroup.GetString(), value: "true", relation: Filter.RelationEnum.Equal),
+                },
+
+                CollapseId = collpaseId,
             };
 
             var response = await instance.CreateNotificationAsync(notification);
 
-            log.LogInformation($"Notification created for {response.Recipients} recipients");
+            log.LogInformation($"Notification sent to {notificationId}");
+            log.LogInformation($"Delivered to {response.Recipients} recipients");
         }
     }
 }

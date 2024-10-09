@@ -479,14 +479,14 @@ namespace Core.Entities
                 message, context);
         }
 
-		public async Task Notify(string title, string message)
+		public async Task Notify(NotificationGroup group, string title, string message, string collapseId = "")
         {
-            await Terminal.NotificationDirector.NotifyUserAsync(this, title, message);
+            await Terminal.NotificationDirector.NotifyUserAsync(this, group, title, message, collapseId);
         }
 
-        public async Task NotifyAppreciateers(string title, string message)
+        public async Task NotifyAppreciateers(NotificationGroup group, string title, string message, string collapseId = "")
         {
-            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(title, message));
+            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(group, title, message, collapseId));
         }
 
 		#endregion
