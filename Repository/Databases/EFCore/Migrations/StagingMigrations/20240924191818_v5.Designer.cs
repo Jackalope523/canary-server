@@ -12,7 +12,7 @@ using Repository;
 
 namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 {
-    [DbContext(typeof(AzureProductionContext))]
+    [DbContext(typeof(AzureStagingContext))]
     [Migration("20240924191818_v5")]
     partial class v5
     {
