@@ -29,6 +29,9 @@ namespace Core.Boundaries
 		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
 		Task UnblockUserAsync(ulong userId, ulong targetUserId);
 
+        Task<CoreGathering> CompanionsSince(ulong userId, ulong targetId);
+        Task<DateTimeOffset> BlockedSince(ulong userId, ulong targetId);
+
         Task<bool> HaveMutualGathering(ulong userId, ulong targetId);
     }
 
