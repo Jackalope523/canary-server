@@ -11,6 +11,7 @@ namespace Repository
         public User? Owner { get; set; }
         public Gathering? Gathering { get; set; }
         public List<SnapshotReport>? Reports { get; set; }
+        public List<SnapshotLink>? SnapshotLinks { get; set; }
 
     }
 }

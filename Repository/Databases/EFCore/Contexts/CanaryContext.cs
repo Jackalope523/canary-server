@@ -53,79 +53,89 @@ namespace Repository
                 .HasSrid(4326);
 
             modelBuilder.Entity<User>()
+                 .HasMany(u => u.HostedGatherings)
+                 .WithOne(g => g.Host)
+                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<User>()
                  .HasMany(u => u.InitiatedUserRelationships)
                  .WithOne(l => l.Self)
-                 .OnDelete(DeleteBehavior.NoAction);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.TargetUserRelationships)
                 .WithOne(l => l.Other)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.GatheringLinks)
                 .WithOne(l => l.User)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.SnapshotLinks)
                 .WithOne(l => l.User)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.ReporterList)
                 .WithOne(r => r.Self)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.ReporteeList)
                 .WithOne(r => r.Other)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.SentTelegrams)
                 .WithOne(t => t.Notifier)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.ReceivedTelegrams)
                 .WithOne(t => t.Recipient)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.SnapshotReports)
                 .WithOne(r => r.User)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<User>()
                .HasMany(u => u.GatheringReports)
                .WithOne(r => r.User)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<User>()
                .HasMany(u => u.Snapshots)
                .WithOne(r => r.Owner)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
                .HasMany(u => u.Subscriptions)
                .WithOne(s => s.User)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
              .HasMany(u => u.Feedback)
              .WithOne(f => f.User)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<User>()
              .HasMany(u => u.Penalties)
              .WithOne(p => p.Penalized)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>()
              .HasMany(u => u.GuestClearances)
              .WithOne(c => c.User)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+            .HasMany(u => u.BannerLinks)
+            .WithOne(l => l.User)
+            .OnDelete(DeleteBehavior.Cascade);
 
             // Gathering
             modelBuilder.Entity<Gathering>().Property(g => g.Description)
@@ -141,28 +151,33 @@ namespace Repository
                 .HasSrid(4326);
 
             modelBuilder.Entity<Gathering>()
-               .HasMany(g => g.Links)
+               .HasMany(g => g.GatheringLink)
                .WithOne(l => l.Gathering)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Gathering>()
               .HasMany(g => g.Snapshots)
               .WithOne(s => s.Gathering)
-              .OnDelete(DeleteBehavior.NoAction);
+              .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Gathering>()
               .HasMany(g => g.GatheringReports)
               .WithOne(l => l.Gathering)
-              .OnDelete(DeleteBehavior.NoAction);
+              .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Gathering>()
              .HasMany(g => g.GuestClearances)
              .WithOne(c => c.Gathering)
-             .OnDelete(DeleteBehavior.NoAction);
+             .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Gathering>()
              .HasMany(g => g.UserReports)
              .WithOne(r => r.Gathering)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+             .HasOne(g => g.Host)
+             .WithMany(u => u.HostedGatherings)
              .OnDelete(DeleteBehavior.NoAction);
 
             // Telegram
@@ -249,7 +264,12 @@ namespace Repository
             modelBuilder.Entity<Snapshot>()
                .HasMany(s => s.Reports)
                .WithOne(r => r.Snapshot)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Snapshot>()
+              .HasMany(s => s.SnapshotLinks)
+              .WithOne(l => l.Snapshot)
+              .OnDelete(DeleteBehavior.Cascade);
 
             // Banner
             modelBuilder.Entity<Banner>().Property(b => b.Name)
@@ -267,7 +287,7 @@ namespace Repository
             modelBuilder.Entity<Banner>()
               .HasMany(b => b.Links)
               .WithOne(l => l.Banner)
-              .OnDelete(DeleteBehavior.NoAction);
+              .OnDelete(DeleteBehavior.Cascade);
 
             // Feedback
             modelBuilder.Entity<Feedback>().Property(f => f.Comments)
@@ -286,6 +306,11 @@ namespace Repository
             modelBuilder.Entity<SnapshotLink>()
                 .HasOne(l => l.User)
                 .WithMany(u => u.SnapshotLinks)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SnapshotLink>()
+                .HasOne(l => l.Snapshot)
+                .WithMany(s => s.SnapshotLinks)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // User Link
@@ -311,7 +336,18 @@ namespace Repository
 
             modelBuilder.Entity<GatheringLink>()
                 .HasOne(l => l.Gathering)
-                .WithMany(g => g.Links)
+                .WithMany(g => g.GatheringLink)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Banner Link
+            modelBuilder.Entity<BannerLink>()
+                .HasOne(l => l.User)
+                .WithMany(u => u.BannerLinks)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<BannerLink>()
+                .HasOne(l => l.Banner)
+                .WithMany(b => b.Links)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Clearance Link

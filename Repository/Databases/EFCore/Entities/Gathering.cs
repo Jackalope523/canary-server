@@ -11,7 +11,6 @@ namespace Repository
         public string Description { get; set; } = DefaultDescription;
         public DateTimeOffset StartTime { get; set; } = DefaultStartTime;
         public ulong HostId { get; set; } = DefaultHostId;
-        public User? Host { get; set; }
 
         // X = Longitude Y = Latitude
         public Point Location { get; set; } = DefaultLocation;
@@ -38,7 +37,8 @@ namespace Repository
         public int Age { get; init; } = DefaultAge;
 
         // Navigation Properties
-        public List<GatheringLink>? Links { get; set; }
+        public User? Host { get; set; }
+        public List<GatheringLink>? GatheringLink { get; set; }
         public List<GatheringReport>? GatheringReports { get; set; }
         public List<UserReport>? UserReports { get; set; }
         public List<Snapshot>? Snapshots { get; set; }

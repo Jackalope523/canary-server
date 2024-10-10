@@ -19,6 +19,15 @@ namespace Repository
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            /*
+            modelBuilder.HasSequence<ulong>("UserIds")
+                .StartsAt(100)
+                .IncrementsBy(1);
+
+            modelBuilder.Entity<User>().Property(u => u.Id)
+                .HasDefaultValue("NEXT VALUE FOR UserIds");
+            */
         }
     }
 }

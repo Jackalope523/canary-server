@@ -24,935 +24,935 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Repository.Banner", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("Code")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("nvarchar(7)");
+                b.Property<string>("Color")
+                    .IsRequired()
+                    .HasMaxLength(7)
+                    .HasColumnType("nvarchar(7)");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasMaxLength(1000)
+                    .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("Banners");
-                });
+                b.ToTable("Banners");
+            });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("BannerId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("BannerId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BannerId");
+                b.HasIndex("BannerId");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("BannerLinks");
-                });
+                b.ToTable("BannerLinks");
+            });
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("PenalizedId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("PenalizedId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                b.Property<int>("Type")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("PenalizedId");
+                b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties");
-                });
+                b.ToTable("Penalties");
+            });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<string>("DeviceToken")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("DeviceToken")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions");
-                });
+                b.ToTable("Subscriptions");
+            });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Action")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("Message")
-                        .HasColumnType("int");
+                b.Property<int>("Message")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("NotifierId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("NotifierId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<bool>("Read")
-                        .HasColumnType("bit");
+                b.Property<bool>("Read")
+                    .HasColumnType("bit");
 
-                    b.Property<decimal>("RecipientId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("RecipientId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("NotifierId");
+                b.HasIndex("NotifierId");
 
-                    b.HasIndex("RecipientId");
+                b.HasIndex("RecipientId");
 
-                    b.ToTable("Telegrams");
-                });
+                b.ToTable("Telegrams");
+            });
 
             modelBuilder.Entity("Repository.Feedback", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<string>("Comments")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                b.Property<string>("Comments")
+                    .IsRequired()
+                    .HasMaxLength(300)
+                    .HasColumnType("nvarchar(300)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal?>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal?>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("Feedback");
-                });
+                b.ToTable("Feedback");
+            });
 
             modelBuilder.Entity("Repository.Gathering", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
+                b.Property<int>("Age")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Athleticisme")
-                        .HasColumnType("int");
+                b.Property<int>("Athleticisme")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Chaos")
-                        .HasColumnType("int");
+                b.Property<int>("Chaos")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Competitiveness")
-                        .HasColumnType("int");
+                b.Property<int>("Competitiveness")
+                    .HasColumnType("int");
 
-                    b.Property<int>("DegreeOfPrivacy")
-                        .HasColumnType("int");
+                b.Property<int>("DegreeOfPrivacy")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasMaxLength(1000)
+                    .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTimeOffset?>("EndTime")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("EndTime")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("Extroversion")
-                        .HasColumnType("int");
+                b.Property<int>("Extroversion")
+                    .HasColumnType("int");
 
-                    b.Property<string>("FriendlyLocation")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                b.Property<string>("FriendlyLocation")
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("GroupMaximum")
-                        .HasColumnType("int");
+                b.Property<int>("GroupMaximum")
+                    .HasColumnType("int");
 
-                    b.Property<int>("GroupMinimum")
-                        .HasColumnType("int");
+                b.Property<int>("GroupMinimum")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("HostId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("HostId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<int>("Industriousness")
-                        .HasColumnType("int");
+                b.Property<int>("Industriousness")
+                    .HasColumnType("int");
 
-                    b.Property<bool>("IsDynamic")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDynamic")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsPendingDeletion")
+                    .HasColumnType("bit");
 
-                    b.Property<Point>("Location")
-                        .IsRequired()
-                        .HasColumnType("geography")
-                        .HasAnnotation("Sqlite:Srid", 4326);
+                b.Property<Point>("Location")
+                    .IsRequired()
+                    .HasColumnType("geography")
+                    .HasAnnotation("Sqlite:Srid", 4326);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("NightOwl")
-                        .HasColumnType("int");
+                b.Property<int>("NightOwl")
+                    .HasColumnType("int");
 
-                    b.Property<int>("NumberOfGuests")
-                        .HasColumnType("int");
+                b.Property<int>("NumberOfGuests")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Openness")
-                        .HasColumnType("int");
+                b.Property<int>("Openness")
+                    .HasColumnType("int");
 
-                    b.Property<double>("Radius")
-                        .HasColumnType("float");
+                b.Property<double>("Radius")
+                    .HasColumnType("float");
 
-                    b.Property<DateTimeOffset>("StartTime")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("StartTime")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("State")
-                        .HasColumnType("int");
+                b.Property<int>("State")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("HostId");
+                b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings");
-                });
+                b.ToTable("Gatherings");
+            });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("GatheringId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                b.Property<int>("Type")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("GatheringId");
+                b.HasIndex("GatheringId");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks");
-                });
+                b.ToTable("GatheringLinks");
+            });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<DateTimeOffset>("FilingDate")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("FilingDate")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("GatheringId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                b.Property<string>("Notes")
+                    .IsRequired()
+                    .HasMaxLength(2000)
+                    .HasColumnType("nvarchar(2000)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                b.Property<int>("Type")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("GatheringId");
+                b.HasIndex("GatheringId");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports");
-                });
+                b.ToTable("GatheringReports");
+            });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<int>("Degree")
-                        .HasColumnType("int");
+                b.Property<int>("Degree")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("GatheringId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("GatheringId");
+                b.HasIndex("GatheringId");
 
-                    b.HasIndex("UserId", "GatheringId")
-                        .IsUnique();
+                b.HasIndex("UserId", "GatheringId")
+                    .IsUnique();
 
-                    b.ToTable("GuestClearances");
-                });
+                b.ToTable("GuestClearances");
+            });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("GatheringId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<decimal>("OwnerId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("OwnerId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("PostedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("PostedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("GatheringId");
+                b.HasIndex("GatheringId");
 
-                    b.HasIndex("OwnerId");
+                b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots");
-                });
+                b.ToTable("Snapshots");
+            });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("SnapshotId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("SnapshotId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                b.Property<int>("Type")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("SnapshotId");
+                b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId", "SnapshotId")
-                        .IsUnique();
+                b.HasIndex("UserId", "SnapshotId")
+                    .IsUnique();
 
-                    b.ToTable("SnapshotLinks");
-                });
+                b.ToTable("SnapshotLinks");
+            });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<DateTimeOffset>("FilingDate")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("FilingDate")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                b.Property<string>("Notes")
+                    .IsRequired()
+                    .HasMaxLength(2000)
+                    .HasColumnType("nvarchar(2000)");
 
-                    b.Property<decimal>("SnapshotId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("SnapshotId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                b.Property<int>("Type")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("UserId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("SnapshotId");
+                b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotReports");
-                });
+                b.ToTable("SnapshotReports");
+            });
 
             modelBuilder.Entity("Repository.User", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<int>("AccessTries")
-                        .HasColumnType("int");
+                b.Property<int>("AccessTries")
+                    .HasColumnType("int");
 
-                    b.Property<int>("AccountStatus")
-                        .HasColumnType("int");
+                b.Property<int>("AccountStatus")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
+                b.Property<int>("Age")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Athleticisme")
-                        .HasColumnType("int");
+                b.Property<int>("Athleticisme")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Chaos")
-                        .HasColumnType("int");
+                b.Property<int>("Chaos")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Competitiveness")
-                        .HasColumnType("int");
+                b.Property<int>("Competitiveness")
+                    .HasColumnType("int");
 
-                    b.Property<decimal?>("CurrentGathering")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal?>("CurrentGathering")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<Point>("CurrentLocation")
-                        .IsRequired()
-                        .HasColumnType("geography")
-                        .HasAnnotation("Sqlite:Srid", 4326);
+                b.Property<Point>("CurrentLocation")
+                    .IsRequired()
+                    .HasColumnType("geography")
+                    .HasAnnotation("Sqlite:Srid", 4326);
 
-                    b.Property<double>("CurrentRadius")
-                        .HasColumnType("float");
+                b.Property<double>("CurrentRadius")
+                    .HasColumnType("float");
 
-                    b.Property<DateTimeOffset>("DateOfBirth")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("DateOfBirth")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Extroversion")
-                        .HasColumnType("int");
+                b.Property<int>("Extroversion")
+                    .HasColumnType("int");
 
-                    b.Property<Point>("Haunt")
-                        .IsRequired()
-                        .HasColumnType("geography")
-                        .HasAnnotation("Sqlite:Srid", 4326);
+                b.Property<Point>("Haunt")
+                    .IsRequired()
+                    .HasColumnType("geography")
+                    .HasAnnotation("Sqlite:Srid", 4326);
 
-                    b.Property<double>("HauntRadius")
-                        .HasColumnType("float");
+                b.Property<double>("HauntRadius")
+                    .HasColumnType("float");
 
-                    b.Property<int>("HauntWheight")
-                        .HasColumnType("int");
+                b.Property<int>("HauntWheight")
+                    .HasColumnType("int");
 
-                    b.Property<int>("Industriousness")
-                        .HasColumnType("int");
+                b.Property<int>("Industriousness")
+                    .HasColumnType("int");
 
-                    b.Property<bool>("IsEmailConfirmed")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsEmailConfirmed")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsPendingDeletion")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsPhoneConfirmed")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsPhoneConfirmed")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset>("JoinDate")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("JoinDate")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset?>("LockoutDate")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("LockoutDate")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("NightOwl")
-                        .HasColumnType("int");
+                b.Property<int>("NightOwl")
+                    .HasColumnType("int");
 
-                    b.Property<string>("NormalisedEmail")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                b.Property<string>("NormalisedEmail")
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnType("nvarchar(255)");
 
-                    b.Property<Guid>("NotificationId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("NotificationId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Openness")
-                        .HasColumnType("int");
+                b.Property<int>("Openness")
+                    .HasColumnType("int");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<string>("PhoneNumber")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Pseudonym")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Pseudonym")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Reputation")
-                        .HasColumnType("int");
+                b.Property<int>("Reputation")
+                    .HasColumnType("int");
 
-                    b.Property<string>("SecurityStamp")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("SecurityStamp")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTimeOffset>("TimeOfUserAgreement")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("TimeOfUserAgreement")
+                    .HasColumnType("datetimeoffset");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("Users");
-                });
+                b.ToTable("Users");
+            });
 
             modelBuilder.Entity("Repository.UserRelationship", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<decimal>("OtherId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("OtherId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<decimal>("SelfId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("SelfId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("Time")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                b.Property<int>("Type")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("OtherId");
+                b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId", "OtherId")
-                        .IsUnique();
+                b.HasIndex("SelfId", "OtherId")
+                    .IsUnique();
 
-                    b.ToTable("UserLinks");
-                });
+                b.ToTable("UserLinks");
+            });
 
             modelBuilder.Entity("Repository.UserReport", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+            {
+                b.Property<decimal>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("decimal(20,0)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
 
-                    b.Property<DateTimeOffset>("FilingDate")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("FilingDate")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal?>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal?>("GatheringId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                b.Property<string>("Notes")
+                    .IsRequired()
+                    .HasMaxLength(2000)
+                    .HasColumnType("nvarchar(2000)");
 
-                    b.Property<decimal>("OtherId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("OtherId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<decimal>("SelfId")
-                        .HasColumnType("decimal(20,0)");
+                b.Property<decimal>("SelfId")
+                    .HasColumnType("decimal(20,0)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                b.Property<int>("Type")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("GatheringId");
+                b.HasIndex("GatheringId");
 
-                    b.HasIndex("OtherId");
+                b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId");
+                b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports");
-                });
+                b.ToTable("UserReports");
+            });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
-                {
-                    b.HasOne("Repository.Banner", "Banner")
-                        .WithMany("Links")
-                        .HasForeignKey("BannerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.Banner", "Banner")
+                    .WithMany("Links")
+                    .HasForeignKey("BannerId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                b.HasOne("Repository.User", "User")
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Banner");
+                b.Navigation("Banner");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.HasOne("Repository.User", "Penalized")
-                        .WithMany("Penalties")
-                        .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.User", "Penalized")
+                    .WithMany("Penalties")
+                    .HasForeignKey("PenalizedId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Penalized");
-                });
+                b.Navigation("Penalized");
+            });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
-                {
-                    b.HasOne("Repository.User", "User")
-                        .WithMany("Subscriptions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.User", "User")
+                    .WithMany("Subscriptions")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
-                {
-                    b.HasOne("Repository.User", "Notifier")
-                        .WithMany("SentTelegrams")
-                        .HasForeignKey("NotifierId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.User", "Notifier")
+                    .WithMany("SentTelegrams")
+                    .HasForeignKey("NotifierId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "Recipient")
-                        .WithMany("ReceivedTelegrams")
-                        .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "Recipient")
+                    .WithMany("ReceivedTelegrams")
+                    .HasForeignKey("RecipientId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Notifier");
+                b.Navigation("Notifier");
 
-                    b.Navigation("Recipient");
-                });
+                b.Navigation("Recipient");
+            });
 
             modelBuilder.Entity("Repository.Feedback", b =>
-                {
-                    b.HasOne("Repository.User", "User")
-                        .WithMany("Feedback")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+            {
+                b.HasOne("Repository.User", "User")
+                    .WithMany("Feedback")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.NoAction);
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.Gathering", b =>
-                {
-                    b.HasOne("Repository.User", "Host")
-                        .WithMany()
-                        .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.User", "Host")
+                    .WithMany()
+                    .HasForeignKey("HostId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Host");
-                });
+                b.Navigation("Host");
+            });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
-                {
-                    b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("Links")
-                        .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.Gathering", "Gathering")
+                    .WithMany("Links")
+                    .HasForeignKey("GatheringId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "User")
-                        .WithMany("GatheringLinks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "User")
+                    .WithMany("GatheringLinks")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Gathering");
+                b.Navigation("Gathering");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
-                {
-                    b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("GatheringReports")
-                        .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.Gathering", "Gathering")
+                    .WithMany("GatheringReports")
+                    .HasForeignKey("GatheringId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "User")
-                        .WithMany("GatheringReports")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "User")
+                    .WithMany("GatheringReports")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Gathering");
+                b.Navigation("Gathering");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
-                {
-                    b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("GuestClearances")
-                        .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.Gathering", "Gathering")
+                    .WithMany("GuestClearances")
+                    .HasForeignKey("GatheringId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "User")
-                        .WithMany("GuestClearances")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "User")
+                    .WithMany("GuestClearances")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Gathering");
+                b.Navigation("Gathering");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
-                {
-                    b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("Snapshots")
-                        .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.Gathering", "Gathering")
+                    .WithMany("Snapshots")
+                    .HasForeignKey("GatheringId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "Owner")
-                        .WithMany("Snapshots")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "Owner")
+                    .WithMany("Snapshots")
+                    .HasForeignKey("OwnerId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Gathering");
+                b.Navigation("Gathering");
 
-                    b.Navigation("Owner");
-                });
+                b.Navigation("Owner");
+            });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
-                {
-                    b.HasOne("Repository.Snapshot", "Snapshot")
-                        .WithMany()
-                        .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.Snapshot", "Snapshot")
+                    .WithMany()
+                    .HasForeignKey("SnapshotId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "User")
-                        .WithMany("SnapshotLinks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "User")
+                    .WithMany("SnapshotLinks")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Snapshot");
+                b.Navigation("Snapshot");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
-                {
-                    b.HasOne("Repository.Snapshot", "Snapshot")
-                        .WithMany("Reports")
-                        .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.Snapshot", "Snapshot")
+                    .WithMany("Reports")
+                    .HasForeignKey("SnapshotId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "User")
-                        .WithMany("SnapshotReports")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "User")
+                    .WithMany("SnapshotReports")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Snapshot");
+                b.Navigation("Snapshot");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Repository.UserRelationship", b =>
-                {
-                    b.HasOne("Repository.User", "Other")
-                        .WithMany("TargetUserRelationships")
-                        .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Repository.User", "Other")
+                    .WithMany("TargetUserRelationships")
+                    .HasForeignKey("OtherId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "Self")
-                        .WithMany("InitiatedUserRelationships")
-                        .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "Self")
+                    .WithMany("InitiatedUserRelationships")
+                    .HasForeignKey("SelfId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Other");
+                b.Navigation("Other");
 
-                    b.Navigation("Self");
-                });
+                b.Navigation("Self");
+            });
 
             modelBuilder.Entity("Repository.UserReport", b =>
-                {
-                    b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("UserReports")
-                        .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction);
+            {
+                b.HasOne("Repository.Gathering", "Gathering")
+                    .WithMany("UserReports")
+                    .HasForeignKey("GatheringId")
+                    .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Repository.User", "Other")
-                        .WithMany("ReporteeList")
-                        .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "Other")
+                    .WithMany("ReporteeList")
+                    .HasForeignKey("OtherId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Repository.User", "Self")
-                        .WithMany("ReporterList")
-                        .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Repository.User", "Self")
+                    .WithMany("ReporterList")
+                    .HasForeignKey("SelfId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Gathering");
+                b.Navigation("Gathering");
 
-                    b.Navigation("Other");
+                b.Navigation("Other");
 
-                    b.Navigation("Self");
-                });
+                b.Navigation("Self");
+            });
 
             modelBuilder.Entity("Repository.Banner", b =>
-                {
-                    b.Navigation("Links");
-                });
+            {
+                b.Navigation("Links");
+            });
 
             modelBuilder.Entity("Repository.Gathering", b =>
-                {
-                    b.Navigation("GatheringReports");
+            {
+                b.Navigation("GatheringReports");
 
-                    b.Navigation("GuestClearances");
+                b.Navigation("GuestClearances");
 
-                    b.Navigation("Links");
+                b.Navigation("Links");
 
-                    b.Navigation("Snapshots");
+                b.Navigation("Snapshots");
 
-                    b.Navigation("UserReports");
-                });
+                b.Navigation("UserReports");
+            });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
-                {
-                    b.Navigation("Reports");
-                });
+            {
+                b.Navigation("Reports");
+            });
 
             modelBuilder.Entity("Repository.User", b =>
-                {
-                    b.Navigation("Feedback");
+            {
+                b.Navigation("Feedback");
 
-                    b.Navigation("GatheringLinks");
+                b.Navigation("GatheringLinks");
 
-                    b.Navigation("GatheringReports");
+                b.Navigation("GatheringReports");
 
-                    b.Navigation("GuestClearances");
+                b.Navigation("GuestClearances");
 
-                    b.Navigation("InitiatedUserRelationships");
+                b.Navigation("InitiatedUserRelationships");
 
-                    b.Navigation("Penalties");
+                b.Navigation("Penalties");
 
-                    b.Navigation("ReceivedTelegrams");
+                b.Navigation("ReceivedTelegrams");
 
-                    b.Navigation("ReporteeList");
+                b.Navigation("ReporteeList");
 
-                    b.Navigation("ReporterList");
+                b.Navigation("ReporterList");
 
-                    b.Navigation("SentTelegrams");
+                b.Navigation("SentTelegrams");
 
-                    b.Navigation("SnapshotLinks");
+                b.Navigation("SnapshotLinks");
 
-                    b.Navigation("SnapshotReports");
+                b.Navigation("SnapshotReports");
 
-                    b.Navigation("Snapshots");
+                b.Navigation("Snapshots");
 
-                    b.Navigation("Subscriptions");
+                b.Navigation("Subscriptions");
 
-                    b.Navigation("TargetUserRelationships");
-                });
+                b.Navigation("TargetUserRelationships");
+            });
 #pragma warning restore 612, 618
         }
     }

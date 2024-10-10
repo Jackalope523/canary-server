@@ -170,32 +170,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.ToTable("Telegrams", (string)null);
                 });
 
-            modelBuilder.Entity("Repository.Feedback", b =>
-                {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
-
-                    b.Property<string>("Comments")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<decimal?>("UserId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Feedback", (string)null);
-                });
-
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.Property<decimal>("Id")
@@ -708,15 +682,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", null)
                         .WithMany("Notes")
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Repository.Feedback", b =>
-                {
-                    b.HasOne("Repository.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>

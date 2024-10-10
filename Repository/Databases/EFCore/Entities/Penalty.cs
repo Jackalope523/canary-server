@@ -7,8 +7,10 @@ namespace Repository.Entities
     {
         public ulong Id { get; set; }
         public ulong PenalizedId { get; set; }
-        public User? Penalized { get; set; }
         public PenaltyType Type { get; set; }   
         public DateTimeOffset Time { get; set; }
+
+        // Navigation Properties
+        public User? Penalized { get; set; }
     }
 }

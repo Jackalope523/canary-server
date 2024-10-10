@@ -16,9 +16,9 @@ namespace Repository
 
         // Default Values
         public static ulong DefaultId { get; set; } = ulong.MinValue;
-        public static string DefaultName { get; set; } = "Turtles";
-        public static string DefaultDescription { get; set; } = "The OG Skinny minny ahhhhh!!!!";
-        public static string DefaultCode { get; set; } = "WildTurtles";
-        public static string DefaultColor { get; set; } = "#FF0000";
+        public static string DefaultName { get; set; } = "";
+        public static string DefaultDescription { get; set; } = "";
+        public static string DefaultCode { get; set; } = "";
+        public static string DefaultColor { get; set; } = "";
     }
 }
