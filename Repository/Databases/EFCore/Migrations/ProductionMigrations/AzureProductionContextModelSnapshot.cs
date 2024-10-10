@@ -53,7 +53,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Banners", (string)null);
+                    b.ToTable("Banners");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -79,7 +79,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BannerLinks", (string)null);
+                    b.ToTable("BannerLinks");
                 });
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
@@ -103,7 +103,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties", (string)null);
+                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -119,9 +119,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("DeviceType")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("UserId")
                         .HasColumnType("decimal(20,0)");
 
@@ -129,7 +126,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions", (string)null);
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
@@ -160,14 +157,39 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal?>("UserId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotifierId");
+
+                    b.HasIndex("RecipientId");
+
+                    b.ToTable("Telegrams");
+                });
+
+            modelBuilder.Entity("Repository.Feedback", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(20,0)");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("UserId")
                         .HasColumnType("decimal(20,0)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Telegrams", (string)null);
+                    b.ToTable("Feedback");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
@@ -259,7 +281,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings", (string)null);
+                    b.ToTable("Gatherings");
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -288,7 +310,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks", (string)null);
+                    b.ToTable("GatheringLinks");
                 });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
@@ -322,7 +344,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports", (string)null);
+                    b.ToTable("GatheringReports");
                 });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
@@ -352,7 +374,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "GatheringId")
                         .IsUnique();
 
-                    b.ToTable("GuestClearances", (string)null);
+                    b.ToTable("GuestClearances");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -378,7 +400,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots", (string)null);
+                    b.ToTable("Snapshots");
                 });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
@@ -408,7 +430,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "SnapshotId")
                         .IsUnique();
 
-                    b.ToTable("SnapshotLinks", (string)null);
+                    b.ToTable("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
@@ -442,7 +464,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotReports", (string)null);
+                    b.ToTable("SnapshotReports");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -564,7 +586,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Repository.UserRelationship", b =>
@@ -594,7 +616,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("SelfId", "OtherId")
                         .IsUnique();
 
-                    b.ToTable("UserLinks", (string)null);
+                    b.ToTable("UserLinks");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -633,7 +655,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports", (string)null);
+                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -641,13 +663,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Banner", "Banner")
                         .WithMany("Links")
                         .HasForeignKey("BannerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
-                        .WithMany()
+                        .WithMany("BannerLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Banner");
@@ -660,7 +682,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "Penalized")
                         .WithMany("Penalties")
                         .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Penalized");
@@ -671,7 +693,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -679,17 +701,40 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
                 {
-                    b.HasOne("Repository.User", null)
-                        .WithMany("Notes")
-                        .HasForeignKey("UserId");
+                    b.HasOne("Repository.User", "Notifier")
+                        .WithMany("SentTelegrams")
+                        .HasForeignKey("NotifierId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "Recipient")
+                        .WithMany("ReceivedTelegrams")
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Notifier");
+
+                    b.Navigation("Recipient");
+                });
+
+            modelBuilder.Entity("Repository.Feedback", b =>
+                {
+                    b.HasOne("Repository.User", "User")
+                        .WithMany("Feedback")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
                     b.HasOne("Repository.User", "Host")
-                        .WithMany()
+                        .WithMany("HostedGatherings")
                         .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Host");
@@ -698,15 +743,15 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
             modelBuilder.Entity("Repository.GatheringLink", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("Links")
+                        .WithMany("GatheringLink")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -717,15 +762,15 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
             modelBuilder.Entity("Repository.GatheringReport", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany("Reports")
+                        .WithMany("GatheringReports")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
-                        .WithMany()
+                        .WithMany("GatheringReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -736,15 +781,15 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
             modelBuilder.Entity("Repository.GuestClearance", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany()
+                        .WithMany("GuestClearances")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
-                        .WithMany()
+                        .WithMany("GuestClearances")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -757,13 +802,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Snapshots")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Owner")
                         .WithMany("Snapshots")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -774,15 +819,15 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
             modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
                     b.HasOne("Repository.Snapshot", "Snapshot")
-                        .WithMany()
+                        .WithMany("SnapshotLinks")
                         .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
-                        .WithMany("PostLinks")
+                        .WithMany("SnapshotLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Snapshot");
@@ -793,15 +838,15 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
             modelBuilder.Entity("Repository.SnapshotReport", b =>
                 {
                     b.HasOne("Repository.Snapshot", "Snapshot")
-                        .WithMany()
+                        .WithMany("Reports")
                         .HasForeignKey("SnapshotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
-                        .WithMany()
+                        .WithMany("SnapshotReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Snapshot");
@@ -812,15 +857,15 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
             modelBuilder.Entity("Repository.UserRelationship", b =>
                 {
                     b.HasOne("Repository.User", "Other")
-                        .WithMany("UserLinks")
+                        .WithMany("TargetUserRelationships")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
-                        .WithMany()
+                        .WithMany("InitiatedUserRelationships")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Other");
@@ -831,19 +876,20 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
             modelBuilder.Entity("Repository.UserReport", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany()
-                        .HasForeignKey("GatheringId");
+                        .WithMany("UserReports")
+                        .HasForeignKey("GatheringId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Repository.User", "Other")
                         .WithMany("ReporteeList")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
                         .WithMany("ReporterList")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -860,32 +906,59 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
-                    b.Navigation("Links");
+                    b.Navigation("GatheringLink");
 
-                    b.Navigation("Reports");
+                    b.Navigation("GatheringReports");
+
+                    b.Navigation("GuestClearances");
 
                     b.Navigation("Snapshots");
+
+                    b.Navigation("UserReports");
+                });
+
+            modelBuilder.Entity("Repository.Snapshot", b =>
+                {
+                    b.Navigation("Reports");
+
+                    b.Navigation("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
                 {
+                    b.Navigation("BannerLinks");
+
+                    b.Navigation("Feedback");
+
                     b.Navigation("GatheringLinks");
 
-                    b.Navigation("Notes");
+                    b.Navigation("GatheringReports");
+
+                    b.Navigation("GuestClearances");
+
+                    b.Navigation("HostedGatherings");
+
+                    b.Navigation("InitiatedUserRelationships");
 
                     b.Navigation("Penalties");
 
-                    b.Navigation("PostLinks");
+                    b.Navigation("ReceivedTelegrams");
 
                     b.Navigation("ReporteeList");
 
                     b.Navigation("ReporterList");
 
+                    b.Navigation("SentTelegrams");
+
+                    b.Navigation("SnapshotLinks");
+
+                    b.Navigation("SnapshotReports");
+
                     b.Navigation("Snapshots");
 
                     b.Navigation("Subscriptions");
 
-                    b.Navigation("UserLinks");
+                    b.Navigation("TargetUserRelationships");
                 });
 #pragma warning restore 612, 618
         }
