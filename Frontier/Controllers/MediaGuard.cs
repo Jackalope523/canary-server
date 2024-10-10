@@ -43,7 +43,7 @@ namespace Frontier.Controllers
 
                     return new FileStreamResult(imageStream, "image/jpeg")
                     {
-                        FileDownloadName = $"{asset}.jpg"
+                        FileDownloadName = $"{asset}.png"
                     };
                 }
 
@@ -68,7 +68,7 @@ namespace Frontier.Controllers
 
                     return new FileStreamResult(imageStream, "image/jpeg")
                     {
-                        FileDownloadName = "hero.jpg"
+                        FileDownloadName = "avatar.jpg"
                     };
                 }
 
@@ -162,7 +162,7 @@ namespace Frontier.Controllers
 
                     return new FileStreamResult(imageStream, "image/jpeg")
                     {
-                        FileDownloadName = "hero.jpg"
+                        FileDownloadName = "snapshot.jpg"
                     };
                 }
 
