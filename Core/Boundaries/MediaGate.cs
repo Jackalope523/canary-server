@@ -5,6 +5,8 @@ namespace Core.Boundaries
 {
     #region Schemas
 
+    public record ImageMetadataShard(string Hash, bool Concealed);
+
     #endregion
 
     #region Gates
@@ -30,8 +32,11 @@ namespace Core.Boundaries
     {
         Task<MemoryStream> GetAssetAsync(string asset);
         Task<MemoryStream> GetAvatarAsync(ulong userId, ulong targetId);
+        Task<ImageMetadataShard> GetAvatarMetadataAsync(ulong userId, ulong targetId);
         Task<MemoryStream> GetHeaderAsync(ulong userId, ulong gatheringId);
+        Task<ImageMetadataShard> GetHeaderMetadataAsync(ulong userId, ulong gatheringId);
         Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId);
+        Task<ImageMetadataShard> GetSnapshotMetadataAsync(ulong userId, ulong snapshotId);
     }
 
     #endregion
