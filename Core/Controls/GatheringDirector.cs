@@ -158,7 +158,7 @@ namespace Core.Controls
 			}
 
             // Notify appreciateers of gathering
-            _ = user.NotifyAppreciateers(NotificationGroup.CompanionGathering, $"New Canary Gathering", $"{user.Name} just created {newGathering.Title}");
+            _ = user.NotifyAppreciateers(NotificationGroup.CompanionGathering, $"Companion Gathering", $"{user.Name} just created: {newGathering.Title}");
 
 			return newGathering.ToGatheringShard();
 		}

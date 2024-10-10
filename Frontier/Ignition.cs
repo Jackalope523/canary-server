@@ -67,6 +67,8 @@ namespace Frontier
         {
             string environment = Configuration["ASPNETCORE_ENVIRONMENT"];
             bool isProduction = environment.Equals("Production");
+            bool isStaging = environment.Equals("Staging");
+            bool isDevelopment = environment.Equals("Development");
 
             services.AddCors(options =>
             {
@@ -104,6 +106,10 @@ namespace Frontier
             if (isProduction)
             {
                 harbor = new(Harbor.Flag.Production, repositoryLogger);
+            }
+            else if (isStaging)
+            {
+                harbor = new(Harbor.Flag.Staging, repositoryLogger);
             }
             else
             {
