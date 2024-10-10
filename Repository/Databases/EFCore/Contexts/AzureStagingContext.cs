@@ -1,6 +1,5 @@
 ﻿using EntityFramework.Exceptions.SqlServer;
 using Microsoft.EntityFrameworkCore;
-using static Repository.Harbor;
 
 namespace Repository
 {
@@ -9,7 +8,11 @@ namespace Repository
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string connectionString = "Server=tcp:sparrow-stores.database.windows.net,1433;Initial Catalog=LaboratoryV2;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\"Active Directory Default\";";
-            optionsBuilder.UseSqlServer(connectionString, x => x.UseNetTopologySuite().MigrationsHistoryTable("__StagingMigrationsHistory"));
+            optionsBuilder.UseSqlServer(connectionString, x => x.
+                UseNetTopologySuite().
+                MigrationsHistoryTable("__StagingMigrationsHistory").
+                EnableRetryOnFailure());
+
             optionsBuilder.UseExceptionProcessor();
         }
 

@@ -1,6 +1,4 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Repository.Coordinators;
 
 namespace Repository

@@ -53,19 +53,79 @@ namespace Repository
                 .HasSrid(4326);
 
             modelBuilder.Entity<User>()
-              .HasMany(u => u.UserLinks)
-              .WithOne(l => l.Other)
-              .OnDelete(DeleteBehavior.Cascade);
+                 .HasMany(u => u.InitiatedUserRelationships)
+                 .WithOne(l => l.Self)
+                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.TargetUserRelationships)
+                .WithOne(l => l.Other)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.GatheringLinks)
                 .WithOne(l => l.User)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<User>()
-                .HasMany(u => u.PostLinks)
+                .HasMany(u => u.SnapshotLinks)
                 .WithOne(l => l.User)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.ReporterList)
+                .WithOne(r => r.Self)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.ReporteeList)
+                .WithOne(r => r.Other)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.SentTelegrams)
+                .WithOne(t => t.Notifier)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.ReceivedTelegrams)
+                .WithOne(t => t.Recipient)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.SnapshotReports)
+                .WithOne(r => r.User)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.GatheringReports)
+               .WithOne(r => r.User)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.Snapshots)
+               .WithOne(r => r.Owner)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.Subscriptions)
+               .WithOne(s => s.User)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Feedback)
+             .WithOne(f => f.User)
+             .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Penalties)
+             .WithOne(p => p.Penalized)
+             .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.GuestClearances)
+             .WithOne(c => c.User)
+             .OnDelete(DeleteBehavior.NoAction);
 
             // Gathering
             modelBuilder.Entity<Gathering>().Property(g => g.Description)
@@ -83,25 +143,50 @@ namespace Repository
             modelBuilder.Entity<Gathering>()
                .HasMany(g => g.Links)
                .WithOne(l => l.Gathering)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Gathering>()
               .HasMany(g => g.Snapshots)
               .WithOne(s => s.Gathering)
-              .OnDelete(DeleteBehavior.Cascade);
+              .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Gathering>()
-              .HasMany(g => g.Reports)
+              .HasMany(g => g.GatheringReports)
               .WithOne(l => l.Gathering)
-              .OnDelete(DeleteBehavior.Cascade);
+              .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Gathering>()
+             .HasMany(g => g.GuestClearances)
+             .WithOne(c => c.Gathering)
+             .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Gathering>()
+             .HasMany(g => g.UserReports)
+             .WithOne(r => r.Gathering)
+             .OnDelete(DeleteBehavior.NoAction);
 
             // Telegram
             modelBuilder.Entity<Telegram>().Property(n => n.Action)
                .HasMaxLength(500);
 
+            modelBuilder.Entity<Telegram>()
+              .HasOne(t => t.Notifier)
+              .WithMany(u => u.SentTelegrams)
+              .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Telegram>()
+             .HasOne(t => t.Recipient)
+             .WithMany(u => u.ReceivedTelegrams)
+             .OnDelete(DeleteBehavior.NoAction);
+
             // Subscription
             modelBuilder.Entity<Subscription>().Property(s => s.DeviceToken)
               .HasMaxLength(500);
+
+            modelBuilder.Entity<Subscription>()
+            .HasOne(s => s.User)
+            .WithMany(u => u.Subscriptions)
+            .OnDelete(DeleteBehavior.NoAction);
 
             // User Report
             modelBuilder.Entity<UserReport>().Property(r => r.Notes)
@@ -109,22 +194,62 @@ namespace Repository
 
             modelBuilder.Entity<UserReport>()
                .HasOne(r => r.Self)
-               .WithMany(u => u.ReporterList);
+               .WithMany(u => u.ReporterList)
+               .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<UserReport>()
                 .HasOne(r => r.Other)
-                .WithMany(u => u.ReporteeList);
+                .WithMany(u => u.ReporteeList)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserReport>()
+                .HasOne(r => r.Gathering)
+                .WithMany(g => g.UserReports)
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Gathering Report
             modelBuilder.Entity<GatheringReport>().Property(r => r.Notes)
               .HasMaxLength(2000);
 
+            modelBuilder.Entity<GatheringReport>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.GatheringReports)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<GatheringReport>()
+                .HasOne(r => r.Gathering)
+                .WithMany(g => g.GatheringReports)
+                .OnDelete(DeleteBehavior.NoAction);
+
             // Snapshot Report
             modelBuilder.Entity<SnapshotReport>().Property(r => r.Notes)
               .HasMaxLength(2000);
 
-            // Snapshot
+            modelBuilder.Entity<SnapshotReport>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.SnapshotReports)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<SnapshotReport>()
+                .HasOne(r => r.Snapshot)
+                .WithMany(s => s.Reports)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Snapshot
+            modelBuilder.Entity<Snapshot>()
+                .HasOne(s => s.Owner)
+                .WithMany(u => u.Snapshots)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Snapshot>()
+               .HasOne(s => s.Gathering)
+               .WithMany(g => g.Snapshots)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Snapshot>()
+               .HasMany(s => s.Reports)
+               .WithOne(r => r.Snapshot)
+               .OnDelete(DeleteBehavior.NoAction);
 
             // Banner
             modelBuilder.Entity<Banner>().Property(b => b.Name)
@@ -139,24 +264,76 @@ namespace Repository
             modelBuilder.Entity<Banner>().Property(b => b.Color)
             .HasMaxLength(7);
 
+            modelBuilder.Entity<Banner>()
+              .HasMany(b => b.Links)
+              .WithOne(l => l.Banner)
+              .OnDelete(DeleteBehavior.NoAction);
+
             // Feedback
             modelBuilder.Entity<Feedback>().Property(f => f.Comments)
             .HasMaxLength(300);
+
+            modelBuilder.Entity<Feedback>()
+              .HasOne(f => f.User)
+              .WithMany(u => u.Feedback)
+              .OnDelete(DeleteBehavior.NoAction);
 
             // Snapshot Link
             modelBuilder.Entity<SnapshotLink>()
                .HasIndex(l => new { l.UserId, l.SnapshotId })
                .IsUnique();
 
+            modelBuilder.Entity<SnapshotLink>()
+                .HasOne(l => l.User)
+                .WithMany(u => u.SnapshotLinks)
+                .OnDelete(DeleteBehavior.NoAction);
+
             // User Link
             modelBuilder.Entity<UserRelationship>()
                .HasIndex(l => new { l.SelfId, l.OtherId })
                .IsUnique();
 
+            modelBuilder.Entity<UserRelationship>()
+                .HasOne(l => l.Self)
+                .WithMany(u => u.InitiatedUserRelationships)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserRelationship>()
+                .HasOne(l => l.Other)
+                .WithMany(u => u.TargetUserRelationships)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // User Link
+            modelBuilder.Entity<GatheringLink>()
+                .HasOne(l => l.User)
+                .WithMany(l => l.GatheringLinks)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<GatheringLink>()
+                .HasOne(l => l.Gathering)
+                .WithMany(g => g.Links)
+                .OnDelete(DeleteBehavior.NoAction);
+
             // Clearance Link
             modelBuilder.Entity<GuestClearance>()
                .HasIndex(l => new { l.UserId, l.GatheringId})
                .IsUnique();
+
+            modelBuilder.Entity<GuestClearance>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.GuestClearances)
+                .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<GuestClearance>()
+               .HasOne(c => c.Gathering)
+               .WithMany(u => u.GuestClearances)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            // Penalty
+            modelBuilder.Entity<Penalty>()
+              .HasOne(p => p.Penalized)
+              .WithMany(u => u.Penalties)
+              .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

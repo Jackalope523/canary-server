@@ -549,19 +549,15 @@ namespace Repository
         }    
         public async Task DeleteUserStateAsync(ulong userId, ulong gatheringId) 
         { 
-            GatheringBond type = await storeSentry.ExecuteReadAsync(ctx => 
+            GatheringLink link = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.
                 Where(l => l.UserId == userId && l.GatheringId == gatheringId).
-                Select(l => l.Type).
                 SingleAsync());
 
-            await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.GatheringLinks.
-                Where(l => l.UserId == userId && l.GatheringId == gatheringId).
-                ExecuteDeleteAsync());
-
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
-            switch (type)
+            storeSentry.DiscussWrite(ctx => ctx.GatheringLinks.Remove(link), currentDiscussion);
+
+            switch (link.Type)
             {
                 case GatheringBond.Watching:
                     break;
@@ -763,9 +759,9 @@ namespace Repository
                 toAdd.Id = id;
             }
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.GatheringLinks.Update(toAdd));
-
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
+            storeSentry.DiscussWrite(ctx => ctx.GatheringLinks.Update(toAdd), currentDiscussion);
+
             switch (userState)
             {
                 case GatheringBond.Watching:
