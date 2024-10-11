@@ -6,7 +6,8 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-    public record NestShard(List<TwigShard> Twigs);
+    public record NestShard(List<TwigShard> Twigs,
+        ulong RelativeGatheringId = default, DateTimeOffset BlockedSince = default);
     public record TwigShard(ulong GatheringId, DateTimeOffset StartTime);
 
     public record AgendaShard(List<CardShard> Cards);
@@ -24,12 +25,15 @@ namespace Core.Boundaries
         Task<List<UserShard>> GetBlockedUsersAsync(ulong userId);
         Task<List<UserShard>> GetUsersBlockingAsync(ulong userId);
 
-        Task AppreciateUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
-		Task UnappreciateUserAsync(ulong userId, ulong targetUserId);
-		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
-		Task UnblockUserAsync(ulong userId, ulong targetUserId);
+        Task AppreciateUserAsync(ulong userId, ulong targetId, DateTimeOffset time);
+		Task UnappreciateUserAsync(ulong userId, ulong targetId);
+		Task BlockUserAsync(ulong userId, ulong targetId, DateTimeOffset time);
+		Task UnblockUserAsync(ulong userId, ulong targetId);
 
         Task<bool> HaveMutualGathering(ulong userId, ulong targetId);
+        Task<CoreGathering> GetFirstMutualGathering(ulong userId, ulong targetId);
+        Task<CoreGathering> GetLatestMutualGathering(ulong userId, ulong targetId);
+        Task<DateTimeOffset> BlockedSince(ulong userId, ulong targetId);
     }
 
 	public interface INestOperations

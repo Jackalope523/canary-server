@@ -43,7 +43,7 @@ namespace Frontier.Controllers
 
                     return new FileStreamResult(imageStream, "image/jpeg")
                     {
-                        FileDownloadName = $"{asset}.jpg"
+                        FileDownloadName = $"{asset}.png"
                     };
                 }
 
@@ -68,7 +68,7 @@ namespace Frontier.Controllers
 
                     return new FileStreamResult(imageStream, "image/jpeg")
                     {
-                        FileDownloadName = "hero.jpg"
+                        FileDownloadName = "avatar.jpg"
                     };
                 }
 
@@ -76,26 +76,10 @@ namespace Frontier.Controllers
             });
         }
 
-		[HttpGet("avatars/{userId}/hash")]
-		public async Task<IActionResult> GetAvatarHash(ulong userId)
+		[HttpGet("avatars/{userId}/metadata")]
+		public async Task<IActionResult> GetAvatarMetadata(ulong userId)
         {
-            return await Execute(async user =>
-            {
-                var imageStream = await media.GetAvatarAsync(user.Id, userId);
-
-                if (imageStream != null)
-                {
-                    imageStream.Seek(0, SeekOrigin.Begin);
-
-                    using SHA256 sha256 = SHA256.Create();
-
-                    byte[] hashBytes = sha256.ComputeHash(imageStream);
-
-                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-                }
-
-                throw new UnexpectedFailureException("Could not get image hash.");
-            });
+            return await Execute(user => media.GetAvatarMetadataAsync(user.Id, userId));
         }
 
 		[HttpGet("headers/{gatheringId}")]
@@ -123,26 +107,10 @@ namespace Frontier.Controllers
 			});
         }
 
-        [HttpGet("headers/{gatheringId}/hash")]
-        public async Task<IActionResult> GetHeaderHash(ulong gatheringId)
+        [HttpGet("headers/{gatheringId}/metadata")]
+        public async Task<IActionResult> GetHeaderMetadata(ulong gatheringId)
         {
-            return await Execute(async user =>
-            {
-                var imageStream = await media.GetHeaderAsync(user.Id, gatheringId);
-
-                if (imageStream != null)
-                {
-                    imageStream.Seek(0, SeekOrigin.Begin);
-
-                    using SHA256 sha256 = SHA256.Create();
-
-                    byte[] hashBytes = sha256.ComputeHash(imageStream);
-
-                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-                }
-
-                throw new UnexpectedFailureException("Could not get image hash.");
-            });
+            return await Execute(user => media.GetHeaderMetadataAsync(user.Id, gatheringId));
         }
 
         [HttpGet("snapshots/{snapshotId}")]
@@ -162,7 +130,7 @@ namespace Frontier.Controllers
 
                     return new FileStreamResult(imageStream, "image/jpeg")
                     {
-                        FileDownloadName = "hero.jpg"
+                        FileDownloadName = "snapshot.jpg"
                     };
                 }
 
@@ -170,6 +138,12 @@ namespace Frontier.Controllers
             });
         }
 
-		#endregion
-	}
+        [HttpGet("snapshots/{snapshotId}/metadata")]
+        public async Task<IActionResult> GetSnapshotMetadata(ulong snapshotId)
+        {
+            return await Execute(user => media.GetSnapshotMetadataAsync(user.Id, snapshotId));
+        }
+
+        #endregion
+    }
 }
