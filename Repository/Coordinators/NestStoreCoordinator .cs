@@ -9,45 +9,45 @@
             store = new EFCoreNestStore(flag);
         }
         
-        public async Task AppreciateUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
             await store.AppreciateUserAsync(selfId, targetId, time);
         }
-        public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnappreciateUserAsync(long selfId, long targetId) 
         {
             await store.UnappreciateUserAsync(selfId, targetId);
         }
-        public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
             await store.BlockUserAsync(selfId, targetId, time);
         }
-        public async Task UnblockUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnblockUserAsync(long selfId, long targetId) 
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
-        public async Task<List<UserShard>> GetAppreciatedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long id) 
         {
             return await store.GetAppreciatedUsersAsync(id);
         }
-        public async Task<List<UserShard>> GetBlockedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetBlockedUsersAsync(long id) 
         {
             return await store.GetBlockedUsersAsync(id);
         }
-        public async Task<List<UserShard>> GetCompanionsAsync(ulong id)
+        public async Task<List<UserShard>> GetCompanionsAsync(long id)
         {
             return await store.GetCompanionsAsync(id);
         }
 
-        public async Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersAppreciatingAsync(long userId)
         {
             return await store.GetUsersAppreciatingAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersBlockingAsync(long userId)
         {
            return await store.GetUsersBlockingAsync(userId);
         }
-        public async Task<bool> HaveMutualGathering(ulong userId, ulong targetId)
+        public async Task<bool> HaveMutualGathering(long userId, long targetId)
         {
             return await store.HaveMutualGathering(userId, targetId);
         }

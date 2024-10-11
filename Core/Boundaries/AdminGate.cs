@@ -16,8 +16,8 @@ namespace Core.Boundaries
     public interface IAdminDatabase
 	{
         Task<List<CoreGathering>> GetAllWaitingGatheringsAsync(DateTimeOffset currentTime);
-        Task VoidUserAsync(ulong userId);
-        Task VoidGatheringAsync(ulong gatheringId);
+        Task VoidUserAsync(long userId);
+        Task VoidGatheringAsync(long gatheringId);
     }
 
     #endregion

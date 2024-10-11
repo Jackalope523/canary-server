@@ -9,7 +9,7 @@
             store = new EFCoreBannerStore(flag);
         }
 
-        public async Task AddUserToBannerAsync(ulong userId, ulong bannerId, DateTimeOffset time)
+        public async Task AddUserToBannerAsync(long userId, long bannerId, DateTimeOffset time)
         {
             await store.AddUserToBannerAsync(userId, bannerId, time);
         }
@@ -19,17 +19,17 @@
             return await store.FindBannerByCodeAsync(code);
         }
 
-        public async Task<CoreBanner> FindBannerByIdAsync(ulong bannerId)
+        public async Task<CoreBanner> FindBannerByIdAsync(long bannerId)
         {
             return await store.FindBannerByIdAsync(bannerId);
         }
 
-        public async Task<CoreBanner> FindBannerForUserAsync(ulong userId)
+        public async Task<CoreBanner> FindBannerForUserAsync(long userId)
         {
             return await store.FindBannerForUserAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetBannerMembersAsync(ulong bannerId)
+        public async Task<List<UserShard>> GetBannerMembersAsync(long bannerId)
         {
             return await store.GetBannerMembersAsync(bannerId);
         }

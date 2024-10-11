@@ -52,7 +52,7 @@ namespace Frontier.Controllers
         }
 
 		[HttpGet("avatars/{userId}")]
-		public async Task<IActionResult> GetAvatar(ulong userId)
+		public async Task<IActionResult> GetAvatar(long userId)
         {
             return await ExecuteUnsafe(async () =>
             {
@@ -77,13 +77,13 @@ namespace Frontier.Controllers
         }
 
 		[HttpGet("avatars/{userId}/metadata")]
-		public async Task<IActionResult> GetAvatarMetadata(ulong userId)
+		public async Task<IActionResult> GetAvatarMetadata(long userId)
         {
             return await Execute(user => media.GetAvatarMetadataAsync(user.Id, userId));
         }
 
 		[HttpGet("headers/{gatheringId}")]
-		public async Task<IActionResult> GetHeader(ulong gatheringId)
+		public async Task<IActionResult> GetHeader(long gatheringId)
         {
 			return await ExecuteUnsafe(async () =>
 			{
@@ -108,13 +108,13 @@ namespace Frontier.Controllers
         }
 
         [HttpGet("headers/{gatheringId}/metadata")]
-        public async Task<IActionResult> GetHeaderMetadata(ulong gatheringId)
+        public async Task<IActionResult> GetHeaderMetadata(long gatheringId)
         {
             return await Execute(user => media.GetHeaderMetadataAsync(user.Id, gatheringId));
         }
 
         [HttpGet("snapshots/{snapshotId}")]
-		public async Task<IActionResult> GetSnapshotImage(ulong snapshotId)
+		public async Task<IActionResult> GetSnapshotImage(long snapshotId)
         {
             return await ExecuteUnsafe(async () =>
             {
@@ -139,7 +139,7 @@ namespace Frontier.Controllers
         }
 
         [HttpGet("snapshots/{snapshotId}/metadata")]
-        public async Task<IActionResult> GetSnapshotMetadata(ulong snapshotId)
+        public async Task<IActionResult> GetSnapshotMetadata(long snapshotId)
         {
             return await Execute(user => media.GetSnapshotMetadataAsync(user.Id, snapshotId));
         }

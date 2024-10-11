@@ -4,9 +4,9 @@ namespace Repository
 {
     public class EFCoreNestStore : QueryStore, INestDatabase
     {     
-        private static readonly Func<CanaryContext, ulong, ulong, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
+        private static readonly Func<CanaryContext, long, long, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
-                (CanaryContext ctx, ulong selfId, ulong otherId, UserRelationship.UserLinkType type) =>
+                (CanaryContext ctx, long selfId, long otherId, UserRelationship.UserLinkType type) =>
                 ctx.UserLinks
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());
@@ -15,9 +15,9 @@ namespace Repository
         {
         }
         
-        public async Task AppreciateUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
-            ulong id = await storeSentry.ExecuteReadAsync(ctx => 
+            long id = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserLinks.
                 Where(l => l.SelfId == selfId && l.OtherId == targetId)
                 .Select(l => l.Id)
@@ -50,14 +50,14 @@ namespace Repository
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toUpdate));
             }
         }
-        public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnappreciateUserAsync(long selfId, long targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Appreciate));
         }
-        public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
-            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.UserLinks.
                Where(l => l.SelfId == selfId && l.OtherId == targetId)
                .Select(l => l.Id)
@@ -90,12 +90,12 @@ namespace Repository
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toUpdate));
             }
         }
-        public async Task UnblockUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnblockUserAsync(long selfId, long targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Block));
         }
-        public async Task<List<UserShard>> GetAppreciatedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
@@ -107,7 +107,7 @@ namespace Repository
                  ).
              ToListAsync());
         }
-        public async Task<List<UserShard>> GetBlockedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetBlockedUsersAsync(long id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Block).
@@ -119,7 +119,7 @@ namespace Repository
                 ).
             ToListAsync());
         }
-        public async Task<List<UserShard>> GetCompanionsAsync(ulong id)
+        public async Task<List<UserShard>> GetCompanionsAsync(long id)
         {
             Task<List<UserShard>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
@@ -144,7 +144,7 @@ namespace Repository
             return (await appreciating).Intersect(await appreciatingMe).ToList();
         }
 
-        public async Task<List<UserShard>> GetUsersAppreciatingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersAppreciatingAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
@@ -155,7 +155,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public async Task<List<UserShard>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersBlockingAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Block).
@@ -166,7 +166,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public Task<bool> HaveMutualGathering(ulong userId, ulong targetId)
+        public Task<bool> HaveMutualGathering(long userId, long targetId)
         {
             return storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.

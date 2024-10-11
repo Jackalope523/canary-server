@@ -21,7 +21,7 @@ namespace Core.Controls
 
 		#region Operations
 
-        public async Task<NestShard> GetNestAsync(ulong userId, ulong targetId)
+        public async Task<NestShard> GetNestAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -87,7 +87,7 @@ namespace Core.Controls
             return nest;
         }
 
-        public async Task<AgendaShard> GetUserAgendaAsync(ulong userId)
+        public async Task<AgendaShard> GetUserAgendaAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
@@ -97,11 +97,11 @@ namespace Core.Controls
             return upcomingAgenda;
         }
 
-        public async Task<IDictionary<ulong, AgendaShard>> GetCompanionAgendasAsync(ulong userId)
+        public async Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
-            Dictionary<ulong, AgendaShard> companionGatherings = new();
+            Dictionary<long, AgendaShard> companionGatherings = new();
 
             // Gather visible agenda of each companion
             foreach (var companion in await user.Companions)
@@ -114,22 +114,22 @@ namespace Core.Controls
             return companionGatherings;
         }
 
-        public async Task<List<UserShard>> GetCompanionsAsync(ulong userId)
+        public async Task<List<UserShard>> GetCompanionsAsync(long userId)
         {
             return await Nests.GetCompanionsAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetAppreciatedUsersAsync(ulong userId)
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long userId)
         {
             return await Nests.GetAppreciatedUsersAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetBlockedUsersAsync(ulong userId)
+        public async Task<List<UserShard>> GetBlockedUsersAsync(long userId)
         {
             return await Nests.GetBlockedUsersAsync(userId);
         }
 
-        public async Task AppreciateUserAsync(ulong userId, ulong targetId)
+        public async Task AppreciateUserAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -145,12 +145,12 @@ namespace Core.Controls
             _ = targetUser.PostTelegram(user, TelegramMessage.UserAppreciated, "");
         }
 
-        public async Task UnappreciateUserAsync(ulong userId, ulong targetId)
+        public async Task UnappreciateUserAsync(long userId, long targetId)
         {
             await Nests.UnappreciateUserAsync(userId, targetId);
         }
 
-        public async Task BlockUserAsync(ulong userId, ulong targetId)
+        public async Task BlockUserAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -176,12 +176,12 @@ namespace Core.Controls
             }
         }
 
-        public async Task UnblockUserAsync(ulong userId, ulong targetId)
+        public async Task UnblockUserAsync(long userId, long targetId)
         {
             await Nests.UnblockUserAsync(userId, targetId);
         }
 
-        public async Task<bool> AuthorisedToAppreciate(ulong userId, ulong targetId)
+        public async Task<bool> AuthorisedToAppreciate(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);

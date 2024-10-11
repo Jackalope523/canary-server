@@ -21,7 +21,7 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<SnapshotShard>> GetGatheringSnapshots(ulong userId, ulong gatheringId)
+		public async Task<List<SnapshotShard>> GetGatheringSnapshots(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var targetGathering = await GetGatheringAsync(gatheringId);
@@ -29,7 +29,7 @@ namespace Core.Controls
             return await RequestVisibleSnapshotsAsync(user, targetGathering);
         }
 
-        public async Task<GalleryShard> GetGalleryAsync(ulong userId, ulong targetId, ulong gatheringId)
+        public async Task<GalleryShard> GetGalleryAsync(long userId, long targetId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -79,7 +79,7 @@ namespace Core.Controls
         }
 
 
-        public async Task<SnapshotShard> AddSnapshotAsync(ulong userId, ulong gatheringId, MemoryStream image)
+        public async Task<SnapshotShard> AddSnapshotAsync(long userId, long gatheringId, MemoryStream image)
         {
             var userSync = GetUserAsync(userId);
             var targetGatheringSync = GetGatheringAsync(gatheringId);
@@ -106,7 +106,7 @@ namespace Core.Controls
             return snapshot;
         }
 
-        public async Task DeleteSnapshotAsync(ulong userId, ulong snapshotId)
+        public async Task DeleteSnapshotAsync(long userId, long snapshotId)
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -120,7 +120,7 @@ namespace Core.Controls
             await Snapshots.DeleteSnapshotAsync(snapshot.Id);
         }
 
-        public async Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, SnapshotAcclaim acclaim)
+        public async Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim)
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -146,10 +146,10 @@ namespace Core.Controls
         }
 
         public async Task<ColumnShard>
-            GetUserColumnAsync(ulong userId, int depth, int lastDepth)
+            GetUserColumnAsync(long userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
-            Dictionary<ulong, GatheringHeader> gatheringHeaders = new();
+            Dictionary<long, GatheringHeader> gatheringHeaders = new();
 
             // Enforce lastDepth < depth
             lastDepth = Math.Min(lastDepth, depth - 1);

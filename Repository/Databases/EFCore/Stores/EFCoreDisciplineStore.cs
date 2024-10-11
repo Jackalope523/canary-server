@@ -10,7 +10,7 @@ namespace Repository
         {
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsByUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsByUserAsync(long id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             UserReports.
@@ -57,7 +57,7 @@ namespace Repository
             return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn);
         }
 
-        public async Task<List<Core.Boundaries.GatheringReport>> GetReportsForGatheringAsync(ulong id)
+        public async Task<List<Core.Boundaries.GatheringReport>> GetReportsForGatheringAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx => ctx.
             GatheringReports.
@@ -74,7 +74,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsForUserAsync(ulong id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsForUserAsync(long id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => 
              ctx.UserReports.
@@ -90,7 +90,7 @@ namespace Repository
              )).
             ToListAsync());       
 
-            List<ulong> gatheringsHosted = await storeSentry.ExecuteReadAsync(ctx => 
+            List<long> gatheringsHosted = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Gatherings.
                 Where(e => e.HostId == id).
                 Select(e => e.Id).
@@ -110,7 +110,7 @@ namespace Repository
             )).
             ToListAsync());
 
-            List<ulong> snapshotsPosted = await storeSentry.ExecuteReadAsync(ctx =>
+            List<long> snapshotsPosted = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.Snapshots.
                Where(s => s.OwnerId == id).
                Select(s => s.Id).
@@ -133,7 +133,7 @@ namespace Repository
             return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn);
         }
 
-        public async Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport, GatheringReportType reportType, string reportDetails)
+        public async Task ReportGatheringAsync(long userId, long gatheringId, DateTimeOffset timeOfReport, GatheringReportType reportType, string reportDetails)
         {
             GatheringReport toCreate = new()
             {
@@ -147,7 +147,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(toCreate));
         }
 
-        public async Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(long userId, long targetUserId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
         {
             UserReport toCreate = new()
             {
@@ -161,7 +161,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(toCreate));
         }
 
-        public async Task ReportUserAsync(ulong selfId, ulong targetId, ulong gatheringId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
+        public async Task ReportUserAsync(long selfId, long targetId, long gatheringId, DateTimeOffset timeOfReport, UserReportType reportType, string reportDetails)
         {
             UserReport toCreate = new()
             {
@@ -176,7 +176,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(toCreate));
         }
 
-        public async Task PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
+        public async Task PenaliseUserAsync(long userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
         {
             Entities.Penalty toAdd = new() 
             {
@@ -187,7 +187,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Penalties.Add(toAdd));
         }
 
-        public async Task<List<PenaltyShard>> GetPenaltiesForUserAsync(ulong userId)
+        public async Task<List<PenaltyShard>> GetPenaltiesForUserAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Penalties.
@@ -196,7 +196,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public async Task<List<Core.Boundaries.SnapshotReport>> GetReportsForSnapshotAsync(ulong snapshotId)
+        public async Task<List<Core.Boundaries.SnapshotReport>> GetReportsForSnapshotAsync(long snapshotId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => ctx.
             SnapshotReports.
@@ -213,7 +213,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public async Task ReportSnapshotAsync(ulong userId, ulong snapshotId, DateTimeOffset timeOfReport, SnapshotReportType reportType, string reportDetails)
+        public async Task ReportSnapshotAsync(long userId, long snapshotId, DateTimeOffset timeOfReport, SnapshotReportType reportType, string reportDetails)
         {
             SnapshotReport toCreate = new()
             {

@@ -53,7 +53,7 @@ namespace Core.Controls
 
 		#region Tools
 
-		protected async Task<User> GetUserAsync(ulong userId)
+		protected async Task<User> GetUserAsync(long userId)
         {
             User user = new(await Accounts.FindUserByIdAsync(userId));
 			
@@ -68,12 +68,12 @@ namespace Core.Controls
             return user;
         }
 
-		protected async Task<User> GetUserUnsafeAsync(ulong userId)
+		protected async Task<User> GetUserUnsafeAsync(long userId)
         {
             return new(await Accounts.FindUserByIdAsync(userId));
         }
 
-        protected async Task<Gathering> GetGatheringAsync(ulong gatheringId)
+        protected async Task<Gathering> GetGatheringAsync(long gatheringId)
         {
             return new(await Gatherings.FindGatheringAsync(gatheringId));
         }

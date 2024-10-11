@@ -23,7 +23,7 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet("{targetId}")]
-        public async Task<IActionResult> GetNest(ulong targetId)
+        public async Task<IActionResult> GetNest(long targetId)
 		{
 			return await Execute(async user =>
 				await nests.GetNestAsync(user.Id, targetId));
@@ -94,14 +94,14 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{targetId}/authorisation/appreciate")]
-		public async Task<IActionResult> CheckAppreciateAuthorisation(ulong targetId)
+		public async Task<IActionResult> CheckAppreciateAuthorisation(long targetId)
 		{
 			return await Execute(async user =>
 				await nests.AuthorisedToAppreciate(user.Id, targetId));
 		}
 
 		[HttpPost("{targetId}/report")]
-		public async Task<IActionResult> ReportUser(ulong targetId, [FromBody] AccountReportManifest report)
+		public async Task<IActionResult> ReportUser(long targetId, [FromBody] AccountReportManifest report)
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)

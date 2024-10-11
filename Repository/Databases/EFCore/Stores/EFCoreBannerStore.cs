@@ -8,7 +8,7 @@ namespace Repository
         {
         }
 
-        public async Task AddUserToBannerAsync(ulong userId, ulong bannerId, DateTimeOffset time)
+        public async Task AddUserToBannerAsync(long userId, long bannerId, DateTimeOffset time)
         {
             BannerLink toAdd = new()
             {
@@ -29,7 +29,7 @@ namespace Repository
                .SingleAsync());
         }
 
-        public async Task<CoreBanner> FindBannerByIdAsync(ulong bannerId)
+        public async Task<CoreBanner> FindBannerByIdAsync(long bannerId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
               ctx.Banners
@@ -38,9 +38,9 @@ namespace Repository
               .SingleAsync());
         }
 
-        public async Task<CoreBanner> FindBannerForUserAsync(ulong userId)
+        public async Task<CoreBanner> FindBannerForUserAsync(long userId)
         {
-            ulong bannerId = await storeSentry.ExecuteReadAsync(ctx =>
+            long bannerId = await storeSentry.ExecuteReadAsync(ctx =>
                                ctx.BannerLinks
                                .Where(l => l.UserId == userId)
                                .Select(l => l.BannerId)
@@ -53,7 +53,7 @@ namespace Repository
                 .SingleAsync());
         }
 
-        public async Task<List<UserShard>> GetBannerMembersAsync(ulong bannerId)
+        public async Task<List<UserShard>> GetBannerMembersAsync(long bannerId)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.BannerLinks

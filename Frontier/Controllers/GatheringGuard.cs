@@ -23,7 +23,7 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet("{gatheringId}")]
-        public async Task<IActionResult> GetGathering(ulong gatheringId)
+        public async Task<IActionResult> GetGathering(long gatheringId)
         {
 			return await Execute(async user =>
 			{
@@ -57,7 +57,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{gatheringId}/edit")]
-        public async Task<IActionResult> EditGathering(ulong gatheringId, [FromForm] GatheringEditManifest gatheringDetails)
+        public async Task<IActionResult> EditGathering(long gatheringId, [FromForm] GatheringEditManifest gatheringDetails)
 		{
 			// Verify parameters
 			if (gatheringDetails == null)
@@ -85,7 +85,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/start")]
-		public async Task<IActionResult> StartGathering(ulong gatheringId)
+		public async Task<IActionResult> StartGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -95,7 +95,7 @@ namespace Frontier.Controllers
 		}
 
         [HttpDelete("{gatheringId}/edit")]
-        public async Task<IActionResult> EndGathering(ulong gatheringId)
+        public async Task<IActionResult> EndGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -105,7 +105,7 @@ namespace Frontier.Controllers
         }
 
         [HttpDelete("{gatheringId}")]
-        public async Task<IActionResult> DeleteGathering(ulong gatheringId)
+        public async Task<IActionResult> DeleteGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -115,7 +115,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{gatheringId}/visibility")]
-        public async Task<IActionResult> HideGathering(ulong gatheringId, bool hide)
+        public async Task<IActionResult> HideGathering(long gatheringId, bool hide)
 		{
 			return await Execute(async user =>
 			{
@@ -124,7 +124,7 @@ namespace Frontier.Controllers
         }
 
 		[HttpPost("{gatheringId}/survey")]
-		public async Task<IActionResult> SurveyGathering(ulong gatheringId)
+		public async Task<IActionResult> SurveyGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -134,7 +134,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPut("{gatheringId}/survey")]
-		public async Task<IActionResult> UnsurveyGathering(ulong gatheringId)
+		public async Task<IActionResult> UnsurveyGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -144,7 +144,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{gatheringId}")]
-        public async Task<IActionResult> JoinGathering(ulong gatheringId)
+        public async Task<IActionResult> JoinGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -154,7 +154,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/checkin")]
-        public async Task<IActionResult> CheckInToGathering(ulong gatheringId, float latitude, float longitude)
+        public async Task<IActionResult> CheckInToGathering(long gatheringId, float latitude, float longitude)
 		{
 			return await Execute(async user =>
 			{
@@ -164,7 +164,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPut("{gatheringId}")]
-		public async Task<IActionResult> LeaveGathering(ulong gatheringId)
+		public async Task<IActionResult> LeaveGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -174,7 +174,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/guests")]
-		public async Task<IActionResult> GetGuestList(ulong gatheringId)
+		public async Task<IActionResult> GetGuestList(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -183,7 +183,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/invite")]
-		public async Task<IActionResult> GetPotentialInvitees(ulong gatheringId)
+		public async Task<IActionResult> GetPotentialInvitees(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
@@ -192,7 +192,7 @@ namespace Frontier.Controllers
         }
 
 		[HttpPost("{gatheringId}/invite")]
-		public async Task<IActionResult> InviteUser(ulong gatheringId, ulong targetId)
+		public async Task<IActionResult> InviteUser(long gatheringId, long targetId)
 		{
 			return await Execute(async user =>
 			{
@@ -201,7 +201,7 @@ namespace Frontier.Controllers
         }
 
 		[HttpPut("{gatheringId}/guests")]
-		public async Task<IActionResult> KickUser(ulong gatheringId, ulong targetId)
+		public async Task<IActionResult> KickUser(long gatheringId, long targetId)
 		{
 			return await Execute(async user =>
 			{
@@ -210,25 +210,25 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/authorisation/start")]
-		public async Task<IActionResult> CheckStartAuthorisation(ulong gatheringId)
+		public async Task<IActionResult> CheckStartAuthorisation(long gatheringId)
 		{
 			return await Execute(async user => await gatherings.AuthorisedToStart(user.Id, gatheringId));
 		}
 
 		[HttpGet("{gatheringId}/authorisation/join")]
-		public async Task<IActionResult> CheckJoinAuthorisation(ulong gatheringId)
+		public async Task<IActionResult> CheckJoinAuthorisation(long gatheringId)
 		{
 			return await Execute(async user => await gatherings.AuthorisedToJoin(user.Id, gatheringId));
 		}
 
 		[HttpGet("{gatheringId}/authorisation/upload")]
-		public async Task<IActionResult> CheckUploadAuthorisation(ulong gatheringId)
+		public async Task<IActionResult> CheckUploadAuthorisation(long gatheringId)
 		{
 			return await Execute(async user => await gatherings.AuthorisedToUpload(user.Id, gatheringId));
 		}
 
 		[HttpPost("{gatheringId}/report")]
-		public async Task<IActionResult> ReportGathering(ulong gatheringId, [FromBody] GatheringReportManifest report)
+		public async Task<IActionResult> ReportGathering(long gatheringId, [FromBody] GatheringReportManifest report)
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)
@@ -241,7 +241,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/snapshots")]
-		public async Task<IActionResult> GetGallery(ulong gatheringId, ulong targetId)
+		public async Task<IActionResult> GetGallery(long gatheringId, long targetId)
 		{
 			return await Execute(async user =>
 			{
@@ -250,7 +250,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{gatheringId}/snapshots")]
-		public async Task<IActionResult> SnapshotGathering(ulong gatheringId, [FromForm] SnapshotManifest snapshot)
+		public async Task<IActionResult> SnapshotGathering(long gatheringId, [FromForm] SnapshotManifest snapshot)
         {
             // Verify parameters
             if (snapshot == null || !ModelState.IsValid ||
@@ -267,7 +267,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPut("{gatheringId}/snapshots/{snapshotId}")]
-		public async Task<IActionResult> RemoveSnapshot(ulong gatheringId, ulong snapshotId)
+		public async Task<IActionResult> RemoveSnapshot(long gatheringId, long snapshotId)
 		{
 			return await Execute(async user =>
 			{
@@ -276,7 +276,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{gatheringId}/snapshots/{snapshotId}")]
-		public async Task<IActionResult> AcclaimSnapshot(ulong gatheringId, ulong snapshotId, [FromBody] AccountRatingManifest details)
+		public async Task<IActionResult> AcclaimSnapshot(long gatheringId, long snapshotId, [FromBody] AccountRatingManifest details)
 		{
 			// Verify parameters
 			if (details == null || !ModelState.IsValid)
@@ -289,7 +289,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("{gatheringId}/snapshots/{snapshotId}/report")]
-		public async Task<IActionResult> ReportSnapshot(ulong gatheringId, ulong snapshotId, [FromBody] SnapshotReportManifest report)
+		public async Task<IActionResult> ReportSnapshot(long gatheringId, long snapshotId, [FromBody] SnapshotReportManifest report)
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)

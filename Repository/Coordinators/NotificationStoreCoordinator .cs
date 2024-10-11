@@ -16,17 +16,17 @@ namespace Repository
             return await store.GetAllTelegramsAsync(messageType);
         }
 
-        public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
+        public async Task<List<TelegramShard>> GetTelegramsAsync(long userId)
         {
             return await store.GetTelegramsAsync(userId);
         }
 
-        public async Task SaveTelegramAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, TelegramMessage message, string context)
+        public async Task SaveTelegramAsync(long recipientId, long notifierId, DateTimeOffset time, TelegramMessage message, string context)
         {
            await store.SaveTelegramAsync(recipientId, notifierId, time, message, context);
         }
 
-        public async Task DeleteTelegramAsync(ulong telegramId)
+        public async Task DeleteTelegramAsync(long telegramId)
         {
            await store.DeleteTelegramAsync(telegramId);
         }

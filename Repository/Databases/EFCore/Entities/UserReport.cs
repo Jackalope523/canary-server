@@ -6,10 +6,10 @@ namespace Repository
     {
         public UserReportType Type { get; set; }
 
-        public ulong Id { get; init; }
-        public ulong SelfId { get; init; }
-        public ulong OtherId { get; init; }
-        public ulong? GatheringId { get; init; }
+        public long Id { get; init; }
+        public long SelfId { get; init; }
+        public long OtherId { get; init; }
+        public long? GatheringId { get; init; }
         public DateTimeOffset FilingDate { get; init; }
         public string Notes { get; init; }
 

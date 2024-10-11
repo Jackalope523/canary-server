@@ -16,12 +16,12 @@ namespace Repository
             return await store.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character, notificationId);
         }
 
-        public async Task DeleteUserAsync(ulong id)
+        public async Task DeleteUserAsync(long id)
         {
             await store.DeleteUserAsync(id);
         }
 
-        public async Task<CoreUser> FindUserByIdAsync(ulong id) 
+        public async Task<CoreUser> FindUserByIdAsync(long id) 
         {
             return await store.FindUserByIdAsync(id);
         }
@@ -36,27 +36,27 @@ namespace Repository
             return await store.FindUserByEmailAsync(email);
         }
 
-        public async Task<HauntShard> GetUserHauntAsync(ulong id)
+        public async Task<HauntShard> GetUserHauntAsync(long id)
         {
             return await store.GetUserHauntAsync(id);
         }
 
-        public async Task<LocationShard> GetRecentLocationAsync(ulong id)
+        public async Task<LocationShard> GetRecentLocationAsync(long id)
         {
             return await store.GetRecentLocationAsync(id);
         }    
 
-        public async Task UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)
+        public async Task UpdateUserAsync(long id, List<(string Property, object Value)> edits)
         {
             await store.UpdateUserAsync(id, edits);
         }
 
-        public async Task UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
+        public async Task UpdateHauntAsync(long id, double latitude, double longitude, double radius, int stability)
         {
             await store.UpdateHauntAsync(id, latitude, longitude, radius, stability);
         }
 
-        public async Task UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
+        public async Task UpdateRecentLocationAsync(long id, double latitude, double longitude, double radius)
         {
             await store.UpdateRecentLocationAsync(id, latitude, longitude, radius);
         }

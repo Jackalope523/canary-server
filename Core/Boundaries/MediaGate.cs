@@ -15,28 +15,28 @@ namespace Core.Boundaries
     {
         Task<MemoryStream> DownloadAssetAsync(string asset);
 
-        Task<MemoryStream> DownloadAvatarAsync(ulong userId);
-        Task UploadAvatarAsync(ulong userId, MemoryStream image);
-        Task DeleteAvatarAsync(ulong userId);
+        Task<MemoryStream> DownloadAvatarAsync(long userId);
+        Task UploadAvatarAsync(long userId, MemoryStream image);
+        Task DeleteAvatarAsync(long userId);
 
-        Task<MemoryStream> DownloadHeroAsync(ulong gatheringId);
-        Task UploadHeroAsync(ulong gatheringId, MemoryStream image);
-        Task DeleteHeroAsync(ulong gatheringId);
+        Task<MemoryStream> DownloadHeroAsync(long gatheringId);
+        Task UploadHeroAsync(long gatheringId, MemoryStream image);
+        Task DeleteHeroAsync(long gatheringId);
 
-        Task<MemoryStream> DownloadSnapshotAsync(ulong snapshotId, ulong ownerId);
-        Task UploadSnapshotAsync(ulong snapshotId, ulong ownerId, MemoryStream image);
-        Task DeleteSnapshotAsync(ulong snapshotId, ulong ownerId);
+        Task<MemoryStream> DownloadSnapshotAsync(long snapshotId, long ownerId);
+        Task UploadSnapshotAsync(long snapshotId, long ownerId, MemoryStream image);
+        Task DeleteSnapshotAsync(long snapshotId, long ownerId);
     }
 
     public interface IMediaOperations
     {
         Task<MemoryStream> GetAssetAsync(string asset);
-        Task<MemoryStream> GetAvatarAsync(ulong userId, ulong targetId);
-        Task<ImageMetadataShard> GetAvatarMetadataAsync(ulong userId, ulong targetId);
-        Task<MemoryStream> GetHeaderAsync(ulong userId, ulong gatheringId);
-        Task<ImageMetadataShard> GetHeaderMetadataAsync(ulong userId, ulong gatheringId);
-        Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId);
-        Task<ImageMetadataShard> GetSnapshotMetadataAsync(ulong userId, ulong snapshotId);
+        Task<MemoryStream> GetAvatarAsync(long userId, long targetId);
+        Task<ImageMetadataShard> GetAvatarMetadataAsync(long userId, long targetId);
+        Task<MemoryStream> GetHeaderAsync(long userId, long gatheringId);
+        Task<ImageMetadataShard> GetHeaderMetadataAsync(long userId, long gatheringId);
+        Task<MemoryStream> GetSnapshotAsync(long userId, long snapshotId);
+        Task<ImageMetadataShard> GetSnapshotMetadataAsync(long userId, long snapshotId);
     }
 
     #endregion

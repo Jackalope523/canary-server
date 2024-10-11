@@ -126,7 +126,7 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByIdAsync_UserNotFound()
         {
-            Func<Task> action = async () => await store.FindUserByIdAsync(ulong.MaxValue);
+            Func<Task> action = async () => await store.FindUserByIdAsync(long.MaxValue);
 
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }     
@@ -810,7 +810,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetUserHauntAsync_UserNotFound()
         {
-            Func<Task> action = async () => await store.GetUserHauntAsync(ulong.MaxValue);
+            Func<Task> action = async () => await store.GetUserHauntAsync(long.MaxValue);
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
@@ -826,7 +826,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetRecentUserLocationAsync_UserNotFound()
         {
-            Func<Task> action = async () => await store.GetRecentLocationAsync(ulong.MaxValue);
+            Func<Task> action = async () => await store.GetRecentLocationAsync(long.MaxValue);
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 

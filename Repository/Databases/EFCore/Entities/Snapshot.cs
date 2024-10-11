@@ -2,9 +2,9 @@ namespace Repository
 {
     public class Snapshot
     {
-        public ulong Id { get; set; }
-        public ulong OwnerId { get; set; }
-        public ulong GatheringId { get; set; }
+        public long Id { get; set; }
+        public long OwnerId { get; set; }
+        public long GatheringId { get; set; }
         public DateTimeOffset PostedAt { get; init; }
 
         // Navigation Properties

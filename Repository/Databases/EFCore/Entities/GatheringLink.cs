@@ -3,9 +3,9 @@ namespace Repository
 {
     public class GatheringLink
     {
-        public ulong Id { get; set; }
-        public ulong UserId { get; set; }
-        public ulong GatheringId { get; set; }
+        public long Id { get; set; }
+        public long UserId { get; set; }
+        public long GatheringId { get; set; }
         public DateTimeOffset Time { get; set; }
         public GatheringBond Type { get; set; }
 

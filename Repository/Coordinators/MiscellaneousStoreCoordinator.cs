@@ -14,7 +14,7 @@
             await store.SaveFeedbackAsync(comments, time);
         }
 
-        public async Task SaveFeedbackAsync(string comments, DateTimeOffset time, ulong userId)
+        public async Task SaveFeedbackAsync(string comments, DateTimeOffset time, long userId)
         {
             await store.SaveFeedbackAsync(comments, time, userId);
         }

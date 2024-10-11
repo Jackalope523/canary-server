@@ -4,7 +4,7 @@ namespace Repository
 {
     public class Banner
     {
-        public ulong Id { get; set; }
+        public long Id { get; set; }
 
         public string Name { get; set; } = DefaultName;
         public string Description { get; set; } = DefaultDescription;
@@ -15,7 +15,7 @@ namespace Repository
         public List<BannerLink>? Links { get; set; }
 
         // Default Values
-        public static ulong DefaultId { get; set; } = ulong.MinValue;
+        public static long DefaultId { get; set; } = long.MinValue;
         public static string DefaultName { get; set; } = "";
         public static string DefaultDescription { get; set; } = "";
         public static string DefaultCode { get; set; } = "";

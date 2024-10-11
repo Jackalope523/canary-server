@@ -10,10 +10,10 @@ namespace Core.Boundaries
     public enum SnapshotAcclaim
     { Acclaim, Remove }
 
-	public record GatheringHeader(ulong Id, string Title, DateTimeOffset Time, bool IsActive, DateTimeOffset LastActiveTime,
+	public record GatheringHeader(long Id, string Title, DateTimeOffset Time, bool IsActive, DateTimeOffset LastActiveTime,
         string FriendlyLocation);
 
-    public record SnapshotShard(ulong Id, ulong GatheringId, UserShard User,
+    public record SnapshotShard(long Id, long GatheringId, UserShard User,
         DateTimeOffset TimeTaken, int Acclaim);
 
     public record ColumnShard(List<GatheringHeader> Headers, List<SnapshotShard> Snapshots);
@@ -26,27 +26,27 @@ namespace Core.Boundaries
 
     public interface ISnapshotDatabase
     {
-        Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(ulong gatheringId);
-        Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong userId);
-        Task<SnapshotShard> GetSnapshotAsync(ulong snapshotId);
-        Task<SnapshotShard> AddSnapshotAsync(ulong gatheringId, ulong etcherId,
+        Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(long gatheringId);
+        Task<List<SnapshotShard>> GetSnapshotsByUserAsync(long userId);
+        Task<SnapshotShard> GetSnapshotAsync(long snapshotId);
+        Task<SnapshotShard> AddSnapshotAsync(long gatheringId, long etcherId,
             DateTimeOffset timeTaken);
-		Task DeleteSnapshotAsync(ulong snapshotId);
+		Task DeleteSnapshotAsync(long snapshotId);
 
-		Task AcclaimSnapshotAsync(ulong snapshotId, ulong voterId);
-		Task DeleteSnapshotAcclaimAsync(ulong snapshotId, ulong voterId);
+		Task AcclaimSnapshotAsync(long snapshotId, long voterId);
+		Task DeleteSnapshotAcclaimAsync(long snapshotId, long voterId);
 
-        Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
+        Task<List<SnapshotShard>> GenerateColumnForUserAsync(long userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
     }
 
     public interface ISnapshotOperations
     {
-        Task<GalleryShard> GetGalleryAsync(ulong userId, ulong targetId, ulong gatheringId);
-        Task<SnapshotShard> AddSnapshotAsync(ulong userId, ulong gatheringId, MemoryStream image);
-        Task DeleteSnapshotAsync(ulong userId, ulong snapshotId);
-        Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, SnapshotAcclaim acclaim);
+        Task<GalleryShard> GetGalleryAsync(long userId, long targetId, long gatheringId);
+        Task<SnapshotShard> AddSnapshotAsync(long userId, long gatheringId, MemoryStream image);
+        Task DeleteSnapshotAsync(long userId, long snapshotId);
+        Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim);
 
-        Task<ColumnShard> GetUserColumnAsync(ulong userId, int depth, int lastDepth);
+        Task<ColumnShard> GetUserColumnAsync(long userId, int depth, int lastDepth);
     }
 
 	#endregion

@@ -5,7 +5,7 @@ namespace Repository
 {
     public class User
     {
-        public ulong Id { get; init; } = DefaultId;
+        public long Id { get; init; } = DefaultId;
         public string PhoneNumber { get; set; } = DefaultPhoneNumber;
         public string Email { get; set; } = DefaultEmail;
         public string NormalisedEmail { get; set; } = DefaultNormalisedEmail;
@@ -20,7 +20,7 @@ namespace Repository
         public DateTimeOffset? LockoutDate { get; set; } = DefaultLockoutDate;
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
-        public ulong? CurrentGathering { get; set; } = DefaultCurrentGathering;
+        public long? CurrentGathering { get; set; } = DefaultCurrentGathering;
         public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
         public DateTimeOffset TimeOfUserAgreement { get; set; } = DefaultTimeOfUserAgreement;
         public Guid NotificationId { get; set; }
@@ -63,7 +63,7 @@ namespace Repository
 
 
         // Default Values
-        public static ulong DefaultId { get; set; } = ulong.MinValue;
+        public static long DefaultId { get; set; } = long.MinValue;
         public static string DefaultPhoneNumber { get; set; } = "8199198013";
         public static string DefaultEmail { get; set; } = "JohnDoe@Test.com";
         public static string DefaultNormalisedEmail { get; set; } = "johndoe@test.com";
@@ -78,7 +78,7 @@ namespace Repository
         public static DateTimeOffset? DefaultLockoutDate { get; set; } = null;
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
-        public static ulong? DefaultCurrentGathering { get; set; } = null;
+        public static long? DefaultCurrentGathering { get; set; } = null;
         public static bool DefaultIsPendingDeletion { get; set; } = false;
         public static DateTimeOffset DefaultTimeOfUserAgreement { get; set; } = DateTimeOffset.MinValue;
 

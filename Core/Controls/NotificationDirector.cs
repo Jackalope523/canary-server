@@ -20,14 +20,14 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<TelegramShard>> GetTelegramsAsync(ulong userId)
+		public async Task<List<TelegramShard>> GetTelegramsAsync(long userId)
 		{
 			var user = await GetUserAsync(userId);
 
 			return await Telegrams.GetTelegramsAsync(user.Id);
 		}
 
-		public async Task ClearTelegramsAsync(ulong userId)
+		public async Task ClearTelegramsAsync(long userId)
 		{
 			var user = await GetUserAsync(userId);
 
@@ -42,7 +42,7 @@ namespace Core.Controls
 			}
 		}
 
-		public async Task ClearTelegramsAsync(ulong userId, List<ulong> telegramIds)
+		public async Task ClearTelegramsAsync(long userId, List<long> telegramIds)
 		{
 			var user = await GetUserAsync(userId);
 

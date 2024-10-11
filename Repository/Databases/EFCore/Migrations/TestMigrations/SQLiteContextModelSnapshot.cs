@@ -20,7 +20,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Banner", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -51,17 +51,17 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.BannerLink", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("BannerId")
+                    b.Property<long>("BannerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -75,11 +75,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("PenalizedId")
+                    b.Property<long>("PenalizedId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -97,7 +97,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -109,7 +109,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<int>("DeviceType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -121,7 +121,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -133,19 +133,19 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<int>("Message")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("NotifierId")
+                    b.Property<long>("NotifierId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("RecipientId")
+                    b.Property<long>("RecipientId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong?>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -157,7 +157,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Feedback", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -169,7 +169,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong?>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -181,7 +181,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -222,7 +222,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<int>("GroupMinimum")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("HostId")
+                    b.Property<long>("HostId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Industriousness")
@@ -271,11 +271,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("GatheringId")
+                    b.Property<long>("GatheringId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -284,7 +284,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -298,14 +298,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong>("GatheringId")
+                    b.Property<long>("GatheringId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
@@ -316,7 +316,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -330,20 +330,20 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Degree")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("GatheringId")
+                    b.Property<long>("GatheringId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -358,14 +358,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.Snapshot", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("GatheringId")
+                    b.Property<long>("GatheringId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("OwnerId")
+                    b.Property<long>("OwnerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("PostedAt")
@@ -382,11 +382,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("SnapshotId")
+                    b.Property<long>("SnapshotId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -395,7 +395,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -410,7 +410,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -422,13 +422,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong>("SnapshotId")
+                    b.Property<long>("SnapshotId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -442,7 +442,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.User", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -464,7 +464,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<int>("Competitiveness")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong?>("CurrentGathering")
+                    b.Property<long?>("CurrentGathering")
                         .HasColumnType("INTEGER");
 
                     b.Property<Point>("CurrentLocation")
@@ -562,14 +562,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.UserRelationship", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("OtherId")
+                    b.Property<long>("OtherId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("SelfId")
+                    b.Property<long>("SelfId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -590,14 +590,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
             modelBuilder.Entity("Repository.UserReport", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong?>("GatheringId")
+                    b.Property<long?>("GatheringId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
@@ -605,10 +605,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong>("OtherId")
+                    b.Property<long>("OtherId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<ulong>("SelfId")
+                    b.Property<long>("SelfId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")

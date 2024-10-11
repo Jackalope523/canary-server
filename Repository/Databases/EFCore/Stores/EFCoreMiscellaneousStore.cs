@@ -11,7 +11,7 @@
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Feedback.Add(new() {Comments = comments, Time = time }));
         }
 
-        public async Task SaveFeedbackAsync(string comments, DateTimeOffset time, ulong userId)
+        public async Task SaveFeedbackAsync(string comments, DateTimeOffset time, long userId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Feedback.Add(new() { Comments = comments, Time = time, UserId = userId }));
         }

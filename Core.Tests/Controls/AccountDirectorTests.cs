@@ -34,7 +34,7 @@ namespace Core.Tests.Controls
 		public async Task GetUserAsync_InvalidId_ThrowsException()
 		{
 			// Act
-			var userSync = director.GetCoreUserAsync(ulong.MaxValue);
+			var userSync = director.GetCoreUserAsync(long.MaxValue);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await userSync);

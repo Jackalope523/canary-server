@@ -24,7 +24,7 @@ namespace Core.Controls
 			return await Media.DownloadAssetAsync(asset);
 		}
 
-		public async Task<MemoryStream> GetAvatarAsync(ulong userId, ulong targetId)
+		public async Task<MemoryStream> GetAvatarAsync(long userId, long targetId)
 		{
 			var user = await GetUserAsync(userId);
 			User targetUser = new() { Id = targetId };
@@ -37,7 +37,7 @@ namespace Core.Controls
 			return stream;
 		}
 
-		public async Task<ImageMetadataShard> GetAvatarMetadataAsync(ulong userId, ulong targetId)
+		public async Task<ImageMetadataShard> GetAvatarMetadataAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             User targetUser = new() { Id = targetId };
@@ -56,7 +56,7 @@ namespace Core.Controls
             return new(await hashSync, false);
         }
 
-        public async Task<MemoryStream> GetHeaderAsync(ulong userId, ulong gatheringId)
+        public async Task<MemoryStream> GetHeaderAsync(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -69,7 +69,7 @@ namespace Core.Controls
             return stream;
         }
 
-        public async Task<ImageMetadataShard> GetHeaderMetadataAsync(ulong userId, ulong gatheringId)
+        public async Task<ImageMetadataShard> GetHeaderMetadataAsync(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
@@ -88,7 +88,7 @@ namespace Core.Controls
             return new(await hashSync, false);
         }
 
-        public async Task<MemoryStream> GetSnapshotAsync(ulong userId, ulong snapshotId)
+        public async Task<MemoryStream> GetSnapshotAsync(long userId, long snapshotId)
         {
             var user = await GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -105,7 +105,7 @@ namespace Core.Controls
             return stream;
         }
 
-        public async Task<ImageMetadataShard> GetSnapshotMetadataAsync(ulong userId, ulong snapshotId)
+        public async Task<ImageMetadataShard> GetSnapshotMetadataAsync(long userId, long snapshotId)
         {
             var user = await GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -132,17 +132,17 @@ namespace Core.Controls
 
         #region Favours
 
-        public async Task UploadAvatarAsync(ulong userId, MemoryStream image)
+        public async Task UploadAvatarAsync(long userId, MemoryStream image)
 		{
 			await Media.UploadAvatarAsync(userId, image);
 		}
 
-		public async Task UploadHeroAsync(ulong gatheringId, MemoryStream image)
+		public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
 		{
 			await Media.UploadHeroAsync(gatheringId, image);
 		}
 
-        public async Task UploadSnapshotAsync(ulong userId, ulong snapshotId, MemoryStream image)
+        public async Task UploadSnapshotAsync(long userId, long snapshotId, MemoryStream image)
 		{
 			await Media.UploadSnapshotAsync(snapshotId, userId, image);
 		}

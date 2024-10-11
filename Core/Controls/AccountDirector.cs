@@ -21,7 +21,7 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<CoreUser> GetCoreUserAsync(ulong userId)
+		public async Task<CoreUser> GetCoreUserAsync(long userId)
         {
             return (await GetUserAsync(userId)).ToCoreUser();
         }
@@ -35,12 +35,12 @@ namespace Core.Controls
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
 		}
 
-		public async Task<AccountShard> GetAccountShardAsync(ulong userId)
+		public async Task<AccountShard> GetAccountShardAsync(long userId)
         {
             return (await GetUserAsync(userId)).ToAccountShard();
         }
 
-		public async Task<UserShard> GetUserShardAsync(ulong userId)
+		public async Task<UserShard> GetUserShardAsync(long userId)
         {
             return (await GetUserAsync(userId)).ToUserShard();
         }
@@ -88,7 +88,7 @@ namespace Core.Controls
             await Banners.AddUserToBannerAsync(user.Id, banner.Id, Time);
         }
 
-        public async Task EditUserAsync(ulong userId,
+        public async Task EditUserAsync(long userId,
             string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
 			string securityStamp = null, DateTimeOffset? lockoutDate = null, int? accessTries = null)
@@ -156,7 +156,7 @@ namespace Core.Controls
             await Accounts.UpdateUserAsync(user.Id, edits);
 		}
 
-        public async Task UpdateUserAgreement(ulong userId)
+        public async Task UpdateUserAgreement(long userId)
         {
             var user = await GetUserAsync(userId);
 
@@ -164,19 +164,19 @@ namespace Core.Controls
                 new() { (nameof(CoreUser.TimeOfUserAgreement), Time) });
         }
 
-        public async Task EditAvatarAsync(ulong userId, MemoryStream image)
+        public async Task EditAvatarAsync(long userId, MemoryStream image)
         {
             var user = await GetUserAsync(userId);
 
             await Terminal.MediaDirector.UploadAvatarAsync(user.Id, image);
         }
 
-        public async Task DeleteUserAsync(ulong userId)
+        public async Task DeleteUserAsync(long userId)
         {
             await Accounts.DeleteUserAsync(userId);
         }
 
-        public async Task UpdateUserLocationAsync(ulong userId, double latitude, double longitude)
+        public async Task UpdateUserLocationAsync(long userId, double latitude, double longitude)
 		{
 			var user = await base.GetUserAsync(userId);
             var userIsAtGathering = user.IsAtGathering();

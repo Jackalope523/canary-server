@@ -31,7 +31,7 @@ namespace Frontier.Controllers
         }
 
 		[HttpPut]
-		public async Task<IActionResult> ClearTelegram([FromBody] List<ulong> telegramIds)
+		public async Task<IActionResult> ClearTelegram([FromBody] List<long> telegramIds)
 		{
 			return await Execute(async user =>
 			{

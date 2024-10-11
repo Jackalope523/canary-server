@@ -12,11 +12,11 @@ namespace Repository
         {
         }
 
-        private async Task PropagateClearance(ulong userId, ulong gatheringId, int degree, List<ulong> exclusionList)
+        private async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList)
         {
             if (degree == 0) return;
 
-            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.GuestClearances.
                 Where(c => c.GatheringId == gatheringId && c.UserId == userId).
                 Select(c => c.Id).
@@ -36,33 +36,33 @@ namespace Repository
             }
             else return;
 
-            Task<List<ulong>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+            Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
                 ctx.UserLinks.
                 Where(l => !exclusionList.Contains(l.OtherId) && l.SelfId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
                 Select(l => l.OtherId).
                 ToListAsync());
 
-            Task<List<ulong>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+            Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
                 ctx.UserLinks.
                 Where(l => !exclusionList.Contains(l.SelfId) && l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
                 Select(l => l.SelfId).
                 ToListAsync());
 
-            List<ulong> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
+            List<long> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
 
             List<Task> tasks = new();
-            foreach (ulong companion in companions)
+            foreach (long companion in companions)
             {
                 tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).ToList()));
             }
             await Task.WhenAll(tasks);
         }
 
-        private async Task UpdateClearance(ulong gatheringId, int previousDegreeOfPrivacy, int newDegreeOfPrivacy)
+        private async Task UpdateClearance(long gatheringId, int previousDegreeOfPrivacy, int newDegreeOfPrivacy)
         {
             if (previousDegreeOfPrivacy < newDegreeOfPrivacy)
             {
-                List<ulong> edgeUsers = await storeSentry.ExecuteReadAsync(ctx =>
+                List<long> edgeUsers = await storeSentry.ExecuteReadAsync(ctx =>
                     ctx.GuestClearances.
                     Where(c => c.GatheringId == gatheringId && c.Degree == previousDegreeOfPrivacy).
                     Select(c => c.UserId).
@@ -70,7 +70,7 @@ namespace Repository
 
 
                 List<Task> tasks = new();
-                foreach (ulong user in edgeUsers)
+                foreach (long user in edgeUsers)
                 {
                     tasks.Add(PropagateClearance(user, gatheringId, newDegreeOfPrivacy - previousDegreeOfPrivacy, new(edgeUsers)));
                 }
@@ -89,7 +89,7 @@ namespace Repository
             }
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(ulong hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy)
+        public async Task<CoreGathering> CreateGatheringAsync(long hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy)
         {
             Gathering toCreate = new()
             {
@@ -162,16 +162,16 @@ namespace Repository
                    toCreate.DegreeOfPrivacy
                    );
         }
-        public async Task DeleteGatheringAsync(ulong gatheringId)
+        public async Task DeleteGatheringAsync(long gatheringId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => 
                 ctx.Gatherings.
                 Where(e => e.Id == gatheringId).
                 ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
         }
-        public async Task<CoreGathering> FindCurrentGatheringForUserAsync(ulong id) 
+        public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
         {
-            ulong? currentGathering = await storeSentry.ExecuteReadAsync(ctx =>
+            long? currentGathering = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Users.
             Where(u => u.Id == id).
             Select(u => u.CurrentGathering).
@@ -224,7 +224,7 @@ namespace Repository
             }
             return gathering;          
         }
-        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(ulong id) 
+        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id) 
         {
              List<CoreGathering> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
              ctx.GatheringLinks.
@@ -294,7 +294,7 @@ namespace Repository
                     e.DegreeOfPrivacy
                  )).ToListAsync());
 
-            List<ulong> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
+            List<long> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.GatheringLinks.
                Where(l => l.UserId == id && l.Type == GatheringBond.Arrived).
                Select(l => l.GatheringId). 
@@ -311,7 +311,7 @@ namespace Repository
 
             return upcomingGatherings;
         }
-        public async Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(ulong id) 
+        public async Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(long id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
              ctx.GatheringLinks.
@@ -381,7 +381,7 @@ namespace Repository
                     e.DegreeOfPrivacy
                  )).ToListAsync());
         }
-        public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(ulong id)
+        public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -451,7 +451,7 @@ namespace Repository
                    e.DegreeOfPrivacy
                 )).ToListAsync());
         }
-        public async Task<CoreGathering> FindGatheringAsync(ulong id)
+        public async Task<CoreGathering> FindGatheringAsync(long id)
         {
             CoreGathering gathering = await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Gatherings.
@@ -534,7 +534,7 @@ namespace Repository
                         e.DegreeOfPrivacy
                    )).ToListAsync());
         }     
-        public async Task<List<UserShard>> GetGuestListAsync(ulong id)
+        public async Task<List<UserShard>> GetGuestListAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -547,7 +547,7 @@ namespace Repository
                 ).
             ToListAsync());
         }    
-        public async Task DeleteUserStateAsync(ulong userId, ulong gatheringId) 
+        public async Task DeleteUserStateAsync(long userId, long gatheringId) 
         { 
             GatheringLink link = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.
@@ -585,7 +585,7 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
-        public async Task UpdateGatheringAsync(ulong id, List<(string Property, object Value)> edits)
+        public async Task UpdateGatheringAsync(long id, List<(string Property, object Value)> edits)
         {
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
@@ -644,7 +644,7 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }   
-        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(ulong id)
+        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(long id)
         {
             var times = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -657,7 +657,7 @@ namespace Repository
                 ).
             ToListAsync());
 
-            Dictionary<ulong,List<(string, DateTimeOffset, GatheringBond)>> history = new();
+            Dictionary<long,List<(string, DateTimeOffset, GatheringBond)>> history = new();
             foreach (var item in times)
             {
                 if (!history.ContainsKey(item.Id)) history.Add(item.Id, new());
@@ -665,7 +665,7 @@ namespace Repository
             }
 
             List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)> toReturn = new();
-            ulong userId;
+            long userId;
             string userName;
             DateTimeOffset arrivalTime;
             DateTimeOffset? departureTime;
@@ -687,7 +687,7 @@ namespace Repository
 
             return toReturn;
         }      
-        public async Task<List<CoreGathering>> FindGatheringsByUserAsync(ulong userId)
+        public async Task<List<CoreGathering>> FindGatheringsByUserAsync(long userId)
         {
            return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.Gatherings.
@@ -726,7 +726,7 @@ namespace Repository
                     e.DegreeOfPrivacy
                     )).ToListAsync());
         }      
-        public async Task<GatheringBond?> GetUserStateAsync(ulong userId, ulong gatheringId)
+        public async Task<GatheringBond?> GetUserStateAsync(long userId, long gatheringId)
         {
             var states = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -738,7 +738,7 @@ namespace Repository
 
             return states.Last().Type;
         }
-        public async Task SetUserStateAsync(ulong userId, ulong gatheringId, GatheringBond userState, DateTimeOffset time)
+        public async Task SetUserStateAsync(long userId, long gatheringId, GatheringBond userState, DateTimeOffset time)
         {
             GatheringLink toAdd = new() 
             { 
@@ -748,7 +748,7 @@ namespace Repository
                 Time = time
             };
 
-            ulong id = await storeSentry.ExecuteReadAsync(ctx => 
+            long id = await storeSentry.ExecuteReadAsync(ctx => 
                        ctx.GatheringLinks.
                        Where(l => l.UserId == userId && l.GatheringId == gatheringId && l.Type == userState).
                        Select(l => l.Id).
@@ -798,7 +798,7 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
-        public async Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId)
+        public async Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(long gatheringId)
         {
             var users = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -811,7 +811,7 @@ namespace Repository
                 ).
             ToListAsync());
 
-            Dictionary<ulong, List<(string, DateTimeOffset, GatheringBond)>> history = new();
+            Dictionary<long, List<(string, DateTimeOffset, GatheringBond)>> history = new();
             foreach (var item in users)
             {
                 if (!history.ContainsKey(item.Id)) history.Add(item.Id, new());
@@ -819,7 +819,7 @@ namespace Repository
             }
 
             List<(UserShard User, GatheringBond State)> toReturn = new();
-            ulong userId;
+            long userId;
             string userName;
             GatheringBond userState;
             foreach (var entry in history)
@@ -834,16 +834,16 @@ namespace Repository
             }
             return toReturn;
         }
-        public async Task TerminateGatheringAsync(ulong id, DateTimeOffset time)
+        public async Task TerminateGatheringAsync(long id, DateTimeOffset time)
         {
-            List<ulong> guests = await storeSentry.ExecuteReadAsync(ctx => 
+            List<long> guests = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Users.
                 Where(u => u.CurrentGathering == id).
                 Select(u => u.Id).
                 ToListAsync());
 
             List<Task> tasks = new();
-            foreach (ulong guest in guests)
+            foreach (long guest in guests)
             {
                 tasks.Add(SetUserStateAsync(guest, id, GatheringBond.Left, time));
             }
@@ -859,9 +859,9 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(currentDiscussion);         
         }
 
-        public async Task<bool> UserIsAuthorizedGuest(ulong userId, ulong gatheringId)
+        public async Task<bool> UserIsAuthorizedGuest(long userId, long gatheringId)
         {
-            ulong id = await storeSentry.ExecuteReadAsync(ctx => 
+            long id = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GuestClearances.
                 Where(c => c.GatheringId == gatheringId && c.UserId == userId).
                 Select(c => c.Id).
@@ -870,7 +870,7 @@ namespace Repository
             return id != 0;
         }
 
-        public async Task<List<ulong>> GetAuthorizedGuests(ulong gatheringId)
+        public async Task<List<long>> GetAuthorizedGuests(long gatheringId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GuestClearances.
@@ -879,7 +879,7 @@ namespace Repository
                 ToListAsync());
         }
 
-        public async Task AddGuestAuthorization(ulong gatheringId, ulong userId)
+        public async Task AddGuestAuthorization(long gatheringId, long userId)
         {
             GuestClearance toAdd = new()
             {
