@@ -2,8 +2,8 @@
 {
     public class Feedback
     {
-        public ulong Id { get; set; }
-        public ulong UserId { get; set; }
+        public long Id { get; set; }
+        public long UserId { get; set; }
         public DateTimeOffset Time { get; set; }
         public string Comments { get; set; }
 

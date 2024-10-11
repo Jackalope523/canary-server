@@ -141,7 +141,7 @@ namespace Repository.Tests
             await BulkWritePost(e1, e2, e3, e4, e5, j1, j2, j3, j4, m1, m2, m3, x1, x2, x3);
 
 
-            List<ulong> exclusionList = new() { kilo.Id };
+            List<long> exclusionList = new() { kilo.Id };
             var retrieved = await store.GenerateColumnForUserAsync(subject.Id, depthCharge, timeA);
 
 

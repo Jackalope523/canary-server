@@ -19,7 +19,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Banners",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
@@ -35,7 +35,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
@@ -51,7 +51,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     LockoutDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     AccessTries = table.Column<int>(type: "INTEGER", nullable: false),
                     AccountStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    CurrentGathering = table.Column<ulong>(type: "INTEGER", nullable: true),
+                    CurrentGathering = table.Column<long>(type: "INTEGER", nullable: true),
                     IsPendingDeletion = table.Column<bool>(type: "INTEGER", nullable: false),
                     TimeOfUserAgreement = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     NotificationId = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -80,10 +80,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "BannerLinks",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    BannerId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    BannerId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -107,9 +107,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Feedback",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: true),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: true),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Comments = table.Column<string>(type: "TEXT", maxLength: 300, nullable: false)
                 },
@@ -127,12 +127,12 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Gatherings",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    HostId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    HostId = table.Column<long>(type: "INTEGER", nullable: false),
                     Location = table.Column<Point>(type: "POINT", nullable: false)
                         .Annotation("Sqlite:Srid", 4326),
                     FriendlyLocation = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
@@ -169,9 +169,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Penalties",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    PenalizedId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    PenalizedId = table.Column<long>(type: "INTEGER", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
                 },
@@ -190,9 +190,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Subscriptions",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     DeviceType = table.Column<int>(type: "INTEGER", nullable: false),
                     DeviceToken = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false)
                 },
@@ -211,15 +211,15 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Telegrams",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    NotifierId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    RecipientId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    NotifierId = table.Column<long>(type: "INTEGER", nullable: false),
+                    RecipientId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Message = table.Column<int>(type: "INTEGER", nullable: false),
                     Action = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: true)
+                    UserId = table.Column<long>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -235,10 +235,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "UserLinks",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SelfId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    OtherId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    SelfId = table.Column<long>(type: "INTEGER", nullable: false),
+                    OtherId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -263,10 +263,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "GatheringLinks",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -291,11 +291,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "GatheringReports",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
                 },
@@ -320,10 +320,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "GuestClearances",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Degree = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -348,10 +348,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Snapshots",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    OwnerId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    OwnerId = table.Column<long>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -375,12 +375,12 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "UserReports",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    SelfId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    OtherId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GatheringId = table.Column<ulong>(type: "INTEGER", nullable: true),
+                    SelfId = table.Column<long>(type: "INTEGER", nullable: false),
+                    OtherId = table.Column<long>(type: "INTEGER", nullable: false),
+                    GatheringId = table.Column<long>(type: "INTEGER", nullable: true),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
                 },
@@ -410,10 +410,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "SnapshotLinks",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    SnapshotId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    SnapshotId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -438,11 +438,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "SnapshotReports",
                 columns: table => new
                 {
-                    Id = table.Column<ulong>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    SnapshotId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    SnapshotId = table.Column<long>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
                 },

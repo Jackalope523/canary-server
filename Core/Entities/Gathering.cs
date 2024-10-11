@@ -38,7 +38,7 @@ namespace Core.Entities
 		///////////////
 
         // Core
-		public ulong Id { get; init; }
+		public long Id { get; init; }
         public User Host { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }

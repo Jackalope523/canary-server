@@ -56,7 +56,7 @@ namespace Core.Daemons
 
                 try
                 {
-                    ulong gatheringId = ulong.Parse(telegram.Context);
+                    long gatheringId = long.Parse(telegram.Context);
                     var gathering = await terminal.GatheringDatabase.FindGatheringAsync(gatheringId);
 
                     // Check if gathering has ended

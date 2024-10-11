@@ -16,7 +16,7 @@ namespace Core.Controls
 
         #region Operations
 
-        public async Task<string> GetCanaryMapKeyAsync(ulong userId)
+        public async Task<string> GetCanaryMapKeyAsync(long userId)
         {
             await GetUserAsync(userId);
 

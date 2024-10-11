@@ -16,14 +16,14 @@ namespace Core.Controls
 
         #region Operations
 
-        public async Task ReceiveFeedback(ulong userId, string comments)
+        public async Task ReceiveFeedback(long userId, string comments)
         {
             var user = await GetUserAsync(userId);
 
             await Miscellaneous.SaveFeedbackAsync(comments, Time, user.Id);
         }
 
-        public async Task ReceiveAnonymousFeedback(ulong userId, string pseudonym, string comments)
+        public async Task ReceiveAnonymousFeedback(long userId, string pseudonym, string comments)
         {
             await GetUserAsync(userId); // Just to verify account, promise :)
 

@@ -6,10 +6,10 @@ namespace Core.Boundaries
 {
 	#region Schema
 
-    public record CoreBanner(ulong Id, string Banner, string Colour, string Code)
+    public record CoreBanner(long Id, string Banner, string Colour, string Code)
 		: CoreOnlyData();
 
-	public record BannerShard(ulong Id, string Banner, string Colour);
+	public record BannerShard(long Id, string Banner, string Colour);
 
     #endregion
 
@@ -17,21 +17,21 @@ namespace Core.Boundaries
 
     public interface IBannerDatabase
 	{
-		Task<CoreBanner> FindBannerByIdAsync(ulong bannerId);
+		Task<CoreBanner> FindBannerByIdAsync(long bannerId);
 		Task<CoreBanner> FindBannerByCodeAsync(string code);
 
-        Task<CoreBanner> FindBannerForUserAsync(ulong userId);
-		Task AddUserToBannerAsync(ulong userId, ulong bannerId, DateTimeOffset time);
+        Task<CoreBanner> FindBannerForUserAsync(long userId);
+		Task AddUserToBannerAsync(long userId, long bannerId, DateTimeOffset time);
 
-		Task<List<UserShard>> GetBannerMembersAsync(ulong bannerId);
+		Task<List<UserShard>> GetBannerMembersAsync(long bannerId);
     }
 
 	public interface IBannerOperations
 	{
-        Task<BannerShard> GetBannerAsync(ulong userId, ulong targetId);
-		Task<string> GetBannerCodeAsync(ulong userId);
+        Task<BannerShard> GetBannerAsync(long userId, long targetId);
+		Task<string> GetBannerCodeAsync(long userId);
 
-		Task<List<ulong>> GetBannerMembersAsync(ulong userId);
+		Task<List<long>> GetBannerMembersAsync(long userId);
     }
 
     #endregion

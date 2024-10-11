@@ -11,7 +11,7 @@ namespace Frontier.Manifests
 	public class TargetManifest
     {
         [Required]
-        public ulong TargetId { get; set; }
+        public long TargetId { get; set; }
     }
 
     public class AccountCredentialsManifest

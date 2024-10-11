@@ -14,7 +14,7 @@ namespace Core.Entities
         // Properties
         ///////////////
 
-        public ulong Id { get; init; }
+        public long Id { get; init; }
         public string Designation { get; set; }
         public string Colour { get; set; }
         public string Code { get; set; }

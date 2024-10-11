@@ -51,7 +51,7 @@ namespace Repository
                  )).ToListAsync());
         }
 
-        public async Task VoidGatheringAsync(ulong gatheringId)
+        public async Task VoidGatheringAsync(long gatheringId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
              ctx.GatheringLinks.
@@ -68,7 +68,7 @@ namespace Repository
               Where(r => r.GatheringId == gatheringId).
               ExecuteDeleteAsync());
 
-            List<ulong> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
+            List<long> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
                                      ctx.Snapshots.
                                      Where(s => s.GatheringId == gatheringId).
                                      Select(s => s.Id).
@@ -89,7 +89,7 @@ namespace Repository
                 Remove(new Gathering { Id = gatheringId }));
         }
 
-        public async Task VoidUserAsync(ulong userId)
+        public async Task VoidUserAsync(long userId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.BannerLinks.

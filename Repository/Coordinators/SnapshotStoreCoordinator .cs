@@ -9,42 +9,42 @@
             store = new EFCoreSnapshotStore(flag);
         }
 
-        public async Task<SnapshotShard> AddSnapshotAsync(ulong gatheringId, ulong posterId, DateTimeOffset timePosted)
+        public async Task<SnapshotShard> AddSnapshotAsync(long gatheringId, long posterId, DateTimeOffset timePosted)
         { 
              return await store.AddSnapshotAsync(gatheringId, posterId, timePosted);  
         }
 
-        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
+        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(long id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
            return await store.GenerateColumnForUserAsync(id, depthCharge, lastDepthCharge);   
         }
 
-        public async Task<SnapshotShard> GetSnapshotAsync(ulong id)
+        public async Task<SnapshotShard> GetSnapshotAsync(long id)
         {
             return await store.GetSnapshotAsync(id);
         }
 
-        public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong id)
+        public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(long id)
         {
             return await store.GetSnapshotsByUserAsync(id);
         }
 
-        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId)
+        public async Task AcclaimSnapshotAsync(long postId, long voterId)
         {           
           await store.AcclaimSnapshotAsync(postId, voterId);
         }
 
-        public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(ulong id)
+        public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(long id)
         {
             return await store.GetSnapshotsForGatheringAsync(id);
         }
 
-        public async Task DeleteSnapshotAsync(ulong snapshotId)
+        public async Task DeleteSnapshotAsync(long snapshotId)
         {
             await store.DeleteSnapshotAsync(snapshotId);
         }
 
-        public async Task DeleteSnapshotAcclaimAsync(ulong snapshotId, ulong voterId)
+        public async Task DeleteSnapshotAcclaimAsync(long snapshotId, long voterId)
         {
             await store.DeleteSnapshotAcclaimAsync(snapshotId, voterId);
         }

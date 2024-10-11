@@ -62,14 +62,14 @@ namespace Repository
               );
         }
 
-        public async Task DeleteUserAsync(ulong id)
+        public async Task DeleteUserAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.Users.
                 Where(u => u.Id == id).
                 ExecuteUpdate(setter => setter.SetProperty(u => u.IsPendingDeletion, true)));
 
-            List<ulong> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
+            List<long> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Gatherings.
                 Where(e => e.HostId == id && e.State == GatheringState.Upcoming).
                 Select(e => e.Id).
@@ -96,7 +96,7 @@ namespace Repository
                ExecuteDelete());
         }
 
-        public async Task<CoreUser> FindUserByIdAsync(ulong id) 
+        public async Task<CoreUser> FindUserByIdAsync(long id) 
         {            
             CoreUser user;
             try 
@@ -232,7 +232,7 @@ namespace Repository
             return user;
         }
 
-        public async Task<HauntShard> GetUserHauntAsync(ulong id)
+        public async Task<HauntShard> GetUserHauntAsync(long id)
         {
             try
             {
@@ -247,7 +247,7 @@ namespace Repository
                 throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
             }
         }
-        public async Task<LocationShard> GetRecentLocationAsync(ulong id)
+        public async Task<LocationShard> GetRecentLocationAsync(long id)
         {       
             try
             {
@@ -264,7 +264,7 @@ namespace Repository
             }                 
         }    
 
-        public async Task UpdateUserAsync(ulong id, List<(string Property, object Value)> edits)
+        public async Task UpdateUserAsync(long id, List<(string Property, object Value)> edits)
         {
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
@@ -317,7 +317,7 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
-        public async Task UpdateHauntAsync(ulong id, double latitude, double longitude, double radius, int stability)
+        public async Task UpdateHauntAsync(long id, double latitude, double longitude, double radius, int stability)
         {
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
@@ -331,7 +331,7 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
-        public async Task UpdateRecentLocationAsync(ulong id, double latitude, double longitude, double radius)
+        public async Task UpdateRecentLocationAsync(long id, double latitude, double longitude, double radius)
         {
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 

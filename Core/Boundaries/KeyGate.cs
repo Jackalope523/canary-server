@@ -22,7 +22,7 @@ namespace Core.Boundaries
 
     public interface IKeyOperations
 	{
-		Task<string> GetCanaryMapKeyAsync(ulong userId);
+		Task<string> GetCanaryMapKeyAsync(long userId);
 	}
 
     #endregion

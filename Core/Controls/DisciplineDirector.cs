@@ -19,7 +19,7 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task ReportUserAsync(ulong userId, ulong targetId,
+		public async Task ReportUserAsync(long userId, long targetId,
             UserReportType reportType, string reportDetails)
         {
             var user = await GetUserAsync(userId);
@@ -49,7 +49,7 @@ namespace Core.Controls
             }
         }
 
-        public async Task ReportGatheringAsync(ulong userId, ulong gatheringId,
+        public async Task ReportGatheringAsync(long userId, long gatheringId,
             GatheringReportType reportType, string reportDetails)
         {
             var user = await GetUserAsync(userId);
@@ -80,7 +80,7 @@ namespace Core.Controls
             }
         }
 
-        public async Task ReportSnapshotAsync(ulong userId, ulong snapshotId,
+        public async Task ReportSnapshotAsync(long userId, long snapshotId,
             SnapshotReportType reportType, string reportDetails)
         {
             var user = await GetUserAsync(userId);

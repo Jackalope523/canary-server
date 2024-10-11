@@ -5,12 +5,12 @@ namespace Repository
 {
     public class Gathering
     {
-        public ulong Id { get; set; }
+        public long Id { get; set; }
 
         public string Name { get; set; } = DefaultName;
         public string Description { get; set; } = DefaultDescription;
         public DateTimeOffset StartTime { get; set; } = DefaultStartTime;
-        public ulong HostId { get; set; } = DefaultHostId;
+        public long HostId { get; set; } = DefaultHostId;
 
         // X = Longitude Y = Latitude
         public Point Location { get; set; } = DefaultLocation;
@@ -47,13 +47,13 @@ namespace Repository
         // Default Values
         private static readonly CoordinateFactory Factory = new();
 
-        public static ulong DefaultId { get; set; } = ulong.MinValue;
+        public static long DefaultId { get; set; } = long.MinValue;
 
         public static string DefaultHeroImageURL { get; set; } = "";
         public static string DefaultName { get; set; } = "Lewis";
         public static string DefaultDescription { get; set; } = "A dog named Lewis.";
         public static DateTimeOffset DefaultStartTime { get; set; } = DateTimeOffset.MinValue;
-        public static ulong DefaultHostId { get; set; } = ulong.MinValue;
+        public static long DefaultHostId { get; set; } = long.MinValue;
         public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
         public static string DefaultFriendlyLocation { get; set; } = "Solitude";
 

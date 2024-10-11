@@ -45,7 +45,7 @@ namespace Frontier.Controllers
         }
 
 		[HttpGet("{userId}")]
-        public async Task<IActionResult> GetUser(ulong userId)
+        public async Task<IActionResult> GetUser(long userId)
         {
             return await Execute(async user =>
                 await accounts.GetUserShardAsync(userId));

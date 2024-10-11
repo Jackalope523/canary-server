@@ -27,8 +27,8 @@ namespace Core.Tests
 
 		private int instance;
 
-		private static ConcurrentBag<ulong> generatedUserIds = new();
-		private ulong uniqueUserIncrement = 0;
+		private static ConcurrentBag<long> generatedUserIds = new();
+		private long uniqueUserIncrement = 0;
 		private string testUserPhoneNumberFormat = "000-{0}-{1}";
 		private string testUserEmailFormat = "email_{0}_{1}@test.com";
 		private string testUserName = "name";
@@ -336,7 +336,7 @@ namespace Core.Tests
 		public async void DisposeEnvironment()
 		{
 			// Delete all users generated in this environment
-            foreach (ulong id in generatedUserIds)
+            foreach (long id in generatedUserIds)
 			{
 				try
 				{

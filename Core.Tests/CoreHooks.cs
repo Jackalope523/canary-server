@@ -19,9 +19,9 @@ namespace Core.Tests
 	public class UserHook : IAccountDatabase
 	{
 		private IAccountDatabase accounts;
-		private ConcurrentBag<ulong> generatedUserIds;
+		private ConcurrentBag<long> generatedUserIds;
 
-		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<ulong> userIdList)
+		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<long> userIdList)
 		{
 			accounts = accountDatabase;
 			generatedUserIds = userIdList;
@@ -59,7 +59,7 @@ namespace Core.Tests
 			return createdUser;
         }
 
-        public async Task DeleteUserAsync(ulong userId)
+        public async Task DeleteUserAsync(long userId)
         {
 			await accounts.DeleteUserAsync(userId);
         }
@@ -69,7 +69,7 @@ namespace Core.Tests
 			return await accounts.FindUserByEmailAsync(normalisedEmail);
         }
 
-        public async Task<CoreUser> FindUserByIdAsync(ulong userId)
+        public async Task<CoreUser> FindUserByIdAsync(long userId)
         {
 			return await accounts.FindUserByIdAsync(userId);
         }
@@ -80,27 +80,27 @@ namespace Core.Tests
             return await accounts.FindUserByPhoneNumberAsync(phoneNumber);
         }
 
-        public async Task<LocationShard> GetRecentLocationAsync(ulong userId)
+        public async Task<LocationShard> GetRecentLocationAsync(long userId)
         {
 			return await accounts.GetRecentLocationAsync(userId);
         }
 
-        public async Task<HauntShard> GetUserHauntAsync(ulong userId)
+        public async Task<HauntShard> GetUserHauntAsync(long userId)
         {
 			return await accounts.GetUserHauntAsync(userId);
         }
 
-        public async Task UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability)
+        public async Task UpdateHauntAsync(long userId, double latitude, double longitude, double radius, int stability)
         {
 			await accounts.UpdateHauntAsync(userId, latitude, longitude, radius, stability);
         }
 
-        public async Task UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius)
+        public async Task UpdateRecentLocationAsync(long userId, double latitude, double longitude, double radius)
         {
 			await accounts.UpdateRecentLocationAsync(userId, latitude, longitude, radius);
         }
 
-        public async Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits)
+        public async Task UpdateUserAsync(long userId, List<(string Property, object Value)> edits)
         {
 			await accounts.UpdateUserAsync(userId, edits);
         }

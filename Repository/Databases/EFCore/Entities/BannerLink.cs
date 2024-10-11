@@ -2,10 +2,10 @@
 {
     public class BannerLink
     {
-        public ulong Id { get; set; }
+        public long Id { get; set; }
 
-        public ulong UserId { get; set; }
-        public ulong BannerId { get; set; }
+        public long UserId { get; set; }
+        public long BannerId { get; set; }
         public DateTimeOffset Time { get; set; } = DefaultTime;
 
         // Navigation Properties

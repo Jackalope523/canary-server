@@ -8,7 +8,7 @@ namespace Repository
         {
         }
 
-        public async Task<SnapshotShard> AddSnapshotAsync(ulong gatheringId, ulong posterId, DateTimeOffset timePosted)
+        public async Task<SnapshotShard> AddSnapshotAsync(long gatheringId, long posterId, DateTimeOffset timePosted)
         { 
             Snapshot toAdd = new() 
             { 
@@ -27,21 +27,21 @@ namespace Repository
             return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserShard(toAdd.OwnerId, ownerName), toAdd.PostedAt, 0);
         }
 
-        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
+        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(long id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
             // Get List of Companions.
-            Task<List<ulong>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
+            Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserLinks.
                 Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).Select(l => l.OtherId).
                 ToListAsync());
 
-            Task<List<ulong>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
+            Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserLinks.
                 Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
                 Select(l => l.SelfId).
                 ToListAsync());
 
-            List<ulong> owners = (await appreciating).Intersect(await appreciatingMe).Append(id).ToList();
+            List<long> owners = (await appreciating).Intersect(await appreciatingMe).Append(id).ToList();
 
             // Get unseen posts by companions from certain depth.
             List<SnapshotShard> companionSnapshots = await storeSentry.ExecuteReadAsync(ctx =>
@@ -56,8 +56,8 @@ namespace Repository
 
             List<Task<int>> companionSnapshotsPositiveRatings = new();
 
-            List<ulong> sitesToBeExplored = new();
-            List<ulong> previouslyExtractedSnapshots = new();
+            List<long> sitesToBeExplored = new();
+            List<long> previouslyExtractedSnapshots = new();
             foreach (SnapshotShard s in companionSnapshots)
             {
                 companionSnapshotsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
@@ -106,7 +106,7 @@ namespace Repository
 
         }
 
-        public async Task<SnapshotShard> GetSnapshotAsync(ulong id)
+        public async Task<SnapshotShard> GetSnapshotAsync(long id)
         {
             Task<int> appreciates = storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.SnapshotId == id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).CountAsync());
 
@@ -125,7 +125,7 @@ namespace Repository
             return snapshot with { User = new UserShard(snapshot.User.Id, await name), Acclaim = await appreciates };
         }
 
-        public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong id)
+        public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(long id)
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Snapshots.Where(p => p.OwnerId == id).
@@ -151,7 +151,7 @@ namespace Repository
             return snapshots;
         }
 
-        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId)
+        public async Task AcclaimSnapshotAsync(long postId, long voterId)
         {
             SnapshotLink toAdd = new()
             {
@@ -161,7 +161,7 @@ namespace Repository
                 Type = SnapshotLink.SnapshotLinkType.Appreciate
             };
 
-            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
                         ctx.SnapshotLinks.
                         Where(l => l.UserId == voterId && l.SnapshotId == postId).
                         Select(l => l.Id).
@@ -175,12 +175,12 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.SnapshotLinks.Update(toAdd));
         }
 
-        public async Task DeleteSnapshotAsync(ulong postId)
+        public async Task DeleteSnapshotAsync(long postId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = postId }));
         }
 
-        public async Task DeleteSnapshotAcclaimAsync(ulong postId, ulong voterId)
+        public async Task DeleteSnapshotAcclaimAsync(long postId, long voterId)
         {
             Func<CanaryContext, Task> query = EF.CompileAsyncQuery(
                 (CanaryContext ctx) =>
@@ -191,7 +191,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(query);
         }
 
-        public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(ulong id)
+        public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(long id)
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
                  ctx.Snapshots.Where(p => p.GatheringId == id).
@@ -217,12 +217,12 @@ namespace Repository
             return snapshots;
         }
 
-        public async Task RemoveSnapshotAsync(ulong snapshotId)
+        public async Task RemoveSnapshotAsync(long snapshotId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = snapshotId }));
         }
 
-        public async Task RemoveSnapshotAcclaimAsync(ulong snapshotId, ulong voterId)
+        public async Task RemoveSnapshotAcclaimAsync(long snapshotId, long voterId)
         {
             Func<CanaryContext, Task> query = EF.CompileAsyncQuery(
                 (CanaryContext ctx) =>

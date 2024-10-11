@@ -25,7 +25,7 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<GatheringShard> GetGatheringInformationAsync(ulong userId, ulong gatheringId)
+		public async Task<GatheringShard> GetGatheringInformationAsync(long userId, long gatheringId)
         {
 			var user = await GetUserAsync(userId);
 			var targetGathering = await GetGatheringAsync(gatheringId);
@@ -37,7 +37,7 @@ namespace Core.Controls
 			return targetGathering.ToGatheringShard();
 		}
 
-		public async Task<List<GatheringShard>> GetGatheringsInAreaAsync(ulong userId,
+		public async Task<List<GatheringShard>> GetGatheringsInAreaAsync(long userId,
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUserAsync(userId);
@@ -57,7 +57,7 @@ namespace Core.Controls
 			return filteredGatherings;
 		}
 
-		public async Task<List<GatheringShard>> GetPersonalisedGatheringsInAreaAsync(ulong userId,
+		public async Task<List<GatheringShard>> GetPersonalisedGatheringsInAreaAsync(long userId,
 			double latitude, double longitude, double distance)
 		{
 			var user = await GetUserAsync(userId);
@@ -77,7 +77,7 @@ namespace Core.Controls
             return filteredGatherings;
 		}
 
-		public async Task<GatheringShard> CreateGatheringAsync(ulong userId,
+		public async Task<GatheringShard> CreateGatheringAsync(long userId,
 			string gatheringName, string gatheringDescription, DateTimeOffset startTime,
 			double latitude, double longitude, string friendlyLocation,
 			double radius, bool isDynamic, int degreeOfPrivacy,
@@ -163,7 +163,7 @@ namespace Core.Controls
 			return newGathering.ToGatheringShard();
 		}
 
-		public async Task EditGatheringAsync(ulong userId, ulong gatheringId,
+		public async Task EditGatheringAsync(long userId, long gatheringId,
 			string gatheringName = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null,
 			double? latitude = null, double? longitude = null, string friendlyLocation = "",
@@ -266,7 +266,7 @@ namespace Core.Controls
 			_ = targetGathering.NotifyActive(NotificationGroup.GatheringReminder, $"{targetGathering.Title}", "The gathering was edited by the host, check to see the updates!", "20");
 		}
 
-		public async Task StartGatheringAsync(ulong userId, ulong gatheringId)
+		public async Task StartGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -287,7 +287,7 @@ namespace Core.Controls
 			await gathering.Started();
 		}
 
-		public async Task TerminateGatheringAsync(ulong userId, ulong gatheringId)
+		public async Task TerminateGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -320,7 +320,7 @@ namespace Core.Controls
 			}
 		}
 
-		public async Task DeleteGatheringAsync(ulong userId, ulong gatheringId)
+		public async Task DeleteGatheringAsync(long userId, long gatheringId)
 		{
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
@@ -342,7 +342,7 @@ namespace Core.Controls
             _ = gathering.NotifyActive(NotificationGroup.GatheringReminder, $"{gathering.Title}", "Uh oh! The gathering was cancelled by the host.", "20");
         }
 
-        public async Task ChangeGatheringVisibilityAsync(ulong userId, ulong gatheringId, bool hide)
+        public async Task ChangeGatheringVisibilityAsync(long userId, long gatheringId, bool hide)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -360,7 +360,7 @@ namespace Core.Controls
 			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), state) });
         }
 
-        public async Task WatchGatheringAsync(ulong userId, ulong gatheringId)
+        public async Task WatchGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -395,7 +395,7 @@ namespace Core.Controls
 			{ throw new InvalidOperationException($"Cannot watch gathering, user currently {userIntention.Value} gathering."); }
 		}
 
-		public async Task UnwatchGatheringAsync(ulong userId, ulong gatheringId)
+		public async Task UnwatchGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 
@@ -423,7 +423,7 @@ namespace Core.Controls
 			{ throw new InvalidOperationException($"Could not unwatch gathering, user currently {userIntention.Value} gathering."); }
 		}
 
-		public async Task JoinGatheringAsync(ulong userId, ulong gatheringId)
+		public async Task JoinGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -481,7 +481,7 @@ namespace Core.Controls
 			{ _ = gathering.Host.Notify(NotificationGroup.GatheringAlert, $"Guest Inbound", $"{user.Name} is joining your gathering."); }
 		}
 
-		public async Task CheckInToGatheringAsync(ulong userId, double latitude, double longitude)
+		public async Task CheckInToGatheringAsync(long userId, double latitude, double longitude)
         {
             var user = await GetUserAsync(userId);
             var nextGathering = await user.NextGathering();
@@ -504,7 +504,7 @@ namespace Core.Controls
 			await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
         }
 
-		public async Task LeaveGatheringAsync(ulong userId, ulong gatheringId)
+		public async Task LeaveGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var targetGathering = await GetGatheringAsync(gatheringId);
@@ -546,7 +546,7 @@ namespace Core.Controls
 		}
 
 		public async Task<List<GuestListBondPair>>
-			GetGuestListAsync(ulong userId, ulong gatheringId)
+			GetGuestListAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -616,7 +616,7 @@ namespace Core.Controls
             return allGuests;
 		}
 
-		public async Task<List<UserShard>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId)
+		public async Task<List<UserShard>> GetPotentialInviteesAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
@@ -636,7 +636,7 @@ namespace Core.Controls
 				.ConvertAll(u => u.ToUserShard());
 		}
 
-		public async Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong gatheringId)
+		public async Task InviteUserAsync(long inviterId, long inviteeId, long gatheringId)
 		{
 			var inviter = await GetUserAsync(inviterId);
 			var invitee = await GetUserAsync(inviteeId);
@@ -658,7 +658,7 @@ namespace Core.Controls
 			_ = invitee.Notify(NotificationGroup.CompanionCommunication, $"{gathering.Title}", $"You were invited by {inviter.Name}");
 		}
 
-		public async Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId)
+		public async Task KickUserAsync(long hostId, long targetId, long gatheringId)
 		{
 			var host = await GetUserAsync(hostId);
 			var targetUser = await GetUserAsync(targetId);
@@ -687,7 +687,7 @@ namespace Core.Controls
 			}
 		}
 
-		public async Task<bool> AuthorisedToStart(ulong userId, ulong gatheringId)
+		public async Task<bool> AuthorisedToStart(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
@@ -695,7 +695,7 @@ namespace Core.Controls
 			return gathering.IsHostedBy(user) && await gathering.IsStartable();
         }
 
-		public async Task<bool> AuthorisedToJoin(ulong userId, ulong gatheringId)
+		public async Task<bool> AuthorisedToJoin(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
@@ -703,7 +703,7 @@ namespace Core.Controls
 			return await user.CanJoin(gathering);
         }
 
-		public async Task<bool> AuthorisedToUpload(ulong userId, ulong gatheringId)
+		public async Task<bool> AuthorisedToUpload(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);

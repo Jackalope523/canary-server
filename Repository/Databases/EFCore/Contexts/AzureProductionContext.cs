@@ -21,7 +21,7 @@ namespace Repository
             base.OnModelCreating(modelBuilder);
 
             /*
-            modelBuilder.HasSequence<ulong>("UserIds")
+            modelBuilder.HasSequence<long>("UserIds")
                 .StartsAt(100)
                 .IncrementsBy(1);
 
