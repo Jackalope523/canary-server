@@ -51,5 +51,20 @@
         {
             return await store.HaveMutualGathering(userId, targetId);
         }
+
+        public async Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId)
+        {
+            return await store.GetFirstMutualGathering(userId, targetId);
+        }
+
+        public async Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId)
+        {
+            return await store.GetLatestMutualGathering(userId, targetId);
+        }
+
+        public async Task<DateTimeOffset> BlockedSince(long userId, long targetId)
+        {
+            return await store.BlockedSince(userId, targetId);
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using System.Collections.Immutable;
 
 namespace Repository
 {
@@ -179,6 +181,129 @@ namespace Repository
                       (x,y) => x.GatheringId
                     ).
                 AnyAsync());
+        }
+
+        public async Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId)
+        {
+            List<long> a = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+                Where(l => l.UserId == userId).
+                Select(l => l.GatheringId).
+                ToListAsync());
+
+            List<long> b = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+                Where(l => l.UserId == targetId).
+                Select(l => l.GatheringId).
+                ToListAsync());
+
+            List<long> mutualGatherings = a.Intersect(b).ToList();
+
+            CoreGathering firstMutualGathering = await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
+                Where(g => mutualGatherings.Contains(g.Id)).
+                OrderByDescending(g => g.StartTime).
+                Select(g => new CoreGathering
+                (
+                   g.Id,
+                   new UserShard(g.HostId, null),
+                   g.Name,
+                   g.Description,
+                   g.StartTime,
+                   g.Location.Y,
+                   g.Location.X,
+                   g.FriendlyLocation,
+                   g.EndTime,
+                   g.State,
+                   g.GroupMinimum,
+                   g.GroupMaximum,
+                   new CharacterShard(
+                   g.Age,
+                   g.Extroversion,
+                   g.Athleticisme,
+                   g.Chaos,
+                   g.Competitiveness,
+                   g.Industriousness,
+                   g.NightOwl,
+                   g.Openness),
+                   g.Radius,
+                   g.IsDynamic,
+                   g.IsPendingDeletion,
+                   g.NumberOfGuests,
+                   g.DegreeOfPrivacy
+                   )).
+                FirstAsync());
+
+            UserShard host = await storeSentry.ExecuteReadAsync(ctx => 
+                                ctx.Users.
+                                Where(u => u.Id == firstMutualGathering.Host.Id).
+                                Select(u => new UserShard(u.Id, u.Name)).
+                                SingleAsync());
+
+            return firstMutualGathering with { Host = host };
+        }
+
+        public async Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId)
+        {
+            List<long> a = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+               Where(l => l.UserId == userId).
+               Select(l => l.GatheringId).
+               ToListAsync());
+
+            List<long> b = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+                Where(l => l.UserId == targetId).
+                Select(l => l.GatheringId).
+                ToListAsync());
+
+            List<long> mutualGatherings = a.Intersect(b).ToList();
+
+            CoreGathering latestMutualGathering = await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
+                Where(g => mutualGatherings.Contains(g.Id)).
+                OrderBy(g => g.StartTime).
+                Select(g => new CoreGathering
+                (
+                   g.Id,
+                   new UserShard(g.HostId, null),
+                   g.Name,
+                   g.Description,
+                   g.StartTime,
+                   g.Location.Y,
+                   g.Location.X,
+                   g.FriendlyLocation,
+                   g.EndTime,
+                   g.State,
+                   g.GroupMinimum,
+                   g.GroupMaximum,
+                   new CharacterShard(
+                   g.Age,
+                   g.Extroversion,
+                   g.Athleticisme,
+                   g.Chaos,
+                   g.Competitiveness,
+                   g.Industriousness,
+                   g.NightOwl,
+                   g.Openness),
+                   g.Radius,
+                   g.IsDynamic,
+                   g.IsPendingDeletion,
+                   g.NumberOfGuests,
+                   g.DegreeOfPrivacy
+                   )).
+                FirstAsync());
+
+            UserShard host = await storeSentry.ExecuteReadAsync(ctx =>
+                                ctx.Users.
+                                Where(u => u.Id == latestMutualGathering.Host.Id).
+                                Select(u => new UserShard(u.Id, u.Name)).
+                                SingleAsync());
+
+            return latestMutualGathering with { Host = host };
+        }
+
+        public async Task<DateTimeOffset> BlockedSince(long userId, long targetId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => 
+                    ctx.UserLinks.
+                    Where(l => l.SelfId == userId && l.OtherId == targetId && l.Type == UserRelationship.UserLinkType.Block).
+                    Select(l => l.Time).
+                    SingleAsync());
         }
     }
 }

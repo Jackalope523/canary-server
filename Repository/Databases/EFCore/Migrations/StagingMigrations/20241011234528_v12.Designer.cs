@@ -3,18 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
 
 #nullable disable
 
-namespace Repository.Databases.EFCore.Migrations.AzureMigrations
+namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     [DbContext(typeof(AzureStagingContext))]
-    partial class AzureStagingContextModelSnapshot : ModelSnapshot
+    [Migration("20241011234528_v12")]
+    partial class v12
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
