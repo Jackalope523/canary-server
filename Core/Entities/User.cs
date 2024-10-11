@@ -334,7 +334,7 @@ namespace Core.Entities
 			{ return false; }
 
             // Check if user is within degree of privacy
-            if (!await Terminal.GatheringDirector.RequestUserIsAuthorisedGuest(this, gathering))
+            if (gathering.DegreeOfPrivacy < 3 && !await Terminal.GatheringDirector.RequestUserIsAuthorisedGuest(this, gathering))
             { return false; }
 
 			return true;
