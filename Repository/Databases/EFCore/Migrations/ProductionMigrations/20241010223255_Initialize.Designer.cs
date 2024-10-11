@@ -13,7 +13,7 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
     [DbContext(typeof(AzureProductionContext))]
-    [Migration("20241010221024_Initialize")]
+    [Migration("20241010223255_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
