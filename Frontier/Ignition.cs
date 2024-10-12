@@ -66,9 +66,16 @@ namespace Frontier
         public void ConfigureServices(IServiceCollection services)
         {
             string environment = Configuration["ASPNETCORE_ENVIRONMENT"];
-            bool isProduction = environment.Equals("Production");
-            bool isStaging = environment.Equals("Staging");
-            bool isDevelopment = environment.Equals("Development");
+
+            var flag = environment switch
+            {
+                "Production" => EnvironmentFlag.Production,
+                "Staging" => EnvironmentFlag.Staging,
+                "Development" => EnvironmentFlag.Development,
+                _ => throw new InvalidEnvironmentException("Unknown ASPNETCORE_ENVIRONMENT set.")
+            }; ;
+
+            EnvironmentOptions env = new() { Flag = EnvironmentFlag.Production };
 
             services.AddCors(options =>
             {
@@ -103,11 +110,11 @@ namespace Frontier
 
             Harbor harbor;
 
-            if (isProduction)
+            if (env.IsProduction)
             {
                 harbor = new(Harbor.Flag.Production, repositoryLogger);
             }
-            else if (isStaging)
+            else if (env.Flag.Equals(EnvironmentFlag.Staging))
             {
                 harbor = new(Harbor.Flag.Staging, repositoryLogger);
             }
@@ -142,6 +149,7 @@ namespace Frontier
 
             CoreTerminal terminal = CoreTerminal.CreateTerminal(
                 coreLogger,
+                env,
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
                 harbor.BannerDatabaseAccess,
