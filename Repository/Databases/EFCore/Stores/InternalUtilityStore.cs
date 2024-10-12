@@ -27,12 +27,27 @@ namespace Repository
             coreGatherings.Sort((x, y) => x.Host.Id.CompareTo(y.Host.Id));
 
             List<long> hostIds = coreGatherings.Select(g => g.Id).ToList();
-            List<UserShard> hosts = await storeSentry.ExecuteReadAsync(ctx =>
+
+            List<UserShard> hosts = new();
+            for (int i = 0; i < hostIds.Count; i++)
+            {
+                if (hostIds[i] == 0)
+                {
+                    hosts.Add(new UserShard(0, "DeletedUser"));
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            List<UserShard> notNullHosts = await storeSentry.ExecuteReadAsync(ctx =>
                                         ctx.Users.
                                         Where(u => hostIds.Contains(u.Id)).
                                         Select(u => new UserShard(u.Id, u.Name)).
                                         ToListAsync());
 
+            hosts.AddRange(notNullHosts);
             hosts.Sort((x, y) => x.Id.CompareTo(y.Id));
 
             for (int i = 0; i < coreGatherings.Count; i++)
