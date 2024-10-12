@@ -135,7 +135,7 @@ namespace Core.Controls
             return await Nests.GetAppreciatedUsersAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetBlockedUsersAsync(long userId)
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
         {
             return await Nests.GetBlockedUsersAsync(userId);
         }
