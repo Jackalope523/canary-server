@@ -28,10 +28,10 @@ namespace Core.Entities
         public static User Redacted
             => new() { Id = 0 };
 
-        public static User Hollow
+        public static User Hidden
             => new() { Id = -1 };
 
-        public static User Hidden
+        public static User Hollow
             => new() { Id = -2 };
 
         ///////
