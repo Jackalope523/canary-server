@@ -61,6 +61,7 @@ namespace Core.Tests
 
 			
             Terminal = CoreTerminal.CreateTerminal(
+				new() { Flag = EnvironmentFlag.Development },
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
