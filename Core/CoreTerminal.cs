@@ -1,19 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using Core.Boundaries;
 using Core.Controls;
 using Core.Daemons;
-using Microsoft.Extensions.Logging;
 
 namespace Core
 {
+    public enum EnvironmentFlag
+    {
+        Production, Staging, Development
+    }
+
+    public record EnvironmentOptions
+    {
+        public EnvironmentFlag Flag { get; init; }
+
+        public bool IsProduction => Flag.Equals(EnvironmentFlag.Production);
+    }
+
     public class CoreTerminal
     {
         #region Variables
 
         public static CoreTerminal Terminal { get; protected set; }
         private static object initLock = new();
+
+        public EnvironmentOptions Environment { get; init; }
 
         public ILogger Log { get; init; }
 
@@ -67,7 +78,7 @@ namespace Core
 
         #region Initialisation
 
-        public static CoreTerminal CreateTerminal(ILogger logger,
+        public static CoreTerminal CreateTerminal(EnvironmentOptions environment, ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
@@ -79,6 +90,7 @@ namespace Core
             {
                 Terminal ??= new CoreTerminal()
                 {
+                    Environment = environment,
                     Log = logger,
 
                     AccountDatabase = accountDatabase,

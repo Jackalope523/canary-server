@@ -10,16 +10,24 @@ namespace Core.Boundaries
 
 	public enum TelegramMessage
 	{
-		UserAgreementsUpdated,
-		AccountStatusChanged,
+		// APP SEGMENT (0XXX)
+		UserAgreementsUpdated = 0001,
+		ServerMaintenance = 0002,
 
-		UserAppreciated,
+		// ACCOUNT SEGMENT (1XXX)
+		AccountStatusChanged = 1001,
 
-		GatheringInvitation,
+		// USER SEGMENT (2XXX)
+		UserAppreciated = 2001,
 
-		GatheringClosingSoon,
-		GatheringMissedHost,
-		GatheringMissedAttendee,
+		// GATHERING SEGMENT (3XXX)
+		GatheringInvitation = 3001,
+
+		GatheringClosingSoon = 3100,
+
+		GatheringMissedHost = 3200,
+		GatheringMissedAttendee = 3201,
+		GatheringSealed = 3202,
 	}
 
 	public enum NotificationGroup

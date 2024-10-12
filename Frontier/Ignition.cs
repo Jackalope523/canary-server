@@ -65,10 +65,17 @@ namespace Frontier
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string environment = Configuration["ASPNETCORE_ENVIRONMENT"];
-            bool isProduction = environment.Equals("Production");
-            bool isStaging = environment.Equals("Staging");
-            bool isDevelopment = environment.Equals("Development");
+            string env = Configuration["ASPNETCORE_ENVIRONMENT"];
+
+            var flag = env switch
+            {
+                "Production" => EnvironmentFlag.Production,
+                "Staging" => EnvironmentFlag.Staging,
+                "Development" => EnvironmentFlag.Development,
+                _ => throw new InvalidEnvironmentException("Unknown ASPNETCORE_ENVIRONMENT set.")
+            }; ;
+
+            EnvironmentOptions environment = new() { Flag = EnvironmentFlag.Production };
 
             services.AddCors(options =>
             {
@@ -103,11 +110,11 @@ namespace Frontier
 
             Harbor harbor;
 
-            if (isProduction)
+            if (environment.IsProduction)
             {
                 harbor = new(Harbor.Flag.Production, repositoryLogger);
             }
-            else if (isStaging)
+            else if (environment.Flag.Equals(EnvironmentFlag.Staging))
             {
                 harbor = new(Harbor.Flag.Staging, repositoryLogger);
             }
@@ -127,7 +134,7 @@ namespace Frontier
                 keyProvider.GetHollowOneSignalApiKeyAsync().Result,
                 keyProvider.GetHollowOneSignalAppIdAsync().Result);
             
-            TwilioService.Initialise(frontierLogger,
+            TwilioService.Initialise(environment, frontierLogger,
                 keyProvider.GetHollowTwilioAccountKeyAsync().Result,
                 keyProvider.GetHollowTwilioAuthTokenAsync().Result,
                 keyProvider.GetHollowTwilioMessagingServiceAsync().Result);
@@ -141,6 +148,7 @@ namespace Frontier
             ////////////////
 
             CoreTerminal terminal = CoreTerminal.CreateTerminal(
+                environment,
                 coreLogger,
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
@@ -155,7 +163,7 @@ namespace Frontier
                 harbor.MiscellaneousDatabaseAccess,
                 pushNotifications);
 
-            GuardBox box = new(frontierLogger,
+            GuardBox box = new(environment, frontierLogger,
                 terminal.AccountOperations,
                 terminal.BannerOperations,
                 terminal.NestOperations,

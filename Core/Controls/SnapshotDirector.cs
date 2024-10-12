@@ -21,14 +21,6 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<SnapshotShard>> GetGatheringSnapshots(long userId, long gatheringId)
-        {
-            var user = await GetUserAsync(userId);
-            var targetGathering = await GetGatheringAsync(gatheringId);
-
-            return await RequestVisibleSnapshotsAsync(user, targetGathering);
-        }
-
         public async Task<GalleryShard> GetGalleryAsync(long userId, long targetId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
@@ -43,7 +35,7 @@ namespace Core.Controls
             Verify(await user.CanView(gathering),
                 new InvalidUserException("User is unable to view gathering."));
 
-            GalleryShard nest = new(new());
+            GalleryShard gallery = new(new());
 
             // Check if user is themself
             if (user.Equals(targetUser))
@@ -51,7 +43,7 @@ namespace Core.Controls
                 // Check if user attended
                 if (await gathering.WasAttendedBy(user))
                 {
-                    nest = new(await gathering.Snapshots);
+                    gallery = new(await gathering.Snapshots);
                 }
                 // Check if any companions attended
                 else
@@ -62,7 +54,7 @@ namespace Core.Controls
                     var companionSnapshots = (await gathering.Snapshots)
                         .Where(snapshot => companionIds.Contains(snapshot.User.Id)).ToList();
 
-                    nest = new(companionSnapshots);
+                    gallery = new(companionSnapshots);
                 }
             }
             // Check if users are companions or attended a common gathering
@@ -72,10 +64,13 @@ namespace Core.Controls
                 var targetSnapshots = (await gathering.Snapshots)
                     .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
 
-                nest = new(targetSnapshots);
+                gallery = new(targetSnapshots);
             }
 
-            return nest;
+            // Remove any snapshots from blocked or blocking users
+            GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
+
+            return filteredGallery;
         }
 
 
@@ -223,7 +218,26 @@ namespace Core.Controls
             }
         }
 
-		#endregion
-	}
+        internal async Task<List<SnapshotShard>>
+            RemoveBlockedSnapshotsAsync(User user, List<SnapshotShard> snapshots)
+        {
+            List<SnapshotShard> accessibleSnapshots = new();
+
+            foreach (SnapshotShard snapshot in snapshots)
+            {
+                User snapshotOwner = new(snapshot.User);
+
+                // Check if blocking link exists
+                if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))
+                { continue; }
+
+                accessibleSnapshots.Add(snapshot);
+            }
+
+            return accessibleSnapshots;
+        }
+
+        #endregion
+    }
 }
 

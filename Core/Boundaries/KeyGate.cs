@@ -18,11 +18,16 @@ namespace Core.Boundaries
 		Task<string> GetHollowTwilioMessagingServiceAsync();
 
 		Task<string> GetCanaryMapKeyAsync();
+
+		Task<string> GetAppleAccountCodeAsync();
+		Task<string> GetGoogleAccountCodeAsync();
     }
 
     public interface IKeyOperations
 	{
 		Task<string> GetCanaryMapKeyAsync(long userId);
+
+		Task<string> GetClassifiedAccountCodeAsync(long userId);
 	}
 
     #endregion

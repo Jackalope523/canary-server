@@ -51,29 +51,31 @@ namespace Core.Controls
             // Check if users are companions
             else if (await targetUser.IsCompanionsWith(user))
             {
+                // Get first gathering together
+                var firstGatheringSync = Nests.GetFirstMutualGathering(user.Id, targetUser.Id);
+
                 // Gather active and upcoming gatherings visible to the user
                 var upcomingAgendaSync = RequestAgenda(targetUser);
                 var siftedAgendaSync = Terminal.GatheringDirector.RemoveUnviewableAgendaCardsAsync(user, await upcomingAgendaSync);
 
                 // Get private gatherings and snapshots
-                nest = nest with
-                {
-                    Twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard())
-                };
+                var twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard());
 
-                nest.Twigs.AddRange((await siftedAgendaSync).Cards
+                twigs.AddRange((await siftedAgendaSync).Cards
                     .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
+
+                nest = new(twigs, (await firstGatheringSync).Id);
             }
             // User is a stranger
             else
             {
+                // Check if has a mutual gathering
+                var hasMutualSync = Nests.HaveMutualGathering(user.Id, targetUser.Id);
+
                 // Get public hosted gatherings
                 var hostedGatherings = (await Gatherings.FindGatheringsByUserAsync(targetUser.Id)).ConvertAll(e => new Gathering(e));
-                nest = nest with
-                {
-                    Twigs = hostedGatherings.ConvertAll(e => e.ToTwigShard())
-                };
+                var twigs = hostedGatherings.ConvertAll(e => e.ToTwigShard());
 
                 // Get common gatherings
                 var commonGatherings = (await targetUser.PastGatherings)
@@ -81,7 +83,16 @@ namespace Core.Controls
                     .Intersect(await user.PastGatherings)
                     .ToList().ConvertAll(e => e.ToTwigShard());
 
-                nest.Twigs.AddRange(commonGatherings);
+                twigs.AddRange(commonGatherings);
+
+                if (await hasMutualSync)
+                {
+                    nest = new(twigs, (await Nests.GetLatestMutualGathering(user.Id, targetUser.Id)).Id);
+                }
+                else
+                {
+                    nest = new(twigs, default);
+                }
             }
 
             return nest;
@@ -124,7 +135,7 @@ namespace Core.Controls
             return await Nests.GetAppreciatedUsersAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetBlockedUsersAsync(long userId)
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
         {
             return await Nests.GetBlockedUsersAsync(userId);
         }

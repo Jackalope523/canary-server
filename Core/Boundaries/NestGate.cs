@@ -7,11 +7,14 @@ namespace Core.Boundaries
     #region Schemas
 
     public record NestShard(List<TwigShard> Twigs,
-        long RelativeGatheringId = default, DateTimeOffset BlockedSince = default);
+        long RelativeGatheringId = default);
     public record TwigShard(long GatheringId, DateTimeOffset StartTime);
 
     public record AgendaShard(List<CardShard> Cards);
     public record CardShard(long GatheringId, DateTimeOffset StartTime, GatheringBond Bond);
+
+    public record BlockedUserShard(long Id, string NameWhenBlocked, DateTimeOffset DateBlocked) :
+        UserShard(Id, NameWhenBlocked);
 
 	#endregion
 
@@ -22,7 +25,7 @@ namespace Core.Boundaries
         Task<List<UserShard>> GetCompanionsAsync(long userId);
 		Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
         Task<List<UserShard>> GetUsersAppreciatingAsync(long userId);
-        Task<List<UserShard>> GetBlockedUsersAsync(long userId);
+        Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
         Task<List<UserShard>> GetUsersBlockingAsync(long userId);
 
         Task AppreciateUserAsync(long userId, long targetId, DateTimeOffset time);
@@ -45,7 +48,7 @@ namespace Core.Boundaries
 
         Task<List<UserShard>> GetCompanionsAsync(long userId);
         Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
-        Task<List<UserShard>> GetBlockedUsersAsync(long userId);
+        Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 
         Task AppreciateUserAsync(long userId, long targetId);
         Task UnappreciateUserAsync(long userId, long targetId);

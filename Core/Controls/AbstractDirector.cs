@@ -14,6 +14,8 @@ namespace Core.Controls
 
 		protected CoreTerminal Terminal { get; init; }
 
+		protected EnvironmentOptions Environment { get; init; }
+
 		protected ILogger Log { get; private set; }
 
 		protected IAccountDatabase Accounts { get; private set; }
@@ -34,6 +36,7 @@ namespace Core.Controls
         public AbstractDirector(CoreTerminal terminal)
 		{
 			Terminal = terminal;
+			Environment = terminal.Environment;
 
 			Log = Terminal.Log;
 			

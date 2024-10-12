@@ -38,5 +38,15 @@
         {
             return await sentry.GetSecretAsync("MapboxSparrowMapToken");
         }
+
+        public async Task<string> GetAppleAccountCodeAsync()
+        {
+            return await sentry.GetSecretAsync("AppleReviewAccountCode");
+        }
+
+        public async Task<string> GetGoogleAccountCodeAsync()
+        {
+            return await sentry.GetSecretAsync("GoogleReviewAccountCode");
+        }
     }
 }
