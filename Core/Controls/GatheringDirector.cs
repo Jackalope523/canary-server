@@ -861,7 +861,7 @@ namespace Core.Controls
 
 		private GuestListBondPair AsHiddenBondPair(GatheringBond bond)
 		{
-			return new(new(0, "hidden"), bond);
+			return new(new(-2, "hidden"), bond);
 		}
 
         private int GetBondPriority(GatheringBond bond)
