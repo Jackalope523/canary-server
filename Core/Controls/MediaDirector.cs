@@ -82,10 +82,16 @@ namespace Core.Controls
             // Get image hash
             var hashSync = ComputeHashAsync(image);
 
-            // Check if image is concealed due to reports
-            // TODO
+            // Get reports
+            var headerReports = (await gathering.GatheringReports)
+                .FindAll(report => report.ReportType.Equals(GatheringReportType.InappropriateHeader));
+            bool shouldConceal = false;
 
-            return new(await hashSync, false);
+            // Check if header is concealed due to reports or if user reported it
+            shouldConceal = headerReports.Count > 2 ||
+                headerReports.Find(report => report.ReportingUserId.Equals(user.Id)) != default;
+
+            return new(await hashSync, shouldConceal);
         }
 
         public async Task<MemoryStream> GetSnapshotAsync(long userId, long snapshotId)
@@ -122,10 +128,15 @@ namespace Core.Controls
             // Get image hash
             var hashSync = ComputeHashAsync(image);
 
-            // Check if image is concealed due to reports
-            // TODO
+            // Get reports
+            var reports = await Reports.GetReportsForSnapshotAsync(snapshot.Id);
+            bool shouldConceal = false;
 
-            return new(await hashSync, false);
+            // Check if image is concealed due to reports or if user reported it
+            shouldConceal = reports.Count > 2 ||
+                reports.Find(report => report.ReportingUserId.Equals(user.Id)) != default;
+
+            return new(await hashSync, shouldConceal);
         }
 
         #endregion
