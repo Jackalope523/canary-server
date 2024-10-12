@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Frontier.Manifests;
 using System.Collections.Generic;
 using System.Text;
+using Core;
 
 namespace Frontier.Controllers
 {
@@ -38,6 +39,7 @@ namespace Frontier.Controllers
 
 		#region Variables
 
+		public EnvironmentOptions env;
 		public ILogger log;
 
 		public IAccountOperations accounts;
@@ -59,6 +61,7 @@ namespace Frontier.Controllers
 
 		public AbstractGuard(GuardBox box, UserManager<CoreUser> aspUserManager)
 		{
+			env = box.env;
 			log = box.log;
 
 			accounts = box.accounts;

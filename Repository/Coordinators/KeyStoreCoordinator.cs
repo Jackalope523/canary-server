@@ -40,5 +40,15 @@ namespace Repository.Coordinators
         {
             return await store.GetCanaryMapKeyAsync();
         }
+
+        public async Task<string> GetAppleAccountCodeAsync()
+        {
+            return await store.GetAppleAccountCodeAsync();
+        }
+
+        public async Task<string> GetGoogleAccountCodeAsync()
+        {
+            return await store.GetGoogleAccountCodeAsync();
+        }
     }
 }

@@ -78,7 +78,7 @@ namespace Core
 
         #region Initialisation
 
-        public static CoreTerminal CreateTerminal(ILogger logger, EnvironmentOptions environment,
+        public static CoreTerminal CreateTerminal(EnvironmentOptions environment, ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,

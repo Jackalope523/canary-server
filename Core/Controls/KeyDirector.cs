@@ -23,6 +23,16 @@ namespace Core.Controls
             return await Keys.GetCanaryMapKeyAsync();
         }
 
+        public async Task<string> GetClassifiedAccountCodeAsync(long userId)
+        {
+            return userId switch
+            {
+                -7 => await Keys.GetAppleAccountCodeAsync(),
+                -8 => await Keys.GetGoogleAccountCodeAsync(),
+                _ => throw new InvalidUserException("User does not exist")
+            };
+        }
+
         #endregion
 
         #region Favours
