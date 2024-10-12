@@ -18,7 +18,7 @@ namespace Repository
             Select(r => new Core.Boundaries.UserReport
             (
                 r.Id,
-                r.SelfId,
+                r.SelfId ?? 0,
                 r.OtherId,
                 r.FilingDate,
                 r.Type,
@@ -32,7 +32,7 @@ namespace Repository
             Select(r => new Core.Boundaries.GatheringReport
             (
                 r.Id,
-                r.UserId,
+                r.UserId ?? 0,
                 r.GatheringId,
                 r.FilingDate,
                 r.Type,
@@ -46,7 +46,7 @@ namespace Repository
             Select(r => new Core.Boundaries.SnapshotReport
             (
                 r.Id,
-                r.UserId,
+                r.UserId ?? 0,
                 r.SnapshotId,
                 r.FilingDate,
                 r.Type,
@@ -65,7 +65,7 @@ namespace Repository
             Select(r => new Core.Boundaries.GatheringReport
             (
                 r.Id,
-                r.UserId,
+                r.UserId ?? 0,
                 r.GatheringId,
                 r.FilingDate,
                 r.Type,
@@ -82,7 +82,7 @@ namespace Repository
              Select(r => new Core.Boundaries.UserReport
              (
                  r.Id,
-                 r.SelfId,
+                 r.SelfId ?? 0,
                  r.OtherId,
                  r.FilingDate,
                  r.Type,
@@ -102,7 +102,7 @@ namespace Repository
             Select(r => new Core.Boundaries.GatheringReport
             (
                 r.Id,
-                r.UserId,
+                r.UserId ?? 0,
                 r.GatheringId,
                 r.FilingDate,
                 r.Type,
@@ -122,7 +122,7 @@ namespace Repository
             Select(r => new Core.Boundaries.SnapshotReport
             (
                r.Id,
-               r.UserId,
+               r.UserId ?? 0,
                r.SnapshotId,
                r.FilingDate,
                r.Type,
@@ -204,7 +204,7 @@ namespace Repository
             Select(r => new Core.Boundaries.SnapshotReport
             (
                 r.Id,
-                r.UserId,
+                r.UserId ?? 0,
                 r.SnapshotId,
                 r.FilingDate,
                 r.Type,

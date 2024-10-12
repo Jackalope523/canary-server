@@ -63,18 +63,18 @@ namespace Repository
 
 
         // Default Values
-        public static long DefaultId { get; set; } = long.MinValue;
-        public static string DefaultPhoneNumber { get; set; } = "8199198013";
-        public static string DefaultEmail { get; set; } = "JohnDoe@Test.com";
-        public static string DefaultNormalisedEmail { get; set; } = "johndoe@test.com";
-        public static string DefaultName { get; set; } = "John Doe";
-        public static string DefaultPseudonym { get; set; } = "JohnBoy";
+        public static long DefaultId { get; set; } = 0;
+        public static string DefaultPhoneNumber { get; set; } = "";
+        public static string DefaultEmail { get; set; } = "";
+        public static string DefaultNormalisedEmail { get; set; } = "";
+        public static string DefaultName { get; set; } = "";
+        public static string DefaultPseudonym { get; set; } = "";
         public static DateTimeOffset DefaultDateOfBirth { get; set; } = DateTimeOffset.MinValue;
         public static DateTimeOffset DefaultJoinDate { get; set; } = DateTimeOffset.MinValue;
         public static int DefaultReputation { get; set; } = 50;
         public static bool DefaultIsPhoneConfirmed { get; set; } = false;
         public static bool DefaultIsEmailConfirmed { get; set; } = false;
-        public static string DefaultSecurityStamp { get; set; } = "ijhbzdfsoiuh9ui239";
+        public static string DefaultSecurityStamp { get; set; } = "";
         public static DateTimeOffset? DefaultLockoutDate { get; set; } = null;
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;

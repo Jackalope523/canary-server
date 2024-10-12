@@ -10,7 +10,7 @@ namespace Repository
         public string Name { get; set; } = DefaultName;
         public string Description { get; set; } = DefaultDescription;
         public DateTimeOffset StartTime { get; set; } = DefaultStartTime;
-        public long HostId { get; set; } = DefaultHostId;
+        public long? HostId { get; set; } = DefaultHostId;
 
         // X = Longitude Y = Latitude
         public Point Location { get; set; } = DefaultLocation;

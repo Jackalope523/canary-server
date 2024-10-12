@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Security.KeyVault.Certificates;
+using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
 
 namespace Repository

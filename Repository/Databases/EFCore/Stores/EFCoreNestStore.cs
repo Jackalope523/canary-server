@@ -6,6 +6,8 @@ namespace Repository
 {
     public class EFCoreNestStore : QueryStore, INestDatabase
     {     
+        private InternalUtilityStore internalUtilityStore;
+
         private static readonly Func<CanaryContext, long, long, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
                 (CanaryContext ctx, long selfId, long otherId, UserRelationship.UserLinkType type) =>
@@ -15,6 +17,7 @@ namespace Repository
 
         public EFCoreNestStore(Harbor.Flag flag) : base(flag)
         {
+            internalUtilityStore = new(flag);
         }
         
         public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
@@ -203,7 +206,7 @@ namespace Repository
                 Select(g => new CoreGathering
                 (
                    g.Id,
-                   new UserShard(g.HostId, null),
+                   new UserShard(g.HostId ?? 0, null),
                    g.Name,
                    g.Description,
                    g.StartTime,
@@ -231,11 +234,7 @@ namespace Repository
                    )).
                 FirstAsync());
 
-            UserShard host = await storeSentry.ExecuteReadAsync(ctx => 
-                                ctx.Users.
-                                Where(u => u.Id == firstMutualGathering.Host.Id).
-                                Select(u => new UserShard(u.Id, u.Name)).
-                                SingleAsync());
+            UserShard host = await internalUtilityStore.GetHostShard(firstMutualGathering.Host.Id);
 
             return firstMutualGathering with { Host = host };
         }
@@ -260,7 +259,7 @@ namespace Repository
                 Select(g => new CoreGathering
                 (
                    g.Id,
-                   new UserShard(g.HostId, null),
+                   new UserShard(g.HostId ?? 0, null),
                    g.Name,
                    g.Description,
                    g.StartTime,
@@ -288,11 +287,7 @@ namespace Repository
                    )).
                 FirstAsync());
 
-            UserShard host = await storeSentry.ExecuteReadAsync(ctx =>
-                                ctx.Users.
-                                Where(u => u.Id == latestMutualGathering.Host.Id).
-                                Select(u => new UserShard(u.Id, u.Name)).
-                                SingleAsync());
+            UserShard host = await internalUtilityStore.GetHostShard(latestMutualGathering.Host.Id);
 
             return latestMutualGathering with { Host = host };
         }

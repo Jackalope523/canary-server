@@ -7,7 +7,7 @@ namespace Repository
         public GatheringReportType Type { get; set; }
 
         public long Id { get; init; }
-        public long UserId { get; init; }
+        public long? UserId { get; init; }
         public long GatheringId { get; init; }
         public DateTimeOffset FilingDate { get; init; }
         public string Notes { get; init; }

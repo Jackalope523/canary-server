@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Core.Boundaries;
 using Xunit.Abstractions;
-using NetTopologySuite.Geometries;
-
-using Microsoft.Extensions.Logging;
 
 namespace Repository.Tests
 {
@@ -40,7 +37,7 @@ namespace Repository.Tests
         public async Task CreateGatheringAsync_SUCCESS()
         {
             CoreGathering createdShard = await store.CreateGatheringAsync(
-                testGathering.HostId,
+                testGathering.HostId ?? 0,
                 testGathering.Name,
                 testGathering.Description,
                 testGathering.StartTime,
