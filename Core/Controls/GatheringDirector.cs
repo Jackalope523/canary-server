@@ -308,17 +308,24 @@ namespace Core.Controls
 			// Update all participants' vectors
 			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(CoreUser.Character), user.Character) });
 
-			if (gathering.Duration > TimeSpan.FromMinutes(30))
+			// Gather no-shows
+            var absentUsers = (await gathering.Guests).Except(await gathering.Arrived).Except(await gathering.Left);
+
+            if (gathering.Duration > TimeSpan.FromMinutes(20))
 			{
 				// Notify no-shows
-				var absentUsers = (await gathering.Guests).Except(await gathering.Arrived).Except(await gathering.Left);
-
 				foreach (var absent in absentUsers)
 				{
 					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee, $"{gathering.Title}");
 				}
+            }
+
+			// Remove no-shows from the guest list
+			foreach (var absent in absentUsers)
+			{
+				await Gatherings.DeleteUserStateAsync(absent.Id, gathering.Id);
 			}
-		}
+        }
 
 		public async Task DeleteGatheringAsync(long userId, long gatheringId)
 		{
