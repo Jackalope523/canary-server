@@ -73,7 +73,7 @@ namespace Frontier
                 "Staging" => EnvironmentFlag.Staging,
                 "Development" => EnvironmentFlag.Development,
                 _ => throw new InvalidEnvironmentException("Unknown ASPNETCORE_ENVIRONMENT set.")
-            }; ;
+            };
 
             EnvironmentOptions environment = new() { Flag = EnvironmentFlag.Production };
 
