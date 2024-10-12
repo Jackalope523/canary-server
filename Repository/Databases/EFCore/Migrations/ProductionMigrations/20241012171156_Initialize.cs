@@ -16,7 +16,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Banners",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
@@ -32,7 +32,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
@@ -48,7 +48,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     LockoutDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     AccessTries = table.Column<int>(type: "int", nullable: false),
                     AccountStatus = table.Column<int>(type: "int", nullable: false),
-                    CurrentGathering = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
+                    CurrentGathering = table.Column<long>(type: "bigint", nullable: true),
                     IsPendingDeletion = table.Column<bool>(type: "bit", nullable: false),
                     TimeOfUserAgreement = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -75,10 +75,10 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "BannerLinks",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    BannerId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    BannerId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
@@ -100,9 +100,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Feedback",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: true),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Comments = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
                 },
@@ -120,12 +120,12 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Gatherings",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    HostId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    HostId = table.Column<long>(type: "bigint", nullable: true),
                     Location = table.Column<Point>(type: "geography", nullable: false),
                     FriendlyLocation = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
@@ -160,9 +160,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Penalties",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PenalizedId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    PenalizedId = table.Column<long>(type: "bigint", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
@@ -180,9 +180,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Subscriptions",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
                     DeviceToken = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
@@ -199,10 +199,10 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Telegrams",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NotifierId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    RecipientId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    NotifierId = table.Column<long>(type: "bigint", nullable: false),
+                    RecipientId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Message = table.Column<int>(type: "int", nullable: false),
                     Action = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
@@ -227,10 +227,10 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "UserLinks",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SelfId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    OtherId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    SelfId = table.Column<long>(type: "bigint", nullable: false),
+                    OtherId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false)
                 },
@@ -253,10 +253,10 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "GatheringLinks",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false)
                 },
@@ -279,11 +279,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "GatheringReports",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: true),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false)
                 },
@@ -306,10 +306,10 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "GuestClearances",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Degree = table.Column<int>(type: "int", nullable: false)
                 },
@@ -332,10 +332,10 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "Snapshots",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    OwnerId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    OwnerId = table.Column<long>(type: "bigint", nullable: false),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: false),
                     PostedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
@@ -357,12 +357,12 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "UserReports",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    SelfId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    OtherId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    GatheringId = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
+                    SelfId = table.Column<long>(type: "bigint", nullable: true),
+                    OtherId = table.Column<long>(type: "bigint", nullable: false),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: true),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false)
                 },
@@ -390,10 +390,10 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "SnapshotLinks",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    SnapshotId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    SnapshotId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false)
                 },
@@ -416,11 +416,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                 name: "SnapshotReports",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
-                    SnapshotId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: true),
+                    SnapshotId = table.Column<long>(type: "bigint", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false)
                 },

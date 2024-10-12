@@ -25,11 +25,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Banner", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -58,20 +58,20 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.BannerLink", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal>("BannerId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("BannerId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -84,14 +84,14 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal>("PenalizedId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("PenalizedId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -108,19 +108,19 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("DeviceToken")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -131,11 +131,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Action")
                         .IsRequired()
@@ -145,14 +145,14 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("Message")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("NotifierId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("NotifierId")
+                        .HasColumnType("bigint");
 
                     b.Property<bool>("Read")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("RecipientId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("RecipientId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -168,11 +168,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Feedback", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Comments")
                         .IsRequired()
@@ -182,8 +182,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -194,11 +194,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<int>("Age")
                         .HasColumnType("int");
@@ -237,8 +237,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("GroupMinimum")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("HostId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long?>("HostId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Industriousness")
                         .HasColumnType("int");
@@ -286,14 +286,14 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("GatheringId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -301,8 +301,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -315,17 +315,17 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("GatheringId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Notes")
                         .IsRequired()
@@ -335,8 +335,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -349,23 +349,23 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<int>("Degree")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("GatheringId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -379,17 +379,17 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.Snapshot", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("GatheringId")
+                        .HasColumnType("bigint");
 
-                    b.Property<decimal>("OwnerId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("OwnerId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("PostedAt")
                         .HasColumnType("datetimeoffset");
@@ -405,14 +405,14 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal>("SnapshotId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("SnapshotId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -420,8 +420,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -435,11 +435,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("datetimeoffset");
@@ -449,14 +449,14 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<decimal>("SnapshotId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("SnapshotId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("UserId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -469,11 +469,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.User", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<int>("AccessTries")
                         .HasColumnType("int");
@@ -493,8 +493,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("Competitiveness")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("CurrentGathering")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long?>("CurrentGathering")
+                        .HasColumnType("bigint");
 
                     b.Property<Point>("CurrentLocation")
                         .IsRequired()
@@ -591,17 +591,17 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.UserRelationship", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal>("OtherId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("OtherId")
+                        .HasColumnType("bigint");
 
-                    b.Property<decimal>("SelfId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("SelfId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -621,28 +621,28 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
             modelBuilder.Entity("Repository.UserReport", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTimeOffset>("FilingDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal?>("GatheringId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long?>("GatheringId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<decimal>("OtherId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long>("OtherId")
+                        .HasColumnType("bigint");
 
-                    b.Property<decimal>("SelfId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<long?>("SelfId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -723,8 +723,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Feedback")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("User");
                 });
@@ -734,8 +733,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "Host")
                         .WithMany("HostedGatherings")
                         .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Host");
                 });
@@ -770,8 +768,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Gathering");
 
@@ -846,8 +843,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("SnapshotReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Snapshot");
 
@@ -889,8 +885,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "Self")
                         .WithMany("ReporterList")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Gathering");
 
