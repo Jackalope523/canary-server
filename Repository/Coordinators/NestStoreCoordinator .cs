@@ -29,7 +29,7 @@
         {
             return await store.GetAppreciatedUsersAsync(id);
         }
-        public async Task<List<UserShard>> GetBlockedUsersAsync(long id) 
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long id) 
         {
             return await store.GetBlockedUsersAsync(id);
         }

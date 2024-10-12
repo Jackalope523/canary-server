@@ -112,7 +112,7 @@ namespace Repository
                  ).
              ToListAsync());
         }
-        public async Task<List<UserShard>> GetBlockedUsersAsync(long id) 
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Block).
@@ -120,7 +120,7 @@ namespace Repository
                 ctx.Users, 
                 l => l.OtherId, 
                 u => u.Id, 
-                (l,u) => new UserShard(u.Id, u.Name)
+                (l,u) => new BlockedUserShard(u.Id, u.Name, l.Time)
                 ).
             ToListAsync());
         }
