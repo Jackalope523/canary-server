@@ -7,7 +7,7 @@ namespace Core.Boundaries
     #region Schemas
 
     public record NestShard(List<TwigShard> Twigs,
-        long RelativeGatheringId = default, DateTimeOffset BlockedSince = default);
+        long RelativeGatheringId = default);
     public record TwigShard(long GatheringId, DateTimeOffset StartTime);
 
     public record AgendaShard(List<CardShard> Cards);
