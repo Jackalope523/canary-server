@@ -90,7 +90,7 @@ namespace Repository.Tests
         public async Task ReportGatheringAsync_SUCCESS()
         {
             string notes = "Test";
-            GatheringReportType type = GatheringReportType.Inappropriate;
+            GatheringReportType type = GatheringReportType.InappropriateHeader;
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
             await store.ReportGatheringAsync(subject1.Id, testGathering.Id, time, type, notes);
