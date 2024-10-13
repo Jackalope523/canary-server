@@ -29,7 +29,7 @@ namespace Core.Entities
             => new() { Id = 0 };
 
         public static User Hidden
-            => new() { Id = -1 };
+            => new() { Id = -1, Name = "hidden" };
 
         public static User Hollow
             => new() { Id = -2 };
