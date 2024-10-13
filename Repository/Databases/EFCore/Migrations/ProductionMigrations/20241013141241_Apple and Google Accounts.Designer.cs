@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
@@ -12,9 +13,11 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
     [DbContext(typeof(AzureProductionContext))]
-    partial class AzureProductionContextModelSnapshot : ModelSnapshot
+    [Migration("20241013141241_Apple and Google Accounts")]
+    partial class AppleandGoogleAccounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

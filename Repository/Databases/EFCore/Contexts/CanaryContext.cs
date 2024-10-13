@@ -26,6 +26,24 @@ namespace Repository
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // User
+            modelBuilder.Entity<User>()
+                .HasData(new User()
+                {
+                    Id = -7,
+                    PhoneNumber = "11002003007",
+                    Name = "Apple Test Account",
+                    IsPhoneConfirmed = true,
+                });
+
+            modelBuilder.Entity<User>()
+               .HasData(new User()
+               {
+                   Id = -8,
+                   PhoneNumber = "11002003008",
+                   Name = "Google Test Account",
+                   IsPhoneConfirmed = true,
+               });
+
             modelBuilder.Entity<User>().Property(u => u.Email)
                 .HasMaxLength(255);
 
