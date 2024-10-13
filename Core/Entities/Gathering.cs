@@ -20,8 +20,8 @@ namespace Core.Entities
 		// Constants
 		//////////////
 
-		public const int MaximumNameLength = 50;
-        public const int MaximumDescLength = 400;
+		public const int MaximumNameLength = 30;
+        public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
