@@ -254,14 +254,14 @@ namespace Frontier.Controllers
                     var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
 
                     // Check if account is activated
-                    if (!await userManager.IsPhoneNumberConfirmedAsync(user))
+                    if (await userManager.IsPhoneNumberConfirmedAsync(user))
+                    { throw e; }
+                    // Account is not activated, send an SMS with a generated change number token
+                    else
                     {
-                        // Account is not activated, send an SMS with a generated change number token
                         var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
                         await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
                     }
-
-                    throw e;
                 }
             });
         }
@@ -313,6 +313,8 @@ namespace Frontier.Controllers
 
         #endregion
 
+        #region Tools
+
         private class BypassHandler
         {
             private EnvironmentOptions env;
@@ -358,5 +360,7 @@ namespace Frontier.Controllers
                 return !string.IsNullOrEmpty(staticCode) && code.Equals(staticCode);
             }
         }
+
+        #endregion
     }
 }

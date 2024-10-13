@@ -79,7 +79,7 @@ namespace Frontier.Controllers
 		[HttpGet("avatars/{userId}/metadata")]
 		public async Task<IActionResult> GetAvatarMetadata(long userId)
         {
-            return await Execute(user => media.GetAvatarMetadataAsync(user.Id, userId));
+            return await Execute(async user => await media.GetAvatarMetadataAsync(user.Id, userId));
         }
 
 		[HttpGet("headers/{gatheringId}")]
@@ -110,7 +110,7 @@ namespace Frontier.Controllers
         [HttpGet("headers/{gatheringId}/metadata")]
         public async Task<IActionResult> GetHeaderMetadata(long gatheringId)
         {
-            return await Execute(user => media.GetHeaderMetadataAsync(user.Id, gatheringId));
+            return await Execute(async user => await media.GetHeaderMetadataAsync(user.Id, gatheringId));
         }
 
         [HttpGet("snapshots/{snapshotId}")]
@@ -141,7 +141,7 @@ namespace Frontier.Controllers
         [HttpGet("snapshots/{snapshotId}/metadata")]
         public async Task<IActionResult> GetSnapshotMetadata(long snapshotId)
         {
-            return await Execute(user => media.GetSnapshotMetadataAsync(user.Id, snapshotId));
+            return await Execute(async user => await media.GetSnapshotMetadataAsync(user.Id, snapshotId));
         }
 
         #endregion

@@ -560,7 +560,7 @@ namespace Core.Controls
 
 			// Gather
 			var allGuests = SelectAsShard(await gathering.AllUsers,
-				user => user.State != GatheringBond.Watching);
+				user => user.State != GatheringBond.Watching && user.State != GatheringBond.Kicked);
 
 			// Sort
 			allGuests.Sort((bond1, bond2) =>
@@ -861,7 +861,7 @@ namespace Core.Controls
 
 		private GuestListBondPair AsHiddenBondPair(GatheringBond bond)
 		{
-			return new(new(-2, "hidden"), bond);
+			return new(User.Hidden.ToUserShard(), bond);
 		}
 
         private int GetBondPriority(GatheringBond bond)

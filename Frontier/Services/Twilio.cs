@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Twilio;
 using Core;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace Frontier.Services
 {
@@ -28,15 +29,11 @@ namespace Frontier.Services
             if (env.IsProduction)
             {
                 log.LogInformation("Sending SMS to {phoneNumber}: {message}", phoneNumber, message);
-                /*
-                if (phoneNumber[0] == '+')
-                {
-                    await MessageResource.CreateAsync(
-                        messagingServiceSid: messagingServiceSid,
-                        to: new Twilio.Types.PhoneNumber(phoneNumber),
-                        body: message);
-                }
-                */
+
+				await MessageResource.CreateAsync(
+                    messagingServiceSid: messagingServiceSid,
+                    to: new Twilio.Types.PhoneNumber($"+{phoneNumber}"),
+                    body: message);
             }
             else
             {
