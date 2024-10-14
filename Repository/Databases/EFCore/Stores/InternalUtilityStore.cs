@@ -35,10 +35,6 @@ namespace Repository
                 {
                     hosts.Add(new UserShard(0, "DeletedUser"));
                 }
-                else
-                {
-                    break;
-                }
             }
 
             List<UserShard> notNullHosts = await storeSentry.ExecuteReadAsync(ctx =>
