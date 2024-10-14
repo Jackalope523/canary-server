@@ -370,6 +370,27 @@ namespace Core.Entities
             return true;
 		}
 
+		public async Task<bool> CanCheckIn(Gathering gathering)
+		{
+			// Check if currently at another gathering
+			if (await IsAtGathering())
+			{ return false; }
+
+			// Check if user is incoming to the gathering
+			if ((await NextGathering()).Equals(gathering))
+			{ return false; }
+
+            // Check that gathering is ongoing
+            if (!gathering.IsOngoing)
+			{ return false; }
+
+            // Check if user is in range of the gathering
+			// if (!GeoLocation.AreInRange(await LastKnownLocation, gathering.Location, Gathering.MaximumJoinDistance))
+			// { return false; }
+
+            return true;
+		}
+
         public async Task CanEtch(Gathering gathering)
 		{
 			// Verify snapshot is not before gathering starting or user is host

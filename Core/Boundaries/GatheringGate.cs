@@ -96,6 +96,7 @@ namespace Core.Boundaries
 
 		Task<bool> AuthorisedToStart(long userId, long gatheringId);
 		Task<bool> AuthorisedToJoin(long userId, long gatheringId);
+		Task<bool> AuthorisedToCheckIn(long userId, long gatheringId);
 		Task<bool> AuthorisedToUpload(long userId, long gatheringId);
 	}
 
