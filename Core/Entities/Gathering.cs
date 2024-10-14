@@ -20,7 +20,7 @@ namespace Core.Entities
 		// Constants
 		//////////////
 
-		public const int MaximumNameLength = 30;
+		public const int MaximumTitleLength = 30;
         public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
 
@@ -203,7 +203,7 @@ namespace Core.Entities
             issues = "";
 
             // Sanitise User content
-            Title = ContentValidation.NormaliseText(Title, MaximumNameLength);
+            Title = ContentValidation.NormaliseText(Title, MaximumTitleLength);
             if (string.IsNullOrEmpty(Title)) { issues += "Title cannot be empty. "; }
 
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);

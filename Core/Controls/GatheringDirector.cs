@@ -710,6 +710,14 @@ namespace Core.Controls
 			return await user.CanJoin(gathering);
         }
 
+		public async Task<bool> AuthorisedToCheckIn(long userId, long gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetGatheringAsync(gatheringId);
+
+            return await user.CanCheckIn(gathering);
+        }
+
 		public async Task<bool> AuthorisedToUpload(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);

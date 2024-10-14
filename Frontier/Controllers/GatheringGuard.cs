@@ -221,6 +221,12 @@ namespace Frontier.Controllers
 			return await Execute(async user => await gatherings.AuthorisedToJoin(user.Id, gatheringId));
 		}
 
+		[HttpGet("{gatheringId}/authorisation/checkin")]
+		public async Task<IActionResult> CheckCheckInAuthorisation(long gatheringId)
+		{
+			return await Execute(async user => await gatherings.AuthorisedToCheckIn(user.Id, gatheringId));
+		}
+
 		[HttpGet("{gatheringId}/authorisation/upload")]
 		public async Task<IActionResult> CheckUploadAuthorisation(long gatheringId)
 		{
