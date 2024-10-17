@@ -6,13 +6,12 @@ namespace Repository
 {
     public class EFCoreGatheringStore : QueryStore, IGatheringDatabase
     {
-        private InternalUtilityStore internalUtilityStore;
         public EFCoreGatheringStore(Harbor.Flag flag) : base(flag)
         {
-            internalUtilityStore = new InternalUtilityStore(flag);
+
         }
 
-        private async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList)
+        private async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
         {
             if (degree == 0) return;
 
@@ -24,15 +23,15 @@ namespace Repository
 
             if (id != 0)
             {
-               await storeSentry.ExecuteWriteAsync(ctx =>
+               storeSentry.DiscussWrite(ctx =>
                ctx.GuestClearances.
-               AddAsync(new GuestClearance
+               Add(new GuestClearance
                {
                    UserId = userId,
                    GatheringId = gatheringId,
                    Degree = degree,
                }
-               ));
+               ), discussion);
             }
             else return;
 
@@ -53,7 +52,7 @@ namespace Repository
             List<Task> tasks = new();
             foreach (long companion in companions)
             {
-                tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).ToList()));
+                tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).ToList(), discussion));
             }
             await Task.WhenAll(tasks);
         }
@@ -72,7 +71,9 @@ namespace Repository
                 List<Task> tasks = new();
                 foreach (long user in edgeUsers)
                 {
-                    tasks.Add(PropagateClearance(user, gatheringId, newDegreeOfPrivacy - previousDegreeOfPrivacy, new(edgeUsers)));
+                    Discussion discussion = storeSentry.BeginDiscussion();
+                    tasks.Add(PropagateClearance(user, gatheringId, newDegreeOfPrivacy - previousDegreeOfPrivacy, new(edgeUsers), discussion));
+                    storeSentry.EndDiscussion(discussion);
                 }
                 await Task.WhenAll(tasks);
             }
@@ -129,7 +130,9 @@ namespace Repository
 
             if (degreeOfPrivacy < 3)
             {
-                await PropagateClearance(hostId, toCreate.Id, degreeOfPrivacy, new());
+                Discussion discussion = storeSentry.BeginDiscussion();
+                await PropagateClearance(hostId, toCreate.Id, degreeOfPrivacy, new(), discussion);
+                storeSentry.EndDiscussion(discussion);
             }
 
             return new CoreGathering
@@ -183,50 +186,57 @@ namespace Repository
                 gathering = await storeSentry.ExecuteReadAsync(ctx =>
                     ctx.Gatherings.
                     Where(e => e.Id == currentGathering).
-                    Select(e => new CoreGathering
+                    GroupJoin(
+                        ctx.Users,
+                        e => e.HostId,
+                        u => u.Id,
+                        (g, users) => new { g, user = users.FirstOrDefault() }).
+                    Select(pair => new CoreGathering
                     (
-                        e.Id,
-                        new UserShard(e.HostId ?? 0, null),
-                        e.Name,
-                        e.Description,
-                        e.StartTime,
-                        e.Location.Y,
-                        e.Location.X,
-                        e.FriendlyLocation,
-                        e.EndTime,
-                        e.State,
-                        e.GroupMinimum,
-                        e.GroupMaximum,
+                        pair.g.Id,
+                        pair.user != null ? new UserShard(pair.user.Id, pair.user.Name) : new UserShard(0, "DeletedGathering"),
+                        pair.g.Name,
+                        pair.g.Description,
+                        pair.g.StartTime,
+                        pair.g.Location.Y,
+                        pair.g.Location.X,
+                        pair.g.FriendlyLocation,
+                        pair.g.EndTime,
+                        pair.g.State,
+                        pair.g.GroupMinimum,
+                        pair.g.GroupMaximum,
                         new CharacterShard(
-                        e.Extroversion,
-                        e.Athleticisme,
-                        e.Chaos,
-                        e.Competitiveness,
-                        e.Industriousness,
-                        e.NightOwl,
-                        e.Openness,
-                        e.Age),
-                        e.Radius,
-                        e.IsDynamic,
-                        e.IsPendingDeletion,
-                        e.NumberOfGuests,
-                        e.DegreeOfPrivacy
+                        pair.g.Extroversion,
+                        pair.g.Athleticisme,
+                        pair.g.Chaos,
+                        pair.g.Competitiveness,
+                        pair.g.Industriousness,
+                        pair.g.NightOwl,
+                        pair.g.Openness,
+                        pair.g.Age),
+                        pair.g.Radius,
+                        pair.g.IsDynamic,
+                        pair.g.IsPendingDeletion,
+                        pair.g.NumberOfGuests,
+                        pair.g.DegreeOfPrivacy
                         )).SingleAsync());
-
-                UserShard host = await internalUtilityStore.GetHostShard(gathering.Host.Id);
-
-
-                gathering =  gathering with { Host = host };
             }
             return gathering;          
         }
         public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id) 
         {
-            List<CoreGathering> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
-             ctx.GatheringLinks.
-             Where(l => l.UserId == id && l.Type == GatheringBond.Guest).
-             Join(
-                ctx.Gatherings.Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.OngoingOpen) && !e.IsPendingDeletion),
+            List<long> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
+               ctx.GatheringLinks.
+               Where(l => l.UserId == id && l.Type == GatheringBond.Arrived).
+               Select(l => l.GatheringId).
+               ToListAsync());
+
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.GatheringLinks
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
+            .Join(
+                ctx.Gatherings
+                .Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.OngoingOpen) && !e.IsPendingDeletion && !toExclude.Contains(e.Id)),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
@@ -255,64 +265,124 @@ namespace Repository
                     e.IsPendingDeletion,
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy
-                }).
-             Join(
-                 ctx.Users,
-                 e => e.HostId,
-                 u => u.Id,
-                 (e, u) => new CoreGathering
-                 (
+                })
+            .GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, userGroup) => new { e, user = userGroup.FirstOrDefault() })
+            .Select(joinResult => new CoreGathering
+            (
+                joinResult.e.Id,
+                joinResult.user != null ? new UserShard(joinResult.user.Id, joinResult.user.Name) : new UserShard(0, "DeletedUser"),  
+                joinResult.e.Name,
+                joinResult.e.Description,
+                joinResult.e.StartTime,
+                joinResult.e.Location.Y,
+                joinResult.e.Location.X,
+                joinResult.e.FriendlyLocation,
+                joinResult.e.EndTime,
+                joinResult.e.State,
+                joinResult.e.GroupMinimum,
+                joinResult.e.GroupMaximum,
+                new CharacterShard(
+                    joinResult.e.Age,
+                    joinResult.e.Extroversion,
+                    joinResult.e.Athleticisme,
+                    joinResult.e.Chaos,
+                    joinResult.e.Competitiveness,
+                    joinResult.e.Industriousness,
+                    joinResult.e.NightOwl,
+                    joinResult.e.Openness
+                    ),
+                joinResult.e.Radius,
+                joinResult.e.IsDynamic,
+                joinResult.e.IsPendingDeletion,
+                joinResult.e.NumberOfGuests,
+                joinResult.e.DegreeOfPrivacy
+                ))
+            .ToListAsync());
+        }
+        public async Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(long id) 
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.GatheringLinks
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Watching)
+            .Join(
+                ctx.Gatherings
+                .Where(e => !e.IsPendingDeletion),
+                l => l.GatheringId,
+                e => e.Id,
+                (l, e) => new
+                {
                     e.Id,
-                    new UserShard(u.Id, u.Name),
                     e.Name,
+                    e.HostId,
                     e.Description,
                     e.StartTime,
-                    e.Location.Y,
-                    e.Location.X,
+                    e.Location,
                     e.FriendlyLocation,
                     e.EndTime,
                     e.State,
                     e.GroupMinimum,
                     e.GroupMaximum,
-                    new CharacterShard(
-                    e.Age,
                     e.Extroversion,
                     e.Athleticisme,
                     e.Chaos,
                     e.Competitiveness,
                     e.Industriousness,
                     e.NightOwl,
-                    e.Openness),
+                    e.Age,
+                    e.Openness,
                     e.Radius,
                     e.IsDynamic,
                     e.IsPendingDeletion,
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy
-                 )).ToListAsync());
-
-            List<long> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.UserId == id && l.Type == GatheringBond.Arrived).
-               Select(l => l.GatheringId).
-               ToListAsync());
-
-            for (int i = 0; i < upcomingGatherings.Count; i++)
-            {
-                if (toExclude.Contains(upcomingGatherings[i].Id))
-                {
-                    upcomingGatherings.RemoveAt(i);
-                    i--;
-                }
-            }
-
-            return upcomingGatherings;
+                })
+            .GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, userGroup) => new { e, user = userGroup.FirstOrDefault() })
+            .Select(joinResult => new CoreGathering
+            (
+                joinResult.e.Id,
+                joinResult.user != null ? new UserShard(joinResult.user.Id, joinResult.user.Name) : new UserShard(0, "DeletedUser"),
+                joinResult.e.Name,
+                joinResult.e.Description,
+                joinResult.e.StartTime,
+                joinResult.e.Location.Y,
+                joinResult.e.Location.X,
+                joinResult.e.FriendlyLocation,
+                joinResult.e.EndTime,
+                joinResult.e.State,
+                joinResult.e.GroupMinimum,
+                joinResult.e.GroupMaximum,
+                new CharacterShard(
+                    joinResult.e.Age,
+                    joinResult.e.Extroversion,
+                    joinResult.e.Athleticisme,
+                    joinResult.e.Chaos,
+                    joinResult.e.Competitiveness,
+                    joinResult.e.Industriousness,
+                    joinResult.e.NightOwl,
+                    joinResult.e.Openness),
+                joinResult.e.Radius,
+                joinResult.e.IsDynamic,
+                joinResult.e.IsPendingDeletion,
+                joinResult.e.NumberOfGuests,
+                joinResult.e.DegreeOfPrivacy
+                ))
+            .ToListAsync());
         }
-        public async Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(long id) 
+
+        public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-             ctx.GatheringLinks.
-             Where(l => l.UserId == id && l.Type == GatheringBond.Watching).
-             Join(
+            ctx.GatheringLinks
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Left)
+            .Join(
                 ctx.Gatherings.Where(e => !e.IsPendingDeletion),
                 l => l.GatheringId,
                 e => e.Id,
@@ -342,150 +412,87 @@ namespace Repository
                     e.IsPendingDeletion,
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy
-                }).
-             Join(
-                 ctx.Users,
-                 e => e.HostId,
-                 u => u.Id,
-                 (e, u) => new CoreGathering
-                 (
-                    e.Id,
-                    new UserShard(u.Id, u.Name),
-                    e.Name,
-                    e.Description,
-                    e.StartTime,
-                    e.Location.Y,
-                    e.Location.X,
-                    e.FriendlyLocation,
-                    e.EndTime,
-                    e.State,
-                    e.GroupMinimum,
-                    e.GroupMaximum,
+                }
+            )
+            .GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, users) => new { e, user = users.FirstOrDefault() }
+            )
+            .Select(
+                combined => new CoreGathering
+                (
+                    combined.e.Id,
+                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.e.Name,
+                    combined.e.Description,
+                    combined.e.StartTime,
+                    combined.e.Location.Y,
+                    combined.e.Location.X,
+                    combined.e.FriendlyLocation,
+                    combined.e.EndTime,
+                    combined.e.State,
+                    combined.e.GroupMinimum,
+                    combined.e.GroupMaximum,
                     new CharacterShard(
-                    e.Age,
-                    e.Extroversion,
-                    e.Athleticisme,
-                    e.Chaos,
-                    e.Competitiveness,
-                    e.Industriousness,
-                    e.NightOwl,
-                    e.Openness),
-                    e.Radius,
-                    e.IsDynamic,
-                    e.IsPendingDeletion,
-                    e.NumberOfGuests,
-                    e.DegreeOfPrivacy
-                 )).ToListAsync());
-        }
-        public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
-        {
-            return await storeSentry.ExecuteReadAsync(ctx =>
-           ctx.GatheringLinks.
-           Where(l => l.UserId == id && l.Type == GatheringBond.Left).
-           Join(
-              ctx.Gatherings.Where(e => !e.IsPendingDeletion),
-              l => l.GatheringId,
-              e => e.Id,
-              (l, e) => new
-              {
-                  e.Id,
-                  e.Name,
-                  e.HostId,
-                  e.Description,
-                  e.StartTime,
-                  e.Location,
-                  e.FriendlyLocation,
-                  e.EndTime,
-                  e.State,
-                  e.GroupMinimum,
-                  e.GroupMaximum,
-                  e.Extroversion,
-                  e.Athleticisme,
-                  e.Chaos,
-                  e.Competitiveness,
-                  e.Industriousness,
-                  e.NightOwl,
-                  e.Age,
-                  e.Openness,
-                  e.Radius,
-                  e.IsDynamic,
-                  e.IsPendingDeletion,
-                  e.NumberOfGuests,
-                  e.DegreeOfPrivacy
-              }).
-           Join(
-               ctx.Users,
-               e => e.HostId,
-               u => u.Id,
-               (e, u) => new CoreGathering
-               (
-                  e.Id,
-                  new UserShard(u.Id, u.Name),
-                  e.Name,
-                  e.Description,
-                  e.StartTime,
-                  e.Location.Y,
-                  e.Location.X,
-                  e.FriendlyLocation,
-                  e.EndTime,
-                  e.State,
-                  e.GroupMinimum,
-                  e.GroupMaximum,
-                  new CharacterShard(
-                  e.Age,
-                  e.Extroversion,
-                  e.Athleticisme,
-                  e.Chaos,
-                  e.Competitiveness,
-                  e.Industriousness,
-                  e.NightOwl,
-                  e.Openness),
-                  e.Radius,
-                  e.IsDynamic,
-                  e.IsPendingDeletion,
-                  e.NumberOfGuests,
-                  e.DegreeOfPrivacy
-               )).ToListAsync());
+                        combined.e.Age,
+                        combined.e.Extroversion,
+                        combined.e.Athleticisme,
+                        combined.e.Chaos,
+                        combined.e.Competitiveness,
+                        combined.e.Industriousness,
+                        combined.e.NightOwl,
+                        combined.e.Openness),
+                    combined.e.Radius,
+                    combined.e.IsDynamic,
+                    combined.e.IsPendingDeletion,
+                    combined.e.NumberOfGuests,
+                    combined.e.DegreeOfPrivacy
+                )
+            ).ToListAsync());
         }
         public async Task<CoreGathering> FindGatheringAsync(long id)
         {
-            CoreGathering gathering = await storeSentry.ExecuteReadAsync(ctx => 
+            return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Gatherings.
             Where(e => e.Id == id).
-            Select(e => new CoreGathering
-               (
-                   e.Id,
-                   new UserShard(e.HostId ?? 0, null),
-                   e.Name,
-                   e.Description,
-                   e.StartTime,
-                   e.Location.Y,
-                   e.Location.X,
-                   e.FriendlyLocation,
-                   e.EndTime,
-                   e.State,
-                   e.GroupMinimum,
-                   e.GroupMaximum,
-                   new CharacterShard(
-                   e.Age,
-                   e.Extroversion,
-                   e.Athleticisme,
-                   e.Chaos,
-                   e.Competitiveness,
-                   e.Industriousness,
-                   e.NightOwl,
-                   e.Openness),
-                   e.Radius,
-                   e.IsDynamic,
-                   e.IsPendingDeletion,
-                   e.NumberOfGuests,
-                   e.DegreeOfPrivacy
-               )).
-             SingleAsync());
-
-            UserShard host = await internalUtilityStore.GetHostShard(gathering.Host.Id);
-
-            return gathering with {Host = host } ;
+            GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, users) => new { e, user = users.FirstOrDefault() }).
+             Select(
+                combined => new CoreGathering
+                (
+                    combined.e.Id,
+                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.e.Name,
+                    combined.e.Description,
+                    combined.e.StartTime,
+                    combined.e.Location.Y,
+                    combined.e.Location.X,
+                    combined.e.FriendlyLocation,
+                    combined.e.EndTime,
+                    combined.e.State,
+                    combined.e.GroupMinimum,
+                    combined.e.GroupMaximum,
+                    new CharacterShard(
+                        combined.e.Age,
+                        combined.e.Extroversion,
+                        combined.e.Athleticisme,
+                        combined.e.Chaos,
+                        combined.e.Competitiveness,
+                        combined.e.Industriousness,
+                        combined.e.NightOwl,
+                        combined.e.Openness),
+                    combined.e.Radius,
+                    combined.e.IsDynamic,
+                    combined.e.IsPendingDeletion,
+                    combined.e.NumberOfGuests,
+                    combined.e.DegreeOfPrivacy
+                )
+            ).SingleAsync());
         }
         public async Task<List<CoreGathering>> FindGatheringsAsync(double latitude, double longitude, double distance)
         {

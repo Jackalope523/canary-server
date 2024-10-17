@@ -28,8 +28,8 @@ namespace Repository.Tests
         public void Dispose()
         {
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Gatherings.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
         }
 
 
@@ -349,7 +349,7 @@ namespace Repository.Tests
             Assert.Equal(testGathering.State, gathering.State);
         }
         [Fact]
-        public async Task FindUpcomingGatheringsForUserAsync_SUCCESS()
+        public async Task FindUpcomingGatheringsForUserAsync_Standard()
         {
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
@@ -358,6 +358,30 @@ namespace Repository.Tests
 
             Assert.NotNull(gathering);
             Assert.Equal(testGathering.HostId, gathering.Host.Id);
+            Assert.Equal(testGathering.Name, gathering.Title);
+            Assert.Equal(testGathering.Description, gathering.Description);
+            Assert.Equal(testGathering.StartTime, gathering.StartTime);
+            Assert.Equal(testGathering.Location.Y, gathering.Latitude);
+            Assert.Equal(testGathering.Location.X, gathering.Longitude);
+            Assert.Equal(testGathering.GroupMinimum, gathering.GroupMinimum);
+            Assert.Equal(testGathering.GroupMaximum, gathering.GroupMaximum);
+            Assert.Equal(testGathering.State, gathering.State);
+        }
+        [Fact]
+        public async Task FindUpcomingGatheringsForUserAsync_Orphan()
+        {
+            User guest = new UserFactory().Create();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(guest));
+    
+            GatheringLink link = new GatheringLinkFactory().Create(guest, testGathering, GatheringBond.Guest);
+            sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
+
+            sentry.ExecuteWrite(ctx => ctx.Users.Remove(testUser));
+
+            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(guest.Id)).First();
+
+            Assert.NotNull(gathering);
+            Assert.Equal(0, gathering.Host.Id);
             Assert.Equal(testGathering.Name, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
@@ -549,6 +573,6 @@ namespace Repository.Tests
             int count = sentry.ExecuteRead(ctx => ctx.Gatherings.Count());
 
             Assert.Equal(1, count);
-        }      
+        }
     }
 }

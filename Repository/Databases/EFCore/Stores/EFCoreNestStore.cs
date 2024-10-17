@@ -1,13 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using System.Collections.Immutable;
 
 namespace Repository
 {
     public class EFCoreNestStore : QueryStore, INestDatabase
     {     
-        private InternalUtilityStore internalUtilityStore;
-
         private static readonly Func<CanaryContext, long, long, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
                 (CanaryContext ctx, long selfId, long otherId, UserRelationship.UserLinkType type) =>
@@ -17,7 +13,7 @@ namespace Repository
 
         public EFCoreNestStore(Harbor.Flag flag) : base(flag)
         {
-            internalUtilityStore = new(flag);
+
         }
         
         public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
@@ -199,43 +195,44 @@ namespace Repository
 
             List<long> mutualGatherings = a.Intersect(b).ToList();
 
-            CoreGathering firstMutualGathering = await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
                 Where(g => mutualGatherings.Contains(g.Id)).
                 OrderByDescending(g => g.StartTime).
-                Select(g => new CoreGathering
+                GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, users) => new { e, user = users.FirstOrDefault() }).
+                Select(
+                combined => new CoreGathering
                 (
-                   g.Id,
-                   new UserShard(g.HostId ?? 0, null),
-                   g.Name,
-                   g.Description,
-                   g.StartTime,
-                   g.Location.Y,
-                   g.Location.X,
-                   g.FriendlyLocation,
-                   g.EndTime,
-                   g.State,
-                   g.GroupMinimum,
-                   g.GroupMaximum,
-                   new CharacterShard(
-                   g.Age,
-                   g.Extroversion,
-                   g.Athleticisme,
-                   g.Chaos,
-                   g.Competitiveness,
-                   g.Industriousness,
-                   g.NightOwl,
-                   g.Openness),
-                   g.Radius,
-                   g.IsDynamic,
-                   g.IsPendingDeletion,
-                   g.NumberOfGuests,
-                   g.DegreeOfPrivacy
-                   )).
-                FirstAsync());
-
-            UserShard host = await internalUtilityStore.GetHostShard(firstMutualGathering.Host.Id);
-
-            return firstMutualGathering with { Host = host };
+                    combined.e.Id,
+                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.e.Name,
+                    combined.e.Description,
+                    combined.e.StartTime,
+                    combined.e.Location.Y,
+                    combined.e.Location.X,
+                    combined.e.FriendlyLocation,
+                    combined.e.EndTime,
+                    combined.e.State,
+                    combined.e.GroupMinimum,
+                    combined.e.GroupMaximum,
+                    new CharacterShard(
+                        combined.e.Age,
+                        combined.e.Extroversion,
+                        combined.e.Athleticisme,
+                        combined.e.Chaos,
+                        combined.e.Competitiveness,
+                        combined.e.Industriousness,
+                        combined.e.NightOwl,
+                        combined.e.Openness),
+                    combined.e.Radius,
+                    combined.e.IsDynamic,
+                    combined.e.IsPendingDeletion,
+                    combined.e.NumberOfGuests,
+                    combined.e.DegreeOfPrivacy
+                )).FirstAsync());
         }
 
         public async Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId)
@@ -252,43 +249,44 @@ namespace Repository
 
             List<long> mutualGatherings = a.Intersect(b).ToList();
 
-            CoreGathering latestMutualGathering = await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
                 Where(g => mutualGatherings.Contains(g.Id)).
                 OrderBy(g => g.StartTime).
-                Select(g => new CoreGathering
+                GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, users) => new { e, user = users.FirstOrDefault() }).
+                Select(
+                combined => new CoreGathering
                 (
-                   g.Id,
-                   new UserShard(g.HostId ?? 0, null),
-                   g.Name,
-                   g.Description,
-                   g.StartTime,
-                   g.Location.Y,
-                   g.Location.X,
-                   g.FriendlyLocation,
-                   g.EndTime,
-                   g.State,
-                   g.GroupMinimum,
-                   g.GroupMaximum,
-                   new CharacterShard(
-                   g.Age,
-                   g.Extroversion,
-                   g.Athleticisme,
-                   g.Chaos,
-                   g.Competitiveness,
-                   g.Industriousness,
-                   g.NightOwl,
-                   g.Openness),
-                   g.Radius,
-                   g.IsDynamic,
-                   g.IsPendingDeletion,
-                   g.NumberOfGuests,
-                   g.DegreeOfPrivacy
-                   )).
-                FirstAsync());
-
-            UserShard host = await internalUtilityStore.GetHostShard(latestMutualGathering.Host.Id);
-
-            return latestMutualGathering with { Host = host };
+                    combined.e.Id,
+                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.e.Name,
+                    combined.e.Description,
+                    combined.e.StartTime,
+                    combined.e.Location.Y,
+                    combined.e.Location.X,
+                    combined.e.FriendlyLocation,
+                    combined.e.EndTime,
+                    combined.e.State,
+                    combined.e.GroupMinimum,
+                    combined.e.GroupMaximum,
+                    new CharacterShard(
+                        combined.e.Age,
+                        combined.e.Extroversion,
+                        combined.e.Athleticisme,
+                        combined.e.Chaos,
+                        combined.e.Competitiveness,
+                        combined.e.Industriousness,
+                        combined.e.NightOwl,
+                        combined.e.Openness),
+                    combined.e.Radius,
+                    combined.e.IsDynamic,
+                    combined.e.IsPendingDeletion,
+                    combined.e.NumberOfGuests,
+                    combined.e.DegreeOfPrivacy
+                )).FirstAsync());
         }
 
         public async Task<DateTimeOffset> BlockedSince(long userId, long targetId)

@@ -53,7 +53,7 @@ namespace Repository
         public static string DefaultName { get; set; } = "Lewis";
         public static string DefaultDescription { get; set; } = "A dog named Lewis.";
         public static DateTimeOffset DefaultStartTime { get; set; } = DateTimeOffset.MinValue;
-        public static long DefaultHostId { get; set; } = long.MinValue;
+        public static long? DefaultHostId { get; set; } = null;
         public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
         public static string DefaultFriendlyLocation { get; set; } = "Solitude";
 
