@@ -412,7 +412,7 @@ namespace Core.Entities
                 updatedGuests.Add(guest);
 
 				// Notify of gathering ending
-				_ = guest.Notify(NotificationGroup.GatheringAlert, $"{Title}", $"Gathering has concluded, thank you for joining.");
+				_ = guest.Notify(NotificationGroup.GatheringActivity, $"{Title}", $"Gathering has concluded, thank you for joining.");
 			}
 
             return updatedGuests;
