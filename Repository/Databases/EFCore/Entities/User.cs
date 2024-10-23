@@ -5,7 +5,8 @@ namespace Repository
 {
     public class User
     {
-        public long Id { get; init; } = DefaultId;
+        public long Id { get; set; } = DefaultId;
+        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public string PhoneNumber { get; set; } = DefaultPhoneNumber;
         public string Email { get; set; } = DefaultEmail;
         public string NormalisedEmail { get; set; } = DefaultNormalisedEmail;
@@ -21,7 +22,6 @@ namespace Repository
         public int AccessTries { get; set; } = DefaultAccessTries;
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
         public long? CurrentGathering { get; set; } = DefaultCurrentGathering;
-        public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
         public DateTimeOffset TimeOfUserAgreement { get; set; } = DefaultTimeOfUserAgreement;
         public Guid NotificationId { get; set; }
 
@@ -64,6 +64,7 @@ namespace Repository
 
         // Default Values
         public static long DefaultId { get; set; } = 0;
+        public static bool DefaultSoftDeleted { get; set; } = false;
         public static string DefaultPhoneNumber { get; set; } = "";
         public static string DefaultEmail { get; set; } = "";
         public static string DefaultNormalisedEmail { get; set; } = "";
@@ -79,7 +80,6 @@ namespace Repository
         public static int DefaultAccessTries { get; set; } = 3;
         public static UserAccountStatus DefaultAccountStatus { get; set; } = UserAccountStatus.Active;
         public static long? DefaultCurrentGathering { get; set; } = null;
-        public static bool DefaultIsPendingDeletion { get; set; } = false;
         public static DateTimeOffset DefaultTimeOfUserAgreement { get; set; } = DateTimeOffset.MinValue;
 
         // Vector

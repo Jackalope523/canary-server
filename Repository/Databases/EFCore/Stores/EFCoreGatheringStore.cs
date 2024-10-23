@@ -36,13 +36,13 @@ namespace Repository
             else return;
 
             Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
-                ctx.UserLinks.
+                ctx.UserRelationships.
                 Where(l => !exclusionList.Contains(l.OtherId) && l.SelfId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
                 Select(l => l.OtherId).
                 ToListAsync());
 
             Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
-                ctx.UserLinks.
+                ctx.UserRelationships.
                 Where(l => !exclusionList.Contains(l.SelfId) && l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
                 Select(l => l.SelfId).
                 ToListAsync());
@@ -94,7 +94,7 @@ namespace Repository
         {
             Gathering toCreate = new()
             {
-                Name = title,
+                Title = title,
                 Description = description,
                 StartTime = startTime,
                 HostId = hostId,
@@ -139,7 +139,7 @@ namespace Repository
                 (
                    toCreate.Id,
                    host,
-                   toCreate.Name,
+                   toCreate.Title,
                    toCreate.Description,
                    toCreate.StartTime,
                    toCreate.Location.Y,
@@ -160,18 +160,70 @@ namespace Repository
                    toCreate.Openness),
                    toCreate.Radius,
                    toCreate.IsDynamic,
-                   toCreate.IsPendingDeletion,
+                   toCreate.SoftDeleted,
                    toCreate.NumberOfGuests,
                    toCreate.DegreeOfPrivacy
                    );
         }
+
+        private async Task SoftDeleteGathering(long id)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GatheringLinks.
+               Where(l => l.GatheringId == id).
+               ExecuteUpdate(setter => setter.SetProperty(l => l.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GatheringReports.
+               Where(r => r.GatheringId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GuestClearances.
+               Where(c => c.GatheringId == id).
+               ExecuteUpdate(setter => setter.SetProperty(c => c.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Gatherings.
+               Where(e => e.Id == id).
+               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+        }
+
+        private async Task HardDeleteGathering(long id)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GatheringLinks.
+               Where(l => l.GatheringId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GatheringReports.
+               Where(r => r.GatheringId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.UserReports.
+               Where(r => r.GatheringId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GuestClearances.
+               Where(c => c.GatheringId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Gatherings.
+               Remove(new Gathering { Id = id }));
+        }
+
         public async Task DeleteGatheringAsync(long gatheringId)
         {
             await storeSentry.ExecuteWriteAsync(ctx => 
                 ctx.Gatherings.
                 Where(e => e.Id == gatheringId).
-                ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
+                ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
         }
+
         public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
         {
             long? currentGathering = await storeSentry.ExecuteReadAsync(ctx =>
@@ -195,7 +247,7 @@ namespace Repository
                     (
                         pair.g.Id,
                         pair.user != null ? new UserShard(pair.user.Id, pair.user.Name) : new UserShard(0, "DeletedGathering"),
-                        pair.g.Name,
+                        pair.g.Title,
                         pair.g.Description,
                         pair.g.StartTime,
                         pair.g.Location.Y,
@@ -216,7 +268,7 @@ namespace Repository
                         pair.g.Age),
                         pair.g.Radius,
                         pair.g.IsDynamic,
-                        pair.g.IsPendingDeletion,
+                        pair.g.SoftDeleted,
                         pair.g.NumberOfGuests,
                         pair.g.DegreeOfPrivacy
                         )).SingleAsync());
@@ -236,13 +288,13 @@ namespace Repository
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
                 ctx.Gatherings
-                .Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.OngoingOpen) && !e.IsPendingDeletion && !toExclude.Contains(e.Id)),
+                .Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.OngoingOpen) && !toExclude.Contains(e.Id)),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
                 {
                     e.Id,
-                    e.Name,
+                    e.Title,
                     e.HostId,
                     e.Description,
                     e.StartTime,
@@ -262,7 +314,7 @@ namespace Repository
                     e.Openness,
                     e.Radius,
                     e.IsDynamic,
-                    e.IsPendingDeletion,
+                    e.SoftDeleted,
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy
                 })
@@ -275,7 +327,7 @@ namespace Repository
             (
                 joinResult.e.Id,
                 joinResult.user != null ? new UserShard(joinResult.user.Id, joinResult.user.Name) : new UserShard(0, "DeletedUser"),  
-                joinResult.e.Name,
+                joinResult.e.Title,
                 joinResult.e.Description,
                 joinResult.e.StartTime,
                 joinResult.e.Location.Y,
@@ -297,7 +349,7 @@ namespace Repository
                     ),
                 joinResult.e.Radius,
                 joinResult.e.IsDynamic,
-                joinResult.e.IsPendingDeletion,
+                joinResult.e.SoftDeleted,
                 joinResult.e.NumberOfGuests,
                 joinResult.e.DegreeOfPrivacy
                 ))
@@ -309,14 +361,13 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Watching)
             .Join(
-                ctx.Gatherings
-                .Where(e => !e.IsPendingDeletion),
+                ctx.Gatherings,
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
                 {
                     e.Id,
-                    e.Name,
+                    e.Title,
                     e.HostId,
                     e.Description,
                     e.StartTime,
@@ -336,7 +387,7 @@ namespace Repository
                     e.Openness,
                     e.Radius,
                     e.IsDynamic,
-                    e.IsPendingDeletion,
+                    e.SoftDeleted,
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy
                 })
@@ -349,7 +400,7 @@ namespace Repository
             (
                 joinResult.e.Id,
                 joinResult.user != null ? new UserShard(joinResult.user.Id, joinResult.user.Name) : new UserShard(0, "DeletedUser"),
-                joinResult.e.Name,
+                joinResult.e.Title,
                 joinResult.e.Description,
                 joinResult.e.StartTime,
                 joinResult.e.Location.Y,
@@ -370,7 +421,7 @@ namespace Repository
                     joinResult.e.Openness),
                 joinResult.e.Radius,
                 joinResult.e.IsDynamic,
-                joinResult.e.IsPendingDeletion,
+                joinResult.e.SoftDeleted,
                 joinResult.e.NumberOfGuests,
                 joinResult.e.DegreeOfPrivacy
                 ))
@@ -383,13 +434,13 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Left)
             .Join(
-                ctx.Gatherings.Where(e => !e.IsPendingDeletion),
+                ctx.Gatherings,
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
                 {
                     e.Id,
-                    e.Name,
+                    e.Title,
                     e.HostId,
                     e.Description,
                     e.StartTime,
@@ -409,7 +460,7 @@ namespace Repository
                     e.Openness,
                     e.Radius,
                     e.IsDynamic,
-                    e.IsPendingDeletion,
+                    e.SoftDeleted,
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy
                 }
@@ -425,7 +476,7 @@ namespace Repository
                 (
                     combined.e.Id,
                     combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
-                    combined.e.Name,
+                    combined.e.Title,
                     combined.e.Description,
                     combined.e.StartTime,
                     combined.e.Location.Y,
@@ -446,7 +497,7 @@ namespace Repository
                         combined.e.Openness),
                     combined.e.Radius,
                     combined.e.IsDynamic,
-                    combined.e.IsPendingDeletion,
+                    combined.e.SoftDeleted,
                     combined.e.NumberOfGuests,
                     combined.e.DegreeOfPrivacy
                 )
@@ -467,7 +518,7 @@ namespace Repository
                 (
                     combined.e.Id,
                     combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
-                    combined.e.Name,
+                    combined.e.Title,
                     combined.e.Description,
                     combined.e.StartTime,
                     combined.e.Location.Y,
@@ -488,7 +539,7 @@ namespace Repository
                         combined.e.Openness),
                     combined.e.Radius,
                     combined.e.IsDynamic,
-                    combined.e.IsPendingDeletion,
+                    combined.e.SoftDeleted,
                     combined.e.NumberOfGuests,
                     combined.e.DegreeOfPrivacy
                 )
@@ -502,7 +553,7 @@ namespace Repository
 
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Gatherings.
-                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.OngoingOpen || e.State == GatheringState.Upcoming) && !e.IsPendingDeletion).
+                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.OngoingOpen || e.State == GatheringState.Upcoming)).
                 Join(
                     ctx.Users, 
                     e => e.HostId, 
@@ -511,7 +562,7 @@ namespace Repository
                     (
                         e.Id,
                         new UserShard(u.Id, u.Name),
-                        e.Name,
+                        e.Title,
                         e.Description,
                         e.StartTime,
                         e.Location.Y,
@@ -532,7 +583,7 @@ namespace Repository
                         e.Openness),
                         e.Radius,
                         e.IsDynamic,
-                        e.IsPendingDeletion,
+                        e.SoftDeleted,
                         e.NumberOfGuests,
                         e.DegreeOfPrivacy
                    )).ToListAsync());
@@ -600,7 +651,7 @@ namespace Repository
                 switch (Property)
                 {
                     case nameof(CoreGathering.Title):
-                        e.Name = (string)Value;
+                        e.Title = (string)Value;
                         break;
                     case nameof(CoreGathering.Description):
                         e.Description = (string)Value;
@@ -694,7 +745,7 @@ namespace Repository
         {
            return await storeSentry.ExecuteReadAsync(ctx =>
            ctx.Gatherings.
-           Where(e => e.HostId == userId && !e.IsPendingDeletion).
+           Where(e => e.HostId == userId).
            Join(
                ctx.Users,
                e => e.HostId,
@@ -702,7 +753,7 @@ namespace Repository
                (e, u) => new CoreGathering(
                     e.Id, 
                     new UserShard(u.Id, u.Name), 
-                    e.Name, 
+                    e.Title, 
                     e.Description, 
                     e.StartTime, 
                     e.Location.Y, 
@@ -724,7 +775,7 @@ namespace Repository
                         ), 
                     e.Radius, 
                     e.IsDynamic,
-                    e.IsPendingDeletion,
+                    e.SoftDeleted,
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy
                     )).ToListAsync());

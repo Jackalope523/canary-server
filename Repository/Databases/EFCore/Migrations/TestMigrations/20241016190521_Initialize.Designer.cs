@@ -697,13 +697,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Banner", "Banner")
                         .WithMany("Links")
                         .HasForeignKey("BannerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("BannerLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Banner");
@@ -716,7 +716,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.User", "Penalized")
                         .WithMany("Penalties")
                         .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Penalized");
@@ -727,7 +727,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -738,13 +738,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.User", "Notifier")
                         .WithMany("SentTelegrams")
                         .HasForeignKey("NotifierId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Recipient")
                         .WithMany("ReceivedTelegrams")
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Notifier");
@@ -757,7 +757,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Feedback")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
@@ -767,7 +767,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.User", "Host")
                         .WithMany("HostedGatherings")
                         .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Host");
                 });
@@ -777,13 +777,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GatheringLink")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -796,13 +796,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GatheringReports")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Gathering");
 
@@ -814,13 +814,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GuestClearances")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GuestClearances")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -833,13 +833,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Snapshots")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Owner")
                         .WithMany("Snapshots")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -852,13 +852,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany("SnapshotLinks")
                         .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("SnapshotLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Snapshot");
@@ -871,13 +871,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany("Reports")
                         .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("SnapshotReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Snapshot");
 
@@ -889,13 +889,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.User", "Other")
                         .WithMany("TargetUserRelationships")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
                         .WithMany("InitiatedUserRelationships")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Other");
@@ -908,18 +908,18 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("UserReports")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Repository.User", "Other")
                         .WithMany("ReporteeList")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
                         .WithMany("ReporterList")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Gathering");
 

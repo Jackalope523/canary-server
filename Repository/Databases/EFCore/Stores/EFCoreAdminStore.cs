@@ -24,7 +24,7 @@ namespace Repository
                 (
                     g.Id,
                     new UserShard(u.Id, u.Name),
-                    g.Name,
+                    g.Title,
                     g.Description,
                     g.StartTime,
                     g.Location.Y,
@@ -45,7 +45,7 @@ namespace Repository
                     g.Openness),
                     g.Radius,
                     g.IsDynamic,
-                    g.IsPendingDeletion,
+                    g.SoftDeleted,
                     g.NumberOfGuests,
                     g.DegreeOfPrivacy
                  )).ToListAsync());
@@ -132,7 +132,7 @@ namespace Repository
                 ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.UserLinks.
+                ctx.UserRelationships.
                 Where(l => l.SelfId == userId || l.OtherId == userId).
                 ExecuteDeleteAsync());
 

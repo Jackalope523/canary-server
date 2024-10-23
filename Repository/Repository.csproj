@@ -49,6 +49,7 @@
 
   <ItemGroup>
     <Folder Include="Databases\EFCore\Migrations\ProductionMigrations\" />
+    <Folder Include="Databases\EFCore\Migrations\StagingMigrations\" />
     <Folder Include="Databases\EFCore\Migrations\TestMigrations\" />
   </ItemGroup>
 

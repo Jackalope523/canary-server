@@ -31,12 +31,12 @@ namespace Repository
         {
             // Get List of Companions.
             Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
-                ctx.UserLinks.
+                ctx.UserRelationships.
                 Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).Select(l => l.OtherId).
                 ToListAsync());
 
             Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
-                ctx.UserLinks.
+                ctx.UserRelationships.
                 Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
                 Select(l => l.SelfId).
                 ToListAsync());
@@ -175,9 +175,44 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.SnapshotLinks.Update(toAdd));
         }
 
-        public async Task DeleteSnapshotAsync(long postId)
+        private async Task SoftDeleteSnapshot(long id)
         {
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = postId }));
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.SnapshotLinks.
+               Where(l => l.SnapshotId == id).
+               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.SnapshotReports.
+               Where(r => r.SnapshotId == id).
+               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.Snapshots.
+              Where(s => s.Id == id).
+              ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+        }
+
+        private async Task HardDeleteSnapshot(long id)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => 
+                ctx.SnapshotLinks.
+                Where(l => l.SnapshotId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.SnapshotReports.
+                Where(r => r.SnapshotId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx => 
+                ctx.Snapshots.
+                Remove(new Snapshot { Id = id }));
+        }
+
+        public async Task DeleteSnapshotAsync(long snapshotId)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = snapshotId }));
         }
 
         public async Task DeleteSnapshotAcclaimAsync(long postId, long voterId)
@@ -215,22 +250,6 @@ namespace Repository
             }
 
             return snapshots;
-        }
-
-        public async Task RemoveSnapshotAsync(long snapshotId)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = snapshotId }));
-        }
-
-        public async Task RemoveSnapshotAcclaimAsync(long snapshotId, long voterId)
-        {
-            Func<CanaryContext, Task> query = EF.CompileAsyncQuery(
-                (CanaryContext ctx) =>
-                ctx.SnapshotLinks.
-                Where(l => l.UserId == voterId && l.SnapshotId == snapshotId).
-                ExecuteDelete());
-
-            await storeSentry.ExecuteWriteAsync(query);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Banners");
+                    b.ToTable("Banners", (string)null);
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -79,7 +79,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BannerLinks");
+                    b.ToTable("BannerLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
@@ -103,7 +103,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties");
+                    b.ToTable("Penalties", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -126,7 +126,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
@@ -163,7 +163,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Telegrams");
+                    b.ToTable("Telegrams", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Feedback", b =>
@@ -189,7 +189,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback");
+                    b.ToTable("Feedback", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
@@ -254,11 +254,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasColumnType("geography")
                         .HasAnnotation("Sqlite:Srid", 4326);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<int>("NightOwl")
                         .HasColumnType("int");
 
@@ -277,11 +272,16 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("State")
                         .HasColumnType("int");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings");
+                    b.ToTable("Gatherings", (string)null);
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -310,7 +310,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks");
+                    b.ToTable("GatheringLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
@@ -344,7 +344,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports");
+                    b.ToTable("GatheringReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
@@ -374,7 +374,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "GatheringId")
                         .IsUnique();
 
-                    b.ToTable("GuestClearances");
+                    b.ToTable("GuestClearances", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -400,7 +400,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots");
+                    b.ToTable("Snapshots", (string)null);
                 });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
@@ -430,7 +430,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "SnapshotId")
                         .IsUnique();
 
-                    b.ToTable("SnapshotLinks");
+                    b.ToTable("SnapshotLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
@@ -464,7 +464,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotReports");
+                    b.ToTable("SnapshotReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -586,7 +586,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new
@@ -684,7 +684,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("SelfId", "OtherId")
                         .IsUnique();
 
-                    b.ToTable("UserLinks");
+                    b.ToTable("UserLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -723,7 +723,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports");
+                    b.ToTable("UserReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -731,13 +731,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Banner", "Banner")
                         .WithMany("Links")
                         .HasForeignKey("BannerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("BannerLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Banner");
@@ -750,7 +750,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "Penalized")
                         .WithMany("Penalties")
                         .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Penalized");
@@ -761,7 +761,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -772,13 +772,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "Notifier")
                         .WithMany("SentTelegrams")
                         .HasForeignKey("NotifierId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Recipient")
                         .WithMany("ReceivedTelegrams")
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Notifier");
@@ -791,7 +791,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Feedback")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
@@ -801,7 +801,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "Host")
                         .WithMany("HostedGatherings")
                         .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Host");
                 });
@@ -811,13 +811,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GatheringLink")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -830,13 +830,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GatheringReports")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Gathering");
 
@@ -848,13 +848,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GuestClearances")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GuestClearances")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -867,13 +867,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Snapshots")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Owner")
                         .WithMany("Snapshots")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -886,13 +886,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany("SnapshotLinks")
                         .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("SnapshotLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Snapshot");
@@ -905,13 +905,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany("Reports")
                         .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("SnapshotReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Snapshot");
 
@@ -923,13 +923,13 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.User", "Other")
                         .WithMany("TargetUserRelationships")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
                         .WithMany("InitiatedUserRelationships")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Other");
@@ -942,18 +942,18 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("UserReports")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Repository.User", "Other")
                         .WithMany("ReporteeList")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
                         .WithMany("ReporterList")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Gathering");
 

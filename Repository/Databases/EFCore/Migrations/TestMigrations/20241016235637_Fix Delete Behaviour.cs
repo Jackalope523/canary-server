@@ -112,7 +112,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "BannerId",
                 principalTable: "Banners",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_BannerLinks_Users_UserId",
@@ -120,7 +120,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Feedback_Users_UserId",
@@ -128,7 +128,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GatheringLinks_Gatherings_GatheringId",
@@ -136,7 +136,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "GatheringId",
                 principalTable: "Gatherings",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GatheringLinks_Users_UserId",
@@ -144,7 +144,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GatheringReports_Gatherings_GatheringId",
@@ -152,7 +152,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "GatheringId",
                 principalTable: "Gatherings",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GatheringReports_Users_UserId",
@@ -160,7 +160,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Gatherings_Users_HostId",
@@ -168,7 +168,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "HostId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GuestClearances_Gatherings_GatheringId",
@@ -176,7 +176,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "GatheringId",
                 principalTable: "Gatherings",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GuestClearances_Users_UserId",
@@ -184,7 +184,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Penalties_Users_PenalizedId",
@@ -192,7 +192,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "PenalizedId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_SnapshotLinks_Snapshots_SnapshotId",
@@ -200,7 +200,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "SnapshotId",
                 principalTable: "Snapshots",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_SnapshotLinks_Users_UserId",
@@ -208,7 +208,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_SnapshotReports_Users_UserId",
@@ -216,7 +216,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Snapshots_Gatherings_GatheringId",
@@ -232,7 +232,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "OwnerId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Subscriptions_Users_UserId",
@@ -240,7 +240,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Telegrams_Users_NotifierId",
@@ -248,7 +248,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "NotifierId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Telegrams_Users_RecipientId",
@@ -256,7 +256,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "RecipientId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UserLinks_Users_OtherId",
@@ -264,7 +264,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "OtherId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UserLinks_Users_SelfId",
@@ -272,7 +272,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "SelfId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UserReports_Gatherings_GatheringId",
@@ -288,7 +288,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "OtherId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UserReports_Users_SelfId",
@@ -296,7 +296,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "SelfId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />

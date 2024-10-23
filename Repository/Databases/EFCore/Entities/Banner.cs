@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
-
-namespace Repository
+﻿namespace Repository
 {
     public class Banner
     {
-        public long Id { get; set; }
-
+        public long Id { get; set; } = DefaultId;
+        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public string Name { get; set; } = DefaultName;
         public string Description { get; set; } = DefaultDescription;
         public string Code { get; set; } = DefaultCode;
@@ -15,7 +13,8 @@ namespace Repository
         public List<BannerLink>? Links { get; set; }
 
         // Default Values
-        public static long DefaultId { get; set; } = long.MinValue;
+        public static long DefaultId { get; set; } = 0;
+        public static bool DefaultSoftDeleted { get; set; } = false;
         public static string DefaultName { get; set; } = "";
         public static string DefaultDescription { get; set; } = "";
         public static string DefaultCode { get; set; } = "";

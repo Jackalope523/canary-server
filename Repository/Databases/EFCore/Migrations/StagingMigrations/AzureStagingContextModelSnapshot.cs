@@ -9,7 +9,7 @@ using Repository;
 
 #nullable disable
 
-namespace Repository.Databases.EFCore.Migrations.AzureMigrations
+namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     [DbContext(typeof(AzureStagingContext))]
     partial class AzureStagingContextModelSnapshot : ModelSnapshot
@@ -51,6 +51,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("Banners");
@@ -66,6 +69,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.Property<long>("BannerId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -93,6 +99,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<long>("PenalizedId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -118,6 +127,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -154,6 +166,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<long>("RecipientId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -179,10 +194,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<long>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -237,7 +255,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<int>("GroupMinimum")
                         .HasColumnType("int");
 
-                    b.Property<long>("HostId")
+                    b.Property<long?>("HostId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Industriousness")
@@ -246,18 +264,10 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<bool>("IsDynamic")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
-
                     b.Property<Point>("Location")
                         .IsRequired()
                         .HasColumnType("geography")
                         .HasAnnotation("Sqlite:Srid", 4326);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("NightOwl")
                         .HasColumnType("int");
@@ -271,11 +281,19 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<double>("Radius")
                         .HasColumnType("float");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -294,6 +312,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.Property<long>("GatheringId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -332,10 +353,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -360,6 +384,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.Property<long>("GatheringId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -394,6 +421,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<DateTimeOffset>("PostedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GatheringId");
@@ -413,6 +443,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
 
                     b.Property<long>("SnapshotId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -452,10 +485,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<long>("SnapshotId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -532,9 +568,6 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<bool>("IsEmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsPhoneConfirmed")
                         .HasColumnType("bit");
 
@@ -581,12 +614,83 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("TimeOfUserAgreement")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -7L,
+                            AccessTries = 3,
+                            AccountStatus = 0,
+                            Age = 25,
+                            Athleticisme = 50,
+                            Chaos = 50,
+                            Competitiveness = 50,
+                            CurrentLocation = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"),
+                            CurrentRadius = 10.0,
+                            DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "",
+                            Extroversion = 50,
+                            Haunt = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"),
+                            HauntRadius = 10.0,
+                            HauntWheight = 0,
+                            Industriousness = 50,
+                            IsEmailConfirmed = false,
+                            IsPhoneConfirmed = true,
+                            JoinDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Apple Test Account",
+                            NightOwl = 50,
+                            NormalisedEmail = "",
+                            NotificationId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Openness = 50,
+                            PhoneNumber = "11002003007",
+                            Pseudonym = "",
+                            Reputation = 50,
+                            SecurityStamp = "",
+                            SoftDeleted = false,
+                            TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = -8L,
+                            AccessTries = 3,
+                            AccountStatus = 0,
+                            Age = 25,
+                            Athleticisme = 50,
+                            Chaos = 50,
+                            Competitiveness = 50,
+                            CurrentLocation = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"),
+                            CurrentRadius = 10.0,
+                            DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "",
+                            Extroversion = 50,
+                            Haunt = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"),
+                            HauntRadius = 10.0,
+                            HauntWheight = 0,
+                            Industriousness = 50,
+                            IsEmailConfirmed = false,
+                            IsPhoneConfirmed = true,
+                            JoinDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Name = "Google Test Account",
+                            NightOwl = 50,
+                            NormalisedEmail = "",
+                            NotificationId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Openness = 50,
+                            PhoneNumber = "11002003008",
+                            Pseudonym = "",
+                            Reputation = 50,
+                            SecurityStamp = "",
+                            SoftDeleted = false,
+                            TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
                 });
 
             modelBuilder.Entity("Repository.UserRelationship", b =>
@@ -603,6 +707,9 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<long>("SelfId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -616,7 +723,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasIndex("SelfId", "OtherId")
                         .IsUnique();
 
-                    b.ToTable("UserLinks");
+                    b.ToTable("UserRelationships");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -641,8 +748,11 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.Property<long>("OtherId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("SelfId")
+                    b.Property<long?>("SelfId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -663,13 +773,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Banner", "Banner")
                         .WithMany("Links")
                         .HasForeignKey("BannerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("BannerLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Banner");
@@ -682,7 +792,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.User", "Penalized")
                         .WithMany("Penalties")
                         .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Penalized");
@@ -693,7 +803,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -704,13 +814,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.User", "Notifier")
                         .WithMany("SentTelegrams")
                         .HasForeignKey("NotifierId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Recipient")
                         .WithMany("ReceivedTelegrams")
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Notifier");
@@ -723,8 +833,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Feedback")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
@@ -734,8 +843,7 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.User", "Host")
                         .WithMany("HostedGatherings")
                         .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Host");
                 });
@@ -745,13 +853,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GatheringLink")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -764,14 +872,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GatheringReports")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GatheringReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Gathering");
 
@@ -783,13 +890,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("GuestClearances")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("GuestClearances")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -802,13 +909,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("Snapshots")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Owner")
                         .WithMany("Snapshots")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -821,13 +928,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany("SnapshotLinks")
                         .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("SnapshotLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Snapshot");
@@ -840,14 +947,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Snapshot", "Snapshot")
                         .WithMany("Reports")
                         .HasForeignKey("SnapshotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "User")
                         .WithMany("SnapshotReports")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Snapshot");
 
@@ -859,13 +965,13 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.User", "Other")
                         .WithMany("TargetUserRelationships")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
                         .WithMany("InitiatedUserRelationships")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Other");
@@ -878,19 +984,18 @@ namespace Repository.Databases.EFCore.Migrations.AzureMigrations
                     b.HasOne("Repository.Gathering", "Gathering")
                         .WithMany("UserReports")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Repository.User", "Other")
                         .WithMany("ReporteeList")
                         .HasForeignKey("OtherId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Self")
                         .WithMany("ReporterList")
                         .HasForeignKey("SelfId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Gathering");
 

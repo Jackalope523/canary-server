@@ -80,20 +80,20 @@ namespace Repository.Tests
             UserRelationship link1 = factory.Create(subject, companionE, UserRelationship.UserLinkType.Appreciate);
             UserRelationship link2 = factory.Create(companionE, subject, UserRelationship.UserLinkType.Appreciate);
 
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link1));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link2));
 
             link1 = factory.Create(subject, companionJ, UserRelationship.UserLinkType.Appreciate);
             link2 = factory.Create(companionJ, subject, UserRelationship.UserLinkType.Appreciate);
 
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link1));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link2));
 
             link1 = factory.Create(subject, companionM, UserRelationship.UserLinkType.Appreciate);
             link2 = factory.Create(companionM, subject, UserRelationship.UserLinkType.Appreciate);
 
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link1));
-            sentry.ExecuteWrite(ctx => ctx.UserLinks.Add(link2));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link1));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link2));
 
 
             // Gathering block

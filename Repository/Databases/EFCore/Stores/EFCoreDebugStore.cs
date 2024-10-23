@@ -16,7 +16,7 @@ namespace Repository
             storeSentry.ExecuteWrite(ctx => ctx.Banners.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.SnapshotLinks.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.GatheringLinks.ExecuteDelete());
-            storeSentry.ExecuteWrite(ctx => ctx.UserLinks.ExecuteDelete());
+            storeSentry.ExecuteWrite(ctx => ctx.UserRelationships.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.UserReports.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.GatheringReports.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.Snapshots.ExecuteDelete());

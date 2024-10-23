@@ -11,7 +11,7 @@ namespace Repository
             produced++;
             return new Gathering
             {
-                Name = "gathering" + produced,
+                Title = "gathering" + produced,
                 HostId = host.Id,
                 Description = "This is gathering number " + produced + ".",
                 StartTime = DateTimeOffset.UtcNow.AddHours(produced),
@@ -38,7 +38,7 @@ namespace Repository
             produced++;
             return new Gathering
             {
-                Name = "gathering" + produced,
+                Title = "gathering" + produced,
                 HostId = 0,
                 Description = "This is gathering number " + produced + ".",
                 StartTime = DateTimeOffset.UtcNow.AddHours(produced),

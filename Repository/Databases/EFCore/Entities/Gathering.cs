@@ -1,13 +1,12 @@
 ﻿using NetTopologySuite.Geometries;
-using Core.Boundaries;
 
 namespace Repository
 {
     public class Gathering
     {
-        public long Id { get; set; }
-
-        public string Name { get; set; } = DefaultName;
+        public long Id { get; set; } = DefaultId;
+        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
+        public string Title { get; set; } = DefaultTitle;
         public string Description { get; set; } = DefaultDescription;
         public DateTimeOffset StartTime { get; set; } = DefaultStartTime;
         public long? HostId { get; set; } = DefaultHostId;
@@ -22,7 +21,6 @@ namespace Repository
         public DateTimeOffset? EndTime { get; set; }
         public double Radius { get; set; } = DefaultRadius;
         public bool IsDynamic { get; set; } = DefaultIsDynamic;
-        public bool IsPendingDeletion { get; set; } = DefaultIsPendingDeletion;
         public int NumberOfGuests { get; set; } = DefaultNumberOfGuests;
         public int DegreeOfPrivacy { get; set; } = DefaultDegreeOfPrivacy;
 
@@ -47,22 +45,20 @@ namespace Repository
         // Default Values
         private static readonly CoordinateFactory Factory = new();
 
-        public static long DefaultId { get; set; } = long.MinValue;
-
+        public static long DefaultId { get; set; } = 0;
+        public static bool DefaultSoftDeleted { get; set; } = false;
         public static string DefaultHeroImageURL { get; set; } = "";
-        public static string DefaultName { get; set; } = "Lewis";
+        public static string DefaultTitle { get; set; } = "Lewis";
         public static string DefaultDescription { get; set; } = "A dog named Lewis.";
         public static DateTimeOffset DefaultStartTime { get; set; } = DateTimeOffset.MinValue;
         public static long? DefaultHostId { get; set; } = null;
         public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
         public static string DefaultFriendlyLocation { get; set; } = "Solitude";
-
         public static GatheringState DefaultState { get; set; } = GatheringState.Upcoming;
         public static int DefaultGroupMinimum { get; set; } = 0;
         public static int DefaultGroupMaximum { get; set; } = 10;
         public static double DefaultRadius { get; set; } = 10.000;
         public static bool DefaultIsDynamic { get; set; } = false;
-        public static bool DefaultIsPendingDeletion { get; set; } = false;
         public static int DefaultNumberOfGuests { get; set; } = 0;
         public static int DefaultDegreeOfPrivacy { get; set; } = 3;
 

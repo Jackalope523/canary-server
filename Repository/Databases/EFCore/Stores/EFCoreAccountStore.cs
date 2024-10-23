@@ -41,7 +41,7 @@ namespace Repository
                   toCreate.DateOfBirth,
                   toCreate.IsPhoneConfirmed,
                   toCreate.IsEmailConfirmed,
-                  toCreate.IsPendingDeletion,
+                  toCreate.SoftDeleted,
                   toCreate.SecurityStamp,
                   toCreate.LockoutDate,
                   toCreate.AccessTries,
@@ -62,12 +62,143 @@ namespace Repository
               );
         }
 
+        private async Task SoftDeleteUser(long id)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.SnapshotLinks.
+             Where(s => s.UserId == id).
+             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.Snapshots.
+             Where(s => s.OwnerId == id).
+             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.Telegrams.
+             Where(t => t.NotifierId == id || t.RecipientId == id).
+             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.Subscriptions.
+              Where(s => s.UserId == id).
+              ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.Penalties.
+              Where(p => p.PenalizedId == id).
+              ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.GuestClearances.
+             Where(c => c.UserId == id).
+             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.UserRelationships.
+               Where(l => l.SelfId == id).
+               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GatheringLinks.
+               Where(l => l.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.BannerLinks.
+               Where(l => l.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Users.
+               Where(u => u.Id == id).
+               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+        }
+
+        private async Task HardDeleteUser(long id)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.SnapshotLinks.
+             Where(s => s.UserId == id).
+             ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.Snapshots.
+             Where(s => s.OwnerId == id).
+             ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.Telegrams.
+             Where(t => t.NotifierId == id || t.RecipientId == id).
+             ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.Subscriptions.
+              Where(s => s.UserId == id).
+              ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.Penalties.
+              Where(p => p.PenalizedId == id).
+              ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+             ctx.GuestClearances.
+             Where(c => c.UserId == id).
+             ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.UserRelationships.
+               Where(l => l.SelfId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GatheringLinks.
+               Where(l => l.UserId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.BannerLinks.
+               Where(l => l.UserId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Feedback.
+               Where(r => r.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.UserReports.
+               Where(r => r.SelfId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.SelfId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.GatheringReports.
+              Where(r => r.UserId == id).
+              ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.SnapshotReports.
+              Where(r => r.UserId == id).
+              ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.Gatherings.
+              Where(g => g.HostId == id).
+              ExecuteUpdate(setter => setter.SetProperty(g => g.HostId, (long?)null)));        
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Users.
+               Where(u => u.Id == id).
+               ExecuteDeleteAsync());
+        }
+
         public async Task DeleteUserAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.Users.
                 Where(u => u.Id == id).
-                ExecuteUpdate(setter => setter.SetProperty(u => u.IsPendingDeletion, true)));
+                ExecuteUpdate(setter => setter.SetProperty(u => u.SoftDeleted, true)));
 
             List<long> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Gatherings.
@@ -78,7 +209,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Gatherings.
                Where(e => upcomingGatherings.Contains(e.Id)).
-               ExecuteUpdate(setter => setter.SetProperty(e => e.IsPendingDeletion, true)));
+               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
         
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Telegrams.
@@ -114,7 +245,7 @@ namespace Repository
                    u.DateOfBirth,
                    u.IsPhoneConfirmed,
                    u.IsEmailConfirmed,
-                   u.IsPendingDeletion,
+                   u.SoftDeleted,
                    u.SecurityStamp,
                    u.LockoutDate,
                    u.AccessTries,
@@ -159,7 +290,7 @@ namespace Repository
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
-                  u.IsPendingDeletion,
+                  u.SoftDeleted,
                   u.SecurityStamp,
                   u.LockoutDate,
                   u.AccessTries,
@@ -204,7 +335,7 @@ namespace Repository
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
-                  u.IsPendingDeletion,
+                  u.SoftDeleted,
                   u.SecurityStamp,
                   u.LockoutDate,
                   u.AccessTries,

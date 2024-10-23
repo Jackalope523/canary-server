@@ -59,7 +59,7 @@ namespace Repository
                 ctx.BannerLinks
                 .Where(l => l.BannerId == bannerId)
                 .Join(
-                    ctx.Users.Where(u => u.IsPendingDeletion != true), 
+                    ctx.Users.Where(u => u.SoftDeleted != true), 
                     l => l.UserId, 
                     u => u.Id, 
                     (l,u) => new UserShard(u.Id, u.Name))

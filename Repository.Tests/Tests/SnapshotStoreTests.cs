@@ -48,12 +48,12 @@ namespace Repository.Tests
             Assert.Equal(postTime, created.PostedAt);
         }
         [Fact]
-        public async Task RemoveSnapshotAsync_SUCCESS()
+        public async Task DeleteSnapshotAsync_SUCCESS()
         {
             Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Snapshots.AddAsync(testSnapshot));
 
-            await snapshotStore.RemoveSnapshotAsync(testSnapshot.Id);
+            await snapshotStore.DeleteSnapshotAsync(testSnapshot.Id);
 
             int numPosts = await sentry.ExecuteReadAsync(ctx => ctx.Snapshots.CountAsync());
 
@@ -117,7 +117,7 @@ namespace Repository.Tests
             Assert.Equal(rating, created.Type);
         }
         [Fact]
-        public async Task RemoveSnapshotRatingAsync_SUCCESS()
+        public async Task DeleteSnapshotRatingAsync_SUCCESS()
         {
             Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
             await sentry.ExecuteWriteAsync(ctx => ctx.Snapshots.AddAsync(testSnapshot));
@@ -125,7 +125,7 @@ namespace Repository.Tests
             SnapshotLink rating = new PostLinkFactory().Create(subject, testSnapshot);
             await sentry.ExecuteWriteAsync(ctx => ctx.SnapshotLinks.AddAsync(rating));
 
-            await snapshotStore.RemoveSnapshotAcclaimAsync(testSnapshot.Id, subject.Id);
+            await snapshotStore.DeleteSnapshotAcclaimAsync(testSnapshot.Id, subject.Id);
 
             int count = await sentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.CountAsync());
 

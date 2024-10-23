@@ -432,7 +432,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         column: x => x.SnapshotId,
                         principalTable: "Snapshots",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_SnapshotReports_Users_UserId",
                         column: x => x.UserId,
