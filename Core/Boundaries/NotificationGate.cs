@@ -32,10 +32,11 @@ namespace Core.Boundaries
 
 	public enum NotificationGroup
 	{
-        CompanionCommunication,
-		CompanionGathering,
+        SocialInvitation,
+		CompanionActivity,
 		GatheringReminder,
-		GatheringAlert,
+		GatheringActivity,
+		GatheringDiscovery,
     }
 
     public static class NotificationGroupExtensions
@@ -44,10 +45,11 @@ namespace Core.Boundaries
         {
             return group switch
             {
-                NotificationGroup.CompanionCommunication => "preference_companion_communications",
-                NotificationGroup.CompanionGathering => "preference_companion_gatherings",
-                NotificationGroup.GatheringReminder => "preference_gathering_reminders",
-                NotificationGroup.GatheringAlert => "preference_gathering_alerts",
+                NotificationGroup.SocialInvitation => "preferences/social_invitations",
+                NotificationGroup.CompanionActivity => "preferences/companion_activity",
+                NotificationGroup.GatheringReminder => "preferences/gathering_reminders",
+                NotificationGroup.GatheringActivity => "preferences/gathering_activity",
+                NotificationGroup.GatheringDiscovery => "preferences/gathering_discovery",
                 _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
             };
         }

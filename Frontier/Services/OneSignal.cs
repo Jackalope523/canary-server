@@ -44,7 +44,7 @@ namespace Frontier.Services
 
                 Filters = new()
                 {
-                    new(field: "tag", key: notificationGroup.GetString(), value: "true", relation: Filter.RelationEnum.Equal),
+                    new(field: "tag", key: notificationGroup.GetString(), value: "1", relation: Filter.RelationEnum.Equal),
                 },
 
                 CollapseId = collpaseId,
