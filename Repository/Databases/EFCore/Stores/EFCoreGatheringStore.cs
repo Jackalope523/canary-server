@@ -11,7 +11,7 @@ namespace Repository
 
         }
 
-        private async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
+        internal async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
         {
             if (degree == 0) return;
 

@@ -51,9 +51,12 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Banners", (string)null);
+                    b.ToTable("Banners");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -67,6 +70,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<long>("BannerId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -79,7 +85,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BannerLinks", (string)null);
+                    b.ToTable("BannerLinks");
                 });
 
             modelBuilder.Entity("Repository.Entities.Penalty", b =>
@@ -93,6 +99,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<long>("PenalizedId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -103,7 +112,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties", (string)null);
+                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -119,6 +128,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
@@ -126,7 +138,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions", (string)null);
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
@@ -154,6 +166,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<long>("RecipientId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -163,7 +178,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Telegrams", (string)null);
+                    b.ToTable("Telegrams");
                 });
 
             modelBuilder.Entity("Repository.Feedback", b =>
@@ -179,6 +194,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -189,7 +207,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback", (string)null);
+                    b.ToTable("Feedback");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
@@ -246,9 +264,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<bool>("IsDynamic")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
-
                     b.Property<Point>("Location")
                         .IsRequired()
                         .HasColumnType("geography")
@@ -266,6 +281,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<double>("Radius")
                         .HasColumnType("float");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("datetimeoffset");
 
@@ -281,7 +299,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings", (string)null);
+                    b.ToTable("Gatherings");
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -294,6 +312,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.Property<long>("GatheringId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -310,7 +331,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks", (string)null);
+                    b.ToTable("GatheringLinks");
                 });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
@@ -332,6 +353,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -344,7 +368,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports", (string)null);
+                    b.ToTable("GatheringReports");
                 });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
@@ -361,6 +385,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<long>("GatheringId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -374,7 +401,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "GatheringId")
                         .IsUnique();
 
-                    b.ToTable("GuestClearances", (string)null);
+                    b.ToTable("GuestClearances");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -394,13 +421,16 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<DateTimeOffset>("PostedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GatheringId");
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots", (string)null);
+                    b.ToTable("Snapshots");
                 });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
@@ -413,6 +443,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.Property<long>("SnapshotId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
@@ -430,7 +463,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "SnapshotId")
                         .IsUnique();
 
-                    b.ToTable("SnapshotLinks", (string)null);
+                    b.ToTable("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
@@ -452,6 +485,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<long>("SnapshotId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -464,7 +500,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotReports", (string)null);
+                    b.ToTable("SnapshotReports");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -532,9 +568,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<bool>("IsEmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsPhoneConfirmed")
                         .HasColumnType("bit");
 
@@ -581,12 +614,15 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("TimeOfUserAgreement")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -608,7 +644,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             HauntWheight = 0,
                             Industriousness = 50,
                             IsEmailConfirmed = false,
-                            IsPendingDeletion = false,
                             IsPhoneConfirmed = true,
                             JoinDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Name = "Apple Test Account",
@@ -620,6 +655,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             Pseudonym = "",
                             Reputation = 50,
                             SecurityStamp = "",
+                            SoftDeleted = false,
                             TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
@@ -641,7 +677,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             HauntWheight = 0,
                             Industriousness = 50,
                             IsEmailConfirmed = false,
-                            IsPendingDeletion = false,
                             IsPhoneConfirmed = true,
                             JoinDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Name = "Google Test Account",
@@ -653,6 +688,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             Pseudonym = "",
                             Reputation = 50,
                             SecurityStamp = "",
+                            SoftDeleted = false,
                             TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
@@ -671,6 +707,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<long>("SelfId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("datetimeoffset");
 
@@ -684,7 +723,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("SelfId", "OtherId")
                         .IsUnique();
 
-                    b.ToTable("UserLinks", (string)null);
+                    b.ToTable("UserRelationships");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -712,6 +751,9 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<long?>("SelfId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -723,7 +765,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports", (string)null);
+                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>

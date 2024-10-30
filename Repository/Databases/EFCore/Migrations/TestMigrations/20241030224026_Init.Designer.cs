@@ -12,8 +12,8 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
     [DbContext(typeof(DevelopmentContext))]
-    [Migration("20241016190521_Initialize")]
-    partial class Initialize
+    [Migration("20241030224026_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("Banners");
@@ -59,6 +62,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("BannerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -85,6 +91,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<long>("PenalizedId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
@@ -108,6 +117,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
@@ -142,6 +154,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<long>("RecipientId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
@@ -164,6 +179,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
@@ -230,18 +248,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<bool>("IsDynamic")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Point>("Location")
                         .IsRequired()
                         .HasColumnType("POINT")
                         .HasAnnotation("Sqlite:Srid", 4326);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("NightOwl")
                         .HasColumnType("INTEGER");
@@ -255,11 +265,19 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<double>("Radius")
                         .HasColumnType("REAL");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("State")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -275,6 +293,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("GatheringId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -312,6 +333,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
@@ -337,6 +361,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("GatheringId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -370,6 +397,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<DateTimeOffset>("PostedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GatheringId");
@@ -386,6 +416,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("SnapshotId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("Time")
@@ -422,6 +455,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SnapshotId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
@@ -502,9 +538,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<bool>("IsEmailConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsPendingDeletion")
-                        .HasColumnType("INTEGER");
-
                     b.Property<bool>("IsPhoneConfirmed")
                         .HasColumnType("INTEGER");
 
@@ -551,6 +584,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTimeOffset>("TimeOfUserAgreement")
                         .HasColumnType("TEXT");
 
@@ -578,7 +614,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                             HauntWheight = 0,
                             Industriousness = 50,
                             IsEmailConfirmed = false,
-                            IsPendingDeletion = false,
                             IsPhoneConfirmed = true,
                             JoinDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Name = "Apple Test Account",
@@ -590,6 +625,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                             Pseudonym = "",
                             Reputation = 50,
                             SecurityStamp = "",
+                            SoftDeleted = false,
                             TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
@@ -611,7 +647,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                             HauntWheight = 0,
                             Industriousness = 50,
                             IsEmailConfirmed = false,
-                            IsPendingDeletion = false,
                             IsPhoneConfirmed = true,
                             JoinDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Name = "Google Test Account",
@@ -623,6 +658,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                             Pseudonym = "",
                             Reputation = 50,
                             SecurityStamp = "",
+                            SoftDeleted = false,
                             TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
@@ -639,6 +675,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Property<long>("SelfId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTimeOffset>("Time")
                         .HasColumnType("TEXT");
 
@@ -652,7 +691,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasIndex("SelfId", "OtherId")
                         .IsUnique();
 
-                    b.ToTable("UserLinks");
+                    b.ToTable("UserRelationships");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -676,6 +715,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<long?>("SelfId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")

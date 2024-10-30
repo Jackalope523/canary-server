@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Core.Boundaries;
 using Xunit.Abstractions;
+using NetTopologySuite.Utilities;
+using Assert = Xunit.Assert;
 
 namespace Repository.Tests
 {
@@ -27,6 +29,8 @@ namespace Repository.Tests
         }
         public void Dispose()
         {
+            sentry.ExecuteWrite(ctx => ctx.GuestClearances.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Gatherings.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
@@ -571,6 +575,27 @@ namespace Repository.Tests
             await store.DeleteGatheringAsync(testGathering.Id);
 
             int count = sentry.ExecuteRead(ctx => ctx.Gatherings.Count());
+
+            Assert.Equal(1, count);
+        }
+        [Fact]
+        public async Task PropagateClearance_SUCCESS()
+        {
+            UserFactory userFactory = new UserFactory();
+            User companion = userFactory.Create();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companion));
+
+            UserLinkFactory linkFactory = new UserLinkFactory();
+            UserRelationship linkA = linkFactory.Create(testUser, companion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkB = linkFactory.Create(companion, testUser, UserRelationship.UserLinkType.Appreciate);
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
+
+            Discussion discussion = sentry.BeginDiscussion();
+            await store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
+            discussion.End();
+
+            int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
 
             Assert.Equal(1, count);
         }

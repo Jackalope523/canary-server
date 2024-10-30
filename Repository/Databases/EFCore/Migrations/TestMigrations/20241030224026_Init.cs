@@ -9,7 +9,7 @@ using NetTopologySuite.Geometries;
 namespace Repository.Databases.EFCore.Migrations.TestMigrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,6 +23,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     Code = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
@@ -39,6 +40,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     NormalisedEmail = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
@@ -54,7 +56,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     AccessTries = table.Column<int>(type: "INTEGER", nullable: false),
                     AccountStatus = table.Column<int>(type: "INTEGER", nullable: false),
                     CurrentGathering = table.Column<long>(type: "INTEGER", nullable: true),
-                    IsPendingDeletion = table.Column<bool>(type: "INTEGER", nullable: false),
                     TimeOfUserAgreement = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     NotificationId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Extroversion = table.Column<int>(type: "INTEGER", nullable: false),
@@ -84,6 +85,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     BannerId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
@@ -95,12 +97,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_BannerLinks_Banners_BannerId",
                         column: x => x.BannerId,
                         principalTable: "Banners",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_BannerLinks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -109,6 +113,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: true),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Comments = table.Column<string>(type: "TEXT", maxLength: 300, nullable: false)
@@ -120,7 +125,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_Feedback_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -129,7 +135,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     HostId = table.Column<long>(type: "INTEGER", nullable: true),
@@ -142,7 +149,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     EndTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     Radius = table.Column<double>(type: "REAL", nullable: false),
                     IsDynamic = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsPendingDeletion = table.Column<bool>(type: "INTEGER", nullable: false),
                     NumberOfGuests = table.Column<int>(type: "INTEGER", nullable: false),
                     DegreeOfPrivacy = table.Column<int>(type: "INTEGER", nullable: false),
                     Extroversion = table.Column<int>(type: "INTEGER", nullable: false),
@@ -161,7 +167,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_Gatherings_Users_HostId",
                         column: x => x.HostId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -170,6 +177,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     PenalizedId = table.Column<long>(type: "INTEGER", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
@@ -181,7 +189,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_Penalties_Users_PenalizedId",
                         column: x => x.PenalizedId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -190,6 +199,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     DeviceToken = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false)
                 },
@@ -200,7 +210,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_Subscriptions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,6 +220,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     NotifierId = table.Column<long>(type: "INTEGER", nullable: false),
                     RecipientId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -223,20 +235,23 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_Telegrams_Users_NotifierId",
                         column: x => x.NotifierId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Telegrams_Users_RecipientId",
                         column: x => x.RecipientId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserLinks",
+                name: "UserRelationships",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     SelfId = table.Column<long>(type: "INTEGER", nullable: false),
                     OtherId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -244,17 +259,19 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLinks", x => x.Id);
+                    table.PrimaryKey("PK_UserRelationships", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserLinks_Users_OtherId",
+                        name: "FK_UserRelationships_Users_OtherId",
                         column: x => x.OtherId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserLinks_Users_SelfId",
+                        name: "FK_UserRelationships_Users_SelfId",
                         column: x => x.SelfId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -263,6 +280,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -275,12 +293,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_GatheringLinks_Gatherings_GatheringId",
                         column: x => x.GatheringId,
                         principalTable: "Gatherings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_GatheringLinks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -290,6 +310,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: true),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -302,12 +323,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_GatheringReports_Gatherings_GatheringId",
                         column: x => x.GatheringId,
                         principalTable: "Gatherings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_GatheringReports_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -316,6 +339,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -328,12 +352,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_GuestClearances_Gatherings_GatheringId",
                         column: x => x.GatheringId,
                         principalTable: "Gatherings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_GuestClearances_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -342,6 +368,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     OwnerId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
@@ -353,12 +380,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_Snapshots_Gatherings_GatheringId",
                         column: x => x.GatheringId,
                         principalTable: "Gatherings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Snapshots_Users_OwnerId",
                         column: x => x.OwnerId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -368,6 +397,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     SelfId = table.Column<long>(type: "INTEGER", nullable: true),
                     OtherId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: true),
@@ -381,17 +411,20 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_UserReports_Gatherings_GatheringId",
                         column: x => x.GatheringId,
                         principalTable: "Gatherings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserReports_Users_OtherId",
                         column: x => x.OtherId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserReports_Users_SelfId",
                         column: x => x.SelfId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -400,6 +433,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     SnapshotId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -412,12 +446,14 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_SnapshotLinks_Snapshots_SnapshotId",
                         column: x => x.SnapshotId,
                         principalTable: "Snapshots",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_SnapshotLinks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -427,6 +463,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: true),
                     SnapshotId = table.Column<long>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -445,16 +482,17 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         name: "FK_SnapshotReports_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessTries", "AccountStatus", "Age", "Athleticisme", "Chaos", "Competitiveness", "CurrentGathering", "CurrentLocation", "CurrentRadius", "DateOfBirth", "Email", "Extroversion", "Haunt", "HauntRadius", "HauntWheight", "Industriousness", "IsEmailConfirmed", "IsPendingDeletion", "IsPhoneConfirmed", "JoinDate", "LockoutDate", "Name", "NightOwl", "NormalisedEmail", "NotificationId", "Openness", "PhoneNumber", "Pseudonym", "Reputation", "SecurityStamp", "TimeOfUserAgreement" },
+                columns: new[] { "Id", "AccessTries", "AccountStatus", "Age", "Athleticisme", "Chaos", "Competitiveness", "CurrentGathering", "CurrentLocation", "CurrentRadius", "DateOfBirth", "Email", "Extroversion", "Haunt", "HauntRadius", "HauntWheight", "Industriousness", "IsEmailConfirmed", "IsPhoneConfirmed", "JoinDate", "LockoutDate", "Name", "NightOwl", "NormalisedEmail", "NotificationId", "Openness", "PhoneNumber", "Pseudonym", "Reputation", "SecurityStamp", "SoftDeleted", "TimeOfUserAgreement" },
                 values: new object[,]
                 {
-                    { -8L, 3, 0, 25, 50, 50, 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Google Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003008", "", 50, "", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
-                    { -7L, 3, 0, 25, 50, 50, 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Apple Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003007", "", 50, "", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
+                    { -8L, 3, 0, 25, 50, 50, 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Google Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003008", "", 50, "", false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { -7L, 3, 0, 25, 50, 50, 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Apple Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003007", "", 50, "", false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -560,13 +598,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 column: "RecipientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserLinks_OtherId",
-                table: "UserLinks",
+                name: "IX_UserRelationships_OtherId",
+                table: "UserRelationships",
                 column: "OtherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserLinks_SelfId_OtherId",
-                table: "UserLinks",
+                name: "IX_UserRelationships_SelfId_OtherId",
+                table: "UserRelationships",
                 columns: new[] { "SelfId", "OtherId" },
                 unique: true);
 
@@ -620,7 +658,7 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 name: "Telegrams");
 
             migrationBuilder.DropTable(
-                name: "UserLinks");
+                name: "UserRelationships");
 
             migrationBuilder.DropTable(
                 name: "UserReports");
