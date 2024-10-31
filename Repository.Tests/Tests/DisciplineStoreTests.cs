@@ -150,7 +150,7 @@ namespace Repository.Tests
         {
             await store.PenaliseUserAsync(subject1.Id, PenaltyType.Unreliable, DateTimeOffset.MinValue);
 
-            Entities.Penalty penalty = sentry.ExecuteRead(ctx => ctx.Penalties.Single());
+            Penalty penalty = sentry.ExecuteRead(ctx => ctx.Penalties.Single());
 
             Assert.NotNull(penalty);
             Assert.Equal(subject1.Id, penalty.PenalizedId);
@@ -160,7 +160,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetPenaltiesForUserAsync_SUCCESS()
         {
-            Entities.Penalty penalty = new PenaltyFactory().Create(subject1);
+            Penalty penalty = new PenaltyFactory().Create(subject1);
             sentry.ExecuteWrite(ctx => ctx.Penalties.Add(penalty));
 
             PenaltyShard found = (await store.GetPenaltiesForUserAsync(subject1.Id)).Single();

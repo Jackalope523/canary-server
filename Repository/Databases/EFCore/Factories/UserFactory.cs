@@ -2,7 +2,7 @@
 
 namespace Repository
 {
-    internal class UserFactory
+    internal class UserFactory : Factory
     {
         private int produced = 0;
         private CoordinateFactory internalFactory = new();

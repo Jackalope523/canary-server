@@ -26,6 +26,9 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Entity
+            modelBuilder.Ignore<Entity>();
+
             // User
             modelBuilder.Entity<User>()
             .HasQueryFilter(u => !u.SoftDeleted);

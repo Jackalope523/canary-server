@@ -1,7 +1,7 @@
 ﻿
 namespace Repository
 {
-    internal class PostLinkFactory
+    internal class PostLinkFactory : Factory
     {
         internal SnapshotLink Create(User user, Snapshot snapshot)
         {

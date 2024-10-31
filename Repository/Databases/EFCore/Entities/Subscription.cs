@@ -1,9 +1,7 @@
 ﻿namespace Repository.Entities
 {
-    public class Subscription
+    public class Subscription : Entity
     {
-        public long Id { get; set; } = DefaultId;
-        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public long UserId { get; set; }
         public string DeviceToken { get; set; }
 
@@ -11,7 +9,5 @@
         public User? User { get; set; }
 
         // Default Values
-        public static long DefaultId { get; set; } = 0;
-        public static bool DefaultSoftDeleted { get; set; } = false;
     }
 }

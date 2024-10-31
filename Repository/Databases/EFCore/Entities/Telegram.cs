@@ -1,9 +1,7 @@
 ﻿namespace Repository.Entities
 {
-    public class Telegram
+    public class Telegram : Entity
     {
-        public long Id { get; set; } = DefaultId;
-        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public long NotifierId { get; set; }
         public long RecipientId { get; set; }
         public DateTimeOffset Time { get; set; }
@@ -16,7 +14,5 @@
         internal User? Recipient { get; set; }
 
         // Default Values
-        public static long DefaultId { get; set; } = 0;
-        public static bool DefaultSoftDeleted { get; set; } = false;
     }
 }

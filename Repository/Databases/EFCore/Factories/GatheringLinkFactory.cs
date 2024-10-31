@@ -2,7 +2,7 @@
 
 namespace Repository
 {
-    internal class GatheringLinkFactory
+    internal class GatheringLinkFactory : Factory
     {
         int created = 0;
         internal GatheringLink Create(User user, Gathering gathering, GatheringBond type)

@@ -1,7 +1,7 @@
 ﻿
 namespace Repository
 {
-    internal class SnapshotFactory
+    internal class SnapshotFactory : Factory
     {
         private int created = 0;
         

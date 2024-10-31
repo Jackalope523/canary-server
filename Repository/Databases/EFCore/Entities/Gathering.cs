@@ -2,10 +2,8 @@
 
 namespace Repository
 {
-    public class Gathering
+    public class Gathering : Entity
     {
-        public long Id { get; set; } = DefaultId;
-        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public string Title { get; set; } = DefaultTitle;
         public string Description { get; set; } = DefaultDescription;
         public DateTimeOffset StartTime { get; set; } = DefaultStartTime;
@@ -45,8 +43,6 @@ namespace Repository
         // Default Values
         private static readonly CoordinateFactory Factory = new();
 
-        public static long DefaultId { get; set; } = 0;
-        public static bool DefaultSoftDeleted { get; set; } = false;
         public static string DefaultHeroImageURL { get; set; } = "";
         public static string DefaultTitle { get; set; } = "Lewis";
         public static string DefaultDescription { get; set; } = "A dog named Lewis.";

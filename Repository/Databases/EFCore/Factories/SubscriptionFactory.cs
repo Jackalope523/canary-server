@@ -2,7 +2,7 @@
 
 namespace Repository
 {
-    internal class SubscriptionFactory
+    internal class SubscriptionFactory : Factory
     {
         private int produced = 0;
 

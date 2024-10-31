@@ -3,10 +3,8 @@ using Repository.Entities;
 
 namespace Repository
 {
-    public class User
+    public class User : Entity
     {
-        public long Id { get; set; } = DefaultId;
-        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public string PhoneNumber { get; set; } = DefaultPhoneNumber;
         public string Email { get; set; } = DefaultEmail;
         public string NormalisedEmail { get; set; } = DefaultNormalisedEmail;
@@ -63,8 +61,6 @@ namespace Repository
 
 
         // Default Values
-        public static long DefaultId { get; set; } = 0;
-        public static bool DefaultSoftDeleted { get; set; } = false;
         public static string DefaultPhoneNumber { get; set; } = "";
         public static string DefaultEmail { get; set; } = "";
         public static string DefaultNormalisedEmail { get; set; } = "";

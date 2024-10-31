@@ -79,31 +79,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.ToTable("BannerLinks");
                 });
 
-            modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("PenalizedId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PenalizedId");
-
-                    b.ToTable("Penalties");
-                });
-
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
                     b.Property<long>("Id")
@@ -377,6 +352,31 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .IsUnique();
 
                     b.ToTable("GuestClearances");
+                });
+
+            modelBuilder.Entity("Repository.Penalty", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("PenalizedId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PenalizedId");
+
+                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -750,17 +750,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.HasOne("Repository.User", "Penalized")
-                        .WithMany("Penalties")
-                        .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Penalized");
-                });
-
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
                     b.HasOne("Repository.User", "User")
@@ -865,6 +854,17 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("Gathering");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Penalty", b =>
+                {
+                    b.HasOne("Repository.User", "Penalized")
+                        .WithMany("Penalties")
+                        .HasForeignKey("PenalizedId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Penalized");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>

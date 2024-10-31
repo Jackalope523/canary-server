@@ -603,39 +603,42 @@ namespace Repository
         }    
         public async Task DeleteUserStateAsync(long userId, long gatheringId) 
         { 
-            GatheringLink link = await storeSentry.ExecuteReadAsync(ctx => 
+            List<GatheringLink> links = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.
                 Where(l => l.UserId == userId && l.GatheringId == gatheringId).
-                SingleAsync());
+                ToListAsync());
 
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
-            storeSentry.DiscussWrite(ctx => ctx.GatheringLinks.Remove(link), currentDiscussion);
-
-            switch (link.Type)
+            foreach (GatheringLink link in links) 
             {
-                case GatheringBond.Watching:
-                    break;
-                case GatheringBond.Guest:
-                    int num = await storeSentry.ExecuteReadAsync(ctx =>
-                        ctx.Gatherings.
-                        Where(e => e.Id == gatheringId).
-                        Select(e => e.NumberOfGuests).
-                        SingleAsync());
+                storeSentry.DiscussWrite(ctx => ctx.GatheringLinks.Remove(link), currentDiscussion);
 
-                    Gathering e = new() { Id = gatheringId, NumberOfGuests = num - 1 };
-                    storeSentry.DiscussWrite(ctx => ctx.Gatherings.Attach(e), currentDiscussion);
-                    storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.NumberOfGuests)).IsModified = true, currentDiscussion);
-                    break;
-                case GatheringBond.Arrived:
-                    User arrivedUser = new() { Id = userId, CurrentGathering = null };
+                switch (link.Type)
+                {
+                    case GatheringBond.Watching:
+                        break;
+                    case GatheringBond.Guest:
+                        int num = await storeSentry.ExecuteReadAsync(ctx =>
+                            ctx.Gatherings.
+                            Where(e => e.Id == gatheringId).
+                            Select(e => e.NumberOfGuests).
+                            SingleAsync());
 
-                    storeSentry.DiscussWrite(ctx => ctx.Users.Attach(arrivedUser), currentDiscussion);
-                    storeSentry.DiscussWrite(ctx => ctx.Entry(arrivedUser).Property(nameof(arrivedUser.CurrentGathering)).IsModified = true, currentDiscussion);
-                    break;
-                case GatheringBond.Left:
-                    break;
-                case GatheringBond.Kicked:
-                    break;
+                        Gathering e = new() { Id = gatheringId, NumberOfGuests = num - 1 };
+                        storeSentry.DiscussWrite(ctx => ctx.Gatherings.Attach(e), currentDiscussion);
+                        storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(nameof(e.NumberOfGuests)).IsModified = true, currentDiscussion);
+                        break;
+                    case GatheringBond.Arrived:
+                        User arrivedUser = new() { Id = userId, CurrentGathering = null };
+
+                        storeSentry.DiscussWrite(ctx => ctx.Users.Attach(arrivedUser), currentDiscussion);
+                        storeSentry.DiscussWrite(ctx => ctx.Entry(arrivedUser).Property(nameof(arrivedUser.CurrentGathering)).IsModified = true, currentDiscussion);
+                        break;
+                    case GatheringBond.Left:
+                        break;
+                    case GatheringBond.Kicked:
+                        break;
+                }
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }

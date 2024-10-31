@@ -178,7 +178,7 @@ namespace Repository
 
         public async Task PenaliseUserAsync(long userId, PenaltyType offense, DateTimeOffset timeOfPenalty)
         {
-            Entities.Penalty toAdd = new() 
+            Penalty toAdd = new() 
             {
                 PenalizedId = userId,
                 Type = offense, 

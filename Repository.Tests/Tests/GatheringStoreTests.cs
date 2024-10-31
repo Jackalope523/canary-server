@@ -12,7 +12,11 @@ namespace Repository.Tests
         private static EFCoreSentry sentry = new(Harbor.Flag.Development);
         private static EFCoreGatheringStore store = new(Harbor.Flag.Development);
 
+        private readonly UserFactory _userFactory;
+        private readonly GatheringFactory _gatheringFactory;
+        private readonly UserLinkFactory _UserRelationshipFactory;
         private readonly ITestOutputHelper _testOutputHelper;
+        private readonly IFactoryObserver _reaper;
 
         private User testUser;
         private Gathering testGathering;
@@ -20,6 +24,9 @@ namespace Repository.Tests
         public GatheringStoreTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
+            _reaper = new ReaperObserver();
+
+            _userFactory = new UserFactory(_reaper);
 
             testUser = new UserFactory().Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(testUser));

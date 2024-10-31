@@ -1,9 +1,7 @@
 namespace Repository
 {
-    public class Snapshot
+    public class Snapshot : Entity
     {
-        public long Id { get; set; } = DefaultId;
-        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public long OwnerId { get; set; }
         public long GatheringId { get; set; }
         public DateTimeOffset PostedAt { get; init; }
@@ -15,8 +13,6 @@ namespace Repository
         public List<SnapshotLink>? SnapshotLinks { get; set; }
 
         // Default Values
-        public static long DefaultId { get; set; } = 0;
-        public static bool DefaultSoftDeleted { get; set; } = false;
 
     }
 }

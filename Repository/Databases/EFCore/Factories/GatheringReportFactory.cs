@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    internal class GatheringReportFactory
+    internal class GatheringReportFactory : Factory
     {
         private int created = 0;
 

@@ -1,7 +1,7 @@
 ﻿
 namespace Repository
 {
-    internal class NoteFactory
+    internal class NoteFactory : Factory
     {
         private int produced = 0;
 

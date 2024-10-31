@@ -23,11 +23,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     Code = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Color = table.Column<string>(type: "TEXT", maxLength: 7, nullable: false)
+                    Color = table.Column<string>(type: "TEXT", maxLength: 7, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -40,7 +40,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     NormalisedEmail = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
@@ -72,7 +71,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     HauntWheight = table.Column<int>(type: "INTEGER", nullable: false),
                     CurrentLocation = table.Column<Point>(type: "POINT", nullable: false)
                         .Annotation("Sqlite:Srid", 4326),
-                    CurrentRadius = table.Column<double>(type: "REAL", nullable: false)
+                    CurrentRadius = table.Column<double>(type: "REAL", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -85,10 +85,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     BannerId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -113,10 +113,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: true),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Comments = table.Column<string>(type: "TEXT", maxLength: 300, nullable: false)
+                    Comments = table.Column<string>(type: "TEXT", maxLength: 300, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -135,7 +135,6 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     Title = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -158,7 +157,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Competitiveness = table.Column<int>(type: "INTEGER", nullable: false),
                     Industriousness = table.Column<int>(type: "INTEGER", nullable: false),
                     NightOwl = table.Column<int>(type: "INTEGER", nullable: false),
-                    Age = table.Column<int>(type: "INTEGER", nullable: false)
+                    Age = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -177,10 +177,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     PenalizedId = table.Column<long>(type: "INTEGER", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,9 +199,9 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    DeviceToken = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false)
+                    DeviceToken = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -220,13 +220,13 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     NotifierId = table.Column<long>(type: "INTEGER", nullable: false),
                     RecipientId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     Message = table.Column<int>(type: "INTEGER", nullable: false),
                     Action = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -251,11 +251,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     SelfId = table.Column<long>(type: "INTEGER", nullable: false),
                     OtherId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false)
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -280,11 +280,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false)
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,11 +310,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: true),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
+                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -339,11 +339,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Degree = table.Column<int>(type: "INTEGER", nullable: false)
+                    Degree = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -368,10 +368,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     OwnerId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: false),
-                    PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    PostedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -397,12 +397,12 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     SelfId = table.Column<long>(type: "INTEGER", nullable: true),
                     OtherId = table.Column<long>(type: "INTEGER", nullable: false),
                     GatheringId = table.Column<long>(type: "INTEGER", nullable: true),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
+                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -433,11 +433,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: false),
                     SnapshotId = table.Column<long>(type: "INTEGER", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false)
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -463,11 +463,11 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UserId = table.Column<long>(type: "INTEGER", nullable: true),
                     SnapshotId = table.Column<long>(type: "INTEGER", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false)
+                    Notes = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

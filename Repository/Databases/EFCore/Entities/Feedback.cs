@@ -1,9 +1,7 @@
 ﻿namespace Repository
 {
-    public class Feedback
+    public class Feedback : Entity
     {
-        public long Id { get; set; } = DefaultId;
-        public bool SoftDeleted { get; set; } = DefaultSoftDeleted;
         public long? UserId { get; set; }
         public DateTimeOffset Time { get; set; }
         public string Comments { get; set; }
@@ -12,7 +10,5 @@
         public User? User { get; set; }
 
         // Default Values
-        public static long DefaultId { get; set; } = 0;
-        public static bool DefaultSoftDeleted { get; set; } = false;
     }
 }

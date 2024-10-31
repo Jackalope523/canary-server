@@ -1,13 +1,10 @@
-﻿
-using Core.Boundaries;
-
-namespace Repository
+﻿namespace Repository
 {
-    internal class PenaltyFactory
+    internal class PenaltyFactory : Factory
     {
-        internal Entities.Penalty Create(User user)
+        internal Penalty Create(User user)
         {
-            return new Entities.Penalty
+            return new Penalty
             {
                 PenalizedId = user.Id,
                 Type = PenaltyType.Unreliable,

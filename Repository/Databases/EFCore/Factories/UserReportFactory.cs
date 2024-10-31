@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    internal class UserReportFactory
+    internal class UserReportFactory : Factory
     {
         private int created = 0;
 
