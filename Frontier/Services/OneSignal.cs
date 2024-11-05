@@ -34,13 +34,19 @@ namespace Frontier.Services
 
         public async Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collpaseId = "")
         {
+            if (notificationId.Equals(Guid.Empty.ToString()))
+            {
+                log.LogWarning("Tried to push notification to empty user.\nTitle {title}\nMessage {message}", title, message);
+                return;
+            }
+
             var notification = new Notification(appId: appId)
             {
                 Headings = new StringMap(en: title),
                 Contents = new StringMap(en: message),
                 TargetChannel = Notification.TargetChannelEnum.Push,
                 ChannelForExternalUserIds = "push",
-                IncludeExternalUserIds = new() { notificationId }, // Deprecated is a mistake
+                IncludeExternalUserIds = new() { notificationId }, // Deprecated is a mistake, leave as is
 
                 Filters = new()
                 {
@@ -50,10 +56,7 @@ namespace Frontier.Services
                 CollapseId = collpaseId,
             };
 
-            var response = await instance.CreateNotificationAsync(notification);
-
-            log.LogInformation($"Notification sent to {notificationId}");
-            log.LogInformation($"Delivered to {response.Recipients} recipients");
+            await instance.CreateNotificationAsync(notification);
         }
     }
 }
