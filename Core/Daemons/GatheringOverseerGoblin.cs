@@ -64,18 +64,23 @@ namespace Core.Daemons
                     await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);
 
                     // Notify host
-                    User host = new(gathering.Host);
+                    User host = await GetUserAsync(gathering.Host.Id);
                     await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
                 }
                 // Check if the next pass will delete the gathering
                 else if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart - interval))
                 {
                     // Warn host
-                    User host = new(gathering.Host);
+                    User host = await GetUserAsync(gathering.Host.Id);
                     await host.Notify(NotificationGroup.GatheringActivity, "Your gathering is about to be deleted.",
                         $"{gathering.Title} is going to be deleted if you do not start it!", "30");
                 }
             }
+        }
+
+        private async Task<User> GetUserAsync(long userId)
+        {
+            return new(await terminal.AccountDatabase.FindUserByIdAsync(userId));
         }
     }
 }
