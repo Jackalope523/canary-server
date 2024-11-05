@@ -57,7 +57,7 @@ namespace Core.Daemons
                 }
 
                 // Check if gathering has expired
-                if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart))
+                if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait))
                 {
                     // Purge gathering
                     log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Title);
@@ -65,10 +65,10 @@ namespace Core.Daemons
 
                     // Notify host
                     User host = await GetUserAsync(gathering.Host.Id);
-                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
+                    await host.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
                 }
                 // Check if the next pass will delete the gathering
-                else if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart - interval))
+                else if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait - interval))
                 {
                     // Warn host
                     User host = await GetUserAsync(gathering.Host.Id);

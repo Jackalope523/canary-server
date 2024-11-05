@@ -28,6 +28,7 @@ namespace Core.Entities
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
         public static readonly TimeSpan MaximumSnapshotLateness = OneDay;
         public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(20);
+        public static readonly TimeSpan MaximumStartWait = TimeSpan.FromMinutes(30);
         public static readonly TimeSpan MaximumAutoStart = TimeSpan.FromMinutes(5);
 
         public static Gathering None
