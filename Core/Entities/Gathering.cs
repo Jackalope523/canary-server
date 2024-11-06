@@ -20,12 +20,15 @@ namespace Core.Entities
 		// Constants
 		//////////////
 
-		public const int MaximumNameLength = 50;
-        public const int MaximumDescLength = 400;
+		public const int MaximumTitleLength = 30;
+        public const int MaximumDescLength = 300;
+        public const int MaximumLocationLength = 80;
 
-        public readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
-        public readonly Distance ArrivalDistance = new() { Metres = 75 };
-        public readonly TimeSpan MaximumSnapshotLateness = OneDay;
+        public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
+        public static readonly Distance ArrivalDistance = new() { Metres = 75 };
+        public static readonly TimeSpan MaximumSnapshotLateness = OneDay;
+        public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(20);
+        public static readonly TimeSpan MaximumAutoStart = TimeSpan.FromMinutes(5);
 
         public static Gathering None
             => new() { Id = 0, Exists = false };
@@ -34,39 +37,52 @@ namespace Core.Entities
 		// Properties
 		///////////////
 
-		public ulong Id { get; init; }
+        // Core
+		public long Id { get; init; }
         public User Host { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string Description { get; set; }
         public CharacterVector Character { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public GeoLocation Location { get; set; }
+        public string FriendlyLocation { get; set; }
         public Distance Radius { get; set; }
         public bool IsDynamic { get; set; }
+        public int DegreeOfPrivacy { get; set; }
         public DateTimeOffset? EndTime { get; set; }
         public GatheringState State { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public bool IsDeleted { get; set; }
+
         public int NumberOfGuests { get; set; }
         public float RelativeAngle { get; set; } = 0;
 
         public bool IsWaiting
             => State.Equals(GatheringState.Upcoming) &&
-                HasAlready(StartTime);
+                HasAlready(StartTime - MaximumEarlyBirdStart);
+        public bool IsWaitingAuto
+            => State.Equals(GatheringState.Upcoming) &&
+                HasAlready(StartTime - MaximumAutoStart);
         public bool IsOpen
             => State.Equals(GatheringState.Upcoming) ||
-                State.Equals(GatheringState.Open);
+                State.Equals(GatheringState.OngoingOpen);
         public bool IsOngoing
-            => State.Equals(GatheringState.Open) ||
-                State.Equals(GatheringState.Sealed);
+            => State.Equals(GatheringState.OngoingOpen) ||
+                State.Equals(GatheringState.OngoingHidden);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumSnapshotLateness);
-        public bool IsEnded
+        public bool IsTerminated
             => EndTime.HasValue;
 
         public bool Exists { get; set; } = true;
+
+        public TimeSpan Duration
+            => State == GatheringState.Upcoming ?
+                TimeSpan.Zero
+            :
+                (EndTime ?? Time) - StartTime;
 
         ////////
         // Synced Properties
@@ -92,7 +108,7 @@ namespace Core.Entities
         public Gathering()
         {
             AllUsers = new(() => Terminal.GatheringDirector.RequestAllUsersFromGatheringAsync(this));
-            Surveying = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Surveying)).ConvertAll(user => user.User));
+            Surveying = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Watching)).ConvertAll(user => user.User));
             Guests = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Guest)).ConvertAll(user => user.User));
             Arrived = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Arrived)).ConvertAll(user => user.User));
             Left = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Left)).ConvertAll(user => user.User));
@@ -107,11 +123,12 @@ namespace Core.Entities
         {
             Id = fromGathering.Id;
             Host = new(fromGathering.Host);
-            Name = fromGathering.Name;
+            Title = fromGathering.Title;
             Description = fromGathering.Description;
             StartTime = fromGathering.StartTime;
             Location = new()
                 { Latitude = fromGathering.Latitude, Longitude = fromGathering.Longitude };
+            FriendlyLocation = fromGathering.FriendlyLocation;
             EndTime = fromGathering.TimeEnded;
             State = fromGathering.State;
             GroupMinimum = fromGathering.GroupMinimum;
@@ -119,6 +136,7 @@ namespace Core.Entities
             Character = new(fromGathering.Character);
             Radius = new() { Kilometres = fromGathering.Radius };
             IsDynamic = fromGathering.IsDynamic;
+            DegreeOfPrivacy = fromGathering.DegreeOfPrivacy;
             IsDeleted = fromGathering.IsPendingDeletion;
             NumberOfGuests = fromGathering.NumberOfGuests;
         }
@@ -127,7 +145,7 @@ namespace Core.Entities
         {
             Id = fromGathering.Id;
             Host = new(fromGathering.Host);
-            Name = fromGathering.Name;
+            Title = fromGathering.Title;
             Description = fromGathering.Description;
             StartTime = fromGathering.StartTime;
             Location = new()
@@ -137,37 +155,43 @@ namespace Core.Entities
             GroupMinimum = fromGathering.GroupMinimum;
             GroupMaximum = fromGathering.GroupMaximum;
             Radius = new() { Kilometres = fromGathering.Radius };
+            DegreeOfPrivacy = fromGathering.DegreeOfPrivacy;
             NumberOfGuests = fromGathering.NumberOfGuests;
         }
 
         public CoreGathering ToCoreGathering()
         {
-            return new(Id, Host.ToUserSilhouette(), Name, Description,
-                StartTime, Location.Latitude, Location.Longitude, EndTime,
-                State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
-                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests);
+            return new(Id, Host.ToUserShard(), Title, Description,
+                StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
+                EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
+                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests, DegreeOfPrivacy);
         }
 
         public GatheringShard ToGatheringShard()
         {
-            return new(Id, Host.ToUserSilhouette(), Name, Description,
-                StartTime, Location.Latitude, Location.Longitude, EndTime,
-                State, GroupMinimum, GroupMaximum,
-                Radius.Kilometres, NumberOfGuests, RelativeAngle);
+            return new(Id, Host.ToUserShard(), Title, Description,
+                StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
+                EndTime, State, GroupMinimum, GroupMaximum,
+                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests, RelativeAngle);
         }
 
         public GatheringShard ToGatheringShard(User relativeUser)
         {
-            return new(Id, Host.ToUserSilhouette(), Name, Description,
-                StartTime, Location.Latitude, Location.Longitude, EndTime,
-                State, GroupMinimum, GroupMaximum,
-                Radius.Kilometres, NumberOfGuests,
+            return new(Id, Host.ToUserShard(), Title, Description,
+                StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
+                EndTime, State, GroupMinimum, GroupMaximum,
+                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests,
                 CharacterVector.AngleBetweenAffected(relativeUser.Character, Character));
         }
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Name, IsActive, lastActiveTime, Location.Latitude, Location.Longitude);
+            return new(Id, Title, IsOngoing ? StartTime : EndTime.Value, IsOngoing, lastActiveTime, FriendlyLocation);
+        }
+
+        public TwigShard ToTwigShard()
+        {
+            return new(Id, StartTime);
         }
 
 		#endregion
@@ -179,14 +203,26 @@ namespace Core.Entities
             issues = "";
 
             // Sanitise User content
-            Name = ContentValidation.NormaliseText(Name, MaximumNameLength);
+            Title = ContentValidation.NormaliseText(Title, MaximumTitleLength);
+            if (string.IsNullOrEmpty(Title)) { issues += "Title cannot be empty. "; }
+
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
+            if (string.IsNullOrEmpty(Description)) { issues += "Description cannot be empty. "; }
+
+            FriendlyLocation = ContentValidation.NormaliseText(FriendlyLocation, MaximumLocationLength);
+            if (string.IsNullOrEmpty(FriendlyLocation)) { issues += "Friendly location cannot be empty. "; }
 
             // Verify Gathering is now or in the future
-            if (HappenedBefore(StartTime, Time)) { issues += "Gathering is in the past. "; }
+            if (HappenedBefore(StartTime, Time - MaximumEarlyBirdStart)) { issues += "Gathering is in the past. "; }
+
+            // If in the past, make it now
+            if (HappenedBefore(StartTime, Time)) { StartTime = Time; }
 
             // Verify Gathering is within a reasonable time
             if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }
+
+            // Force degree to be sensible
+            DegreeOfPrivacy = Math.Clamp(DegreeOfPrivacy, 1, 3);
 
             // Verify group bounds
             if (GroupMaximum != 0 &&
@@ -241,13 +277,17 @@ namespace Core.Entities
 			{
 				// User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!user.CanAttendCompanions || !await Host.IsCompanionsWith(user))
+				if (!(user.CanAttendCompanions && await Host.IsCompanionsWith(user)))
 				{ return false; }
 			}
 
 			// Check if user is blocked by or blocking gathering host
 			if (await Host.IsBlockedBy(user) || await Host.IsBlocking(user))
 			{ return false; }
+
+            // Check if user is within degree of privacy
+            if (DegreeOfPrivacy < 3 && !await Terminal.GatheringDirector.RequestUserIsAuthorisedGuest(user, this))
+            { return false; }
 
             return true;
 		}
@@ -266,10 +306,12 @@ namespace Core.Entities
             if ((await Kicked).Contains(user))
             { return false; }
 
+            /*
             // Check if user or user's haunt is within a reasonable distance
             if (!GeoLocation.AreInRange(await user.LastKnownLocation, Location, MaximumJoinDistance) &&
                 !GeoLocation.AreInRange(await user.Haunt, Location, MaximumJoinDistance))
             { return false; }
+            */
 
             return true;
         }
@@ -295,7 +337,13 @@ namespace Core.Entities
         public async Task<bool> HasUserRelationship(User user)
         {
             // Check if user has interacted with gathering
-            return IsHostedBy(user) || (await AllUsers).FindAll(x => x.User.Id == user.Id).Count == 1;
+            return IsHostedBy(user) || (await AllUsers).Exists(x => x.User.Id == user.Id);
+        }
+
+        public async Task<bool> HasOnGuestList(User user)
+        {
+            // Check if user is affiliated with the gathering
+            return (await Guests).Contains(user) || await WasAttendedBy(user);
         }
 
         public async Task<bool> WasAttendedBy(User user)
@@ -314,7 +362,27 @@ namespace Core.Entities
             { return false; }
 
             // Check if host is within range
+            /*
             if (!await IsInRange(Host))
+            { return false; }
+            */
+
+            return true;
+        }
+
+        public bool IsTerminable()
+        {
+            // Ensure gathering is ongoing
+            if (!IsOngoing)
+            { return false; }
+
+            return true;
+        }
+
+        public bool IsDeletable()
+        {
+            // Ensure gathering has not already occurred
+            if (IsOngoing || IsTerminated)
             { return false; }
 
             return true;
@@ -326,7 +394,7 @@ namespace Core.Entities
 
         public async Task Started()
         {
-            _ = NotifyActive($"{Name}", "Gathering is active!");
+            _ = NotifyActive(NotificationGroup.GatheringReminder, $"{Title}", "Gathering is live!", "20");
         }
 
         public async Task<List<User>> Ended()
@@ -336,12 +404,15 @@ namespace Core.Entities
             // Update all participants' vectors and notify
 			foreach ((var joined, var left, var guest) in await GuestHistory)
 			{
-				guest.CalculateCharacter(this, left.Value - joined);
+                if (left.HasValue)
+                { guest.CalculateCharacter(this, left.Value - joined); }
+                else
+                { guest.CalculateCharacter(this, Time - joined); }
 
                 updatedGuests.Add(guest);
 
 				// Notify of gathering ending
-				_ = guest.Notify($"{Name}", $"Gathering has concluded.");
+				_ = guest.Notify(NotificationGroup.GatheringActivity, $"{Title}", $"Gathering has concluded, thank you for joining.");
 			}
 
             return updatedGuests;
@@ -350,15 +421,15 @@ namespace Core.Entities
         public async Task Taken(User user)
         {
             // Verify snapshot is not before gathering starting or user is host
-            Try(HasAlready(StartTime) || IsModifiableBy(user),
+            Verify(HasAlready(StartTime) || IsModifiableBy(user),
                 new InvalidGatheringException("Gathering has yet to start."));
 
             // Verify user can etch into the gathering
-            Try(await WasAttendedBy(user) || IsModifiableBy(user),
+            Verify(await WasAttendedBy(user) || IsModifiableBy(user),
                 new InvalidGatheringException("User did not attend gathering."));
 
             // Verify snapshot is added before gathering is closed
-            Try(IsActive,
+            Verify(IsActive,
                 new InvalidGatheringException("Gathering has already ended."));
 		}
 
@@ -375,25 +446,25 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task NotifyActive(string title, string message)
+        public async Task NotifyActive(NotificationGroup group, string title, string message, string collapseId = "")
         {
             foreach (var user in (await Guests).Concat(await Arrived))
             {
                 if (IsHostedBy(user))
                 { continue; }
 
-                _ = user.Notify(title, message);
+                _ = user.Notify(group, title, message, collapseId);
             }
         }
 
-        public async Task NotifyGuests(string title, string message)
+        public async Task NotifyGuests(NotificationGroup group, string title, string message, string collapseId = "")
         {
             foreach (var guest in await Arrived)
             {
                 if (IsHostedBy(guest))
                 { continue; }
 
-                _ = guest.Notify(title, message);
+                _ = guest.Notify(group, title, message, collapseId);
             }
         }
 

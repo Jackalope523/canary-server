@@ -2,7 +2,7 @@
 
 namespace Repository
 {
-    internal class CoordinateFactory
+    internal class CoordinateFactory : Factory
     {
         private readonly GeometryFactory internalFactory;
 

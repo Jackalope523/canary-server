@@ -1,24 +1,65 @@
 ﻿using Core.Boundaries;
+using Serilog;
 
 namespace Repository
 {
     public class AzureFileStore : IMediaDatabase
     {
-        private readonly AzureStorageSentry sentry = new();
+        private readonly AzureStorageSentry sentry;
 
-        public async Task UploadImageAsync(ulong snapshotId, ulong ownerId, MemoryStream image)
+        public AzureFileStore(Harbor.Flag flag) 
         {
-            await sentry.UploadBlobAsync(ownerId.ToString(), snapshotId.ToString(), image);
+            sentry = new(flag);
         }
 
-        public async Task<MemoryStream> DownloadImageAsync(ulong snapshotId, ulong ownerId)
+        public async Task<MemoryStream> DownloadAssetAsync(string asset)
         {
-            return await sentry.DownloadBlobAsync(ownerId.ToString(), snapshotId.ToString());
+            return await sentry.DownloadBlobAsync("assets", asset);
         }
 
-        public async Task DeleteImageAsync(ulong snapshotId, ulong ownerId)
+        public async Task UploadSnapshotAsync(long snapshotId, long ownerId, MemoryStream image)
         {
-            await sentry.DownloadBlobAsync(ownerId.ToString(), snapshotId.ToString());
+            await sentry.UploadBlobAsync("users" + ownerId.ToString(), snapshotId.ToString(), image);
+        }
+
+        public async Task<MemoryStream> DownloadSnapshotAsync(long snapshotId, long ownerId)
+        {
+            return await sentry.DownloadBlobAsync("users" + ownerId.ToString(), snapshotId.ToString());
+        }
+
+        public async Task DeleteSnapshotAsync(long snapshotId, long ownerId)
+        {
+            await sentry.DeleteBlobAsync("users" + ownerId.ToString(), snapshotId.ToString());
+        }
+
+        public async Task<MemoryStream> DownloadAvatarAsync(long userId)
+        {
+            return await sentry.DownloadBlobAsync("user" + userId.ToString(), "avatar");
+        }
+
+        public async Task UploadAvatarAsync(long userId, MemoryStream image)
+        {
+            await sentry.UploadBlobAsync("user" + userId.ToString(), "avatar", image);
+        }
+
+        public async Task DeleteAvatarAsync(long userId)
+        {
+            await sentry.DeleteBlobAsync("user" + userId.ToString(), "avatar");
+        }
+
+        public async Task<MemoryStream> DownloadHeroAsync(long gatheringId)
+        {
+            return await sentry.DownloadBlobAsync("gathering" + gatheringId.ToString(), "hero");
+        }
+
+        public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
+        {
+            await sentry.UploadBlobAsync("gathering" + gatheringId.ToString(), "hero", image);
+        }
+
+        public async Task DeleteHeroAsync(long gatheringId)
+        {
+            await sentry.DeleteBlobAsync("gathering" + gatheringId.ToString(), "hero");
         }
     }
 }

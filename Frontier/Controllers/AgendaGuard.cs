@@ -22,18 +22,18 @@ namespace Frontier.Controllers
 
         #region Actions
 
-        [HttpGet("{targetIdentification}")]
-        public async Task<IActionResult> GetUserAgenda(ulong targetIdentification)
+        [HttpGet]
+        public async Task<IActionResult> GetUserAgenda()
         {
             return await Execute(async user =>
-                await nests.GetUserAgendaAsync(user.Id, targetIdentification));
+                await nests.GetUserAgendaAsync(user.Id));
         }
 
-        [HttpGet]
+        [HttpGet("companions")]
         public async Task<IActionResult> GetCompanionAgenda()
         {
             return await Execute(async user =>
-                await nests.GetCompanionAgendaAsync(user.Id));
+                await nests.GetCompanionAgendasAsync(user.Id));
         }
 
         #endregion

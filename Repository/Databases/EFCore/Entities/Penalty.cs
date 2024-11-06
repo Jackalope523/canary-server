@@ -1,14 +1,14 @@
-﻿
-using Core.Boundaries;
-
-namespace Repository.Entities
+﻿namespace Repository
 {
-    public class Penalty
+    public class Penalty : Entity
     {
-        public ulong Id { get; set; }
-        public ulong PenalizedId { get; set; }
-        public User Penalized { get; set; }
+        public long PenalizedId { get; set; }
         public PenaltyType Type { get; set; }   
         public DateTimeOffset Time { get; set; }
+
+        // Navigation Properties
+        public User? Penalized { get; set; }
+
+        // Default Values
     }
 }

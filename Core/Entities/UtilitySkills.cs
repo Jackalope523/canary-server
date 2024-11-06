@@ -11,13 +11,13 @@ namespace Core.Entities
 	{
 		#region Skills
 
-		public static void Try<E>(bool success, E exception) where E : HollowException
+		public static void Verify<E>(bool success, E exception) where E : HollowException
 		{
 			if (!success)
 			{ throw exception; }
 		}
 
-		public static void Fail<E>(bool failure, E exception) where E : HollowException
+		public static void FailIf<E>(bool failure, E exception) where E : HollowException
 		{
 			if (failure)
 			{ throw exception; }
@@ -70,8 +70,10 @@ namespace Core.Entities
 			=> TimeSpan.FromHours(1);
 		public static TimeSpan HalfHour
 			=> TimeSpan.FromMinutes(30);
-		public static TimeSpan QuarterHour
+		public static TimeSpan FifteenMinutes
 			=> TimeSpan.FromMinutes(15);
+		public static TimeSpan FiveMinutes
+			=> TimeSpan.FromMinutes(5);
 
 		#endregion
 

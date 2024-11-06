@@ -12,7 +12,9 @@ namespace Frontier.Tests
 	public class AbstractGuardTests
 	{
 		static ILogger log = LoggerFactory.Create((ILoggingBuilder obj) => NoOp()).CreateLogger("testing");
-		static GuardBox testBox = new(log, null, null, null, null, null, null, null, null, null);
+		static GuardBox testBox = new(
+			new() { Flag = Core.EnvironmentFlag.Development },
+			log, null, null, null, null, null, null, null, null, null, null);
 
 		AbstractGuard testGuard = new(testBox, null);
 
@@ -34,7 +36,7 @@ namespace Frontier.Tests
 		public async Task Execute_Shard_Success()
 		{
 			// Arrange
-			var outgoing = new UserSilhouette(117, "John");
+			var outgoing = new UserShard(117, "John");
 			Func<Task<object>> action = async () => outgoing;
 
 			// Act
@@ -43,7 +45,7 @@ namespace Frontier.Tests
 			// Assert
 			Assert.NotNull(result);
 
-			var resultManifest = result.Value as UserSilhouette;
+			var resultManifest = result.Value as UserShard;
 			Assert.NotNull(resultManifest);
 			Assert.Equal(outgoing.Id, resultManifest.Id);
 			Assert.Equal(outgoing.Name, resultManifest.Name);
@@ -53,7 +55,7 @@ namespace Frontier.Tests
 		public async Task Execute_List_Success()
 		{
 			// Arrange
-			List<UserSilhouette> outgoing = new() { new UserSilhouette(117, "John"), new UserSilhouette(3, "Thel") };
+			List<UserShard> outgoing = new() { new UserShard(117, "John"), new UserShard(3, "Thel") };
 			Func<Task<object>> action = async () => outgoing;
 
 			// Act
@@ -62,7 +64,7 @@ namespace Frontier.Tests
 			// Assert
 			Assert.NotNull(result);
 
-			var resultList = result.Value as List<UserSilhouette>;
+			var resultList = result.Value as List<UserShard>;
 			Assert.NotNull(resultList);
 			Assert.Equal(outgoing.Count, resultList.Count);
 		}
@@ -71,9 +73,10 @@ namespace Frontier.Tests
 		public async Task Execute_ProtectedData_Failure()
 		{
 			// Arrange
-			CoreUser bastardData = new(117, "John", "", "", DateTimeOffset.UtcNow,
+			CoreUser bastardData = new(117, "John", "", "", "", DateTimeOffset.UtcNow,
 				true, true, false, "", null,
-				0, UserAccountStatus.Impotent, DateTimeOffset.UtcNow, 0, 0, null);
+				0, UserAccountStatus.Impotent, DateTimeOffset.UtcNow, 0, null, DateTimeOffset.UtcNow,
+				Guid.NewGuid());
 
 			Func<Task<object>> action = async () => bastardData;
 

@@ -58,7 +58,7 @@ namespace Core.Tests.Entities
 			var user = await environment.GenerateUniqueUserAsync();
 
 			var gathering = environment.CreateTestGathering(host);
-			gathering.Character = new(new(100,100,100,100,100,100,100));
+			gathering.Character = new(new(20,100,100,100,100,100,100,100));
 			var oldCharacter = user.Character;
 
 			// Act
@@ -466,75 +466,17 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string context = "action";
 
 			// Act
-			await user.PostNote(noter, message, action);
+			await user.PostTelegram(noter, message, context);
 
 			// Assert
 			var notes = await environment.GetNotesAsync(user);
 			Assert.Single(notes);
 			Assert.Equal(message, notes[0].Message);
-			Assert.Equal(action, notes[0].Action);
-		}
-
-		[Fact]
-		public async Task Notify_SubscribedUser_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			await environment.SubscribeUserAsync(user, DeviceType.iOS, user.Id.ToString());
-			string notificationTitle = "title", notificationBody = "body";
-
-			// Act
-			await user.Notify(notificationTitle, notificationBody);
-
-			// Assert
-			Assert.True(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
-
-			var userMessages = environment.GetUserMessages(user);
-			Assert.Single(userMessages);
-
-			var notification = userMessages[0];
-			Assert.Equal(notificationTitle, notification.Title);
-			Assert.Equal(notificationBody, notification.Message);
-		}
-
-		[Fact]
-		public async Task Notify_UnsubscribedUser_Drops()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			await user.Notify("", "");
-
-            // Assert
-            Assert.False(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
-		}
-
-		[Fact]
-		public async Task NotifyAppreciateers_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var companion1 = await environment.GenerateUniqueUserAsync();
-			var companion2 = await environment.GenerateUniqueUserAsync();
-
-			await environment.ForceCompanionshipAsync(user, companion1, companion2);
-			await environment.SubscribeUserAsync(companion1, DeviceType.iOS, companion1.Id.ToString());
-			await environment.SubscribeUserAsync(companion2, DeviceType.iOS, companion2.Id.ToString());
-			string notificationTitle = "gathering title", notificationMessage = "message test";
-
-			// Act
-			await user.NotifyAppreciateers(notificationTitle, notificationMessage);
-
-			// Assert
-			var incomingUserMessages = environment.GetUserMessages(companion1);
-			Assert.Single(incomingUserMessages);
-
-			var guestMessages = environment.GetUserMessages(companion2);
-			Assert.Single(guestMessages);
+			Assert.Equal(context, notes[0].Context);
 		}
 	}
 }

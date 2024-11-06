@@ -11,9 +11,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Repository;
-using Core;
 using Frontier.Controllers;
 using Microsoft.Extensions.Logging;
+using Core;
+using Core.Daemons;
 
 namespace Frontier
 {
@@ -53,6 +54,8 @@ namespace Frontier
                     webBuilder.UseStartup<Ignition>();
                 });
 
+        public static string HollowSpecificOrigins = "_HollowSpecificOrigins";
+
         public IConfiguration Configuration { get; }
 
         public Ignition(IConfiguration configuration)
@@ -62,6 +65,27 @@ namespace Frontier
 
         public void ConfigureServices(IServiceCollection services)
         {
+            string env = Configuration["ASPNETCORE_ENVIRONMENT"];
+
+            var flag = env switch
+            {
+                "Production" => EnvironmentFlag.Production,
+                "Staging" => EnvironmentFlag.Staging,
+                "Development" => EnvironmentFlag.Development,
+                _ => throw new InvalidEnvironmentException("Unknown ASPNETCORE_ENVIRONMENT set.")
+            };
+
+            EnvironmentOptions environment = new() { Flag = EnvironmentFlag.Production };
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: HollowSpecificOrigins,
+                    policy =>
+                    {
+                        policy.WithOrigins("https://almostcanary.com");
+                    });
+            });
+
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -69,47 +93,66 @@ namespace Frontier
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
             });
 
+            /////
+            // Loggers
+            ////////////
+
             var loggerFactory = new LoggerFactory()
                 .AddSerilog(Log.Logger);
 
+            var frontierLogger = loggerFactory.CreateLogger("Frontier");
+            var coreLogger = loggerFactory.CreateLogger("Core");
+            var repositoryLogger = loggerFactory.CreateLogger("Repository");
+            
+            /////
+            // Database
+            /////////////
+
+            Harbor harbor;
+
+            if (environment.IsProduction)
+            {
+                harbor = new(Harbor.Flag.Production, repositoryLogger);
+            }
+            else if (environment.Flag.Equals(EnvironmentFlag.Staging))
+            {
+                harbor = new(Harbor.Flag.Staging, repositoryLogger);
+            }
+            else
+            {
+                harbor = new(Harbor.Flag.Development, repositoryLogger);
+            }
+
+            var keyProvider = harbor.KeyDatabaseAccess;
 
             /////
             // Services 
             /////////////
 
-            var frontierLogger = loggerFactory.CreateLogger("Frontier");
-            var coreLogger = loggerFactory.CreateLogger("Core");
-            var repositoryLogger = loggerFactory.CreateLogger("Repository");
+            OneSignalService pushNotifications = new();
+            OneSignalService.Initialise(frontierLogger,
+                keyProvider.GetHollowOneSignalApiKeyAsync().Result,
+                keyProvider.GetHollowOneSignalAppIdAsync().Result);
+            
+            TwilioService.Initialise(environment, frontierLogger,
+                keyProvider.GetHollowTwilioAccountKeyAsync().Result,
+                keyProvider.GetHollowTwilioAuthTokenAsync().Result,
+                keyProvider.GetHollowTwilioMessagingServiceAsync().Result);
 
-            Services.CorePush pushTelegrams = new();
-            Services.CorePush.Initialise("", "", "", "", CorePush.Apple.ApnServerType.Development,
-                "", "");
-
+            services.AddTransient<INotificationService, OneSignalService>(service => pushNotifications);
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();
-            // TwilioService.Initialise(Configuration["Twilio:AUTH_ID"], Configuration["Twilio:TOKEN"], Configuration["Twilio:NUMBER"]);
-
 
             //////
             // Connections
             ////////////////
 
-            Harbor harbor;
-
-            if (IsDebug)
-            {
-                harbor = new(Harbor.Flag.Development, repositoryLogger);
-            }
-            else
-            {
-                harbor = new(Harbor.Flag.Production, repositoryLogger);
-            }
-
-            DebugTerminal terminal = DebugTerminal.CreateDebugTerminal(
+            CoreTerminal terminal = CoreTerminal.CreateTerminal(
+                environment,
                 coreLogger,
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
-                new DebugBannerBypass(),
+                harbor.BannerDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -117,10 +160,10 @@ namespace Frontier
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
-                pushTelegrams,
-                harbor.DebugDatabaseAccess);
+                harbor.MiscellaneousDatabaseAccess,
+                pushNotifications);
 
-            GuardBox box = new(frontierLogger,
+            GuardBox box = new(environment, frontierLogger,
                 terminal.AccountOperations,
                 terminal.BannerOperations,
                 terminal.NestOperations,
@@ -129,10 +172,17 @@ namespace Frontier
                 terminal.KeyOperations,
                 terminal.DisciplineOperations,
                 terminal.MediaOperations,
-                terminal.NotificationOperations);
+                terminal.NotificationOperations,
+                terminal.MiscellaneousOperations);
 
             services.AddSingleton(box);
-            services.AddSingleton(terminal.DebugOperations);
+
+            /////
+            // Daemons
+            ////////////
+
+            services.AddHostedService(services => terminal.CreateRepositoryCleanupService());
+            services.AddHostedService(services => terminal.CreateTelegramCleanupService());
 
             /////////
             // Authentication Schema 
@@ -165,6 +215,8 @@ namespace Frontier
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(HollowSpecificOrigins);
 
             app.UseAuthentication();
             app.UseCookiePolicy();

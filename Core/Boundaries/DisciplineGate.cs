@@ -9,22 +9,34 @@ namespace Core.Boundaries
     public enum PenaltyType
     { Unreliable }
 
-    public enum GatheringReportType
-    { Inappropriate, Spam, Misleading, Promotion }
-
     public enum UserReportType
     {
         Rude, HateSpeech, Harassment,
-        Violent, Assault
+        ViolenceOrAssault, Other
+    }
+
+    public enum GatheringReportType
+    {
+        InappropriateGathering, InappropriateHeader, Misleading,
+        Illegal, Promotion, Spam, Other
+    }
+
+    public enum SnapshotReportType
+    {
+        Inappropriate, GraphicContent, ManipulatedMedia,
+        Promotion, Spam, Other
     }
 
     public record PenaltyShard(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
 
-	public record UserReport(ulong Id, ulong ReportingUserId, ulong ReportedUserId, DateTimeOffset ReportTime,
+	public record UserReport(long Id, long ReportingUserId, long ReportedUserId, DateTimeOffset ReportTime,
         UserReportType ReportType, string ReportDetails);
 
-    public record GatheringReport(ulong Id, ulong ReportingUserId, ulong ReportedGatheringId, DateTimeOffset ReportTime,
+    public record GatheringReport(long Id, long ReportingUserId, long ReportedGatheringId, DateTimeOffset ReportTime,
         GatheringReportType ReportType, string ReportDetails);
+
+    public record SnapshotReport(long Id, long ReportingUserId, long ReportedSnapshotId, DateTimeOffset ReportTime,
+        SnapshotReportType ReportType, string ReportDetails);
 
 	#endregion
 
@@ -32,28 +44,35 @@ namespace Core.Boundaries
 
 	public interface IDisciplineDatabase
     {
-        Task<List<PenaltyShard>> GetPenaltiesForUserAsync(ulong userId);
-        Task PenaliseUserAsync(ulong userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
+        Task<List<PenaltyShard>> GetPenaltiesForUserAsync(long userId);
+        Task PenaliseUserAsync(long userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
 
-        Task<(List<UserReport>, List<GatheringReport>)> GetReportsForUserAsync(ulong userId);
-        Task<(List<UserReport>, List<GatheringReport>)> GetReportsByUserAsync(ulong userId);
-        Task ReportUserAsync(ulong userId, ulong targetUserId, ulong gatheringId, DateTimeOffset timeOfReport,
+        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>)> GetReportsForUserAsync(long userId);
+        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>)> GetReportsByUserAsync(long userId);
+        Task ReportUserAsync(long userId, long targetUserId, long gatheringId, DateTimeOffset timeOfReport,
             UserReportType reportType, string reportDetails);
-        Task ReportUserAsync(ulong userId, ulong targetUserId, DateTimeOffset timeOfReport,
+        Task ReportUserAsync(long userId, long targetUserId, DateTimeOffset timeOfReport,
             UserReportType reportType, string reportDetails);
 
-        Task<List<GatheringReport>> GetReportsForGatheringAsync(ulong gatheringId);
-        Task ReportGatheringAsync(ulong userId, ulong gatheringId, DateTimeOffset timeOfReport,
+        Task<List<GatheringReport>> GetReportsForGatheringAsync(long gatheringId);
+        Task ReportGatheringAsync(long userId, long gatheringId, DateTimeOffset timeOfReport,
             GatheringReportType reportType, string reportDetails);
+
+        Task<List<SnapshotReport>> GetReportsForSnapshotAsync(long snapshotId);
+        Task ReportSnapshotAsync(long userId, long snapshotId, DateTimeOffset timeOfReport,
+            SnapshotReportType reportType, string reportDetails);
     }
 
     public interface IDisciplineOperations
     {
-        Task ReportUserAsync(ulong userId, ulong targetId,
+        Task ReportUserAsync(long userId, long targetId,
             UserReportType reportType, string reportDetails);
 
-        Task ReportGatheringAsync(ulong userId, ulong gatheringId,
+        Task ReportGatheringAsync(long userId, long gatheringId,
             GatheringReportType reportType, string reportDetails);
+
+        Task ReportSnapshotAsync(long userId, long snapshotId,
+            SnapshotReportType reportType, string reportDetails);
     }
 
 	#endregion

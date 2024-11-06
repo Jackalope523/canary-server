@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
+using Microsoft.Extensions.Logging;
 
 using static Core.Entities.Arbiter;
 
@@ -20,167 +21,183 @@ namespace Core.Controls
 
 		#region Operations
 
-        public async Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId)
+        public async Task<NestShard> GetNestAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
             // Fail if user is blocked
-            Fail(await user.IsBlockedBy(targetUser),
+            FailIf(await user.IsBlockedBy(targetUser),
                 new InvalidUserException("User is unable to view target."));
 
-            NestShard nest = new(new(), new());
+            NestShard nest = new(new());
 
             // Check if user is themself
             if (user.Equals(targetUser))
             {
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingAgenda = await GetUserAgenda(targetUser);
-                upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
+                var upcomingAgendaSync = RequestAgenda(user);
 
                 // Get private gatherings and snapshots
                 nest = nest with
                 {
-                    Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
+                    Twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard())
                 };
 
-                nest.Gatherings.AddRange(upcomingAgenda.Agenda.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
-
-                foreach (var shard in nest.Gatherings)
-                {
-                    Gathering gathering = new(shard);
-                    nest.Snapshots.AddRange(await gathering.Snapshots);
-                }
+                nest.Twigs.AddRange((await upcomingAgendaSync).Cards
+                    .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
+                    .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
             }
             // Check if users are companions
             else if (await targetUser.IsCompanionsWith(user))
             {
+                // Get first gathering together
+                var firstGatheringSync = Nests.GetFirstMutualGathering(user.Id, targetUser.Id);
+
                 // Gather active and upcoming gatherings visible to the user
-                var upcomingAgenda = await GetUserAgenda(targetUser);
-                upcomingAgenda = await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
+                var upcomingAgendaSync = RequestAgenda(targetUser);
+                var siftedAgendaSync = Terminal.GatheringDirector.RemoveUnviewableAgendaCardsAsync(user, await upcomingAgendaSync);
 
                 // Get private gatherings and snapshots
-                nest = nest with
-                {
-                    Gatherings = (await targetUser.PastGatherings).ConvertAll(e => e.ToGatheringShard())
-                };
+                var twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard());
 
-                nest.Gatherings.AddRange(upcomingAgenda.Agenda.ConvertAll(e => new Gathering(e.Gathering).ToGatheringShard()));
+                twigs.AddRange((await siftedAgendaSync).Cards
+                    .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
+                    .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
 
-                nest = nest with
-                {
-                    Snapshots = await Snapshots.GetSnapshotsByUserAsync(targetUser.Id)
-                };
+                nest = new(twigs, (await firstGatheringSync).Id);
             }
+            // User is a stranger
             else
             {
+                // Check if has a mutual gathering
+                var hasMutualSync = Nests.HaveMutualGathering(user.Id, targetUser.Id);
+
                 // Get public hosted gatherings
                 var hostedGatherings = (await Gatherings.FindGatheringsByUserAsync(targetUser.Id)).ConvertAll(e => new Gathering(e));
-                nest = nest with
-                {
-                    Gatherings = hostedGatherings.ConvertAll(e => e.ToGatheringShard())
-                };
+                var twigs = hostedGatherings.ConvertAll(e => e.ToTwigShard());
 
                 // Get common gatherings
                 var commonGatherings = (await targetUser.PastGatherings)
                     .Except(hostedGatherings)
                     .Intersect(await user.PastGatherings)
-                    .ToList().ConvertAll(e => e.ToGatheringShard());
+                    .ToList().ConvertAll(e => e.ToTwigShard());
 
-                nest.Gatherings.AddRange(commonGatherings);
+                twigs.AddRange(commonGatherings);
 
-                var targetSnapshots = await Snapshots.GetSnapshotsByUserAsync(targetUser.Id);
-
-                nest.Snapshots.AddRange(targetSnapshots.Where(snapshot => commonGatherings.Exists(e => e.Id.Equals(snapshot.GatheringId))));
+                if (await hasMutualSync)
+                {
+                    nest = new(twigs, (await Nests.GetLatestMutualGathering(user.Id, targetUser.Id)).Id);
+                }
+                else
+                {
+                    nest = new(twigs, default);
+                }
             }
 
             return nest;
         }
 
-        public async Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId)
+        public async Task<AgendaShard> GetUserAgendaAsync(long userId)
         {
             var user = await GetUserAsync(userId);
-            var targetUser = await GetUserAsync(targetId);
-
-            // Verify users are companions
-            Try(user.Equals(targetUser) || await targetUser.IsCompanionsWith(user),
-                new InvalidUserException("User is unable to view target."));
 
             // Gather active and upcoming gatherings
-            var upcomingAgenda = await GetUserAgenda(targetUser);
-
-            // Remove active and upcoming gatherings if the user cannot view them
-            await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, upcomingAgenda);
+            var upcomingAgenda = await RequestAgenda(user);
 
             return upcomingAgenda;
         }
 
-        public async Task<IDictionary<UserSilhouette, AgendaShard>> GetCompanionAgendaAsync(ulong userId)
+        public async Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
-            ConcurrentDictionary<UserSilhouette, AgendaShard> companionGatherings = new();
+            Dictionary<long, AgendaShard> companionGatherings = new();
 
             // Gather visible agenda of each companion
-            (await user.Companions).AsParallel()
-                .ForAll(async companion =>
-                {
-                    var companionAgenda = await GetUserAgenda(companion);
-                    await Terminal.GatheringDirector.RemoveInaccessibleGatheringBondsAsync(user, companionAgenda);
-                    companionGatherings.TryAdd(companion.ToUserSilhouette(), companionAgenda);
-                });
+            foreach (var companion in await user.Companions)
+            {
+                var companionAgenda = await RequestAgenda(companion);
+                companionAgenda = await Terminal.GatheringDirector.RemoveUnviewableAgendaCardsAsync(user, companionAgenda);
+                companionGatherings.TryAdd(companion.Id, companionAgenda);
+            };
 
             return companionGatherings;
         }
 
-        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId)
+        public async Task<List<UserShard>> GetCompanionsAsync(long userId)
         {
             return await Nests.GetCompanionsAsync(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId)
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long userId)
         {
             return await Nests.GetAppreciatedUsersAsync(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId)
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
         {
             return await Nests.GetBlockedUsersAsync(userId);
         }
 
-        public async Task AppreciateUserAsync(ulong userId, ulong targetId)
+        public async Task AppreciateUserAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
-            Fail(user.Equals(targetUser),
+            FailIf(user.Equals(targetUser),
                 new InvalidUserException("User cannot appreciate themself."));
 
-            Fail(await user.IsBlocking(targetUser) || await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User cannot appreciate blocked/blocking user."));
+            Verify(await user.CanAppreciate(targetUser),
+                new InvalidUserException("User cannot appreciate this user."));
 
             await Nests.AppreciateUserAsync(userId, targetId, Psijic.Time);
+
+            _ = targetUser.PostTelegram(user, TelegramMessage.UserAppreciated, "");
         }
 
-        public async Task UnappreciateUserAsync(ulong userId, ulong targetId)
+        public async Task UnappreciateUserAsync(long userId, long targetId)
         {
             await Nests.UnappreciateUserAsync(userId, targetId);
         }
 
-        public async Task BlockUserAsync(ulong userId, ulong targetId)
+        public async Task BlockUserAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
-			Fail(user.Equals(targetUser),
+			FailIf(user.Equals(targetUser),
 				new InvalidUserException("User cannot block themself."));
 
 			await Nests.BlockUserAsync(userId, targetId, Psijic.Time);
+
+            // Ensure removal from upcoming hosted gatherings
+            foreach (var gathering in await user.UpcomingGatherings)
+            {
+                // Check if user is host
+                if (gathering.Host.Equals(user))
+                {
+                    try
+                    {
+                        // Blind-remove target
+                        await Gatherings.DeleteUserStateAsync(targetUser.Id, gathering.Id);
+                    }
+                    catch { }
+                }
+            }
         }
 
-        public async Task UnblockUserAsync(ulong userId, ulong targetId)
+        public async Task UnblockUserAsync(long userId, long targetId)
         {
             await Nests.UnblockUserAsync(userId, targetId);
+        }
+
+        public async Task<bool> AuthorisedToAppreciate(long userId, long targetId)
+        {
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+            return await user.CanAppreciate(targetUser);
         }
 
 		#endregion
@@ -217,27 +234,29 @@ namespace Core.Controls
 				.ConvertAll(user => new User(user));
         }
 
-        internal async Task<(int Positive, int Negative)> RequestAllRatingsAsync(User user)
-            => await Nests.GetUserRatingsAsync(user.Id);
+        internal async Task<bool> RequestAttendedMutualGatheringAsync(User user, User target)
+        {
+            return await Nests.HaveMutualGathering(user.Id, target.Id);
+        }
 
 		#endregion
 
 		#region Tools
 
-        private async Task<AgendaShard> GetUserAgenda(User user)
+        private async Task<AgendaShard> RequestAgenda(User user)
         {
             _ = user.UpcomingGatherings.Sync();
             _ = user.CurrentGathering.Sync();
 
             // Gather all user gathering data
             AgendaShard agenda = new((await user.UpcomingGatherings)
-                .ConvertAll(gathering => (gathering.ToGatheringShard(), GatheringBond.Guest)));
+                .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Guest)));
 
-            agenda.Agenda.AddRange((await user.SurveyingGatherings)
-                .ConvertAll(gathering => (gathering.ToGatheringShard(), GatheringBond.Surveying)));
+            agenda.Cards.AddRange((await user.SurveyingGatherings)
+                .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Watching)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
-            { agenda.Agenda.Add(((await user.CurrentGathering).ToGatheringShard(), GatheringBond.Arrived)); }
+            { agenda.Cards.Add(new CardShard((await user.CurrentGathering).Id, (await user.CurrentGathering).StartTime, GatheringBond.Arrived)); }
 
             return agenda;
         }

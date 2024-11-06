@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Core.Boundaries
@@ -7,24 +8,23 @@ namespace Core.Boundaries
     #region Schemas
 
     public enum GatheringState
-	{ Upcoming, Open, Sealed, Ended }
+	{ Upcoming, OngoingOpen, OngoingHidden, Ended }
 
     public enum GatheringBond
-    { Surveying, Guest, Arrived, Left, Kicked }
+    { Watching, Guest, Arrived, Left, Kicked }
 
-    public record CoreGathering(ulong Id, UserSilhouette Host, string Name, string Description,
-		DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-		GatheringState State, int GroupMinimum, int GroupMaximum, Character Character,
-		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests)
+    public record CoreGathering(long Id, UserShard Host, string Title, string Description,
+		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
+		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
+		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests, int DegreeOfPrivacy)
 		: CoreOnlyData();
 
-	public record GatheringShard(ulong Id, UserSilhouette Host, string Name, string Description,
-        DateTimeOffset StartTime, double Latitude, double Longitude, DateTimeOffset? TimeEnded,
-        GatheringState State, int GroupMinimum, int GroupMaximum,
-        double Radius, int NumberOfGuests, float RelativeAngle);
+	public record GatheringShard(long Id, UserShard Host, string Title, string Description,
+        DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
+		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
+        double Radius, int DegreeOfPrivacy, int NumberOfGuests, float RelativeAngle);
 
-	public record GuestListShard(int Surveyers, int GuestCount,
-		List<(UserSilhouette User, GatheringBond Bond)> Guests);
+	public record GuestListBondPair(UserShard User, GatheringBond Bond);
 
     #endregion
 
@@ -32,58 +32,72 @@ namespace Core.Boundaries
 
     public interface IGatheringDatabase
 	{
-        Task<CoreGathering> FindGatheringAsync(ulong gatheringId);
+        Task<CoreGathering> FindGatheringAsync(long gatheringId);
 		Task<List<CoreGathering>> FindGatheringsAsync(double latitude, double longitude, double distance);
-		Task<CoreGathering> FindCurrentGatheringForUserAsync(ulong userId);
-		Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(ulong userId);
-		Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(ulong userId);
-		Task<List<CoreGathering>> FindPastGatheringsForUserAsync(ulong userId);
-		Task<List<CoreGathering>> FindGatheringsByUserAsync(ulong userId);
+		Task<CoreGathering> FindCurrentGatheringForUserAsync(long userId);
+		Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long userId);
+		Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(long userId);
+		Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long userId);
+		Task<List<CoreGathering>> FindGatheringsByUserAsync(long userId);
 
-		Task<CoreGathering> CreateGatheringAsync(ulong hostId, string name, string description,
-			DateTimeOffset startTime, double latitude, double longitude,
-			int groupMinimum, int groupMaximum, Character character,
-			double Radius, bool isDynamic);
-		Task UpdateGatheringAsync(ulong gatheringId, List<(string Property, object Value)> edits);
-		Task EndGatheringAsync(ulong gatheringId, DateTimeOffset time);
-		Task DeleteGatheringAsync(ulong gatheringId);
+		Task<CoreGathering> CreateGatheringAsync(long hostId, string title, string description,
+			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
+			int groupMinimum, int groupMaximum, CharacterShard character,
+			double Radius, bool isDynamic, int degreeOfPrivacy);
+		Task UpdateGatheringAsync(long gatheringId, List<(string Property, object Value)> edits);
+		Task TerminateGatheringAsync(long gatheringId, DateTimeOffset time);
+		Task DeleteGatheringAsync(long gatheringId);
 
-		Task<GatheringBond?> GetUserStateAsync(ulong userId, ulong gatheringId);
-		Task SetUserStateAsync(ulong userId, ulong gatheringId, GatheringBond userState, DateTimeOffset time);
-		Task RemoveUserAsync(ulong userId, ulong gatheringId);
+		Task<GatheringBond?> GetUserStateAsync(long userId, long gatheringId);
+		Task SetUserStateAsync(long userId, long gatheringId, GatheringBond userState, DateTimeOffset time);
+		Task DeleteUserStateAsync(long userId, long gatheringId);
 
-		Task<List<(UserSilhouette User, GatheringBond State)>> GetAllUsersAsync(ulong gatheringId);
-		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserSilhouette User)>> GetGuestHistoryAsync(ulong gatheringId);
-	}
+		Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(long gatheringId);
+		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(long gatheringId);
+
+        Task<bool> UserIsAuthorizedGuest(long userId, long gatheringId);
+        Task<List<long>> GetAuthorizedGuests(long gatheringId);
+        Task AddGuestAuthorization(long gatheringId, long userId);
+    }
 
 	public interface IGatheringOperations
 	{
-		Task<GatheringShard> GetGatheringInformationAsync(ulong userId, ulong gatheringId);
-		Task<List<GatheringShard>> GetGatheringsInAreaAsync(ulong userId,
+		Task<GatheringShard> GetGatheringInformationAsync(long userId, long gatheringId);
+		Task<List<GatheringShard>> GetGatheringsInAreaAsync(long userId,
 			double latitude, double longitude, double distance);
-		Task<List<GatheringShard>> GetPersonalisedGatheringsInAreaAsync(ulong userId,
+		Task<List<GatheringShard>> GetPersonalisedGatheringsInAreaAsync(long userId,
 			double latitude, double longitude, double distance);
 
-		Task<GatheringShard> CreateGatheringAsync(ulong userId, string gatheringName, string gatheringDescription,
-			DateTimeOffset startTime, double latitude, double longitude,
-			double radius, bool isDynamic, int? groupMinimum, int? groupMaximum);
-		Task EditGatheringAsync(ulong userId, ulong gatheringId,
-			string gatheringDescription = "", bool? isOpen = null,
-			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null,
-			double? radius = null, bool? isDynamic = null, int? groupMinimum = null, int? groupMaximum = null);
-		Task StartGatheringAsync(ulong userId, ulong gatheringId);
-		Task EndGatheringAsync(ulong userId, ulong gatheringId);
-		Task DeleteGatheringAsync(ulong userId, ulong gatheringId);
+		Task<GatheringShard> CreateGatheringAsync(long userId, string gatheringTitle, string gatheringDescription,
+			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
+			double radius, bool isDynamic, int degreeOfPrivacy, int? groupMinimum, int? groupMaximum,
+			MemoryStream heroImage);
+		Task EditGatheringAsync(long userId, long gatheringId,
+			string gatheringTitle = "", string gatheringDescription = "",
+			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
+			double? radius = null, bool? isDynamic = null, int? degreeOfPrivacy = null,
+			int? groupMinimum = null, int? groupMaximum = null, MemoryStream heroImage = null);
+		Task StartGatheringAsync(long userId, long gatheringId);
+		Task TerminateGatheringAsync(long userId, long gatheringId);
+		Task DeleteGatheringAsync(long userId, long gatheringId);
 
-		Task SurveyGatheringAsync(ulong userId, ulong gatheringId);
-		Task UnsurveyGatheringAsync(ulong userId, ulong gatheringId);
-		Task JoinGatheringAsync(ulong userId, ulong gatheringId);
-		Task LeaveGatheringAsync(ulong userId, ulong gatheringId);
+		Task ChangeGatheringVisibilityAsync(long userId, long gatheringId, bool hide);
 
-		Task<GuestListShard> GetGuestListAsync(ulong userId, ulong gatheringId);
-		Task<List<UserSilhouette>> GetPotentialInviteesAsync(ulong userId, ulong gatheringId);
-		Task InviteUserAsync(ulong inviterId, ulong inviteeId, ulong gatheringId);
-		Task KickUserAsync(ulong hostId, ulong targetId, ulong gatheringId);
+		Task WatchGatheringAsync(long userId, long gatheringId);
+		Task UnwatchGatheringAsync(long userId, long gatheringId);
+		Task JoinGatheringAsync(long userId, long gatheringId);
+		Task CheckInToGatheringAsync(long userId, double latitude, double longitude);
+		Task LeaveGatheringAsync(long userId, long gatheringId);
+
+		Task<List<GuestListBondPair>> GetGuestListAsync(long userId, long gatheringId);
+		Task<List<UserShard>> GetPotentialInviteesAsync(long userId, long gatheringId);
+		Task InviteUserAsync(long inviterId, long inviteeId, long gatheringId);
+		Task KickUserAsync(long hostId, long targetId, long gatheringId);
+
+		Task<bool> AuthorisedToStart(long userId, long gatheringId);
+		Task<bool> AuthorisedToJoin(long userId, long gatheringId);
+		Task<bool> AuthorisedToCheckIn(long userId, long gatheringId);
+		Task<bool> AuthorisedToUpload(long userId, long gatheringId);
 	}
 
 	#endregion

@@ -6,71 +6,28 @@ namespace Repository
 {
     internal class EFCoreSentry : IDatabaseSentry
     {
-        private readonly Func<QueryContext> initializeContext;
+        private readonly Func<CanaryContext> initializeContext;
         public EFCoreSentry(Flag flag)
         {
             switch (flag)
             {
                 case Flag.Development:
-                    initializeContext = () => new SQLiteContext();
+                    initializeContext = () => new DevelopmentContext();
                     break;
-
+                case Flag.Staging:
+                    initializeContext = () => new AzureStagingContext();
+                    break;
                 case Flag.Production:
-                    initializeContext = () => new AzureSQLContext();
+                    initializeContext = () => new AzureProductionContext();
                     break;
-
                 default:
-                    throw new UnsupportedHarborFlagException();
+                    throw new ArgumentException("Invalid Harbor flag: " + nameof(flag));
             }
         }
-        public static void SeedDatabase()
+
+        public T ExecuteRead<T>(Func<CanaryContext, T> read)
         {
-            using AzureSQLContext context = new();
-
-            UserFactory userFactory = new();
-            GatheringFactory gatheringFactory = new();
-            SnapshotFactory snapshotFactory = new();
-            UserReportFactory userReportFactory = new();
-            GatheringReportFactory gatheringReportFactory = new();
-            PenaltyFactory penaltyFactory = new();
-            SubscriptionFactory subscriptionFactory = new();
-            NoteFactory noteFactory = new();
-            UserLinkFactory userLinkFactory = new();
-            GatheringLinkFactory gatheringLinkFactory = new();
-            PostLinkFactory postLinkFactory = new();
-
-            List<User> users = new();
-            for (int i = 0; i < 10; i++)
-            {
-                users.Add(userFactory.Create());
-            }
-            context.Users.AddRange(users);
-            context.SaveChanges();
-
-            List<Gathering> gatherings = new();
-            for (int i = 0; i < 2; i++)
-            {
-                gatherings.Add(gatheringFactory.Create(users[i]));
-            }
-            context.Gatherings.AddRange(gatherings);
-            context.SaveChanges();
-
-            List<Post> snapshots = new();
-            for (int i = 0; i < 10; i++)
-            {
-                Gathering location;
-                if (i <= 6) location = gatherings[0];
-                else location = gatherings[1];
-
-                snapshots.Add(snapshotFactory.Create(users[i], location));
-            }
-            context.Posts.AddRange(snapshots);
-            context.SaveChanges();
-        }
-
-        public T ExecuteRead<T>(Func<QueryContext, T> read)
-        {
-            using (QueryContext context = initializeContext())
+            using (CanaryContext context = initializeContext())
             {
                 try
                 {
@@ -88,9 +45,9 @@ namespace Repository
             }
         }
 
-        public void ExecuteWrite(Action<QueryContext> write)
+        public void ExecuteWrite(Action<CanaryContext> write)
         {
-            using (QueryContext context = initializeContext())
+            using (CanaryContext context = initializeContext())
             {
                 try
                 {
@@ -108,9 +65,9 @@ namespace Repository
             }
         }
 
-        public async Task<T> ExecuteReadAsync<T>(Func<QueryContext, Task<T>> read)
+        public async Task<T> ExecuteReadAsync<T>(Func<CanaryContext, Task<T>> read)
         {
-            using (QueryContext context = initializeContext())
+            using (CanaryContext context = initializeContext())
             {
                 try
                 {
@@ -128,9 +85,9 @@ namespace Repository
             }
         }
 
-        public async Task ExecuteWriteAsync(Action<QueryContext> write)
+        public async Task ExecuteWriteAsync(Action<CanaryContext> write)
         {
-            using (QueryContext context = initializeContext())
+            using (CanaryContext context = initializeContext())
             {
                 try
                 {
@@ -147,9 +104,9 @@ namespace Repository
                 }
             }
         }
-        public async Task ExecuteWriteAsync(Func<QueryContext, Task> write)
+        public async Task ExecuteWriteAsync(Func<CanaryContext, Task> write)
         {
-            using (QueryContext context = initializeContext())
+            using (CanaryContext context = initializeContext())
             {
                 try
                 {
@@ -172,13 +129,13 @@ namespace Repository
             return new Discussion(initializeContext());
         }
 
-        public void DiscussWrite(Action<QueryContext> write, Discussion discussion)
+        public void DiscussWrite(Action<CanaryContext> write, Discussion discussion)
         {
             try
             {
                 write.Invoke(discussion.SharedContext);
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 discussion.EndNow();
                 throw new DatabaseWriteException(ex);

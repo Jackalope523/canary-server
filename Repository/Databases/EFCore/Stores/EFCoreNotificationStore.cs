@@ -11,51 +11,41 @@ namespace Repository
         {
         }
 
-        public async Task<List<NoteShard>> GetNotesAsync(ulong userId)
+        public async Task DeleteTelegramAsync(long telegramId)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Telegrams.Remove(new Telegram { Id = telegramId }));
+        }
+
+        public async Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.Notes.
-            Where(n => n.RecipientId == userId).
-            Select(n => new NoteShard(n.NotifierId, n.Time, n.Message, n.Action)).
+            ctx.Telegrams.
+            Where(n => n.Message == messageType).
+            Select(n => new TelegramShard(n.Id, n.NotifierId, n.Time, n.Message, n.Action)).
             ToListAsync());
         }
-        public async Task<DeviceShard> GetUserSubscriptionAsync(ulong userId)
-        {
-           return await storeSentry.ExecuteReadAsync(ctx =>
-           ctx.Subscriptions.
-           Where(s => s.UserId == userId).
-           Select(s => new DeviceShard(s.DeviceType, s.DeviceToken)).
-           SingleAsync());
 
-        }
-        public async Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time, string message, string action)
+        public async Task<List<TelegramShard>> GetTelegramsAsync(long userId)
         {
-            Entities.Note toAdd = new() 
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.Telegrams.
+            Where(n => n.RecipientId == userId).
+            Select(n => new TelegramShard(n.Id, n.NotifierId, n.Time, n.Message, n.Action)).
+            ToListAsync());
+        }
+        public async Task SaveTelegramAsync(long recipientId, long notifierId, DateTimeOffset time, TelegramMessage message, string context)
+        {
+            Telegram toAdd = new() 
             {  
                 NotifierId = notifierId, 
                 RecipientId = recipientId,
                 Time = time, 
                 Message = message, 
-                Action =  action, 
+                Action =  context, 
                 Read = false
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Notes.Add(toAdd));
-        }
-        public async Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken)
-        {
-            Subscription toAdd = new()
-            {
-                UserId = userId,
-                DeviceType = deviceType,
-                DeviceToken = deviceToken
-            };
-
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Add(toAdd));
-        }
-        public async Task UnsubscribeUserAsync(ulong userId)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Subscriptions.Where(s => s.UserId == userId).ExecuteDeleteAsync());
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Telegrams.Add(toAdd));
         }
     }
 }

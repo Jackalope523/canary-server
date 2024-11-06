@@ -50,7 +50,7 @@ namespace Repository.Tests
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
             await sentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(gatheringReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>) reports = await store.GetReportsByUserAsync(subject1.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>) reports = await store.GetReportsByUserAsync(subject1.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);
@@ -90,7 +90,7 @@ namespace Repository.Tests
         public async Task ReportGatheringAsync_SUCCESS()
         {
             string notes = "Test";
-            GatheringReportType type = GatheringReportType.Inappropriate;
+            GatheringReportType type = GatheringReportType.InappropriateHeader;
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
             await store.ReportGatheringAsync(subject1.Id, testGathering.Id, time, type, notes);
@@ -128,7 +128,7 @@ namespace Repository.Tests
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
             await sentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(gatheringReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>) reports = await store.GetReportsForUserAsync(subject2.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>) reports = await store.GetReportsForUserAsync(subject2.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);
@@ -150,7 +150,7 @@ namespace Repository.Tests
         {
             await store.PenaliseUserAsync(subject1.Id, PenaltyType.Unreliable, DateTimeOffset.MinValue);
 
-            Entities.Penalty penalty = sentry.ExecuteRead(ctx => ctx.Penalties.Single());
+            Penalty penalty = sentry.ExecuteRead(ctx => ctx.Penalties.Single());
 
             Assert.NotNull(penalty);
             Assert.Equal(subject1.Id, penalty.PenalizedId);
@@ -160,7 +160,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetPenaltiesForUserAsync_SUCCESS()
         {
-            Entities.Penalty penalty = new PenaltyFactory().Create(subject1);
+            Penalty penalty = new PenaltyFactory().Create(subject1);
             sentry.ExecuteWrite(ctx => ctx.Penalties.Add(penalty));
 
             PenaltyShard found = (await store.GetPenaltiesForUserAsync(subject1.Id)).Single();

@@ -1,33 +1,42 @@
 ﻿
 namespace Repository
 {
-    internal class SnapshotFactory
+    internal class SnapshotFactory : Factory
     {
-        private int created = 0;
-        
-        internal Post Create(User owner, Gathering location)
+        #region constructors
+        public SnapshotFactory(IFactoryObserver observer) : base(observer)
         {
-            created++;
-            return new Post
+
+        }
+
+        public SnapshotFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public SnapshotFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
+
+        internal Snapshot Create(User owner, Gathering location)
+        {
+            return Create(new Snapshot
             {
                 OwnerId = owner.Id,
                 GatheringId = location.Id,
                 PostedAt = DateTime.MinValue,
-                PhotoURL = "URL " + created,
-                IsHidden = false
-            };
+            });
         }
-        internal Post Create(User owner, Gathering location, DateTimeOffset postedAt)
+        internal Snapshot Create(User owner, Gathering location, DateTimeOffset postedAt)
         {
-            created++;
-            return new Post
+            return Create(new Snapshot
             {
                 OwnerId = owner.Id,
                 GatheringId = location.Id,
                 PostedAt = postedAt,
-                PhotoURL = "URL " + created,
-                IsHidden = false
-            };
+            });
         }
     }
 }

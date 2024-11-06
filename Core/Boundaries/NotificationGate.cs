@@ -8,40 +8,81 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-    public enum DeviceType
-    { iOS, Android }
+	public enum TelegramMessage
+	{
+		// APP SEGMENT (0XXX)
+		UserAgreementsUpdated = 0001,
+		ServerMaintenance = 0002,
 
-    public record NoteShard(ulong NotifierId, DateTimeOffset Time,
-		string Message, string Action);
+		// ACCOUNT SEGMENT (1XXX)
+		AccountStatusChanged = 1001,
 
-	public record DeviceShard(DeviceType DeviceType, string DeviceToken);
+		// USER SEGMENT (2XXX)
+		UserAppreciated = 2001,
+
+		// GATHERING SEGMENT (3XXX)
+		GatheringInvitation = 3001,
+
+		GatheringClosingSoon = 3100,
+
+		GatheringMissedHost = 3200,
+		GatheringMissedAttendee = 3201,
+		GatheringSealed = 3202,
+	}
+
+	public enum NotificationGroup
+	{
+        SocialInvitation,
+		CompanionActivity,
+		GatheringReminder,
+		GatheringActivity,
+		GatheringDiscovery,
+    }
+
+    public static class NotificationGroupExtensions
+    {
+        public static string GetString(this NotificationGroup group)
+        {
+            return group switch
+            {
+                NotificationGroup.SocialInvitation => "preferences/social_invitations",
+                NotificationGroup.CompanionActivity => "preferences/companion_activity",
+                NotificationGroup.GatheringReminder => "preferences/gathering_reminders",
+                NotificationGroup.GatheringActivity => "preferences/gathering_activity",
+                NotificationGroup.GatheringDiscovery => "preferences/gathering_discovery",
+                _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
+            };
+        }
+    }
+
+    public record TelegramShard(long Id, long NotifierId, DateTimeOffset Time,
+		TelegramMessage Message, string Context);
 
     #endregion
 
     #region Gates
 
     public interface INotificationDatabase
-	{
-		Task<List<NoteShard>> GetNotesAsync(ulong userId);
-		Task SaveNoteAsync(ulong recipientId, ulong notifierId, DateTimeOffset time,
-			string message, string action);
+    {
+        Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType);
 
-		Task<DeviceShard> GetUserSubscriptionAsync(ulong userId);
-		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
-		Task UnsubscribeUserAsync(ulong userId);
+        Task<List<TelegramShard>> GetTelegramsAsync(long userId);
+		Task SaveTelegramAsync(long recipientId, long notifierId, DateTimeOffset time,
+			TelegramMessage message, string context);
+		Task DeleteTelegramAsync(long telegramId);
 	}
 
 	public interface INotificationOperations
 	{
-		Task<List<NoteShard>> GetNotesAsync(ulong userId);
-
-		Task SubscribeUserAsync(ulong userId, DeviceType deviceType, string deviceToken);
-		Task UnsubscribeUserAsync(ulong userId);
+		Task<List<TelegramShard>> GetTelegramsAsync(long userId);
+		Task ClearTelegramsAsync(long userId);
+		Task ClearTelegramsAsync(long userId, List<long> telegramIds);
 	}
 
 	public interface INotificationService
 	{
-		Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message);
+		Task PushNotification(string notificationId, NotificationGroup notificationGroup,
+			string title, string message, string collapseId = "");
 	}
 
 	#endregion

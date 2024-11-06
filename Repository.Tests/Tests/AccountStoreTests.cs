@@ -11,8 +11,8 @@ namespace Repository.Tests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Production);
-        private static readonly EFCoreAccountStore store = new(Harbor.Flag.Production);  
+        private static readonly EFCoreSentry sentry = new(Harbor.Flag.Development);
+        private static readonly EFCoreAccountStore store = new(Harbor.Flag.Development);  
         
         private User subject;
 
@@ -40,7 +40,8 @@ namespace Repository.Tests
                 subject.Name,
                 subject.DateOfBirth,
                 subject.JoinDate,
-                new Character(
+                new CharacterShard(
+                    subject.Age,
                     subject.Extroversion,
                     subject.Athleticisme,
                     subject.Chaos,
@@ -48,7 +49,8 @@ namespace Repository.Tests
                     subject.Industriousness,
                     subject.NightOwl,
                     subject.Openness
-                    ));
+                    ),
+                subject.NotificationId);
 
             User created = sentry.ExecuteRead(ctx => ctx.Users.Single());
 
@@ -67,7 +69,7 @@ namespace Repository.Tests
             Assert.Equal(User.DefaultLockoutDate, created.LockoutDate);
             Assert.Equal(User.DefaultAccessTries, created.AccessTries);
             Assert.Equal(User.DefaultAccountStatus, created.AccountStatus);
-            Assert.Equal(subject.IsPendingDeletion, created.IsPendingDeletion);
+            Assert.Equal(subject.SoftDeleted, created.SoftDeleted);
             Assert.Equal(subject.Extroversion, created.Extroversion);
             Assert.Equal(subject.Athleticisme, created.Athleticisme);
             Assert.Equal(subject.Chaos, created.Chaos);
@@ -90,7 +92,7 @@ namespace Repository.Tests
 
             int numRecords = await sentry.ExecuteReadAsync(ctx => ctx.Users.CountAsync());
 
-            Assert.Equal(0, numRecords);
+            Assert.Equal(1, numRecords);
         }     
 
         [Fact]
@@ -124,14 +126,14 @@ namespace Repository.Tests
         [Fact]
         public async Task FindUserByIdAsync_UserNotFound()
         {
-            Func<Task> action = async () => await store.FindUserByIdAsync(ulong.MaxValue);
+            Func<Task> action = async () => await store.FindUserByIdAsync(long.MaxValue);
 
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }     
 
         [Fact]
         public async Task FindUserByPhoneNumberAsync_SUCCESS()
-        {
+        { 
             CoreUser found = await store.FindUserByPhoneNumberAsync(subject.PhoneNumber);
 
             Assert.NotNull(found);
@@ -161,7 +163,6 @@ namespace Repository.Tests
         public async Task FindUserByPhoneNumberAsync_UserNotFound()
         {
             Func<Task> action = async () => await store.FindUserByPhoneNumberAsync("");
-
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
@@ -809,14 +810,14 @@ namespace Repository.Tests
         [Fact]
         public async Task GetUserHauntAsync_UserNotFound()
         {
-            Func<Task> action = async () => await store.GetUserHauntAsync(ulong.MaxValue);
+            Func<Task> action = async () => await store.GetUserHauntAsync(long.MaxValue);
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
         [Fact]
         public async Task GetRecentUserLocationAsync_SUCCESS()
         {
-            (double latitude, double longitude, double radius) = await store.GetRecentUserLocationAsync(subject.Id);
+            (double latitude, double longitude, double radius) = await store.GetRecentLocationAsync(subject.Id);
 
             Assert.Equal(subject.Haunt.Y, latitude);
             Assert.Equal(subject.Haunt.X, longitude);
@@ -825,7 +826,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetRecentUserLocationAsync_UserNotFound()
         {
-            Func<Task> action = async () => await store.GetRecentUserLocationAsync(ulong.MaxValue);
+            Func<Task> action = async () => await store.GetRecentLocationAsync(long.MaxValue);
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 

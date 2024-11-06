@@ -1,12 +1,11 @@
-﻿using Core.Boundaries;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Repository.Coordinators;
 
 namespace Repository
 {
     public class Harbor
     {
-        public enum Flag { Development, Production }
+        public enum Flag { Development, Staging, Production }
 
         internal static ILogger logger;
 
@@ -21,6 +20,7 @@ namespace Repository
         public IKeyDatabase KeyDatabaseAccess { get; private set; }
         public IBannerDatabase BannerDatabaseAccess { get; private set; }
         public IDebugDatabase DebugDatabaseAccess { get; private set; }
+        public IMiscellaneousDatabase MiscellaneousDatabaseAccess { get; private set; }
 
         public Harbor(Flag flag)
         {
@@ -31,9 +31,11 @@ namespace Repository
             SnapshotDatabaseAccess = new SnapshotStoreCoordinator(flag);
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
-            MediaDatabaseAccess = new MediaStoreCoordinator();
+            BannerDatabaseAccess = new BannerStoreCoordinator(flag);
             KeyDatabaseAccess = new KeyStoreCoordinator();
+            MediaDatabaseAccess = new MediaStoreCoordinator(flag);
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
+            MiscellaneousDatabaseAccess = new MiscellaneousStoreCoordinator(flag);
         }
 
         public Harbor(Flag flag, ILogger logger) : this(flag)

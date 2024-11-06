@@ -1,8 +1,4 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Mathematics;
-
-using System;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
@@ -12,15 +8,15 @@ namespace Repository
         {
         }
 
-        public async Task<SnapshotShard> AddSnapshotAsync(ulong gatheringId, ulong posterId, DateTimeOffset timePosted)
+        public async Task<SnapshotShard> AddSnapshotAsync(long gatheringId, long posterId, DateTimeOffset timePosted)
         { 
-            Post toAdd = new() 
+            Snapshot toAdd = new() 
             { 
                 GatheringId = gatheringId, 
                 OwnerId = posterId, 
                 PostedAt = timePosted
             };
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Add(toAdd));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Add(toAdd));
 
             string ownerName = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Users.
@@ -28,100 +24,96 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserSilhouette(toAdd.OwnerId, ownerName), toAdd.PostedAt, new(0, 0), toAdd.IsHidden );
+            return new SnapshotShard ( toAdd.Id, toAdd.GatheringId, new UserShard(toAdd.OwnerId, ownerName), toAdd.PostedAt, 0);
         }
 
-        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(ulong id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
+        public async Task<List<SnapshotShard>> GenerateColumnForUserAsync(long id, DateTimeOffset depthCharge, DateTimeOffset lastDepthCharge)
         {
             // Get List of Companions.
-            Task<List<ulong>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
-                ctx.UserLinks.
-                Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).Select(l => l.OtherId).
+            Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
+                ctx.UserRelationships.
+                Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).Select(l => l.OtherId).
                 ToListAsync());
 
-            Task<List<ulong>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
-                ctx.UserLinks.
-                Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Appreciate).
+            Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
+                ctx.UserRelationships.
+                Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
                 Select(l => l.SelfId).
                 ToListAsync());
 
-            List<ulong> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
+            List<long> owners = (await appreciating).Intersect(await appreciatingMe).Append(id).ToList();
 
             // Get unseen posts by companions from certain depth.
-            List<SnapshotShard> companionPosts = await storeSentry.ExecuteReadAsync(ctx =>
-              ctx.Posts.
-              Where(p => companions.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
+            List<SnapshotShard> companionSnapshots = await storeSentry.ExecuteReadAsync(ctx =>
+              ctx.Snapshots.
+              Where(p => owners.Contains(p.OwnerId) && p.PostedAt >= depthCharge && p.PostedAt <= lastDepthCharge).
               Join(
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
+                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1)
                ).ToListAsync());
 
-            List<Task<int>> companionPostsPositiveRatings = new();
-            List<Task<int>> companionPostNegativeRatings = new();
-            List<ulong> sitesToBeExplored = new();
-            List<ulong> previouslyExtractedPosts = new();
-            foreach (SnapshotShard e in companionPosts)
+            List<Task<int>> companionSnapshotsPositiveRatings = new();
+
+            List<long> sitesToBeExplored = new();
+            List<long> previouslyExtractedSnapshots = new();
+            foreach (SnapshotShard s in companionSnapshots)
             {
-                companionPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
-                    ctx.PostLinks.
-                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateUp).
+                companionSnapshotsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => 
+                    ctx.SnapshotLinks.
+                    Where(l => l.SnapshotId == s.Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).
                     CountAsync()));
 
-                companionPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
-                    ctx.PostLinks.
-                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateDown).
-                    CountAsync()));
 
                 // Compile unique list if gatherings spanned by companion posts and a list of already loaded posts. 
-                if (!sitesToBeExplored.Contains(e.GatheringId)) sitesToBeExplored.Add(e.GatheringId);
-                previouslyExtractedPosts.Add(e.Id);
+                if (!sitesToBeExplored.Contains(s.GatheringId)) sitesToBeExplored.Add(s.GatheringId);
+                previouslyExtractedSnapshots.Add(s.Id);
             }
 
             // Get remaining companion posts from same gatherings as others even if outside time range.
-            List<SnapshotShard> nettedPosts = await storeSentry.ExecuteReadAsync(ctx => 
-                ctx.Posts.
-                Where(p => companions.Contains(p.OwnerId) && !previouslyExtractedPosts.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
+            List<SnapshotShard> nettedSnapshots = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Snapshots.
+                Where(p => owners.Contains(p.OwnerId) && !previouslyExtractedSnapshots.Contains(p.Id) && sitesToBeExplored.Contains(p.GatheringId)).
                 Join(
                   ctx.Users,
                   p => p.OwnerId,
                   u => u.Id,
-                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, new(-1, -1), p.IsHidden)
+                  (p, u) => new SnapshotShard(p.Id, p.GatheringId, new(u.Id, u.Name), p.PostedAt, -1)
                 ).ToListAsync());
 
-            List<Task<int>> nettedPostsPositiveRatings = new();
-            List<Task<int>> nettedPostNegativeRatings = new();
-            foreach (SnapshotShard e in nettedPosts)
-            {
-                nettedPostsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
-                    ctx.PostLinks.
-                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateUp).
-                    CountAsync()));
+            List<Task<int>> nettedSnapshotsPositiveRatings = new();
 
-                nettedPostNegativeRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
-                    ctx.PostLinks.
-                    Where(l => l.PostId == e.Id && l.Type == PostLink.PostLinkType.RateDown).
+            foreach (SnapshotShard s in nettedSnapshots)
+            {
+                nettedSnapshotsPositiveRatings.Add(storeSentry.ExecuteReadAsync(ctx =>
+                    ctx.SnapshotLinks.
+                    Where(l => l.SnapshotId == s.Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).
                     CountAsync()));
             }
 
-            await Task.WhenAll(companionPostsPositiveRatings);
-            await Task.WhenAll(companionPostNegativeRatings);
-            await Task.WhenAll(nettedPostsPositiveRatings);
-            await Task.WhenAll(nettedPostNegativeRatings);
+            for (int i = 0; i < companionSnapshots.Count; i++)
+            {
+                companionSnapshots[i] = companionSnapshots[i] with { Acclaim = await companionSnapshotsPositiveRatings[i] };
+            }
 
-            return companionPosts.Concat(nettedPosts).ToList();
+            for (int i = 0; i < nettedSnapshots.Count; i++)
+            {
+                nettedSnapshots[i] = nettedSnapshots[i] with { Acclaim = await nettedSnapshotsPositiveRatings[i] };
+            }
+
+            return companionSnapshots.Concat(nettedSnapshots).ToList();
+
         }
 
-        public async Task<SnapshotShard> GetSnapshotAsync(ulong id)
+        public async Task<SnapshotShard> GetSnapshotAsync(long id)
         {
-            Task<int> ups = storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == id && l.Type == PostLink.PostLinkType.RateUp).CountAsync());
-            Task<int> downs = storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == id && l.Type == PostLink.PostLinkType.RateDown).CountAsync());
+            Task<int> appreciates = storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.SnapshotId == id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).CountAsync());
 
             SnapshotShard snapshot = await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.Posts.
+            ctx.Snapshots.
             Where(p => p.Id == id).
-            Select(p => new SnapshotShard(p.Id, p.GatheringId, new UserSilhouette(p.OwnerId, null), p.PostedAt, new (0,0), p.IsHidden)).
+            Select(p => new SnapshotShard(p.Id, p.GatheringId, new UserShard(p.OwnerId, null), p.PostedAt, 0)).
             SingleAsync());
 
             Task<string> name = storeSentry.ExecuteReadAsync(ctx => 
@@ -130,55 +122,48 @@ namespace Repository
                 Select(u => u.Name).
                 SingleAsync());
 
-            return snapshot with { User = new UserSilhouette(snapshot.User.Id, await name), Acclaim = new (await ups, await downs) };
+            return snapshot with { User = new UserShard(snapshot.User.Id, await name), Acclaim = await appreciates };
         }
 
-        public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(ulong id)
+        public async Task<List<SnapshotShard>> GetSnapshotsByUserAsync(long id)
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
-                 ctx.Posts.Where(p => p.OwnerId == id).
-                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
+                 ctx.Snapshots.Where(p => p.OwnerId == id).
+                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
-            List<Task<int>> negativeRatings = new(snapshots.Count);
             List<Task<string>> authorNames = new(snapshots.Count);
             for (int i = 0; i < snapshots.Count; i++)
             {
-                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == PostLink.PostLinkType.RateUp).CountAsync()));
-                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == PostLink.PostLinkType.RateDown).CountAsync()));
+                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.SnapshotId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).CountAsync()));
                 authorNames.Add(storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == snapshots[i].User.Id).Select(u => u.Name).SingleAsync()));
             }
 
             int[] ups = await Task.WhenAll(positiveRatings);
-            int[] downs = await Task.WhenAll(negativeRatings);
             string[] names = await Task.WhenAll(authorNames);
 
             for (int i = 0; i < snapshots.Count; i++)
             {
-                snapshots[i] = snapshots[i] with { Acclaim = (ups[i], downs[i]), User = new UserSilhouette(snapshots[i].User.Id, names[i]) };
+                snapshots[i] = snapshots[i] with { Acclaim = ups[i], User = new UserShard(snapshots[i].User.Id, names[i]) };
             }
 
             return snapshots;
         }
 
-        public async Task AcclaimSnapshotAsync(ulong postId, ulong voterId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(long postId, long voterId)
         {
-            PostLink.PostLinkType type;
-            if (rating.Equals(UserRating.Positive)) type = PostLink.PostLinkType.RateUp;
-            else type = PostLink.PostLinkType.RateDown;
-
-            PostLink toAdd = new()
+            SnapshotLink toAdd = new()
             {
                 UserId = voterId,
-                PostId = postId,
+                SnapshotId = postId,
                 Time = DateTimeOffset.UtcNow,
-                Type = type
+                Type = SnapshotLink.SnapshotLinkType.Appreciate
             };
 
-            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
-                        ctx.PostLinks.
-                        Where(l => l.UserId == voterId && l.PostId == postId).
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
+                        ctx.SnapshotLinks.
+                        Where(l => l.UserId == voterId && l.SnapshotId == postId).
                         Select(l => l.Id).
                         SingleOrDefaultAsync());
 
@@ -187,61 +172,84 @@ namespace Repository
                 toAdd.Id = id;
             }
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.PostLinks.Update(toAdd));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.SnapshotLinks.Update(toAdd));
         }
 
-        public async Task RemoveSnapshotAsync(ulong postId)
+        private async Task SoftDeleteSnapshot(long id)
         {
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Posts.Remove(new Post { Id = postId }));
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.SnapshotLinks.
+               Where(l => l.SnapshotId == id).
+               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.SnapshotReports.
+               Where(r => r.SnapshotId == id).
+               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+              ctx.Snapshots.
+              Where(s => s.Id == id).
+              ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
         }
 
-        public async Task RemoveSnapshotAcclaimAsync(ulong postId, ulong voterId)
+        private async Task HardDeleteSnapshot(long id)
         {
-            Func<QueryContext, Task> query = EF.CompileAsyncQuery(
-                (QueryContext ctx) =>
-                ctx.PostLinks.
-                Where(l => l.UserId == voterId && l.PostId == postId).
+            await storeSentry.ExecuteWriteAsync(ctx => 
+                ctx.SnapshotLinks.
+                Where(l => l.SnapshotId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.SnapshotReports.
+                Where(r => r.SnapshotId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx => 
+                ctx.Snapshots.
+                Remove(new Snapshot { Id = id }));
+        }
+
+        public async Task DeleteSnapshotAsync(long snapshotId)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Snapshots.Remove(new Snapshot { Id = snapshotId }));
+        }
+
+        public async Task DeleteSnapshotAcclaimAsync(long postId, long voterId)
+        {
+            Func<CanaryContext, Task> query = EF.CompileAsyncQuery(
+                (CanaryContext ctx) =>
+                ctx.SnapshotLinks.
+                Where(l => l.UserId == voterId && l.SnapshotId == postId).
                 ExecuteDelete());
 
             await storeSentry.ExecuteWriteAsync(query);
         }
 
-        public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(ulong id)
+        public async Task<List<SnapshotShard>> GetSnapshotsForGatheringAsync(long id)
         {
             List<SnapshotShard> snapshots = await storeSentry.ExecuteReadAsync(ctx =>
-                 ctx.Posts.Where(p => p.GatheringId == id).
-                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserSilhouette(a.OwnerId, null), a.PostedAt, new(0, 0), a.IsHidden)).
+                 ctx.Snapshots.Where(p => p.GatheringId == id).
+                 Select(a => new SnapshotShard(a.Id, a.GatheringId, new UserShard(a.OwnerId, null), a.PostedAt, 0)).
                  ToListAsync());
 
             List<Task<int>> positiveRatings = new(snapshots.Count);
-            List<Task<int>> negativeRatings = new(snapshots.Count);
             List<Task<string>> authorNames = new(snapshots.Count);
             for (int i = 0; i < snapshots.Count; i++)
             {            
-                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == PostLink.PostLinkType.RateUp).CountAsync()));
-                negativeRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.PostLinks.Where(l => l.PostId == snapshots[i].Id && l.Type == PostLink.PostLinkType.RateDown).CountAsync()));
+                positiveRatings.Add(storeSentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.Where(l => l.SnapshotId == snapshots[i].Id && l.Type == SnapshotLink.SnapshotLinkType.Appreciate).CountAsync()));
                 authorNames.Add(storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == snapshots[i].User.Id).Select(u => u.Name).SingleAsync()));
             }
 
             int[] ups = await Task.WhenAll(positiveRatings);
-            int[] downs = await Task.WhenAll(negativeRatings);
             string[] names = await Task.WhenAll(authorNames);
 
             for (int i = 0; i < snapshots.Count; i++)
             {
-                snapshots[i] = snapshots[i] with { Acclaim = (ups[i], downs[i]), User = new UserSilhouette(snapshots[i].User.Id, names[i]) };
+                snapshots[i] = snapshots[i] with { Acclaim = ups[i], User = new UserShard(snapshots[i].User.Id, names[i]) };
             }
 
             return snapshots;
-        }
-        public async Task HideSnapshotAsync(ulong snapshotId)
-        {
-            Discussion currentDiscussion = storeSentry.BeginDiscussion();
-
-            Post p = new() { Id = snapshotId, IsHidden = true };
-            storeSentry.DiscussWrite(ctx => ctx.Posts.Attach(p), currentDiscussion);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(p).Property(nameof(p.IsHidden)).IsModified = true, currentDiscussion);           
-            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
     }
 }

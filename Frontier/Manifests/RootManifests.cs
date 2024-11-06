@@ -6,9 +6,17 @@ using Core.Boundaries;
 
 namespace Frontier.Manifests
 {
-	public class SparrowDetailsManifest
+	public class CanaryDetailsManifest
     {
         public string MinimumVersion { get; set; }
+    }
+
+	public class FeedbackManifest
+    {
+        [Required]
+        public string Comments { get; set; }
+
+        public string Pseudonym { get; set; }
     }
 }
 

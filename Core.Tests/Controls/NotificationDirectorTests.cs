@@ -28,7 +28,8 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string action = "action";
 			int messageCount = 3;
 
 			// Act
@@ -36,7 +37,7 @@ namespace Core.Tests.Controls
 			{ await environment.SaveNoteAsync(user, noter, message, action); }
 			
 			// Assert
-			var notes = await director.GetNotesAsync(user.Id);
+			var notes = await director.GetTelegramsAsync(user.Id);
 			Assert.Equal(messageCount, notes.Count);
 		}
 
@@ -46,16 +47,17 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string context = "action";
 
 			// Act
-			await director.PostNoteAsync(user, noter, message, action);
+			await director.PostTelegramAsync(user, noter, message, context);
 
 			// Assert
-			var notes = await director.GetNotesAsync(user.Id);
+			var notes = await director.GetTelegramsAsync(user.Id);
 			Assert.Single(notes);
 			Assert.Equal(message, notes[0].Message);
-			Assert.Equal(action, notes[0].Action);
+			Assert.Equal(context, notes[0].Context);
 		}
 
 		[Fact]
@@ -65,125 +67,15 @@ namespace Core.Tests.Controls
 			var userA = await environment.GenerateUniqueUserAsync();
 			var userB = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(userA, userB);
-			string message = "message", action = "action";
+			TelegramMessage message = TelegramMessage.UserAppreciated;
+			string context = "action";
 
 			// Act
-			await director.PostNoteAsync(userA, userB, message, action);
+			await director.PostTelegramAsync(userA, userB, message, context);
 
 			// Assert
-			var notes = await director.GetNotesAsync(userA.Id);
+			var notes = await director.GetTelegramsAsync(userA.Id);
 			Assert.Empty(notes);
-		}
-
-		//////////
-		// Push Telegrams
-		///////////////////////
-
-		[Fact]
-		public async Task SubscribeUserAsync_ValidUser_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
-
-			// Assert
-			var subscription = await environment.GetUserSubscriptionAsync(user);
-			Assert.False(string.IsNullOrEmpty(subscription.DeviceToken));
-		}
-
-		[Fact]
-		public async Task SubscribeUserAsync_SubscribedUser_Drops()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
-
-			// Act
-			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
-			// If no exception is thrown, the test is successful
-		}
-
-		[Fact]
-		public async Task UnsubscribeUserAsync_ValidUser_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
-
-			// Act
-			await director.UnsubscribeUserAsync(user.Id);
-
-			// Assert
-			var subscription = await environment.GetUserSubscriptionAsync(user);
-			Assert.Null(subscription);
-		}
-
-		[Fact]
-		public async Task UnsubscribeUserAsync_UnsubscribedUser_Drops()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			await director.UnsubscribeUserAsync(user.Id);
-			// If no exception is thrown, the test is successful
-		}
-
-		[Fact]
-		public async Task NotifyUserAsync_SubscribedUser_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
-			string notificationTitle = "title", notificationBody = "body";
-
-			// Act
-			await director.NotifyUserAsync(user, notificationTitle, notificationBody);
-
-			// Assert
-			Assert.True(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
-
-			var userMessages = environment.GetUserMessages(user);
-			Assert.Single(userMessages);
-
-			var notification = userMessages[0];
-			Assert.Equal(notificationTitle, notification.Title);
-			Assert.Equal(notificationBody, notification.Message);
-		}
-
-		[Fact]
-		public async Task NotifyUserAsync_MultipleTelegrams_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			await director.SubscribeUserAsync(user.Id, DeviceType.iOS, user.Id.ToString());
-			string notificationTitle = "title", notificationBody = "body";
-
-			// Act
-			await director.NotifyUserAsync(user, notificationTitle, notificationBody);
-			await director.NotifyUserAsync(user, notificationTitle, notificationBody);
-			await director.NotifyUserAsync(user, notificationTitle, notificationBody);
-
-			// Assert
-			Assert.True(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
-
-			var userMessages = environment.GetUserMessages(user);
-			Assert.Equal(3, userMessages.Count);
-		}
-
-		[Fact]
-		public async Task NotifyUserAsync_UnsubscribedUser_Drops()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-
-			// Act
-			await director.NotifyUserAsync(user, "", "");
-
-			// Assert
-			Assert.False(NotificationServiceStub.messages.ContainsKey(user.Id.ToString()));
 		}
 	}
 }

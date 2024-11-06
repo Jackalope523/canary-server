@@ -1,17 +1,34 @@
 ﻿
 namespace Repository
 {
-    internal class PostLinkFactory
+    internal class PostLinkFactory : Factory
     {
-        internal PostLink Create(User user, Post snapshot)
+        #region constructors
+        public PostLinkFactory(IFactoryObserver observer) : base(observer)
         {
-            return new PostLink
+
+        }
+
+        public PostLinkFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public PostLinkFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
+
+        internal SnapshotLink Create(User user, Snapshot snapshot)
+        {
+            return Create(new SnapshotLink
             {
                 UserId = user.Id,
-                PostId = snapshot.Id,
-                Type = PostLink.PostLinkType.RateUp,
+                SnapshotId = snapshot.Id,
+                Type = SnapshotLink.SnapshotLinkType.Appreciate,
                 Time = DateTimeOffset.MinValue
-            };
+            });
         }
     }
 }

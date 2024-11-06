@@ -6,15 +6,16 @@ using Core.Boundaries;
 
 namespace Frontier.Manifests
 {
-	public class AccountDetailsManifest
+	public class AccountEditManifest
     {
         public string Name { get; set; }
+        public string Email { get; set; }
     }
 
     public class AccountRatingManifest
     {
         [Required]
-        public UserRating Rating { get; set; }
+        public SnapshotAcclaim Action { get; set; }
     }
 }
 

@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Core.Boundaries;
-using Core.Controls;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using static Core.Entities.Psijic;
 using static Core.Entities.Arbiter;
@@ -29,17 +25,26 @@ namespace Core.Entities
         public const int ReputationPopulation = 20;
         public const float ReputationIntensity = 2.2f;
 
+        public static User Redacted
+            => new() { Id = 0 };
+
+        public static User Hidden
+            => new() { Id = -1, Name = "hidden" };
+
+        public static User Hollow
+            => new() { Id = -2 };
+
         ///////
         // Properties
         ///////////////
 		
-        public ulong Id { get; init; }
+        public long Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
+        public string Pseudonym { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
-        public int Appreciation { get; set; }
         public DateTimeOffset JoinDate { get; init; }
         public int Reputation { get; set; }
 
@@ -50,6 +55,8 @@ namespace Core.Entities
         public string SecurityStamp { get; set; }
         public DateTimeOffset? LockoutDate { get; set; }
         public int AccessTries { get; set; }
+        public DateTimeOffset TimeOfUserAgreement { get; set; }
+        public Guid NotificationId { get; set; }
 
         public UserAccountStatus AccountStatus { get; set; }
         public bool CanAttend => AccountStatus == UserAccountStatus.Active ||
@@ -65,9 +72,7 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
-        public Synced<string> Banner { get; }
-
-        public Synced<(int Postitive, int Negative)> Ratings { get; }
+        public Synced<Banner> Banner { get; }
 
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
 		public Synced<GeoLocation> LastKnownLocation { get; }
@@ -89,12 +94,13 @@ namespace Core.Entities
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
-        public Synced<List<NoteShard>> Notes { get; }
+        public Synced<List<TelegramShard>> Notes { get; }
         public Synced<List<PenaltyShard>> Penalties { get; }
 
-        private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports)> ReportsSync { get; }
+        private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports, List<SnapshotReport> SnapshotReports)> ReportsSync { get; }
         public Synced<List<UserReport>> Reports { get; }
         public Synced<List<GatheringReport>> GatheringReports { get; }
+        public Synced<List<SnapshotReport>> SnapshotReports { get; }
 
 
         #endregion
@@ -104,8 +110,6 @@ namespace Core.Entities
         public User()
         {
             Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
-
-            Ratings = new(() => Terminal.NestDirector.RequestAllRatingsAsync(this));
 
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
             LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
@@ -127,12 +131,13 @@ namespace Core.Entities
             Blocking = new(() => Terminal.NestDirector.RequestBlockedUsersAsync(this));
             BlockedBy = new(() => Terminal.NestDirector.RequestUsersBlockingAsync(this));
 
-            Notes = new(() => Terminal.NotificationDirector.GetNotesAsync(Id));
+            Notes = new(() => Terminal.NotificationDirector.GetTelegramsAsync(Id));
             Penalties = new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
 
             ReportsSync = new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
             Reports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
             GatheringReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).GatheringReports);
+            SnapshotReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).SnapshotReports);
         }
 
         public User(CoreUser fromUser) : this()
@@ -141,10 +146,10 @@ namespace Core.Entities
             PhoneNumber = fromUser.PhoneNumber;
             Email = fromUser.Email;
             Name = fromUser.Name;
+            Pseudonym = fromUser.Pseudonym;
             DateOfBirth = fromUser.DateOfBirth;
             JoinDate = fromUser.JoinDate;
             Reputation = fromUser.Reputation;
-            Appreciation = fromUser.Appreciation;
             IsPhoneConfirmed = fromUser.IsPhoneConfirmed;
             IsEmailConfirmed = fromUser.IsEmailConfirmed;
             IsDeleted = fromUser.IsPendingDeletion;
@@ -153,44 +158,36 @@ namespace Core.Entities
             AccessTries = fromUser.AccessTries;
             AccountStatus = fromUser.AccountStatus;
             Character = new(fromUser.Character);
+            TimeOfUserAgreement = fromUser.TimeOfUserAgreement;
+            NotificationId = fromUser.NotificationId;
         }
 
-        public User(UserSilhouette fromUser) : this()
+        public User(UserShard fromUser) : this()
         {
             Id = fromUser.Id;
             Name = fromUser.Name;
-        }
-
-        public User(UserProfile fromUser) : this()
-        {
-            Id = fromUser.Id;
-            Name = fromUser.Name;
-            Reputation = fromUser.Reputation;
-            Appreciation = fromUser.Appreciation;
         }
 
         public CoreUser ToCoreUser()
         {
-            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+            return new(Id, PhoneNumber, Email, Name, Pseudonym, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
-                JoinDate, Reputation, Appreciation, Character.ToCharacter());
+                JoinDate, Reputation,
+                Character.ToCharacter(), TimeOfUserAgreement,
+                NotificationId);
+        }
+
+        public AccountShard ToAccountShard()
+        {
+            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+                IsPhoneConfirmed, IsEmailConfirmed, AccountStatus,
+                JoinDate, TimeOfUserAgreement, NotificationId);
         }
 
         public UserShard ToUserShard()
         {
-            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
-                Reputation, Appreciation);
-        }
-
-        public UserSilhouette ToUserSilhouette()
-        {
             return new(Id, Name);
-        }
-
-        public UserProfile ToUserProfile()
-        {
-            return new(Id, Name, Reputation, Appreciation);
         }
 
 		#endregion
@@ -219,6 +216,18 @@ namespace Core.Entities
             return issues.Equals("");
         }
 
+        public int GetAge()
+        {
+            int age = Time.Year - DateOfBirth.Year;
+
+            if (Time < DateOfBirth.AddYears(age))
+            {
+                age--;
+            }
+
+            return age;
+        }
+
         public void GenerateSecurityStamp()
         {
             SecurityStamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(20));
@@ -226,13 +235,12 @@ namespace Core.Entities
 
 		public async Task CalculateReputation()
         {
-            _ = (Penalties.Sync(), Ratings.Sync());
+            _ = (Penalties.Sync(), AppreciatedBy.Sync());
 
             // Get all recent penalties
             var penalties = (await Penalties).Where(penalty => HasYet(penalty.TimeOfPenalty + OneYear)).ToList();
-            var ratings = await Ratings;
-            int ratingDiff = ratings.Postitive - ratings.Negative - penalties.Count/2;
-            int reputationRaw = Math.Clamp(ratingDiff, -ReputationPopulation, ReputationPopulation);
+            int appreciations = (await AppreciatedBy).Count;
+            int reputationRaw = Math.Clamp(appreciations, -ReputationPopulation, ReputationPopulation);
 
             float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
 
@@ -249,7 +257,9 @@ namespace Core.Entities
 
         public async Task<Gathering> NextGathering()
         {
-            return (await UpcomingGatherings).Count != 0 ? (await UpcomingGatherings)[0] : Gathering.None;
+            var upcoming = await UpcomingGatherings;
+            upcoming.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+            return upcoming.Count != 0 ? upcoming.First() : Gathering.None;
         }
 
 		#endregion
@@ -321,13 +331,17 @@ namespace Core.Entities
 			{
                 // User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!CanAttendCompanions || !await IsCompanionsWith(gathering.Host))
+				if (!(CanAttendCompanions && await IsCompanionsWith(gathering.Host)))
 				{ return false; }
 			}
 
             // Check if user is blocked by or blocking gathering host
             if (await IsBlockedBy(gathering.Host) || await IsBlocking(gathering.Host))
 			{ return false; }
+
+            // Check if user is within degree of privacy
+            if (gathering.DegreeOfPrivacy < 3 && !await Terminal.GatheringDirector.RequestUserIsAuthorisedGuest(this, gathering))
+            { return false; }
 
 			return true;
 		}
@@ -342,26 +356,53 @@ namespace Core.Entities
 			if (!await CanView(gathering))
 			{ return false; }
 
+            // Check if user is kicked from gathering
+            if ((await gathering.Kicked).Contains(this))
+            { return false; }
+
+            /*
 			// Check if user or user's haunt is within a reasonable distance
 			if (!GeoLocation.AreInRange(await LastKnownLocation, gathering.Location, gathering.MaximumJoinDistance) &&
 				!GeoLocation.AreInRange(await Haunt, gathering.Location, gathering.MaximumJoinDistance))
 			{ return false; }
+            */
 
-			return true;
+            return true;
+		}
+
+		public async Task<bool> CanCheckIn(Gathering gathering)
+		{
+			// Check if currently at another gathering
+			if (await IsAtGathering())
+			{ return false; }
+
+			// Check if user is incoming to the gathering
+			if ((await NextGathering()).Equals(gathering))
+			{ return false; }
+
+            // Check that gathering is ongoing
+            if (!gathering.IsOngoing)
+			{ return false; }
+
+            // Check if user is in range of the gathering
+			// if (!GeoLocation.AreInRange(await LastKnownLocation, gathering.Location, Gathering.MaximumJoinDistance))
+			// { return false; }
+
+            return true;
 		}
 
         public async Task CanEtch(Gathering gathering)
 		{
 			// Verify snapshot is not before gathering starting or user is host
-			Try(HasAlready(gathering.StartTime) || gathering.IsModifiableBy(this),
+			Verify(HasAlready(gathering.StartTime) || gathering.IsModifiableBy(this),
 				new InvalidGatheringException("Gathering has yet to start."));
 
 			// Verify user can etch into the gathering
-			Try(await gathering.WasAttendedBy(this) || gathering.IsModifiableBy(this),
+			Verify(await gathering.WasAttendedBy(this) || gathering.IsModifiableBy(this),
 				new InvalidGatheringException("User did not attend gathering."));
 
 			// Verify snapshot is added before gathering is closed
-			Try(gathering.IsActive,
+			Verify(gathering.IsActive,
 				new InvalidGatheringException("Gathering has already ended."));
 		}
 
@@ -372,13 +413,22 @@ namespace Core.Entities
 
         public async Task<bool> CanReport()
         {
-            var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - QuarterHour))
-                + (await GatheringReports).Count(report => After(report.ReportTime, Time - QuarterHour));
+            var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - FifteenMinutes))
+                + (await GatheringReports).Count(report => After(report.ReportTime, Time - FifteenMinutes));
 
             if (recentReportCount > 3)
             { return false; }
 
             return true;
+        }
+
+        public async Task<bool> CanAppreciate(User target)
+        {
+            var haveMutualGatheringSync = Terminal.NestDirector.RequestAttendedMutualGatheringAsync(this, target);
+            bool bannership = (await Banner).Id.Equals((await target.Banner).Id);
+            bool blockAppreciate = await IsBlocking(target) || await IsBlockedBy(target);
+
+            return !blockAppreciate && (await haveMutualGatheringSync || bannership);
         }
 
 		#endregion
@@ -427,39 +477,44 @@ namespace Core.Entities
 
         public async Task<UserAccountStatus> Reported()
         {
+            var currentStatus = AccountStatus;
+            UserAccountStatus nextStatus;
+
 			// Check if there are enough reports
 			if ((await Reports).Count < 4)
 			{ return AccountStatus; }
+			else if ((await Reports).Count < 6)
+			{ nextStatus = UserAccountStatus.Limited; }
+            else if ((await Reports).Count < 10)
+			{ nextStatus = UserAccountStatus.Suspended; }
+            else
+            { nextStatus = UserAccountStatus.Blacklisted; }
 
-			// Check if there are enough reports
-			if ((await Reports).Count < 6)
-			{ return UserAccountStatus.Limited; }
-            
-			// Check if there are enough reports
-			if ((await Reports).Count < 10)
-			{ return UserAccountStatus.Suspended; }
+            // Notify user of change
+            if (!currentStatus.Equals(nextStatus))
+            { _ = PostTelegram(Hollow, TelegramMessage.AccountStatusChanged);  }
 
-            return UserAccountStatus.Blacklisted;
+            return nextStatus;
         }
 
 		#endregion
 
 		#region Actions
 
-        public async Task PostNote(User notifier, string message, string action)
+        public async Task PostTelegram(User notifier, TelegramMessage message, string context = "")
         {
-            await Terminal.NotificationDirector.PostNoteAsync(this, notifier,
-                message, action);
+            await Terminal.NotificationDirector.PostTelegramAsync(this, notifier,
+                message, context);
         }
 
-		public async Task Notify(string title, string message)
+		public async Task Notify(NotificationGroup group, string title, string message, string collapseId = "")
         {
-            await Terminal.NotificationDirector.NotifyUserAsync(this, title, message);
+            await Terminal.NotificationDirector.NotifyUserAsync(this, group, title, message, collapseId);
         }
 
-        public async Task NotifyAppreciateers(string title, string message)
+        public async Task NotifyAppreciateers(NotificationGroup group, string title, string message, string collapseId = "")
         {
-            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(title, message));
+            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(group, title, message, collapseId));
         }
 
 		#endregion

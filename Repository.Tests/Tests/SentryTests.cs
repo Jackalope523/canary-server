@@ -12,12 +12,5 @@ namespace Repository.Tests
         {
             
         }
-
-        [Fact]
-        public void SeedDatabase_SUCCESS()
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

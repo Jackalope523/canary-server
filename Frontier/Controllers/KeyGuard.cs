@@ -21,15 +21,11 @@ namespace Frontier.Controllers
 
 		#region Actions
 
-		[HttpGet("{key}")]
-		public async Task<IActionResult> GetSecret(string key)
+		[HttpGet("map")]
+		public async Task<IActionResult> GetMapKey()
 		{
 			return await Execute(async user =>
-			{
-				var secret = await keys.GetSecretAsync(user.Id, key);
-
-				return Ok(secret);
-			});
+				await keys.GetCanaryMapKeyAsync(user.Id));
         }
 
 		#endregion

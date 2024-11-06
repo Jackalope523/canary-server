@@ -9,6 +9,7 @@ using Core.Boundaries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
+/*
 namespace Frontier.Controllers
 {
 	[Route("debug")]
@@ -50,7 +51,6 @@ namespace Frontier.Controllers
 
                 foreach (var user in seed.Users)
 				{
-					await debug.AddUserToBannerAsync(user.PhoneNumber, "debug");
 					await accounts.CreateUserAsync(user.PhoneNumber, user.Email, user.Name, user.DateOfBirth);
 
 					var coreUser = await accounts.GetCoreUserAsync(user.PhoneNumber);
@@ -59,7 +59,7 @@ namespace Frontier.Controllers
 
 					// Confirm user phone
 					var code = await userManager.GenerateChangePhoneNumberTokenAsync(coreUser, user.PhoneNumber);
-					await userManager.VerifyTwoFactorTokenAsync(coreUser, TokenOptions.DefaultPhoneProvider, code);
+					await userManager.VerifyChangePhoneNumberTokenAsync(coreUser, TokenOptions.DefaultPhoneProvider, code);
 
 					// Confirm user email
 					var token = await userManager.GenerateEmailConfirmationTokenAsync(coreUser);
@@ -97,9 +97,10 @@ namespace Frontier.Controllers
 
                     seedGatherings.Add(await gatherings.CreateGatheringAsync(host.Id,
                         gathering.Name, gathering.Description,
-                        gathering.StartTime, gathering.Latitude, gathering.Longitude,
+                        gathering.StartTime,
+						gathering.Latitude, gathering.Longitude, gathering.FriendlyLocation,
                         gathering.Radius, gathering.IsDynamic,
-                        gathering.GroupMinimum, gathering.GroupMaximum));
+                        gathering.GroupMinimum, gathering.GroupMaximum, new System.IO.MemoryStream { }));
                 }
 
                 log.LogError("Joining users to gatherings..");
@@ -133,7 +134,7 @@ namespace Frontier.Controllers
                     var tuple = seed.Acclaims[i];
                     var who = tuple[0]; var snapshot = tuple[1];
 
-					await snapshots.AcclaimSnapshotAsync(seedUsers[who - 1].Id, seedSnapshots[snapshot - 1].Id, UserRating.Positive);
+					await snapshots.AcclaimSnapshotAsync(seedUsers[who - 1].Id, seedSnapshots[snapshot - 1].Id, SnapshotAcclaim.Acclaim);
 				}
             });
 		}
@@ -141,3 +142,4 @@ namespace Frontier.Controllers
 		#endregion
 	}
 }
+*/

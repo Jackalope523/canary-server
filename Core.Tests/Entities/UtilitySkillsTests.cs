@@ -12,28 +12,28 @@ namespace Core.Tests.Entities
 		public void Try_Success_DoesNotThrowException()
 		{
 			// Act & Assert
-			Arbiter.Try(true, new UnexpectedFailureException()); // No exception should be thrown
+			Arbiter.Verify(true, new UnexpectedFailureException()); // No exception should be thrown
 		}
 
 		[Fact]
 		public void Try_Failure_ThrowsException()
 		{
 			// Act & Assert
-			Assert.Throws<UnexpectedFailureException>(() => Arbiter.Try(false, new UnexpectedFailureException()));
+			Assert.Throws<UnexpectedFailureException>(() => Arbiter.Verify(false, new UnexpectedFailureException()));
 		}
 
 		[Fact]
 		public void Fail_Failure_DoesNotThrowException()
 		{
 			// Act & Assert
-			Arbiter.Fail(false, new UnexpectedFailureException()); // No exception should be thrown
+			Arbiter.FailIf(false, new UnexpectedFailureException()); // No exception should be thrown
 		}
 
 		[Fact]
 		public void Fail_Success_ThrowsException()
 		{
 			// Act & Assert
-			Assert.Throws<UnexpectedFailureException>(() => Arbiter.Fail(true, new UnexpectedFailureException()));
+			Assert.Throws<UnexpectedFailureException>(() => Arbiter.FailIf(true, new UnexpectedFailureException()));
 		}
 	}
 

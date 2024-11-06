@@ -1,7 +1,4 @@
-﻿using Core.Boundaries;
-using Serilog;
-
-namespace Repository
+﻿namespace Repository
 {
     public class AzureKeyStore : IKeyDatabase
     {
@@ -12,19 +9,44 @@ namespace Repository
             sentry = new AzureKeySentry();
         }
 
-        public async Task<string> GetSecretAsync(string secretName)
+        public async Task<string> GetHollowOneSignalApiKeyAsync()
         {
-            return await sentry.GetSecretAsync(secretName);
+            return await sentry.GetSecretAsync("OneSignalApiKey");
         }
 
-        public async Task<object> GetKeyAsync(string keyName)
+        public async Task<string> GetHollowOneSignalAppIdAsync()
         {
-            return await sentry.GetKeyAsync(keyName);
+            return await sentry.GetSecretAsync("OneSignalAppId");
         }
 
-        public async Task<byte[]> GetCertificateAsync(string certificateName)
+        public async Task<string> GetHollowTwilioAccountKeyAsync()
         {
-            return await sentry.GetCertificateAsync(certificateName);
+            return await sentry.GetSecretAsync("TwilioAccountSID");
+        }
+
+        public async Task<string> GetHollowTwilioAuthTokenAsync()
+        {
+            return await sentry.GetSecretAsync("TwilioAuthToken");
+        }
+
+        public async Task<string> GetHollowTwilioMessagingServiceAsync()
+        {
+            return await sentry.GetSecretAsync("TwilioMessagingServiceSID");
+        }
+
+        public async Task<string> GetCanaryMapKeyAsync()
+        {
+            return await sentry.GetSecretAsync("MapboxSparrowMapToken");
+        }
+
+        public async Task<string> GetAppleAccountCodeAsync()
+        {
+            return await sentry.GetSecretAsync("AppleReviewAccountCode");
+        }
+
+        public async Task<string> GetGoogleAccountCodeAsync()
+        {
+            return await sentry.GetSecretAsync("GoogleReviewAccountCode");
         }
     }
 }

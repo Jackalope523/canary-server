@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Frontier.Manifests;
 using System.Collections.Generic;
+using System.Text;
+using Core;
 
 namespace Frontier.Controllers
 {
@@ -37,6 +39,7 @@ namespace Frontier.Controllers
 
 		#region Variables
 
+		public EnvironmentOptions env;
 		public ILogger log;
 
 		public IAccountOperations accounts;
@@ -48,6 +51,7 @@ namespace Frontier.Controllers
 		public IMediaOperations media;
 		public INotificationOperations telegrams;
 		public INestOperations nests;
+		public IMiscellaneousOperations miscellaneous;
 
 		public UserManager<CoreUser> userManager;
 
@@ -57,6 +61,7 @@ namespace Frontier.Controllers
 
 		public AbstractGuard(GuardBox box, UserManager<CoreUser> aspUserManager)
 		{
+			env = box.env;
 			log = box.log;
 
 			accounts = box.accounts;
@@ -68,54 +73,74 @@ namespace Frontier.Controllers
 			reports = box.reports;
 			media = box.media;
 			telegrams = box.telegrams;
+			miscellaneous = box.miscellaneous;
 
 			userManager = aspUserManager;
 		}
 
-		#endregion
+        #endregion
 
-		#region Favours
+        #region Favours
 
-		[NonAction]
-		public async Task<IActionResult> Execute(Func<Task<object>> action)
-		{
-			try
-			{
-				var result = await action.Invoke();
+
+        [NonAction]
+        public async Task<IActionResult> ExecuteUnsafe(Func<Task<IActionResult>> action)
+        {
+            try
+            {
+                var result = await action.Invoke();
 
                 // Check if there is a result
                 if (result == null)
                 {
-					Ok();
+                    Ok();
                 }
+
+                return result;
+            }
+            catch (HollowFailureException ex)
+            {
+				// Get full exception message
+				var message = DrillExceptionDetails(ex);
+
+                // Log failure
+                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
+
+                return StatusCode(500);
+            }
+            catch (UserErrorException ex)
+            {
+                // Log debug information
+                log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
+
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+				// Get full exception message
+                var message = DrillExceptionDetails(ex);
+
+                // Log failure
+                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
+
+
+                return StatusCode(500);
+            }
+        }
+
+        [NonAction]
+		public async Task<IActionResult> Execute(Func<Task<object>> action)
+		{
+			return await ExecuteUnsafe(async () =>
+			{
+				var result = await action.Invoke();
 
                 // Ensure outgoing type is generic or manifest
                 if (result is CoreOnlyData)
                 { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}."); }
 
                 return Ok(result);
-			}
-			catch (HollowFailureException ex)
-			{
-				// Log failure
-				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-				return StatusCode(500);
-			}
-			catch (UserErrorException ex)
-			{
-				// Log debug information
-				log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-                return BadRequest(ex.Message);
-			}
-			catch (Exception ex)
-			{
-				// Log failure
-				log.LogError("\nHollow Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
-
-				return StatusCode(500);
-			}
+			});
 		}
 
 		[NonAction]
@@ -124,7 +149,7 @@ namespace Frontier.Controllers
 			return await Execute(async () =>
 			{
 				await action.Invoke();
-				return null;
+				return "";
 			});
 		}
 
@@ -134,7 +159,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await action.Invoke(user);
-				return null;
+				return "";
 			},
 			allowUnverified);
 		}
@@ -160,8 +185,8 @@ namespace Frontier.Controllers
 		[NonAction]
 		public void ThrowIfUnverified(CoreUser user)
 		{
-			if (user.IsEmailConfirmed)
-			{ throw new InvalidUserException("User has not yet confirmed their email."); }
+			if (!user.IsPhoneConfirmed)
+			{ throw new InvalidUserException("User has not yet confirmed their phone number."); }
 		}
 
 		[NonAction]
@@ -178,6 +203,21 @@ namespace Frontier.Controllers
 			}
 
 			return null;
+		}
+
+		[NonAction]
+		public string DrillExceptionDetails(Exception ex)
+		{
+			StringBuilder builder = new();
+
+			while (ex != null)
+			{
+				builder.Append($"{ex.Message}, ");
+
+				ex = ex.InnerException;
+			}
+
+			return builder.ToString();
 		}
 
 		#endregion

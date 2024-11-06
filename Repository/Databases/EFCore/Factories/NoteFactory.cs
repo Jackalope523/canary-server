@@ -1,22 +1,38 @@
 ﻿
+using Repository.Entities;
+
 namespace Repository
 {
-    internal class NoteFactory
+    internal class NoteFactory : Factory
     {
-        private int produced = 0;
-
-        internal Entities.Note Create(User Notifier, User Recipient)
+        #region constructors
+        public NoteFactory(IFactoryObserver observer) : base(observer)
         {
-            produced++;
-            return new Entities.Note
+
+        }
+
+        public NoteFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public NoteFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
+
+        internal Telegram Create(User Notifier, User Recipient)
+        {
+            return Create(new Telegram()
             {
                 NotifierId = Notifier.Id,
                 RecipientId = Recipient.Id,
                 Time = DateTimeOffset.MinValue,
-                Message = "Message " + produced,
-                Action = "Action " + produced,
+                Message = TelegramMessage.UserAppreciated,
+                Action = "Action " + Count(),
                 Read = false
-            };
+            });
         }
     }
 }

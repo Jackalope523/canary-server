@@ -11,19 +11,44 @@ namespace Repository.Coordinators
             store = new AzureKeyStore();
         }
 
-        public async Task<byte[]> GetCertificateAsync(string certificateName)
+        public async Task<string> GetHollowOneSignalApiKeyAsync()
         {
-            return await store.GetCertificateAsync(certificateName);
+            return await store.GetHollowOneSignalApiKeyAsync();
         }
 
-        public async Task<object> GetKeyAsync(string keyName)
+        public async Task<string> GetHollowOneSignalAppIdAsync()
         {
-            return await store.GetKeyAsync(keyName);
+            return await store.GetHollowOneSignalAppIdAsync();
         }
 
-        public async Task<string> GetSecretAsync(string secretName)
+        public async Task<string> GetHollowTwilioAccountKeyAsync()
         {
-            return await store.GetSecretAsync(secretName);
+            return await store.GetHollowTwilioAccountKeyAsync();
+        }
+
+        public async Task<string> GetHollowTwilioAuthTokenAsync()
+        {
+            return await store.GetHollowTwilioAuthTokenAsync();
+        }
+
+        public async Task<string> GetHollowTwilioMessagingServiceAsync()
+        {
+            return await store.GetHollowTwilioMessagingServiceAsync();
+        }
+
+        public async Task<string> GetCanaryMapKeyAsync()
+        {
+            return await store.GetCanaryMapKeyAsync();
+        }
+
+        public async Task<string> GetAppleAccountCodeAsync()
+        {
+            return await store.GetAppleAccountCodeAsync();
+        }
+
+        public async Task<string> GetGoogleAccountCodeAsync()
+        {
+            return await store.GetGoogleAccountCodeAsync();
         }
     }
 }

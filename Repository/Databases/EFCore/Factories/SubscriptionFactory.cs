@@ -2,19 +2,31 @@
 
 namespace Repository
 {
-    internal class SubscriptionFactory
+    internal class SubscriptionFactory : Factory
     {
-        private int produced = 0;
+        #region constructors
+        public SubscriptionFactory(IFactoryObserver observer) : base(observer)
+        {
+
+        }
+
+        public SubscriptionFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public SubscriptionFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
 
         internal Subscription Create(User user)
         {
-            produced++;
-            return new Subscription
+            return Create(new Subscription
             {
                 UserId = user.Id,
-                DeviceType = DeviceType.iOS,
-                DeviceToken = produced.ToString()
-            };
+            });
         }
     }
 }

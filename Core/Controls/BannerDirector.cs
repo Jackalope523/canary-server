@@ -1,9 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-
-using static Core.Entities.Arbiter;
 
 namespace Core.Controls
 {
@@ -17,37 +16,42 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<string> InviteUserAsync(ulong userId, string invitedPhoneNumber)
+		public async Task<BannerShard> GetBannerAsync(long userId, long targetId)
 		{
 			var user = await GetUserAsync(userId);
-			var userBanner = await Banners.GetUserBannerAsync(user.Id);
+			var targetUser = await GetUserAsync(targetId);
 
-			var validNumber = ContentValidation.TryNormalisePhoneNumber(invitedPhoneNumber, out invitedPhoneNumber);
+			return (await targetUser.Banner).ToBannerShard();
+		}
 
-			Try(validNumber,
-				new InvalidUserException("Invalid phone number."));
+		public async Task<string> GetBannerCodeAsync(long userId)
+		{
+			var user = await GetUserAsync(userId);
 
-			// Check if invited user already has a banner
-			try
-			{
-				await Banners.GetUserBannerAsync(invitedPhoneNumber);
-				throw new InvalidUserException("User already has a banner.");
-			}
-			catch { }
+			return (await user.Banner).Code;
+		}
 
-			// Add user to the banner
-			await Banners.AddBannerMemberAsync(invitedPhoneNumber, userBanner);
+		public async Task<List<long>> GetBannerMembersAsync(long userId)
+		{
+			var user = await GetUserAsync(userId);
 
-			return userBanner;
+			return (await (await user.Banner).Members)
+				.ConvertAll(member => member.Id);
 		}
 
 		#endregion
 
 		#region Favours
 
-		public async Task<string> RequestUserBannerAsync(User user)
+		public async Task<Banner> RequestUserBannerAsync(User user)
 		{
-			return await Banners.GetUserBannerAsync(user.Id);
+			return new(await Banners.FindBannerForUserAsync(user.Id));
+		}
+
+		public async Task<List<User>> RequestBannerMembersAsync(Banner banner)
+		{
+			return (await Banners.GetBannerMembersAsync(banner.Id))
+				.ConvertAll(user => new User(user));
 		}
 
 		#endregion

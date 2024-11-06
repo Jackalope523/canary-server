@@ -1,20 +1,18 @@
-﻿using Core.Boundaries;
-
-namespace Repository
+﻿namespace Repository
 {
-    public class GatheringReport
+    public class GatheringReport : Entity
     {
         public GatheringReportType Type { get; set; }
 
-        public ulong Id { get; init; }
-
-        public ulong UserId { get; init; }
-        public User? Self { get; init; } // Navigation Property
-
-        public ulong GatheringId { get; init; }
-        public Gathering? Gathering { get; init; } // Navigation Property
-
+        public long? UserId { get; init; }
+        public long GatheringId { get; init; }
         public DateTimeOffset FilingDate { get; init; }
         public string Notes { get; init; }
+
+        // Navigation Properties
+        public User? User { get; init; }
+        public Gathering? Gathering { get; init; }
+
+        // Default Values
     }
 }

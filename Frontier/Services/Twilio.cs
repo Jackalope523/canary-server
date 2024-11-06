@@ -1,35 +1,44 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Twilio;
+using Core;
 using Twilio.Rest.Api.V2010.Account;
-using Core.Boundaries;
 
 namespace Frontier.Services
 {
 	public class TwilioService : ISMSService
 	{
-		private static string senderPhoneNumber = "";
+		private static ILogger log;
+		private static EnvironmentOptions env;
 
-		public static void Initialise(string accountId, string accountToken, string phoneNumber)
+		private static string messagingServiceSid = "";
+
+		public static void Initialise(EnvironmentOptions environment, ILogger logger, string accountId, string accountToken, string messagingService)
 		{
-			TwilioClient.Init(accountId, accountToken);
+			env = environment;
+			log = logger;
+			messagingServiceSid = messagingService;
 
-			senderPhoneNumber = phoneNumber;
+			TwilioClient.Init(accountId, accountToken);
 		}
 
 		public async Task SendSMSAsync(string phoneNumber, string message)
-		{
-            if (phoneNumber[0] == '+')
-			{
+        {
+            log.LogInformation("Want to send SMS to {phoneNumber}", phoneNumber);
+
+            if (env.IsProduction)
+            {
+                log.LogInformation("Sending SMS to {phoneNumber}: {message}", phoneNumber, message);
+
 				await MessageResource.CreateAsync(
-					from: new Twilio.Types.PhoneNumber(senderPhoneNumber),
-					to: new Twilio.Types.PhoneNumber(phoneNumber),
-					body: message);
-			}
-			else
-			{
-				Console.WriteLine($"SMS to {phoneNumber}: {message}");
-			}
+                    messagingServiceSid: messagingServiceSid,
+                    to: new Twilio.Types.PhoneNumber($"+{phoneNumber}"),
+                    body: message);
+            }
+            else
+            {
+                log.LogInformation("Dropped SMS to {phoneNumber}: {message}", phoneNumber, message);
+            }
 		}
 	}
 }

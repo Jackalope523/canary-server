@@ -250,11 +250,11 @@ namespace Frontier.Stores
 			GC.SuppressFinalize(this);
 		}
 
-		private ulong GetId(string id)
+		private long GetId(string id)
 		{
-			if (!ulong.TryParse(id, out ulong parsedId))
+			if (!long.TryParse(id, out long parsedId))
 			{
-				throw new ArgumentException("Not a valid ulong.", nameof(id));
+				throw new ArgumentException("Not a valid long.", nameof(id));
 			}
 
 			return parsedId;

@@ -8,31 +8,62 @@ namespace Repository
         {
         }
 
-        public async Task AddBannerMemberAsync(string phoneNumber, string banner)
+        public async Task AddUserToBannerAsync(long userId, long bannerId, DateTimeOffset time)
         {
-            //ulong userId = await storeSentry.ExecuteReadAsync(ctx => ctx.Users
-            //    .Where(u => u.PhoneNumber == phoneNumber)
-            //    .Select(u => u.Id)
-            //    .SingleAsync());
+            BannerLink toAdd = new()
+            {
+                UserId = userId,
+                BannerId = bannerId,
+                Time = time,
+            };
 
-            //ulong bannerId = await storeSentry.ExecuteReadAsync(ctx => ctx.Banners
-            //    .Where(b => b.Name == banner)
-            //    .Select(b => b.Id)
-            //    .SingleAsync());
-
-            //await storeSentry.ExecuteWriteAsync(ctx => ctx.BannerLinks.Add(new BannerLink { }));
-
-            throw new NotImplementedException();
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.BannerLinks.Add(toAdd));
         }
 
-        public async Task<string> GetUserBannerAsync(ulong userId)
+        public async Task<CoreBanner> FindBannerByCodeAsync(string code)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx =>
+               ctx.Banners
+               .Where(b => b.Code == code)
+               .Select(b => new CoreBanner(b.Id, b.Name, b.Color, b.Code))
+               .SingleAsync());
         }
 
-        public async Task<string> GetUserBannerAsync(string phoneNumber)
+        public async Task<CoreBanner> FindBannerByIdAsync(long bannerId)
         {
-            throw new NotImplementedException();
+            return await storeSentry.ExecuteReadAsync(ctx =>
+              ctx.Banners
+              .Where(b => b.Id == bannerId)
+              .Select(b => new CoreBanner(b.Id, b.Name, b.Color, b.Code))
+              .SingleAsync());
+        }
+
+        public async Task<CoreBanner> FindBannerForUserAsync(long userId)
+        {
+            long bannerId = await storeSentry.ExecuteReadAsync(ctx =>
+                               ctx.BannerLinks
+                               .Where(l => l.UserId == userId)
+                               .Select(l => l.BannerId)
+                               .SingleAsync());
+
+            return await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Banners
+                .Where(b => b.Id == bannerId)
+                .Select(b => new CoreBanner(b.Id, b.Name, b.Color, b.Code))
+                .SingleAsync());
+        }
+
+        public async Task<List<UserShard>> GetBannerMembersAsync(long bannerId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.BannerLinks
+                .Where(l => l.BannerId == bannerId)
+                .Join(
+                    ctx.Users.Where(u => u.SoftDeleted != true), 
+                    l => l.UserId, 
+                    u => u.Id, 
+                    (l,u) => new UserShard(u.Id, u.Name))
+                .ToListAsync());
         }
     }
 }

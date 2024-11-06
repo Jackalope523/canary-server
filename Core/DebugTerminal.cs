@@ -29,39 +29,38 @@ namespace Core
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase,
+            INestDatabase nestDatabase, IMiscellaneousDatabase miscellaneousDatabase,
             INotificationService notificationService, IDebugDatabase debugDatabase)
 		{
 			lock (initLock)
 			{
-				Terminal ??= new DebugTerminal(logger,
-                        accountDatabase, adminDatabase, bannerDatabase,
-                        gatheringDatabase, snapshotDatabase,
-                        disciplineDatabase, keyDatabase,
-                        mediaDatabase, notificationDatabase,
-                        nestDatabase,
-                        notificationService,
-						debugDatabase);
+				Terminal ??= new DebugTerminal()
+				{
+					Log = logger,
 
-				return (DebugTerminal) Terminal;
+					AccountDatabase = accountDatabase,
+					AdminDatabase = adminDatabase,
+					BannerDatabase = bannerDatabase,
+					GatheringDatabase = gatheringDatabase,
+					SnapshotDatabase = snapshotDatabase,
+					DisciplineDatabase = disciplineDatabase,
+					KeyDatabase = keyDatabase,
+					MediaDatabase = mediaDatabase,
+					NotificationDatabase = notificationDatabase,
+					NestDatabase = nestDatabase,
+					MiscellaneousDatabase = miscellaneousDatabase,
+
+                    NotificationService = notificationService,
+					DebugDatabase = debugDatabase,
+                };
+
+                return (DebugTerminal) Terminal;
 			}
 		}
 
-		protected DebugTerminal(ILogger logger,
-            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-            IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
-            IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
-            IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase,
-            INotificationService notificationService, IDebugDatabase debugDatabase)
-			: base(logger,
-					accountDatabase, adminDatabase, bannerDatabase,
-					gatheringDatabase, snapshotDatabase,
-					disciplineDatabase, keyDatabase,
-					mediaDatabase, notificationDatabase,
-					nestDatabase,  notificationService)
+		protected DebugTerminal()
+			: base()
 		{
-			DebugDatabase = debugDatabase;
 			DebugDirector = new DebugDirector(this);
 		}
 

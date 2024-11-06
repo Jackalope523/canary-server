@@ -6,13 +6,15 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-    public enum UserRating
-    { Positive, Negative, Remove }
+    public record NestShard(List<TwigShard> Twigs,
+        long RelativeGatheringId = default);
+    public record TwigShard(long GatheringId, DateTimeOffset StartTime);
 
-    public record UserProfile(ulong Id, string Name, int Reputation, int Appreciation);
-    public record UserSilhouette(ulong Id, string Name);
-    public record NestShard(List<GatheringShard> Gatherings, List<SnapshotShard> Snapshots);
-    public record AgendaShard(List<(GatheringShard Gathering, GatheringBond Bond)> Agenda);
+    public record AgendaShard(List<CardShard> Cards);
+    public record CardShard(long GatheringId, DateTimeOffset StartTime, GatheringBond Bond);
+
+    public record BlockedUserShard(long Id, string NameWhenBlocked, DateTimeOffset DateBlocked) :
+        UserShard(Id, NameWhenBlocked);
 
 	#endregion
 
@@ -20,37 +22,40 @@ namespace Core.Boundaries
 
 	public interface INestDatabase
     {
-        Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
-		Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId);
-        Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId);
-        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
-        Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId);
+        Task<List<UserShard>> GetCompanionsAsync(long userId);
+		Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
+        Task<List<UserShard>> GetUsersAppreciatingAsync(long userId);
+        Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
+        Task<List<UserShard>> GetUsersBlockingAsync(long userId);
 
-        Task AppreciateUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
-		Task UnappreciateUserAsync(ulong userId, ulong targetUserId);
-		Task BlockUserAsync(ulong userId, ulong targetUserId, DateTimeOffset time);
-		Task UnblockUserAsync(ulong userId, ulong targetUserId);
+        Task AppreciateUserAsync(long userId, long targetId, DateTimeOffset time);
+		Task UnappreciateUserAsync(long userId, long targetId);
+		Task BlockUserAsync(long userId, long targetId, DateTimeOffset time);
+		Task UnblockUserAsync(long userId, long targetId);
 
-		Task RateUserAsync(ulong userId, ulong targetUserId, UserRating rating, DateTimeOffset time);
-		Task RemoveUserRatingAsync(ulong userId, ulong targetUserId);
-		Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong userId);
+        Task<bool> HaveMutualGathering(long userId, long targetId);
+        Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId);
+        Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId);
+        Task<DateTimeOffset> BlockedSince(long userId, long targetId);
     }
 
 	public interface INestOperations
     {
-        Task<NestShard> GetUserNestAsync(ulong userId, ulong targetId);
+        Task<NestShard> GetNestAsync(long userId, long targetId);
 
-        Task<AgendaShard> GetUserAgendaAsync(ulong userId, ulong targetId);
-        Task<IDictionary<UserSilhouette, AgendaShard>> GetCompanionAgendaAsync(ulong userId);
+        Task<AgendaShard> GetUserAgendaAsync(long userId);
+        Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId);
 
-        Task<List<UserSilhouette>> GetCompanionsAsync(ulong userId);
-        Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong userId);
-        Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong userId);
+        Task<List<UserShard>> GetCompanionsAsync(long userId);
+        Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
+        Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 
-        Task AppreciateUserAsync(ulong userId, ulong targetId);
-        Task UnappreciateUserAsync(ulong userId, ulong targetId);
-        Task BlockUserAsync(ulong userId, ulong targetId);
-        Task UnblockUserAsync(ulong userId, ulong targetId);
+        Task AppreciateUserAsync(long userId, long targetId);
+        Task UnappreciateUserAsync(long userId, long targetId);
+        Task BlockUserAsync(long userId, long targetId);
+        Task UnblockUserAsync(long userId, long targetId);
+
+        Task<bool> AuthorisedToAppreciate(long userId, long targetId);
     }
 
 	#endregion

@@ -1,18 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using Core.Boundaries;
 using Core.Controls;
-using Microsoft.Extensions.Logging;
+using Core.Daemons;
 
 namespace Core
 {
+    public enum EnvironmentFlag
+    {
+        Production, Staging, Development
+    }
+
+    public record EnvironmentOptions
+    {
+        public EnvironmentFlag Flag { get; init; }
+
+        public bool IsProduction => Flag.Equals(EnvironmentFlag.Production);
+    }
+
     public class CoreTerminal
     {
         #region Variables
 
         public static CoreTerminal Terminal { get; protected set; }
         private static object initLock = new();
+
+        public EnvironmentOptions Environment { get; init; }
 
         public ILogger Log { get; init; }
 
@@ -26,6 +38,7 @@ namespace Core
         public IMediaDatabase MediaDatabase { get; init; }
         public INotificationDatabase NotificationDatabase { get; init; }
         public INestDatabase NestDatabase { get; init; }
+        public IMiscellaneousDatabase MiscellaneousDatabase { get; init; }
 
         public IAccountOperations AccountOperations
             => AccountDirector;
@@ -45,6 +58,8 @@ namespace Core
             => NotificationDirector;
         public INestOperations NestOperations
             => NestDirector;
+        public IMiscellaneousOperations MiscellaneousOperations
+            => MiscellaneousDirector;
 
         public INotificationService NotificationService { get; init; }
 
@@ -57,60 +72,52 @@ namespace Core
         internal MediaDirector MediaDirector { get; private set; }
         internal NotificationDirector NotificationDirector { get; private set; }
         internal NestDirector NestDirector { get; private set; }
+        internal MiscellaneousDirector MiscellaneousDirector { get; private set; }
 
         #endregion
 
         #region Initialisation
 
-        public static CoreTerminal CreateTerminal(ILogger logger,
+        public static CoreTerminal CreateTerminal(EnvironmentOptions environment, ILogger logger,
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase,
+            INestDatabase nestDatabase, IMiscellaneousDatabase miscellaneousDatabase,
             INotificationService notificationService)
         {
             lock (initLock)
             {
-                Terminal ??= new CoreTerminal(logger,
-                        accountDatabase, adminDatabase, bannerDatabase,
-                        gatheringDatabase, snapshotDatabase,
-                        disciplineDatabase, keyDatabase,
-                        mediaDatabase, notificationDatabase,
-                        nestDatabase,
-                        notificationService);
+                Terminal ??= new CoreTerminal()
+                {
+                    Environment = environment,
+                    Log = logger,
+
+                    AccountDatabase = accountDatabase,
+                    AdminDatabase = adminDatabase,
+                    BannerDatabase = bannerDatabase,
+                    GatheringDatabase = gatheringDatabase,
+                    SnapshotDatabase = snapshotDatabase,
+                    DisciplineDatabase = disciplineDatabase,
+                    KeyDatabase = keyDatabase,
+                    MediaDatabase = mediaDatabase,
+                    NotificationDatabase = notificationDatabase,
+                    NestDatabase = nestDatabase,
+                    MiscellaneousDatabase = miscellaneousDatabase,
+
+                    NotificationService = notificationService,
+                };
+
+                Terminal.CreateManagers();
 
                 return Terminal;
             }
         }
 
-        protected CoreTerminal(ILogger logger,
-            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
-			IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
-			IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
-            IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase,
-            INotificationService notificationService)
-        {
-            Log = logger;
+        protected CoreTerminal()
+        { }
 
-            AccountDatabase = accountDatabase;
-            AdminDatabase = adminDatabase;
-            BannerDatabase = bannerDatabase;
-            GatheringDatabase = gatheringDatabase;
-            SnapshotDatabase = snapshotDatabase;
-            DisciplineDatabase = disciplineDatabase;
-            KeyDatabase = keyDatabase;
-            MediaDatabase = mediaDatabase;
-            NotificationDatabase = notificationDatabase;
-            NestDatabase = nestDatabase;
-
-            NotificationService = notificationService;
-
-            CreateManagers();
-        }
-
-        private void CreateManagers()
+        protected void CreateManagers()
         {
             AccountDirector = new AccountDirector(this);
             BannerDirector = new BannerDirector(this);
@@ -121,7 +128,19 @@ namespace Core
             MediaDirector = new MediaDirector(this);
             NotificationDirector = new NotificationDirector(this);
             NestDirector = new NestDirector(this);
+            MiscellaneousDirector = new MiscellaneousDirector(this);
         }
+
+        #endregion
+
+        #region Daemons
+
+        public GatheringOverseerGoblin CreateRepositoryCleanupService()
+         => new(this);
+
+
+        public TelegramCleanupGoblin CreateTelegramCleanupService()
+         => new(this);
 
         #endregion
     }

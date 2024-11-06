@@ -19,15 +19,15 @@ namespace Repository.Tests
             _testOutputHelper = testOutputHelper;
 
             subject = new UserFactory().Create();
-            testGathering = new GatheringFactory().Create(subject);
-
             sentry.ExecuteWrite(ctx => ctx.Users.Add(subject));
+
+            testGathering = new GatheringFactory().Create(subject);
             sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(testGathering));
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.PostLinks.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Posts.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.SnapshotLinks.ExecuteDelete());
+            sentry.ExecuteWrite(ctx => ctx.Snapshots.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Gatherings.ExecuteDelete());
         }
@@ -40,32 +40,30 @@ namespace Repository.Tests
 
             await snapshotStore.AddSnapshotAsync(testGathering.Id, subject.Id, postTime);
 
-            Post created = await sentry.ExecuteReadAsync(ctx => ctx.Posts.FirstAsync());
+            Snapshot created = await sentry.ExecuteReadAsync(ctx => ctx.Snapshots.FirstAsync());
 
             Assert.NotNull(created);
             Assert.Equal(subject.Id, created.OwnerId);
             Assert.Equal(testGathering.Id, created.GatheringId);
             Assert.Equal(postTime, created.PostedAt);
-            Assert.Equal(url, created.PhotoURL);
-            Assert.False(created.IsHidden);
         }
         [Fact]
-        public async Task RemoveSnapshotAsync_SUCCESS()
+        public async Task DeleteSnapshotAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testSnapshot));
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            await sentry.ExecuteWriteAsync(ctx => ctx.Snapshots.AddAsync(testSnapshot));
 
-            await snapshotStore.RemoveSnapshotAsync(testSnapshot.Id);
+            await snapshotStore.DeleteSnapshotAsync(testSnapshot.Id);
 
-            int numPosts = await sentry.ExecuteReadAsync(ctx => ctx.Posts.CountAsync());
+            int numPosts = await sentry.ExecuteReadAsync(ctx => ctx.Snapshots.CountAsync());
 
             Assert.Equal(0, numPosts);
         }
         [Fact]
         public async Task GetSnapshotAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testSnapshot));
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            await sentry.ExecuteWriteAsync(ctx => ctx.Snapshots.AddAsync(testSnapshot));
 
             SnapshotShard retrieved = await snapshotStore.GetSnapshotAsync(testSnapshot.Id);
 
@@ -73,15 +71,14 @@ namespace Repository.Tests
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
             Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task GetSnapshotsByUserAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            sentry.ExecuteWrite(ctx => ctx.Snapshots.Add(testSnapshot));
 
-            int a = sentry.ExecuteRead(ctx => ctx.Posts.Count());
+            int a = sentry.ExecuteRead(ctx => ctx.Snapshots.Count());
             _testOutputHelper.WriteLine(a.ToString());
 
            SnapshotShard retrieved = (await snapshotStore.GetSnapshotsByUserAsync(subject.Id)).First();
@@ -90,13 +87,12 @@ namespace Repository.Tests
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
             Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task GetSnapshotsForGatheringAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            sentry.ExecuteWrite(ctx => ctx.Snapshots.Add(testSnapshot));
 
             SnapshotShard retrieved = (await snapshotStore.GetSnapshotsForGatheringAsync(testGathering.Id)).First();
 
@@ -104,54 +100,36 @@ namespace Repository.Tests
             Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
             Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
             Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.Equal(testSnapshot.IsHidden, retrieved.IsHidden);
         }
         [Fact]
         public async Task RateSnapshotAsync_SUCCESS()
         {
-            PostLink.PostLinkType rating = PostLink.PostLinkType.RateUp;
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
+            SnapshotLink.SnapshotLinkType rating = SnapshotLink.SnapshotLinkType.Appreciate;
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            sentry.ExecuteWrite(ctx => ctx.Snapshots.Add(testSnapshot));
 
-            await snapshotStore.AcclaimSnapshotAsync(testSnapshot.Id, subject.Id, UserRating.Positive);
+            await snapshotStore.AcclaimSnapshotAsync(testSnapshot.Id, subject.Id);
 
-            PostLink created = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.FirstAsync());
+            SnapshotLink created = await sentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.FirstAsync());
 
             Assert.Equal(subject.Id, created.UserId);
-            Assert.Equal(testSnapshot.Id, created.PostId);
+            Assert.Equal(testSnapshot.Id, created.SnapshotId);
             Assert.Equal(rating, created.Type);
         }
         [Fact]
-        public async Task RemoveSnapshotRatingAsync_SUCCESS()
+        public async Task DeleteSnapshotRatingAsync_SUCCESS()
         {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            await sentry.ExecuteWriteAsync(ctx => ctx.Posts.AddAsync(testSnapshot));
+            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
+            await sentry.ExecuteWriteAsync(ctx => ctx.Snapshots.AddAsync(testSnapshot));
 
-            PostLink rating = new PostLinkFactory().Create(subject, testSnapshot);
-            await sentry.ExecuteWriteAsync(ctx => ctx.PostLinks.AddAsync(rating));
+            SnapshotLink rating = new PostLinkFactory().Create(subject, testSnapshot);
+            await sentry.ExecuteWriteAsync(ctx => ctx.SnapshotLinks.AddAsync(rating));
 
-            await snapshotStore.RemoveSnapshotAcclaimAsync(testSnapshot.Id, subject.Id);
+            await snapshotStore.DeleteSnapshotAcclaimAsync(testSnapshot.Id, subject.Id);
 
-            int count = await sentry.ExecuteReadAsync(ctx => ctx.PostLinks.CountAsync());
+            int count = await sentry.ExecuteReadAsync(ctx => ctx.SnapshotLinks.CountAsync());
 
             Assert.Equal(0, count);
-        }
-        [Fact]
-        public async Task HideSnapshotAsync_SUCCESS()
-        {
-            Post testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            sentry.ExecuteWrite(ctx => ctx.Posts.Add(testSnapshot));
-
-            await snapshotStore.HideSnapshotAsync(testSnapshot.Id);
-
-            SnapshotShard retrieved = (await snapshotStore.GetSnapshotsForGatheringAsync(testGathering.Id)).First();
-
-            Assert.NotNull(retrieved);
-            Assert.Equal(testSnapshot.OwnerId, retrieved.User.Id);
-            Assert.Equal(testSnapshot.GatheringId, retrieved.GatheringId);
-            Assert.Equal(testSnapshot.PostedAt, retrieved.TimeTaken);
-            Assert.NotEqual(testSnapshot.IsHidden, retrieved.IsHidden);
-            Assert.True(retrieved.IsHidden);
         }
     }
 }

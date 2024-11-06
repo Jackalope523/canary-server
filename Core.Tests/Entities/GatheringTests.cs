@@ -22,7 +22,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var validGathering = new Gathering
 			{
-				Name = "Valid Gathering",
+				Title = "Valid Gathering",
 				Description = "A valid gathering description",
 				StartTime = DateTimeOffset.Now,
 				GroupMinimum = 5,
@@ -42,7 +42,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var invalidGathering = new Gathering
 			{
-				Name = "Invalid Gathering",
+				Title = "Invalid Gathering",
 				Description = "A".PadLeft(Gathering.MaximumDescLength + 1),
 				StartTime = DateTimeOffset.Now - TimeSpan.FromDays(8),
 				GroupMinimum = 5,
@@ -264,7 +264,7 @@ namespace Core.Tests.Entities
 			var surveyingUser = await environment.GenerateUniqueUserAsync();
 
 			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(gathering, surveyingUser, GatheringBond.Surveying);
+			await environment.AddUserToGatheringAsync(gathering, surveyingUser, GatheringBond.Watching);
 
 			// Act
 			var result = await gathering.HasUserRelationship(surveyingUser);
@@ -553,82 +553,6 @@ namespace Core.Tests.Entities
 			// Act
 			await gathering.Reported();
 			// If no exception is thrown, the test is successful
-		}
-
-		//////
-		// Actions
-		////////////
-
-		[Fact]
-		public async Task NotifyActive_Succeeds()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var incomingUser = await environment.GenerateUniqueUserAsync();
-			var activeGuest = await environment.GenerateUniqueUserAsync();
-
-			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(gathering, incomingUser, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, activeGuest, GatheringBond.Arrived);
-
-			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
-			await environment.SubscribeUserAsync(activeGuest, DeviceType.iOS, activeGuest.Id.ToString());
-			string notificationTitle = "gathering title", notificationMessage = "message test";
-
-			// Act
-			await gathering.NotifyActive(notificationTitle, notificationMessage);
-
-			// Assert
-			var incomingUserMessages = environment.GetUserMessages(incomingUser);
-			Assert.Single(incomingUserMessages);
-
-			var notification = incomingUserMessages[0];
-			Assert.Equal(notificationTitle, notification.Title);
-			Assert.Equal(notificationMessage, notification.Message);
-
-			var guestMessages = environment.GetUserMessages(activeGuest);
-			Assert.Single(guestMessages);
-
-			notification = guestMessages[0];
-			Assert.Equal(notificationTitle, notification.Title);
-			Assert.Equal(notificationMessage, notification.Message);
-		}
-
-		[Fact]
-		public async Task NotifyGuests_Succeeds()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var incomingUser = await environment.GenerateUniqueUserAsync();
-			var leftGuest = await environment.GenerateUniqueUserAsync();
-			var activeGuest = await environment.GenerateUniqueUserAsync();
-
-			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(gathering, incomingUser, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, leftGuest, GatheringBond.Left);
-			await environment.AddUserToGatheringAsync(gathering, activeGuest, GatheringBond.Arrived);
-
-			await environment.SubscribeUserAsync(incomingUser, DeviceType.iOS, incomingUser.Id.ToString());
-			await environment.SubscribeUserAsync(leftGuest, DeviceType.iOS, leftGuest.Id.ToString());
-			await environment.SubscribeUserAsync(activeGuest, DeviceType.iOS, activeGuest.Id.ToString());
-			string notificationTitle = "gathering title", notificationMessage = "message test";
-
-			// Act
-			await gathering.NotifyGuests(notificationTitle, notificationMessage);
-
-			// Assert
-			var incomingUserMessages = environment.GetUserMessages(incomingUser);
-			Assert.Empty(incomingUserMessages);
-
-			var leftGuestMessages = environment.GetUserMessages(leftGuest);
-			Assert.Empty(leftGuestMessages);
-
-			var guestMessages = environment.GetUserMessages(activeGuest);
-			Assert.Single(guestMessages);
-
-			var notification = guestMessages[0];
-			Assert.Equal(notificationTitle, notification.Title);
-			Assert.Equal(notificationMessage, notification.Message);
 		}
 	}
 }

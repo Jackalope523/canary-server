@@ -1,14 +1,14 @@
 ﻿namespace Repository
 {
-    public class BannerLink
+    public class BannerLink : Entity
     {
-        public ulong Id { get; set; }
-
-        public ulong UserId { get; set; }
-        public User? User { get; set; }
-        public ulong BannerId { get; set; }
-        public Banner? Banner { get; set; }
+        public long UserId { get; set; }
+        public long BannerId { get; set; }
         public DateTimeOffset Time { get; set; } = DefaultTime;
+
+        // Navigation Properties
+        public User? User { get; set; }
+        public Banner? Banner { get; set; }
 
         // Default Values
         public static DateTimeOffset DefaultTime { get; set; } = DateTimeOffset.MinValue;

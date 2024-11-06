@@ -26,31 +26,27 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				return await telegrams.GetNotesAsync(user.Id);
+				return await telegrams.GetTelegramsAsync(user.Id);
 			});
         }
 
-		[HttpPost]
-		public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionManifest subscription)
+		[HttpPut]
+		public async Task<IActionResult> ClearTelegram([FromBody] List<long> telegramIds)
 		{
-			// Verify parameters
-			if (subscription == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
-
 			return await Execute(async user =>
 			{
-				await telegrams.SubscribeUserAsync(user.Id, subscription.DeviceType, subscription.DeviceToken);
-			}, allowUnverified: true);
-		}
+				await telegrams.ClearTelegramsAsync(user.Id, telegramIds);
+			});
+        }
 
 		[HttpDelete]
-		public async Task<IActionResult> Unsubscribe()
+		public async Task<IActionResult> ClearTelegrams()
 		{
 			return await Execute(async user =>
 			{
-				await telegrams.UnsubscribeUserAsync(user.Id);
-			}, allowUnverified: true);
-		}
+				await telegrams.ClearTelegramsAsync(user.Id);
+			});
+        }
 
 		#endregion
 	}

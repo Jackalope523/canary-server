@@ -47,6 +47,9 @@ namespace Core.Entities
 
 			content = content[..maximumLength];
 
+			// Sanitise text
+			content = filter.Sanitise(content);
+
             // Check if text contains inappropriate phrases
             content = filter.CensorText(content);
 
@@ -93,10 +96,23 @@ namespace Core.Entities
 
 		#region Operations
 
+		public string Sanitise(string text)
+		{
+			// First, remove anything above a double line break
+            string result = Regex.Replace(text, @"(\r?\n){3,}", "\n\n");
+
+            // Second, remove line breaks between single letters
+            result = Regex.Replace(result, @"(?<=\w)\r?\n(?=\w)", "");
+
+			return result;
+        }
+
 		public string CensorText(string text)
 		{
-			Fail(string.IsNullOrEmpty(text),
-				new InvalidInformationException($"{nameof(text)} cannot be null or empty."));
+			if (string.IsNullOrEmpty(text))
+			{
+				return "";
+			}
 
 			string censoredText = text;
 
@@ -113,6 +129,11 @@ namespace Core.Entities
 
 		public string HideInformation(string text)
 		{
+			if (string.IsNullOrEmpty(text))
+			{
+				return "";
+			}
+
             // Regular expression to find links
             string linkPattern = @"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
 

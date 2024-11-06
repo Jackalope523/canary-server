@@ -12,22 +12,32 @@ namespace Core.Controls
 
 		public KeyDirector(CoreTerminal terminal) : base(terminal) { }
 
-		#endregion
+        #endregion
 
-		#region Operations
+        #region Operations
 
-		public async Task<string> GetSecretAsync(ulong userId, string secret)
-		{
-			await GetUserAsync(userId);
+        public async Task<string> GetCanaryMapKeyAsync(long userId)
+        {
+            await GetUserAsync(userId);
 
-			return await Keys.GetSecretAsync(secret);
-		}
+            return await Keys.GetCanaryMapKeyAsync();
+        }
 
-		#endregion
+        public async Task<string> GetClassifiedAccountCodeAsync(long userId)
+        {
+            return userId switch
+            {
+                -7 => await Keys.GetAppleAccountCodeAsync(),
+                -8 => await Keys.GetGoogleAccountCodeAsync(),
+                _ => throw new InvalidUserException("User does not exist")
+            };
+        }
 
-		#region Favours
+        #endregion
+
+        #region Favours
 
 
-		#endregion
-	}
+        #endregion
+    }
 }

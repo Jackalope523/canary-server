@@ -1,178 +1,301 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
     public class EFCoreNestStore : QueryStore, INestDatabase
     {     
-        private static readonly Func<QueryContext, ulong, ulong, UserLink.UserLinkType, Task> RemoveLinkOperation =
+        private static readonly Func<CanaryContext, long, long, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
-                (QueryContext ctx, ulong selfId, ulong otherId, UserLink.UserLinkType type) =>
-                ctx.UserLinks
+                (CanaryContext ctx, long selfId, long otherId, UserRelationship.UserLinkType type) =>
+                ctx.UserRelationships
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());
 
         public EFCoreNestStore(Harbor.Flag flag) : base(flag)
         {
+
         }
         
-        public async Task AppreciateUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
-            UserLink toAdd = new()
-            {
-                SelfId = selfId,
-                OtherId = targetId,
-                Time = time,
-                Type = UserLink.UserLinkType.Appreciate
-            };
+            long id = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.UserRelationships.
+                Where(l => l.SelfId == selfId && l.OtherId == targetId)
+                .Select(l => l.Id)
+                .SingleOrDefaultAsync()); 
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));
+
+            if (id == 0)
+            {
+                UserRelationship toAdd = new()
+                {
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserRelationship.UserLinkType.Appreciate
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Add(toAdd));
+            }
+            else
+            {
+                UserRelationship toUpdate = new()
+                {
+                    Id = id,
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserRelationship.UserLinkType.Appreciate
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Update(toUpdate));
+            }
         }
-        public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnappreciateUserAsync(long selfId, long targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Appreciate));
+            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Appreciate));
         }
-        public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
-            UserLink toAdd = new()
-            {
-                SelfId = selfId,
-                OtherId = targetId,
-                Time = time,
-                Type = UserLink.UserLinkType.Block
-            };
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
+               ctx.UserRelationships.
+               Where(l => l.SelfId == selfId && l.OtherId == targetId)
+               .Select(l => l.Id)
+               .SingleOrDefaultAsync());
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Add(toAdd));      
+
+            if (id == 0)
+            {
+                UserRelationship toAdd = new()
+                {
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserRelationship.UserLinkType.Block
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Add(toAdd));
+            }
+            else
+            {
+                UserRelationship toUpdate = new()
+                {
+                    Id = id,
+                    SelfId = selfId,
+                    OtherId = targetId,
+                    Time = time,
+                    Type = UserRelationship.UserLinkType.Block
+                };
+
+                await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Update(toUpdate));
+            }
         }
-        public async Task UnblockUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnblockUserAsync(long selfId, long targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserLink.UserLinkType.Block));
+            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Block));
         }
-        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
+             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.OtherId,
                  u => u.Id,
-                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 (l, u) => new UserShard(u.Id, u.Name)
                  ).
              ToListAsync());
         }
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong id) 
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Block).
+            ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Block).
             Join(
                 ctx.Users, 
                 l => l.OtherId, 
                 u => u.Id, 
-                (l,u) => new UserSilhouette(u.Id, u.Name)
+                (l,u) => new BlockedUserShard(u.Id, u.Name, l.Time)
                 ).
             ToListAsync());
         }
-        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong id)
+        public async Task<List<UserShard>> GetCompanionsAsync(long id)
         {
-            Task<List<UserSilhouette>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.SelfId == id && l.Type == UserLink.UserLinkType.Appreciate).
+            Task<List<UserShard>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.OtherId,
                  u => u.Id,
-                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 (l, u) => new UserShard(u.Id, u.Name)
                  ).
              ToListAsync());
 
-            Task<List<UserSilhouette>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserLinks.Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.Appreciate).
+            Task<List<UserShard>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+             ctx.UserRelationships.Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
              Join(
                  ctx.Users,
                  l => l.SelfId,
                  u => u.Id,
-                 (l, u) => new UserSilhouette(u.Id, u.Name)
+                 (l, u) => new UserShard(u.Id, u.Name)
                  ).
              ToListAsync());
 
             return (await appreciating).Intersect(await appreciatingMe).ToList();
         }
 
-        public async Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong id)
-        {
-            Task<int> up = storeSentry.ExecuteReadAsync(ctx =>
-            ctx.UserLinks.
-            Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.RateUp).
-            CountAsync());
-
-            Task<int> down = storeSentry.ExecuteReadAsync(ctx =>
-            ctx.UserLinks.
-            Where(l => l.OtherId == id && l.Type == UserLink.UserLinkType.RateDown).
-            CountAsync()); ;
-
-            return (await up, await down);
-        }
-
-        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating, DateTimeOffset time)
-        {
-            UserLink.UserLinkType type;
-            if (rating.Equals(UserRating.Positive)) type = UserLink.UserLinkType.RateUp;
-            else type = UserLink.UserLinkType.RateDown;
-
-            UserLink toAdd = new()
-            {
-                SelfId = selfId,
-                OtherId = targetId,
-                Time = time,
-                Type = type
-            };
-
-            ulong id = await storeSentry.ExecuteReadAsync(ctx =>
-                        ctx.UserLinks.
-                        Where(l => l.SelfId == selfId && l.OtherId == targetId).
-                        Select(l => l.Id).
-                        SingleOrDefaultAsync());
-
-            if (id != 0)
-            {
-                toAdd.Id = id;
-            }
-
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.UserLinks.Update(toAdd));
-        }
-
-        public async Task RemoveUserRatingAsync(ulong selfId, ulong targetId)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx => 
-            ctx.UserLinks.
-            Where(l => 
-            l.SelfId == selfId && l.OtherId == targetId && 
-            (l.Type == UserLink.UserLinkType.RateUp || l.Type == UserLink.UserLinkType.RateDown)).
-            ExecuteDelete());
-        }
-
-        public async Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersAppreciatingAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Appreciate).
+            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
-            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            (l, u) => new UserShard(u.Id, u.Name)).
             ToListAsync());
         }
 
-        public async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersBlockingAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserLinks.Where(l => l.OtherId == userId && l.Type == UserLink.UserLinkType.Block).
+            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Block).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
-            (l, u) => new UserSilhouette(u.Id, u.Name)).
+            (l, u) => new UserShard(u.Id, u.Name)).
             ToListAsync());
+        }
+
+        public Task<bool> HaveMutualGathering(long userId, long targetId)
+        {
+            return storeSentry.ExecuteReadAsync(ctx => 
+                ctx.GatheringLinks.
+                Where(l => l.UserId == userId && l.Type == GatheringBond.Arrived).
+                Join(
+                      ctx.GatheringLinks.Where(l => l.UserId == targetId && l.Type == GatheringBond.Arrived),
+                      x => x.GatheringId,
+                      y => y.GatheringId,
+                      (x,y) => x.GatheringId
+                    ).
+                AnyAsync());
+        }
+
+        public async Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId)
+        {
+            List<long> a = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+                Where(l => l.UserId == userId && l.Type == GatheringBond.Arrived).
+                Select(l => l.GatheringId).
+                ToListAsync());
+
+            List<long> b = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+                Where(l => l.UserId == targetId && l.Type == GatheringBond.Arrived).
+                Select(l => l.GatheringId).
+                ToListAsync());
+
+            List<long> mutualGatherings = a.Intersect(b).ToList();
+
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
+                Where(g => mutualGatherings.Contains(g.Id)).
+                OrderByDescending(g => g.StartTime).
+                GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, users) => new { e, user = users.FirstOrDefault() }).
+                Select(
+                combined => new CoreGathering
+                (
+                    combined.e.Id,
+                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.e.Title,
+                    combined.e.Description,
+                    combined.e.StartTime,
+                    combined.e.Location.Y,
+                    combined.e.Location.X,
+                    combined.e.FriendlyLocation,
+                    combined.e.EndTime,
+                    combined.e.State,
+                    combined.e.GroupMinimum,
+                    combined.e.GroupMaximum,
+                    new CharacterShard(
+                        combined.e.Age,
+                        combined.e.Extroversion,
+                        combined.e.Athleticisme,
+                        combined.e.Chaos,
+                        combined.e.Competitiveness,
+                        combined.e.Industriousness,
+                        combined.e.NightOwl,
+                        combined.e.Openness),
+                    combined.e.Radius,
+                    combined.e.IsDynamic,
+                    combined.e.SoftDeleted,
+                    combined.e.NumberOfGuests,
+                    combined.e.DegreeOfPrivacy
+                )).FirstAsync());
+        }
+
+        public async Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId)
+        {
+            List<long> a = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+               Where(l => l.UserId == userId && l.Type == GatheringBond.Arrived).
+               Select(l => l.GatheringId).
+               ToListAsync());
+
+            List<long> b = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
+                Where(l => l.UserId == targetId && l.Type == GatheringBond.Arrived).
+                Select(l => l.GatheringId).
+                ToListAsync());
+
+            List<long> mutualGatherings = a.Intersect(b).ToList();
+
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Gatherings.
+                Where(g => mutualGatherings.Contains(g.Id)).
+                OrderBy(g => g.StartTime).
+                GroupJoin(
+                ctx.Users,
+                e => e.HostId,
+                u => u.Id,
+                (e, users) => new { e, user = users.FirstOrDefault() }).
+                Select(
+                combined => new CoreGathering
+                (
+                    combined.e.Id,
+                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.e.Title,
+                    combined.e.Description,
+                    combined.e.StartTime,
+                    combined.e.Location.Y,
+                    combined.e.Location.X,
+                    combined.e.FriendlyLocation,
+                    combined.e.EndTime,
+                    combined.e.State,
+                    combined.e.GroupMinimum,
+                    combined.e.GroupMaximum,
+                    new CharacterShard(
+                        combined.e.Age,
+                        combined.e.Extroversion,
+                        combined.e.Athleticisme,
+                        combined.e.Chaos,
+                        combined.e.Competitiveness,
+                        combined.e.Industriousness,
+                        combined.e.NightOwl,
+                        combined.e.Openness),
+                    combined.e.Radius,
+                    combined.e.IsDynamic,
+                    combined.e.SoftDeleted,
+                    combined.e.NumberOfGuests,
+                    combined.e.DegreeOfPrivacy
+                )).FirstAsync());
+        }
+
+        public async Task<DateTimeOffset> BlockedSince(long userId, long targetId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => 
+                    ctx.UserRelationships.
+                    Where(l => l.SelfId == userId && l.OtherId == targetId && l.Type == UserRelationship.UserLinkType.Block).
+                    Select(l => l.Time).
+                    SingleAsync());
         }
     }
 }

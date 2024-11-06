@@ -21,38 +21,87 @@ namespace Core.Controls
 
 		#region Operations
 
-		public async Task<List<SnapshotShard>> GetGatheringSnapshotsAsync(ulong userId, ulong gatheringId)
+        public async Task<GalleryShard> GetGalleryAsync(long userId, long targetId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
-            var targetGathering = await GetGatheringAsync(gatheringId);
-            _ = targetGathering.Snapshots.Sync();
+            var targetUser = await GetUserAsync(targetId);
+            var gathering = await GetGatheringAsync(gatheringId);
 
-            // Verify user can see the gathering
-            Try(await targetGathering.WasAttendedBy(user) || targetGathering.IsModifiableBy(user),
-                new InvalidGatheringException("User did not attend gathering."));
+            // Fail if user is blocked
+            FailIf(await user.IsBlockedBy(targetUser),
+                new InvalidUserException("User is unable to view target."));
 
-            return await targetGathering.Snapshots;
+            // Fail if user cannot view gathering
+            Verify(await user.CanView(gathering),
+                new InvalidUserException("User is unable to view gathering."));
+
+            GalleryShard gallery = new(new());
+
+            // Check if user is themself
+            if (user.Equals(targetUser))
+            {
+                // Check if user attended
+                if (await gathering.WasAttendedBy(user))
+                {
+                    gallery = new(await gathering.Snapshots);
+                }
+                // Check if any companions attended
+                else
+                {
+                    var companionIds = (await user.Companions)
+                        .ConvertAll(companion => companion.Id);
+
+                    var companionSnapshots = (await gathering.Snapshots)
+                        .Where(snapshot => companionIds.Contains(snapshot.User.Id)).ToList();
+
+                    gallery = new(companionSnapshots);
+                }
+            }
+            // Check if users are companions or attended a common gathering
+            else if (await user.IsCompanionsWith(targetUser) ||
+                (await gathering.WasAttendedBy(user) && await gathering.WasAttendedBy(targetUser)))
+            {
+                var targetSnapshots = (await gathering.Snapshots)
+                    .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
+
+                gallery = new(targetSnapshots);
+            }
+
+            // Remove any snapshots from blocked or blocking users
+            GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
+
+            return filteredGallery;
         }
 
-        public async Task<SnapshotShard> AddSnapshotAsync(ulong userId, ulong gatheringId, MemoryStream image)
+
+        public async Task<SnapshotShard> AddSnapshotAsync(long userId, long gatheringId, MemoryStream image)
         {
             var userSync = GetUserAsync(userId);
             var targetGatheringSync = GetGatheringAsync(gatheringId);
             var user = await userSync;
-            var targetGathering = await targetGatheringSync;
+            var gathering = await targetGatheringSync;
 
-            await user.CanEtch(targetGathering);
+            await user.CanEtch(gathering);
 
             // Try to etch
-            var snapshot = await Snapshots.AddSnapshotAsync(targetGathering.Id, user.Id, Time);
+            var snapshot = await Snapshots.AddSnapshotAsync(gathering.Id, user.Id, Time);
 
-            // Save image
-            await Terminal.MediaDirector.UploadImageAsync(user.Id, snapshot.Id, image);
+            try
+            {
+                // Save image
+                await Terminal.MediaDirector.UploadSnapshotAsync(user.Id, snapshot.Id, image);
+            }
+            catch
+            {
+                // If failed, remove snapshot
+                await Snapshots.DeleteSnapshotAsync(snapshot.Id);
+                throw new UnexpectedFailureException("Image upload failed.");
+            }
 
             return snapshot;
         }
 
-        public async Task RemoveSnapshotAsync(ulong userId, ulong snapshotId)
+        public async Task DeleteSnapshotAsync(long userId, long snapshotId)
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -60,13 +109,13 @@ namespace Core.Controls
             var user = await userSync;
 
             // Verify user owns the snapshot or can modify the gathering
-            Try(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
+            Verify(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove snapshot."));
 
-            await Snapshots.RemoveSnapshotAsync(snapshot.Id);
+            await Snapshots.DeleteSnapshotAsync(snapshot.Id);
         }
 
-        public async Task AcclaimSnapshotAsync(ulong userId, ulong snapshotId, UserRating rating)
+        public async Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim)
         {
             var userSync = GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
@@ -74,28 +123,28 @@ namespace Core.Controls
             var user = await userSync;
 
             // Verify user can interact with snapshot
-            Try(await gatheringTaken.WasAttendedBy(user),
+            Verify(await gatheringTaken.WasAttendedBy(user),
                 new InvalidUserException("User cannot interact with snapshot."));
 
-            Fail(user.Taken(snapshot),
+            FailIf(user.Taken(snapshot),
                 new InvalidUserException("User cannot rate their own snapshot."));
 
-            // Check if removing a rating
-            if (rating != UserRating.Remove)
+            // Check action
+            if (acclaim == SnapshotAcclaim.Acclaim)
             {
-                await Snapshots.AcclaimSnapshotAsync(snapshot.Id, user.Id, rating);
+                await Snapshots.AcclaimSnapshotAsync(snapshot.Id, user.Id);
             }
             else
             {
-                await Snapshots.RemoveSnapshotAcclaimAsync(snapshot.Id, user.Id);
+                await Snapshots.DeleteSnapshotAcclaimAsync(snapshot.Id, user.Id);
             }
         }
 
         public async Task<ColumnShard>
-            GetUserColumnAsync(ulong userId, int depth, int lastDepth)
+            GetUserColumnAsync(long userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
-            Dictionary<ulong, GatheringHeader> gatheringHeaders = new();
+            Dictionary<long, GatheringHeader> gatheringHeaders = new();
 
             // Enforce lastDepth < depth
             lastDepth = Math.Min(lastDepth, depth - 1);
@@ -121,11 +170,11 @@ namespace Core.Controls
                 else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, snapshot.TimeTaken))
                 {
                     gatheringHeaders[gatheringId] = new(gatheringId,
-                        gatheringHeaders[gatheringId].Name,
+                        gatheringHeaders[gatheringId].Title,
+                        gatheringHeaders[gatheringId].Time,
                         gatheringHeaders[gatheringId].IsActive,
                         snapshot.TimeTaken,
-                        gatheringHeaders[gatheringId].Latitude,
-                        gatheringHeaders[gatheringId].Longitude);
+                        gatheringHeaders[gatheringId].FriendlyLocation);
                 }
             }
 
@@ -139,7 +188,56 @@ namespace Core.Controls
 		internal async Task<List<SnapshotShard>> RequestGatheringSnapshotsAsync(Gathering gathering)
             => await Snapshots.GetSnapshotsForGatheringAsync(gathering.Id);
 
-		#endregion
-	}
+		internal async Task<List<SnapshotShard>> RequestVisibleSnapshotsAsync(User user, Gathering gathering)
+        {
+            // Verify user can see the gathering
+            if (!await user.CanView(gathering))
+            {
+                return new List<SnapshotShard> { };
+            }
+
+            _ = gathering.Snapshots.Sync();
+
+            // Determine the level of visibility to the user
+
+            // Check if the user attended the gathering
+            if (await gathering.WasAttendedBy(user) || gathering.IsModifiableBy(user))
+            {
+                return await gathering.Snapshots;
+            }
+            else
+            {
+                // Get all companion snapshots
+                var companions = await user.Companions;
+
+                var companionSnapshots = (await gathering.Snapshots)
+                    .Where(snapshot => companions.Exists(cmp => cmp.Id.Equals(snapshot.User.Id)))
+                    .ToList();
+
+                return companionSnapshots;
+            }
+        }
+
+        internal async Task<List<SnapshotShard>>
+            RemoveBlockedSnapshotsAsync(User user, List<SnapshotShard> snapshots)
+        {
+            List<SnapshotShard> accessibleSnapshots = new();
+
+            foreach (SnapshotShard snapshot in snapshots)
+            {
+                User snapshotOwner = new(snapshot.User);
+
+                // Check if blocking link exists
+                if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))
+                { continue; }
+
+                accessibleSnapshots.Add(snapshot);
+            }
+
+            return accessibleSnapshots;
+        }
+
+        #endregion
+    }
 }
 

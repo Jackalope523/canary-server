@@ -1,5 +1,5 @@
 ﻿using Core.Boundaries;
-
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,7 +11,7 @@ namespace Frontier.Manifests
 	public class TargetManifest
     {
         [Required]
-        public ulong TargetId { get; set; }
+        public long TargetId { get; set; }
     }
 
     public class AccountCredentialsManifest
@@ -34,5 +34,13 @@ namespace Frontier.Manifests
 
 		[Required]
 		public DateTime DateOfBirth { get; set; }
+
+		public string Code { get; set; }
     }
+
+	public class AvatarManifest
+	{
+		[Required]
+		public IFormFile Image { get; set; }
+	}
 }

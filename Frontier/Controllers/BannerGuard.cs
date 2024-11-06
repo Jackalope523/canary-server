@@ -14,27 +14,33 @@ namespace Frontier.Controllers
 	{
 		#region Initialisation
 
-		ISMSService smsService;
-
-		public BannerGuard(GuardBox box, UserManager<CoreUser> aspUserManager, ISMSService externalSMSService) : base(box, aspUserManager)
-		{
-			smsService = externalSMSService;
-		}
+		public BannerGuard(GuardBox box, UserManager<CoreUser> aspUserManager) : base(box, aspUserManager)
+		{ }
 
 		#endregion
 
 		#region Actions
 
-		[HttpPost("{phoneNumber}")]
-		public async Task<IActionResult> InviteUser(string phoneNumber)
+		[HttpGet]
+		public async Task<IActionResult> GetBanner(long targetId)
 		{
-			return await Execute(async user =>
-			{
-				var banner = await banners.InviteUserAsync(user.Id, phoneNumber);
-
-				await smsService.SendSMSAsync(phoneNumber, $"You have been invited by ${user.Name} to join the Sparrow beta under the ${banner}.");
-			});
+			return await Execute(async user => await banners.GetBannerAsync(user.Id, targetId),
+				allowUnverified: true);
         }
+
+		[HttpGet("code")]
+		public async Task<IActionResult> GetBannerCode()
+		{
+			return await Execute(async user => await banners.GetBannerCodeAsync(user.Id),
+				allowUnverified: true);
+        }
+
+		[HttpGet("members")]
+		public async Task<IActionResult> GetMembers()
+		{
+			return await Execute(async user => await banners.GetBannerMembersAsync(user.Id),
+				allowUnverified: true);
+		}
 
 		#endregion
 	}

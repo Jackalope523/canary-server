@@ -1,16 +1,33 @@
 ﻿namespace Repository
 {
-    internal class UserLinkFactory
-    {      
-        internal UserLink Create(User self, User other, UserLink.UserLinkType type)
+    internal class UserLinkFactory : Factory
+    {
+        #region constructors
+        public UserLinkFactory(IFactoryObserver observer) : base(observer)
         {
-            return new UserLink
+
+        }
+
+        public UserLinkFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public UserLinkFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
+
+        internal UserRelationship Create(User self, User other, UserRelationship.UserLinkType type)
+        {
+            return Create(new UserRelationship
             {
                 SelfId = self.Id,
                 OtherId = other.Id,
                 Type = type,
                 Time = DateTimeOffset.MinValue
-            };
+            });
         }
     }
 }

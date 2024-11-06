@@ -1,12 +1,15 @@
 ﻿using Azure.Storage.Blobs;
 
-
 namespace Repository
 {
     internal class AzureStorageSentry
     {
-        AzureStorageContext context = new();
+        AzureStorageContext context;
 
+        public AzureStorageSentry(Harbor.Flag flag)
+        {
+            context = new(flag);
+        }
 
         public async Task UploadBlobAsync(string containerName, string blobName, MemoryStream blob)
         {
@@ -15,9 +18,9 @@ namespace Repository
             try
             {
                 await containerClient.CreateIfNotExistsAsync();
-
                 blob.Position = 0;
-                await containerClient.UploadBlobAsync(blobName, blob);
+
+                await containerClient.GetBlobClient(blobName).UploadAsync(blob, overwrite: true);
             }
             catch (Exception ex)
             {
@@ -38,10 +41,6 @@ namespace Repository
             catch (Exception ex)
             {
                 throw new BlobIOException(ex);
-            }
-            finally
-            {
-                stream.Dispose();
             }
         }
 

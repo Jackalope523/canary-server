@@ -19,15 +19,15 @@ namespace Core.Tests
 	public class UserHook : IAccountDatabase
 	{
 		private IAccountDatabase accounts;
-		private ConcurrentBag<ulong> generatedUserIds;
+		private ConcurrentBag<long> generatedUserIds;
 
-		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<ulong> userIdList)
+		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<long> userIdList)
 		{
 			accounts = accountDatabase;
 			generatedUserIds = userIdList;
 		}
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, Character character)
+        public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character, Guid notificationId)
         {
 			ContentValidation.TryNormalisePhoneNumber(phoneNumber, out phoneNumber);
             // Ensure no duplicate user exists
@@ -51,13 +51,15 @@ namespace Core.Tests
 				throw new UnexpectedFailureException();
 			}
 
-			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character);
+			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character, notificationId);
 
 			CoreUser createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
 			generatedUserIds.Add(createdUser.Id);
+
+			return createdUser;
         }
 
-        public async Task DeleteUserAsync(ulong userId)
+        public async Task DeleteUserAsync(long userId)
         {
 			await accounts.DeleteUserAsync(userId);
         }
@@ -67,7 +69,7 @@ namespace Core.Tests
 			return await accounts.FindUserByEmailAsync(normalisedEmail);
         }
 
-        public async Task<CoreUser> FindUserByIdAsync(ulong userId)
+        public async Task<CoreUser> FindUserByIdAsync(long userId)
         {
 			return await accounts.FindUserByIdAsync(userId);
         }
@@ -78,27 +80,27 @@ namespace Core.Tests
             return await accounts.FindUserByPhoneNumberAsync(phoneNumber);
         }
 
-        public async Task<RecentLocation> GetRecentUserLocationAsync(ulong userId)
+        public async Task<LocationShard> GetRecentLocationAsync(long userId)
         {
-			return await accounts.GetRecentUserLocationAsync(userId);
+			return await accounts.GetRecentLocationAsync(userId);
         }
 
-        public async Task<Haunt> GetUserHauntAsync(ulong userId)
+        public async Task<HauntShard> GetUserHauntAsync(long userId)
         {
 			return await accounts.GetUserHauntAsync(userId);
         }
 
-        public async Task UpdateHauntAsync(ulong userId, double latitude, double longitude, double radius, int stability)
+        public async Task UpdateHauntAsync(long userId, double latitude, double longitude, double radius, int stability)
         {
 			await accounts.UpdateHauntAsync(userId, latitude, longitude, radius, stability);
         }
 
-        public async Task UpdateRecentLocationAsync(ulong userId, double latitude, double longitude, double radius)
+        public async Task UpdateRecentLocationAsync(long userId, double latitude, double longitude, double radius)
         {
 			await accounts.UpdateRecentLocationAsync(userId, latitude, longitude, radius);
         }
 
-        public async Task UpdateUserAsync(ulong userId, List<(string Property, object Value)> edits)
+        public async Task UpdateUserAsync(long userId, List<(string Property, object Value)> edits)
         {
 			await accounts.UpdateUserAsync(userId, edits);
         }
@@ -114,15 +116,15 @@ namespace Core.Tests
 
 		public static ConcurrentDictionary<string, ConcurrentBag<NotificationStub>> messages = new();
 
-		public Task PushNotification(DeviceType deviceType, string deviceToken, string title, string message)
+		public Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collapseId = "")
 		{
 			ConcurrentBag<NotificationStub> userBag;
-			var exists = messages.TryGetValue(deviceToken, out userBag);
+			var exists = messages.TryGetValue(notificationId, out userBag);
 
 			if (!exists)
 			{ 
 				userBag = new();
-				messages.TryAdd(deviceToken, userBag);
+				messages.TryAdd(notificationId, userBag);
 			}
 
 			userBag.Add(new NotificationStub() { Title = title, Message = message });

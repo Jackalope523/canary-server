@@ -1,29 +1,62 @@
-﻿using Core.Boundaries;
-
-namespace Repository
+﻿namespace Repository
 {
     internal class MediaStoreCoordinator: IMediaDatabase
     {
         private readonly IMediaDatabase store;
 
-        public MediaStoreCoordinator()
+        public MediaStoreCoordinator(Harbor.Flag flag)
         {
-            store = new AzureFileStore();
+            store = new AzureFileStore(flag);
+        }
+
+        public async Task<MemoryStream> DownloadAssetAsync(string asset)
+        {
+            return await store.DownloadAssetAsync(asset);
         }
         
-        public async Task<MemoryStream> DownloadImageAsync(ulong snapshotId, ulong ownerId)
+        public async Task<MemoryStream> DownloadSnapshotAsync(long snapshotId, long ownerId)
         {
-            return await store.DownloadImageAsync(snapshotId, ownerId);
+            return await store.DownloadSnapshotAsync(snapshotId, ownerId);
         }
 
-        public async Task UploadImageAsync(ulong snapshotId, ulong ownerId, MemoryStream image)
+        public async Task UploadSnapshotAsync(long snapshotId, long ownerId, MemoryStream image)
         {
-            await store.UploadImageAsync(snapshotId, ownerId, image);
+            await store.UploadSnapshotAsync(snapshotId, ownerId, image);
         }
 
-        public async Task DeleteImageAsync(ulong snapshotId, ulong ownerId)
+        public async Task DeleteSnapshotAsync(long snapshotId, long ownerId)
         {
-            await store.DeleteImageAsync(snapshotId, ownerId);
+            await store.DeleteSnapshotAsync(snapshotId, ownerId);
+        }
+
+        public async Task<MemoryStream> DownloadAvatarAsync(long userId)
+        {
+            return await store.DownloadAvatarAsync(userId);
+        }
+
+        public async Task UploadAvatarAsync(long userId, MemoryStream image)
+        {
+            await store.UploadAvatarAsync(userId, image);
+        }
+
+        public async Task DeleteAvatarAsync(long userId)
+        {
+            await store.DeleteAvatarAsync(userId);
+        }
+
+        public async Task<MemoryStream> DownloadHeroAsync(long gatheringId)
+        {
+            return await store.DownloadHeroAsync(gatheringId);
+        }
+
+        public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
+        {
+            await store.UploadHeroAsync(gatheringId, image);
+        }
+
+        public async Task DeleteHeroAsync(long gatheringId)
+        {
+            await store.DeleteHeroAsync(gatheringId);
         }
     }
 }

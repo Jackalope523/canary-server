@@ -1,7 +1,4 @@
-﻿using Core.Boundaries;
-
-
-namespace Repository
+﻿namespace Repository
 {
     public class NestStoreCoordinator : INestDatabase
     {
@@ -12,58 +9,62 @@ namespace Repository
             store = new EFCoreNestStore(flag);
         }
         
-        public async Task AppreciateUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
             await store.AppreciateUserAsync(selfId, targetId, time);
         }
-        public async Task UnappreciateUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnappreciateUserAsync(long selfId, long targetId) 
         {
-            await store.UnblockUserAsync(selfId, targetId);
+            await store.UnappreciateUserAsync(selfId, targetId);
         }
-        public async Task BlockUserAsync(ulong selfId, ulong targetId, DateTimeOffset time) 
+        public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
             await store.BlockUserAsync(selfId, targetId, time);
         }
-        public async Task UnblockUserAsync(ulong selfId, ulong targetId) 
+        public async Task UnblockUserAsync(long selfId, long targetId) 
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
-        public async Task<List<UserSilhouette>> GetAppreciatedUsersAsync(ulong id) 
+        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long id) 
         {
             return await store.GetAppreciatedUsersAsync(id);
         }
-        public async Task<List<UserSilhouette>> GetBlockedUsersAsync(ulong id) 
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long id) 
         {
             return await store.GetBlockedUsersAsync(id);
         }
-        public async Task<List<UserSilhouette>> GetCompanionsAsync(ulong id)
+        public async Task<List<UserShard>> GetCompanionsAsync(long id)
         {
             return await store.GetCompanionsAsync(id);
         }
 
-        public async Task<(int Positive, int Negative)> GetUserRatingsAsync(ulong id)
-        {
-            return await store.GetUserRatingsAsync(id);
-        }
-
-        public async Task RateUserAsync(ulong selfId, ulong targetId, UserRating rating, DateTimeOffset time)
-        {
-            await store.RateUserAsync(selfId, targetId, rating, time);
-        }
-
-        public async Task RemoveUserRatingAsync(ulong selfId, ulong targetId)
-        {
-            await store.RemoveUserRatingAsync(selfId, targetId);
-        }
-
-        public async Task<List<UserSilhouette>> GetUsersAppreciatingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersAppreciatingAsync(long userId)
         {
             return await store.GetUsersAppreciatingAsync(userId);
         }
 
-        public async Task<List<UserSilhouette>> GetUsersBlockingAsync(ulong userId)
+        public async Task<List<UserShard>> GetUsersBlockingAsync(long userId)
         {
            return await store.GetUsersBlockingAsync(userId);
+        }
+        public async Task<bool> HaveMutualGathering(long userId, long targetId)
+        {
+            return await store.HaveMutualGathering(userId, targetId);
+        }
+
+        public async Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId)
+        {
+            return await store.GetFirstMutualGathering(userId, targetId);
+        }
+
+        public async Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId)
+        {
+            return await store.GetLatestMutualGathering(userId, targetId);
+        }
+
+        public async Task<DateTimeOffset> BlockedSince(long userId, long targetId)
+        {
+            return await store.BlockedSince(userId, targetId);
         }
     }
 }

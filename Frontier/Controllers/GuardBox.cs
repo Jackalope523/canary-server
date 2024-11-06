@@ -1,11 +1,10 @@
-﻿using Core.Boundaries;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
+﻿using Core;
 
 namespace Frontier.Controllers
 {
 	public class GuardBox
 	{
+		public EnvironmentOptions env;
 		public ILogger log;
 
 		public IAccountOperations accounts;
@@ -17,14 +16,16 @@ namespace Frontier.Controllers
 		public IMediaOperations media;
 		public INotificationOperations telegrams;
 		public INestOperations nests;
+        public IMiscellaneousOperations miscellaneous;
 
-		public GuardBox(ILogger logger,
+        public GuardBox(EnvironmentOptions environment, ILogger logger,
 			IAccountOperations accountOperations, IBannerOperations bannerOperations,
 			INestOperations nestOperations, IGatheringOperations gatheringOperations,
 			ISnapshotOperations snapshotOperations, IKeyOperations keyOperations,
 			IDisciplineOperations disciplineOperations,IMediaOperations mediaOperations,
-			INotificationOperations notificationOperations)
+			INotificationOperations notificationOperations, IMiscellaneousOperations miscellaneousOperations)
 		{
+			env = environment;
 			log = logger;
 
 			accounts = accountOperations;
@@ -36,6 +37,7 @@ namespace Frontier.Controllers
 			reports = disciplineOperations;
 			media = mediaOperations;
 			telegrams = notificationOperations;
+			miscellaneous = miscellaneousOperations;
 		}
 	}
 }

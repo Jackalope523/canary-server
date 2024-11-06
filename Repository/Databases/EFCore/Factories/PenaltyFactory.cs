@@ -1,18 +1,32 @@
-﻿
-using Core.Boundaries;
-
-namespace Repository
+﻿namespace Repository
 {
-    internal class PenaltyFactory
+    internal class PenaltyFactory : Factory
     {
-        internal Entities.Penalty Create(User user)
+        #region constructors
+        public PenaltyFactory(IFactoryObserver observer) : base(observer)
         {
-            return new Entities.Penalty
+
+        }
+
+        public PenaltyFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public PenaltyFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
+
+        internal Penalty Create(User user)
+        {
+            return Create(new Penalty
             {
                 PenalizedId = user.Id,
                 Type = PenaltyType.Unreliable,
                 Time = DateTimeOffset.MinValue,
-            };
+            });
         }
     }
 }

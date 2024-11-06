@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-
+using Microsoft.Extensions.Logging;
 using static Core.Entities.Arbiter;
 
 namespace Core.Controls
@@ -14,6 +14,10 @@ namespace Core.Controls
 
 		protected CoreTerminal Terminal { get; init; }
 
+		protected EnvironmentOptions Environment { get; init; }
+
+		protected ILogger Log { get; private set; }
+
 		protected IAccountDatabase Accounts { get; private set; }
 		protected IBannerDatabase Banners { get; private set; }
 		protected IGatheringDatabase Gatherings { get; private set; }
@@ -23,14 +27,18 @@ namespace Core.Controls
 		protected IMediaDatabase Media { get; private set; }
 		protected INotificationDatabase Telegrams { get; private set; }
 		protected INestDatabase Nests { get; private set; }
+        protected IMiscellaneousDatabase Miscellaneous { get; private set; }
 
-		#endregion
+        #endregion
 
-		#region Initialisation
+        #region Initialisation
 
-		public AbstractDirector(CoreTerminal terminal)
+        public AbstractDirector(CoreTerminal terminal)
 		{
 			Terminal = terminal;
+			Environment = terminal.Environment;
+
+			Log = Terminal.Log;
 			
 			Accounts = Terminal.AccountDatabase;
 			Banners = Terminal.BannerDatabase;
@@ -41,33 +49,34 @@ namespace Core.Controls
 			Media = Terminal.MediaDatabase;
 			Telegrams = Terminal.NotificationDatabase;
 			Nests = Terminal.NestDatabase;
+			Miscellaneous = Terminal.MiscellaneousDatabase;
         }
 
 		#endregion
 
 		#region Tools
 
-		protected async Task<User> GetUserAsync(ulong userId)
+		protected async Task<User> GetUserAsync(long userId)
         {
             User user = new(await Accounts.FindUserByIdAsync(userId));
-
+			
 			// Fail if user account is locked
-			Fail(user.IsLocked,
+			FailIf(user.IsLocked,
 				new InvalidUserException("User account is locked."));
 
 			// Fail if user account is pending deletion
-			Fail(user.IsDeleted,
+			FailIf(user.IsDeleted,
 				new InvalidUserException("User account is deleted"));
 
             return user;
         }
 
-		protected async Task<User> GetUserUnsafeAsync(ulong userId)
+		protected async Task<User> GetUserUnsafeAsync(long userId)
         {
             return new(await Accounts.FindUserByIdAsync(userId));
         }
 
-        protected async Task<Gathering> GetGatheringAsync(ulong gatheringId)
+        protected async Task<Gathering> GetGatheringAsync(long gatheringId)
         {
             return new(await Gatherings.FindGatheringAsync(gatheringId));
         }

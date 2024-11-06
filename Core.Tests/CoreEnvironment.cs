@@ -27,8 +27,8 @@ namespace Core.Tests
 
 		private int instance;
 
-		private static ConcurrentBag<ulong> generatedUserIds = new();
-		private ulong uniqueUserIncrement = 0;
+		private static ConcurrentBag<long> generatedUserIds = new();
+		private long uniqueUserIncrement = 0;
 		private string testUserPhoneNumberFormat = "000-{0}-{1}";
 		private string testUserEmailFormat = "email_{0}_{1}@test.com";
 		private string testUserName = "name";
@@ -40,6 +40,7 @@ namespace Core.Tests
 		private string testGatheringDescription = "The first of many.";
 		private DateTimeOffset testGatheringStartTime = new(DateTime.UtcNow + TimeSpan.FromDays(1));
 		private GeoLocation testGatheringLocation = new() { Latitude = 0, Longitude = 0 };
+		private string testGatheringFriendlyLocation = "Somewhere, over the rainbow.";
 		private int testGatheringGroupMinimum = 0;
 		private int testGatheringGroupMaximum = 10;
 		private Distance testGatheringRadius = new() { Kilometres = 1 };
@@ -60,6 +61,7 @@ namespace Core.Tests
 
 			
             Terminal = CoreTerminal.CreateTerminal(
+				new() { Flag = EnvironmentFlag.Development },
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
@@ -71,6 +73,7 @@ namespace Core.Tests
                 harbor.MediaDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
+				harbor.MiscellaneousDatabaseAccess,
 				new NotificationServiceStub());
 			
 		}
@@ -98,7 +101,8 @@ namespace Core.Tests
 		internal async Task<User> GenerateUserUnsafeAsync(User userStub)
         {
             await Terminal.AccountDatabase.CreateUserAsync(userStub.PhoneNumber, userStub.Email, userStub.Email,
-				userStub.Name, userStub.DateOfBirth, DateTimeOffset.UtcNow, CharacterVector.Default.ToCharacter());
+				userStub.Name, userStub.DateOfBirth, DateTimeOffset.UtcNow,
+				CharacterVector.Default(userStub.GetAge()).ToCharacter(), userStub.NotificationId);
 
 			var user = await Terminal.AccountDatabase.FindUserByPhoneNumberAsync(userStub.PhoneNumber);
 
@@ -158,15 +162,17 @@ namespace Core.Tests
 		{
 			Gathering gatheringStub = new()
 			{
-				Name = testGatheringName,
+				Title = testGatheringName,
 				Description = testGatheringDescription,
 				Host = host,
 				StartTime = testGatheringStartTime,
 				Location = testGatheringLocation,
+				FriendlyLocation = testGatheringFriendlyLocation,
 				GroupMinimum = testGatheringGroupMinimum,
 				GroupMaximum = testGatheringGroupMaximum,
 				Radius = testGatheringRadius,
-				IsDynamic = testGatheringIsDynamic
+				IsDynamic = testGatheringIsDynamic,
+				DegreeOfPrivacy = 3,
 			};
 
 			return gatheringStub;
@@ -174,10 +180,10 @@ namespace Core.Tests
 
 		internal async Task<Gathering> GenerateGatheringUnsafeAsync(Gathering gatheringStub, User host)
 		{
-			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Name, gatheringStub.Description,
-				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude,
+			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
+				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
-				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic));
+				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic, gatheringStub.DegreeOfPrivacy));
 		}
 
 		internal async Task<Gathering> GenerateUpcomingGatheringAsync(User host)
@@ -205,7 +211,7 @@ namespace Core.Tests
 			gatheringStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
-			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.Open) });
+			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingOpen) });
 			await Terminal.GatheringDatabase.SetUserStateAsync(host.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)
@@ -229,7 +235,7 @@ namespace Core.Tests
 				await Terminal.GatheringDatabase.SetUserStateAsync(guest.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 			}
 
-			await Terminal.GatheringDatabase.EndGatheringAsync(gatheringStub.Id, DateTimeOffset.UtcNow);
+			await Terminal.GatheringDatabase.TerminateGatheringAsync(gatheringStub.Id, DateTimeOffset.UtcNow);
 
 			return gatheringStub;
 		}
@@ -307,32 +313,14 @@ namespace Core.Tests
 		// Notification Helpers
 		/////////////////////////
 		
-		internal async Task SaveNoteAsync(User user, User notifier, string message, string action)
+		internal async Task SaveNoteAsync(User user, User notifier, TelegramMessage message, string action)
 		{
-			await Terminal.NotificationDatabase.SaveNoteAsync(user.Id, notifier.Id, new DateTime(0), message, action);
+			await Terminal.NotificationDatabase.SaveTelegramAsync(user.Id, notifier.Id, new DateTime(0), message, action);
 		}
 
-		internal async Task<List<NoteShard>> GetNotesAsync(User user)
+		internal async Task<List<TelegramShard>> GetNotesAsync(User user)
 		{
-			return await Terminal.NotificationDatabase.GetNotesAsync(user.Id);
-		}
-
-		internal async Task SubscribeUserAsync(User user, DeviceType deviceType, string deviceToken)
-		{
-			await Terminal.NotificationDatabase.SubscribeUserAsync(user.Id, deviceType, deviceToken);
-		}
-
-		internal async Task<DeviceShard> GetUserSubscriptionAsync(User user)
-		{
-			DeviceShard subscription = null;
-
-			try
-			{
-				subscription = await Terminal.NotificationDatabase.GetUserSubscriptionAsync(user.Id);
-			}
-			catch { }
-
-			return subscription;
+			return await Terminal.NotificationDatabase.GetTelegramsAsync(user.Id);
 		}
 
 		internal List<NotificationServiceStub.NotificationStub> GetUserMessages(User user)
@@ -349,7 +337,7 @@ namespace Core.Tests
 		public async void DisposeEnvironment()
 		{
 			// Delete all users generated in this environment
-            foreach (ulong id in generatedUserIds)
+            foreach (long id in generatedUserIds)
 			{
 				try
 				{
