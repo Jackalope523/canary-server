@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Core.Boundaries;
 using Xunit.Abstractions;
-using NetTopologySuite.Utilities;
 using Assert = Xunit.Assert;
+using System;
 
 namespace Repository.Tests
 {
@@ -14,9 +14,9 @@ namespace Repository.Tests
 
         private readonly UserFactory _userFactory;
         private readonly GatheringFactory _gatheringFactory;
-        private readonly UserLinkFactory _UserRelationshipFactory;
+        private readonly UserLinkFactory _userRelationshipFactory;
         private readonly ITestOutputHelper _testOutputHelper;
-        private readonly IFactoryObserver _reaper;
+        private readonly ReaperObserver _reaper;
 
         private User testUser;
         private Gathering testGathering;
@@ -27,26 +27,29 @@ namespace Repository.Tests
             _reaper = new ReaperObserver();
 
             _userFactory = new UserFactory(_reaper);
+            _gatheringFactory = new GatheringFactory(_reaper);
+            _userRelationshipFactory = new UserLinkFactory(_reaper);
 
-            testUser = new UserFactory().Create();
+            testUser = _userFactory.Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(testUser));
 
-            testGathering = new GatheringFactory().Create(testUser);
+            testGathering = _gatheringFactory.Create(testUser);
             sentry.ExecuteWrite(ctx => ctx.Gatherings.Add(testGathering));
         }
         public void Dispose()
         {
-            sentry.ExecuteWrite(ctx => ctx.GuestClearances.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.UserRelationships.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.GatheringLinks.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Gatherings.ExecuteDelete());
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
+            foreach (Entity item in _reaper.Blacklist)
+            {
+                _testOutputHelper.WriteLine($"Reaped {item.GetType().ToString()} {item.Id.ToString()}...");
+            }
+
+            _reaper.Reap(sentry);
         }
 
 
         [Fact]
-        public async Task CreateGatheringAsync_SUCCESS()
-        {
+        public async Task CreateGatheringAsync_Public()
+        { 
             CoreGathering createdShard = await store.CreateGatheringAsync(
                 testGathering.HostId ?? 0,
                 testGathering.Title,
@@ -72,6 +75,8 @@ namespace Repository.Tests
                 );
 
             Gathering created = sentry.ExecuteRead(ctx => ctx.Gatherings.Where(e => e.Id == createdShard.Id).Single());
+            GatheringLink hostLink = sentry.ExecuteRead(ctx => ctx.GatheringLinks.Single());
+            _reaper.Notify(created, hostLink);
 
             Assert.NotNull(created);
             Assert.Equal(testGathering.HostId, created.HostId);
@@ -86,6 +91,69 @@ namespace Repository.Tests
             Assert.Equal(testGathering.State, created.State);
             Assert.Equal(testGathering.State, created.State);
             Assert.Equal(testGathering.State, created.State);
+
+            Assert.NotNull(hostLink);
+            Assert.Equal(GatheringLink.DefaultSoftDeleted, hostLink.SoftDeleted);
+            Assert.Equal(created.HostId, hostLink.UserId);
+            Assert.Equal(created.Id, hostLink.GatheringId);
+            Assert.Equal(GatheringBond.Guest, hostLink.Type);
+        }
+        [Fact]
+        public async Task CreateGatheringAsync_Private()
+        {
+            CoreGathering createdShard = await store.CreateGatheringAsync(
+                testGathering.HostId ?? 0,
+                testGathering.Title,
+                testGathering.Description,
+                testGathering.StartTime,
+                testGathering.Location.Y,
+                testGathering.Location.X,
+                testGathering.FriendlyLocation,
+                testGathering.GroupMinimum,
+                testGathering.GroupMaximum,
+                new CharacterShard(
+                    testGathering.Age,
+                    testGathering.Extroversion,
+                    testGathering.Athleticisme,
+                    testGathering.Chaos,
+                    testGathering.Competitiveness,
+                    testGathering.Industriousness,
+                    testGathering.NightOwl,
+                    testGathering.Openness),
+                testGathering.Radius,
+                testGathering.IsDynamic,
+                2
+                );
+
+            Gathering created = sentry.ExecuteRead(ctx => ctx.Gatherings.Where(e => e.Id == createdShard.Id).Single());
+            GatheringLink hostLink = sentry.ExecuteRead(ctx => ctx.GatheringLinks.Single());
+            GuestClearance hostClearance = sentry.ExecuteRead(ctx => ctx.GuestClearances.Single());
+            _reaper.Notify(created, hostLink, hostClearance);
+
+            Assert.NotNull(created);
+            Assert.Equal(testGathering.HostId, created.HostId);
+            Assert.Equal(testGathering.Title, created.Title);
+            Assert.Equal(testGathering.Description, created.Description);
+            Assert.Equal(testGathering.StartTime, created.StartTime);
+            Assert.Equal(testGathering.Location.Y, created.Location.Y);
+            Assert.Equal(testGathering.Location.X, created.Location.X);
+            Assert.Equal(testGathering.GroupMinimum, created.GroupMinimum);
+            Assert.Equal(testGathering.GroupMaximum, created.GroupMaximum);
+            Assert.Equal(testGathering.State, created.State);
+            Assert.Equal(testGathering.State, created.State);
+            Assert.Equal(testGathering.State, created.State);
+            Assert.Equal(testGathering.State, created.State);
+
+            Assert.NotNull(hostLink);
+            Assert.Equal(GatheringLink.DefaultSoftDeleted, hostLink.SoftDeleted);
+            Assert.Equal(created.HostId, hostLink.UserId);
+            Assert.Equal(created.Id, hostLink.GatheringId);
+            Assert.Equal(GatheringBond.Guest, hostLink.Type);
+
+            Assert.NotNull(hostClearance);
+            Assert.Equal(GuestClearance.DefaultSoftDeleted, hostClearance.SoftDeleted);
+            Assert.Equal(created.HostId, hostClearance.UserId);
+            Assert.Equal(created.Id, hostClearance.GatheringId);
         }
         [Fact]
         public async Task FindGatheringAsync_SUCCESS()
@@ -586,15 +654,42 @@ namespace Repository.Tests
             Assert.Equal(1, count);
         }
         [Fact]
-        public async Task PropagateClearance_SUCCESS()
+        public async Task PropagateClearance_DEGREE_0()
         {
-            UserFactory userFactory = new UserFactory();
-            User companion = userFactory.Create();
+            /* 
+                Host
+            */
+
+            User companion = _userFactory.Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion));
 
-            UserLinkFactory linkFactory = new UserLinkFactory();
-            UserRelationship linkA = linkFactory.Create(testUser, companion, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkB = linkFactory.Create(companion, testUser, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserLinkType.Appreciate);
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
+
+            Discussion discussion = sentry.BeginDiscussion();
+            await store.PropagateClearance(testUser.Id, testGathering.Id, 0, new(), discussion);
+            discussion.End();
+
+            int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
+            List<GuestClearance> guestClearances = sentry.ExecuteRead(ctx => ctx.GuestClearances.ToList());
+            _reaper.Notify(guestClearances);
+
+            Assert.Equal(1, count);
+        }
+        [Fact]
+        public async Task PropagateClearance_DEGREE_1_ONE_LAYER_SINGLE()
+        {
+            /*  
+                Host -- Companion
+            */
+
+            User companion = _userFactory.Create();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companion));
+
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserLinkType.Appreciate);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
 
@@ -603,8 +698,106 @@ namespace Repository.Tests
             discussion.End();
 
             int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
+            List<GuestClearance> guestClearances = sentry.ExecuteRead(ctx => ctx.GuestClearances.ToList());
+            _reaper.Notify(guestClearances);
 
-            Assert.Equal(1, count);
+            Assert.Equal(2, count);
+        }
+        [Fact]
+        public async Task PropagateClearance_DEGREE_1_ONE_LAYER_DOUBLE()
+        {
+           /*          ___ Companion
+                      |
+               Host -- 
+                      |
+                       ___ Companion
+           */
+
+            User companion1 = _userFactory.Create();
+            User companion2 = _userFactory.Create();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companion1));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companion2));
+
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion1, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion1, testUser, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkC = _userRelationshipFactory.Create(testUser, companion2, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkD = _userRelationshipFactory.Create(companion2, testUser, UserRelationship.UserLinkType.Appreciate);
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkD));
+
+            Discussion discussion = sentry.BeginDiscussion();
+            await store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
+            discussion.End();
+
+            int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
+            List<GuestClearance> guestClearances = sentry.ExecuteRead(ctx => ctx.GuestClearances.ToList());
+            _reaper.Notify(guestClearances);
+
+            Assert.Equal(3, count);
+        }
+        [Fact]
+        public async Task PropagateClearance_DEGREE_1_TWO_LAYER()
+        {
+            /*  
+                Host -- Companion -- Companion
+            */
+
+            User hostCompanion = _userFactory.Create();
+            User companionCompanion = _userFactory.Create();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(hostCompanion));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionCompanion));
+
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserLinkType.Appreciate);
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkD));
+
+            Discussion discussion = sentry.BeginDiscussion();
+            await store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
+            discussion.End();
+
+            int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
+            List<GuestClearance> guestClearances = sentry.ExecuteRead(ctx => ctx.GuestClearances.ToList());
+            _reaper.Notify(guestClearances);
+
+            Assert.Equal(2, count);
+        }
+        [Fact]
+        public async Task PropagateClearance_DEGREE_2_TWO_LAYER()
+        {
+            /*  
+                Host -- Companion -- Companion
+            */
+
+            User hostCompanion = _userFactory.Create();
+            User companionCompanion = _userFactory.Create();
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(hostCompanion));
+            sentry.ExecuteWrite(ctx => ctx.Users.Add(companionCompanion));
+
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserLinkType.Appreciate);
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
+            sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkD));
+
+            Discussion discussion = sentry.BeginDiscussion();
+            await store.PropagateClearance(testUser.Id, testGathering.Id, 2, new(), discussion);
+            discussion.End();
+
+            int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
+            List<GuestClearance> guestClearances = sentry.ExecuteRead(ctx => ctx.GuestClearances.ToList());
+            _reaper.Notify(guestClearances);
+
+            Assert.Equal(3, count);
         }
     }
 }
