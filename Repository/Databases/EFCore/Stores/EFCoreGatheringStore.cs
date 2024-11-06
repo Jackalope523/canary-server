@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Utilities;
 using System.Linq;
 
 namespace Repository
@@ -13,7 +14,7 @@ namespace Repository
 
         internal async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
         {
-            if (degree == 0) return;
+            if (degree == -1) return;
 
             long id = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.GuestClearances.
@@ -21,7 +22,7 @@ namespace Repository
                 Select(c => c.Id).
                 SingleOrDefaultAsync());
 
-            if (id != 0)
+            if (id == 0)
             {
                storeSentry.DiscussWrite(ctx =>
                ctx.GuestClearances.
@@ -52,7 +53,7 @@ namespace Repository
             List<Task> tasks = new();
             foreach (long companion in companions)
             {
-                tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).ToList(), discussion));
+                tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).Append(userId).ToList(), discussion));
             }
             await Task.WhenAll(tasks);
         }
