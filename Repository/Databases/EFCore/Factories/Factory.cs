@@ -1,43 +1,56 @@
-﻿namespace Repository
+﻿using System.Xml.Serialization;
+
+namespace Repository
 {
     internal abstract class Factory
     {
-        private List<IFactoryObserver> observers;
+        private CountingObserver _counter;
+        private List<IFactoryObserver> subscribers;
 
         #region constructors
         internal Factory() 
         {
-            observers = new();
+            _counter = new CountingObserver();
+            subscribers = new() { _counter };
         }
-        internal Factory(IFactoryObserver assignee) : this()
+        internal Factory(IFactoryObserver observer) : this()
         {
-            observers.Add(assignee);
+            subscribers.Add(observer);
         }
-        internal Factory(IEnumerable<IFactoryObserver> assignees) : this()
+        internal Factory(IEnumerable<IFactoryObserver> observers) : this()
         {
-            observers.AddRange(assignees);
+            subscribers.AddRange(observers);
         }
-        internal Factory(params IFactoryObserver[] assignees) : this()
+        internal Factory(params IFactoryObserver[] observers) : this()
         {
-            observers.AddRange(assignees);
+            subscribers.AddRange(observers);
         }
         #endregion
 
         #region methods
         internal void Assign(IFactoryObserver observer)
         {
-            observers.Add(observer);
+            subscribers.Add(observer);
         }
         internal void Dismiss(IFactoryObserver observer)
         {
-            observers.Remove(observer);
+            subscribers.Remove(observer);
         }
         internal void NotifyObservers(Entity entity)
         {
-            foreach (IFactoryObserver observer in observers)
+            foreach (IFactoryObserver observer in subscribers)
             {
                 observer.Notify(entity);
             }
+        }
+        internal int Count()
+        {
+            return _counter.Count;
+        }
+        internal T Create<T>(T entity) where T : Entity
+        {
+            NotifyObservers(entity);
+            return entity;
         }
         #endregion
     }

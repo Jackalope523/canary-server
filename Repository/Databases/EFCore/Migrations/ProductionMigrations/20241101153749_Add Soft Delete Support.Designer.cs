@@ -13,8 +13,8 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
     [DbContext(typeof(AzureProductionContext))]
-    [Migration("20241023232429_Soft Delete")]
-    partial class SoftDelete
+    [Migration("20241101153749_Add Soft Delete Support")]
+    partial class AddSoftDeleteSupport
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,33 +89,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId");
 
                     b.ToTable("BannerLinks");
-                });
-
-            modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("PenalizedId")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PenalizedId");
-
-                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -405,6 +378,33 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .IsUnique();
 
                     b.ToTable("GuestClearances");
+                });
+
+            modelBuilder.Entity("Repository.Penalty", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("PenalizedId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PenalizedId");
+
+                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -790,17 +790,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.HasOne("Repository.User", "Penalized")
-                        .WithMany("Penalties")
-                        .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Penalized");
-                });
-
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
                     b.HasOne("Repository.User", "User")
@@ -905,6 +894,17 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Navigation("Gathering");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Penalty", b =>
+                {
+                    b.HasOne("Repository.User", "Penalized")
+                        .WithMany("Penalties")
+                        .HasForeignKey("PenalizedId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Penalized");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
