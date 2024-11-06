@@ -5,7 +5,7 @@
 namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
     /// <inheritdoc />
-    public partial class SoftDelete : Migration
+    public partial class AddSoftDeleteSupport : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

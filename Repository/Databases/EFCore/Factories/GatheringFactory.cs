@@ -4,60 +4,75 @@ namespace Repository
 {
     internal class GatheringFactory : Factory
     {
-        private int produced = 0;
         private readonly CoordinateFactory innerFactory = new();
+
+        #region constructors
+        public GatheringFactory(IFactoryObserver observer) : base(observer) 
+        { 
+
+        }
+
+        public GatheringFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public GatheringFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
+
         internal Gathering Create(User host)
-        {          
-            produced++;
-            return new Gathering
+        {
+            return Create(new Gathering
             {
-                Title = "gathering" + produced,
+                Title = "gathering" + Count(),
                 HostId = host.Id,
-                Description = "This is gathering number " + produced + ".",
-                StartTime = DateTimeOffset.UtcNow.AddHours(produced),
-                GroupMinimum = 0 + produced,
-                GroupMaximum = 10 + produced,
+                Description = "This is gathering number " + Count() + ".",
+                StartTime = DateTimeOffset.UtcNow.AddHours(Count()),
+                GroupMinimum = 0 + Count(),
+                GroupMaximum = 10 + Count(),
                 State = GatheringState.Upcoming,
-                Location = innerFactory.Create(17.544 + produced, -72.483 - produced),
+                Location = innerFactory.Create(17.544 + Count(), -72.483 - Count()),
                 Radius = 10.0,
                 IsDynamic = false,
                 DegreeOfPrivacy = 3,
 
-                Extroversion = 8 + produced,
-                Athleticisme = 2 + produced,
-                Openness = 6 + produced,
-                Chaos = 2 + produced,
-                Competitiveness = 7 + produced,
-                Industriousness = 3 + produced,
-                NightOwl = 9 + produced,
-            };
+                Extroversion = 8 + Count(),
+                Athleticisme = 2 + Count(),
+                Openness = 6 + Count(),
+                Chaos = 2 + Count(),
+                Competitiveness = 7 + Count(),
+                Industriousness = 3 + Count(),
+                NightOwl = 9 + Count(),
+            });
         }
 
         internal Gathering Create()
         {
-            produced++;
-            return new Gathering
+            return Create(new Gathering
             {
-                Title = "gathering" + produced,
+                Title = "gathering" + Count(),
                 HostId = 0,
-                Description = "This is gathering number " + produced + ".",
-                StartTime = DateTimeOffset.UtcNow.AddHours(produced),
-                GroupMinimum = 0 + produced,
-                GroupMaximum = 10 + produced,
+                Description = "This is gathering number " + Count() + ".",
+                StartTime = DateTimeOffset.UtcNow.AddHours(Count()),
+                GroupMinimum = 0 + Count(),
+                GroupMaximum = 10 + Count(),
                 State = GatheringState.Upcoming,
-                Location = innerFactory.Create(17.544 + produced, -72.483 - produced),
+                Location = innerFactory.Create(17.544 + Count(), -72.483 - Count()),
                 Radius = 10.0,
                 IsDynamic = false,
                 DegreeOfPrivacy = 3,
 
-                Extroversion = 8 + produced,
-                Athleticisme = 2 + produced,
-                Openness = 6 + produced,
-                Chaos = 2 + produced,
-                Competitiveness = 7 + produced,
-                Industriousness = 3 + produced,
-                NightOwl = 9 + produced,
-            };
+                Extroversion = 8 + Count(),
+                Athleticisme = 2 + Count(),
+                Openness = 6 + Count(),
+                Chaos = 2 + Count(),
+                Competitiveness = 7 + Count(),
+                Industriousness = 3 + Count(),
+                NightOwl = 9 + Count(),
+            });
         }
     }
 

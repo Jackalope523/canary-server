@@ -2,19 +2,33 @@
 {
     internal class GatheringReportFactory : Factory
     {
-        private int created = 0;
+        #region constructors
+        public GatheringReportFactory(IFactoryObserver observer) : base(observer)
+        {
+
+        }
+
+        public GatheringReportFactory(IEnumerable<IFactoryObserver> observers) : base(observers)
+        {
+
+        }
+
+        public GatheringReportFactory(params IFactoryObserver[] observers) : base(observers)
+        {
+
+        }
+        #endregion
 
         internal GatheringReport Create(User reporter, Gathering location)
         {
-            created++;
-            return new GatheringReport
+            return Create(new GatheringReport
             {
                 UserId = reporter.Id,
                 GatheringId = location.Id,
                 Type = GatheringReportType.Misleading,
                 FilingDate = DateTimeOffset.MinValue,
-                Notes = "Test Gathering Report " + created
-            };          
+                Notes = "Test Gathering Report " + Count()
+            });          
         }
     }
 }

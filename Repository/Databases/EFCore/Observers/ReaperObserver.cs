@@ -1,25 +1,30 @@
-﻿namespace Repository
+﻿
+namespace Repository
 {
     internal class ReaperObserver : IFactoryObserver
     {
-        List<Entity> touchedTables;
+        public List<Entity> Blacklist {  get; private set; }
 
         internal ReaperObserver()
         {
-            touchedTables = new();
+            Blacklist = new();
         }
         
         public void Notify(Entity entity)
         {
-            touchedTables.Add(entity);
+            Blacklist.Add(entity);
+        }
+        public void Notify(params Entity[] entities)
+        {
+            Blacklist.AddRange(entities);
+        }
+        public void Notify(IEnumerable<Entity> entities)
+        {
+            Blacklist.AddRange(entities);
         }
         public void Reap(EFCoreSentry sentry)
         {
-            sentry.ExecuteWrite(ctx => ctx.RemoveRange(touchedTables));
-        }
-        public List<long> GetBlacklist()
-        {
-            return touchedTables.Select(e => e.Id).ToList();
+            sentry.ExecuteWrite(ctx => ctx.RemoveRange(Blacklist));
         }
     }
 }

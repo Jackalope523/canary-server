@@ -56,7 +56,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Banners", (string)null);
+                    b.ToTable("Banners");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -85,34 +85,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BannerLinks", (string)null);
-                });
-
-            modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("PenalizedId")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PenalizedId");
-
-                    b.ToTable("Penalties", (string)null);
+                    b.ToTable("BannerLinks");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -138,7 +111,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions", (string)null);
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
@@ -178,7 +151,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Telegrams", (string)null);
+                    b.ToTable("Telegrams");
                 });
 
             modelBuilder.Entity("Repository.Feedback", b =>
@@ -207,7 +180,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback", (string)null);
+                    b.ToTable("Feedback");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
@@ -299,7 +272,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings", (string)null);
+                    b.ToTable("Gatherings");
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -331,7 +304,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks", (string)null);
+                    b.ToTable("GatheringLinks");
                 });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
@@ -368,7 +341,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports", (string)null);
+                    b.ToTable("GatheringReports");
                 });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
@@ -401,7 +374,34 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "GatheringId")
                         .IsUnique();
 
-                    b.ToTable("GuestClearances", (string)null);
+                    b.ToTable("GuestClearances");
+                });
+
+            modelBuilder.Entity("Repository.Penalty", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("PenalizedId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PenalizedId");
+
+                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -430,7 +430,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots", (string)null);
+                    b.ToTable("Snapshots");
                 });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
@@ -463,7 +463,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("UserId", "SnapshotId")
                         .IsUnique();
 
-                    b.ToTable("SnapshotLinks", (string)null);
+                    b.ToTable("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
@@ -500,7 +500,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotReports", (string)null);
+                    b.ToTable("SnapshotReports");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -622,7 +622,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -723,7 +723,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.HasIndex("SelfId", "OtherId")
                         .IsUnique();
 
-                    b.ToTable("UserRelationships", (string)null);
+                    b.ToTable("UserRelationships");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -765,7 +765,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports", (string)null);
+                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("Repository.BannerLink", b =>
@@ -785,17 +785,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Navigation("Banner");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Repository.Entities.Penalty", b =>
-                {
-                    b.HasOne("Repository.User", "Penalized")
-                        .WithMany("Penalties")
-                        .HasForeignKey("PenalizedId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Penalized");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -902,6 +891,17 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Navigation("Gathering");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Penalty", b =>
+                {
+                    b.HasOne("Repository.User", "Penalized")
+                        .WithMany("Penalties")
+                        .HasForeignKey("PenalizedId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Penalized");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
