@@ -51,8 +51,7 @@ namespace Core.Controls
             // Check if users are companions
             else if (await targetUser.IsCompanionsWith(user))
             {
-                // Get first gathering together
-                var firstGatheringSync = Nests.GetFirstMutualGathering(user.Id, targetUser.Id);
+                var hasMutualSync = Nests.HaveMutualGathering(user.Id, targetUser.Id);
 
                 // Gather active and upcoming gatherings visible to the user
                 var upcomingAgendaSync = RequestAgenda(targetUser);
@@ -65,7 +64,14 @@ namespace Core.Controls
                     .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
 
-                nest = new(twigs, (await firstGatheringSync).Id);
+                if (await hasMutualSync)
+                {
+                    nest = new(twigs, (await Nests.GetFirstMutualGathering(user.Id, targetUser.Id)).Id);
+                }
+                else
+                {
+                    nest = new(twigs, default);
+                }
             }
             // User is a stranger
             else

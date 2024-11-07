@@ -57,25 +57,37 @@ namespace Core.Daemons
                 }
 
                 // Check if gathering has expired
-                if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart))
+                if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait))
                 {
                     // Purge gathering
                     log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Title);
                     await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);
 
                     // Notify host
-                    User host = new(gathering.Host);
-                    await host.PostTelegram(User.Hollow, Boundaries.TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
+                    User host = await GetUserAsync(gathering.Host.Id);
+                    await host.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
+                    await host.Notify(NotificationGroup.GatheringActivity, "You missed your gathering.",
+                        $"{gathering.Title} was cancelled due to lack of host.", "30");
+
+                    // Notify guests
+                    Gathering expiredGathering = new(gathering);
+                    await expiredGathering.NotifyGuests(NotificationGroup.GatheringActivity, "The host missed their gathering.",
+                        $"{gathering.Title} was cancelled due to an absent host.", "30");
                 }
                 // Check if the next pass will delete the gathering
-                else if (HasAlready(gathering.StartTime + Gathering.MaximumEarlyBirdStart - interval))
+                else if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait - interval))
                 {
                     // Warn host
-                    User host = new(gathering.Host);
-                    await host.Notify(NotificationGroup.GatheringActivity, "Your gathering is about to be deleted.",
-                        $"{gathering.Title} is going to be deleted if you do not start it!", "30");
+                    User host = await GetUserAsync(gathering.Host.Id);
+                    await host.Notify(NotificationGroup.GatheringActivity, "Your gathering is about to be cancelled.",
+                        $"{gathering.Title} is going to be cancelled if you do not start it!", "30");
                 }
             }
+        }
+
+        private async Task<User> GetUserAsync(long userId)
+        {
+            return new(await terminal.AccountDatabase.FindUserByIdAsync(userId));
         }
     }
 }

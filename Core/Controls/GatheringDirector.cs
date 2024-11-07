@@ -485,7 +485,10 @@ namespace Core.Controls
 
 			// Notify host if gathering has already started
 			if (HasAlready(gathering.StartTime))
-			{ _ = gathering.Host.Notify(NotificationGroup.GatheringActivity, $"Guest Inbound", $"{user.Name} is joining your gathering."); }
+			{
+				var host = await GetUserAsync(gathering.Host.Id);
+				_ = host.Notify(NotificationGroup.GatheringActivity, $"Guest Inbound", $"{user.Name} is joining your gathering.");
+			}
 		}
 
 		public async Task CheckInToGatheringAsync(long userId, double latitude, double longitude)
