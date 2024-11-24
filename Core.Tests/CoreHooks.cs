@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
+using Core.Notifications;
 
 namespace Core.Tests
 {
@@ -108,26 +109,20 @@ namespace Core.Tests
 
 	public class NotificationServiceStub : INotificationService
 	{
-		public class NotificationStub
-		{
-			public string Title { get; init; }
-			public string Message { get; init; }
-		}
+		public static ConcurrentDictionary<string, ConcurrentBag<CanaryNotification>> messages = new();
 
-		public static ConcurrentDictionary<string, ConcurrentBag<NotificationStub>> messages = new();
-
-		public Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collapseId = "")
+		public Task PushNotification(Guid userNotificationId, CanaryNotification notification)
 		{
-			ConcurrentBag<NotificationStub> userBag;
-			var exists = messages.TryGetValue(notificationId, out userBag);
+			ConcurrentBag<CanaryNotification> userBag;
+			var exists = messages.TryGetValue(userNotificationId.ToString(), out userBag);
 
 			if (!exists)
 			{ 
 				userBag = new();
-				messages.TryAdd(notificationId, userBag);
+				messages.TryAdd(userNotificationId.ToString(), userBag);
 			}
 
-			userBag.Add(new NotificationStub() { Title = title, Message = message });
+			userBag.Add(notification);
 			return Task.FromResult(0);
 		}
 	}

@@ -18,6 +18,7 @@ using PhoneNumbers;
 using System.Timers;
 using Serilog;
 using Microsoft.Extensions.Logging;
+using Core.Notifications;
 
 namespace Core.Tests
 {
@@ -323,9 +324,9 @@ namespace Core.Tests
 			return await Terminal.NotificationDatabase.GetTelegramsAsync(user.Id);
 		}
 
-		internal List<NotificationServiceStub.NotificationStub> GetUserMessages(User user)
+		internal List<CanaryNotification> GetUserMessages(User user)
 		{
-			ConcurrentBag<NotificationServiceStub.NotificationStub> userMessages;
+			ConcurrentBag<CanaryNotification> userMessages;
 			var exists = NotificationServiceStub.messages.TryGetValue(user.Id.ToString(), out userMessages);
 			return exists ? userMessages.ToList() : new();
 		}
