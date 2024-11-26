@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Core.Boundaries;
-using Core.Entities;
 
 namespace Core.Notifications
 {
@@ -167,7 +162,7 @@ namespace Core.Notifications
             return notification;
         }
 
-        public static CanaryNotification CompanionJoined(UserShard companion, GatheringShard gathering)
+        public static CanaryNotification CompanionJoined(UserShard companion, GatheringShard gathering) // TODO Slot in
             => CompanionActivity(new(gathering.Title, $"{companion.Name} joined the gathering", new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.GuestList), $"{gathering.Id}:10"));
 
         public static CanaryNotification CompanionGatheringCreated(UserShard companion, GatheringShard gathering)
@@ -186,11 +181,11 @@ namespace Core.Notifications
             return notification;
         }
 
-        public static CanaryNotification NearbyGatherings()
+        public static CanaryNotification NearbyGatherings() // TODO Slot in
             => GatheringDiscovery(new("New Gatherings Nearby", "There are new gatherings in your area that you may be interested in.", new DiscoveryDeepLink()));
         // TODO A. Need to actually ensure that they are new (gathering creation time vs last logged in) B. not send multiple
 
-        public static CanaryNotification CompanionMotive(GatheringShard gathering)
+        public static CanaryNotification CompanionMotive(GatheringShard gathering) // TODO Slot in
             => GatheringDiscovery(new("Companion Movement", "Your companions are headed somewhere interesting...", new GatheringDeepLink(gathering.Id)));
     }
 
@@ -206,24 +201,24 @@ namespace Core.Notifications
             return notification;
         }
 
-        public static CanaryNotification UserMissedGathering(GatheringShard gathering)
+        public static CanaryNotification UserMissedGathering(GatheringShard gathering) // TODO Slot in
             => GatheringActivity(new(gathering.Title, "You missed the gathering.", new GatheringDeepLink(gathering.Id), "30"));
 
         // Host
 
-        public static CanaryNotification HostArrived(GatheringShard gathering)
+        public static CanaryNotification HostArrived(GatheringShard gathering) // TODO Slot in
             => GatheringActivity(new(gathering.Title, "You have arrived?", new GatheringDeepLink(gathering.Id, immediate: true)));
 
-        public static CanaryNotification GatheringSealed(GatheringShard gathering)
+        public static CanaryNotification GatheringSealed(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"was reported too many times and was sealed as a result.", new GatheringDeepLink(gathering.Id, @sealed: true)));
 
-        public static CanaryNotification GatheringHeartbeat(GatheringShard gathering)
+        public static CanaryNotification GatheringHeartbeat(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"Is the gathering still ongoing?", new GatheringDeepLink(gathering.Id, immediate: true)));
 
-        public static CanaryNotification HostLeavingGatheringArea(GatheringShard gathering)
+        public static CanaryNotification HostLeavingGatheringArea(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"You are leaving the gathering area, gathering will hide itself.", new GatheringDeepLink(gathering.Id)));
 
-        public static CanaryNotification GatheringWaiting(GatheringShard gathering)
+        public static CanaryNotification GatheringWaiting(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"Your gathering is waiting to start!", new GatheringDeepLink(gathering.Id, immediate: true), "30"));
 
         public static CanaryNotification GatheringRemovalWarning(GatheringShard gathering)
@@ -234,10 +229,10 @@ namespace Core.Notifications
 
         // Attendee
 
-        public static CanaryNotification AttendeeArrived(GatheringShard gathering)
+        public static CanaryNotification AttendeeArrived(GatheringShard gathering) // TODO Slot in
             => GatheringActivity(new(gathering.Title, "You have entered the gathering area, get on now!", new GatheringDeepLink(gathering.Id, immediate: true), "30"));
 
-        public static CanaryNotification AttendeeLeavingGatheringArea(GatheringShard gathering)
+        public static CanaryNotification AttendeeLeavingGatheringArea(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"Is starting later.", new GatheringDeepLink(gathering.Id), "30"));
 
         public static CanaryNotification GatheringTerminated(GatheringShard gathering)
@@ -259,10 +254,10 @@ namespace Core.Notifications
             return notification;
         }
 
-        public static CanaryNotification GatheringUpcoming(GatheringShard gathering)
+        public static CanaryNotification GatheringUpcoming(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"Is starting later.", new GatheringDeepLink(gathering.Id), "20"));
 
-        public static CanaryNotification GatheringImminent(GatheringShard gathering)
+        public static CanaryNotification GatheringImminent(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"Is starting shortly.", new GatheringDeepLink(gathering.Id, immediate: true), "20"));
 
         public static CanaryNotification GatheringLive(GatheringShard gathering)
@@ -274,7 +269,7 @@ namespace Core.Notifications
         public static CanaryNotification GatheringEdited(GatheringShard gathering)
             => GatheringReminders(new(gathering.Title, $"Was modified by the host.", new GatheringDeepLink(gathering.Id), "21"));
 
-        public static CanaryNotification GatheringUploadClosing(GatheringShard gathering)
+        public static CanaryNotification GatheringUploadClosing(GatheringShard gathering) // TODO Slot in
             => GatheringReminders(new(gathering.Title, $"Post your remaining photos before the upload window closes.", new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.Gallery)));
     }
 }

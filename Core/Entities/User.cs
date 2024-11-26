@@ -518,6 +518,11 @@ namespace Core.Entities
             (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(notification));
         }
 
+        public async Task NotifyCompanions(CanaryNotification notification)
+        {
+            (await Companions).ForEach(companion => _ = companion.Notify(notification));
+        }
+
 		#endregion
 
 		#region Dissimilation

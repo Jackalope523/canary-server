@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
+using Core.Notifications;
 using Microsoft.Extensions.Logging;
 
 using static Core.Entities.Arbiter;
@@ -160,6 +161,11 @@ namespace Core.Controls
             await Nests.AppreciateUserAsync(userId, targetId, Psijic.Time);
 
             _ = targetUser.PostTelegram(user, TelegramMessage.UserAppreciated, "");
+
+            if (await targetUser.IsAppreciating(user))
+            { _ = targetUser.Notify(CanaryNotification.CompanionshipForged(user.ToUserShard())); }
+            else
+            { _ = targetUser.Notify(CanaryNotification.UserAdded(user.ToUserShard())); }
         }
 
         public async Task UnappreciateUserAsync(long userId, long targetId)
