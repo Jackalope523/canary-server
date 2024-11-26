@@ -158,8 +158,8 @@ namespace Core.Controls
 				catch { }
 			}
 
-            // Notify appreciateers of gathering
-            _ = user.NotifyAppreciateers(CanaryNotification.CompanionGatheringCreated(user.ToUserShard(), newGathering.ToGatheringShard()));
+            // Notify companions of gathering
+            _ = user.NotifyCompanions(CanaryNotification.CompanionGatheringCreated(user.ToUserShard(), newGathering.ToGatheringShard()));
 			
 			return newGathering.ToGatheringShard();
 		}
