@@ -137,9 +137,9 @@ namespace Core.Controls
             return await Nests.GetCompanionsAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long userId)
+        public async Task<List<UserShard>> GetFollowedUsersAsync(long userId)
         {
-            return await Nests.GetAppreciatedUsersAsync(userId);
+            return await Nests.GetFollowedUsersAsync(userId);
         }
 
         public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
@@ -147,30 +147,30 @@ namespace Core.Controls
             return await Nests.GetBlockedUsersAsync(userId);
         }
 
-        public async Task AppreciateUserAsync(long userId, long targetId)
+        public async Task FollowUserAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
             FailIf(user.Equals(targetUser),
-                new InvalidUserException("User cannot appreciate themself."));
+                new InvalidUserException("User cannot follow themself."));
 
-            Verify(await user.CanAppreciate(targetUser),
-                new InvalidUserException("User cannot appreciate this user."));
+            Verify(await user.CanFollow(targetUser),
+                new InvalidUserException("User cannot follow this user."));
 
-            await Nests.AppreciateUserAsync(userId, targetId, Psijic.Time);
+            await Nests.FollowUserAsync(userId, targetId, Psijic.Time);
 
-            _ = targetUser.PostTelegram(user, TelegramMessage.UserAppreciated, "");
+            _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
 
-            if (await targetUser.IsAppreciating(user))
+            if (await targetUser.IsFollowing(user))
             { _ = targetUser.Notify(CanaryNotification.CompanionshipForged(user.ToUserShard())); }
             else
             { _ = targetUser.Notify(CanaryNotification.UserAdded(user.ToUserShard())); }
         }
 
-        public async Task UnappreciateUserAsync(long userId, long targetId)
+        public async Task UnfollowUserAsync(long userId, long targetId)
         {
-            await Nests.UnappreciateUserAsync(userId, targetId);
+            await Nests.UnfollowUserAsync(userId, targetId);
         }
 
         public async Task BlockUserAsync(long userId, long targetId)
@@ -204,12 +204,12 @@ namespace Core.Controls
             await Nests.UnblockUserAsync(userId, targetId);
         }
 
-        public async Task<bool> AuthorisedToAppreciate(long userId, long targetId)
+        public async Task<bool> AuthorisedToFollow(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
 
-            return await user.CanAppreciate(targetUser);
+            return await user.CanFollow(targetUser);
         }
 
 		#endregion
@@ -222,15 +222,15 @@ namespace Core.Controls
                 .ConvertAll(user => new User(user));
 		}
 
-        internal async Task<List<User>> RequestAppreciatedUsersAsync(User user)
+        internal async Task<List<User>> RequestFollowedUsersAsync(User user)
         {
-            return (await Nests.GetAppreciatedUsersAsync(user.Id))
+            return (await Nests.GetFollowedUsersAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
 
-        internal async Task<List<User>> RequestAppreciateersAsync(User user)
+        internal async Task<List<User>> RequestFollowersAsync(User user)
         {
-            return (await Nests.GetUsersAppreciatingAsync(user.Id))
+            return (await Nests.GetUserFollowersAsync(user.Id))
                 .ConvertAll(user => new User(user));
 		}
 

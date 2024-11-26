@@ -88,8 +88,8 @@ namespace Core.Entities
         public Synced<List<Gathering>> SurveyingGatherings { get; }
 
         public Synced<List<User>> Companions { get; }
-        public Synced<List<User>> Appreciating { get; }
-        public Synced<List<User>> AppreciatedBy { get; }
+        public Synced<List<User>> Following { get; }
+        public Synced<List<User>> Followers { get; }
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
@@ -123,8 +123,8 @@ namespace Core.Entities
             SurveyingGatherings = new(() => Terminal.GatheringDirector.RequestSurveyingGatheringsForUserAsync(this));
 
             Companions = new(() => Terminal.NestDirector.RequestCompanionsAsync(this));
-            Appreciating = new(() => Terminal.NestDirector.RequestAppreciatedUsersAsync(this));
-            AppreciatedBy = new(() => Terminal.NestDirector.RequestAppreciateersAsync(this));
+            Following = new(() => Terminal.NestDirector.RequestFollowedUsersAsync(this));
+            Followers = new(() => Terminal.NestDirector.RequestFollowersAsync(this));
             Blocking = new(() => Terminal.NestDirector.RequestBlockedUsersAsync(this));
             BlockedBy = new(() => Terminal.NestDirector.RequestUsersBlockingAsync(this));
 
@@ -232,12 +232,12 @@ namespace Core.Entities
 
 		public async Task CalculateReputation()
         {
-            _ = (Penalties.Sync(), AppreciatedBy.Sync());
+            _ = (Penalties.Sync(), Followers.Sync());
 
             // Get all recent penalties
             var penalties = (await Penalties).Where(penalty => HasYet(penalty.TimeOfPenalty + OneYear)).ToList();
-            int appreciations = (await AppreciatedBy).Count;
-            int reputationRaw = Math.Clamp(appreciations, -ReputationPopulation, ReputationPopulation);
+            int follows = (await Followers).Count;
+            int reputationRaw = Math.Clamp(follows, -ReputationPopulation, ReputationPopulation);
 
             float normal = MathF.Tan(ReputationIntensity / 2) / ReputationPopulation;
 
@@ -272,10 +272,10 @@ namespace Core.Entities
             return false;
         }
 
-        public async Task<bool> IsAppreciating(User otherUser)
+        public async Task<bool> IsFollowing(User otherUser)
         {
-			// Check if user is appreciating target
-			if ((await Appreciating).Contains(otherUser))
+			// Check if user is following target
+			if ((await Following).Contains(otherUser))
 			{ return true; }
 
             return false;
@@ -419,12 +419,12 @@ namespace Core.Entities
             return true;
         }
 
-        public async Task<bool> CanAppreciate(User target)
+        public async Task<bool> CanFollow(User target)
         {
             var haveMutualGatheringSync = Terminal.NestDirector.RequestAttendedMutualGatheringAsync(this, target);
-            bool blockAppreciate = await IsBlocking(target) || await IsBlockedBy(target);
+            bool blockFollow = await IsBlocking(target) || await IsBlockedBy(target);
 
-            return !blockAppreciate && await haveMutualGatheringSync;
+            return !blockFollow && await haveMutualGatheringSync;
         }
 
 		#endregion
@@ -508,9 +508,9 @@ namespace Core.Entities
             await Terminal.NotificationDirector.NotifyUserAsync(this, notification);
         }
 
-        public async Task NotifyAppreciateers(CanaryNotification notification)
+        public async Task NotifyFollowers(CanaryNotification notification)
         {
-            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(notification));
+            (await Followers).ForEach(follower => _ = follower.Notify(notification));
         }
 
         public async Task NotifyCompanions(CanaryNotification notification)

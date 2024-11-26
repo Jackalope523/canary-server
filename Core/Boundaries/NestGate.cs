@@ -23,13 +23,13 @@ namespace Core.Boundaries
 	public interface INestDatabase
     {
         Task<List<UserShard>> GetCompanionsAsync(long userId);
-		Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
-        Task<List<UserShard>> GetUsersAppreciatingAsync(long userId);
+		Task<List<UserShard>> GetFollowedUsersAsync(long userId);
+        Task<List<UserShard>> GetUserFollowersAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
         Task<List<UserShard>> GetUsersBlockingAsync(long userId);
 
-        Task AppreciateUserAsync(long userId, long targetId, DateTimeOffset time);
-		Task UnappreciateUserAsync(long userId, long targetId);
+        Task FollowUserAsync(long userId, long targetId, DateTimeOffset time);
+		Task UnfollowUserAsync(long userId, long targetId);
 		Task BlockUserAsync(long userId, long targetId, DateTimeOffset time);
 		Task UnblockUserAsync(long userId, long targetId);
 
@@ -47,15 +47,15 @@ namespace Core.Boundaries
         Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId);
 
         Task<List<UserShard>> GetCompanionsAsync(long userId);
-        Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
+        Task<List<UserShard>> GetFollowedUsersAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 
-        Task AppreciateUserAsync(long userId, long targetId);
-        Task UnappreciateUserAsync(long userId, long targetId);
+        Task FollowUserAsync(long userId, long targetId);
+        Task UnfollowUserAsync(long userId, long targetId);
         Task BlockUserAsync(long userId, long targetId);
         Task UnblockUserAsync(long userId, long targetId);
 
-        Task<bool> AuthorisedToAppreciate(long userId, long targetId);
+        Task<bool> AuthorisedToFollow(long userId, long targetId);
     }
 
 	#endregion

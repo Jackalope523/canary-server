@@ -2,7 +2,7 @@
 {
     public class UserRelationship : Entity
     {
-        public enum UserLinkType { Appreciate, Block }
+        public enum UserLinkType { Follow, Block }
 
         public long SelfId { get; init; }
         public long OtherId { get; init; }

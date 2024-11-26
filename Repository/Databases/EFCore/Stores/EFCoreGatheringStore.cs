@@ -38,13 +38,13 @@ namespace Repository
 
             Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
                 ctx.UserRelationships.
-                Where(l => !exclusionList.Contains(l.OtherId) && l.SelfId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
+                Where(l => !exclusionList.Contains(l.OtherId) && l.SelfId == userId && l.Type == UserRelationship.UserLinkType.Follow).
                 Select(l => l.OtherId).
                 ToListAsync());
 
             Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
                 ctx.UserRelationships.
-                Where(l => !exclusionList.Contains(l.SelfId) && l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
+                Where(l => !exclusionList.Contains(l.SelfId) && l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Follow).
                 Select(l => l.SelfId).
                 ToListAsync());
 

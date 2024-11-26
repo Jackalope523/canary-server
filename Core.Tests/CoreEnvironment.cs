@@ -135,7 +135,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.NestDatabase.AppreciateUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
+					await Terminal.NestDatabase.FollowUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}

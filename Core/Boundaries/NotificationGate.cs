@@ -19,7 +19,7 @@ namespace Core.Boundaries
 		AccountStatusChanged = 1001,
 
 		// USER SEGMENT (2XXX)
-		UserAppreciated = 2001,
+		UserFollowed = 2001,
 
 		// GATHERING SEGMENT (3XXX)
 		GatheringInvitation = 3001,

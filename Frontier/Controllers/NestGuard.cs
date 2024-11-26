@@ -36,33 +36,33 @@ namespace Frontier.Controllers
                 await nests.GetCompanionsAsync(user.Id));
         }
 
-        [HttpGet("appreciating")]
-        public async Task<IActionResult> GetAppreciated()
+        [HttpGet("following")]
+        public async Task<IActionResult> GetFollowed()
 		{
 			return await Execute(async user =>
-				await nests.GetAppreciatedUsersAsync(user.Id));
+				await nests.GetFollowedUsersAsync(user.Id));
 		}
 
-		[HttpPost("appreciating")]
-		public async Task<IActionResult> AppreciateUser([FromBody] TargetManifest info)
+		[HttpPost("following")]
+		public async Task<IActionResult> FollowUser([FromBody] TargetManifest info)
 		{
 			// Verify parameters
 			if (info == null || !ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await nests.AppreciateUserAsync(user.Id, info.TargetId));
+				await nests.FollowUserAsync(user.Id, info.TargetId));
 		}
 
-		[HttpPut("appreciating")]
-		public async Task<IActionResult> UnappreciateUser([FromBody] TargetManifest info)
+		[HttpPut("following")]
+		public async Task<IActionResult> UnfollowUser([FromBody] TargetManifest info)
 		{
 			// Verify parameters
 			if (info == null || !ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await nests.UnappreciateUserAsync(user.Id, info.TargetId));
+				await nests.UnfollowUserAsync(user.Id, info.TargetId));
 		}
 
 		[HttpGet("blocked")]
@@ -93,11 +93,11 @@ namespace Frontier.Controllers
 				await nests.UnblockUserAsync(user.Id, info.TargetId));
 		}
 
-		[HttpGet("{targetId}/authorisation/appreciate")]
-		public async Task<IActionResult> CheckAppreciateAuthorisation(long targetId)
+		[HttpGet("{targetId}/authorisation/follow")]
+		public async Task<IActionResult> CheckFollowAuthorisation(long targetId)
 		{
 			return await Execute(async user =>
-				await nests.AuthorisedToAppreciate(user.Id, targetId));
+				await nests.AuthorisedToFollow(user.Id, targetId));
 		}
 
 		[HttpPost("{targetId}/report")]

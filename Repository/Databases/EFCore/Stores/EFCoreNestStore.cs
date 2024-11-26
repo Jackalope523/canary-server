@@ -16,7 +16,7 @@ namespace Repository
 
         }
         
-        public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
+        public async Task FollowUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
             long id = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserRelationships.
@@ -32,7 +32,7 @@ namespace Repository
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserRelationship.UserLinkType.Appreciate
+                    Type = UserRelationship.UserLinkType.Follow
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Add(toAdd));
@@ -45,16 +45,16 @@ namespace Repository
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserRelationship.UserLinkType.Appreciate
+                    Type = UserRelationship.UserLinkType.Follow
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Update(toUpdate));
             }
         }
-        public async Task UnappreciateUserAsync(long selfId, long targetId) 
+        public async Task UnfollowUserAsync(long selfId, long targetId) 
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Appreciate));
+            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Follow));
         }
         public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
@@ -96,10 +96,10 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Block));
         }
-        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long id) 
+        public async Task<List<UserShard>> GetFollowedUsersAsync(long id) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
+             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Follow).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -123,7 +123,7 @@ namespace Repository
         public async Task<List<UserShard>> GetCompanionsAsync(long id)
         {
             Task<List<UserShard>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
+             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Follow).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -133,7 +133,7 @@ namespace Repository
              ToListAsync());
 
             Task<List<UserShard>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserRelationships.Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
+             ctx.UserRelationships.Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Follow).
              Join(
                  ctx.Users,
                  l => l.SelfId,
@@ -145,10 +145,10 @@ namespace Repository
             return (await appreciating).Intersect(await appreciatingMe).ToList();
         }
 
-        public async Task<List<UserShard>> GetUsersAppreciatingAsync(long userId)
+        public async Task<List<UserShard>> GetUserFollowersAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Appreciate).
+            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Follow).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
