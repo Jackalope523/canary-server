@@ -47,16 +47,6 @@ namespace Core.Controls
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, string code = "")
         {
-            CoreBanner banner;
-
-            // Verify banner code
-            try
-            {
-                banner = await Banners.FindBannerByCodeAsync(code.ToLower());
-            }
-            catch
-            { throw new InvalidInformationException("Incorrect code."); }
-
             // Create user
             User newUser = new()
             {
@@ -83,9 +73,6 @@ namespace Core.Controls
                 newUser.Name, newUser.DateOfBirth, Time,
                 CharacterVector.Default(newUser.GetAge()).ToCharacter(),
                 Guid.NewGuid());
-
-            // Add user to banner
-            await Banners.AddUserToBannerAsync(user.Id, banner.Id, Time);
         }
 
         public async Task EditUserAsync(long userId,

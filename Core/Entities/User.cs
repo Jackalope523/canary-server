@@ -73,8 +73,6 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
-        public Synced<Banner> Banner { get; }
-
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
 		public Synced<GeoLocation> LastKnownLocation { get; }
         public Synced<Distance> LastKnownRadius { get; }
@@ -110,8 +108,6 @@ namespace Core.Entities
 
         public User()
         {
-            Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
-
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
             LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
             LastKnownRadius = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Radius);
@@ -426,10 +422,9 @@ namespace Core.Entities
         public async Task<bool> CanAppreciate(User target)
         {
             var haveMutualGatheringSync = Terminal.NestDirector.RequestAttendedMutualGatheringAsync(this, target);
-            bool bannership = (await Banner).Id.Equals((await target.Banner).Id);
             bool blockAppreciate = await IsBlocking(target) || await IsBlockedBy(target);
 
-            return !blockAppreciate && (await haveMutualGatheringSync || bannership);
+            return !blockAppreciate && await haveMutualGatheringSync;
         }
 
 		#endregion

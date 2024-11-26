@@ -30,7 +30,6 @@ namespace Core
 
         public IAccountDatabase AccountDatabase { get; init; }
         public IAdminDatabase AdminDatabase { get; init; }
-        public IBannerDatabase BannerDatabase { get; init; }
         public IGatheringDatabase GatheringDatabase { get; init; }
         public ISnapshotDatabase SnapshotDatabase { get; init; }
         public IDisciplineDatabase DisciplineDatabase { get; init; }
@@ -42,8 +41,6 @@ namespace Core
 
         public IAccountOperations AccountOperations
             => AccountDirector;
-        public IBannerOperations BannerOperations
-            => BannerDirector;
         public IGatheringOperations GatheringOperations
             => GatheringDirector;
         public ISnapshotOperations SnapshotOperations
@@ -64,7 +61,6 @@ namespace Core
         public INotificationService NotificationService { get; init; }
 
         internal AccountDirector AccountDirector { get; private set; }
-        internal BannerDirector BannerDirector { get; private set; }
         internal GatheringDirector GatheringDirector { get; private set; }
         internal SnapshotDirector SnapshotDirector { get; private set; }
         internal DisciplineDirector DisciplineDirector { get; private set; }
@@ -79,7 +75,7 @@ namespace Core
         #region Initialisation
 
         public static CoreTerminal CreateTerminal(EnvironmentOptions environment, ILogger logger,
-            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
+            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
@@ -95,7 +91,6 @@ namespace Core
 
                     AccountDatabase = accountDatabase,
                     AdminDatabase = adminDatabase,
-                    BannerDatabase = bannerDatabase,
                     GatheringDatabase = gatheringDatabase,
                     SnapshotDatabase = snapshotDatabase,
                     DisciplineDatabase = disciplineDatabase,
@@ -120,7 +115,6 @@ namespace Core
         protected void CreateManagers()
         {
             AccountDirector = new AccountDirector(this);
-            BannerDirector = new BannerDirector(this);
             GatheringDirector = new GatheringDirector(this);
             SnapshotDirector = new SnapshotDirector(this);
             DisciplineDirector = new DisciplineDirector(this);

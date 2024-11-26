@@ -66,7 +66,6 @@ namespace Core.Tests
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
-				harbor.BannerDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -184,7 +183,7 @@ namespace Core.Tests
 			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
-				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic, gatheringStub.DegreeOfPrivacy));
+				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic, gatheringStub.DegreeOfPrivacy, gatheringStub.StartTime));
 		}
 
 		internal async Task<Gathering> GenerateUpcomingGatheringAsync(User host)
@@ -212,7 +211,7 @@ namespace Core.Tests
 			gatheringStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
-			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingOpen) });
+			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.Ongoing) });
 			await Terminal.GatheringDatabase.SetUserStateAsync(host.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)

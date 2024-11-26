@@ -152,7 +152,6 @@ namespace Frontier
                 coreLogger,
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
-                harbor.BannerDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -165,7 +164,6 @@ namespace Frontier
 
             GuardBox box = new(environment, frontierLogger,
                 terminal.AccountOperations,
-                terminal.BannerOperations,
                 terminal.NestOperations,
                 terminal.GatheringOperations,
                 terminal.SnapshotOperations,

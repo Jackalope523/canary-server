@@ -43,7 +43,6 @@ namespace Frontier.Controllers
 		public ILogger log;
 
 		public IAccountOperations accounts;
-		public IBannerOperations banners;
 		public IGatheringOperations gatherings;
 		public ISnapshotOperations snapshots;
 		public IDisciplineOperations reports;
@@ -65,7 +64,6 @@ namespace Frontier.Controllers
 			log = box.log;
 
 			accounts = box.accounts;
-			banners = box.banners;
 			nests = box.nests;
 			gatherings = box.gatherings;
 			snapshots = box.snapshots;
