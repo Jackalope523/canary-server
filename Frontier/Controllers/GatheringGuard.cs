@@ -110,7 +110,7 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				// Delete gathering
-				await gatherings.DeleteGatheringAsync(user.Id, gatheringId);
+				await gatherings.CancelGatheringAsync(user.Id, gatheringId);
 			});
         }
 

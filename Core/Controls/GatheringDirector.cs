@@ -329,24 +329,24 @@ namespace Core.Controls
 			}
         }
 
-		public async Task DeleteGatheringAsync(long userId, long gatheringId)
+		public async Task CancelGatheringAsync(long userId, long gatheringId)
 		{
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify gathering has not yet started
-			Verify(gathering.IsDeletable(),
-				new InvalidGatheringException("Gathering cannot be deleted once it has started."));
+			Verify(gathering.IsCancelable(),
+				new InvalidGatheringException("Gathering cannot be cancelled once it has started."));
 
-            // Verify user is able to delete the gathering
+            // Verify user is able to cancel the gathering
             Verify(gathering.IsModifiableBy(user),
                 new InvalidUserException("User does not have permissions to delete gathering."));
 
-			// Try to delete gathering
-			await Gatherings.DeleteGatheringAsync(gathering.Id);
+			// Try to cancel gathering
+			await Gatherings.CancelGatheringAsync(gathering.Id);
 
-			// Delete hero
-			await Media.DeleteHeroAsync(gathering.Id);
+			// Delete hero // TODO Necessary w cancellations?
+			// await Media.DeleteHeroAsync(gathering.Id);
 
             _ = gathering.NotifyActive(CanaryNotification.GatheringCancelled(gathering.ToGatheringShard()));
         }

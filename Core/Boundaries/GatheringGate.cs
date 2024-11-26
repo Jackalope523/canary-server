@@ -8,7 +8,7 @@ namespace Core.Boundaries
     #region Schemas
 
     public enum GatheringState
-	{ Upcoming, Ongoing, Ended }
+	{ Upcoming, Ongoing, Ended, Cancelled }
 
     public enum GatheringVisibility
 	{ Visible, Hidden, Sealed }
@@ -51,6 +51,7 @@ namespace Core.Boundaries
 			double Radius, bool isDynamic, int degreeOfPrivacy, DateTimeOffset timeOfCreation);
 		Task UpdateGatheringAsync(long gatheringId, List<(string Property, object Value)> edits);
 		Task TerminateGatheringAsync(long gatheringId, DateTimeOffset time);
+		Task CancelGatheringAsync(long gatheringId);
 		Task DeleteGatheringAsync(long gatheringId);
 
 		Task<GatheringBond?> GetUserStateAsync(long userId, long gatheringId);
@@ -84,7 +85,7 @@ namespace Core.Boundaries
 			int? groupMinimum = null, int? groupMaximum = null, MemoryStream heroImage = null);
 		Task StartGatheringAsync(long userId, long gatheringId);
 		Task TerminateGatheringAsync(long userId, long gatheringId);
-		Task DeleteGatheringAsync(long userId, long gatheringId);
+		Task CancelGatheringAsync(long userId, long gatheringId);
 
 		Task ChangeGatheringVisibilityAsync(long userId, long gatheringId, bool hide);
 

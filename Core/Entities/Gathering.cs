@@ -69,8 +69,8 @@ namespace Core.Entities
             => State.Equals(GatheringState.Upcoming) &&
                 HasAlready(StartTime - MaximumAutoStart);
         public bool IsOpen
-            => State.Equals(GatheringState.Upcoming) ||
-                State.Equals(GatheringState.Ongoing) &&
+            => (State.Equals(GatheringState.Upcoming) ||
+                State.Equals(GatheringState.Ongoing)) &&
                 Visibility.Equals(GatheringVisibility.Visible);
         public bool IsOngoing
             => State.Equals(GatheringState.Ongoing);
@@ -388,7 +388,7 @@ namespace Core.Entities
             return true;
         }
 
-        public bool IsDeletable()
+        public bool IsCancelable()
         {
             // Ensure gathering has not already occurred
             if (IsOngoing || IsTerminated)

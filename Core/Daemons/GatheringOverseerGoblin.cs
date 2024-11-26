@@ -63,8 +63,8 @@ namespace Core.Daemons
                 if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait))
                 {
                     // Purge gathering
-                    log.LogInformation("Gathering {id} {name} ended for being late.", gathering.Id, gathering.Title);
-                    await terminal.AdminDatabase.VoidGatheringAsync(gathering.Id);
+                    log.LogInformation("Gathering {id} {name} cancelled for being late.", gathering.Id, gathering.Title);
+                    await terminal.GatheringDatabase.CancelGatheringAsync(gathering.Id);
 
                     // Notify host
                     User host = await GetUserAsync(gathering.Host.Id);
