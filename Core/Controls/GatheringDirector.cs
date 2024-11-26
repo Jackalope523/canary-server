@@ -282,7 +282,7 @@ namespace Core.Controls
 				new InvalidGatheringException("Gathering cannot be started."));
 
 			// Try to start gathering
-			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingOpen), (nameof(CoreGathering.StartTime), Time) });
+			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), GatheringState.Ongoing), (nameof(CoreGathering.StartTime), Time) });
 			await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 
 			await gathering.Started();
@@ -363,9 +363,13 @@ namespace Core.Controls
             Verify(gathering.IsOngoing,
                 new InvalidGatheringException("Unable to edit gathering, gathering has to be ongoing."));
 
-			var state = hide ? GatheringState.OngoingHidden : GatheringState.OngoingOpen;
+            // Ensure gathering is not sealed
+            FailIf(gathering.Visibility == GatheringVisibility.Sealed,
+                new InvalidGatheringException("Unable to edit gathering, gathering is sealed."));
 
-			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.State), state) });
+			var visibility = hide ? GatheringVisibility.Hidden : GatheringVisibility.Visible;
+
+			await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Visibility), visibility) });
         }
 
         public async Task WatchGatheringAsync(long userId, long gatheringId)

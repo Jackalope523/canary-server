@@ -8,7 +8,10 @@ namespace Core.Boundaries
     #region Schemas
 
     public enum GatheringState
-	{ Upcoming, OngoingOpen, OngoingHidden, Ended }
+	{ Upcoming, Ongoing, Ended }
+
+    public enum GatheringVisibility
+	{ Visible, Hidden, Sealed }
 
     public enum GatheringBond
     { Watching, Guest, Arrived, Left, Kicked }
@@ -16,13 +19,15 @@ namespace Core.Boundaries
     public record CoreGathering(long Id, UserShard Host, string Title, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
-		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests, int DegreeOfPrivacy)
+		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests,
+		int DegreeOfPrivacy, GatheringVisibility Visibility)
 		: CoreOnlyData();
 
 	public record GatheringShard(long Id, UserShard Host, string Title, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
-        double Radius, int DegreeOfPrivacy, int NumberOfGuests, float RelativeAngle);
+        double Radius, int DegreeOfPrivacy, int NumberOfGuests, float RelativeAngle,
+		GatheringVisibility Visibility);
 
 	public record GuestListBondPair(UserShard User, GatheringBond Bond);
 

@@ -53,6 +53,7 @@ namespace Core.Entities
         public int DegreeOfPrivacy { get; set; }
         public DateTimeOffset? EndTime { get; set; }
         public GatheringState State { get; set; }
+        public GatheringVisibility Visibility { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
         public bool IsDeleted { get; set; }
@@ -68,10 +69,10 @@ namespace Core.Entities
                 HasAlready(StartTime - MaximumAutoStart);
         public bool IsOpen
             => State.Equals(GatheringState.Upcoming) ||
-                State.Equals(GatheringState.OngoingOpen);
+                State.Equals(GatheringState.Ongoing) &&
+                Visibility.Equals(GatheringVisibility.Visible);
         public bool IsOngoing
-            => State.Equals(GatheringState.OngoingOpen) ||
-                State.Equals(GatheringState.OngoingHidden);
+            => State.Equals(GatheringState.Ongoing);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumSnapshotLateness);
@@ -166,7 +167,8 @@ namespace Core.Entities
             return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
-                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests, DegreeOfPrivacy);
+                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests,
+                DegreeOfPrivacy, Visibility);
         }
 
         public GatheringShard ToGatheringShard()
@@ -174,7 +176,8 @@ namespace Core.Entities
             return new(Id, Host.ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
-                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests, RelativeAngle);
+                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests, RelativeAngle,
+                Visibility);
         }
 
         public GatheringShard ToGatheringShard(User relativeUser)
@@ -183,7 +186,8 @@ namespace Core.Entities
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests,
-                CharacterVector.AngleBetweenAffected(relativeUser.Character, Character));
+                CharacterVector.AngleBetweenAffected(relativeUser.Character, Character),
+                Visibility);
         }
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)

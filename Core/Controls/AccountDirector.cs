@@ -214,7 +214,7 @@ namespace Core.Controls
                     {
                         Log.LogWarning("Host {name} left gathering {title} area, sealing...", user.Name, currentGathering.Title);
                         // Seal the gathering if user is the host
-                        await Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingHidden)});
+                        await Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Hidden)});
                     }
                     else
                     {
