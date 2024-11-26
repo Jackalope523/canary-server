@@ -105,11 +105,11 @@ namespace Frontier.Controllers
         }
 
         [HttpDelete("{gatheringId}")]
-        public async Task<IActionResult> DeleteGathering(long gatheringId)
+        public async Task<IActionResult> CancelGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
-				// Delete gathering
+				// Cancel gathering
 				await gatherings.CancelGatheringAsync(user.Id, gatheringId);
 			});
         }
