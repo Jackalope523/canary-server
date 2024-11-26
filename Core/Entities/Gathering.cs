@@ -56,6 +56,7 @@ namespace Core.Entities
         public GatheringVisibility Visibility { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
+        public DateTimeOffset TimeOfCreation { get; set; }
         public bool IsDeleted { get; set; }
 
         public int NumberOfGuests { get; set; }
@@ -134,6 +135,7 @@ namespace Core.Entities
             FriendlyLocation = fromGathering.FriendlyLocation;
             EndTime = fromGathering.TimeEnded;
             State = fromGathering.State;
+            Visibility = fromGathering.Visibility;
             GroupMinimum = fromGathering.GroupMinimum;
             GroupMaximum = fromGathering.GroupMaximum;
             Character = new(fromGathering.Character);
@@ -141,6 +143,7 @@ namespace Core.Entities
             IsDynamic = fromGathering.IsDynamic;
             DegreeOfPrivacy = fromGathering.DegreeOfPrivacy;
             IsDeleted = fromGathering.IsPendingDeletion;
+            TimeOfCreation = fromGathering.TimeOfCreation;
             NumberOfGuests = fromGathering.NumberOfGuests;
         }
 
@@ -168,7 +171,7 @@ namespace Core.Entities
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests,
-                DegreeOfPrivacy, Visibility);
+                DegreeOfPrivacy, Visibility, TimeOfCreation);
         }
 
         public GatheringShard ToGatheringShard()

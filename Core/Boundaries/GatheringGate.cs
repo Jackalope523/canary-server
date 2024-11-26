@@ -20,7 +20,7 @@ namespace Core.Boundaries
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests,
-		int DegreeOfPrivacy, GatheringVisibility Visibility)
+		int DegreeOfPrivacy, GatheringVisibility Visibility, DateTimeOffset TimeOfCreation)
 		: CoreOnlyData();
 
 	public record GatheringShard(long Id, UserShard Host, string Title, string Description,
@@ -48,7 +48,7 @@ namespace Core.Boundaries
 		Task<CoreGathering> CreateGatheringAsync(long hostId, string title, string description,
 			DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation,
 			int groupMinimum, int groupMaximum, CharacterShard character,
-			double Radius, bool isDynamic, int degreeOfPrivacy);
+			double Radius, bool isDynamic, int degreeOfPrivacy, DateTimeOffset timeOfCreation);
 		Task UpdateGatheringAsync(long gatheringId, List<(string Property, object Value)> edits);
 		Task TerminateGatheringAsync(long gatheringId, DateTimeOffset time);
 		Task DeleteGatheringAsync(long gatheringId);
