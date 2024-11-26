@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
+using Core.Notifications;
 using Microsoft.Extensions.Hosting;
 
 using static Core.Entities.Psijic;
@@ -49,12 +50,14 @@ namespace Core.Daemons
         {
             var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatheringsAsync(DateTimeOffset.UtcNow);
 
-            foreach (var gathering in waitingGatherings)
+            foreach (var coreGathering in waitingGatherings)
             {
                 if (stoppingToken.IsCancellationRequested)
                 {
                     break;
                 }
+
+                Gathering gathering = new(coreGathering);
 
                 // Check if gathering has expired
                 if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait))
@@ -66,21 +69,17 @@ namespace Core.Daemons
                     // Notify host
                     User host = await GetUserAsync(gathering.Host.Id);
                     await host.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
-                    await host.Notify(NotificationGroup.GatheringActivity, "You missed your gathering.",
-                        $"{gathering.Title} was cancelled due to lack of host.", "30");
+                    await host.Notify(CanaryNotification.GatheringDeleted(gathering.ToGatheringShard()));
 
                     // Notify guests
-                    Gathering expiredGathering = new(gathering);
-                    await expiredGathering.NotifyGuests(NotificationGroup.GatheringActivity, "The host missed their gathering.",
-                        $"{gathering.Title} was cancelled due to an absent host.", "30");
+                    await gathering.NotifyGuests(CanaryNotification.HostMissedGathering(gathering.ToGatheringShard()));
                 }
                 // Check if the next pass will delete the gathering
                 else if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait - interval))
                 {
                     // Warn host
                     User host = await GetUserAsync(gathering.Host.Id);
-                    await host.Notify(NotificationGroup.GatheringActivity, "Your gathering is about to be cancelled.",
-                        $"{gathering.Title} is going to be cancelled if you do not start it!", "30");
+                    await host.Notify(CanaryNotification.GatheringRemovalWarning(gathering.ToGatheringShard()));
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Boundaries;
+using Core.Notifications;
 using Newtonsoft.Json;
 using OneSignalApi.Api;
 using OneSignalApi.Client;
@@ -32,31 +33,36 @@ namespace Frontier.Services
             instance = new DefaultApi(appConfig);
         }
 
-        public async Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collpaseId = "")
+        public async Task PushNotification(Guid userNotificationId, CanaryNotification notification)
         {
-            if (notificationId.Equals(Guid.Empty.ToString()))
+            if (userNotificationId.Equals(Guid.Empty))
             {
-                log.LogWarning("Tried to push notification to empty user.\nTitle {title}\nMessage {message}", title, message);
+                log.LogWarning("Tried to push notification to empty user.\nTitle {title}\nBody {body}", notification.Body, notification.Body);
                 return;
             }
 
-            var notification = new Notification(appId: appId)
+            var notif = new Notification(appId: appId)
             {
-                Headings = new StringMap(en: title),
-                Contents = new StringMap(en: message),
+                Headings = new StringMap(en: notification.Title),
+                Contents = new StringMap(en: notification.Body),
                 TargetChannel = Notification.TargetChannelEnum.Push,
                 ChannelForExternalUserIds = "push",
-                IncludeExternalUserIds = new() { notificationId }, // Deprecated is a mistake, leave as is
+                IncludeExternalUserIds = new() { userNotificationId.ToString() }, // Deprecated is a mistake, leave as is
 
                 Filters = new()
                 {
-                    new(field: "tag", key: notificationGroup.GetString(), value: "1", relation: Filter.RelationEnum.Equal),
+                    new(field: "tag", key: notification.Group.GetString(), value: "1", relation: Filter.RelationEnum.Equal),
                 },
 
-                CollapseId = collpaseId,
+                AppUrl = notification.AppUrl,
+                CollapseId = notification.CollapseId,
             };
 
-            await instance.CreateNotificationAsync(notification);
+            log.LogError("Short-circuiting notification {notification}", notif.ToJson());
+
+            return;
+
+            await instance.CreateNotificationAsync(notif);
         }
     }
 }

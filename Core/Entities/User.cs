@@ -7,6 +7,7 @@ using Core.Boundaries;
 
 using static Core.Entities.Psijic;
 using static Core.Entities.Arbiter;
+using Core.Notifications;
 
 namespace Core.Entities
 {
@@ -507,14 +508,14 @@ namespace Core.Entities
                 message, context);
         }
 
-		public async Task Notify(NotificationGroup group, string title, string message, string collapseId = "")
+		public async Task Notify(CanaryNotification notification)
         {
-            await Terminal.NotificationDirector.NotifyUserAsync(this, group, title, message, collapseId);
+            await Terminal.NotificationDirector.NotifyUserAsync(this, notification);
         }
 
-        public async Task NotifyAppreciateers(NotificationGroup group, string title, string message, string collapseId = "")
+        public async Task NotifyAppreciateers(CanaryNotification notification)
         {
-            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(group, title, message, collapseId));
+            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(notification));
         }
 
 		#endregion

@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Core.Entities;
+using Core.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -158,8 +159,8 @@ namespace Core.Controls
 			}
 
             // Notify appreciateers of gathering
-            _ = user.NotifyAppreciateers(NotificationGroup.CompanionActivity, $"Companion Gathering", $"{user.Name} just created: {newGathering.Title}");
-
+            _ = user.NotifyAppreciateers(CanaryNotification.CompanionGatheringCreated(user.ToUserShard(), newGathering.ToGatheringShard()));
+			
 			return newGathering.ToGatheringShard();
 		}
 
@@ -263,7 +264,7 @@ namespace Core.Controls
 				await Terminal.MediaDirector.UploadHeroAsync(targetGathering.Id, heroImage);
             }
 
-			_ = targetGathering.NotifyActive(NotificationGroup.GatheringReminder, $"{targetGathering.Title}", "The gathering was edited by the host, check to see the updates.", "21");
+			_ = targetGathering.NotifyActive(CanaryNotification.GatheringEdited(targetGathering.ToGatheringShard()));
 		}
 
 		public async Task StartGatheringAsync(long userId, long gatheringId)
@@ -346,7 +347,7 @@ namespace Core.Controls
 			// Delete hero
 			await Media.DeleteHeroAsync(gathering.Id);
 
-            _ = gathering.NotifyActive(NotificationGroup.GatheringReminder, $"{gathering.Title}", "Uh oh, the gathering was cancelled by the host.", "20");
+            _ = gathering.NotifyActive(CanaryNotification.GatheringCancelled(gathering.ToGatheringShard()));
         }
 
         public async Task ChangeGatheringVisibilityAsync(long userId, long gatheringId, bool hide)
@@ -484,11 +485,13 @@ namespace Core.Controls
             }
 
 			// Notify host if gathering has already started
+			/* TODO?
 			if (HasAlready(gathering.StartTime))
 			{
 				var host = await GetUserAsync(gathering.Host.Id);
 				_ = host.Notify(NotificationGroup.GatheringActivity, $"Guest Inbound", $"{user.Name} is joining your gathering.");
 			}
+			*/
 		}
 
 		public async Task CheckInToGatheringAsync(long userId, double latitude, double longitude)
@@ -665,7 +668,7 @@ namespace Core.Controls
 				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
-			_ = invitee.Notify(NotificationGroup.SocialInvitation, $"{gathering.Title}", $"You were invited by {inviter.Name}");
+			_ = invitee.Notify(CanaryNotification.GatheringInvitation(inviter.ToUserShard(), gathering.ToGatheringShard()));
 		}
 
 		public async Task KickUserAsync(long hostId, long targetId, long gatheringId)

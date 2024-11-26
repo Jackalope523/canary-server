@@ -7,6 +7,7 @@ using Core.Boundaries;
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
 using Microsoft.Extensions.Logging;
+using Core.Notifications;
 
 namespace Core.Entities
 {
@@ -395,7 +396,7 @@ namespace Core.Entities
 
         public async Task Started()
         {
-            _ = NotifyActive(NotificationGroup.GatheringReminder, $"{Title}", "Gathering is live!", "20");
+            _ = NotifyActive(CanaryNotification.GatheringLive(ToGatheringShard()));
         }
 
         public async Task<List<User>> Ended()
@@ -413,7 +414,7 @@ namespace Core.Entities
                 updatedGuests.Add(guest);
 
 				// Notify of gathering ending
-				_ = guest.Notify(NotificationGroup.GatheringActivity, $"{Title}", $"Gathering has concluded, thank you for joining.");
+				_ = guest.Notify(CanaryNotification.GatheringTerminated(ToGatheringShard()));
 			}
 
             return updatedGuests;
@@ -447,25 +448,25 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task NotifyActive(NotificationGroup group, string title, string message, string collapseId = "")
+        public async Task NotifyActive(CanaryNotification notification)
         {
             foreach (var user in (await Guests).Concat(await Arrived))
             {
                 if (IsHostedBy(user))
                 { continue; }
 
-                _ = user.Notify(group, title, message, collapseId);
+                _ = user.Notify(notification);
             }
         }
 
-        public async Task NotifyGuests(NotificationGroup group, string title, string message, string collapseId = "")
+        public async Task NotifyGuests(CanaryNotification notification)
         {
             foreach (var guest in await Arrived)
             {
                 if (IsHostedBy(guest))
                 { continue; }
 
-                _ = guest.Notify(group, title, message, collapseId);
+                _ = guest.Notify(notification);
             }
         }
 

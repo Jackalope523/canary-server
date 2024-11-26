@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-
+using Core.Notifications;
 using static Core.Entities.Psijic;
 
 namespace Core.Controls
@@ -69,9 +69,9 @@ namespace Core.Controls
 			await Telegrams.SaveTelegramAsync(user.Id, notifier.Id, Time, message, context);
 		}
 
-		internal async Task NotifyUserAsync(User user, NotificationGroup group, string title, string message, string collapseId = "")
+		internal async Task NotifyUserAsync(User user, CanaryNotification notification)
 		{
-            await Terminal.NotificationService.PushNotification(user.NotificationId.ToString(), group, title, message, collapseId);
+            await Terminal.NotificationService.PushNotification(user.NotificationId, notification);
 		}
 
 		#endregion

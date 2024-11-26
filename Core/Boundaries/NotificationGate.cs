@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Notifications;
 
 namespace Core.Boundaries
 {
@@ -30,31 +31,6 @@ namespace Core.Boundaries
 		GatheringSealed = 3202,
 	}
 
-	public enum NotificationGroup
-	{
-        SocialInvitation,
-		CompanionActivity,
-		GatheringReminder,
-		GatheringActivity,
-		GatheringDiscovery,
-    }
-
-    public static class NotificationGroupExtensions
-    {
-        public static string GetString(this NotificationGroup group)
-        {
-            return group switch
-            {
-                NotificationGroup.SocialInvitation => "preferences/social_invitations",
-                NotificationGroup.CompanionActivity => "preferences/companion_activity",
-                NotificationGroup.GatheringReminder => "preferences/gathering_reminders",
-                NotificationGroup.GatheringActivity => "preferences/gathering_activity",
-                NotificationGroup.GatheringDiscovery => "preferences/gathering_discovery",
-                _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
-            };
-        }
-    }
-
     public record TelegramShard(long Id, long NotifierId, DateTimeOffset Time,
 		TelegramMessage Message, string Context);
 
@@ -81,8 +57,7 @@ namespace Core.Boundaries
 
 	public interface INotificationService
 	{
-		Task PushNotification(string notificationId, NotificationGroup notificationGroup,
-			string title, string message, string collapseId = "");
+		Task PushNotification(Guid userNotificationId, CanaryNotification notification);
 	}
 
 	#endregion
