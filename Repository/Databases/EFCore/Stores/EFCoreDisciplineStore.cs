@@ -1,6 +1,4 @@
-﻿using Core.Boundaries;
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
@@ -10,7 +8,7 @@ namespace Repository
         {
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsByUserAsync(long id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>, List<Core.Boundaries.RumorReport>)> GetReportsByUserAsync(long id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
             UserReports.
@@ -54,7 +52,21 @@ namespace Repository
             )).
             ToListAsync());
 
-            return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn);
+            Task<List<Core.Boundaries.RumorReport>> rumorReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
+            RumorReports.
+            Where(r => r.UserId == id).
+            Select(r => new Core.Boundaries.RumorReport
+            (
+                r.Id,
+                r.UserId ?? 0,
+                r.RumorId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
+
+            return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn, await rumorReportsToReturn);
         }
 
         public async Task<List<Core.Boundaries.GatheringReport>> GetReportsForGatheringAsync(long id)
@@ -74,7 +86,7 @@ namespace Repository
             ToListAsync());
         }
 
-        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsForUserAsync(long id)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>, List<Core.Boundaries.RumorReport>)> GetReportsForUserAsync(long id)
         {
             Task<List<Core.Boundaries.UserReport>> userReportsToReturn = storeSentry.ExecuteReadAsync(ctx => 
              ctx.UserReports.
@@ -90,47 +102,61 @@ namespace Repository
              )).
             ToListAsync());       
 
-            List<long> gatheringsHosted = await storeSentry.ExecuteReadAsync(ctx => 
-                ctx.Gatherings.
-                Where(e => e.HostId == id).
-                Select(e => e.Id).
-                ToListAsync());
-
-            Task<List<Core.Boundaries.GatheringReport>>  gatheringReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
-            GatheringReports.
-            Where(r => gatheringsHosted.Contains(r.GatheringId)).
-            Select(r => new Core.Boundaries.GatheringReport
-            (
-                r.Id,
-                r.UserId ?? 0,
-                r.GatheringId,
-                r.FilingDate,
-                r.Type,
-                r.Notes
-            )).
-            ToListAsync());
-
-            List<long> snapshotsPosted = await storeSentry.ExecuteReadAsync(ctx =>
-               ctx.Snapshots.
-               Where(s => s.OwnerId == id).
-               Select(s => s.Id).
+            Task<List<Core.Boundaries.GatheringReport>> gatheringReportsToReturn = storeSentry.ExecuteReadAsync(ctx =>
+               ctx.Gatherings.
+               Where(g => g.HostId == id).
+               Join(
+                   ctx.GatheringReports,
+                   x => x.HostId,
+                   y => y.GatheringId,
+                   (x, y) => new Core.Boundaries.GatheringReport
+                   (
+                       y.Id,
+                       y.UserId ?? 0,
+                       y.GatheringId,
+                       y.FilingDate,
+                       y.Type,
+                       y.Notes
+                   )).
                ToListAsync());
 
-            Task<List<Core.Boundaries.SnapshotReport>> snapshotReportsToReturn = storeSentry.ExecuteReadAsync(ctx => ctx.
-            SnapshotReports.
-            Where(r => snapshotsPosted.Contains(r.SnapshotId)).
-            Select(r => new Core.Boundaries.SnapshotReport
-            (
-               r.Id,
-               r.UserId ?? 0,
-               r.SnapshotId,
-               r.FilingDate,
-               r.Type,
-               r.Notes
-            )).
-            ToListAsync());
+            Task<List<Core.Boundaries.SnapshotReport>> snapshotReportsToReturn = storeSentry.ExecuteReadAsync(ctx =>
+               ctx.Snapshots.
+               Where(s => s.OwnerId == id).
+               Join(
+                   ctx.SnapshotReports,
+                   x => x.Id,
+                   y => y.SnapshotId,
+                   (x, y) => new Core.Boundaries.SnapshotReport
+                   (
+                       y.Id,
+                       y.UserId ?? 0,
+                       y.SnapshotId,
+                       y.FilingDate,
+                       y.Type,
+                       y.Notes
+                   )).
+               ToListAsync());
 
-            return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn);
+            Task<List<Core.Boundaries.RumorReport>> rumorReportsToReturn = storeSentry.ExecuteReadAsync(ctx =>
+               ctx.Rumors.
+               Where(s => s.AuthorId == id).
+               Join(
+                   ctx.RumorReports,
+                   x => x.Id,
+                   y => y.RumorId,
+                   (x, y) => new Core.Boundaries.RumorReport
+                   (
+                       y.Id, 
+                       y.UserId ?? 0, 
+                       y.RumorId, 
+                       y.FilingDate, 
+                       y.Type, 
+                       y.Notes
+                   )).
+               ToListAsync());
+
+            return (await userReportsToReturn, await gatheringReportsToReturn, await snapshotReportsToReturn, await rumorReportsToReturn);
         }
 
         public async Task ReportGatheringAsync(long userId, long gatheringId, DateTimeOffset timeOfReport, GatheringReportType reportType, string reportDetails)
@@ -225,6 +251,37 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.SnapshotReports.Add(toCreate));
+        }
+
+        public Task<List<Core.Boundaries.RumorReport>> GetReportsForRumorAsync(long rumorId)
+        {
+            return storeSentry.ExecuteReadAsync(ctx => ctx.
+            RumorReports.
+            Where(r => r.RumorId == rumorId).
+            Select(r => new Core.Boundaries.RumorReport
+            (
+                r.Id,
+                r.UserId ?? 0,
+                r.RumorId,
+                r.FilingDate,
+                r.Type,
+                r.Notes
+            )).
+            ToListAsync());
+        }
+
+        public async Task ReportRumorAsync(long userId, long rumorId, DateTimeOffset timeOfReport, RumorReportType reportType, string reportDetails)
+        {
+            RumorReport toCreate = new()
+            {
+                UserId = userId,
+                RumorId = rumorId,
+                FilingDate = timeOfReport,
+                Notes = reportDetails,
+                Type = reportType
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.RumorReports.Add(toCreate));
         }
     }
 }

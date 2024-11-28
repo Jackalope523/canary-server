@@ -27,6 +27,11 @@ namespace Core.Boundaries
         Promotion, Spam, Other
     }
 
+    public enum RumorReportType
+    {
+        Inappropriate, Promotion, Spam, Other
+    }
+
     public record PenaltyShard(PenaltyType Offense, DateTimeOffset TimeOfPenalty);
 
 	public record UserReport(long Id, long ReportingUserId, long ReportedUserId, DateTimeOffset ReportTime,
@@ -38,17 +43,20 @@ namespace Core.Boundaries
     public record SnapshotReport(long Id, long ReportingUserId, long ReportedSnapshotId, DateTimeOffset ReportTime,
         SnapshotReportType ReportType, string ReportDetails);
 
-	#endregion
+    public record RumorReport(long Id, long ReportingUserId, long ReportedRumorId, DateTimeOffset ReportTime,
+        RumorReportType ReportType, string ReportDetails);
 
-	#region Gates
+    #endregion
 
-	public interface IDisciplineDatabase
+    #region Gates
+
+    public interface IDisciplineDatabase
     {
         Task<List<PenaltyShard>> GetPenaltiesForUserAsync(long userId);
         Task PenaliseUserAsync(long userId, PenaltyType offense, DateTimeOffset timeOfPenalty);
 
-        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>)> GetReportsForUserAsync(long userId);
-        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>)> GetReportsByUserAsync(long userId);
+        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>, List<RumorReport>)> GetReportsForUserAsync(long userId);
+        Task<(List<UserReport>, List<GatheringReport>, List<SnapshotReport>, List<RumorReport>)> GetReportsByUserAsync(long userId);
         Task ReportUserAsync(long userId, long targetUserId, long gatheringId, DateTimeOffset timeOfReport,
             UserReportType reportType, string reportDetails);
         Task ReportUserAsync(long userId, long targetUserId, DateTimeOffset timeOfReport,
@@ -61,6 +69,10 @@ namespace Core.Boundaries
         Task<List<SnapshotReport>> GetReportsForSnapshotAsync(long snapshotId);
         Task ReportSnapshotAsync(long userId, long snapshotId, DateTimeOffset timeOfReport,
             SnapshotReportType reportType, string reportDetails);
+
+        Task<List<RumorReport>> GetReportsForRumorAsync(long rumorId);
+        Task ReportRumorAsync(long userId, long rumorId, DateTimeOffset timeOfReport,
+            RumorReportType reportType, string reportDetails);
     }
 
     public interface IDisciplineOperations

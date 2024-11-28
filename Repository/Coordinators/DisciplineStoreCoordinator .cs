@@ -41,24 +41,34 @@ namespace Repository
             return await store.GetPenaltiesForUserAsync(userId);
         }
 
-        public Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsForUserAsync(long userId)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>, List<Core.Boundaries.RumorReport>)> GetReportsForUserAsync(long userId)
         {
-            return store.GetReportsForUserAsync(userId);
+            return await store.GetReportsForUserAsync(userId);
         }
 
-        public Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>)> GetReportsByUserAsync(long userId)
+        public async Task<(List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>, List<Core.Boundaries.RumorReport>)> GetReportsByUserAsync(long userId)
         {
-            return store.GetReportsByUserAsync(userId);
+            return await store.GetReportsByUserAsync(userId);
         }
 
-        public Task<List<Core.Boundaries.SnapshotReport>> GetReportsForSnapshotAsync(long snapshotId)
+        public async Task<List<Core.Boundaries.SnapshotReport>> GetReportsForSnapshotAsync(long snapshotId)
         {
-            return store.GetReportsForSnapshotAsync(snapshotId);
+            return await store.GetReportsForSnapshotAsync(snapshotId);
         }
 
-        public Task ReportSnapshotAsync(long userId, long snapshotId, DateTimeOffset timeOfReport, SnapshotReportType reportType, string reportDetails)
+        public async Task ReportSnapshotAsync(long userId, long snapshotId, DateTimeOffset timeOfReport, SnapshotReportType reportType, string reportDetails)
         {
-            return store.ReportSnapshotAsync(userId, snapshotId, timeOfReport, reportType, reportDetails);
+            await store.ReportSnapshotAsync(userId, snapshotId, timeOfReport, reportType, reportDetails);
+        }
+
+        public async Task<List<Core.Boundaries.RumorReport>> GetReportsForRumorAsync(long rumorId)
+        {
+            return await store.GetReportsForRumorAsync(rumorId);
+        }
+
+        public async Task ReportRumorAsync(long userId, long rumorId, DateTimeOffset timeOfReport, RumorReportType reportType, string reportDetails)
+        {
+            await store.ReportRumorAsync(userId, rumorId, timeOfReport, reportType, reportDetails);
         }
     }
 }

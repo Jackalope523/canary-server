@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Linq.Expressions;
 using static Repository.Harbor;
 
 namespace Repository
@@ -7,6 +8,7 @@ namespace Repository
     internal class EFCoreSentry : IDatabaseSentry
     {
         private readonly Func<CanaryContext> initializeContext;
+
         public EFCoreSentry(Flag flag)
         {
             switch (flag)
@@ -49,18 +51,24 @@ namespace Repository
         {
             using (CanaryContext context = initializeContext())
             {
-                try
+                using (IDbContextTransaction transaction = context.Database.BeginTransaction())
                 {
-                    write.Invoke(context);
-                    context.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    throw new DatabaseWriteException(ex);
-                }
-                finally
-                {
-                    context.Dispose();
+                    try
+                    {
+                        write.Invoke(context);
+                        context.SaveChanges();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw new DatabaseWriteException(ex);
+                    }
+                    finally
+                    {
+                        transaction.Dispose();
+                        context.Dispose();
+                    }
                 }
             }
         }
@@ -89,18 +97,24 @@ namespace Repository
         {
             using (CanaryContext context = initializeContext())
             {
-                try
+                using (IDbContextTransaction transaction = await context.Database.BeginTransactionAsync())
                 {
-                    write.Invoke(context);
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    throw new DatabaseWriteException(ex);
-                }
-                finally
-                {
-                    await context.DisposeAsync();
+                    try
+                    {
+                        write.Invoke(context);
+                        await context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        throw new DatabaseWriteException(ex);
+                    }
+                    finally
+                    {
+                        await transaction.DisposeAsync();
+                        await context.DisposeAsync();
+                    }
                 }
             }
         }
@@ -108,18 +122,24 @@ namespace Repository
         {
             using (CanaryContext context = initializeContext())
             {
-                try
+                using (IDbContextTransaction transaction = await context.Database.BeginTransactionAsync())
                 {
-                    await write.Invoke(context);
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    throw new DatabaseWriteException(ex);
-                }
-                finally
-                {
-                    await context.DisposeAsync();
+                    try
+                    {
+                        await write.Invoke(context);
+                        await context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        throw new DatabaseWriteException(ex);
+                    }
+                    finally
+                    {
+                        await transaction.DisposeAsync();
+                        await context.DisposeAsync();
+                    }
                 }
             }
         }

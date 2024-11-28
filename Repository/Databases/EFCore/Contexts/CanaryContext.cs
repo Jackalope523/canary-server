@@ -1,6 +1,4 @@
-﻿using Azure.Security.KeyVault.Certificates;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
 
 namespace Repository
@@ -15,6 +13,7 @@ namespace Repository
         internal DbSet<UserReport> UserReports { get; set; }
         internal DbSet<GatheringReport> GatheringReports { get; set; }
         internal DbSet<SnapshotReport> SnapshotReports { get; set; }
+        internal DbSet<RumorReport> RumorReports { get; set; }
         internal DbSet<Snapshot> Snapshots { get; set; }
         internal DbSet<Telegram> Telegrams { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
@@ -23,6 +22,9 @@ namespace Repository
         internal DbSet<BannerLink> BannerLinks { get; set; }
         internal DbSet<GuestClearance> GuestClearances { get; set; }
         internal DbSet<Feedback> Feedback { get; set; }
+        internal DbSet<RumoredGathering> RumoredGatherings { get; set; }
+        internal DbSet<Rumor> Rumors { get; set; }
+        internal DbSet<Investigation> RumorLinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -129,6 +131,11 @@ namespace Repository
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
+                .HasMany(u => u.RumorReports)
+                .WithOne(r => r.User)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
                .HasMany(u => u.GatheringReports)
                .WithOne(r => r.User)
                .OnDelete(DeleteBehavior.Restrict);
@@ -161,6 +168,16 @@ namespace Repository
             modelBuilder.Entity<User>()
             .HasMany(u => u.BannerLinks)
             .WithOne(l => l.User)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+            .HasMany(u => u.Investigations)
+            .WithOne(i => i.Investigator)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+            .HasMany(u => u.Rumors)
+            .WithOne(r => r.Author)
             .OnDelete(DeleteBehavior.Restrict);
 
             // Gathering
@@ -237,6 +254,13 @@ namespace Repository
             .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<SnapshotReport>().Property(r => r.Notes)
+              .HasMaxLength(2000);
+
+            // Rumor Report
+            modelBuilder.Entity<RumorReport>()
+            .HasQueryFilter(r => !r.SoftDeleted);
+
+            modelBuilder.Entity<RumorReport>().Property(r => r.Notes)
               .HasMaxLength(2000);
 
             // Snapshot
@@ -316,6 +340,32 @@ namespace Repository
             // Penalty
             modelBuilder.Entity<Penalty>()
             .HasQueryFilter(p => !p.SoftDeleted);
+
+            // Rumored Gathering
+            modelBuilder.Entity<RumoredGathering>()
+            .HasQueryFilter(r => !r.SoftDeleted);
+
+            modelBuilder.Entity<RumoredGathering>()
+            .HasMany(r => r.Investigations)
+            .WithOne(i => i.RumoredGathering)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RumoredGathering>()
+            .HasMany(r => r.Rumors)
+            .WithOne(r => r.RumoredGathering)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            // Rumor
+            modelBuilder.Entity<Rumor>()
+            .HasQueryFilter(r => !r.SoftDeleted);
+
+            modelBuilder.Entity<Rumor>()
+            .Property(r => r.Text)
+            .HasMaxLength(200);
+
+            // Investigation
+            modelBuilder.Entity<Investigation>()
+            .HasQueryFilter(r => !r.SoftDeleted);
         }
     }
 }

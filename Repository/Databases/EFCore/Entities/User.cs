@@ -51,6 +51,7 @@ namespace Repository
         public List<UserReport>? ReporteeList { get; set; }
         public List<GatheringReport>? GatheringReports { get; set; }
         public List<SnapshotReport>? SnapshotReports { get; set; }
+        public List<RumorReport>? RumorReports { get; set; }
         public List<Snapshot>? Snapshots { get; set; }
         public List<Telegram>? SentTelegrams { get; set; }
         public List<Telegram>? ReceivedTelegrams { get; set; }
@@ -58,6 +59,8 @@ namespace Repository
         public List<Penalty>? Penalties { get; set; }
         public List<Feedback>? Feedback { get; set; }
         public List<GuestClearance>? GuestClearances { get; set; }
+        public List<Investigation>? Investigations { get; set; }
+        public List<Rumor>? Rumors { get; set; }
 
 
         // Default Values
