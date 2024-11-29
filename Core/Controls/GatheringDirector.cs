@@ -305,6 +305,12 @@ namespace Core.Controls
             // Try to end gathering
             await Gatherings.TerminateGatheringAsync(gathering.Id, Time);
 
+			// Reshow if hidden
+			if (gathering.Visibility == GatheringVisibility.Hidden)
+			{
+				await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Visible) });
+			}
+
 			var participants = await gathering.Ended();
 
 			// Update all participants' vectors
