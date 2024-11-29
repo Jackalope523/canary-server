@@ -31,6 +31,7 @@ namespace Core.Entities
         public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(20);
         public static readonly TimeSpan MaximumStartWait = TimeSpan.FromMinutes(30);
         public static readonly TimeSpan MaximumAutoStart = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan MaximumCreationAdvance = TimeSpan.FromDays(14);
 
         public static Gathering None
             => new() { Id = 0, Exists = false };
@@ -228,7 +229,7 @@ namespace Core.Entities
             if (HappenedBefore(StartTime, Time)) { StartTime = Time; }
 
             // Verify Gathering is within a reasonable time
-            if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }
+            if (After(StartTime, Time + MaximumCreationAdvance)) { issues += "Gathering is too far in the future. "; }
 
             // Force degree to be sensible
             DegreeOfPrivacy = Math.Clamp(DegreeOfPrivacy, 1, 3);
