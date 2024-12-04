@@ -19,8 +19,6 @@ namespace Repository
         internal DbSet<Telegram> Telegrams { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
         internal DbSet<Penalty> Penalties { get; set; }
-        internal DbSet<Banner> Banners { get; set; }
-        internal DbSet<BannerLink> BannerLinks { get; set; }
         internal DbSet<GuestClearance> GuestClearances { get; set; }
         internal DbSet<Feedback> Feedback { get; set; }
 
@@ -253,27 +251,6 @@ namespace Repository
               .WithOne(l => l.Snapshot)
               .OnDelete(DeleteBehavior.Restrict);
 
-            // Banner
-            modelBuilder.Entity<Banner>()
-            .HasQueryFilter(b => !b.SoftDeleted);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Name)
-             .HasMaxLength(100);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Description)
-             .HasMaxLength(1000);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Code)
-             .HasMaxLength(50);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Color)
-            .HasMaxLength(7);
-
-            modelBuilder.Entity<Banner>()
-              .HasMany(b => b.Links)
-              .WithOne(l => l.Banner)
-              .OnDelete(DeleteBehavior.Restrict);
-
             // Feedback
             modelBuilder.Entity<Feedback>()
             .HasQueryFilter(f => !f.SoftDeleted);
@@ -299,10 +276,6 @@ namespace Repository
 
             // Gathering Link
             modelBuilder.Entity<GatheringLink>()
-            .HasQueryFilter(l => !l.SoftDeleted);
-
-            // Banner Link
-            modelBuilder.Entity<BannerLink>()
             .HasQueryFilter(l => !l.SoftDeleted);
 
             // Guest Clearance

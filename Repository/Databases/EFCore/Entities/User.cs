@@ -46,7 +46,6 @@ namespace Repository
         public List<UserRelationship>? TargetUserRelationships { get; set; }
         public List<GatheringLink>? GatheringLinks { get; set; }
         public List<SnapshotLink>? SnapshotLinks { get; set; }
-        public List<BannerLink>? BannerLinks { get; set; }
         public List<UserReport>? ReporterList { get; set; }
         public List<UserReport>? ReporteeList { get; set; }
         public List<GatheringReport>? GatheringReports { get; set; }
