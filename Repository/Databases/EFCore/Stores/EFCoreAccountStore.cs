@@ -105,11 +105,6 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.BannerLinks.
-               Where(l => l.UserId == id).
-               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Users.
                Where(u => u.Id == id).
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
@@ -154,11 +149,6 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.GatheringLinks.
-               Where(l => l.UserId == id).
-               ExecuteDeleteAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.BannerLinks.
                Where(l => l.UserId == id).
                ExecuteDeleteAsync());
 

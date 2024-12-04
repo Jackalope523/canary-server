@@ -156,11 +156,6 @@ namespace Repository
              .WithOne(c => c.User)
              .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<User>()
-            .HasMany(u => u.BannerLinks)
-            .WithOne(l => l.User)
-            .OnDelete(DeleteBehavior.Restrict);
-
             // Gathering
             modelBuilder.Entity<Gathering>()
             .HasQueryFilter(g => !g.SoftDeleted);

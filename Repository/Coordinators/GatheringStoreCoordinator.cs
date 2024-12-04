@@ -12,9 +12,9 @@ namespace Repository
             store = new EFCoreGatheringStore(flag);
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(long hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy)
+        public async Task<CoreGathering> CreateGatheringAsync(long hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy, DateTimeOffset timeOfCreation)
         {
-            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy);
+            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy, timeOfCreation);
         }
 
         public async Task DeleteGatheringAsync(long gatheringId)
@@ -105,6 +105,11 @@ namespace Repository
         public async Task AddGuestAuthorization(long gatheringId, long userId)
         {
             await store.AddGuestAuthorization(gatheringId, userId);
+        }
+
+        public async Task CancelGatheringAsync(long gatheringId)
+        {
+            await store.CancelGatheringAsync(gatheringId);
         }
     }
 }

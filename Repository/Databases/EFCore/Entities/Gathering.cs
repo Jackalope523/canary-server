@@ -7,6 +7,7 @@ namespace Repository
         public string Title { get; set; } = DefaultTitle;
         public string Description { get; set; } = DefaultDescription;
         public DateTimeOffset StartTime { get; set; } = DefaultStartTime;
+        public DateTimeOffset TimeOfCreation { get; set; } = DefaultTimeOfCreation;
         public long? HostId { get; set; } = DefaultHostId;
 
         // X = Longitude Y = Latitude
@@ -14,6 +15,7 @@ namespace Repository
         public string FriendlyLocation { get; set; } = DefaultFriendlyLocation;
 
         public GatheringState State { get; set; } = DefaultState;
+        public GatheringVisibility Visibility { get; set; } = DefaultVisibility;
         public int GroupMinimum { get; set; } = DefaultGroupMinimum;
         public int GroupMaximum { get; set; } = DefaultGroupMaximum;
         public DateTimeOffset? EndTime { get; set; }
@@ -47,10 +49,12 @@ namespace Repository
         public static string DefaultTitle { get; set; } = "Lewis";
         public static string DefaultDescription { get; set; } = "A dog named Lewis.";
         public static DateTimeOffset DefaultStartTime { get; set; } = DateTimeOffset.MinValue;
+        public static DateTimeOffset DefaultTimeOfCreation { get; set; } = DateTimeOffset.MinValue;
         public static long? DefaultHostId { get; set; } = null;
         public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
         public static string DefaultFriendlyLocation { get; set; } = "Solitude";
         public static GatheringState DefaultState { get; set; } = GatheringState.Upcoming;
+        public static GatheringVisibility DefaultVisibility { get; set; } = GatheringVisibility.Visible;
         public static int DefaultGroupMinimum { get; set; } = 0;
         public static int DefaultGroupMaximum { get; set; } = 10;
         public static double DefaultRadius { get; set; } = 10.000;

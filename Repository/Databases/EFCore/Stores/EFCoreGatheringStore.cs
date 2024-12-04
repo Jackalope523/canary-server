@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
 using System.Linq;
@@ -91,7 +92,7 @@ namespace Repository
             }
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(long hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy)
+        public async Task<CoreGathering> CreateGatheringAsync(long hostId, string title, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy, DateTimeOffset timeOfCreation)
         {
             Gathering toCreate = new()
             {
@@ -113,6 +114,7 @@ namespace Repository
                 Industriousness = character.Industriousness,
                 NightOwl = character.NightOwl,
                 DegreeOfPrivacy = degreeOfPrivacy,
+                TimeOfCreation = timeOfCreation
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Gatherings.AddAsync(toCreate));
@@ -163,7 +165,9 @@ namespace Repository
                    toCreate.IsDynamic,
                    toCreate.SoftDeleted,
                    toCreate.NumberOfGuests,
-                   toCreate.DegreeOfPrivacy
+                   toCreate.DegreeOfPrivacy,
+                   toCreate.Visibility,
+                   toCreate.TimeOfCreation
                    );
         }
 
@@ -247,7 +251,7 @@ namespace Repository
                     Select(pair => new CoreGathering
                     (
                         pair.g.Id,
-                        pair.user != null ? new UserShard(pair.user.Id, pair.user.Name) : new UserShard(0, "DeletedGathering"),
+                        pair.user != null ? new UserShard(pair.user.Id, pair.user.Name) : new UserShard(0, "DeletedUser"),
                         pair.g.Title,
                         pair.g.Description,
                         pair.g.StartTime,
@@ -271,7 +275,9 @@ namespace Repository
                         pair.g.IsDynamic,
                         pair.g.SoftDeleted,
                         pair.g.NumberOfGuests,
-                        pair.g.DegreeOfPrivacy
+                        pair.g.DegreeOfPrivacy,
+                        pair.g.Visibility,
+                        pair.g.TimeOfCreation
                         )).SingleAsync());
             }
             return gathering;          
@@ -289,7 +295,7 @@ namespace Repository
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
                 ctx.Gatherings
-                .Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.OngoingOpen) && !toExclude.Contains(e.Id)),
+                .Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.Ongoing) && !toExclude.Contains(e.Id)),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
@@ -317,7 +323,9 @@ namespace Repository
                     e.IsDynamic,
                     e.SoftDeleted,
                     e.NumberOfGuests,
-                    e.DegreeOfPrivacy
+                    e.DegreeOfPrivacy,
+                    e.Visibility,
+                    e.TimeOfCreation
                 })
             .GroupJoin(
                 ctx.Users,
@@ -352,7 +360,9 @@ namespace Repository
                 joinResult.e.IsDynamic,
                 joinResult.e.SoftDeleted,
                 joinResult.e.NumberOfGuests,
-                joinResult.e.DegreeOfPrivacy
+                joinResult.e.DegreeOfPrivacy,
+                joinResult.e.Visibility,
+                joinResult.e.TimeOfCreation
                 ))
             .ToListAsync());
         }
@@ -390,7 +400,9 @@ namespace Repository
                     e.IsDynamic,
                     e.SoftDeleted,
                     e.NumberOfGuests,
-                    e.DegreeOfPrivacy
+                    e.DegreeOfPrivacy,
+                    e.Visibility,
+                    e.TimeOfCreation
                 })
             .GroupJoin(
                 ctx.Users,
@@ -424,7 +436,9 @@ namespace Repository
                 joinResult.e.IsDynamic,
                 joinResult.e.SoftDeleted,
                 joinResult.e.NumberOfGuests,
-                joinResult.e.DegreeOfPrivacy
+                joinResult.e.DegreeOfPrivacy,
+                joinResult.e.Visibility,
+                joinResult.e.TimeOfCreation
                 ))
             .ToListAsync());
         }
@@ -463,7 +477,9 @@ namespace Repository
                     e.IsDynamic,
                     e.SoftDeleted,
                     e.NumberOfGuests,
-                    e.DegreeOfPrivacy
+                    e.DegreeOfPrivacy,
+                    e.Visibility,
+                    e.TimeOfCreation
                 }
             )
             .GroupJoin(
@@ -500,7 +516,9 @@ namespace Repository
                     combined.e.IsDynamic,
                     combined.e.SoftDeleted,
                     combined.e.NumberOfGuests,
-                    combined.e.DegreeOfPrivacy
+                    combined.e.DegreeOfPrivacy,
+                    combined.e.Visibility,
+                    combined.e.TimeOfCreation
                 )
             ).ToListAsync());
         }
@@ -542,7 +560,9 @@ namespace Repository
                     combined.e.IsDynamic,
                     combined.e.SoftDeleted,
                     combined.e.NumberOfGuests,
-                    combined.e.DegreeOfPrivacy
+                    combined.e.DegreeOfPrivacy,
+                    combined.e.Visibility,
+                    combined.e.TimeOfCreation
                 )
             ).SingleAsync());
         }
@@ -554,7 +574,7 @@ namespace Repository
 
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Gatherings.
-                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.OngoingOpen || e.State == GatheringState.Upcoming)).
+                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.Ongoing || e.State == GatheringState.Upcoming) && e.Visibility == GatheringVisibility.Visible).
                 Join(
                     ctx.Users, 
                     e => e.HostId, 
@@ -586,7 +606,9 @@ namespace Repository
                         e.IsDynamic,
                         e.SoftDeleted,
                         e.NumberOfGuests,
-                        e.DegreeOfPrivacy
+                        e.DegreeOfPrivacy,
+                        e.Visibility,
+                        e.TimeOfCreation
                    )).ToListAsync());
         }     
         public async Task<List<UserShard>> GetGuestListAsync(long id)
@@ -781,7 +803,9 @@ namespace Repository
                     e.IsDynamic,
                     e.SoftDeleted,
                     e.NumberOfGuests,
-                    e.DegreeOfPrivacy
+                    e.DegreeOfPrivacy,
+                    e.Visibility,
+                    e.TimeOfCreation
                     )).ToListAsync());
         }      
         public async Task<GatheringBond?> GetUserStateAsync(long userId, long gatheringId)
@@ -944,6 +968,17 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.GuestClearances.Add(toAdd)); 
+        }
+
+        public async  Task CancelGatheringAsync(long gatheringId)
+        {
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
+            Gathering e = new() { Id = gatheringId, State = GatheringState.Cancelled };
+            storeSentry.DiscussWrite(ctx => ctx.Gatherings.Attach(e), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(e).Property(e => e.State).IsModified = true, currentDiscussion);
+ 
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
     }
 }

@@ -231,7 +231,9 @@ namespace Repository
                     combined.e.IsDynamic,
                     combined.e.SoftDeleted,
                     combined.e.NumberOfGuests,
-                    combined.e.DegreeOfPrivacy
+                    combined.e.DegreeOfPrivacy,
+                    combined.e.Visibility,
+                    combined.e.TimeOfCreation
                 )).FirstAsync());
         }
 
@@ -285,7 +287,9 @@ namespace Repository
                     combined.e.IsDynamic,
                     combined.e.SoftDeleted,
                     combined.e.NumberOfGuests,
-                    combined.e.DegreeOfPrivacy
+                    combined.e.DegreeOfPrivacy,
+                    combined.e.Visibility,
+                    combined.e.TimeOfCreation
                 )).FirstAsync());
         }
 

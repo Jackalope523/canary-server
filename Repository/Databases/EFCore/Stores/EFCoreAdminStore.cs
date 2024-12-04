@@ -47,7 +47,9 @@ namespace Repository
                     g.IsDynamic,
                     g.SoftDeleted,
                     g.NumberOfGuests,
-                    g.DegreeOfPrivacy
+                    g.DegreeOfPrivacy,
+                    g.Visibility,
+                    g.TimeOfCreation
                  )).ToListAsync());
         }
 
@@ -91,11 +93,6 @@ namespace Repository
 
         public async Task VoidUserAsync(long userId)
         {
-            await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.BannerLinks.
-                Where(l => l.UserId == userId).
-                ExecuteDeleteAsync());
-
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.Penalties.
                 Where(p => p.PenalizedId == userId).
