@@ -113,7 +113,7 @@ namespace Core.Controls
         internal async Task PenaliseUserAsync(User user, PenaltyType offense, DateTimeOffset timeOfPenalty)
             => await Reports.PenaliseUserAsync(user.Id, offense, timeOfPenalty);
 
-		internal async Task<(List<UserReport> UserReports, List<GatheringReport> GatheringReports, List<SnapshotReport> SnapshotReports)>
+		internal async Task<(List<UserReport> UserReports, List<GatheringReport> GatheringReports, List<SnapshotReport> SnapshotReports, List<RumorReport> RumorReports)>
             RequestAllReportsAsync(User user)
             => await Reports.GetReportsForUserAsync(user.Id);
 

@@ -24,7 +24,7 @@ namespace Repository
         internal DbSet<Feedback> Feedback { get; set; }
         internal DbSet<RumoredGathering> RumoredGatherings { get; set; }
         internal DbSet<Rumor> Rumors { get; set; }
-        internal DbSet<Investigation> RumorLinks { get; set; }
+        internal DbSet<Investigation> Investigations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -346,6 +346,10 @@ namespace Repository
             .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<RumoredGathering>()
+            .Property(g => g.Location)
+            .HasSrid(4326);
+
+            modelBuilder.Entity<RumoredGathering>()
             .HasMany(r => r.Investigations)
             .WithOne(i => i.RumoredGathering)
             .OnDelete(DeleteBehavior.Restrict);
@@ -366,6 +370,10 @@ namespace Repository
             // Investigation
             modelBuilder.Entity<Investigation>()
             .HasQueryFilter(r => !r.SoftDeleted);
+
+            modelBuilder.Entity<Investigation>()
+               .HasIndex(i => new { i.InvestigatorId, i.RumoredGatheringId })
+               .IsUnique();
         }
     }
 }

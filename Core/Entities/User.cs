@@ -97,7 +97,7 @@ namespace Core.Entities
         public Synced<List<TelegramShard>> Notes { get; }
         public Synced<List<PenaltyShard>> Penalties { get; }
 
-        private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports, List<SnapshotReport> SnapshotReports)> ReportsSync { get; }
+        private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports, List<SnapshotReport> SnapshotReports, List<RumorReport> RumorReports)> ReportsSync { get; }
         public Synced<List<UserReport>> Reports { get; }
         public Synced<List<GatheringReport>> GatheringReports { get; }
         public Synced<List<SnapshotReport>> SnapshotReports { get; }

@@ -10,6 +10,11 @@ namespace Repository
             store = new EFCoreRumorStore(flag);
         }
 
+        public async Task ConfirmRumor(long investigatorId, long rumoredGatheringId)
+        {
+            await store.ConfirmRumor(investigatorId, rumoredGatheringId);
+        }
+
         public async Task<CoreRumor> CreateRumorAsync(long rumoredGatheringId, long authorId, string text, DateTimeOffset time)
         {
             return await store.CreateRumorAsync(rumoredGatheringId, authorId, text, time);
@@ -18,6 +23,11 @@ namespace Repository
         public async Task<CoreRumoredGathering> CreateRumoredGatheringAsync(double latitude, double longitude, string friendlyLocation)
         {
             return await store.CreateRumoredGatheringAsync(latitude, longitude, friendlyLocation);
+        }
+
+        public async Task DenyRumor(long investigatorId, long rumoredGatheringId)
+        {
+            await store.DenyRumor(investigatorId, rumoredGatheringId);
         }
 
         public async Task<UserShard> GetFounderAsync(long rumoredGatheringId)

@@ -50,7 +50,7 @@ namespace Repository.Tests
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
             await sentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(gatheringReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>) reports = await store.GetReportsByUserAsync(subject1.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>, List<Core.Boundaries.RumorReport>) reports = await store.GetReportsByUserAsync(subject1.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);
@@ -128,7 +128,7 @@ namespace Repository.Tests
             await sentry.ExecuteWriteAsync(ctx => ctx.UserReports.Add(userReport));
             await sentry.ExecuteWriteAsync(ctx => ctx.GatheringReports.Add(gatheringReport));
 
-            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>) reports = await store.GetReportsForUserAsync(subject2.Id);
+            (List<Core.Boundaries.UserReport>, List<Core.Boundaries.GatheringReport>, List<Core.Boundaries.SnapshotReport>, List<Core.Boundaries.RumorReport>) reports = await store.GetReportsForUserAsync(subject2.Id);
 
             Assert.NotNull(reports.Item1);
             Assert.NotNull(reports.Item2);

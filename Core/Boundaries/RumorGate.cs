@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Core.Boundaries
 {
     #region Schema
-    public record CoreRumoredGathering(long Id, double Latitude, double Longitude, string FriendlyLocation) : CoreOnlyData();
+    public record CoreRumoredGathering(long Id, double Latitude, double Longitude, string FriendlyLocation, int TrueConfidenceRating) : CoreOnlyData();
     public record CoreRumor(long Id, string Text, DateTimeOffset Time) : CoreOnlyData();
 
     public record RumorGatheringShard();
@@ -34,6 +34,8 @@ namespace Core.Boundaries
         Task SoftDeleteRumorAsync(long id);
         Task HardDeleteRumorAsync(long id);
         Task UpdateRumorAsync(long id, List<(string Property, object Value)> edits);
+        Task ConfirmRumor(long investigatorId, long rumoredGatheringId);
+        Task DenyRumor(long investigatorId, long rumoredGatheringId);
     }
 
     public interface IRumorOperations

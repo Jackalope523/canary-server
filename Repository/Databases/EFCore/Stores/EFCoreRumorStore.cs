@@ -8,6 +8,25 @@ namespace Repository
         {
         }
 
+        public async Task ConfirmRumor(long investigatorId, long rumoredGatheringId)
+        {
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Investigations.
+                Where(i => i.InvestigatorId == investigatorId && i.RumoredGatheringId == rumoredGatheringId)
+                .Select(l => l.Id)
+                .SingleOrDefaultAsync());
+
+            Investigation investigation = new()
+            {
+                Id = id,
+                InvestigatorId = investigatorId,
+                RumoredGatheringId = rumoredGatheringId,
+                Conclusion = Investigation.InvestigationConclusion.Confirm
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Investigations.Update(investigation));
+        }
+
         public async Task<CoreRumor> CreateRumorAsync(long rumoredGatheringId, long authorId, string text, DateTimeOffset time)
         {
             Rumor toCreate = new()
@@ -34,7 +53,26 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.RumoredGatherings.Add(toCreate));
 
-            return new CoreRumoredGathering(toCreate.Id, toCreate.Location.Y, toCreate.Location.X, toCreate.FriendlyLocation);
+            return new CoreRumoredGathering(toCreate.Id, toCreate.Location.Y, toCreate.Location.X, toCreate.FriendlyLocation, toCreate.ConfidenceRating);
+        }
+
+        public async Task DenyRumor(long investigatorId, long rumoredGatheringId)
+        {
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
+                ctx.Investigations.
+                Where(i => i.InvestigatorId == investigatorId && i.RumoredGatheringId == rumoredGatheringId)
+                .Select(l => l.Id)
+                .SingleOrDefaultAsync());
+
+            Investigation investigation = new()
+            {
+                Id = id,
+                InvestigatorId = investigatorId,
+                RumoredGatheringId = rumoredGatheringId,
+                Conclusion = Investigation.InvestigationConclusion.Deny
+            };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Investigations.Update(investigation));
         }
 
         public async Task<UserShard> GetFounderAsync(long rumoredGatheringId)
@@ -67,7 +105,7 @@ namespace Repository
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.RumoredGatherings.
                 Where(r => r.Id == id).
-                Select(r => new CoreRumoredGathering(r.Id, r.Location.Y, r.Location.X, r.FriendlyLocation)).
+                Select(r => new CoreRumoredGathering(r.Id, r.Location.Y, r.Location.X, r.FriendlyLocation, r.ConfidenceRating)).
                 SingleAsync());
         }
 
@@ -161,7 +199,7 @@ namespace Repository
 
             storeSentry.DiscussWrite(ctx => ctx.RumorReports.Where(r => rumorIds.Contains(r.RumorId)).ExecuteDelete(), deleteDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Rumors.Where(r => rumorIds.Contains(r.Id)).ExecuteDelete(), deleteDiscussion);
-            storeSentry.DiscussWrite(ctx => ctx.RumorLinks.Where(l => l.RumoredGatheringId == id).ExecuteDelete(), deleteDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Investigations.Where(l => l.RumoredGatheringId == id).ExecuteDelete(), deleteDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.RumoredGatherings.Remove(new RumoredGathering { Id = id }), deleteDiscussion);
 
             await storeSentry.EndDiscussionAsync(deleteDiscussion);
@@ -178,7 +216,7 @@ namespace Repository
                 updateDiscussion);
 
             Rumor r = new() { Id = id, SoftDeleted = true };
-            storeSentry.DiscussWrite(ctx => ctx.RumoredGatherings.Attach(r), updateDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Rumors.Attach(r), updateDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(r).Property(nameof(r.SoftDeleted)).IsModified = true, updateDiscussion);
 
             await storeSentry.EndDiscussionAsync(updateDiscussion);
@@ -207,7 +245,7 @@ namespace Repository
                 updateDiscussion);
 
             storeSentry.DiscussWrite(ctx => 
-                ctx.RumorLinks.
+                ctx.Investigations.
                 Where(l => l.RumoredGatheringId == id).
                 ExecuteUpdate(setter => setter.SetProperty(l => l.SoftDeleted, true)),
                 updateDiscussion);

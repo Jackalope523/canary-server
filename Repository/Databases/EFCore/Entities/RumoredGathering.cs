@@ -15,7 +15,7 @@ namespace Repository
         // Default Values
         private static readonly CoordinateFactory Factory = new();
      
-        public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
+        public static Point DefaultLocation { get; set; } = Factory.Create(17.544, -72.483);
         public static string DefaultFriendlyLocation { get; set; } = "";
         public static int DefaultConfidenceRating { get; set; } = 100;
     }

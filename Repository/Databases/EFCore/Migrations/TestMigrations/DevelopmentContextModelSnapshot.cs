@@ -354,6 +354,34 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.ToTable("GuestClearances");
                 });
 
+            modelBuilder.Entity("Repository.Investigation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Conclusion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("InvestigatorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("RumoredGatheringId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RumoredGatheringId");
+
+                    b.HasIndex("InvestigatorId", "RumoredGatheringId")
+                        .IsUnique();
+
+                    b.ToTable("Investigations");
+                });
+
             modelBuilder.Entity("Repository.Penalty", b =>
                 {
                     b.Property<long>("Id")
@@ -377,6 +405,99 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.HasIndex("PenalizedId");
 
                     b.ToTable("Penalties");
+                });
+
+            modelBuilder.Entity("Repository.Rumor", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("AuthorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("RumoredGatheringId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("Time")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("RumoredGatheringId");
+
+                    b.ToTable("Rumors");
+                });
+
+            modelBuilder.Entity("Repository.RumorReport", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("FilingDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("RumorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RumorId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RumorReports");
+                });
+
+            modelBuilder.Entity("Repository.RumoredGathering", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ConfidenceRating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FriendlyLocation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Point>("Location")
+                        .IsRequired()
+                        .HasColumnType("POINT")
+                        .HasAnnotation("Sqlite:Srid", 4326);
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RumoredGatherings");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -856,6 +977,25 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Repository.Investigation", b =>
+                {
+                    b.HasOne("Repository.User", "Investigator")
+                        .WithMany("Investigations")
+                        .HasForeignKey("InvestigatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Repository.RumoredGathering", "RumoredGathering")
+                        .WithMany("Investigations")
+                        .HasForeignKey("RumoredGatheringId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Investigator");
+
+                    b.Navigation("RumoredGathering");
+                });
+
             modelBuilder.Entity("Repository.Penalty", b =>
                 {
                     b.HasOne("Repository.User", "Penalized")
@@ -865,6 +1005,42 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                         .IsRequired();
 
                     b.Navigation("Penalized");
+                });
+
+            modelBuilder.Entity("Repository.Rumor", b =>
+                {
+                    b.HasOne("Repository.User", "Author")
+                        .WithMany("Rumors")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Repository.RumoredGathering", "RumoredGathering")
+                        .WithMany("Rumors")
+                        .HasForeignKey("RumoredGatheringId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("RumoredGathering");
+                });
+
+            modelBuilder.Entity("Repository.RumorReport", b =>
+                {
+                    b.HasOne("Repository.Rumor", "Rumor")
+                        .WithMany("RumorReports")
+                        .HasForeignKey("RumorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany("RumorReports")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Rumor");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -985,6 +1161,18 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("UserReports");
                 });
 
+            modelBuilder.Entity("Repository.Rumor", b =>
+                {
+                    b.Navigation("RumorReports");
+                });
+
+            modelBuilder.Entity("Repository.RumoredGathering", b =>
+                {
+                    b.Navigation("Investigations");
+
+                    b.Navigation("Rumors");
+                });
+
             modelBuilder.Entity("Repository.Snapshot", b =>
                 {
                     b.Navigation("Reports");
@@ -1008,6 +1196,8 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
 
                     b.Navigation("InitiatedUserRelationships");
 
+                    b.Navigation("Investigations");
+
                     b.Navigation("Penalties");
 
                     b.Navigation("ReceivedTelegrams");
@@ -1015,6 +1205,10 @@ namespace Repository.Databases.EFCore.Migrations.TestMigrations
                     b.Navigation("ReporteeList");
 
                     b.Navigation("ReporterList");
+
+                    b.Navigation("RumorReports");
+
+                    b.Navigation("Rumors");
 
                     b.Navigation("SentTelegrams");
 
