@@ -71,7 +71,8 @@ namespace Repository.Tests
                     testGathering.Openness),
                 testGathering.Radius,
                 testGathering.IsDynamic,
-                testGathering.DegreeOfPrivacy
+                testGathering.DegreeOfPrivacy,
+                testGathering.TimeOfCreation
                 );
 
             Gathering created = sentry.ExecuteRead(ctx => ctx.Gatherings.Where(e => e.Id == createdShard.Id).Single());
@@ -122,7 +123,8 @@ namespace Repository.Tests
                     testGathering.Openness),
                 testGathering.Radius,
                 testGathering.IsDynamic,
-                2
+                testGathering.DegreeOfPrivacy,
+                testGathering.TimeOfCreation
                 );
 
             Gathering created = sentry.ExecuteRead(ctx => ctx.Gatherings.Where(e => e.Id == createdShard.Id).Single());

@@ -12,8 +12,6 @@ namespace Repository
 
         public async Task DrainDatabaseAsync()
         {
-            storeSentry.ExecuteWrite(ctx => ctx.BannerLinks.ExecuteDelete());
-            storeSentry.ExecuteWrite(ctx => ctx.Banners.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.SnapshotLinks.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.GatheringLinks.ExecuteDelete());
             storeSentry.ExecuteWrite(ctx => ctx.UserRelationships.ExecuteDelete());

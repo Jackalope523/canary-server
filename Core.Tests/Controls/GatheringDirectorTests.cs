@@ -322,7 +322,7 @@ namespace Core.Tests.Controls
 			// Assert
 			Gathering startedGathering = new(await environment.Terminal.GatheringDatabase.FindGatheringAsync(gathering.Id));
 			Assert.Equal(gathering, startedGathering);
-			Assert.Equal(GatheringState.OngoingOpen, startedGathering.State);
+			Assert.Equal(GatheringState.Ongoing, startedGathering.State);
 		}
 
 		[Fact]
