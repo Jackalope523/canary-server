@@ -290,7 +290,7 @@ namespace Frontier.Controllers
         [HttpPost("agreement")]
         public async Task<IActionResult> UpdateUserAgreement()
         {
-            return await Execute(async user => await accounts.UpdateUserAgreement(user.Id), allowUnverified: true);
+            return await Execute(async user => await accounts.UpdateUserAgreementAsync(user.Id), allowUnverified: true);
         }
 
         [HttpPost("avatar")]
@@ -309,6 +309,13 @@ namespace Frontier.Controllers
                 // Send avatar to account manager
                 await accounts.EditAvatarAsync(user.Id, stream);
             }, allowUnverified: true);
+        }
+
+        [HttpPost("code")]
+        public async Task<IActionResult> RerollCode()
+        {
+            return await Execute(async user =>
+                await accounts.RerollCodeAsync(user.Id));
         }
 
         #endregion

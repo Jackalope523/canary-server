@@ -47,6 +47,16 @@ namespace Core.Controls
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, string code = "")
         {
+            CoreUser invitingUser;
+
+            // Verify invite code
+            try
+            {
+                invitingUser = await Accounts.FindUserByCodeAsync(code.ToLower());
+            }
+            catch
+            { throw new InvalidInformationException("Incorrect code."); }
+
             // Create user
             User newUser = new()
             {
@@ -73,6 +83,8 @@ namespace Core.Controls
                 newUser.Name, newUser.DateOfBirth, Time,
                 CharacterVector.Default(newUser.GetAge()).ToCharacter(),
                 Guid.NewGuid());
+
+            await Nests.FollowUserAsync(user.Id, invitingUser.Id, Time);
         }
 
         public async Task EditUserAsync(long userId,
@@ -143,7 +155,7 @@ namespace Core.Controls
             await Accounts.UpdateUserAsync(user.Id, edits);
 		}
 
-        public async Task UpdateUserAgreement(long userId)
+        public async Task UpdateUserAgreementAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
@@ -158,8 +170,17 @@ namespace Core.Controls
             await Terminal.MediaDirector.UploadAvatarAsync(user.Id, image);
         }
 
+        public async Task<string> RerollCodeAsync(long userId)
+        {
+            var user = await GetUserAsync(userId);
+
+            return await Accounts.RerollUserCodeAsync(user.Id);
+        }
+
         public async Task DeleteUserAsync(long userId)
         {
+            // TODO Gracefully delete data
+
             await Accounts.DeleteUserAsync(userId);
         }
 

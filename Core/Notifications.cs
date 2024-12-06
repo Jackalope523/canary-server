@@ -104,9 +104,19 @@ namespace Core.Notifications
     {
         public string RelativePath { get; private set; }
 
-        public NestDeepLink(long userId)
+        public NestDeepLink(long userId,
+            string lastMet = null)
         {
             RelativePath = $"nest/{userId}";
+
+            string options = "";
+
+            options += IDeepLink.ParseOption("lastMet", lastMet);
+
+            if (!string.IsNullOrEmpty(options))
+            {
+                RelativePath += $"?{options.Remove(RelativePath.Length - 1)}";
+            }
         }
     }
 
@@ -140,8 +150,8 @@ namespace Core.Notifications
             return notification;
         }
 
-        public static CanaryNotification UserAdded(UserShard addingUser)
-            => SocialInvitation(new("Companion Request", $"{addingUser} added you.", new NestDeepLink(addingUser.Id), "1"));
+        public static CanaryNotification UserAdded(UserShard addingUser, string lastMet)
+            => SocialInvitation(new("Companion Request", $"{addingUser} added you.", new NestDeepLink(addingUser.Id, lastMet: lastMet), "1"));
 
         public static CanaryNotification CompanionshipForged(UserShard addingUser)
             => SocialInvitation(new("New Companion", $"Companionship forged, {addingUser.Name} added you.", new NestDeepLink(addingUser.Id), "1"));

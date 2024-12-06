@@ -4,10 +4,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Core.Boundaries;
+using Core.Notifications;
 
 using static Core.Entities.Psijic;
 using static Core.Entities.Arbiter;
-using Core.Notifications;
 
 namespace Core.Entities
 {
@@ -15,7 +15,6 @@ namespace Core.Entities
 
     internal class User
     {
-
 		#region Variables
 
         //////
@@ -43,7 +42,7 @@ namespace Core.Entities
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
-        public string Pseudonym { get; set; }
+        public string Code { get; set; }
         public DateTimeOffset DateOfBirth { get; init; }
 
         public DateTimeOffset JoinDate { get; init; }
@@ -143,7 +142,7 @@ namespace Core.Entities
             PhoneNumber = fromUser.PhoneNumber;
             Email = fromUser.Email;
             Name = fromUser.Name;
-            Pseudonym = fromUser.Pseudonym;
+            Code = fromUser.Code;
             DateOfBirth = fromUser.DateOfBirth;
             JoinDate = fromUser.JoinDate;
             Reputation = fromUser.Reputation;
@@ -167,7 +166,7 @@ namespace Core.Entities
 
         public CoreUser ToCoreUser()
         {
-            return new(Id, PhoneNumber, Email, Name, Pseudonym, DateOfBirth,
+            return new(Id, PhoneNumber, Email, Name, Code, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, IsDeleted,
                 SecurityStamp, LockoutDate, AccessTries, AccountStatus,
                 JoinDate, Reputation,
@@ -177,7 +176,7 @@ namespace Core.Entities
 
         public AccountShard ToAccountShard()
         {
-            return new(Id, PhoneNumber, Email, Name, DateOfBirth,
+            return new(Id, PhoneNumber, Email, Name, Code, DateOfBirth,
                 IsPhoneConfirmed, IsEmailConfirmed, AccountStatus,
                 JoinDate, TimeOfUserAgreement, NotificationId);
         }
