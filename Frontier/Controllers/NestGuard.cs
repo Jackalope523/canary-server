@@ -44,25 +44,32 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("following")]
-		public async Task<IActionResult> FollowUser([FromBody] TargetManifest info)
+		public async Task<IActionResult> FollowUser(long? targetId = null, string code = null)
 		{
 			// Verify parameters
-			if (info == null || !ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await nests.FollowUserAsync(user.Id, info.TargetId));
+			{
+				if (targetId.HasValue)
+				{ await nests.FollowUserAsync(user.Id, targetId.Value); }
+				else if (!string.IsNullOrEmpty(code))
+				{ await nests.FollowUserAsync(user.Id, code); }
+				else
+				{ throw new InvalidInformationException("Missing parameter."); }
+			});
 		}
 
 		[HttpPut("following")]
-		public async Task<IActionResult> UnfollowUser([FromBody] TargetManifest info)
+		public async Task<IActionResult> UnfollowUser(long targetId)
 		{
 			// Verify parameters
-			if (info == null || !ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await nests.UnfollowUserAsync(user.Id, info.TargetId));
+				await nests.UnfollowUserAsync(user.Id, targetId));
 		}
 
 		[HttpGet("blocked")]
@@ -73,24 +80,24 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("blocked")]
-		public async Task<IActionResult> BlockUser([FromBody] TargetManifest info)
+		public async Task<IActionResult> BlockUser(long targetId)
 		{
 			// Verify parameters
-			if (info == null || !ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await nests.BlockUserAsync(user.Id, info.TargetId));
+				await nests.BlockUserAsync(user.Id, targetId));
 		}
 
 		[HttpPut("blocked")]
-		public async Task<IActionResult> UnblockUser([FromBody] TargetManifest info)
+		public async Task<IActionResult> UnblockUser(long targetId)
 		{
-			if (info == null || !ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{ return BadRequest(HollowError.MissingInformation.ToString()); }
 
 			return await Execute(async user =>
-				await nests.UnblockUserAsync(user.Id, info.TargetId));
+				await nests.UnblockUserAsync(user.Id, targetId));
 		}
 
 		[HttpGet("{targetId}/authorisation/follow")]

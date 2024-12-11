@@ -418,12 +418,17 @@ namespace Core.Entities
             return true;
         }
 
-        public async Task<bool> CanFollow(User target)
+        public async Task<bool> CanFollow(User target, bool hasCode = false)
         {
-            var haveMutualGatheringSync = Terminal.NestDirector.RequestAttendedMutualGatheringAsync(this, target);
             bool blockFollow = await IsBlocking(target) || await IsBlockedBy(target);
 
-            return !blockFollow && await haveMutualGatheringSync;
+            // Check if code bypass
+            if (hasCode)
+            { return !blockFollow; }
+
+            var haveMutualGathering = await Terminal.NestDirector.RequestAttendedMutualGatheringAsync(this, target);
+
+            return !blockFollow && haveMutualGathering;
         }
 
 		#endregion

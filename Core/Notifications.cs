@@ -150,7 +150,7 @@ namespace Core.Notifications
             return notification;
         }
 
-        public static CanaryNotification UserAdded(UserShard addingUser, string lastMet)
+        public static CanaryNotification UserAdded(UserShard addingUser, string lastMet = null)
             => SocialInvitation(new("Companion Request", $"{addingUser} added you.", new NestDeepLink(addingUser.Id, lastMet: lastMet), "1"));
 
         public static CanaryNotification CompanionshipForged(UserShard addingUser)

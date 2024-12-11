@@ -158,14 +158,64 @@ namespace Core.Controls
             Verify(await user.CanFollow(targetUser),
                 new InvalidUserException("User cannot follow this user."));
 
-            await Nests.FollowUserAsync(userId, targetId, Psijic.Time);
+            await Nests.FollowUserAsync(user.Id, targetUser.Id, Psijic.Time);
 
             _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
 
+            CanaryNotification targetNotification = CanaryNotification.UserAdded(user.ToUserShard());
+
+            // Should always hit
+            if (await Nests.HaveMutualGathering(user.Id, targetUser.Id))
+            {
+                var lastMutualGathering = await Nests.GetLatestMutualGathering(user.Id, targetUser.Id);
+
+                targetNotification = CanaryNotification.UserAdded(user.ToUserShard(), lastMutualGathering.Title);
+            }
+
+            // Check if this forges companionship
             if (await targetUser.IsFollowing(user))
-            { _ = targetUser.Notify(CanaryNotification.CompanionshipForged(user.ToUserShard())); }
-            else
-            { _ = targetUser.Notify(CanaryNotification.UserAdded(user.ToUserShard())); }
+            {
+                targetNotification = CanaryNotification.CompanionshipForged(user.ToUserShard());
+            }
+
+            _ = targetUser.Notify(targetNotification);
+        }
+
+        public async Task FollowUserAsync(long userId, string code)
+        {
+            var user = await GetUserAsync(userId);
+
+            CoreUser potentialUser;
+
+            // Check user code
+            try
+            {
+                potentialUser = await Accounts.FindUserByCodeAsync(code.ToLower());
+            }
+            catch
+            { throw new InvalidInformationException("Incorrect code."); }
+
+            User targetUser = new(potentialUser);
+
+            FailIf(user.Equals(targetUser),
+                new InvalidUserException("User cannot follow themself."));
+
+            Verify(await user.CanFollow(targetUser, hasCode: true),
+                new InvalidUserException("User cannot follow this user."));
+
+            await Nests.FollowUserAsync(user.Id, targetUser.Id, Psijic.Time);
+
+            _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
+
+            CanaryNotification targetNotification = CanaryNotification.UserAdded(user.ToUserShard());
+
+            // Check if this forges companionship
+            if (await targetUser.IsFollowing(user))
+            {
+                targetNotification = CanaryNotification.CompanionshipForged(user.ToUserShard());
+            }
+
+            _ = targetUser.Notify(targetNotification);
         }
 
         public async Task UnfollowUserAsync(long userId, long targetId)

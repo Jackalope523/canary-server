@@ -51,6 +51,7 @@ namespace Core.Boundaries
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 
         Task FollowUserAsync(long userId, long targetId);
+        Task FollowUserAsync(long userId, string code);
         Task UnfollowUserAsync(long userId, long targetId);
         Task BlockUserAsync(long userId, long targetId);
         Task UnblockUserAsync(long userId, long targetId);
