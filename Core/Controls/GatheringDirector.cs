@@ -35,7 +35,7 @@ namespace Core.Controls
 			Verify(await targetGathering.IsVisibleTo(user),
 				new InvalidGatheringException("User is unable to view gathering."));
 
-			return targetGathering.ToGatheringShard();
+			return await targetGathering.ToGatheringShard();
 		}
 
 		public async Task<List<GatheringShard>> GetGatheringsInAreaAsync(long userId,
@@ -159,9 +159,9 @@ namespace Core.Controls
 			}
 
             // Notify companions of gathering
-            _ = user.NotifyCompanions(CanaryNotification.CompanionGatheringCreated(user.ToUserShard(), newGathering.ToGatheringShard()));
+            _ = user.NotifyCompanions(CanaryNotification.CompanionGatheringCreated(user.ToUserShard(), await newGathering.ToGatheringShard()));
 			
-			return newGathering.ToGatheringShard();
+			return await newGathering.ToGatheringShard();
 		}
 
 		public async Task EditGatheringAsync(long userId, long gatheringId,
@@ -193,7 +193,7 @@ namespace Core.Controls
                 IsNotNull(radius) || IsNotNull(isDynamic)),
 				new InvalidGatheringException("Cannot edit certain gathering attributes once it has started."));
 
-			Gathering editedGathering = new(targetGathering.ToGatheringShard())
+			Gathering editedGathering = new(targetGathering.ToCoreGathering())
 			{
                 Title = string.IsNullOrEmpty(gatheringName) ? targetGathering.Title : gatheringName,
                 Description = string.IsNullOrEmpty(gatheringDescription) ? targetGathering.Description : gatheringDescription,
@@ -264,14 +264,14 @@ namespace Core.Controls
 				await Terminal.MediaDirector.UploadHeroAsync(targetGathering.Id, heroImage);
             }
 
-			_ = targetGathering.NotifyActive(CanaryNotification.GatheringEdited(targetGathering.ToGatheringShard()));
+			_ = targetGathering.NotifyActive(CanaryNotification.GatheringEdited(await targetGathering.ToGatheringShard()));
 		}
 
 		public async Task StartGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
 			var gathering = await GetGatheringAsync(gatheringId);
-			_ = gathering.Host.LastKnownLocation.Sync();
+			_ = (await gathering.Host).LastKnownLocation.Sync();
 
 			// Verify user is host
 			Verify(gathering.IsHostedBy(user),
@@ -347,7 +347,7 @@ namespace Core.Controls
 			// Delete hero
 			await Media.DeleteHeroAsync(gathering.Id);
 
-            _ = gathering.NotifyActive(CanaryNotification.GatheringCancelled(gathering.ToGatheringShard()));
+            _ = gathering.NotifyActive(CanaryNotification.GatheringCancelled(await gathering.ToGatheringShard()));
         }
 
         public async Task ChangeGatheringVisibilityAsync(long userId, long gatheringId, bool hide)
@@ -565,7 +565,7 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Gather
-			var allGuests = SelectAsShard(await gathering.AllUsers,
+			var allGuests = SelectAsBonds(await gathering.AllUsers,
 				user => user.State != GatheringBond.Watching && user.State != GatheringBond.Kicked);
 
 			// Sort
@@ -584,7 +584,7 @@ namespace Core.Controls
             {
 				for (int i = 0; i < allGuests.Count; i++)
 				{
-					User guest = new(allGuests[i].User);
+					User guest = allGuests[i].User;
 					GatheringBond bond = allGuests[i].Bond;
 
 					// Might have to hide incoming guest
@@ -608,7 +608,7 @@ namespace Core.Controls
 			{
                 for (int i = 0; i < allGuests.Count; i++)
                 {
-                    User guest = new(allGuests[i].User);
+                    User guest = allGuests[i].User;
 
                     bool isCompanion = await user.IsCompanionsWith(guest);
                     bool isHost = gathering.IsModifiableBy(guest);
@@ -626,7 +626,10 @@ namespace Core.Controls
 			else
 			{ throw new InvalidUserException("User cannot view gathering."); }
 
-            return allGuests;
+			List<GuestListBondPair> allGuestShards = allGuests
+				.ConvertAll(userDetails => new GuestListBondPair(userDetails.User.ToUserShard(), userDetails.Bond));
+
+            return allGuestShards;
 		}
 
 		public async Task<List<UserShard>> GetPotentialInviteesAsync(long userId, long gatheringId)
@@ -668,7 +671,7 @@ namespace Core.Controls
 				new InvalidUserException("Cannot invite non-companions."));
 
 			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
-			_ = invitee.Notify(CanaryNotification.GatheringInvitation(inviter.ToUserShard(), gathering.ToGatheringShard()));
+			_ = invitee.Notify(CanaryNotification.GatheringInvitation(inviter.ToUserShard(), await gathering.ToGatheringShard()));
 		}
 
 		public async Task KickUserAsync(long hostId, long targetId, long gatheringId)
@@ -770,14 +773,14 @@ namespace Core.Controls
 		internal async Task<List<(User User, GatheringBond State)>> RequestAllUsersFromGatheringAsync(Gathering gathering)
 		{
 			return (await Gatherings.GetAllUsersAsync(gathering.Id))
-				.ConvertAll(userDetails => (new User(userDetails.User), userDetails.State));
+				.ConvertAll(userDetails => (User.GetUserAsync(userDetails.UserId).Result, userDetails.State));
 		}
 
-		internal async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>>
+		internal async Task<List<(User User, DateTimeOffset Joined, DateTimeOffset? Left)>>
 			RequestGuestHistoryAsync(Gathering gathering)
 		{
 			return (await Gatherings.GetGuestHistoryAsync(gathering.Id))
-				.ConvertAll(userDetails => (userDetails.Joined, userDetails.Left, new User(userDetails.User)));
+				.ConvertAll(userDetails => (User.GetUserAsync(userDetails.UserId).Result, userDetails.Joined, userDetails.Left));
 		}
 
 		internal async Task<List<GatheringShard>>
@@ -790,7 +793,7 @@ namespace Core.Controls
 				Gathering gathering = new(coreGathering);
 
 				if (await user.CanJoin(gathering))
-				{ accessibleGatherings.Add(gathering.ToGatheringShard(user)); }
+				{ accessibleGatherings.Add(await gathering.ToGatheringShard(user)); }
 			}
 
 			return accessibleGatherings;
@@ -824,16 +827,16 @@ namespace Core.Controls
 				gathering.RelativeAngle = CharacterVector.AngleBetweenAffected(user.Character, gathering.Character);
 
                 if (await user.CanJoin(gathering))
-				{ accessibleGatherings.Add(gathering.ToGatheringShard()); continue; }
+				{ accessibleGatherings.Add(await gathering.ToGatheringShard()); continue; }
 
 				if (gathering.RelativeAngle < maximumAngle)
-				{ accessibleGatherings.Add(gathering.ToGatheringShard()); }
+				{ accessibleGatherings.Add(await gathering.ToGatheringShard()); }
             }
 
             return accessibleGatherings;
 		}
 
-		internal List<GatheringShard>
+		internal async Task<List<GatheringShard>>
 			EnsureContains(List<GatheringShard> list, List<CoreGathering> ensured)
 		{
 			foreach (CoreGathering gathering in ensured)
@@ -845,7 +848,7 @@ namespace Core.Controls
 				if (!pair.Equals(default))
 				{
 					Gathering gath = new(gathering);
-					list.Add(gath.ToGatheringShard());
+					list.Add(await gath.ToGatheringShard());
 				}
 			}
 
@@ -867,15 +870,15 @@ namespace Core.Controls
 				new InvalidUserException($"{user.Name} is currently attending the gathering {(await user.CurrentGathering).Title}."));
 		}
 
-		private List<GuestListBondPair>
-			SelectAsShard(List<(User User, GatheringBond State)> users, Func<(User User, GatheringBond State), bool> predicate)
+		private List<(User User, GatheringBond Bond)>
+			SelectAsBonds(List<(User User, GatheringBond State)> users, Func<(User User, GatheringBond State), bool> predicate)
 		{
-			return users.Where(predicate).ToList().ConvertAll(userDetails => new GuestListBondPair(userDetails.User.ToUserShard(), userDetails.State));
+			return users.Where(predicate).ToList().ConvertAll(userDetails => (userDetails.User, userDetails.State));
 		}
 
-		private GuestListBondPair AsHiddenBondPair(GatheringBond bond)
+		private (User User, GatheringBond Bond) AsHiddenBondPair(GatheringBond bond)
 		{
-			return new(User.Hidden.ToUserShard(), bond);
+			return new(User.Hidden, bond);
 		}
 
         private int GetBondPriority(GatheringBond bond)

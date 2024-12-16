@@ -25,7 +25,7 @@
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
-        public async Task<List<UserShard>> GetAppreciatedUsersAsync(long id) 
+        public async Task<List<CoreUser>> GetAppreciatedUsersAsync(long id) 
         {
             return await store.GetAppreciatedUsersAsync(id);
         }
@@ -33,17 +33,17 @@
         {
             return await store.GetBlockedUsersAsync(id);
         }
-        public async Task<List<UserShard>> GetCompanionsAsync(long id)
+        public async Task<List<CoreUser>> GetCompanionsAsync(long id)
         {
             return await store.GetCompanionsAsync(id);
         }
 
-        public async Task<List<UserShard>> GetUsersAppreciatingAsync(long userId)
+        public async Task<List<CoreUser>> GetUsersAppreciatingAsync(long userId)
         {
             return await store.GetUsersAppreciatingAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetUsersBlockingAsync(long userId)
+        public async Task<List<CoreUser>> GetUsersBlockingAsync(long userId)
         {
            return await store.GetUsersBlockingAsync(userId);
         }

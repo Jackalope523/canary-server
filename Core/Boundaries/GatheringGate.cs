@@ -13,7 +13,7 @@ namespace Core.Boundaries
     public enum GatheringBond
     { Watching, Guest, Arrived, Left, Kicked }
 
-    public record CoreGathering(long Id, UserShard Host, string Title, string Description,
+    public record CoreGathering(long Id, long HostId, string Title, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests, int DegreeOfPrivacy)
@@ -52,8 +52,8 @@ namespace Core.Boundaries
 		Task SetUserStateAsync(long userId, long gatheringId, GatheringBond userState, DateTimeOffset time);
 		Task DeleteUserStateAsync(long userId, long gatheringId);
 
-		Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(long gatheringId);
-		Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(long gatheringId);
+		Task<List<(long UserId, GatheringBond State)>> GetAllUsersAsync(long gatheringId);
+		Task<List<(long UserId, DateTimeOffset Joined, DateTimeOffset? Left)>> GetGuestHistoryAsync(long gatheringId);
 
         Task<bool> UserIsAuthorizedGuest(long userId, long gatheringId);
         Task<List<long>> GetAuthorizedGuests(long gatheringId);

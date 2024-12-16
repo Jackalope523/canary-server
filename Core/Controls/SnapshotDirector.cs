@@ -225,7 +225,7 @@ namespace Core.Controls
 
             foreach (SnapshotShard snapshot in snapshots)
             {
-                User snapshotOwner = new(snapshot.User);
+                User snapshotOwner = await GetUserAsync(snapshot.User.Id);
 
                 // Check if blocking link exists
                 if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))

@@ -134,12 +134,14 @@ namespace Core.Controls
 
         public async Task<List<UserShard>> GetCompanionsAsync(long userId)
         {
-            return await Nests.GetCompanionsAsync(userId);
+            return (await Nests.GetCompanionsAsync(userId))
+                .ConvertAll(u => new User(u).ToUserShard());
         }
 
         public async Task<List<UserShard>> GetAppreciatedUsersAsync(long userId)
         {
-            return await Nests.GetAppreciatedUsersAsync(userId);
+            return (await Nests.GetAppreciatedUsersAsync(userId))
+                .ConvertAll(u => new User(u).ToUserShard());
         }
 
         public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
@@ -237,7 +239,7 @@ namespace Core.Controls
 		internal async Task<List<User>> RequestBlockedUsersAsync(User user)
         {
             return (await Nests.GetBlockedUsersAsync(user.Id))
-				.ConvertAll(user => new User(user));
+				.ConvertAll(u => User.GetUserAsync(u.Id).Result);
         }
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)

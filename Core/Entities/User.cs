@@ -108,6 +108,11 @@ namespace Core.Entities
 
         #region Initialisation & Extraction
 
+        public static async Task<User> GetUserAsync(long id)
+        {
+            return new(await Terminal.AccountDatabase.FindUserByIdAsync(id));
+        }
+
         public User()
         {
             Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
@@ -161,12 +166,6 @@ namespace Core.Entities
             Character = new(fromUser.Character);
             TimeOfUserAgreement = fromUser.TimeOfUserAgreement;
             NotificationId = fromUser.NotificationId;
-        }
-
-        public User(UserShard fromUser) : this()
-        {
-            Id = fromUser.Id;
-            Name = fromUser.Name;
         }
 
         public CoreUser ToCoreUser()
@@ -332,12 +331,12 @@ namespace Core.Entities
 			{
                 // User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!(CanAttendCompanions && await IsCompanionsWith(gathering.Host)))
+				if (!(CanAttendCompanions && await IsCompanionsWith(await gathering.Host)))
 				{ return false; }
 			}
 
             // Check if user is blocked by or blocking gathering host
-            if (await IsBlockedBy(gathering.Host) || await IsBlocking(gathering.Host))
+            if (await IsBlockedBy(await gathering.Host) || await IsBlocking(await gathering.Host))
 			{ return false; }
 
             // Check if user is within degree of privacy

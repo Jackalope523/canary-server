@@ -51,7 +51,7 @@ namespace Core.Controls
 		public async Task<List<User>> RequestBannerMembersAsync(Banner banner)
 		{
 			return (await Banners.GetBannerMembersAsync(banner.Id))
-				.ConvertAll(user => new User(user));
+				.ConvertAll(user => User.GetUserAsync(user.Id).Result);
 		}
 
 		#endregion

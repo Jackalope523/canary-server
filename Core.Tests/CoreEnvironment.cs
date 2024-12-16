@@ -165,7 +165,7 @@ namespace Core.Tests
 			{
 				Title = testGatheringName,
 				Description = testGatheringDescription,
-				Host = host,
+				HostId = host.Id,
 				StartTime = testGatheringStartTime,
 				Location = testGatheringLocation,
 				FriendlyLocation = testGatheringFriendlyLocation,
@@ -175,6 +175,8 @@ namespace Core.Tests
 				IsDynamic = testGatheringIsDynamic,
 				DegreeOfPrivacy = 3,
 			};
+
+			gatheringStub.Host.Set(host);
 
 			return gatheringStub;
 		}

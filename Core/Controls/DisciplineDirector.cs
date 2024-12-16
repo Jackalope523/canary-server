@@ -64,7 +64,7 @@ namespace Core.Controls
             // Check if action is to be taken
             if (await targetGathering.Reported())
             {
-                var host = await GetUserAsync(targetGathering.Host.Id);
+                var host = await GetUserAsync(targetGathering.HostId);
 
                 // Threshold hit, end gathering
                 _ = Terminal.GatheringDirector.TerminateGatheringAsync(host.Id, gatheringId);
@@ -85,7 +85,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetSnapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-            User targetUser = new(targetSnapshot.User);
+            User targetUser = await GetUserAsync(targetSnapshot.User.Id);
 
             // Verify user can report
             Verify(await user.CanReport(),
