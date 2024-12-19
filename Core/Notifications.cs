@@ -92,7 +92,7 @@ namespace Core.Notifications
 
             if (!string.IsNullOrEmpty(options))
             {
-                RelativePath += $"?{options.Remove(RelativePath.Length - 1)}";
+                RelativePath += $"?{options.Remove(options.Length - 1)}";
             }
         }
     }
