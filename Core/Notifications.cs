@@ -30,6 +30,8 @@ namespace Core.Notifications
 
     public interface IDeepLink
     {
+        public static string BasePath => "almostcanary://";
+
         public string RelativePath { get; }
 
         public static string ParseOption(string option, bool? value)
@@ -79,7 +81,7 @@ namespace Core.Notifications
             FocusTarget? focus = null, string invitedBy = null,
             bool? immediate = null, bool? @sealed = null)
         {
-            RelativePath = $"gathering/{gatheringId}";
+            RelativePath = $"{IDeepLink.BasePath}gathering/{gatheringId}";
             
             string options = "";
 
@@ -97,7 +99,7 @@ namespace Core.Notifications
 
     public struct DiscoveryDeepLink : IDeepLink
     {
-        public string RelativePath => "discovery";
+        public string RelativePath => $"{IDeepLink.BasePath}discovery";
     }
 
     public struct NestDeepLink : IDeepLink
@@ -106,7 +108,7 @@ namespace Core.Notifications
 
         public NestDeepLink(long userId)
         {
-            RelativePath = $"nest/{userId}";
+            RelativePath = $"{IDeepLink.BasePath}nest/{userId}";
         }
     }
 
