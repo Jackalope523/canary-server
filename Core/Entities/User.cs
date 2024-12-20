@@ -16,7 +16,7 @@ namespace Core.Entities
     internal class User
     {
 
-		#region Variables
+        #region Variables
 
         //////
         // Constants
@@ -38,7 +38,7 @@ namespace Core.Entities
         ///////
         // Properties
         ///////////////
-		
+
         public long Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
@@ -74,6 +74,7 @@ namespace Core.Entities
         //////////////////////
 
         public Synced<Banner> Banner { get; }
+        public Synced<NotificationProfile> NotificationProfile { get; }
 
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
 		public Synced<GeoLocation> LastKnownLocation { get; }
@@ -116,6 +117,7 @@ namespace Core.Entities
         public User()
         {
             Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
+            NotificationProfile = new(() => );
 
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
             LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);

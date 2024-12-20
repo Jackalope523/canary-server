@@ -27,11 +27,17 @@ namespace Frontier.Services
             appToken = apiAccessToken;
         }
 
-        public async Task PushNotification(Guid userNotificationId, CanaryNotification notification)
+        public async Task PushNotification(NotificationProfile userNotificationProfile, CanaryNotification notification)
         {
-            if (userNotificationId.Equals(Guid.Empty))
+            // Check valid target
+            if (userNotificationProfile.NotificationId.Equals(Guid.Empty))
             {
                 log.LogWarning("Tried to push notification to empty user.\nTitle {title}\nBody {body}", notification.Body, notification.Body);
+                return;
+            }
+            // Check user preferences
+            if (!notification.Check(userNotificationProfile))
+            {
                 return;
             }
 
@@ -43,7 +49,7 @@ namespace Frontier.Services
                 headings = new { en = notification.Title },
                 contents = new { en = notification.Body },
                 target_channel = "push",
-                include_aliases = new { external_id = new[] { userNotificationId.ToString() } },
+                include_aliases = new { external_id = new[] { userNotificationProfile.NotificationId.ToString() } },
                 app_url = notification.AppUrl,
                 collapse_id = notification.CollapseId,
             };

@@ -3,31 +3,6 @@ using Core.Boundaries;
 
 namespace Core.Notifications
 {
-    public enum NotificationGroup
-    {
-        SocialInvitation,
-        CompanionActivity,
-        GatheringReminder,
-        GatheringActivity,
-        GatheringDiscovery,
-    }
-
-    public static class NotificationGroupExtensions
-    {
-        public static string GetString(this NotificationGroup group)
-        {
-            return group switch
-            {
-                NotificationGroup.SocialInvitation => "preferences/social_invitations",
-                NotificationGroup.CompanionActivity => "preferences/companion_activity",
-                NotificationGroup.GatheringReminder => "preferences/gathering_reminders",
-                NotificationGroup.GatheringActivity => "preferences/gathering_activity",
-                NotificationGroup.GatheringDiscovery => "preferences/gathering_discovery",
-                _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
-            };
-        }
-    }
-
     public interface IDeepLink
     {
         public static string BasePath => "almostcanary://";
@@ -127,6 +102,11 @@ namespace Core.Notifications
             Body = body;
             AppUrl = deepLink != null ? deepLink.RelativePath : "";
             CollapseId = collapseId;
+        }
+
+        public bool Check(NotificationProfile profile)
+        {
+            return false;
         }
     }
 

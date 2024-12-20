@@ -34,12 +34,17 @@ namespace Core.Boundaries
     public record TelegramShard(long Id, long NotifierId, DateTimeOffset Time,
 		TelegramMessage Message, string Context);
 
+	public record NotificationProfile(long UserId, Guid NotificationId);
+
     #endregion
 
     #region Gates
 
     public interface INotificationDatabase
     {
+		Task<NotificationProfile> GetNotificationProfileAsync(long userId);
+        Task UpdateNotificationProfileAsync(long userId, List<(string Property, object Value)> edits);
+
         Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType);
 
         Task<List<TelegramShard>> GetTelegramsAsync(long userId);
@@ -57,7 +62,7 @@ namespace Core.Boundaries
 
 	public interface INotificationService
 	{
-		Task PushNotification(Guid userNotificationId, CanaryNotification notification);
+		Task PushNotification(NotificationProfile userNotificationProfile, CanaryNotification notification);
 	}
 
 	#endregion
