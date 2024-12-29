@@ -56,6 +56,11 @@ namespace Repository
         public async Task VoidGatheringAsync(long gatheringId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
+            ctx.GuestClearances.
+            Where(c => c.GatheringId == gatheringId).
+            ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
              ctx.GatheringLinks.
              Where(l => l.GatheringId == gatheringId).
              ExecuteDeleteAsync());
@@ -77,14 +82,14 @@ namespace Repository
                                      ToListAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.SnapshotLinks.
-             Where(l => snapshots.Contains(l.SnapshotId)).
-             ExecuteDeleteAsync());
+               ctx.SnapshotLinks.
+               Where(l => snapshots.Contains(l.SnapshotId)).
+               ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Snapshots.
-             Where(s => s.GatheringId == gatheringId).
-             ExecuteDeleteAsync());
+               ctx.Snapshots.
+               Where(s => s.GatheringId == gatheringId).
+               ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.Gatherings.
@@ -131,6 +136,11 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.UserRelationships.
                 Where(l => l.SelfId == userId || l.OtherId == userId).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GuestClearances.
+                Where(c => c.UserId == userId).
                 ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
