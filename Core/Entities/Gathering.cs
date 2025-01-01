@@ -316,7 +316,7 @@ namespace Core.Entities
         public bool IsHostedBy(User user)
         {
 			// Check if user is gathering host
-			if (Host.Equals(user))
+			if (HostId.Equals(user.Id))
 			{ return true; }
 
 			return false;

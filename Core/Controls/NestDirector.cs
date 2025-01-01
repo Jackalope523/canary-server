@@ -189,7 +189,7 @@ namespace Core.Controls
             foreach (var gathering in await user.UpcomingGatherings)
             {
                 // Check if user is host
-                if (gathering.Host.Equals(user))
+                if (gathering.HostId.Equals(user.Id))
                 {
                     try
                     {
