@@ -17,14 +17,20 @@ namespace Frontier.Services
         private static DefaultApi instance;
 
         private static string appId;
-        private static string appToken;
 
         public static void Initialise(ILogger logger, string apiAccessToken, string apiAppId)
         {
             log = logger;
 
             appId = apiAppId;
-            appToken = apiAccessToken;
+
+            var appConfig = new Configuration
+            {
+                BasePath = "https://onesignal.com/api/v1",
+                AccessToken = apiAccessToken
+            };
+
+            instance = new DefaultApi(appConfig);
         }
 
         public async Task PushNotification(NotificationProfile userNotificationProfile, CanaryNotification notification)
@@ -36,44 +42,23 @@ namespace Frontier.Services
                 return;
             }
             // Check user preferences
-            if (!notification.Check(userNotificationProfile))
+            if (!notification.CheckEnabled(userNotificationProfile))
             {
                 return;
             }
 
-            // The onesignal .net pkg is a mess, do not press further into this until it is updated
-
-            var payload = new
+            var notif = new Notification(appId: appId)
             {
-                app_id = appId,
-                headings = new { en = notification.Title },
-                contents = new { en = notification.Body },
-                target_channel = "push",
-                include_aliases = new { external_id = new[] { userNotificationProfile.NotificationId.ToString() } },
-                app_url = notification.AppUrl,
-                collapse_id = notification.CollapseId,
+                Headings = new StringMap(en: notification.Title),
+                Contents = new StringMap(en: notification.Body),
+                ChannelForExternalUserIds = "push",
+                IncludeExternalUserIds = new() { userNotificationProfile.NotificationId.ToString() }, // Deprecated is a mistake, leave as is
+
+                AppUrl = notification.AppUrl,
+                CollapseId = notification.CollapseId,
             };
 
-            string jsonPayload = System.Text.Json.JsonSerializer.Serialize(payload);
-            
-            using HttpClient client = new();
-
-            client.DefaultRequestHeaders.Add("Authorization", "Basic " + appToken);
-
-            var requestContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await client.PostAsync("https://onesignal.com/api/v1/notifications", requestContent);
-
-            if (response.IsSuccessStatusCode)
-            {
-                string responseContent = await response.Content.ReadAsStringAsync();
-                log.LogInformation("Notification sent successfully: {info}", responseContent);
-            }
-            else
-            {
-                string errorContent = await response.Content.ReadAsStringAsync();
-                log.LogError("Failed to send notification: {info}", errorContent);
-            }
+            await instance.CreateNotificationAsync(notif);
         }
     }
 }

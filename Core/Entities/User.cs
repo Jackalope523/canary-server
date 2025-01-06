@@ -117,7 +117,7 @@ namespace Core.Entities
         public User()
         {
             Banner = new(() => Terminal.BannerDirector.RequestUserBannerAsync(this));
-            NotificationProfile = new(() => );
+            NotificationProfile = new(() => Terminal.NotificationDirector.RequestNotificationProfileAsync(this));
 
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
             LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);

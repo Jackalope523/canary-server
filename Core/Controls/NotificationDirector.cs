@@ -60,6 +60,11 @@ namespace Core.Controls
 
 		#region Favours
 
+		internal async Task<NotificationProfile> RequestNotificationProfileAsync(User user)
+		{
+			return await Telegrams.GetNotificationProfileAsync(user.Id);
+		}
+
 		internal async Task PostTelegramAsync(User user, User notifier, TelegramMessage message, string context)
 		{
 			// Check if notifier can notify user
@@ -71,7 +76,7 @@ namespace Core.Controls
 
 		internal async Task NotifyUserAsync(User user, CanaryNotification notification)
 		{
-            await Terminal.NotificationService.PushNotification(user.NotificationId, notification);
+            await Terminal.NotificationService.PushNotification(await user.NotificationProfile, notification);
 		}
 
 		#endregion

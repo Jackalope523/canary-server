@@ -34,7 +34,15 @@ namespace Core.Boundaries
     public record TelegramShard(long Id, long NotifierId, DateTimeOffset Time,
 		TelegramMessage Message, string Context);
 
-	public record NotificationProfile(long UserId, Guid NotificationId);
+	public record NotificationProfile(long UserId, Guid NotificationId,
+		bool SocialInvitation, bool CompanionActivity,
+		bool GatheringReminder, bool GatheringActivity,
+		bool GatheringDiscovery);
+
+	public record NotificationPreferencesShard(Guid NotificationId,
+		bool SocialInvitation, bool CompanionActivity,
+		bool GatheringReminder, bool GatheringActivity,
+		bool GatheringDiscovery);
 
     #endregion
 
@@ -55,6 +63,9 @@ namespace Core.Boundaries
 
 	public interface INotificationOperations
 	{
+		Task<NotificationPreferencesShard> GetNotificationPreferencesAsync(long userId);
+		Task UpdateNotificationPreferencesAsync(long userId);
+
 		Task<List<TelegramShard>> GetTelegramsAsync(long userId);
 		Task ClearTelegramsAsync(long userId);
 		Task ClearTelegramsAsync(long userId, List<long> telegramIds);

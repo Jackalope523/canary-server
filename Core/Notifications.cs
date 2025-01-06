@@ -3,6 +3,31 @@ using Core.Boundaries;
 
 namespace Core.Notifications
 {
+    public enum NotificationGroup
+    {
+        SocialInvitation,
+        CompanionActivity,
+        GatheringReminder,
+        GatheringActivity,
+        GatheringDiscovery,
+    }
+
+    public static class NotificationGroupExtensions
+    {
+        public static bool CheckEnabled(this NotificationGroup group, NotificationProfile profile)
+        {
+            return group switch
+            {
+                NotificationGroup.SocialInvitation => profile.SocialInvitation,
+                NotificationGroup.CompanionActivity => profile.CompanionActivity,
+                NotificationGroup.GatheringReminder => profile.GatheringReminder,
+                NotificationGroup.GatheringActivity => profile.CompanionActivity,
+                NotificationGroup.GatheringDiscovery => profile.GatheringDiscovery,
+                _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
+            };
+        }
+    }
+
     public interface IDeepLink
     {
         public static string BasePath => "almostcanary://";
@@ -104,9 +129,9 @@ namespace Core.Notifications
             CollapseId = collapseId;
         }
 
-        public bool Check(NotificationProfile profile)
+        public bool CheckEnabled(NotificationProfile profile)
         {
-            return false;
+            return Group.CheckEnabled(profile);
         }
     }
 
