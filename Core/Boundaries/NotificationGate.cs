@@ -44,6 +44,11 @@ namespace Core.Boundaries
 		bool GatheringReminder, bool GatheringActivity,
 		bool GatheringDiscovery);
 
+	public record HostNotificationSchedule(string GatheringWaitingId);
+
+	public record GuestNotificationSchedule(long UserId,
+		string GatheringUpcomingId, string GatheringImminentId);
+
     #endregion
 
     #region Gates
@@ -52,6 +57,11 @@ namespace Core.Boundaries
     {
 		Task<NotificationProfile> GetNotificationProfileAsync(long userId);
         Task UpdateNotificationProfileAsync(long userId, List<(string Property, object Value)> edits);
+
+		Task<(HostNotificationSchedule, List<GuestNotificationSchedule>)> GetGatheringNotificationScheduleAsync(long gatheringId);
+		Task UpdateGatheringHostNotificationScheduleAsync(long gatheringId, string gatheringWaitingId);
+		Task UpdateGatheringGuestNotificationSchedulesAsync(params (long gatheringId, long userId, string gatheringUpcomingId, string gatheringImminentId)[] guestSchedules);
+		Task ClearGatheringNotificationScheduleAsync(long gatheringId);
 
         Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType);
 
