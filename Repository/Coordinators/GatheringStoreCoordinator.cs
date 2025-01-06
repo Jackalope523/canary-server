@@ -106,6 +106,16 @@ namespace Repository
         {
             await store.AddGuestAuthorization(gatheringId, userId);
         }
+
+        public async Task SoftDeleteAsync(long gatheringId)
+        {
+            await store.SoftDeleteAsync(gatheringId);
+        }
+
+        public async Task HardDeleteAsync(long gatheringId)
+        {
+            await store.HardDeleteAsync(gatheringId);
+        }
     }
 }
 

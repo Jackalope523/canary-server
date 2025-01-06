@@ -37,6 +37,9 @@ namespace Core.Boundaries
 		Task DeleteSnapshotAcclaimAsync(long snapshotId, long voterId);
 
         Task<List<SnapshotShard>> GenerateColumnForUserAsync(long userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
+
+        Task SoftDeleteAsync(long snapshotId);
+        Task HardDeleteAsync(long snapshotId);
     }
 
     public interface ISnapshotOperations

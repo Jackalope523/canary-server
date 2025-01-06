@@ -48,5 +48,15 @@
         {
             await store.DeleteSnapshotAcclaimAsync(snapshotId, voterId);
         }
+
+        public async Task SoftDeleteAsync(long snapshotId)
+        {
+            await store.SoftDeleteAsync(snapshotId);
+        }
+
+        public async Task HardDeleteAsync(long snapshotId)
+        {
+            await store.HardDeleteAsync(snapshotId);
+        }
     }
 }

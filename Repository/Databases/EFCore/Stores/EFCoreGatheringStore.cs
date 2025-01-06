@@ -165,7 +165,7 @@ namespace Repository
                    );
         }
 
-        private async Task SoftDeleteGathering(long id)
+        public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.GatheringLinks.
@@ -188,7 +188,7 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
         }
 
-        private async Task HardDeleteGathering(long id)
+        public async Task HardDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.GatheringLinks.

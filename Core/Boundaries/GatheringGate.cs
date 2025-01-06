@@ -58,6 +58,9 @@ namespace Core.Boundaries
         Task<bool> UserIsAuthorizedGuest(long userId, long gatheringId);
         Task<List<long>> GetAuthorizedGuests(long gatheringId);
         Task AddGuestAuthorization(long gatheringId, long userId);
+
+        Task SoftDeleteAsync(long gatheringId);
+        Task HardDeleteAsync(long gatheringId);
     }
 
 	public interface IGatheringOperations

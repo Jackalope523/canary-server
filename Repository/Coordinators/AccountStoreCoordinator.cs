@@ -60,5 +60,15 @@ namespace Repository
         {
             await store.UpdateRecentLocationAsync(id, latitude, longitude, radius);
         }
+
+        public async Task SoftDeleteAsync(long userId)
+        {
+            await store.SoftDeleteAsync(userId);
+        }
+
+        public async Task HardDeleteAsync(long userId)
+        {
+            await store.HardDeleteAsync(userId);
+        }
     }
 }

@@ -62,12 +62,12 @@ namespace Repository
               );
         }
 
-        private async Task SoftDeleteUser(long id)
+        public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
              ctx.SnapshotLinks.
              Where(s => s.UserId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+             ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
              ctx.Snapshots.
@@ -90,9 +90,9 @@ namespace Repository
               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.GuestClearances.
-             Where(c => c.UserId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+              ctx.GuestClearances.
+              Where(c => c.UserId == id).
+              ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.UserRelationships.
@@ -115,7 +115,7 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
         }
 
-        private async Task HardDeleteUser(long id)
+        public async Task HardDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
              ctx.SnapshotLinks.
@@ -128,9 +128,9 @@ namespace Repository
              ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Telegrams.
-             Where(t => t.NotifierId == id || t.RecipientId == id).
-             ExecuteDeleteAsync());
+              ctx.Telegrams.
+              Where(t => t.NotifierId == id || t.RecipientId == id).
+              ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
               ctx.Subscriptions.
@@ -143,34 +143,34 @@ namespace Repository
               ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.GuestClearances.
-             Where(c => c.UserId == id).
-             ExecuteDeleteAsync());
+              ctx.GuestClearances.
+              Where(c => c.UserId == id).
+              ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.UserRelationships.
-               Where(l => l.SelfId == id).
-               ExecuteDeleteAsync());
+              ctx.UserRelationships.
+              Where(l => l.SelfId == id).
+              ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.UserId == id).
-               ExecuteDeleteAsync());
+              ctx.GatheringLinks.
+              Where(l => l.UserId == id).
+              ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.BannerLinks.
-               Where(l => l.UserId == id).
-               ExecuteDeleteAsync());
+              ctx.BannerLinks.
+              Where(l => l.UserId == id).
+              ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Feedback.
-               Where(r => r.UserId == id).
-               ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+              ctx.Feedback.
+              Where(r => r.UserId == id).
+              ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.UserReports.
-               Where(r => r.SelfId == id).
-               ExecuteUpdate(setter => setter.SetProperty(r => r.SelfId, (long?)null)));
+              ctx.UserReports.
+              Where(r => r.SelfId == id).
+              ExecuteUpdate(setter => setter.SetProperty(r => r.SelfId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
               ctx.GatheringReports.
@@ -188,9 +188,9 @@ namespace Repository
               ExecuteUpdate(setter => setter.SetProperty(g => g.HostId, (long?)null)));        
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Users.
-               Where(u => u.Id == id).
-               ExecuteDeleteAsync());
+              ctx.Users.
+              Where(u => u.Id == id).
+              ExecuteDeleteAsync());
         }
 
         public async Task DeleteUserAsync(long id)

@@ -49,7 +49,10 @@ namespace Core.Boundaries
 
 		Task<HauntShard> GetUserHauntAsync(long userId);
 		Task UpdateHauntAsync(long userId, double latitude, double longitude, double radius, int stability);
-	}
+
+		Task SoftDeleteAsync(long userId);
+        Task HardDeleteAsync(long userId);
+    }
 
 	public interface IAccountOperations
 	{
