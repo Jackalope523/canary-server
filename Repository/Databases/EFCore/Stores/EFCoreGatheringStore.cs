@@ -168,51 +168,61 @@ namespace Repository
         public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(l => l.SoftDeleted, true)));
+                ctx.Notifications.
+                Where(n => n.GatheringId == id).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringReports.
-               Where(r => r.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(r => r.SoftDeleted, true)));
+                ctx.GatheringLinks.
+                Where(l => l.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(l => l.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GuestClearances.
-               Where(c => c.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(c => c.SoftDeleted, true)));
+                ctx.GatheringReports.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Gatherings.
-               Where(e => e.Id == id).
-               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+                ctx.GuestClearances.
+                Where(c => c.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(c => c.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Gatherings.
+                Where(e => e.Id == id).
+                ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
         }
 
         public async Task HardDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.GatheringId == id).
-               ExecuteDeleteAsync());
+                ctx.Notifications.
+                Where(l => l.GatheringId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringReports.
-               Where(r => r.GatheringId == id).
-               ExecuteDeleteAsync());
+                ctx.GatheringLinks.
+                Where(l => l.GatheringId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.UserReports.
-               Where(r => r.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
+                ctx.GatheringReports.
+                Where(r => r.GatheringId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GuestClearances.
-               Where(c => c.GatheringId == id).
-               ExecuteDeleteAsync());
+                ctx.UserReports.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Gatherings.
-               Remove(new Gathering { Id = id }));
+                ctx.GuestClearances.
+                Where(c => c.GatheringId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Gatherings.
+                Remove(new Gathering { Id = id }));
         }
 
         public async Task DeleteGatheringAsync(long gatheringId)

@@ -60,7 +60,7 @@ namespace Core.Boundaries
 
 		Task<(HostNotificationSchedule, List<GuestNotificationSchedule>)> GetGatheringNotificationScheduleAsync(long gatheringId);
 		Task UpdateGatheringHostNotificationScheduleAsync(long gatheringId, string gatheringWaitingId);
-		Task UpdateGatheringGuestNotificationSchedulesAsync(params (long gatheringId, long userId, string gatheringUpcomingId, string gatheringImminentId)[] guestSchedules);
+		Task UpdateGatheringGuestNotificationSchedulesAsync(long gatheringId, params (long userId, string gatheringUpcomingId, string gatheringImminentId)[] guestSchedules);
 		Task ClearGatheringNotificationScheduleAsync(long gatheringId);
 
         Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType);

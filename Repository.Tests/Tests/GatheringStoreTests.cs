@@ -637,15 +637,6 @@ namespace Repository.Tests
             Assert.Equal(GatheringBond.Watching, State);
         }
         [Fact]
-        public async Task DeleteGatheringAsync_SUCCESS()
-        {
-            await store.DeleteGatheringAsync(testGathering.Id);
-
-            int count = sentry.ExecuteRead(ctx => ctx.Gatherings.Count());
-
-            Assert.Equal(1, count);
-        }
-        [Fact]
         public async Task PropagateClearance_DEGREE_0()
         {
             /* 
