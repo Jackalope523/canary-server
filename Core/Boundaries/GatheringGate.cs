@@ -46,7 +46,7 @@ namespace Core.Boundaries
 			double Radius, bool isDynamic, int degreeOfPrivacy);
 		Task UpdateGatheringAsync(long gatheringId, List<(string Property, object Value)> edits);
 		Task TerminateGatheringAsync(long gatheringId, DateTimeOffset time);
-		Task DeleteGatheringAsync(long gatheringId);
+		Task CancelGatheringAsync(long gatheringId);
 
 		Task<GatheringBond?> GetUserStateAsync(long userId, long gatheringId);
 		Task SetUserStateAsync(long userId, long gatheringId, GatheringBond userState, DateTimeOffset time);

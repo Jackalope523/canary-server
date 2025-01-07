@@ -31,7 +31,6 @@ namespace Core.Boundaries
         Task<SnapshotShard> GetSnapshotAsync(long snapshotId);
         Task<SnapshotShard> AddSnapshotAsync(long gatheringId, long etcherId,
             DateTimeOffset timeTaken);
-		Task DeleteSnapshotAsync(long snapshotId);
 
 		Task AcclaimSnapshotAsync(long snapshotId, long voterId);
 		Task DeleteSnapshotAcclaimAsync(long snapshotId, long voterId);

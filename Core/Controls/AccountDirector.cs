@@ -173,7 +173,7 @@ namespace Core.Controls
 
         public async Task DeleteUserAsync(long userId)
         {
-            await Accounts.DeleteUserAsync(userId);
+            await Accounts.SoftDeleteAsync(userId);
         }
 
         public async Task UpdateUserLocationAsync(long userId, double latitude, double longitude)
