@@ -146,12 +146,12 @@ namespace Repository
 
         public async Task UpdateGatheringGuestNotificationSchedulesAsync(long gatheringId, params (long userId, string gatheringUpcomingId, string gatheringImminentId)[] guestSchedules)
         {
-            await storeSentry.ExecuteWriteAsync(ctx => 
+            Discussion discussion = storeSentry.BeginDiscussion();
+
+            await storeSentry.DiscussWriteAsync(ctx => 
                 ctx.Notifications.
                 Where(n => n.GatheringId == gatheringId && n.Type != NotificationType.GatheringWaiting).
-                ExecuteDeleteAsync());
-
-            Discussion discussion = storeSentry.BeginDiscussion();
+                ExecuteDeleteAsync(), discussion);
 
             foreach (var schedule in guestSchedules) 
             {
@@ -179,10 +179,12 @@ namespace Repository
 
         public async Task UpdateGatheringHostNotificationScheduleAsync(long gatheringId, string gatheringWaitingId)
         {
-            await storeSentry.ExecuteWriteAsync(ctx =>
+            Discussion discussion = storeSentry.BeginDiscussion();
+
+            await storeSentry.DiscussWriteAsync(ctx =>
                ctx.Notifications.
                Where(n => n.GatheringId == gatheringId && n.Type == NotificationType.GatheringWaiting).
-               ExecuteDeleteAsync());
+               ExecuteDeleteAsync(), discussion);
 
             long? hostId = await storeSentry.ExecuteReadAsync(ctx => 
                             ctx.Gatherings.
@@ -190,7 +192,7 @@ namespace Repository
                             Select(g => g.HostId).
                             SingleAsync());
 
-            await storeSentry.ExecuteWriteAsync(ctx =>
+            storeSentry.DiscussWrite(ctx =>
                ctx.Notifications.
                Add(new() 
                { 
@@ -199,7 +201,9 @@ namespace Repository
                    NotificationId = gatheringWaitingId, 
                    Type = NotificationType.GatheringWaiting
                 }
-            ));
+            ), discussion);
+
+            storeSentry.EndDiscussion(discussion);
         }
     }
 }
