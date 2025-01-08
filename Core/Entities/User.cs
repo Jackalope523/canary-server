@@ -4,10 +4,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Core.Boundaries;
+using Core.Notifications;
 
 using static Core.Entities.Psijic;
 using static Core.Entities.Arbiter;
-using Core.Notifications;
 
 namespace Core.Entities
 {
@@ -509,19 +509,19 @@ namespace Core.Entities
                 message, context);
         }
 
-		public async Task Notify(CanaryNotification notification)
+        public async Task<string> Notify(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {
-            await Terminal.NotificationDirector.NotifyUserAsync(this, notification);
+             return await Terminal.NotificationDirector.NotifyUserAsync(this, notification, notifyAt);
         }
 
-        public async Task NotifyAppreciateers(CanaryNotification notification)
+        public async Task<string> NotifyAppreciateers(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {
-            (await AppreciatedBy).ForEach(appreciateer => _ = appreciateer.Notify(notification));
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, (await AppreciatedBy).ToArray());
         }
 
-        public async Task NotifyCompanions(CanaryNotification notification)
+        public async Task<string> NotifyCompanions(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {
-            (await Companions).ForEach(companion => _ = companion.Notify(notification));
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, (await Companions).ToArray());
         }
 
 		#endregion

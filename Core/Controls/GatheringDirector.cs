@@ -4,10 +4,8 @@ using Core.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 using static Core.Entities.Arbiter;
@@ -135,7 +133,7 @@ namespace Core.Controls
 			catch
 			{
 				// If failed, remove gathering
-				await Gatherings.DeleteGatheringAsync(newGathering.Id);
+				await Gatherings.HardDeleteAsync(newGathering.Id);
 				throw new UnexpectedFailureException("Failed to upload hero image.");
             }
 
@@ -157,6 +155,18 @@ namespace Core.Controls
 				}
 				catch { }
 			}
+			else
+			{
+				// Schedule notifications
+				var gatheringShard = await newGathering.ToGatheringShard();
+
+				var waitingNotificationId = await user.Notify(CanaryNotification.GatheringWaiting(gatheringShard), newGathering.StartTime);
+				var upcomingNotificationId = await user.Notify(CanaryNotification.GatheringUpcoming(gatheringShard), newGathering.StartTime - OneHour);
+				var imminentNotificationId = await user.Notify(CanaryNotification.GatheringImminent(gatheringShard), newGathering.StartTime - FifteenMinutes);
+
+				await Telegrams.UpdateGatheringHostNotificationScheduleAsync(newGathering.Id, waitingNotificationId);
+				await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(newGathering.Id, (user.Id, upcomingNotificationId, imminentNotificationId));
+			}
 
             // Notify companions of gathering
             _ = user.NotifyCompanions(CanaryNotification.CompanionGatheringCreated(user.ToUserShard(), await newGathering.ToGatheringShard()));
@@ -173,18 +183,18 @@ namespace Core.Controls
 			MemoryStream heroImage = null)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
+			var originalGathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is gathering host
-			Verify(targetGathering.IsModifiableBy(user),
+			Verify(originalGathering.IsModifiableBy(user),
 				new InvalidGatheringException("User is unable to edit gathering."));
 
 			// Ensure gathering is editable
-			FailIf(targetGathering.IsTerminated,
+			FailIf(originalGathering.IsTerminated,
 				new InvalidGatheringException("Unable to edit gathering, gathering has ended."));
 
 			// Fail if edits may not be done during the gathering
-			FailIf(targetGathering.IsOngoing &&
+			FailIf(originalGathering.IsOngoing &&
 				(!string.IsNullOrEmpty(gatheringName) ||
 				!string.IsNullOrEmpty(gatheringDescription) ||
 				IsNotNull(startTime) ||
@@ -193,18 +203,18 @@ namespace Core.Controls
                 IsNotNull(radius) || IsNotNull(isDynamic)),
 				new InvalidGatheringException("Cannot edit certain gathering attributes once it has started."));
 
-			Gathering editedGathering = new(targetGathering.ToCoreGathering())
+			Gathering editedGathering = new(originalGathering.ToCoreGathering())
 			{
-                Title = string.IsNullOrEmpty(gatheringName) ? targetGathering.Title : gatheringName,
-                Description = string.IsNullOrEmpty(gatheringDescription) ? targetGathering.Description : gatheringDescription,
-				StartTime = startTime ?? targetGathering.StartTime,
-				Location = AreNull(latitude, longitude) ? targetGathering.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
-				FriendlyLocation = string.IsNullOrEmpty(friendlyLocation) ? targetGathering.FriendlyLocation : friendlyLocation,
-				Radius = IsNull(radius) ? targetGathering.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
-				IsDynamic = isDynamic ?? targetGathering.IsDynamic,
-				DegreeOfPrivacy = degreeOfPrivacy ?? targetGathering.DegreeOfPrivacy,
-				GroupMinimum = groupMinimum ?? targetGathering.GroupMinimum,
-				GroupMaximum = groupMaximum ?? targetGathering.GroupMaximum,
+                Title = string.IsNullOrEmpty(gatheringName) ? originalGathering.Title : gatheringName,
+                Description = string.IsNullOrEmpty(gatheringDescription) ? originalGathering.Description : gatheringDescription,
+				StartTime = startTime ?? originalGathering.StartTime,
+				Location = AreNull(latitude, longitude) ? originalGathering.Location : new() { Latitude = latitude.Value, Longitude = longitude.Value },
+				FriendlyLocation = string.IsNullOrEmpty(friendlyLocation) ? originalGathering.FriendlyLocation : friendlyLocation,
+				Radius = IsNull(radius) ? originalGathering.Radius : new() { Kilometres = Math.Clamp(radius.Value, 0.1, radius.Value) },
+				IsDynamic = isDynamic ?? originalGathering.IsDynamic,
+				DegreeOfPrivacy = degreeOfPrivacy ?? originalGathering.DegreeOfPrivacy,
+				GroupMinimum = groupMinimum ?? originalGathering.GroupMinimum,
+				GroupMaximum = groupMaximum ?? originalGathering.GroupMaximum,
 			};
 
 			// Validate gathering
@@ -256,16 +266,22 @@ namespace Core.Controls
 			}
 
 			// Push update
-			await Gatherings.UpdateGatheringAsync(targetGathering.Id, edits);
+			await Gatherings.UpdateGatheringAsync(originalGathering.Id, edits);
 
 			// Update hero image if provided
 			if (heroImage != null && heroImage.Length > 0)
 			{
-				await Terminal.MediaDirector.UploadHeroAsync(targetGathering.Id, heroImage);
+				await Terminal.MediaDirector.UploadHeroAsync(originalGathering.Id, heroImage);
             }
 
-			_ = targetGathering.NotifyActive(CanaryNotification.GatheringEdited(await targetGathering.ToGatheringShard()));
-		}
+			_ = originalGathering.NotifyActive(CanaryNotification.GatheringEdited(await originalGathering.ToGatheringShard()), notifyHost: false);
+
+			// Reschedule notifications if required
+			if (IsNotNull(startTime))
+			{
+				_ = RescheduleSchedule(editedGathering);
+            }
+        }
 
 		public async Task StartGatheringAsync(long userId, long gatheringId)
 		{
@@ -286,6 +302,9 @@ namespace Core.Controls
 			await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
 
 			await gathering.Started();
+
+			// Cancel lingering scheduled notifications
+			_ = CancelScheduledNotifications(gathering);
 		}
 
 		public async Task TerminateGatheringAsync(long userId, long gatheringId)
@@ -342,12 +361,15 @@ namespace Core.Controls
                 new InvalidUserException("User does not have permissions to delete gathering."));
 
 			// Try to delete gathering
-			await Gatherings.DeleteGatheringAsync(gathering.Id);
+			await Gatherings.CancelGatheringAsync(gathering.Id);
 
 			// Delete hero
 			await Media.DeleteHeroAsync(gathering.Id);
 
-            _ = gathering.NotifyActive(CanaryNotification.GatheringCancelled(await gathering.ToGatheringShard()));
+            _ = gathering.NotifyActive(CanaryNotification.GatheringCancelled(await gathering.ToGatheringShard()), notifyHost: false);
+
+			// Cancel scheduled notifications
+			_ = CancelScheduledNotifications(gathering);
         }
 
         public async Task ChangeGatheringVisibilityAsync(long userId, long gatheringId, bool hide)
@@ -482,6 +504,9 @@ namespace Core.Controls
 			{
 				// Try to add user to the gathering
 				await Gatherings.SetUserStateAsync(user.Id, gatheringId, GatheringBond.Guest, Time);
+
+				// Schedule notifications as required
+				_ = ScheduleNotificationsForGuest(gathering, user);
             }
 
 			// Notify host if gathering has already started
@@ -520,10 +545,10 @@ namespace Core.Controls
 		public async Task LeaveGatheringAsync(long userId, long gatheringId)
 		{
 			var user = await GetUserAsync(userId);
-			var targetGathering = await GetGatheringAsync(gatheringId);
+			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify user is the host
-			FailIf(targetGathering.IsHostedBy(user),
+			FailIf(gathering.IsHostedBy(user),
 				new InvalidUserException("Host cannot leave the gathering."));
 
             // Get the user's current status
@@ -538,20 +563,23 @@ namespace Core.Controls
             if (userIntention.Equals(GatheringBond.Arrived))
 			{
 				// Try to remove user from gathering
-				await Gatherings.SetUserStateAsync(user.Id, targetGathering.Id, GatheringBond.Left, Time);
+				await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Left, Time);
 			}
 			else if (userIntention.Equals(GatheringBond.Guest))
 			{
 				// Check if user previously left gathering
-				if (await targetGathering.WasAttendedBy(user))
+				if (await gathering.WasAttendedBy(user))
 				{
 					// TODO This should not create false data.
-					await Gatherings.SetUserStateAsync(user.Id, targetGathering.Id, GatheringBond.Left, Time);
+					await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Left, Time);
 				}
 				else
 				{
 					// Try to remove user from gathering
-					await Gatherings.DeleteUserStateAsync(user.Id, targetGathering.Id);
+					await Gatherings.DeleteUserStateAsync(user.Id, gathering.Id);
+
+					// Cancel scheduled notifications
+					_ = CancelScheduledNotificationsForGuest(gathering, user);
 				}
 			}
 			else if (userIntention.HasValue)
@@ -699,8 +727,10 @@ namespace Core.Controls
 			foreach (SnapshotShard snapshot in await gathering.Snapshots)
 			{
 				if (targetUser.Taken(snapshot))
-				{ _ = Snapshots.DeleteSnapshotAsync(snapshot.Id); }
+				{ _ = Snapshots.SoftDeleteAsync(snapshot.Id); }
 			}
+
+			// Cancel any scheduled notifications
 		}
 
 		public async Task<bool> AuthorisedToStart(long userId, long gatheringId)
@@ -890,6 +920,134 @@ namespace Core.Controls
                 GatheringBond.Left => 2,    // sorted last
                 _ => 3
             };
+        }
+
+		private async Task RescheduleSchedule(Gathering gathering)
+		{
+            // Cancel scheduled notifications
+            await CancelScheduledNotifications(gathering);
+
+            // Reschedule guests and host
+            await ScheduleNotifications(gathering);
+        }
+
+		private async Task CancelScheduledNotifications(Gathering gathering)
+		{
+			var (HostSchedule, GuestSchedules) = await Telegrams.GetGatheringNotificationScheduleAsync(gathering.Id);
+
+            // Cancel host notification
+            try
+            {
+				await Terminal.NotificationService.CancelNotification(HostSchedule.GatheringWaitingId);
+            }
+            catch (Exception e)
+            {
+                Log.LogError("Was unable to cancel host notification for {gathering}: {error}", gathering.Title, e);
+            }
+
+			// Cancel guest notifications
+			await CancelScheduledNotificationBatch(gathering, GuestSchedules);
+
+			await Telegrams.ClearGatheringNotificationScheduleAsync(gathering.Id);
+		}
+
+        private async Task CancelScheduledNotificationsForGuest(Gathering gathering, User guest)
+        {
+            var (_, GuestSchedules) = await Telegrams.GetGatheringNotificationScheduleAsync(gathering.Id);
+
+            var schedule = GuestSchedules.Find(s => s.UserId.Equals(guest.Id));
+
+            var batch = GuestSchedules.Where(s =>
+                s.GatheringUpcomingId.Equals(schedule.GatheringUpcomingId) || s.GatheringImminentId.Equals(schedule.GatheringImminentId));
+            bool isBatchedNotification = batch.Count() > 1;
+
+            // If batched, reschedule everyone
+            if (isBatchedNotification)
+            {
+                // Cancel scheduled notifications
+                await CancelScheduledNotifications(gathering);
+
+                // Reschedule guests and host
+                await ScheduleNotifications(gathering);
+            }
+            // else, simple remove
+            else
+            {
+                await CancelScheduledNotificationBatch(gathering, new() { schedule });
+            }
+        }
+
+        private async Task CancelScheduledNotificationBatch(Gathering gathering, List<GuestNotificationSchedule> schedules)
+        {
+			// Flatten batches
+			// TODO
+
+			// Cancel batches
+            foreach (var schedule in schedules)
+            {
+                var upcomingSync = Terminal.NotificationService.CancelNotification(schedule.GatheringUpcomingId);
+                var imminentSync = Terminal.NotificationService.CancelNotification(schedule.GatheringImminentId);
+
+                try
+                {
+                    await Psijic.Once(upcomingSync, imminentSync);
+                }
+                catch (Exception e)
+                {
+                    Log.LogError("Was unable to cancel guest {id} notification for {gathering}: {error}", schedule.UserId, gathering.Title, e);
+                }
+            }
+        }
+
+        private async Task ScheduleNotifications(Gathering gathering)
+		{
+            // TODO Should make this a bit more intelligent.
+
+            var shard = await gathering.ToGatheringShard();
+
+            // Schedule host
+            var waitingNotificationIdSync = (await gathering.Host).Notify(CanaryNotification.GatheringWaiting(shard), shard.StartTime);
+
+			// Schedule guests
+            var upcomingIdSync = Task.FromResult("");
+            bool scheduleUpcoming = gathering.StartTime - OneHour < Time;
+
+            if (scheduleUpcoming)
+            {
+                upcomingIdSync = gathering.NotifyGuests(CanaryNotification.GatheringUpcoming(shard), shard.StartTime - OneHour);
+            }
+
+            var imminentIdSync = gathering.NotifyGuests(CanaryNotification.GatheringImminent(shard), shard.StartTime - FifteenMinutes);
+
+			// Await scheduling
+			string upcomingNotificationId = await upcomingIdSync, imminentNotificationId = await imminentIdSync;
+
+            var schedules = (await gathering.Guests).Select(guest => (guest.Id, upcomingNotificationId, imminentNotificationId));
+
+			// Track notification ids
+            await Telegrams.UpdateGatheringHostNotificationScheduleAsync(gathering.Id, await waitingNotificationIdSync);
+            await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, schedules.ToArray());
+        }
+
+		private async Task ScheduleNotificationsForGuest(Gathering gathering, User guest)
+		{
+			var shard = await gathering.ToGatheringShard();
+
+            var upcomingIdSync = Task.FromResult("");
+            bool scheduleUpcoming = gathering.StartTime - OneHour < Time;
+
+            if (scheduleUpcoming)
+            {
+                upcomingIdSync = guest.Notify(CanaryNotification.GatheringUpcoming(shard), shard.StartTime - OneHour);
+            }
+
+            var imminentIdSync = guest.Notify(CanaryNotification.GatheringImminent(shard), shard.StartTime - FifteenMinutes);
+
+            // Await scheduling
+            string upcomingNotificationId = await upcomingIdSync, imminentNotificationId = await imminentIdSync;
+
+            // Track notification ids
+            await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, (guest.Id, upcomingNotificationId, imminentNotificationId));
         }
 
         #endregion

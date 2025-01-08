@@ -434,26 +434,28 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task NotifyActive(CanaryNotification notification)
+        public async Task<string> NotifyActive(CanaryNotification notification, DateTimeOffset? notifyAt = null, bool notifyHost = true)
         {
-            foreach (var user in (await Guests).Concat(await Arrived))
-            {
-                if (IsHostedBy(user))
-                { continue; }
+            var targets = (await Guests).Concat(await Arrived).ToList();
 
-                _ = user.Notify(notification);
+            if (!notifyHost)
+            {
+                targets.Remove(await Host);
             }
+
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, targets.ToArray());
         }
 
-        public async Task NotifyGuests(CanaryNotification notification)
+        public async Task<string> NotifyGuests(CanaryNotification notification, DateTimeOffset? notifyAt = null, bool notifyHost = true)
         {
-            foreach (var guest in await Arrived)
-            {
-                if (IsHostedBy(guest))
-                { continue; }
+            var targets = await Guests;
 
-                _ = guest.Notify(notification);
+            if (!notifyHost)
+            {
+                targets.Remove(await Host);
             }
+
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, targets.ToArray());
         }
 
 		#endregion

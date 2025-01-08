@@ -58,7 +58,7 @@ namespace Core.Boundaries
 		Task<NotificationProfile> GetNotificationProfileAsync(long userId);
         Task UpdateNotificationProfileAsync(long userId, List<(string Property, object Value)> edits);
 
-		Task<(HostNotificationSchedule, List<GuestNotificationSchedule>)> GetGatheringNotificationScheduleAsync(long gatheringId);
+		Task<(HostNotificationSchedule HostSchedule, List<GuestNotificationSchedule> GuestSchedules)> GetGatheringNotificationScheduleAsync(long gatheringId);
 		Task UpdateGatheringHostNotificationScheduleAsync(long gatheringId, string gatheringWaitingId);
 		Task UpdateGatheringGuestNotificationSchedulesAsync(long gatheringId, params (long userId, string gatheringUpcomingId, string gatheringImminentId)[] guestSchedules);
 		Task ClearGatheringNotificationScheduleAsync(long gatheringId);
@@ -74,7 +74,10 @@ namespace Core.Boundaries
 	public interface INotificationOperations
 	{
 		Task<NotificationPreferencesShard> GetNotificationPreferencesAsync(long userId);
-		Task UpdateNotificationPreferencesAsync(long userId);
+		Task UpdateNotificationPreferencesAsync(long userId,
+			bool? socialInvitation = null, bool? companionActivity = null,
+			bool? gatheringReminder = null, bool? gatheringActivity = null,
+			bool? gatheringDiscovery = null);
 
 		Task<List<TelegramShard>> GetTelegramsAsync(long userId);
 		Task ClearTelegramsAsync(long userId);
@@ -83,7 +86,9 @@ namespace Core.Boundaries
 
 	public interface INotificationService
 	{
-		Task PushNotification(NotificationProfile userNotificationProfile, CanaryNotification notification);
+		Task<string> DispatchNotification(CanaryNotification notification, params NotificationProfile[] notificationProfiles);
+		Task<string> ScheduleNotification(CanaryNotification notification, DateTimeOffset dispatchAt, params NotificationProfile[] notificationProfiles);
+		Task CancelNotification(string notificationId);
 	}
 
 	#endregion

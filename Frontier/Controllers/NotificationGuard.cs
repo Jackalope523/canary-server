@@ -31,11 +31,17 @@ namespace Frontier.Controllers
         }
 
 		[HttpPost]
-		public async Task<IActionResult> UpdateNotificationPreferences()
+		public async Task<IActionResult> UpdateNotificationPreferences(
+			bool? social_invitations = null, bool? companion_activity = null,
+			bool? gathering_reminders = null, bool? gathering_activity = null,
+			bool? gathering_discovery = null)
 		{
 			return await Execute(async user =>
 			{
-				await telegrams.UpdateNotificationPreferencesAsync(user.Id);
+				await telegrams.UpdateNotificationPreferencesAsync(user.Id,
+					socialInvitation: social_invitations, companionActivity: companion_activity,
+					gatheringReminder: gathering_reminders, gatheringActivity: gathering_activity,
+					gatheringDiscovery: gathering_discovery);
 			});
         }
 

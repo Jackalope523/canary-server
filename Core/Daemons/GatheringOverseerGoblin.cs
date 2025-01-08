@@ -72,7 +72,7 @@ namespace Core.Daemons
                     await host.Notify(CanaryNotification.GatheringDeleted(await gathering.ToGatheringShard()));
 
                     // Notify guests
-                    await gathering.NotifyGuests(CanaryNotification.HostMissedGathering(await gathering.ToGatheringShard()));
+                    await gathering.NotifyGuests(CanaryNotification.HostMissedGathering(await gathering.ToGatheringShard()), notifyHost: false);
                 }
                 // Check if the next pass will delete the gathering
                 else if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait - interval))
