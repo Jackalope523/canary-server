@@ -8,7 +8,7 @@ namespace Core.Boundaries
     #region Schemas
 
     public enum GatheringState
-	{ Upcoming, Ongoing, Ended, Cancelled }
+	{ Upcoming, Ongoing, Cancelled, Ended,}
 
     public enum GatheringVisibility
 	{ Visible, Hidden, Sealed }
