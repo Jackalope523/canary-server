@@ -16,11 +16,6 @@ namespace Repository
             return await store.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character, notificationId);
         }
 
-        public async Task DeleteUserAsync(long id)
-        {
-            await store.DeleteUserAsync(id);
-        }
-
         public async Task<CoreUser> FindUserByIdAsync(long id) 
         {
             return await store.FindUserByIdAsync(id);

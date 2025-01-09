@@ -60,11 +60,6 @@ namespace Core.Tests
 			return createdUser;
         }
 
-        public async Task DeleteUserAsync(long userId)
-        {
-			await accounts.DeleteUserAsync(userId);
-        }
-
         public async Task<CoreUser> FindUserByEmailAsync(string normalisedEmail)
         {
 			return await accounts.FindUserByEmailAsync(normalisedEmail);
