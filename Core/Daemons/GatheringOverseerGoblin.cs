@@ -64,7 +64,7 @@ namespace Core.Daemons
                 {
                     // Purge gathering
                     log.LogInformation("Gathering {id} {name} cancelled for being late.", gathering.Id, gathering.Title);
-                    await terminal.GatheringDatabase.CancelGatheringAsync(gathering.Id);
+                    await terminal.GatheringDatabase.SoftDeleteAsync(gathering.Id);
 
                     // Notify host
                     User host = await GetUserAsync(gathering.HostId);

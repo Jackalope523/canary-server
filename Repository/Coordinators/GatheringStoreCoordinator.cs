@@ -17,11 +17,6 @@ namespace Repository
             return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy);
         }
 
-        public async Task DeleteGatheringAsync(long gatheringId)
-        {
-            await store.DeleteGatheringAsync(gatheringId);  
-        }
-
         public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
         {
             return await store.FindCurrentGatheringForUserAsync(id);

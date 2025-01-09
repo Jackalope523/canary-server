@@ -225,14 +225,6 @@ namespace Repository
                 Remove(new Gathering { Id = id }));
         }
 
-        public async Task DeleteGatheringAsync(long gatheringId)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx => 
-                ctx.Gatherings.
-                Where(e => e.Id == gatheringId).
-                ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
-        }
-
         public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
         {
             long? currentGathering = await storeSentry.ExecuteReadAsync(ctx =>

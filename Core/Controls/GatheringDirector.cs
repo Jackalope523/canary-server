@@ -361,7 +361,7 @@ namespace Core.Controls
                 new InvalidUserException("User does not have permissions to delete gathering."));
 
 			// Try to delete gathering
-			await Gatherings.CancelGatheringAsync(gathering.Id);
+			await Gatherings.SoftDeleteAsync(gathering.Id);
 
 			// Delete hero
 			await Media.DeleteHeroAsync(gathering.Id);
