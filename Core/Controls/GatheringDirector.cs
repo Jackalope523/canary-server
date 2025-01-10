@@ -161,7 +161,7 @@ namespace Core.Controls
 				var gatheringShard = await newGathering.ToGatheringShard();
 
 				var waitingNotificationId = await user.Notify(CanaryNotification.GatheringWaiting(gatheringShard), newGathering.StartTime);
-				var upcomingNotificationId = await user.Notify(CanaryNotification.GatheringUpcoming(gatheringShard), newGathering.StartTime - OneHour);
+				var upcomingNotificationId = await user.Notify(CanaryNotification.GatheringUpcoming(gatheringShard, "in an hour"), newGathering.StartTime - OneHour);
 				var imminentNotificationId = await user.Notify(CanaryNotification.GatheringImminent(gatheringShard), newGathering.StartTime - FifteenMinutes);
 
 				await Telegrams.UpdateGatheringHostNotificationScheduleAsync(newGathering.Id, waitingNotificationId);
@@ -331,9 +331,11 @@ namespace Core.Controls
 			// Gather no-shows
             var absentUsers = (await gathering.Guests).Except(await gathering.Arrived).Except(await gathering.Left);
 
-            if (gathering.Duration > TimeSpan.FromMinutes(20))
+            if (gathering.Duration > TimeSpan.FromMinutes(30))
 			{
 				// Notify no-shows
+				_ = User.NotifyAll(CanaryNotification.UserMissedGathering(await gathering.ToGatheringShard()), users: absentUsers.ToArray());
+
 				foreach (var absent in absentUsers)
 				{
 					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee, $"{gathering.Title}");
@@ -345,6 +347,9 @@ namespace Core.Controls
 			{
 				await Gatherings.DeleteUserStateAsync(absent.Id, gathering.Id);
 			}
+
+			// Schedule photo reminder for attendees
+			_ = User.NotifyAll(CanaryNotification.GatheringUploadClosing(await gathering.ToGatheringShard()), notifyAt: Time + Gathering.MaximumSnapshotLateness * 0.7, users: (await gathering.Left).ToArray());
         }
 
 		public async Task DeleteGatheringAsync(long userId, long gatheringId)
@@ -503,10 +508,18 @@ namespace Core.Controls
 			else
 			{
 				// Try to add user to the gathering
-				await Gatherings.SetUserStateAsync(user.Id, gatheringId, GatheringBond.Guest, Time);
+				await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Guest, Time);
 
 				// Schedule notifications as required
 				_ = ScheduleNotificationsForGuest(gathering, user);
+
+				// Notify any companions at gathering
+				var activeGuests = (await gathering.Guests).Concat(await gathering.Arrived);
+				var userCompanions = await user.Companions;
+
+				var activeCompanions = activeGuests.Where(userCompanions.Contains);
+
+				_ = User.NotifyAll(CanaryNotification.CompanionJoined(user.ToUserShard(), await gathering.ToGatheringShard()), users: activeCompanions.ToArray());
             }
 
 			// Notify host if gathering has already started
@@ -1014,7 +1027,7 @@ namespace Core.Controls
 
             if (scheduleUpcoming)
             {
-                upcomingIdSync = gathering.NotifyGuests(CanaryNotification.GatheringUpcoming(shard), shard.StartTime - OneHour);
+                upcomingIdSync = gathering.NotifyGuests(CanaryNotification.GatheringUpcoming(shard, "in an hour"), shard.StartTime - OneHour);
             }
 
             var imminentIdSync = gathering.NotifyGuests(CanaryNotification.GatheringImminent(shard), shard.StartTime - FifteenMinutes);
@@ -1038,7 +1051,7 @@ namespace Core.Controls
 
             if (scheduleUpcoming)
             {
-                upcomingIdSync = guest.Notify(CanaryNotification.GatheringUpcoming(shard), shard.StartTime - OneHour);
+                upcomingIdSync = guest.Notify(CanaryNotification.GatheringUpcoming(shard, "in an hour"), shard.StartTime - OneHour);
             }
 
             var imminentIdSync = guest.Notify(CanaryNotification.GatheringImminent(shard), shard.StartTime - FifteenMinutes);

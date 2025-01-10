@@ -69,7 +69,7 @@ namespace Core.Daemons
                     // Notify host
                     User host = await GetUserAsync(gathering.HostId);
                     await host.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
-                    await host.Notify(CanaryNotification.GatheringDeleted(await gathering.ToGatheringShard()));
+                    await host.Notify(CanaryNotification.GatheringAutoCancelled(await gathering.ToGatheringShard()));
 
                     // Notify guests
                     await gathering.NotifyGuests(CanaryNotification.HostMissedGathering(await gathering.ToGatheringShard()), notifyHost: false);
@@ -79,7 +79,7 @@ namespace Core.Daemons
                 {
                     // Warn host
                     User host = await GetUserAsync(gathering.HostId);
-                    await host.Notify(CanaryNotification.GatheringRemovalWarning(await gathering.ToGatheringShard()));
+                    await host.Notify(CanaryNotification.GatheringAutoCancellationWarning(await gathering.ToGatheringShard()));
                 }
             }
         }

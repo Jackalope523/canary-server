@@ -167,7 +167,7 @@ namespace Core.Controls
             if (await targetUser.IsAppreciating(user))
             { _ = targetUser.Notify(CanaryNotification.CompanionshipForged(user.ToUserShard())); }
             else
-            { _ = targetUser.Notify(CanaryNotification.UserAdded(user.ToUserShard())); }
+            { _ = targetUser.Notify(CanaryNotification.CompanionshipRequest(user.ToUserShard())); }
         }
 
         public async Task UnappreciateUserAsync(long userId, long targetId)

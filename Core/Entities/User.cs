@@ -15,6 +15,14 @@ namespace Core.Entities
 
     internal class User
     {
+        #region Olive Branches
+
+        public static async Task<string> NotifyAll(CanaryNotification notification, DateTimeOffset? notifyAt = null, params User[] users)
+        {
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, users);
+        }
+
+        #endregion
 
         #region Variables
 

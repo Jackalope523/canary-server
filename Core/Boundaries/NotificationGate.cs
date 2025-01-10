@@ -37,7 +37,8 @@ namespace Core.Boundaries
 	public record NotificationProfile(long UserId, Guid NotificationId,
 		bool SocialInvitation, bool CompanionActivity,
 		bool GatheringReminder, bool GatheringActivity,
-		bool GatheringDiscovery);
+		bool GatheringDiscovery)
+		: CoreOnlyData();
 
 	public record NotificationPreferencesShard(Guid NotificationId,
 		bool SocialInvitation, bool CompanionActivity,

@@ -382,7 +382,7 @@ namespace Core.Entities
 
         public async Task Started()
         {
-            _ = NotifyActive(CanaryNotification.GatheringLive(await ToGatheringShard()));
+            _ = NotifyActive(CanaryNotification.GatheringLive(await ToGatheringShard()), notifyHost: false);
         }
 
         public async Task<List<User>> Ended()
