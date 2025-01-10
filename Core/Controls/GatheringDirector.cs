@@ -158,14 +158,7 @@ namespace Core.Controls
 			else
 			{
 				// Schedule notifications
-				var gatheringShard = await newGathering.ToGatheringShard();
-
-				var waitingNotificationId = await user.Notify(CanaryNotification.GatheringWaiting(gatheringShard), newGathering.StartTime);
-				var upcomingNotificationId = await user.Notify(CanaryNotification.GatheringUpcoming(gatheringShard, "in an hour"), newGathering.StartTime - OneHour);
-				var imminentNotificationId = await user.Notify(CanaryNotification.GatheringImminent(gatheringShard), newGathering.StartTime - FifteenMinutes);
-
-				await Telegrams.UpdateGatheringHostNotificationScheduleAsync(newGathering.Id, waitingNotificationId);
-				await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(newGathering.Id, (user.Id, upcomingNotificationId, imminentNotificationId));
+				await ScheduleNotifications(newGathering);
 			}
 
             // Notify companions of gathering
@@ -1038,8 +1031,11 @@ namespace Core.Controls
             var schedules = (await gathering.Guests).Select(guest => (guest.Id, upcomingNotificationId, imminentNotificationId));
 
 			// Track notification ids
-            await Telegrams.UpdateGatheringHostNotificationScheduleAsync(gathering.Id, await waitingNotificationIdSync);
-            await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, schedules.ToArray());
+			if (await waitingNotificationIdSync != "")
+			{ await Telegrams.UpdateGatheringHostNotificationScheduleAsync(gathering.Id, await waitingNotificationIdSync); }
+
+			if (upcomingNotificationId != "" || imminentNotificationId != "")
+			{ await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, schedules.ToArray()); }
         }
 
 		private async Task ScheduleNotificationsForGuest(Gathering gathering, User guest)
@@ -1059,8 +1055,9 @@ namespace Core.Controls
             // Await scheduling
             string upcomingNotificationId = await upcomingIdSync, imminentNotificationId = await imminentIdSync;
 
-            // Track notification ids
-            await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, (guest.Id, upcomingNotificationId, imminentNotificationId));
+			// Track notification ids
+			if (upcomingNotificationId != "" || imminentNotificationId != "")
+			{ await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, (guest.Id, upcomingNotificationId, imminentNotificationId)); }
         }
 
         #endregion
