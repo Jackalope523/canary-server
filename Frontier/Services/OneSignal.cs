@@ -54,9 +54,20 @@ namespace Frontier.Services
                 CollapseId = notification.CollapseId,
             };
 
-            var ret = await instance.CreateNotificationAsync(notif);
 
-            return ret.Id;
+            string returnedId = "";
+
+            try
+            {
+                var ret = await instance.CreateNotificationAsync(notif);
+                returnedId = ret.Id;
+            }
+            catch (Exception e)
+            {
+                log.LogError("Error creating notification {e}", e);
+            }
+
+            return returnedId;
         }
 
         public async Task<string> ScheduleNotification(CanaryNotification notification, DateTimeOffset dispatchAt, params NotificationProfile[] notificationProfiles)
@@ -81,9 +92,19 @@ namespace Frontier.Services
                 SendAfter = dispatchAt.DateTime,
             };
 
-            var ret = await instance.CreateNotificationAsync(notif);
+            string returnedId = "";
 
-            return ret.Id;
+            try
+            {
+                var ret = await instance.CreateNotificationAsync(notif);
+                returnedId = ret.Id;
+            }
+            catch (Exception e)
+            {
+                log.LogError("Error creating notification {e}", e);
+            }
+
+            return returnedId;
         }
 
         public async Task CancelNotification(string notificationId)
@@ -96,7 +117,7 @@ namespace Frontier.Services
 
         public List<string> RetrieveValidTargets(CanaryNotification notification, params NotificationProfile[] notificationProfiles)
         {
-            List<string> notificationIds = new();
+            List<string> targets = new();
 
             foreach (var profile in notificationProfiles)
             {
@@ -106,14 +127,15 @@ namespace Frontier.Services
                     log.LogWarning("Tried to push notification to empty user.\nTitle {title}\nBody {body}", notification.Title, notification.Body);
                     continue;
                 }
-                // Check user preferences
-                if (!notification.CheckEnabled(profile))
-                { continue; }
 
-                notificationIds.Add(profile.NotificationId.ToString());
+                // Check user preferences
+                if (notification.CheckEnabled(profile))
+                {
+                    targets.Add(profile.NotificationId.ToString());
+                }
             }
 
-            return notificationIds;
+            return targets;
         }
     }
 }

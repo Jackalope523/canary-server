@@ -7,9 +7,9 @@ namespace Core.Notifications
     {
         SocialInvitation,
         CompanionActivity,
+        GatheringDiscovery,
         GatheringReminder,
         GatheringActivity,
-        GatheringDiscovery,
     }
 
     public static class NotificationGroupExtensions
@@ -20,9 +20,9 @@ namespace Core.Notifications
             {
                 NotificationGroup.SocialInvitation => profile.SocialInvitation,
                 NotificationGroup.CompanionActivity => profile.CompanionActivity,
-                NotificationGroup.GatheringReminder => profile.GatheringReminder,
-                NotificationGroup.GatheringActivity => profile.CompanionActivity,
                 NotificationGroup.GatheringDiscovery => profile.GatheringDiscovery,
+                NotificationGroup.GatheringReminder => profile.GatheringReminder,
+                NotificationGroup.GatheringActivity => profile.GatheringActivity,
                 _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
             };
         }
@@ -286,19 +286,19 @@ namespace Core.Notifications
             => GatheringActivity(new(gathering.Title,
                 $"Your gathering is waiting to start!",
                 new GatheringDeepLink(gathering.Id, immediate: true),
-                "30"));
+                "20"));
 
         public static CanaryNotification GatheringAutoCancellationWarning(GatheringShard gathering)
             => GatheringActivity(new(gathering.Title,
                 $"Is going to be cancelled if you do not start it.",
                 new GatheringDeepLink(gathering.Id, immediate: true),
-                "30"));
+                "20"));
 
         public static CanaryNotification GatheringAutoCancelled(GatheringShard gathering)
             => GatheringActivity(new(gathering.Title,
                 $"Was cancelled due to your absence.",
                 new GatheringDeepLink(gathering.Id),
-               "30"));
+               "20"));
 
         public static CanaryNotification GatheringHeartbeat(GatheringShard gathering) // TODO Slot in
             => GatheringActivity(new(gathering.Title,
@@ -337,7 +337,7 @@ namespace Core.Notifications
                "20"));
 
         public static CanaryNotification UserMissedGathering(GatheringShard gathering)
-            => GatheringReminders(new(gathering.Title,
+            => GatheringActivity(new(gathering.Title,
                 "You missed the gathering.",
                 new GatheringDeepLink(gathering.Id),
                 "20"));

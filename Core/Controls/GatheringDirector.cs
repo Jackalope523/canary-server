@@ -1016,7 +1016,7 @@ namespace Core.Controls
 
 			// Schedule guests
             var upcomingIdSync = Task.FromResult("");
-            bool scheduleUpcoming = gathering.StartTime - OneHour < Time;
+            bool scheduleUpcoming = gathering.StartTime - OneHour > Time;
 
             if (scheduleUpcoming)
             {
