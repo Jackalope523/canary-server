@@ -65,6 +65,7 @@ namespace Repository
         public List<Penalty>? Penalties { get; set; }
         public List<Feedback>? Feedback { get; set; }
         public List<GuestClearance>? GuestClearances { get; set; }
+        public List<Notification>? Notifications { get; set; }
 
 
         // Default Values

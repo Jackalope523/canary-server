@@ -82,9 +82,25 @@ namespace Repository
                 .Property(u => u.CurrentLocation)
                 .HasSrid(4326);
 
-            modelBuilder.Entity<Gathering>()
-                .Property(e => e.Location)
-                .HasSrid(4326);
+            modelBuilder.Entity<User>()
+                .Property(u => u.SocialInvitations)
+                .HasDefaultValue(true);
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.CompanionActivity)
+                .HasDefaultValue(true);
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.GatheringReminders)
+                .HasDefaultValue(true);
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.GatheringActivity)
+                .HasDefaultValue(true);
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.GatheringDiscovery)
+                .HasDefaultValue(true);
 
             modelBuilder.Entity<User>()
                 .HasMany(u => u.HostedGatherings)
@@ -171,6 +187,11 @@ namespace Repository
                 .WithOne(l => l.User)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.Notifications)
+               .WithOne(n => n.Recipient)
+               .OnDelete(DeleteBehavior.Restrict);
+
             // Gathering
             modelBuilder.Entity<Gathering>()
                 .HasQueryFilter(g => !g.SoftDeleted);
@@ -215,6 +236,11 @@ namespace Repository
                 .HasMany(g => g.UserReports)
                 .WithOne(r => r.Gathering)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+               .HasMany(u => u.Notifications)
+               .WithOne(n => n.Gathering)
+               .OnDelete(DeleteBehavior.Restrict);
 
             // Telegram
             modelBuilder.Entity<Telegram>()

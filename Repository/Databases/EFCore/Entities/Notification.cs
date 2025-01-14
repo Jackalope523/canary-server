@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    internal class Notification : Entity
+    public class Notification : Entity
     {
         public enum NotificationType { GatheringImminent, GatheringUpcoming, GatheringWaiting }
 
