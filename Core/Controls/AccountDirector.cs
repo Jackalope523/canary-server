@@ -1,5 +1,6 @@
 ﻿using Core.Boundaries;
 using Core.Entities;
+using Core.Notifications;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -180,8 +181,7 @@ namespace Core.Controls
         public async Task DeleteUserAsync(long userId)
         {
             // TODO Gracefully delete data
-
-            await Accounts.DeleteUserAsync(userId);
+            await Accounts.SoftDeleteAsync(userId);
         }
 
         public async Task UpdateUserLocationAsync(long userId, double latitude, double longitude)
@@ -220,15 +220,21 @@ namespace Core.Controls
                     // Check if user is a guest or the host
                     if (currentGathering.IsHostedBy(user))
                     {
-                        Log.LogWarning("Host {name} left gathering {title} area, sealing...", user.Name, currentGathering.Title);
-                        // Seal the gathering if user is the host
+                        Log.LogWarning("Host {name} left gathering {title} area, hiding...", user.Name, currentGathering.Title);
+
+                        // Hide the gathering if user is the host
                         await Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Hidden)});
+
+                        _ = user.Notify(CanaryNotification.HostLeavingGatheringArea(await currentGathering.ToGatheringShard()));
                     }
                     else
                     {
                         Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Title);
+
                         // Leave the gathering if user is a guest
                         await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
+
+                        _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await currentGathering.ToGatheringShard()));
                     }
                 }
 

@@ -98,7 +98,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-            User snapshotOwner = new(snapshot.User);
+            User snapshotOwner = await GetUserAsync(snapshot.User.Id);
             var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
             Verify(user.Taken(snapshot) ||
@@ -115,7 +115,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-            User snapshotOwner = new(snapshot.User);
+            User snapshotOwner = await GetUserAsync(snapshot.User.Id);
             var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
             Verify(user.Taken(snapshot) ||

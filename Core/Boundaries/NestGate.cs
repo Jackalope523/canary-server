@@ -22,11 +22,11 @@ namespace Core.Boundaries
 
 	public interface INestDatabase
     {
-        Task<List<UserShard>> GetCompanionsAsync(long userId);
-		Task<List<UserShard>> GetFollowedUsersAsync(long userId);
-        Task<List<UserShard>> GetUserFollowersAsync(long userId);
+        Task<List<CoreUser>> GetCompanionsAsync(long userId);
+		Task<List<CoreUser>> GetFollowedUsersAsync(long userId);
+        Task<List<CoreUser>> GetUserFollowersAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
-        Task<List<UserShard>> GetUsersBlockingAsync(long userId);
+        Task<List<CoreUser>> GetUsersBlockingAsync(long userId);
 
         Task FollowUserAsync(long userId, long targetId, DateTimeOffset time);
 		Task UnfollowUserAsync(long userId, long targetId);

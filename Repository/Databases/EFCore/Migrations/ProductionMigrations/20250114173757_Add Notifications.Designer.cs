@@ -3,18 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
 
 #nullable disable
 
-namespace Repository.Databases.EFCore.Migrations.StagingMigrations
+namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
-    [DbContext(typeof(AzureStagingContext))]
-    partial class AzureStagingContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AzureProductionContext))]
+    [Migration("20250114173757_Add Notifications")]
+    partial class AddNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -561,7 +564,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                         .HasColumnType("int");
 
                     b.Property<bool>("CompanionActivity")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<int>("Competitiveness")
                         .HasColumnType("int");
@@ -589,13 +594,19 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                         .HasColumnType("int");
 
                     b.Property<bool>("GatheringActivity")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("GatheringDiscovery")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("GatheringReminders")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<Point>("Haunt")
                         .IsRequired()
@@ -661,7 +672,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("SocialInvitations")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
@@ -955,15 +968,15 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
             modelBuilder.Entity("Repository.Notification", b =>
                 {
                     b.HasOne("Repository.Gathering", "Gathering")
-                        .WithMany()
+                        .WithMany("Notifications")
                         .HasForeignKey("GatheringId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Repository.User", "Recipient")
-                        .WithMany()
+                        .WithMany("Notifications")
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Gathering");
@@ -1095,6 +1108,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.Navigation("GuestClearances");
 
+                    b.Navigation("Notifications");
+
                     b.Navigation("Snapshots");
 
                     b.Navigation("UserReports");
@@ -1122,6 +1137,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Navigation("HostedGatherings");
 
                     b.Navigation("InitiatedUserRelationships");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("Penalties");
 

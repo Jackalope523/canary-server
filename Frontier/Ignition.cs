@@ -75,7 +75,7 @@ namespace Frontier
                 _ => throw new InvalidEnvironmentException("Unknown ASPNETCORE_ENVIRONMENT set.")
             };
 
-            EnvironmentOptions environment = new() { Flag = EnvironmentFlag.Production };
+            EnvironmentOptions environment = new() { Flag = flag };
 
             services.AddCors(options =>
             {

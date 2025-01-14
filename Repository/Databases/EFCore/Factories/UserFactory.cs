@@ -51,7 +51,7 @@
 
                 Haunt = internalFactory.Create(40.712, -74.006),
                 HauntRadius = 10.0 + Count(),
-                HauntWheight = 5 + Count(),
+                HauntWeight = 5 + Count(),
                 CurrentLocation = internalFactory.Create(40.712, -74.006),
                 CurrentRadius = 15.0 + Count()
             });

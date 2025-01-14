@@ -41,6 +41,7 @@ namespace Repository
         public List<UserReport>? UserReports { get; set; }
         public List<Snapshot>? Snapshots { get; set; }
         public List<GuestClearance>? GuestClearances { get; set; }
+        public List<Notification>? Notifications { get; set; }
 
         // Default Values
         private static readonly CoordinateFactory Factory = new();

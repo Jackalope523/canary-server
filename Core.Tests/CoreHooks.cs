@@ -60,11 +60,6 @@ namespace Core.Tests
 			return createdUser;
         }
 
-        public async Task DeleteUserAsync(long userId)
-        {
-			await accounts.DeleteUserAsync(userId);
-        }
-
         public async Task<CoreUser> FindUserByEmailAsync(string normalisedEmail)
         {
 			return await accounts.FindUserByEmailAsync(normalisedEmail);
@@ -91,6 +86,16 @@ namespace Core.Tests
 			return await accounts.GetUserHauntAsync(userId);
         }
 
+        public async Task HardDeleteAsync(long userId)
+        {
+            await accounts.HardDeleteAsync(userId);
+        }
+
+        public async Task SoftDeleteAsync(long userId)
+        {
+            await accounts.SoftDeleteAsync(userId);
+        }
+
         public async Task UpdateHauntAsync(long userId, double latitude, double longitude, double radius, int stability)
         {
 			await accounts.UpdateHauntAsync(userId, latitude, longitude, radius, stability);
@@ -111,19 +116,48 @@ namespace Core.Tests
 	{
 		public static ConcurrentDictionary<string, ConcurrentBag<CanaryNotification>> messages = new();
 
-		public Task PushNotification(Guid userNotificationId, CanaryNotification notification)
-		{
-			ConcurrentBag<CanaryNotification> userBag;
-			var exists = messages.TryGetValue(userNotificationId.ToString(), out userBag);
+        public async Task CancelNotification(string notificationId)
+        {
+            // no-op
+            // TODO
+        }
 
-			if (!exists)
-			{ 
-				userBag = new();
-				messages.TryAdd(userNotificationId.ToString(), userBag);
-			}
+        public Task<string> DispatchNotification(CanaryNotification notification, params NotificationProfile[] notificationProfiles)
+        {
+            if (notificationProfiles.Length < 1)
+            { return Task.FromResult(""); }
 
-			userBag.Add(notification);
-			return Task.FromResult(0);
-		}
-	}
+            ConcurrentBag<CanaryNotification> userBag;
+            var notificationId = notificationProfiles[0].NotificationId.ToString();
+            var exists = messages.TryGetValue(notificationId, out userBag);
+
+            if (!exists)
+            {
+                userBag = new();
+                messages.TryAdd(notificationId.ToString(), userBag);
+            }
+
+            userBag.Add(notification);
+            return Task.FromResult("");
+        }
+
+        public Task<string> ScheduleNotification(CanaryNotification notification, DateTimeOffset dispatchAt, params NotificationProfile[] notificationProfiles)
+        {
+            if (notificationProfiles.Length < 1)
+            { return Task.FromResult(""); }
+
+            ConcurrentBag<CanaryNotification> userBag;
+            var notificationId = notificationProfiles[0].NotificationId.ToString();
+            var exists = messages.TryGetValue(notificationId, out userBag);
+
+            if (!exists)
+            {
+                userBag = new();
+                messages.TryAdd(notificationId.ToString(), userBag);
+            }
+
+            userBag.Add(notification);
+            return Task.FromResult("");
+        }
+    }
 }

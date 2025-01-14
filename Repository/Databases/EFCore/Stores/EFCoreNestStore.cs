@@ -96,7 +96,8 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx =>
             RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Block));
         }
-        public async Task<List<UserShard>> GetFollowedUsersAsync(long id) 
+
+        public async Task<List<CoreUser>> GetFollowedUsersAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Follow).
@@ -104,7 +105,33 @@ namespace Repository
                  ctx.Users,
                  l => l.OtherId,
                  u => u.Id,
-                 (l, u) => new UserShard(u.Id, u.Name)
+                 (l, u) => new CoreUser(u.Id,
+                      u.PhoneNumber,
+                      u.Email,
+                      u.Name,
+                      u.Pseudonym,
+                      u.DateOfBirth,
+                      u.IsPhoneConfirmed,
+                      u.IsEmailConfirmed,
+                      u.SoftDeleted,
+                      u.SecurityStamp,
+                      u.LockoutDate,
+                      u.AccessTries,
+                      u.AccountStatus,
+                      u.JoinDate,
+                      u.Reputation,
+                      new CharacterShard(
+                          u.Age,
+                          u.Extroversion,
+                          u.Athleticisme,
+                          u.Chaos,
+                          u.Competitiveness,
+                          u.Industriousness,
+                          u.NightOwl,
+                          u.Openness),
+                      u.TimeOfUserAgreement,
+                      u.NotificationId
+                  )
                  ).
              ToListAsync());
         }
@@ -120,50 +147,154 @@ namespace Repository
                 ).
             ToListAsync());
         }
-        public async Task<List<UserShard>> GetCompanionsAsync(long id)
+        public async Task<List<CoreUser>> GetCompanionsAsync(long id)
         {
-            Task<List<UserShard>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+            Task<List<CoreUser>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Follow).
              Join(
                  ctx.Users,
                  l => l.OtherId,
                  u => u.Id,
-                 (l, u) => new UserShard(u.Id, u.Name)
+                 (l, u) => new CoreUser(u.Id,
+                      u.PhoneNumber,
+                      u.Email,
+                      u.Name,
+                      u.Pseudonym,
+                      u.DateOfBirth,
+                      u.IsPhoneConfirmed,
+                      u.IsEmailConfirmed,
+                      u.SoftDeleted,
+                      u.SecurityStamp,
+                      u.LockoutDate,
+                      u.AccessTries,
+                      u.AccountStatus,
+                      u.JoinDate,
+                      u.Reputation,
+                      new CharacterShard(
+                          u.Age,
+                          u.Extroversion,
+                          u.Athleticisme,
+                          u.Chaos,
+                          u.Competitiveness,
+                          u.Industriousness,
+                          u.NightOwl,
+                          u.Openness),
+                      u.TimeOfUserAgreement,
+                      u.NotificationId
+                  )
                  ).
              ToListAsync());
 
-            Task<List<UserShard>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+            Task<List<CoreUser>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
              ctx.UserRelationships.Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Follow).
              Join(
                  ctx.Users,
                  l => l.SelfId,
                  u => u.Id,
-                 (l, u) => new UserShard(u.Id, u.Name)
+                 (l, u) => new CoreUser(u.Id,
+                      u.PhoneNumber,
+                      u.Email,
+                      u.Name,
+                      u.Pseudonym,
+                      u.DateOfBirth,
+                      u.IsPhoneConfirmed,
+                      u.IsEmailConfirmed,
+                      u.SoftDeleted,
+                      u.SecurityStamp,
+                      u.LockoutDate,
+                      u.AccessTries,
+                      u.AccountStatus,
+                      u.JoinDate,
+                      u.Reputation,
+                      new CharacterShard(
+                          u.Age,
+                          u.Extroversion,
+                          u.Athleticisme,
+                          u.Chaos,
+                          u.Competitiveness,
+                          u.Industriousness,
+                          u.NightOwl,
+                          u.Openness),
+                      u.TimeOfUserAgreement,
+                      u.NotificationId
+                  )
                  ).
              ToListAsync());
 
             return (await appreciating).Intersect(await appreciatingMe).ToList();
         }
 
-        public async Task<List<UserShard>> GetUserFollowersAsync(long userId)
+        public async Task<List<CoreUser>> GetUserFollowersAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Follow).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
-            (l, u) => new UserShard(u.Id, u.Name)).
+            (l, u) => new CoreUser(u.Id,
+                      u.PhoneNumber,
+                      u.Email,
+                      u.Name,
+                      u.Pseudonym,
+                      u.DateOfBirth,
+                      u.IsPhoneConfirmed,
+                      u.IsEmailConfirmed,
+                      u.SoftDeleted,
+                      u.SecurityStamp,
+                      u.LockoutDate,
+                      u.AccessTries,
+                      u.AccountStatus,
+                      u.JoinDate,
+                      u.Reputation,
+                      new CharacterShard(
+                          u.Age,
+                          u.Extroversion,
+                          u.Athleticisme,
+                          u.Chaos,
+                          u.Competitiveness,
+                          u.Industriousness,
+                          u.NightOwl,
+                          u.Openness),
+                      u.TimeOfUserAgreement,
+                      u.NotificationId
+                  )).
             ToListAsync());
         }
 
-        public async Task<List<UserShard>> GetUsersBlockingAsync(long userId)
+        public async Task<List<CoreUser>> GetUsersBlockingAsync(long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Block).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
-            (l, u) => new UserShard(u.Id, u.Name)).
+            (l, u) => new CoreUser(u.Id,
+                      u.PhoneNumber,
+                      u.Email,
+                      u.Name,
+                      u.Pseudonym,
+                      u.DateOfBirth,
+                      u.IsPhoneConfirmed,
+                      u.IsEmailConfirmed,
+                      u.SoftDeleted,
+                      u.SecurityStamp,
+                      u.LockoutDate,
+                      u.AccessTries,
+                      u.AccountStatus,
+                      u.JoinDate,
+                      u.Reputation,
+                      new CharacterShard(
+                          u.Age,
+                          u.Extroversion,
+                          u.Athleticisme,
+                          u.Chaos,
+                          u.Competitiveness,
+                          u.Industriousness,
+                          u.NightOwl,
+                          u.Openness),
+                      u.TimeOfUserAgreement,
+                      u.NotificationId
+                  )).
             ToListAsync());
         }
 
@@ -207,7 +338,7 @@ namespace Repository
                 combined => new CoreGathering
                 (
                     combined.e.Id,
-                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.user != null ? combined.user.Id : 0,
                     combined.e.Title,
                     combined.e.Description,
                     combined.e.StartTime,
@@ -263,7 +394,7 @@ namespace Repository
                 combined => new CoreGathering
                 (
                     combined.e.Id,
-                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.user != null ? combined.user.Id : 0,
                     combined.e.Title,
                     combined.e.Description,
                     combined.e.StartTime,

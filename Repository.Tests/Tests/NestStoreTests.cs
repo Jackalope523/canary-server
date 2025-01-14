@@ -93,7 +93,7 @@ namespace Repository.Tests
             UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Follow);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.AddAsync(link));
 
-            UserShard user = (await nestStore.GetFollowedUsersAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetFollowedUsersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -121,7 +121,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link2));
 
-            UserShard user = (await nestStore.GetCompanionsAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetCompanionsAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -133,7 +133,7 @@ namespace Repository.Tests
             UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserLinkType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link));
 
-            UserShard user = (await nestStore.GetUserFollowersAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetUserFollowersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -145,7 +145,7 @@ namespace Repository.Tests
             UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserLinkType.Block);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link));
 
-            UserShard user = (await nestStore.GetUsersBlockingAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetUsersBlockingAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);

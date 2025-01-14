@@ -67,19 +67,19 @@ namespace Core.Daemons
                     await terminal.GatheringDatabase.CancelGatheringAsync(gathering.Id);
 
                     // Notify host
-                    User host = await GetUserAsync(gathering.Host.Id);
+                    User host = await GetUserAsync(gathering.HostId);
                     await host.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
-                    await host.Notify(CanaryNotification.GatheringDeleted(gathering.ToGatheringShard()));
+                    await host.Notify(CanaryNotification.GatheringAutoCancelled(await gathering.ToGatheringShard()));
 
                     // Notify guests
-                    await gathering.NotifyGuests(CanaryNotification.HostMissedGathering(gathering.ToGatheringShard()));
+                    await gathering.NotifyGuests(CanaryNotification.HostMissedGathering(await gathering.ToGatheringShard()), notifyHost: false);
                 }
                 // Check if the next pass will delete the gathering
                 else if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait - interval))
                 {
                     // Warn host
-                    User host = await GetUserAsync(gathering.Host.Id);
-                    await host.Notify(CanaryNotification.GatheringRemovalWarning(gathering.ToGatheringShard()));
+                    User host = await GetUserAsync(gathering.HostId);
+                    await host.Notify(CanaryNotification.GatheringAutoCancellationWarning(await gathering.ToGatheringShard()));
                 }
             }
         }

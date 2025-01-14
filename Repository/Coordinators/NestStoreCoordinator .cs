@@ -25,7 +25,8 @@
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
-        public async Task<List<UserShard>> GetFollowedUsersAsync(long id) 
+
+        public async Task<List<CoreUser>> GetFollowedUsersAsync(long id) 
         {
             return await store.GetFollowedUsersAsync(id);
         }
@@ -33,17 +34,17 @@
         {
             return await store.GetBlockedUsersAsync(id);
         }
-        public async Task<List<UserShard>> GetCompanionsAsync(long id)
+        public async Task<List<CoreUser>> GetCompanionsAsync(long id)
         {
             return await store.GetCompanionsAsync(id);
         }
 
-        public async Task<List<UserShard>> GetUserFollowersAsync(long userId)
+        public async Task<List<CoreUser>> GetUserFollowersAsync(long userId)
         {
             return await store.GetUserFollowersAsync(userId);
         }
 
-        public async Task<List<UserShard>> GetUsersBlockingAsync(long userId)
+        public async Task<List<CoreUser>> GetUsersBlockingAsync(long userId)
         {
            return await store.GetUsersBlockingAsync(userId);
         }

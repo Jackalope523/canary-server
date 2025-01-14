@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
-
+using Core.Notifications;
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
 
@@ -53,21 +53,24 @@ namespace Core.Controls
             GatheringReportType reportType, string reportDetails)
         {
             var user = await GetUserAsync(userId);
-            var targetGathering = await GetGatheringAsync(gatheringId);
+            var gathering = await GetGatheringAsync(gatheringId);
 
             // Verify user can report
             Verify(await user.CanReport(),
                 new InvalidUserException("User has a cooldown to report."));
 
-            await Reports.ReportGatheringAsync(user.Id, targetGathering.Id, Time, reportType, reportDetails);
+            await Reports.ReportGatheringAsync(user.Id, gathering.Id, Time, reportType, reportDetails);
 
             // Check if action is to be taken
-            if (await targetGathering.Reported())
+            if (await gathering.Reported())
             {
-                var host = await GetUserAsync(targetGathering.Host.Id);
+                var host = await GetUserAsync(gathering.HostId);
 
-                // Threshold hit, end gathering
-                _ = Terminal.GatheringDirector.TerminateGatheringAsync(host.Id, gatheringId);
+                // Threshold hit, seal gathering
+                // TODO Update to sealed
+                await Terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Hidden) });
+
+                await gathering.NotifyActive(CanaryNotification.GatheringSealed(await gathering.ToGatheringShard()));
 
                 // Compute host's standing
                 var status = await host.GatheringReported();
@@ -85,7 +88,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetSnapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-            User targetUser = new(targetSnapshot.User);
+            User targetUser = await GetUserAsync(targetSnapshot.User.Id);
 
             // Verify user can report
             Verify(await user.CanReport(),

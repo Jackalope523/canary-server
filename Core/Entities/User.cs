@@ -15,7 +15,16 @@ namespace Core.Entities
 
     internal class User
     {
-		#region Variables
+        #region Olive Branches
+
+        public static async Task<string> NotifyAll(CanaryNotification notification, DateTimeOffset? notifyAt = null, params User[] users)
+        {
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, users);
+        }
+
+        #endregion
+
+        #region Variables
 
         //////
         // Constants
@@ -37,7 +46,7 @@ namespace Core.Entities
         ///////
         // Properties
         ///////////////
-		
+
         public long Id { get; init; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
@@ -72,6 +81,8 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
 
+        public Synced<NotificationProfile> NotificationProfile { get; }
+
         private Synced<(GeoLocation Location, Distance Radius)> LocationSync { get; }
 		public Synced<GeoLocation> LastKnownLocation { get; }
         public Synced<Distance> LastKnownRadius { get; }
@@ -105,8 +116,15 @@ namespace Core.Entities
 
         #region Initialisation & Extraction
 
+        public static async Task<User> GetUserAsync(long id)
+        {
+            return new(await Terminal.AccountDatabase.FindUserByIdAsync(id));
+        }
+
         public User()
         {
+            NotificationProfile = new(() => Terminal.NotificationDirector.RequestNotificationProfileAsync(this));
+
             LocationSync = new(() => Terminal.AccountDirector.RequestLastKnownUserLocationAsync(this));
             LastKnownLocation = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Location);
             LastKnownRadius = new(async () => (await LocationSync.Value().ConfigureAwait(false)).Radius);
@@ -156,12 +174,6 @@ namespace Core.Entities
             Character = new(fromUser.Character);
             TimeOfUserAgreement = fromUser.TimeOfUserAgreement;
             NotificationId = fromUser.NotificationId;
-        }
-
-        public User(UserShard fromUser) : this()
-        {
-            Id = fromUser.Id;
-            Name = fromUser.Name;
         }
 
         public CoreUser ToCoreUser()
@@ -327,12 +339,12 @@ namespace Core.Entities
 			{
                 // User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!(CanAttendCompanions && await IsCompanionsWith(gathering.Host)))
+				if (!(CanAttendCompanions && await IsCompanionsWith(await gathering.Host)))
 				{ return false; }
 			}
 
             // Check if user is blocked by or blocking gathering host
-            if (await IsBlockedBy(gathering.Host) || await IsBlocking(gathering.Host))
+            if (await IsBlockedBy(await gathering.Host) || await IsBlocking(await gathering.Host))
 			{ return false; }
 
             // Check if user is within degree of privacy
@@ -507,19 +519,19 @@ namespace Core.Entities
                 message, context);
         }
 
-		public async Task Notify(CanaryNotification notification)
+        public async Task<string> Notify(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {
-            await Terminal.NotificationDirector.NotifyUserAsync(this, notification);
+             return await Terminal.NotificationDirector.NotifyUserAsync(this, notification, notifyAt);
         }
 
-        public async Task NotifyFollowers(CanaryNotification notification)
+        public async Task<string> NotifyFollowers(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {
-            (await Followers).ForEach(follower => _ = follower.Notify(notification));
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, (await Followers).ToArray());
         }
 
-        public async Task NotifyCompanions(CanaryNotification notification)
+        public async Task<string> NotifyCompanions(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {
-            (await Companions).ForEach(companion => _ = companion.Notify(notification));
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, (await Companions).ToArray());
         }
 
 		#endregion

@@ -23,7 +23,7 @@ namespace Repository
                 (g, u) => new CoreGathering
                 (
                     g.Id,
-                    new UserShard(u.Id, u.Name),
+                    u.Id,
                     g.Title,
                     g.Description,
                     g.StartTime,

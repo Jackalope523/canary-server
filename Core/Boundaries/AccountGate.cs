@@ -42,7 +42,6 @@ namespace Core.Boundaries
 		Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail,
 			string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character, Guid notificationId);
 		Task UpdateUserAsync(long userId, List<(string Property, object Value)> edits);
-		Task DeleteUserAsync(long userId);
 
 		Task<LocationShard> GetRecentLocationAsync(long userId);
 		Task UpdateRecentLocationAsync(long userId, double latitude, double longitude, double radius);
@@ -52,7 +51,10 @@ namespace Core.Boundaries
 
 		Task<string> RerollUserCodeAsync(long userId);
 		Task<CoreUser> FindUserByCodeAsync(string code);
-	}
+
+		Task SoftDeleteAsync(long userId);
+        Task HardDeleteAsync(long userId);
+    }
 
 	public interface IAccountOperations
 	{

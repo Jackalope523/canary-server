@@ -21,7 +21,6 @@ namespace Repository
         public UserAccountStatus AccountStatus { get; set; } = DefaultAccountStatus;
         public long? CurrentGathering { get; set; } = DefaultCurrentGathering;
         public DateTimeOffset TimeOfUserAgreement { get; set; } = DefaultTimeOfUserAgreement;
-        public Guid NotificationId { get; set; }
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -36,9 +35,17 @@ namespace Repository
         //Geolocation: X = Longitude Y = Latitude
         public Point Haunt { get; set; } = DefaultHaunt;
         public double HauntRadius { get; set; } = DefaultHauntRadius;
-        public int HauntWheight { get; set; } = DefaultHauntWheight;
+        public int HauntWeight { get; set; } = DefaultHauntWeight;
         public Point CurrentLocation { get; set; } = DefaultCurrentLocation;
         public double CurrentRadius { get; set; } = DefaultCurrentRadius;
+
+        // Notification Profile
+        public Guid NotificationId { get; set; }
+        public bool SocialInvitations { get; set; } = DefaultSocialInvitations;
+        public bool CompanionActivity { get; set; } = DefaultCompanionActivity;
+        public bool GatheringReminders { get; set; } = DefaultGatheringReminders;
+        public bool GatheringActivity { get; set; } = DefaultGatheringActivity;
+        public bool GatheringDiscovery { get; set; } = DefaultGatheringDiscovery;
 
         // Navigation Properties
         public List<Gathering>? HostedGatherings { get; set; }
@@ -57,6 +64,7 @@ namespace Repository
         public List<Penalty>? Penalties { get; set; }
         public List<Feedback>? Feedback { get; set; }
         public List<GuestClearance>? GuestClearances { get; set; }
+        public List<Notification>? Notifications { get; set; }
 
 
         // Default Values
@@ -89,11 +97,19 @@ namespace Repository
 
         private static readonly CoordinateFactory Factory = new();
 
-        //Geolocation: X = Longitude Y = Latitude     
+        // Geolocation: X = Longitude Y = Latitude     
         public static Point DefaultHaunt { get; set; } = Factory.Create(7.540, 53.483);
         public static double DefaultHauntRadius { get; set; } = 10;
-        public static int DefaultHauntWheight { get; set; } = 0;
+        public static int DefaultHauntWeight { get; set; } = 0;
         public static Point DefaultCurrentLocation { get; set; } = Factory.Create(7.544, 53.483);
-        public static double DefaultCurrentRadius { get; set; } = 10;       
+        public static double DefaultCurrentRadius { get; set; } = 10;
+
+        // Notification Profile
+        public static Guid DefaultNotificationId { get; set; } = Guid.Empty;
+        public static bool DefaultSocialInvitations { get; set; } = true;
+        public static bool DefaultCompanionActivity { get; set; } = true;
+        public static bool DefaultGatheringReminders { get; set; } = true;
+        public static bool DefaultGatheringActivity { get; set; } = true;
+        public static bool DefaultGatheringDiscovery { get; set; } = true; 
     }
 }

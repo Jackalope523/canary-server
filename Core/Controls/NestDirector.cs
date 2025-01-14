@@ -134,12 +134,14 @@ namespace Core.Controls
 
         public async Task<List<UserShard>> GetCompanionsAsync(long userId)
         {
-            return await Nests.GetCompanionsAsync(userId);
+            return (await Nests.GetCompanionsAsync(userId))
+                .ConvertAll(u => new User(u).ToUserShard());
         }
 
         public async Task<List<UserShard>> GetFollowedUsersAsync(long userId)
         {
-            return await Nests.GetFollowedUsersAsync(userId);
+            return (await Nests.GetFollowedUsersAsync(userId))
+                .ConvertAll(u => new User(u).ToUserShard());
         }
 
         public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
@@ -162,14 +164,14 @@ namespace Core.Controls
 
             _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
 
-            CanaryNotification targetNotification = CanaryNotification.UserAdded(user.ToUserShard());
+            CanaryNotification targetNotification = CanaryNotification.CompanionshipRequest(user.ToUserShard());
 
             // Should always hit
             if (await Nests.HaveMutualGathering(user.Id, targetUser.Id))
             {
                 var lastMutualGathering = await Nests.GetLatestMutualGathering(user.Id, targetUser.Id);
 
-                targetNotification = CanaryNotification.UserAdded(user.ToUserShard(), lastMutualGathering.Title);
+                targetNotification = CanaryNotification.CompanionshipRequest(user.ToUserShard(), lastMutualGathering.Title);
             }
 
             // Check if this forges companionship
@@ -207,7 +209,7 @@ namespace Core.Controls
 
             _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
 
-            CanaryNotification targetNotification = CanaryNotification.UserAdded(user.ToUserShard());
+            CanaryNotification targetNotification = CanaryNotification.CompanionshipRequest(user.ToUserShard());
 
             // Check if this forges companionship
             if (await targetUser.IsFollowing(user))
@@ -237,7 +239,7 @@ namespace Core.Controls
             foreach (var gathering in await user.UpcomingGatherings)
             {
                 // Check if user is host
-                if (gathering.Host.Equals(user))
+                if (gathering.HostId.Equals(user.Id))
                 {
                     try
                     {
@@ -287,7 +289,7 @@ namespace Core.Controls
 		internal async Task<List<User>> RequestBlockedUsersAsync(User user)
         {
             return (await Nests.GetBlockedUsersAsync(user.Id))
-				.ConvertAll(user => new User(user));
+				.ConvertAll(u => User.GetUserAsync(u.Id).Result);
         }
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)
