@@ -94,7 +94,7 @@ namespace Core.Controls
             catch
             {
                 // If failed, remove snapshot
-                await Snapshots.DeleteSnapshotAsync(snapshot.Id);
+                await Snapshots.HardDeleteAsync(snapshot.Id);
                 throw new UnexpectedFailureException("Image upload failed.");
             }
 
@@ -112,7 +112,7 @@ namespace Core.Controls
             Verify(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
                 new InvalidUserException("User cannot remove snapshot."));
 
-            await Snapshots.DeleteSnapshotAsync(snapshot.Id);
+            await Snapshots.SoftDeleteAsync(snapshot.Id);
         }
 
         public async Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim)
@@ -225,7 +225,7 @@ namespace Core.Controls
 
             foreach (SnapshotShard snapshot in snapshots)
             {
-                User snapshotOwner = new(snapshot.User);
+                User snapshotOwner = await GetUserAsync(snapshot.User.Id);
 
                 // Check if blocking link exists
                 if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))

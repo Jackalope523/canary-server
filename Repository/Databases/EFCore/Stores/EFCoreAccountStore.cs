@@ -62,37 +62,42 @@ namespace Repository
               );
         }
 
-        private async Task SoftDeleteUser(long id)
+        public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.SnapshotLinks.
-             Where(s => s.UserId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Notifications.
+                Where(n => n.RecipientId == id).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Snapshots.
-             Where(s => s.OwnerId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.SnapshotLinks.
+                Where(s => s.UserId == id).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Telegrams.
-             Where(t => t.NotifierId == id || t.RecipientId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Snapshots.
+                Where(s => s.OwnerId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Subscriptions.
-              Where(s => s.UserId == id).
-              ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Telegrams.
+                Where(t => t.NotifierId == id || t.RecipientId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Penalties.
-              Where(p => p.PenalizedId == id).
-              ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Subscriptions.
+                Where(s => s.UserId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.GuestClearances.
-             Where(c => c.UserId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Penalties.
+                Where(p => p.PenalizedId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GuestClearances.
+                Where(c => c.UserId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.UserRelationships.
@@ -115,37 +120,42 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
         }
 
-        private async Task HardDeleteUser(long id)
+        public async Task HardDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.SnapshotLinks.
-             Where(s => s.UserId == id).
-             ExecuteDeleteAsync());
+                ctx.Notifications.
+                Where(n => n.RecipientId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Snapshots.
-             Where(s => s.OwnerId == id).
-             ExecuteDeleteAsync());
+                ctx.SnapshotLinks.
+                Where(s => s.UserId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Telegrams.
-             Where(t => t.NotifierId == id || t.RecipientId == id).
-             ExecuteDeleteAsync());
+                ctx.Snapshots.
+                Where(s => s.OwnerId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Subscriptions.
-              Where(s => s.UserId == id).
-              ExecuteDeleteAsync());
+                ctx.Telegrams.
+                Where(t => t.NotifierId == id || t.RecipientId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Penalties.
-              Where(p => p.PenalizedId == id).
-              ExecuteDeleteAsync());
+               ctx.Subscriptions.
+               Where(s => s.UserId == id).
+               ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.GuestClearances.
-             Where(c => c.UserId == id).
-             ExecuteDeleteAsync());
+               ctx.Penalties.
+               Where(p => p.PenalizedId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GuestClearances.
+               Where(c => c.UserId == id).
+               ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.UserRelationships.
@@ -173,19 +183,19 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(r => r.SelfId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.GatheringReports.
-              Where(r => r.UserId == id).
-              ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+               ctx.GatheringReports.
+               Where(r => r.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.SnapshotReports.
-              Where(r => r.UserId == id).
-              ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+               ctx.SnapshotReports.
+               Where(r => r.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Gatherings.
-              Where(g => g.HostId == id).
-              ExecuteUpdate(setter => setter.SetProperty(g => g.HostId, (long?)null)));        
+               ctx.Gatherings.
+               Where(g => g.HostId == id).
+               ExecuteUpdate(setter => setter.SetProperty(g => g.HostId, (long?)null)));        
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Users.
@@ -370,7 +380,7 @@ namespace Repository
                 return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Users.
                 Where(u => u.Id == id).
-                Select(u => new HauntShard(u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight)).
+                Select(u => new HauntShard(u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWeight)).
                 SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -453,12 +463,12 @@ namespace Repository
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
             Point newHaunt = new CoordinateFactory().Create(longitude, latitude);
-            User u = new() { Id = id, Haunt = newHaunt , HauntRadius = radius, HauntWheight = stability };
+            User u = new() { Id = id, Haunt = newHaunt , HauntRadius = radius, HauntWeight = stability };
 
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true, currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true, currentDiscussion);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWeight)).IsModified = true, currentDiscussion);
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 

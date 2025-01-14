@@ -11,6 +11,7 @@
 
         internal Discussion BeginDiscussion();
         internal void DiscussWrite(Action<CanaryContext> write, Discussion discussion);
+        internal Task DiscussWriteAsync(Func<CanaryContext, Task> write, Discussion discussion);
         internal void EndDiscussion(Discussion toEnd);
         internal Task EndDiscussionAsync(Discussion toEnd);
     }

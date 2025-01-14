@@ -127,8 +127,6 @@ namespace Repository
             
             await SetUserStateAsync(hostId, toCreate.Id, GatheringBond.Guest, DateTimeOffset.UtcNow);
 
-            UserShard host = await storeSentry.ExecuteReadAsync(ctx => ctx.Users.Where(u => u.Id == hostId).Select(u => new UserShard(u.Id, u.Name)).SingleAsync());
-
             if (degreeOfPrivacy < 3)
             {
                 Discussion discussion = storeSentry.BeginDiscussion();
@@ -139,7 +137,7 @@ namespace Repository
             return new CoreGathering
                 (
                    toCreate.Id,
-                   host,
+                   hostId,
                    toCreate.Title,
                    toCreate.Description,
                    toCreate.StartTime,
@@ -167,62 +165,64 @@ namespace Repository
                    );
         }
 
-        private async Task SoftDeleteGathering(long id)
+        public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(l => l.SoftDeleted, true)));
+                ctx.Notifications.
+                Where(n => n.GatheringId == id).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringReports.
-               Where(r => r.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(r => r.SoftDeleted, true)));
+                ctx.GatheringLinks.
+                Where(l => l.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(l => l.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GuestClearances.
-               Where(c => c.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(c => c.SoftDeleted, true)));
+                ctx.GatheringReports.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Gatherings.
-               Where(e => e.Id == id).
-               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
-        }
-
-        private async Task HardDeleteGathering(long id)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.GatheringId == id).
-               ExecuteDeleteAsync());
+                ctx.GuestClearances.
+                Where(c => c.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(c => c.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GatheringReports.
-               Where(r => r.GatheringId == id).
-               ExecuteDeleteAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.UserReports.
-               Where(r => r.GatheringId == id).
-               ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.GuestClearances.
-               Where(c => c.GatheringId == id).
-               ExecuteDeleteAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Gatherings.
-               Remove(new Gathering { Id = id }));
-        }
-
-        public async Task DeleteGatheringAsync(long gatheringId)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx => 
                 ctx.Gatherings.
-                Where(e => e.Id == gatheringId).
+                Where(e => e.Id == id).
                 ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
+        }
+
+        public async Task HardDeleteAsync(long id)
+        {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Notifications.
+                Where(l => l.GatheringId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GatheringLinks.
+                Where(l => l.GatheringId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GatheringReports.
+                Where(r => r.GatheringId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.UserReports.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GuestClearances.
+                Where(c => c.GatheringId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Gatherings.
+                Remove(new Gathering { Id = id }));
         }
 
         public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
@@ -247,7 +247,7 @@ namespace Repository
                     Select(pair => new CoreGathering
                     (
                         pair.g.Id,
-                        pair.user != null ? new UserShard(pair.user.Id, pair.user.Name) : new UserShard(0, "DeletedGathering"),
+                        pair.user != null ? pair.user.Id : 0,
                         pair.g.Title,
                         pair.g.Description,
                         pair.g.StartTime,
@@ -327,7 +327,7 @@ namespace Repository
             .Select(joinResult => new CoreGathering
             (
                 joinResult.e.Id,
-                joinResult.user != null ? new UserShard(joinResult.user.Id, joinResult.user.Name) : new UserShard(0, "DeletedUser"),  
+                joinResult.user != null ? joinResult.user.Id : 0,  
                 joinResult.e.Title,
                 joinResult.e.Description,
                 joinResult.e.StartTime,
@@ -400,7 +400,7 @@ namespace Repository
             .Select(joinResult => new CoreGathering
             (
                 joinResult.e.Id,
-                joinResult.user != null ? new UserShard(joinResult.user.Id, joinResult.user.Name) : new UserShard(0, "DeletedUser"),
+                joinResult.user != null ? joinResult.user.Id : 0,
                 joinResult.e.Title,
                 joinResult.e.Description,
                 joinResult.e.StartTime,
@@ -476,7 +476,7 @@ namespace Repository
                 combined => new CoreGathering
                 (
                     combined.e.Id,
-                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.user != null ? combined.user.Id : 0,
                     combined.e.Title,
                     combined.e.Description,
                     combined.e.StartTime,
@@ -518,7 +518,7 @@ namespace Repository
                 combined => new CoreGathering
                 (
                     combined.e.Id,
-                    combined.user != null ? new UserShard(combined.user.Id, combined.user.Name) : new UserShard(0, "DeletedUser"),
+                    combined.user != null ? combined.user.Id : 0,
                     combined.e.Title,
                     combined.e.Description,
                     combined.e.StartTime,
@@ -562,7 +562,7 @@ namespace Repository
                     (e,u) => new CoreGathering
                     (
                         e.Id,
-                        new UserShard(u.Id, u.Name),
+                        u.Id,
                         e.Title,
                         e.Description,
                         e.StartTime,
@@ -589,7 +589,7 @@ namespace Repository
                         e.DegreeOfPrivacy
                    )).ToListAsync());
         }     
-        public async Task<List<UserShard>> GetGuestListAsync(long id)
+        public async Task<List<CoreUser>> GetGuestListAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -598,9 +598,35 @@ namespace Repository
                 ctx.Users,
                 l => l.UserId,
                 u => u.Id,
-                (_,u) => new UserShard(u.Id, u.Name)
-                ).
-            ToListAsync());
+                (_,u) => new CoreUser(u.Id,
+                      u.PhoneNumber,
+                      u.Email,
+                      u.Name,
+                      u.Pseudonym,
+                      u.DateOfBirth,
+                      u.IsPhoneConfirmed,
+                      u.IsEmailConfirmed,
+                      u.SoftDeleted,
+                      u.SecurityStamp,
+                      u.LockoutDate,
+                      u.AccessTries,
+                      u.AccountStatus,
+                      u.JoinDate,
+                      u.Reputation,
+                      new CharacterShard(
+                          u.Age,
+                          u.Extroversion,
+                          u.Athleticisme,
+                          u.Chaos,
+                          u.Competitiveness,
+                          u.Industriousness,
+                          u.NightOwl,
+                          u.Openness),
+                      u.TimeOfUserAgreement,
+                      u.NotificationId
+                  )
+            )
+            .ToListAsync());
         }    
         public async Task DeleteUserStateAsync(long userId, long gatheringId) 
         { 
@@ -702,7 +728,7 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }   
-        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(long id)
+        public async Task<List<(long UserId, DateTimeOffset Joined, DateTimeOffset? Left)>> GetGuestHistoryAsync(long id)
         {
             var times = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -722,7 +748,7 @@ namespace Repository
                 history[item.Id].Add((item.Name, item.Time, item.Type));               
             }
 
-            List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)> toReturn = new();
+            List<(long UserId, DateTimeOffset Joined, DateTimeOffset? Left)> toReturn = new();
             long userId;
             string userName;
             DateTimeOffset arrivalTime;
@@ -740,7 +766,7 @@ namespace Repository
                 if (lastState == GatheringBond.Left) departureTime = lastTime;
                 else departureTime = null;
                 
-                toReturn.Add((arrivalTime, departureTime, new UserShard(userId, userName)));
+                toReturn.Add((userId, arrivalTime, departureTime));
             }
 
             return toReturn;
@@ -756,7 +782,7 @@ namespace Repository
                u => u.Id,
                (e, u) => new CoreGathering(
                     e.Id, 
-                    new UserShard(u.Id, u.Name), 
+                    u.Id, 
                     e.Title, 
                     e.Description, 
                     e.StartTime, 
@@ -856,7 +882,7 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
-        public async Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(long gatheringId)
+        public async Task<List<(long UserId, GatheringBond State)>> GetAllUsersAsync(long gatheringId)
         {
             var users = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks.
@@ -876,7 +902,7 @@ namespace Repository
                 history[item.Id].Add((item.Name, item.Time, item.Type));
             }
 
-            List<(UserShard User, GatheringBond State)> toReturn = new();
+            List<(long UserId, GatheringBond State)> toReturn = new();
             long userId;
             string userName;
             GatheringBond userState;
@@ -888,7 +914,7 @@ namespace Repository
                 userName = entry.Value.Last().Item1;
                 userState = entry.Value.Last().Item3;
 
-                toReturn.Add((new UserShard(userId, userName), userState));
+                toReturn.Add((userId, userState));
             }
             return toReturn;
         }

@@ -134,12 +134,14 @@ namespace Core.Controls
 
         public async Task<List<UserShard>> GetCompanionsAsync(long userId)
         {
-            return await Nests.GetCompanionsAsync(userId);
+            return (await Nests.GetCompanionsAsync(userId))
+                .ConvertAll(u => new User(u).ToUserShard());
         }
 
         public async Task<List<UserShard>> GetAppreciatedUsersAsync(long userId)
         {
-            return await Nests.GetAppreciatedUsersAsync(userId);
+            return (await Nests.GetAppreciatedUsersAsync(userId))
+                .ConvertAll(u => new User(u).ToUserShard());
         }
 
         public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
@@ -165,7 +167,7 @@ namespace Core.Controls
             if (await targetUser.IsAppreciating(user))
             { _ = targetUser.Notify(CanaryNotification.CompanionshipForged(user.ToUserShard())); }
             else
-            { _ = targetUser.Notify(CanaryNotification.UserAdded(user.ToUserShard())); }
+            { _ = targetUser.Notify(CanaryNotification.CompanionshipRequest(user.ToUserShard())); }
         }
 
         public async Task UnappreciateUserAsync(long userId, long targetId)
@@ -187,7 +189,7 @@ namespace Core.Controls
             foreach (var gathering in await user.UpcomingGatherings)
             {
                 // Check if user is host
-                if (gathering.Host.Equals(user))
+                if (gathering.HostId.Equals(user.Id))
                 {
                     try
                     {
@@ -237,7 +239,7 @@ namespace Core.Controls
 		internal async Task<List<User>> RequestBlockedUsersAsync(User user)
         {
             return (await Nests.GetBlockedUsersAsync(user.Id))
-				.ConvertAll(user => new User(user));
+				.ConvertAll(u => User.GetUserAsync(u.Id).Result);
         }
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)

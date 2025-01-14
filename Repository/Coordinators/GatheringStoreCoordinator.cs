@@ -17,11 +17,6 @@ namespace Repository
             return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy);
         }
 
-        public async Task DeleteGatheringAsync(long gatheringId)
-        {
-            await store.DeleteGatheringAsync(gatheringId);  
-        }
-
         public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
         {
             return await store.FindCurrentGatheringForUserAsync(id);
@@ -62,7 +57,7 @@ namespace Repository
             await store.UpdateGatheringAsync(id, edits); 
         }   
 
-        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(long id)
+        public async Task<List<(long UserId, DateTimeOffset Joined, DateTimeOffset? Left)>> GetGuestHistoryAsync(long id)
         {
             return await store.GetGuestHistoryAsync(id);
         }   
@@ -82,7 +77,7 @@ namespace Repository
             await store.SetUserStateAsync(userId, gatheringId, userState, time);
         }
 
-        public async Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(long gatheringId)
+        public async Task<List<(long UserId, GatheringBond State)>> GetAllUsersAsync(long gatheringId)
         {
             return await store.GetAllUsersAsync(gatheringId);
         }
@@ -105,6 +100,16 @@ namespace Repository
         public async Task AddGuestAuthorization(long gatheringId, long userId)
         {
             await store.AddGuestAuthorization(gatheringId, userId);
+        }
+
+        public async Task SoftDeleteAsync(long gatheringId)
+        {
+            await store.SoftDeleteAsync(gatheringId);
+        }
+
+        public async Task HardDeleteAsync(long gatheringId)
+        {
+            await store.HardDeleteAsync(gatheringId);
         }
     }
 }
