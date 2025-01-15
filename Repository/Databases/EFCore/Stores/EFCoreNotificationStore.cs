@@ -75,13 +75,13 @@ namespace Repository
             {
                 switch (Property)
                 {
-                    case nameof(NotificationProfile.SocialInvitation):
+                    case nameof(NotificationProfile.SocialInvitations):
                         u.SocialInvitations = (bool)Value;
                         break;
                     case nameof(NotificationProfile.CompanionActivity):
                         u.CompanionActivity = (bool)Value;
                         break;
-                    case nameof(NotificationProfile.GatheringReminder):
+                    case nameof(NotificationProfile.GatheringReminders):
                         u.GatheringReminders = (bool)Value;
                         break;
                     case nameof(NotificationProfile.GatheringActivity):

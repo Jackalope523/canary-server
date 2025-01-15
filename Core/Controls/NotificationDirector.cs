@@ -27,30 +27,30 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 			var profile = await user.NotificationProfile;
 
-			return new(profile.NotificationId, profile.SocialInvitation, profile.CompanionActivity,
-				profile.GatheringActivity, profile.GatheringReminder, profile.GatheringDiscovery);
+			return new(profile.NotificationId, profile.SocialInvitations, profile.CompanionActivity,
+				profile.GatheringReminders, profile.GatheringActivity, profile.GatheringDiscovery);
 		}
 
         public async Task UpdateNotificationPreferencesAsync(long userId,
-            bool? socialInvitation = null, bool? companionActivity = null,
-			bool? gatheringReminder = null, bool? gatheringActivity = null,
+            bool? socialInvitations = null, bool? companionActivity = null,
+			bool? gatheringReminders = null, bool? gatheringActivity = null,
 			bool? gatheringDiscovery = null)
 		{
 			var user = await GetUserAsync(userId);
 
             List<(string Property, object Value)> edits = new();
 
-            if (IsNotNull(socialInvitation))
+            if (IsNotNull(socialInvitations))
 			{
-                edits.Add((nameof(NotificationProfile.SocialInvitation), socialInvitation.Value));
+                edits.Add((nameof(NotificationProfile.SocialInvitations), socialInvitations.Value));
             }
             if (IsNotNull(companionActivity))
 			{
                 edits.Add((nameof(NotificationProfile.CompanionActivity), companionActivity.Value));
             }
-            if (IsNotNull(gatheringReminder))
+            if (IsNotNull(gatheringReminders))
 			{
-                edits.Add((nameof(NotificationProfile.GatheringReminder), gatheringReminder.Value));
+                edits.Add((nameof(NotificationProfile.GatheringReminders), gatheringReminders.Value));
             }
             if (IsNotNull(gatheringActivity))
 			{
