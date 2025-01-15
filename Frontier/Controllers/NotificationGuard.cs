@@ -39,8 +39,8 @@ namespace Frontier.Controllers
 			return await Execute(async user =>
 			{
 				await telegrams.UpdateNotificationPreferencesAsync(user.Id,
-					socialInvitation: social_invitations, companionActivity: companion_activity,
-					gatheringReminder: gathering_reminders, gatheringActivity: gathering_activity,
+					socialInvitations: social_invitations, companionActivity: companion_activity,
+					gatheringReminders: gathering_reminders, gatheringActivity: gathering_activity,
 					gatheringDiscovery: gathering_discovery);
 			});
         }
