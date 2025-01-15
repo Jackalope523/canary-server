@@ -18,10 +18,10 @@ namespace Core.Notifications
         {
             return group switch
             {
-                NotificationGroup.SocialInvitation => profile.SocialInvitation,
+                NotificationGroup.SocialInvitation => profile.SocialInvitations,
                 NotificationGroup.CompanionActivity => profile.CompanionActivity,
                 NotificationGroup.GatheringDiscovery => profile.GatheringDiscovery,
-                NotificationGroup.GatheringReminder => profile.GatheringReminder,
+                NotificationGroup.GatheringReminder => profile.GatheringReminders,
                 NotificationGroup.GatheringActivity => profile.GatheringActivity,
                 _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
             };

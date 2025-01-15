@@ -27,8 +27,8 @@ namespace Core.Controls
 			var user = await GetUserAsync(userId);
 			var profile = await user.NotificationProfile;
 
-			return new(profile.NotificationId, profile.SocialInvitation, profile.CompanionActivity,
-				profile.GatheringActivity, profile.GatheringReminder, profile.GatheringDiscovery);
+			return new(profile.NotificationId, profile.SocialInvitations, profile.CompanionActivity,
+				profile.GatheringActivity, profile.GatheringReminders, profile.GatheringDiscovery);
 		}
 
         public async Task UpdateNotificationPreferencesAsync(long userId,
@@ -42,7 +42,7 @@ namespace Core.Controls
 
             if (IsNotNull(socialInvitation))
 			{
-                edits.Add((nameof(NotificationProfile.SocialInvitation), socialInvitation.Value));
+                edits.Add((nameof(NotificationProfile.SocialInvitations), socialInvitation.Value));
             }
             if (IsNotNull(companionActivity))
 			{
@@ -50,7 +50,7 @@ namespace Core.Controls
             }
             if (IsNotNull(gatheringReminder))
 			{
-                edits.Add((nameof(NotificationProfile.GatheringReminder), gatheringReminder.Value));
+                edits.Add((nameof(NotificationProfile.GatheringReminders), gatheringReminder.Value));
             }
             if (IsNotNull(gatheringActivity))
 			{
