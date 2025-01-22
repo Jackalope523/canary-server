@@ -29,11 +29,11 @@ namespace Core.Controls
 
             // Fail if user is blocked
             FailIf(await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User is unable to view target."));
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
             // Fail if user cannot view gathering
             Verify(await user.CanView(gathering),
-                new InvalidUserException("User is unable to view gathering."));
+                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
 
             GalleryShard gallery = new(new());
 
@@ -91,11 +91,11 @@ namespace Core.Controls
                 // Save image
                 await Terminal.MediaDirector.UploadSnapshotAsync(user.Id, snapshot.Id, image);
             }
-            catch
+            catch (Exception ex)
             {
                 // If failed, remove snapshot
                 await Snapshots.HardDeleteAsync(snapshot.Id);
-                throw new UnexpectedFailureException("Image upload failed.");
+                throw new UnexpectedFailureException($"Failed to upload snapshot for user {userId} at {gatheringId}.", ex, HollowErrorCode.UPLOAD_FAILED);
             }
 
             return snapshot;
@@ -110,7 +110,7 @@ namespace Core.Controls
 
             // Verify user owns the snapshot or can modify the gathering
             Verify(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
-                new InvalidUserException("User cannot remove snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_DELETE));
 
             await Snapshots.SoftDeleteAsync(snapshot.Id);
         }
@@ -124,10 +124,10 @@ namespace Core.Controls
 
             // Verify user can interact with snapshot
             Verify(await gatheringTaken.WasAttendedBy(user),
-                new InvalidUserException("User cannot interact with snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_INTERACT));
 
             FailIf(user.Taken(snapshot),
-                new InvalidUserException("User cannot rate their own snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_INTERACT_SELF));
 
             // Check action
             if (acclaim == SnapshotAcclaim.Acclaim)

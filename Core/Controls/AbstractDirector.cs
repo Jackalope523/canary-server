@@ -60,11 +60,11 @@ namespace Core.Controls
 			
 			// Fail if user account is locked
 			FailIf(user.IsLocked,
-				new InvalidUserException("User account is locked."));
+				new UserErrorException(AccountErrorCode.LOCKED));
 
 			// Fail if user account is pending deletion
 			FailIf(user.IsDeleted,
-				new InvalidUserException("User account is deleted"));
+				new UserErrorException(AccountErrorCode.DELETED));
 
             return user;
         }

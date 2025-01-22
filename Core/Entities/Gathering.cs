@@ -418,15 +418,15 @@ namespace Core.Entities
         {
             // Verify snapshot is not before gathering starting or user is host
             Verify(HasAlready(StartTime) || IsModifiableBy(user),
-                new InvalidGatheringException("Gathering has yet to start."));
+                new UserErrorException(GatheringErrorCode.NOT_STARTED));
 
             // Verify user can etch into the gathering
             Verify(await WasAttendedBy(user) || IsModifiableBy(user),
-                new InvalidGatheringException("User did not attend gathering."));
+                new UserErrorException(GatheringErrorCode.NOT_GUEST));
 
             // Verify snapshot is added before gathering is closed
             Verify(IsActive,
-                new InvalidGatheringException("Gathering has already ended."));
+                new UserErrorException(SnapshotErrorCode.WINDOW_CLOSED));
 		}
 
 		public async Task<bool> Reported()

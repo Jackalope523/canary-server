@@ -1,12 +1,19 @@
 ﻿using System;
+using Core.Boundaries;
 
 namespace Core.Exceptions
 {
-    #region Hollow
+    #region Exceptions
 
     [Serializable]
     public abstract class HollowException : Exception
     {
+        public static readonly HollowException Default = new UnexpectedFailureException("Default Hollow exception thrown.");
+
+        public string ErrorCode { get; set; }
+
+        public object Details { get; set; }
+
         public HollowException()
         { }
 
@@ -15,6 +22,11 @@ namespace Core.Exceptions
 
         public HollowException(string message, Exception innerException)
             : base(message, innerException) { }
+
+        public ErrorShard ToErrorShard()
+        {
+            return new(ErrorCode, Details);
+        }
     }
 
     [Serializable]
@@ -31,30 +43,6 @@ namespace Core.Exceptions
     }
 
     [Serializable]
-    public abstract class UserErrorException : HollowException
-	{
-		public UserErrorException()
-		{ }
-
-		public UserErrorException(string message)
-			: base(message) { }
-
-		public UserErrorException(string message, Exception inner)
-			: base(message, inner) { }
-	}
-
-	[Serializable]
-	public class UnexpectedFailureException : HollowFailureException
-	{
-		public UnexpectedFailureException()
-			: base() { }
-		public UnexpectedFailureException(string message)
-			: base(message) { }
-		public UnexpectedFailureException(string message, Exception innerException)
-			: base(message, innerException) { }
-	}
-
-    [Serializable]
     public class UndefinedBehaviourException : HollowException
     {
         public UndefinedBehaviourException()
@@ -67,65 +55,144 @@ namespace Core.Exceptions
             : base(message, innerException) { }
     }
 
+    [Serializable]
+    public class UnexpectedFailureException : HollowFailureException
+    {
+        public UnexpectedFailureException(string internalMessage, Exception innerException = null,
+            HollowErrorCode code = HollowErrorCode.UNKNOWN, object details = null)
+            : base(internalMessage, innerException)
+        {
+            ErrorCode = $"HOLLOW.{code}";
+            Details = details;
+        }
+    }
+
+    [Serializable]
+    public class UserErrorException : HollowException
+    {
+
+        public UserErrorException(AccountErrorCode code, object details = null)
+        {
+            ErrorCode = $"ACCOUNT.{code}";
+            Details = details;
+        }
+
+        public UserErrorException(UserErrorCode code, object details = null)
+        {
+            ErrorCode = $"USER.{code}";
+            Details = details;
+        }
+
+        public UserErrorException(GatheringErrorCode code, object details = null)
+        {
+            ErrorCode = $"GATHERING.{code}";
+            Details = details;
+        }
+
+        public UserErrorException(SnapshotErrorCode code, object details = null)
+        {
+            ErrorCode = $"SNAPSHOT.{code}";
+            Details = details;
+        }
+    }
+
     #endregion
 
+    #region Error Codes
 
-    #region Core
-
-    [Serializable]
-	public class InvalidActionException : UserErrorException
-	{
-		public InvalidActionException()
-            : base() { }
-		public InvalidActionException(string message)
-            : base(message) { }
-        public InvalidActionException(string message, Exception innerException)
-			: base(message, innerException) { }
-    }
-
-    [Serializable]
-	public class InvalidUserException : UserErrorException
-	{
-		public InvalidUserException()
-            : base() { }
-		public InvalidUserException(string message)
-            : base(message) { }
-        public InvalidUserException(string message, Exception innerException)
-			: base(message, innerException) { }
-    }
-
-    [Serializable]
-    public class InvalidInformationException : UserErrorException
+    public enum AccountErrorCode
     {
-        public InvalidInformationException()
-            : base() { }
-        public InvalidInformationException(string message)
-            : base(message) { }
-        public InvalidInformationException(string message, Exception innerException)
-            : base(message, innerException) { }
+        NOT_FOUND,
+        UNVERIFIED,
+        LOCKED,
+        LOCKED_OUT,
+        DELETED,
+        INCORRECT_CODE,
+        INVALID_PHONE_NUMBER,
+        PHONE_NUMBER_EXISTS,
+        EMAIL_EXISTS,
+        INVALID_DETAILS,
+        INVALID_DETAILS_XYZ,
     }
 
-    [Serializable]
-    public class InsufficientPermissionsException : UserErrorException
+    public enum UserErrorCode
     {
-        public InsufficientPermissionsException()
-            : base() { }
-        public InsufficientPermissionsException(string message)
-            : base(message) { }
-        public InsufficientPermissionsException(string message, Exception innerException)
-            : base(message, innerException) { }
+        CANNOT_REPORT_COOLDOWN,
+        CANNOT_VIEW,
+
+        CANNOT_FOLLOW,
+        CODE_NOT_FOUND,
+        CANNOT_FOLLOW_SELF,
+
+        CANNOT_BLOCK_SELF,
     }
 
-    [Serializable]
-    public class InvalidGatheringException : UserErrorException
+    public enum GatheringErrorCode
     {
-        public InvalidGatheringException()
-            : base() { }
-        public InvalidGatheringException(string message)
-            : base(message) { }
-        public InvalidGatheringException(string message, Exception innerException)
-            : base(message, innerException) { }
+        CANNOT_VIEW,
+        CANNOT_WATCH,
+        CANNOT_UNWATCH,
+        CANNOT_JOIN,
+        CANNOT_JOIN_GUEST,
+
+        CANNOT_LEAVE,
+        CANNOT_LEAVE_HOST,
+
+        CANNOT_INVITE_NEUTRAL,
+        CANNOT_INVITE_INVALID_INVITEE,
+
+        CANNOT_KICK_PERMISSION,
+        CANNOT_KICK_ARCHIVED,
+        CANNOT_KICK_SELF,
+
+        USER_ATTENDING_ELSEWHERE,
+        NO_IMMEDIATE,
+
+        NOT_STARTED,
+        NOT_GUEST,
+        KICKED,
+
+        // Hosting
+        CANNOT_HOST,
+        CANNOT_HOST_XYZ,
+
+        LOCATION_DISABLED,
+        INVALID_DETAILS,
+        CONFLICT,
+
+        CANNOT_EDIT_PERMISSION,
+        CANNOT_EDIT_STARTED,
+        CANNOT_EDIT_ENDED,
+
+        NOT_HOST,
+        CANNOT_START,
+        CANNOT_END,
+        CANNOT_TERMINATE,
+
+        CANNOT_CANCEL_STARTED,
+        CANNOT_CANCEL_PERMISSION,
+
+        SEALED,
+        ENDED,
     }
 
-	#endregion
+    public enum SnapshotErrorCode
+    {
+        CANNOT_VIEW,
+        CANNOT_DELETE,
+
+        CANNOT_INTERACT,
+        CANNOT_INTERACT_SELF,
+
+        WINDOW_CLOSED,
+    }
+
+    public enum HollowErrorCode
+    {
+        UPLOAD_FAILED,
+        DOWNLOAD_FAILED,
+        UNKNOWN,
+    }
+
+    #endregion
 }

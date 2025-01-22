@@ -29,7 +29,7 @@ namespace Core.Controls
 
             // Fail if user is blocked
             FailIf(await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User is unable to view target."));
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
             NestShard nest = new(new());
 
@@ -155,10 +155,10 @@ namespace Core.Controls
             var targetUser = await GetUserAsync(targetId);
 
             FailIf(user.Equals(targetUser),
-                new InvalidUserException("User cannot follow themself."));
+                new UserErrorException(UserErrorCode.CANNOT_FOLLOW_SELF));
 
             Verify(await user.CanFollow(targetUser),
-                new InvalidUserException("User cannot follow this user."));
+                new UserErrorException(UserErrorCode.CANNOT_FOLLOW));
 
             await Nests.FollowUserAsync(user.Id, targetUser.Id, Psijic.Time);
 
@@ -195,15 +195,15 @@ namespace Core.Controls
                 potentialUser = await Accounts.FindUserByCodeAsync(code.ToLower());
             }
             catch
-            { throw new InvalidInformationException("Incorrect code."); }
+            { throw new UserErrorException(UserErrorCode.CODE_NOT_FOUND); }
 
             User targetUser = new(potentialUser);
 
             FailIf(user.Equals(targetUser),
-                new InvalidUserException("User cannot follow themself."));
+                new UserErrorException(UserErrorCode.CANNOT_FOLLOW_SELF));
 
             Verify(await user.CanFollow(targetUser, hasCode: true),
-                new InvalidUserException("User cannot follow this user."));
+                new UserErrorException(UserErrorCode.CANNOT_FOLLOW));
 
             await Nests.FollowUserAsync(user.Id, targetUser.Id, Psijic.Time);
 
@@ -231,7 +231,7 @@ namespace Core.Controls
             var targetUser = await GetUserAsync(targetId);
 
 			FailIf(user.Equals(targetUser),
-				new InvalidUserException("User cannot block themself."));
+				new UserErrorException(UserErrorCode.CANNOT_BLOCK_SELF));
 
 			await Nests.BlockUserAsync(userId, targetId, Psijic.Time);
 

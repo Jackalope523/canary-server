@@ -30,11 +30,18 @@ namespace Core.Controls
 			User targetUser = new() { Id = targetId };
 
 			FailIf(await user.IsBlockedBy(targetUser),
-				new InvalidUserException("User cannot access this avatar."));
+				new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
-			var stream = await Media.DownloadAvatarAsync(targetUser.Id);
+            MemoryStream image;
 
-			return stream;
+            try
+            {
+                image = await Media.DownloadAvatarAsync(targetUser.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
+
+            return image;
 		}
 
 		public async Task<ImageMetadataShard> GetAvatarMetadataAsync(long userId, long targetId)
@@ -43,9 +50,16 @@ namespace Core.Controls
             User targetUser = new() { Id = targetId };
 
             FailIf(await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User cannot access this avatar."));
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
-            var image = await Media.DownloadAvatarAsync(targetUser.Id);
+            MemoryStream image;
+
+            try
+            {
+                image = await Media.DownloadAvatarAsync(targetUser.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
 
             // Get image hash
             var hashSync = ComputeHashAsync(image);
@@ -62,11 +76,18 @@ namespace Core.Controls
 			var gathering = await GetGatheringAsync(gatheringId);
 
             Verify(await gathering.IsVisibleTo(user),
-                new InvalidUserException("User cannot view this gathering."));
+                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
 
-            var stream = await Media.DownloadHeroAsync(gathering.Id);
+            MemoryStream image;
 
-            return stream;
+            try
+            {
+                image = await Media.DownloadHeroAsync(gathering.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
+
+            return image;
         }
 
         public async Task<ImageMetadataShard> GetHeaderMetadataAsync(long userId, long gatheringId)
@@ -75,9 +96,16 @@ namespace Core.Controls
             var gathering = await GetGatheringAsync(gatheringId);
 
             Verify(await gathering.IsVisibleTo(user),
-                new InvalidUserException("User cannot view this gathering."));
+                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
 
-            var image = await Media.DownloadHeroAsync(gathering.Id);
+            MemoryStream image;
+
+            try
+            {
+                image = await Media.DownloadHeroAsync(gathering.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
 
             // Get image hash
             var hashSync = ComputeHashAsync(image);
@@ -104,11 +132,18 @@ namespace Core.Controls
             Verify(user.Taken(snapshot) ||
                 await user.IsCompanionsWith(snapshotOwner) ||
                 await etchedGathering.WasAttendedBy(user),
-                new InvalidUserException("User cannot access this snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_VIEW));
 
-            var stream = await Media.DownloadSnapshotAsync(snapshot.Id, snapshot.User.Id);
+            MemoryStream image;
 
-            return stream;
+            try
+            {
+                image = await Media.DownloadSnapshotAsync(snapshot.Id, snapshot.User.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
+
+            return image;
         }
 
         public async Task<ImageMetadataShard> GetSnapshotMetadataAsync(long userId, long snapshotId)
@@ -121,9 +156,16 @@ namespace Core.Controls
             Verify(user.Taken(snapshot) ||
                 await user.IsCompanionsWith(snapshotOwner) ||
                 await etchedGathering.WasAttendedBy(user),
-                new InvalidUserException("User cannot access this snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_VIEW));
 
-            var image = await Media.DownloadSnapshotAsync(snapshot.Id, snapshot.User.Id);
+            MemoryStream image;
+
+            try
+            {
+                image = await Media.DownloadSnapshotAsync(snapshot.Id, snapshot.User.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
 
             // Get image hash
             var hashSync = ComputeHashAsync(image);
@@ -145,18 +187,34 @@ namespace Core.Controls
 
         public async Task UploadAvatarAsync(long userId, MemoryStream image)
 		{
-			await Media.UploadAvatarAsync(userId, image);
+            try
+            {
+			    await Media.UploadAvatarAsync(userId, image);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException($"Failed to upload avatar for {userId}", ex, HollowErrorCode.UPLOAD_FAILED); }
 		}
 
 		public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
 		{
-			await Media.UploadHeroAsync(gatheringId, image);
-		}
+            try
+            {
+                await Media.UploadHeroAsync(gatheringId, image);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException($"Failed to upload header for {gatheringId}", ex, HollowErrorCode.UPLOAD_FAILED);
+    }
+}
 
         public async Task UploadSnapshotAsync(long userId, long snapshotId, MemoryStream image)
 		{
-			await Media.UploadSnapshotAsync(snapshotId, userId, image);
-		}
+            try
+            {
+			    await Media.UploadSnapshotAsync(snapshotId, userId, image);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException($"Failed to upload snapshot for {snapshotId}", ex, HollowErrorCode.UPLOAD_FAILED); }
+        }
 
         #endregion
 
@@ -177,7 +235,7 @@ namespace Core.Controls
                 return hash;
             }
             else
-            { throw new UnexpectedFailureException("Image was unable to be retrieved."); }
+            { throw new UnexpectedFailureException("Null image hash was unable to be computed.", code: HollowErrorCode.DOWNLOAD_FAILED); }
         }
 
         #endregion

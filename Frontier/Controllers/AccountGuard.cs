@@ -58,7 +58,7 @@ namespace Frontier.Controllers
         {
             // Verify parameters
             if (credentials == null || !ModelState.IsValid)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
             return await Execute(async () =>
             {
@@ -109,7 +109,7 @@ namespace Frontier.Controllers
         {
             // Verify parameters
 			if (credentials == null || !ModelState.IsValid || credentials.Code == null)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
             return await Execute(async () =>
             {
@@ -117,7 +117,7 @@ namespace Frontier.Controllers
 
                 if (await userManager.IsLockedOutAsync(user))
 				{
-					throw new InvalidUserException(HollowError.UserLockedOut.ToString());
+					throw new UserErrorException(AccountErrorCode.LOCKED_OUT);
                 }
 
                 #region UNSAFE — MODIFICATION AUTHORISATION FROM CHRONOS REQUIRED
@@ -132,7 +132,7 @@ namespace Frontier.Controllers
                         return;
                     }
                     else
-                    { throw new InvalidInformationException(HollowError.IncorrectCode.ToString()); }
+                    { throw new UserErrorException(AccountErrorCode.INCORRECT_CODE); }
                 }
                 #endregion
 
@@ -150,7 +150,7 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-						throw new InvalidInformationException(HollowError.IncorrectCode.ToString());
+						throw new UserErrorException(AccountErrorCode.INCORRECT_CODE);
 					}
                 }
                 else
@@ -174,7 +174,7 @@ namespace Frontier.Controllers
                     else
                     {
                         await userManager.AccessFailedAsync(user);
-                        throw new InvalidInformationException(HollowError.IncorrectCode.ToString());
+                        throw new UserErrorException(AccountErrorCode.INCORRECT_CODE);
                     }
                 }
             });
@@ -186,14 +186,14 @@ namespace Frontier.Controllers
         {
             // Verify parameters
 			if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
             return await Execute(async () =>
             {
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    throw new InvalidUserException(HollowError.MissingInformation.ToString());
+                    throw new UserErrorException(AccountErrorCode.NOT_FOUND);
                 }
 
                 var result = await userManager.ConfirmEmailAsync(user, token);
@@ -206,14 +206,14 @@ namespace Frontier.Controllers
         {
             // Verify parameters
             if (string.IsNullOrEmpty(email))
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
             return await Execute(async () =>
             {
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    throw new InvalidUserException(HollowError.MissingInformation.ToString());
+                    throw new UserErrorException(AccountErrorCode.NOT_FOUND);
                 }
 
                 // Send verification email if email is not confirmed
@@ -232,11 +232,13 @@ namespace Frontier.Controllers
 		{
             // Verify parameters
 			if (details == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
             return await Execute(async () =>
             {
-                try
+                var userExists = await accounts.GetUserExistsAsync(details.PhoneNumber);
+
+                if (!userExists)
                 {
                     // Persist a new user
                     await accounts.CreateUserAsync(details.PhoneNumber, details.Email ?? "",
@@ -248,14 +250,15 @@ namespace Frontier.Controllers
                     var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
                     await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
                 }
-                catch (InvalidUserException e)
+                else
                 {
                     // Account already exists
                     var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
 
-                    // Check if account is activated
+                    // Fail if account is already confirmed
                     if (await userManager.IsPhoneNumberConfirmedAsync(user))
-                    { throw e; }
+                    { throw HollowException.Default; }
+
                     // Account is not activated, send an SMS with a generated change number token
                     else
                     {
@@ -271,7 +274,7 @@ namespace Frontier.Controllers
         {
             // Verify parameters
 			if (details == null)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
             return await Execute(async user =>
             {
@@ -299,7 +302,7 @@ namespace Frontier.Controllers
             // Verify parameters
             if (avatar == null || !ModelState.IsValid ||
                 avatar.Image == null || avatar.Image.Length == 0)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
             return await Execute(async user =>
             {

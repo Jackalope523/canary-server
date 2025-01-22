@@ -36,6 +36,8 @@ namespace Core.Boundaries
 
     public interface IAccountDatabase
 	{
+		Task<bool> UserExistsAsync(string phoneNumber);
+
 		Task<CoreUser> FindUserByIdAsync(long userId);
         Task<CoreUser> FindUserByPhoneNumberAsync(string phoneNumber);
 		Task<CoreUser> FindUserByEmailAsync(string normalisedEmail);
@@ -58,6 +60,8 @@ namespace Core.Boundaries
 
 	public interface IAccountOperations
 	{
+		Task<bool> GetUserExistsAsync(string phoneNumber);
+
 		Task<CoreUser> GetCoreUserAsync(long userId);
 		Task<CoreUser> GetCoreUserAsync(string phoneNumber);
 		Task<AccountShard> GetAccountShardAsync(long userId);

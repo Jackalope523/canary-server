@@ -403,15 +403,15 @@ namespace Core.Entities
 		{
 			// Verify snapshot is not before gathering starting or user is host
 			Verify(HasAlready(gathering.StartTime) || gathering.IsModifiableBy(this),
-				new InvalidGatheringException("Gathering has yet to start."));
+				new UserErrorException(GatheringErrorCode.NOT_STARTED));
 
 			// Verify user can etch into the gathering
 			Verify(await gathering.WasAttendedBy(this) || gathering.IsModifiableBy(this),
-				new InvalidGatheringException("User did not attend gathering."));
+				new UserErrorException(GatheringErrorCode.NOT_GUEST));
 
 			// Verify snapshot is added before gathering is closed
 			Verify(gathering.IsActive,
-				new InvalidGatheringException("Gathering has already ended."));
+				new UserErrorException(SnapshotErrorCode.WINDOW_CLOSED));
 		}
 
 		public bool Taken(SnapshotShard snapshot)

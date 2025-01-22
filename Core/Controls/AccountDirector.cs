@@ -22,6 +22,11 @@ namespace Core.Controls
 
 		#region Operations
 
+        public async Task<bool> GetUserExistsAsync(string phoneNumber)
+        {
+            return await Accounts.UserExistsAsync(phoneNumber);
+        }
+
 		public async Task<CoreUser> GetCoreUserAsync(long userId)
         {
             return (await GetUserAsync(userId)).ToCoreUser();
@@ -31,7 +36,7 @@ namespace Core.Controls
 		{
             // Verify phone number is valid
             Verify(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
-                new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
+                new UserErrorException(AccountErrorCode.INVALID_PHONE_NUMBER));
 
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
 		}
@@ -56,7 +61,7 @@ namespace Core.Controls
                 invitingUser = await Accounts.FindUserByCodeAsync(code.ToLower());
             }
             catch
-            { throw new InvalidInformationException("Incorrect code."); }
+            { throw new UserErrorException(AccountErrorCode.INCORRECT_CODE); }
 
             // Create user
             User newUser = new()
@@ -70,7 +75,7 @@ namespace Core.Controls
 
             // Validate and normalise user
             Verify(newUser.ValidateAndNormalise(out string issues),
-                new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
+                new UserErrorException(AccountErrorCode.INVALID_DETAILS, new { issues }));
 
             // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
@@ -108,7 +113,7 @@ namespace Core.Controls
 
             // Validate and Normalise
             Verify(user.ValidateAndNormalise(out string issues),
-                new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
+                new UserErrorException(AccountErrorCode.INVALID_DETAILS, new { issues }));
 
             List<(string Property, object Value)> edits = new();
 
@@ -303,7 +308,7 @@ namespace Core.Controls
 
             // Check if user account is locked
             FailIf(user.IsLocked,
-                new InvalidUserException("User account is locked."));
+                new UserErrorException(AccountErrorCode.LOCKED));
 
             return user;
         }
@@ -320,7 +325,7 @@ namespace Core.Controls
 			catch { }
 
             FailIf(numberTaken,
-                new InvalidUserException("Phone Number already registered."));
+                new UserErrorException(AccountErrorCode.PHONE_NUMBER_EXISTS));
 		}
 
         private async Task ThrowIfEmailTaken(string normalisedEmail)
@@ -335,7 +340,7 @@ namespace Core.Controls
 			catch { }
 
 			FailIf(emailTaken,
-                new InvalidUserException("Email already registered."));
+                new UserErrorException(AccountErrorCode.EMAIL_EXISTS));
         }
 
 		#endregion

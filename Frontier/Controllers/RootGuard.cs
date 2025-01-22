@@ -38,7 +38,7 @@ namespace Frontier.Controllers
         {
             // Verify parameters
             if (feedback == null || !ModelState.IsValid)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
             return await Execute(user =>
 			{

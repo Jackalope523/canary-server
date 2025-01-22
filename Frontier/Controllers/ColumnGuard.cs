@@ -27,7 +27,7 @@ namespace Frontier.Controllers
         {
 			// Verify parameters
             if (!ModelState.IsValid)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
 			return await Execute(async user =>
 				await snapshots.GetUserColumnAsync(user.Id, depth, lastDepth));

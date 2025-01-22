@@ -48,7 +48,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 			{
@@ -57,7 +57,7 @@ namespace Frontier.Controllers
 				else if (!string.IsNullOrEmpty(code))
 				{ await nests.FollowUserAsync(user.Id, code); }
 				else
-				{ throw new InvalidInformationException("Missing parameter."); }
+				{ throw new MissingInformationException(); }
 			});
 		}
 
@@ -66,7 +66,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 				await nests.UnfollowUserAsync(user.Id, targetId));
@@ -84,7 +84,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 				await nests.BlockUserAsync(user.Id, targetId));
@@ -94,7 +94,7 @@ namespace Frontier.Controllers
 		public async Task<IActionResult> UnblockUser(long targetId)
 		{
 			if (!ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 				await nests.UnblockUserAsync(user.Id, targetId));
@@ -112,7 +112,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails));

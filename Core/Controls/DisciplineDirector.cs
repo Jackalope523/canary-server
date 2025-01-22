@@ -28,7 +28,7 @@ namespace Core.Controls
 
             // Verify user can report
             Verify(await user.CanReport(),
-                new InvalidUserException("User has a cooldown to report."));
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
 
             if (occuringGathering.Equals(Gathering.None))
             {
@@ -57,7 +57,7 @@ namespace Core.Controls
 
             // Verify user can report
             Verify(await user.CanReport(),
-                new InvalidUserException("User has a cooldown to report."));
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
 
             await Reports.ReportGatheringAsync(user.Id, gathering.Id, Time, reportType, reportDetails);
 
@@ -92,7 +92,7 @@ namespace Core.Controls
 
             // Verify user can report
             Verify(await user.CanReport(),
-                new InvalidUserException("User has a cooldown to report."));
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
 
             await Reports.ReportSnapshotAsync(user.Id, targetSnapshot.Id, Time, reportType, reportDetails);
 

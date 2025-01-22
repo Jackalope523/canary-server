@@ -63,7 +63,7 @@ namespace Core.Entities
         public void ThrowIfNone()
         {
             if (!Exists)
-            { throw new InvalidInformationException("GeoLocation does not exist."); }
+            { throw new UndefinedBehaviourException("GeoLocation does not exist."); }
         }
 
         #region Dissimilation
@@ -119,7 +119,7 @@ namespace Core.Entities
         public void ThrowIfNone()
         {
             if (!Exists)
-            { throw new InvalidInformationException("Distance does not exist."); }
+            { throw new UndefinedBehaviourException("Distance does not exist."); }
         }
 
         #region Dissimilation

@@ -38,7 +38,7 @@ namespace Frontier.Controllers
 			// Verify parameters
             if (gatheringDetails == null || !ModelState.IsValid ||
 				gatheringDetails.Image == null || gatheringDetails.Image.Length == 0)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
 			return await Execute(async user =>
             {
@@ -61,7 +61,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (gatheringDetails == null)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 			{
@@ -238,7 +238,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 			{
@@ -261,7 +261,7 @@ namespace Frontier.Controllers
             // Verify parameters
             if (snapshot == null || !ModelState.IsValid ||
                 snapshot.Image == null || snapshot.Image.Length == 0)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
 			return await Execute(async user =>
             {
@@ -286,7 +286,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (details == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 			{
@@ -299,7 +299,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
             {
