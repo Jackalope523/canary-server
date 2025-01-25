@@ -159,7 +159,7 @@ namespace Core.Notifications
 
         public static CanaryNotification CompanionshipRequest(UserShard addingUser, string lastMet = null)
             => SocialInvitation(new("Companion Request",
-                $"{addingUser} sent you a companionship request.",
+                $"{addingUser.Name} sent you a companionship request.",
                 new NestDeepLink(addingUser.Id, lastMet),
                 "1"));
 
