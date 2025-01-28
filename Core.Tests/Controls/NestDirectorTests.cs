@@ -163,7 +163,7 @@ namespace Core.Tests.Controls
 			await environment.ForceCompanionshipAsync(user, companion, otherCompanion);
 
 			// Act
-			var followedUsers = await director.GetFollowedUsersAsync(user.Id);
+			var followedUsers = await director.GetCompanionshipRequestsAsync(user.Id);
 
 			// Assert
 			Assert.Equal(2, followedUsers.Count);
@@ -193,7 +193,7 @@ namespace Core.Tests.Controls
 			var stranger = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			await director.FollowUserAsync(user.Id, stranger.Id);
+			await director.AcceptOrRequestCompanionshipAsync(user.Id, stranger.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -206,7 +206,7 @@ namespace Core.Tests.Controls
 			await environment.ForceEnemiesAsync(user, enemy);
 
 			// Act
-			var action = director.FollowUserAsync(user.Id, enemy.Id);
+			var action = director.AcceptOrRequestCompanionshipAsync(user.Id, enemy.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await action);
@@ -218,10 +218,10 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var weirdDynamics = await environment.GenerateUniqueUserAsync();
-			await director.FollowUserAsync(user.Id, weirdDynamics.Id);
+			await director.AcceptOrRequestCompanionshipAsync(user.Id, weirdDynamics.Id);
 
 			// Act
-			await director.UnfollowUserAsync(user.Id, weirdDynamics.Id);
+			await director.DenyOrRemoveUserAsync(user.Id, weirdDynamics.Id);
 			// If no exception is thrown, the test is successful
 		}
 

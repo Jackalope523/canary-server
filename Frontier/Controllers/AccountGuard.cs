@@ -314,13 +314,6 @@ namespace Frontier.Controllers
             }, allowUnverified: true);
         }
 
-        [HttpPost("code")]
-        public async Task<IActionResult> RerollCode()
-        {
-            return await Execute(async user =>
-                await accounts.RerollCodeAsync(user.Id));
-        }
-
         #endregion
 
         #region Tools

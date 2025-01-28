@@ -36,15 +36,22 @@ namespace Frontier.Controllers
                 await nests.GetCompanionsAsync(user.Id));
         }
 
-        [HttpGet("following")]
-        public async Task<IActionResult> GetFollowed()
+        [HttpGet("companions/requests")]
+        public async Task<IActionResult> GetCompanionshipRequests()
 		{
 			return await Execute(async user =>
-				await nests.GetFollowedUsersAsync(user.Id));
+				await nests.GetCompanionshipRequestsAsync(user.Id));
 		}
 
-		[HttpPost("following")]
-		public async Task<IActionResult> FollowUser(long? targetId = null, string code = null)
+        [HttpGet("companions/recent")]
+        public async Task<IActionResult> GetRecentlyMet()
+		{
+			return await Execute(async user =>
+				await nests.GetRecentlyMetAsync(user.Id));
+		}
+
+		[HttpPost("companions")]
+		public async Task<IActionResult> AcceptOrRequestUser(long? target_id = null, string code = null)
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)
@@ -52,27 +59,34 @@ namespace Frontier.Controllers
 
 			return await Execute(async user =>
 			{
-				if (targetId.HasValue)
-				{ await nests.FollowUserAsync(user.Id, targetId.Value); }
+				if (target_id.HasValue)
+				{ await nests.AcceptOrRequestCompanionshipAsync(user.Id, target_id.Value); }
 				else if (!string.IsNullOrEmpty(code))
-				{ await nests.FollowUserAsync(user.Id, code); }
+				{ await nests.RequestCompanionshipAsync(user.Id, code); }
 				else
 				{ throw new MissingInformationException(); }
 			});
 		}
 
-		[HttpPut("following")]
-		public async Task<IActionResult> UnfollowUser(long targetId)
+		[HttpPut("companions")]
+		public async Task<IActionResult> DenyOrRemoveUser(long target_id)
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)
 			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await nests.UnfollowUserAsync(user.Id, targetId));
-		}
+				await nests.DenyOrRemoveUserAsync(user.Id, target_id));
+        }
 
-		[HttpGet("blocked")]
+        [HttpPost("code")]
+        public async Task<IActionResult> RerollUserCode()
+        {
+            return await Execute(async user =>
+                await accounts.RerollCodeAsync(user.Id));
+        }
+
+        [HttpGet("blocked")]
 		public async Task<IActionResult> GetBlocked()
 		{
 			return await Execute(async user =>
@@ -80,24 +94,24 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("blocked")]
-		public async Task<IActionResult> BlockUser(long targetId)
+		public async Task<IActionResult> BlockUser(long target_id)
 		{
 			// Verify parameters
 			if (!ModelState.IsValid)
 			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await nests.BlockUserAsync(user.Id, targetId));
+				await nests.BlockUserAsync(user.Id, target_id));
 		}
 
 		[HttpPut("blocked")]
-		public async Task<IActionResult> UnblockUser(long targetId)
+		public async Task<IActionResult> UnblockUser(long target_id)
 		{
 			if (!ModelState.IsValid)
 			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await nests.UnblockUserAsync(user.Id, targetId));
+				await nests.UnblockUserAsync(user.Id, target_id));
 		}
 
 		[HttpGet("{targetId}/authorisation/follow")]

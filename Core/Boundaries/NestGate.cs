@@ -47,12 +47,13 @@ namespace Core.Boundaries
         Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId);
 
         Task<List<UserShard>> GetCompanionsAsync(long userId);
-        Task<List<UserShard>> GetFollowedUsersAsync(long userId);
+        Task<List<UserShard>> GetCompanionshipRequestsAsync(long userId);
+        Task<List<UserShard>> GetRecentlyMetAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 
-        Task FollowUserAsync(long userId, long targetId);
-        Task FollowUserAsync(long userId, string code);
-        Task UnfollowUserAsync(long userId, long targetId);
+        Task AcceptOrRequestCompanionshipAsync(long userId, long targetId);
+        Task RequestCompanionshipAsync(long userId, string code);
+        Task DenyOrRemoveUserAsync(long userId, long targetId);
         Task BlockUserAsync(long userId, long targetId);
         Task UnblockUserAsync(long userId, long targetId);
 

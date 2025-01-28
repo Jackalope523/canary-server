@@ -247,11 +247,11 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/snapshots")]
-		public async Task<IActionResult> GetGallery(long gatheringId, long targetId)
+		public async Task<IActionResult> GetGallery(long gatheringId, long target_id)
 		{
 			return await Execute(async user =>
 			{
-				return await snapshots.GetGalleryAsync(user.Id, targetId, gatheringId);
+				return await snapshots.GetGalleryAsync(user.Id, target_id, gatheringId);
 			});
 		}
 

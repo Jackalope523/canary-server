@@ -138,7 +138,13 @@ namespace Core.Controls
                 .ConvertAll(u => new User(u).ToUserShard());
         }
 
-        public async Task<List<UserShard>> GetFollowedUsersAsync(long userId)
+        public async Task<List<UserShard>> GetCompanionshipRequestsAsync(long userId)
+        {
+            return (await Nests.GetFollowedUsersAsync(userId))
+                .ConvertAll(u => new User(u).ToUserShard());
+        }
+
+        public async Task<List<UserShard>> GetRecentlyMetAsync(long userId)
         {
             return (await Nests.GetFollowedUsersAsync(userId))
                 .ConvertAll(u => new User(u).ToUserShard());
@@ -149,7 +155,7 @@ namespace Core.Controls
             return await Nests.GetBlockedUsersAsync(userId);
         }
 
-        public async Task FollowUserAsync(long userId, long targetId)
+        public async Task AcceptOrRequestCompanionshipAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
@@ -183,7 +189,7 @@ namespace Core.Controls
             _ = targetUser.Notify(targetNotification);
         }
 
-        public async Task FollowUserAsync(long userId, string code)
+        public async Task RequestCompanionshipAsync(long userId, string code)
         {
             var user = await GetUserAsync(userId);
 
@@ -220,7 +226,7 @@ namespace Core.Controls
             _ = targetUser.Notify(targetNotification);
         }
 
-        public async Task UnfollowUserAsync(long userId, long targetId)
+        public async Task DenyOrRemoveUserAsync(long userId, long targetId)
         {
             await Nests.UnfollowUserAsync(userId, targetId);
         }
