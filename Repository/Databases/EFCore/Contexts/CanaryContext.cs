@@ -57,7 +57,7 @@ namespace Repository
                 .HasMaxLength(100);
 
             modelBuilder.Entity<User>()
-                .Property(u => u.Pseudonym)
+                .Property(u => u.CompanionshipCode)
                 .HasMaxLength(100);
 
             modelBuilder.Entity<User>()

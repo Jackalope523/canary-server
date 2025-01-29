@@ -9,7 +9,7 @@ namespace Repository
         public string Email { get; set; } = DefaultEmail;
         public string NormalisedEmail { get; set; } = DefaultNormalisedEmail;
         public string Name { get; set; } = DefaultName;
-        public string Pseudonym { get; set; } = DefaultPseudonym;
+        public string CompanionshipCode { get; set; } = DefaultCompanionshipCode;
         public DateTimeOffset DateOfBirth { get; init; } = DefaultDateOfBirth;
         public DateTimeOffset JoinDate { get; init; } = DefaultJoinDate;
         public int Reputation { get; set; } = DefaultReputation;
@@ -72,7 +72,7 @@ namespace Repository
         public static string DefaultEmail { get; set; } = "";
         public static string DefaultNormalisedEmail { get; set; } = "";
         public static string DefaultName { get; set; } = "";
-        public static string DefaultPseudonym { get; set; } = "";
+        public static string DefaultCompanionshipCode { get; set; } = "";
         public static DateTimeOffset DefaultDateOfBirth { get; set; } = DateTimeOffset.MinValue;
         public static DateTimeOffset DefaultJoinDate { get; set; } = DateTimeOffset.MinValue;
         public static int DefaultReputation { get; set; } = 50;
@@ -110,6 +110,6 @@ namespace Repository
         public static bool DefaultCompanionActivity { get; set; } = true;
         public static bool DefaultGatheringReminders { get; set; } = true;
         public static bool DefaultGatheringActivity { get; set; } = true;
-        public static bool DefaultGatheringDiscovery { get; set; } = true; 
+        public static bool DefaultGatheringDiscovery { get; set; } = true;
     }
 }

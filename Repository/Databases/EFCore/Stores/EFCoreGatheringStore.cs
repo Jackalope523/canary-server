@@ -624,7 +624,7 @@ namespace Repository
                       u.PhoneNumber,
                       u.Email,
                       u.Name,
-                      u.Pseudonym,
+                      u.CompanionshipCode,
                       u.DateOfBirth,
                       u.IsPhoneConfirmed,
                       u.IsEmailConfirmed,

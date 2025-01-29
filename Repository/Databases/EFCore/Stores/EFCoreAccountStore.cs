@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Utilities;
 
 namespace Repository
 {
@@ -37,7 +38,7 @@ namespace Repository
                   toCreate.PhoneNumber,
                   toCreate.Email,
                   toCreate.Name,
-                  toCreate.Pseudonym,
+                  toCreate.CompanionshipCode,
                   toCreate.DateOfBirth,
                   toCreate.IsPhoneConfirmed,
                   toCreate.IsEmailConfirmed,
@@ -241,7 +242,7 @@ namespace Repository
                    u.PhoneNumber,
                    u.Email,
                    u.Name,
-                   u.Pseudonym,
+                   u.CompanionshipCode,
                    u.DateOfBirth,
                    u.IsPhoneConfirmed,
                    u.IsEmailConfirmed,
@@ -286,7 +287,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
-                  u.Pseudonym,
+                  u.CompanionshipCode,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -331,7 +332,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
-                  u.Pseudonym,
+                  u.CompanionshipCode,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -473,6 +474,77 @@ namespace Repository
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true, currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true, currentDiscussion);
             await storeSentry.EndDiscussionAsync(currentDiscussion);
+        }
+
+        public async Task<bool> UserExistsAsync(string phoneNumber)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Users.AnyAsync(u => u.PhoneNumber == phoneNumber));
+        }
+
+        public async Task<string> RerollUserCodeAsync(long userId)
+        {
+            string[] adjectives = File.ReadAllLines("./adjectives.txt");
+            string[] nouns = File.ReadAllLines("./nouns.txt");
+
+            bool codeUnique = false;
+            Random random = new();
+            string randomAdjective;
+            string randomNoun;
+            string potentialCode = "";
+            while (!codeUnique)
+            {
+                randomAdjective = adjectives[random.Next(adjectives.Length)];
+                randomNoun = nouns[random.Next(nouns.Length)];
+                potentialCode = randomAdjective + randomNoun;
+
+                codeUnique = !(await storeSentry.ExecuteReadAsync(ctx => ctx.Users.AnyAsync(u => u.CompanionshipCode == potentialCode)));
+            }
+
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+
+            User u = new() { Id = userId, CompanionshipCode = potentialCode };
+
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CompanionshipCode)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
+
+            return potentialCode;
+        }
+
+        public async Task<CoreUser> FindUserByCodeAsync(string code)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Users.
+                Where(u => u.CompanionshipCode == code).
+                Select(u => new CoreUser
+                (
+                    u.Id,
+                    u.PhoneNumber,
+                    u.Email,
+                    u.Name,
+                    u.CompanionshipCode,
+                    u.DateOfBirth,
+                    u.IsPhoneConfirmed,
+                    u.IsEmailConfirmed,
+                    u.SoftDeleted,
+                    u.SecurityStamp,
+                    u.LockoutDate,
+                    u.AccessTries,
+                    u.AccountStatus,
+                    u.JoinDate,
+                    u.Reputation,
+                    new CharacterShard(
+                    u.Age,
+                    u.Extroversion,
+                    u.Athleticisme,
+                    u.Chaos,
+                    u.Competitiveness,
+                    u.Industriousness,
+                    u.NightOwl,
+                    u.Openness),
+                    u.TimeOfUserAgreement,
+                    u.NotificationId
+                )).SingleAsync());
         }
     }
 }

@@ -65,5 +65,20 @@ namespace Repository
         {
             await store.HardDeleteAsync(userId);
         }
+
+        public async Task<bool> UserExistsAsync(string phoneNumber)
+        {
+            return await store.UserExistsAsync(phoneNumber);
+        }
+
+        public async Task<string> RerollUserCodeAsync(long userId)
+        {
+            return await store.RerollUserCodeAsync(userId);
+        }
+
+        public async Task<CoreUser> FindUserByCodeAsync(string code)
+        {
+            return await store.FindUserByCodeAsync(code);
+        }
     }
 }
