@@ -491,19 +491,20 @@ namespace Repository
             string randomAdjective;
             string randomNoun;
             string potentialCode = "";
+
             while (!codeUnique)
             {
                 randomAdjective = adjectives[random.Next(adjectives.Length)];
                 randomNoun = nouns[random.Next(nouns.Length)];
-                potentialCode = randomAdjective + randomNoun;
+               
+                potentialCode = (Char.ToUpper(randomAdjective[0]) + randomAdjective.Substring(1)) + (Char.ToUpper(randomNoun[0]) + randomNoun.Substring(1));
 
                 codeUnique = !(await storeSentry.ExecuteReadAsync(ctx => ctx.Users.AnyAsync(u => u.CompanionshipCode == potentialCode)));
             }
 
-            Discussion currentDiscussion = storeSentry.BeginDiscussion();
-
             User u = new() { Id = userId, CompanionshipCode = potentialCode };
 
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CompanionshipCode)).IsModified = true, currentDiscussion);
             await storeSentry.EndDiscussionAsync(currentDiscussion);
