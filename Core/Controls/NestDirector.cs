@@ -134,20 +134,44 @@ namespace Core.Controls
 
         public async Task<List<UserShard>> GetCompanionsAsync(long userId)
         {
-            return (await Nests.GetCompanionsAsync(userId))
-                .ConvertAll(u => new User(u).ToUserShard());
+            var user = await GetUserAsync(userId);
+
+            return (await user.Companions)
+                .ConvertAll(u => u.ToUserShard());
         }
 
         public async Task<List<UserShard>> GetCompanionshipRequestsAsync(long userId)
         {
-            return (await Nests.GetFollowedUsersAsync(userId))
-                .ConvertAll(u => new User(u).ToUserShard());
+            var user = await GetUserAsync(userId);
+
+            return (await user.Followers)
+                .ConvertAll(u => u.ToUserShard());
         }
 
         public async Task<List<UserShard>> GetRecentlyMetAsync(long userId)
         {
-            return (await Nests.GetFollowedUsersAsync(userId))
-                .ConvertAll(u => new User(u).ToUserShard());
+            var user = await GetUserAsync(userId);
+
+            // Get last gathering
+            var lastGathering = await user.LastGathering();
+
+            var neutralGuests = await Task.WhenAll((await lastGathering.Left)
+                .Select(async guest =>
+                    {
+                        if (await user.IsNeutralOrUnrequitedWith(guest))
+                        {
+                            return guest;
+                        }
+
+                        return User.Hidden;
+                    }
+                ));
+
+            // Remove all Hidden users and return
+            return neutralGuests
+                .Where(guest => !guest.Equals(User.Hidden))
+                .ToList()
+                .ConvertAll(u => u.ToUserShard());
         }
 
         public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)

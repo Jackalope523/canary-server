@@ -270,9 +270,23 @@ namespace Core.Entities
             return upcoming.Count != 0 ? upcoming.First() : Gathering.None;
         }
 
+        public async Task<Gathering> LastGathering()
+        {
+            var previous = await PastGatherings;
+            previous.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
+            return previous.Count != 0 ? previous.Last() : Gathering.None;
+        }
+
 		#endregion
 
 		#region Checks
+
+        public async Task<bool> IsNeutralOrUnrequitedWith(User otherUser)
+        {
+            return !await IsFollowing(otherUser) &&
+                !await IsBlockedBy(otherUser) &&
+                !await IsBlocking(otherUser);
+        }
 
         public async Task<bool> IsCompanionsWith(User otherUser)
 		{
