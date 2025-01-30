@@ -357,7 +357,7 @@ namespace Frontier.Controllers
                 {
                     -7 => appleAccountCode,
                     -8 => googleAccountCode,
-                    _ => throw new InvalidUserException(HollowError.CouldNotFindUser.ToString())
+                    _ => throw new UserErrorException(AccountErrorCode.NOT_FOUND)
                 };
 
                 return !string.IsNullOrEmpty(staticCode) && code.Equals(staticCode);
