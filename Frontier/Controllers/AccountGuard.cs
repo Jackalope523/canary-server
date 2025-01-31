@@ -122,11 +122,17 @@ namespace Frontier.Controllers
 
                 #region UNSAFE — MODIFICATION AUTHORISATION FROM CHRONOS REQUIRED
                 // Check if development environment or special account
-                if (bypass.IsGlobalBypassEnabled() ||
-                    bypass.IsClassifiedAccount(user.Id))
+                if (bypass.IsGlobalBypassEnabled())
+                {
+                    var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                    await userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, code);
+                    await signInManager.SignInAsync(user, false);
+                    return;
+                }
+                else if(bypass.IsClassifiedAccount(user.Id))
                 {
                     // Verify static code
-                    if (bypass.CheckStaticCode(user.Id, credentials.Code))
+                    if (bypass.IsGlobalBypassEnabled() || bypass.CheckStaticCode(user.Id, credentials.Code))
                     {
                         await signInManager.SignInAsync(user, false);
                         return;

@@ -20,13 +20,15 @@ namespace Frontier.Services
 			messagingServiceSid = messagingService;
 
 			TwilioClient.Init(accountId, accountToken);
+
+            log.LogInformation("Twilio set up successfully.");
 		}
 
 		public async Task SendSMSAsync(string phoneNumber, string message)
         {
             log.LogInformation("Want to send SMS to {phoneNumber}", phoneNumber);
 
-            if (env.IsProduction || env.IsStaging)
+            if (env.IsProduction)
             {
                 log.LogInformation("Sending SMS to {phoneNumber}: {message}", phoneNumber, message);
 
