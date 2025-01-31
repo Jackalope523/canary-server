@@ -163,7 +163,7 @@ namespace Core.Tests.Controls
 			await environment.ForceCompanionshipAsync(user, companion, otherCompanion);
 
 			// Act
-			var followedUsers = await director.GetCompanionshipRequestsAsync(user.Id);
+			var followedUsers = await director.GetIncomingCompanionshipRequestsAsync(user.Id);
 
 			// Assert
 			Assert.Equal(2, followedUsers.Count);

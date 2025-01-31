@@ -47,7 +47,8 @@ namespace Core.Boundaries
         Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId);
 
         Task<List<UserShard>> GetCompanionsAsync(long userId);
-        Task<List<UserShard>> GetCompanionshipRequestsAsync(long userId);
+        Task<List<UserShard>> GetIncomingCompanionshipRequestsAsync(long userId);
+        Task<List<UserShard>> GetOutgoingCompanionshipRequestsAsync(long userId);
         Task<List<UserShard>> GetRecentlyMetAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 

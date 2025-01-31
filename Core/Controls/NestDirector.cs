@@ -140,11 +140,29 @@ namespace Core.Controls
                 .ConvertAll(u => u.ToUserShard());
         }
 
-        public async Task<List<UserShard>> GetCompanionshipRequestsAsync(long userId)
+        public async Task<List<UserShard>> GetIncomingCompanionshipRequestsAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
-            return (await user.Followers)
+            var userFollowers = await user.Followers;
+            var userCompanions = await user.Companions;
+
+            // Strip out companions
+            return userFollowers.Except(userCompanions)
+                .ToList()
+                .ConvertAll(u => u.ToUserShard());
+        }
+
+        public async Task<List<UserShard>> GetOutgoingCompanionshipRequestsAsync(long userId)
+        {
+            var user = await GetUserAsync(userId);
+
+            var userFollowing = await user.Following;
+            var userCompanions = await user.Companions;
+
+            // Strip out companions
+            return userFollowing.Except(userCompanions)
+                .ToList()
                 .ConvertAll(u => u.ToUserShard());
         }
 

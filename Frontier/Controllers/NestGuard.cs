@@ -36,11 +36,18 @@ namespace Frontier.Controllers
                 await nests.GetCompanionsAsync(user.Id));
         }
 
-        [HttpGet("companions/requests")]
-        public async Task<IActionResult> GetCompanionshipRequests()
+        [HttpGet("companions/incoming")]
+        public async Task<IActionResult> GetIncomingCompanionshipRequests()
 		{
 			return await Execute(async user =>
-				await nests.GetCompanionshipRequestsAsync(user.Id));
+				await nests.GetIncomingCompanionshipRequestsAsync(user.Id));
+		}
+
+        [HttpGet("companions/outgoing")]
+        public async Task<IActionResult> GetOutgoingCompanionshipRequests()
+		{
+			return await Execute(async user =>
+				await nests.GetOutgoingCompanionshipRequestsAsync(user.Id));
 		}
 
         [HttpGet("companions/recent")]
