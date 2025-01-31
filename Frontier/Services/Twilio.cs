@@ -26,7 +26,7 @@ namespace Frontier.Services
         {
             log.LogInformation("Want to send SMS to {phoneNumber}", phoneNumber);
 
-            if (env.IsProduction)
+            if (env.IsProduction || env.IsStaging)
             {
                 log.LogInformation("Sending SMS to {phoneNumber}: {message}", phoneNumber, message);
 

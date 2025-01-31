@@ -15,6 +15,7 @@ namespace Core
         public EnvironmentFlag Flag { get; init; }
 
         public bool IsProduction => Flag.Equals(EnvironmentFlag.Production);
+        public bool IsStaging => Flag.Equals(EnvironmentFlag.Staging);
     }
 
     public class CoreTerminal
