@@ -51,18 +51,8 @@ namespace Core.Controls
             return (await GetUserAsync(userId)).ToUserShard();
         }
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, string code = "")
+        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
-            CoreUser invitingUser;
-
-            // Verify invite code
-            try
-            {
-                invitingUser = await Accounts.FindUserByCodeAsync(code.ToLower());
-            }
-            catch
-            { throw new UserErrorException(AccountErrorCode.INCORRECT_CODE); }
-
             // Create user
             User newUser = new()
             {
@@ -89,8 +79,6 @@ namespace Core.Controls
                 newUser.Name, newUser.DateOfBirth, Time,
                 CharacterVector.Default(newUser.GetAge()).ToCharacter(),
                 Guid.NewGuid());
-
-            await Nests.FollowUserAsync(user.Id, invitingUser.Id, Time);
         }
 
         public async Task EditUserAsync(long userId,

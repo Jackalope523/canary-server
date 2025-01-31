@@ -68,7 +68,7 @@ namespace Core.Boundaries
 		Task<UserShard> GetUserShardAsync(long userId);
 
 		Task CreateUserAsync(string phoneNumber, string email, string name,
-			DateTimeOffset dateOfBirth, string code = "");
+			DateTimeOffset dateOfBirth);
 		Task EditUserAsync(long userId,
 			string phoneNumber = null, string email = null, string name = null,
 			bool? isPhoneNumberConfirmed = null, bool? isEmailConfirmed = null,
