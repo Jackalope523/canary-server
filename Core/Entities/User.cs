@@ -446,6 +446,12 @@ namespace Core.Entities
 
         public async Task<bool> CanFollow(User target, bool hasCode = false)
         {
+            // Check if already following user
+            if (await target.IsFollowing(this))
+            {
+                return true;
+            }
+
             bool blockFollow = await IsBlocking(target) || await IsBlockedBy(target);
 
             // Check if code bypass

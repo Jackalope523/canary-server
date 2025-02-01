@@ -210,8 +210,6 @@ namespace Core.Controls
 
             await Nests.FollowUserAsync(user.Id, targetUser.Id, Psijic.Time);
 
-            _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
-
             CanaryNotification targetNotification = CanaryNotification.CompanionshipRequest(user.ToUserShard());
 
             // Should always hit
@@ -226,6 +224,10 @@ namespace Core.Controls
             if (await targetUser.IsFollowing(user))
             {
                 targetNotification = CanaryNotification.CompanionshipForged(user.ToUserShard());
+            }
+            else
+            {
+                _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
             }
 
             _ = targetUser.Notify(targetNotification);
