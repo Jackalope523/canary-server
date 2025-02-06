@@ -167,7 +167,6 @@ namespace Core.Exceptions
         NOT_HOST,
         CANNOT_START,
         CANNOT_END,
-        CANNOT_TERMINATE,
 
         CANNOT_CANCEL_STARTED,
         CANNOT_CANCEL_PERMISSION,
