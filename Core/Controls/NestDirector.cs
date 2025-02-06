@@ -185,9 +185,9 @@ namespace Core.Controls
                     }
                 ));
 
-            // Remove all Hidden users and return
+            // Remove all Hidden users and self
             return neutralGuests
-                .Where(guest => !guest.Equals(User.Hidden))
+                .Where(guest => !guest.Equals(User.Hidden) && !guest.Equals(user))
                 .ToList()
                 .ConvertAll(u => u.ToUserShard());
         }
