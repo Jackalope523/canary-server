@@ -274,6 +274,7 @@ namespace Core.Controls
 
         public async Task DenyOrRemoveUserAsync(long userId, long targetId)
         {
+            await Nests.UnfollowUserAsync(targetId, userId);
             await Nests.UnfollowUserAsync(userId, targetId);
         }
 
