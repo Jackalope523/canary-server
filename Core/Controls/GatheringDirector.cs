@@ -297,26 +297,6 @@ namespace Core.Controls
 			// Update all participants' vectors
 			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(CoreUser.Character), user.Character) });
 
-			// Gather no-shows
-            var absentUsers = (await gathering.Guests).Except(await gathering.Arrived).Except(await gathering.Left);
-
-            if (gathering.Duration > TimeSpan.FromMinutes(30))
-			{
-				// Notify no-shows
-				_ = User.NotifyAll(CanaryNotification.UserMissedGathering(await gathering.ToGatheringShard()), users: absentUsers.ToArray());
-
-				foreach (var absent in absentUsers)
-				{
-					await absent.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedAttendee, $"{gathering.Title}");
-				}
-            }
-
-			// Remove no-shows from the guest list
-			foreach (var absent in absentUsers)
-			{
-				await Gatherings.DeleteUserStateAsync(absent.Id, gathering.Id);
-			}
-
 			// Schedule photo reminder for attendees
 			_ = User.NotifyAll(CanaryNotification.GatheringUploadClosing(await gathering.ToGatheringShard()), notifyAt: Time + Gathering.MaximumSnapshotLateness * 0.7, users: (await gathering.Left).ToArray());
         }
