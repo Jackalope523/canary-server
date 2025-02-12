@@ -213,7 +213,6 @@ namespace Core.Tests
 			gatheringStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
-			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.Ongoing) });
 			await Terminal.GatheringDatabase.SetUserStateAsync(host.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)

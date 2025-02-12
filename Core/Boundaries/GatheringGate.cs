@@ -8,26 +8,26 @@ namespace Core.Boundaries
     #region Schemas
 
     public enum GatheringState
-	{ Upcoming, Ongoing, Cancelled, Ended,}
+	{ Alive, NOP_REMOVE, Cancelled, Ended }
 
     public enum GatheringVisibility
 	{ Visible, Hidden, Sealed }
 
     public enum GatheringBond
-    { Watching, Guest, Arrived, Left, Kicked }
+    { NOP_REMOVE, Guest, Arrived, Left, Kicked }
 
     public record CoreGathering(long Id, long HostId, string Title, string Description,
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests,
-		int DegreeOfPrivacy, GatheringVisibility Visibility, DateTimeOffset TimeOfCreation)
+		int DegreeOfPrivacy, GatheringVisibility Visibility, DateTimeOffset TimeOfCreation, int Decay)
 		: CoreOnlyData();
 
 	public record GatheringShard(long Id, UserShard Host, string Title, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
         double Radius, int DegreeOfPrivacy, int NumberOfGuests, float RelativeAngle,
-		GatheringVisibility Visibility);
+		GatheringVisibility Visibility, int Decay);
 
 	public record GuestListBondPair(UserShard User, GatheringBond Bond);
 
@@ -85,16 +85,12 @@ namespace Core.Boundaries
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? degreeOfPrivacy = null,
 			int? groupMinimum = null, int? groupMaximum = null, MemoryStream heroImage = null);
-		Task StartGatheringAsync(long userId, long gatheringId);
 		Task TerminateGatheringAsync(long userId, long gatheringId);
 		Task CancelGatheringAsync(long userId, long gatheringId);
 
 		Task ChangeGatheringVisibilityAsync(long userId, long gatheringId, bool hide);
 
-		Task WatchGatheringAsync(long userId, long gatheringId);
-		Task UnwatchGatheringAsync(long userId, long gatheringId);
 		Task JoinGatheringAsync(long userId, long gatheringId);
-		Task CheckInToGatheringAsync(long userId, double latitude, double longitude);
 		Task LeaveGatheringAsync(long userId, long gatheringId);
 
 		Task<List<GuestListBondPair>> GetGuestListAsync(long userId, long gatheringId);
@@ -102,9 +98,7 @@ namespace Core.Boundaries
 		Task InviteUserAsync(long inviterId, long inviteeId, long gatheringId);
 		Task KickUserAsync(long hostId, long targetId, long gatheringId);
 
-		Task<bool> AuthorisedToStart(long userId, long gatheringId);
 		Task<bool> AuthorisedToJoin(long userId, long gatheringId);
-		Task<bool> AuthorisedToCheckIn(long userId, long gatheringId);
 		Task<bool> AuthorisedToUpload(long userId, long gatheringId);
 	}
 

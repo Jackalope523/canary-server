@@ -46,7 +46,6 @@ namespace Core.Controls
                 };
 
                 nest.Twigs.AddRange((await upcomingAgendaSync).Cards
-                    .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
             }
             // Check if users are companions
@@ -62,7 +61,6 @@ namespace Core.Controls
                 var twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard());
 
                 twigs.AddRange((await siftedAgendaSync).Cards
-                    .Where(card => !card.Bond.Equals(GatheringBond.Watching)).ToList()
                     .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
 
                 if (await hasMutualSync)
@@ -368,9 +366,6 @@ namespace Core.Controls
             // Gather all user gathering data
             AgendaShard agenda = new((await user.UpcomingGatherings)
                 .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Guest)));
-
-            agenda.Cards.AddRange((await user.SurveyingGatherings)
-                .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Watching)));
 
             if (!(await user.CurrentGathering).Equals(Gathering.None))
             { agenda.Cards.Add(new CardShard((await user.CurrentGathering).Id, (await user.CurrentGathering).StartTime, GatheringBond.Arrived)); }

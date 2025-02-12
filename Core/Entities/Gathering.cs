@@ -24,6 +24,7 @@ namespace Core.Entities
 		public const int MaximumTitleLength = 30;
         public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
+        public const int MaximumDecay = 100;
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
@@ -59,22 +60,16 @@ namespace Core.Entities
         public int GroupMaximum { get; set; }
         public DateTimeOffset TimeOfCreation { get; set; }
         public bool IsDeleted { get; set; }
+        public int Decay { get; set; }
 
         public int NumberOfGuests { get; set; }
         public float RelativeAngle { get; set; } = 0;
 
-        public bool IsWaiting
-            => State.Equals(GatheringState.Upcoming) &&
-                HasAlready(StartTime - MaximumEarlyBirdStart);
-        public bool IsWaitingAuto
-            => State.Equals(GatheringState.Upcoming) &&
-                HasAlready(StartTime - MaximumAutoStart);
         public bool IsOpen
-            => (State.Equals(GatheringState.Upcoming) ||
-                State.Equals(GatheringState.Ongoing)) &&
+            => State.Equals(GatheringState.Alive) &&
                 Visibility.Equals(GatheringVisibility.Visible);
         public bool IsOngoing
-            => State.Equals(GatheringState.Ongoing);
+            => State.Equals(GatheringState.Alive) && HasAlready(StartTime);
         public bool IsActive
             => !EndTime.HasValue ||
                 HasYet(EndTime.Value + MaximumSnapshotLateness);
@@ -84,7 +79,7 @@ namespace Core.Entities
         public bool Exists { get; set; } = true;
 
         public TimeSpan Duration
-            => State == GatheringState.Upcoming ?
+            => State == GatheringState.Alive ?
                 TimeSpan.Zero
             :
                 (EndTime ?? Time) - StartTime;
@@ -96,7 +91,6 @@ namespace Core.Entities
         public Synced<User> Host { get; }
 
         public Synced<List<(User User, GatheringBond State)>> AllUsers { get; }
-        public Synced<List<User>> Surveying { get; }
         public Synced<List<User>> Guests { get; }
         public Synced<List<User>> Arrived { get; }
         public Synced<List<User>> Left { get; }
@@ -117,7 +111,6 @@ namespace Core.Entities
             Host = new(() => User.GetUserAsync(HostId));
 
             AllUsers = new(() => Terminal.GatheringDirector.RequestAllUsersFromGatheringAsync(this));
-            Surveying = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Watching)).ConvertAll(user => user.User));
             Guests = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Guest)).ConvertAll(user => user.User));
             Arrived = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Arrived)).ConvertAll(user => user.User));
             Left = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Left)).ConvertAll(user => user.User));
@@ -150,6 +143,7 @@ namespace Core.Entities
             IsDeleted = fromGathering.IsPendingDeletion;
             TimeOfCreation = fromGathering.TimeOfCreation;
             NumberOfGuests = fromGathering.NumberOfGuests;
+            Decay = fromGathering.Decay;
         }
 
         public CoreGathering ToCoreGathering()
@@ -158,7 +152,7 @@ namespace Core.Entities
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
                 Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests,
-                DegreeOfPrivacy, Visibility, TimeOfCreation);
+                DegreeOfPrivacy, Visibility, TimeOfCreation, Decay);
         }
 
         public async Task<GatheringShard> ToGatheringShard()
@@ -167,7 +161,7 @@ namespace Core.Entities
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests, RelativeAngle,
-                Visibility);
+                Visibility, Decay);
         }
 
         public async Task<GatheringShard> ToGatheringShard(User relativeUser)
@@ -177,7 +171,7 @@ namespace Core.Entities
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests,
                 CharacterVector.AngleBetweenAffected(relativeUser.Character, Character),
-                Visibility);
+                Visibility, Decay);
         }
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
@@ -351,21 +345,6 @@ namespace Core.Entities
         public async Task<bool> IsInRange(User user)
             => GeoLocation.AreInRange(Location, await user.LastKnownLocation, ArrivalDistance);
 
-        public async Task<bool> IsStartable()
-        {
-            // Check if gathering has not yet started
-            if (!IsWaiting)
-            { return false; }
-
-            // Check if host is within range
-            /*
-            if (!await IsInRange(Host))
-            { return false; }
-            */
-
-            return true;
-        }
-
         public bool IsTerminable()
         {
             // Ensure gathering is ongoing
@@ -387,11 +366,6 @@ namespace Core.Entities
 		#endregion
 
 		#region Effects
-
-        public async Task Started()
-        {
-            _ = NotifyActive(CanaryNotification.GatheringLive(await ToGatheringShard()), notifyHost: false);
-        }
 
         public async Task<List<User>> Ended()
         {
@@ -442,21 +416,9 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task<string> NotifyActive(CanaryNotification notification, DateTimeOffset? notifyAt = null, bool notifyHost = true)
-        {
-            var targets = (await Guests).Concat(await Arrived).ToList();
-
-            if (!notifyHost)
-            {
-                targets.Remove(await Host);
-            }
-
-            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, targets.ToArray());
-        }
-
         public async Task<string> NotifyGuests(CanaryNotification notification, DateTimeOffset? notifyAt = null, bool notifyHost = true)
         {
-            var targets = await Guests;
+            var targets = (await Guests).Concat(await Arrived).ToList();
 
             if (!notifyHost)
             {

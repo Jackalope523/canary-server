@@ -70,7 +70,7 @@ namespace Core.Controls
                 // TODO Update to sealed
                 await Terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Hidden) });
 
-                await gathering.NotifyActive(CanaryNotification.GatheringSealed(await gathering.ToGatheringShard()));
+                await gathering.NotifyGuests(CanaryNotification.GatheringSealed(await gathering.ToGatheringShard()));
 
                 // Compute host's standing
                 var status = await host.GatheringReported();

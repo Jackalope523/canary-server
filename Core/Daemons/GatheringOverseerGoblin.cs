@@ -12,7 +12,7 @@ namespace Core.Daemons
 {
 	public class GatheringOverseerGoblin : BackgroundService
     {
-        private readonly TimeSpan interval = TimeSpan.FromMinutes(5);
+        private readonly TimeSpan interval = TimeSpan.FromMinutes(15);
 
         private CoreTerminal terminal;
 
@@ -33,7 +33,7 @@ namespace Core.Daemons
 
                 try
                 {
-                    await KillZombieGatheringsAsync(stoppingToken);
+                    await CorrodeGatheringsAsync(stoppingToken);
                 }
                 catch (Exception e)
                 {
@@ -46,9 +46,9 @@ namespace Core.Daemons
             }
         }
 
-        private async Task KillZombieGatheringsAsync(CancellationToken stoppingToken)
+        private async Task CorrodeGatheringsAsync(CancellationToken stoppingToken)
         {
-            var waitingGatherings = await terminal.AdminDatabase.GetAllWaitingGatheringsAsync(DateTimeOffset.UtcNow);
+            var waitingGatherings = await terminal.AdminDatabase.GetAllActiveGatheringsAsync(Psijic.Time);
 
             foreach (var coreGathering in waitingGatherings)
             {
@@ -59,27 +59,20 @@ namespace Core.Daemons
 
                 Gathering gathering = new(coreGathering);
 
-                // Check if gathering has expired
-                if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait))
+                float frequency = interval.Minutes / 60;
+                int durationMinutes = gathering.Duration.Minutes;
+
+                int newDecay = (int) (gathering.Decay - 50 * frequency);
+
+                // If gathering has expired
+                if (newDecay <= 0)
                 {
-                    // Purge gathering
-                    log.LogInformation("Gathering {id} {name} cancelled for being late.", gathering.Id, gathering.Title);
-                    await terminal.GatheringDatabase.CancelGatheringAsync(gathering.Id);
-
-                    // Notify host
-                    User host = await GetUserAsync(gathering.HostId);
-                    await host.PostTelegram(User.Hollow, TelegramMessage.GatheringMissedHost, $"{gathering.Title}");
-                    await host.Notify(CanaryNotification.GatheringAutoCancelled(await gathering.ToGatheringShard()));
-
-                    // Notify guests
-                    await gathering.NotifyGuests(CanaryNotification.HostMissedGathering(await gathering.ToGatheringShard()), notifyHost: false);
+                    // Terminate gathering
+                    await terminal.GatheringDirector.TerminateGatheringAsync(gathering.HostId, gathering.Id);
                 }
-                // Check if the next pass will delete the gathering
-                else if (HasAlready(gathering.StartTime + Gathering.MaximumStartWait - interval))
+                else
                 {
-                    // Warn host
-                    User host = await GetUserAsync(gathering.HostId);
-                    await host.Notify(CanaryNotification.GatheringAutoCancellationWarning(await gathering.ToGatheringShard()));
+                    await terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Decay), newDecay) });
                 }
             }
         }

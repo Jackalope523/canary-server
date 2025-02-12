@@ -11,7 +11,7 @@ namespace Repository
 
         }
 
-        public async Task<List<CoreGathering>> GetAllWaitingGatheringsAsync(DateTimeOffset currentTime)
+        public async Task<List<CoreGathering>> GetAllActiveGatheringsAsync(DateTimeOffset currentTime)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Gatherings

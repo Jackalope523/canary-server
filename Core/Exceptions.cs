@@ -136,7 +136,6 @@ namespace Core.Exceptions
         CANNOT_JOIN_GUEST,
 
         CANNOT_LEAVE,
-        CANNOT_LEAVE_HOST,
 
         CANNOT_INVITE_NEUTRAL,
         CANNOT_INVITE_INVALID_INVITEE,

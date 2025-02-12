@@ -207,54 +207,41 @@ namespace Core.Controls
             {
                 var currentGathering = await user.CurrentGathering;
 
-                // Check if user left the gathering radius
-                if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
+                // Check if user is in the gathering radius
+                if (GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
                 {
-                    // Check if user is a guest or the host
-                    if (currentGathering.IsHostedBy(user))
-                    {
-                        Log.LogWarning("Host {name} left gathering {title} area, hiding...", user.Name, currentGathering.Title);
+                    await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.MaximumDecay) });
+                }
+                else
+                {
+                    Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Title);
 
-                        // Hide the gathering if user is the host
-                        await Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Hidden)});
+                    // Leave the gathering
+                    await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
 
-                        _ = user.Notify(CanaryNotification.HostLeavingGatheringArea(await currentGathering.ToGatheringShard()));
-                    }
-                    else
-                    {
-                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Title);
-
-                        // Leave the gathering if user is a guest
-                        await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
-
-                        _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await currentGathering.ToGatheringShard()));
-                    }
+                    _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await currentGathering.ToGatheringShard()));
                 }
 
+                /*
                 // Check if user is the host
                 if (currentGathering.IsHostedBy(user) && currentGathering.IsDynamic)
                 {
                     // Update the position of the gathering
                     _ = Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
                 }
+                */
             }
             // Check if user is on their way to an gathering
             else if (!await userIsAtGathering &&
                 !nextGathering.Equals(Gathering.None))
             {
-                // Check if user is host and can start gathering
-                if (nextGathering.IsWaitingAuto &&
-                    nextGathering.IsHostedBy(user))
-                {
-                    Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Title);
-                    await Terminal.GatheringDirector.StartGatheringAsync(user.Id, nextGathering.Id);
-                }
                 // Check if user is close enough to be arrived
-                else if (nextGathering.IsOngoing &&
+                if (nextGathering.IsOngoing &&
                     await nextGathering.IsInRange(user))
                 {
                     Log.LogWarning("Guest {name} entered gathering {title} area, marking as arrived...", user.Name, nextGathering.Title);
                     await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
+                    await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.MaximumDecay) });
                 }
             }
         }
