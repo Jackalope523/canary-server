@@ -15,7 +15,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Gatherings
-                .Where(g => g.State == GatheringState.Upcoming && g.StartTime <= currentTime)
+                .Where(g => g.State == GatheringState.Alive && g.StartTime <= currentTime)
                 .Join(
                 ctx.Users,
                 g => g.HostId,
@@ -49,7 +49,8 @@ namespace Repository
                     g.NumberOfGuests,
                     g.DegreeOfPrivacy,
                     g.Visibility,
-                    g.TimeOfCreation
+                    g.TimeOfCreation,
+                    g.Decay
                  )).ToListAsync());
         }
 

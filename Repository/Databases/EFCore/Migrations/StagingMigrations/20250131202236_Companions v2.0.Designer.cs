@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
@@ -12,9 +13,11 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     [DbContext(typeof(AzureStagingContext))]
-    partial class AzureStagingContextModelSnapshot : ModelSnapshot
+    [Migration("20250131202236_Companions v2.0")]
+    partial class Companionsv20
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,9 +139,6 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                         .HasColumnType("int");
 
                     b.Property<int>("Competitiveness")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Decay")
                         .HasColumnType("int");
 
                     b.Property<int>("DegreeOfPrivacy")
@@ -779,30 +779,6 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.HasIndex("SelfId");
 
                     b.ToTable("UserReports");
-                });
-
-            modelBuilder.Entity("Repository.Word", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Words");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>

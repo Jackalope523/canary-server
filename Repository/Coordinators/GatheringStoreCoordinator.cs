@@ -27,11 +27,6 @@ namespace Repository
             return await store.FindUpcomingGatheringsForUserAsync(id);
         }
 
-        public async Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(long id) 
-        {
-            return await store.FindSurveyingGatheringsForUserAsync(id);
-        }
-
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
         {
             return await store.FindPastGatheringsForUserAsync(id);

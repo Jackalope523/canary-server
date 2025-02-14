@@ -628,17 +628,6 @@ namespace Repository.Tests
             Assert.Equal(GatheringBond.Guest, link.Type);
         }
         [Fact]
-        public async Task GetAllUsersAsync_SUCCESS()
-        {
-            GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Watching, DateTimeOffset.MinValue);
-            sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
-
-            (long UserId, GatheringBond State) = (await store.GetAllUsersAsync(testGathering.Id)).Single();
-
-            Assert.Equal(testUser.Id, UserId);
-            Assert.Equal(GatheringBond.Watching, State);
-        }
-        [Fact]
         public async Task PropagateClearance_DEGREE_0()
         {
             /* 

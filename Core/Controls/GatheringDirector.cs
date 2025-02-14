@@ -643,12 +643,6 @@ namespace Core.Controls
 			return (await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id))
 				.ConvertAll(gathering => new Gathering(gathering));
 		}
-
-		internal async Task<List<Gathering>> RequestSurveyingGatheringsForUserAsync(User user)
-		{
-			return (await Gatherings.FindSurveyingGatheringsForUserAsync(user.Id))
-				.ConvertAll(gathering => new Gathering(gathering));
-		}
 		
 		internal async Task<List<(User User, GatheringBond State)>> RequestAllUsersFromGatheringAsync(Gathering gathering)
 		{

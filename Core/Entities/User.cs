@@ -137,7 +137,6 @@ namespace Core.Entities
             CurrentGathering = new(() => Terminal.GatheringDirector.RequestCurrentGatheringForUserAsync(this));
             PastGatherings = new(() => Terminal.GatheringDirector.RequestPastGatheringsForUserAsync(this));
             UpcomingGatherings = new(() => Terminal.GatheringDirector.RequestUpcomingGatheringsForUserAsync(this));
-            SurveyingGatherings = new(() => Terminal.GatheringDirector.RequestSurveyingGatheringsForUserAsync(this));
 
             Companions = new(() => Terminal.NestDirector.RequestCompanionsAsync(this));
             Following = new(() => Terminal.NestDirector.RequestFollowedUsersAsync(this));

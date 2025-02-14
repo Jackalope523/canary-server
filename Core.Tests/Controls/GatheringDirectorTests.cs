@@ -470,7 +470,7 @@ namespace Core.Tests.Controls
 			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
 			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
+			//Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
 		}
 
 		[Fact]

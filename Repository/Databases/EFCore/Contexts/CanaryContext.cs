@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
+using System;
 
 namespace Repository
 {
@@ -20,6 +21,7 @@ namespace Repository
         internal DbSet<GuestClearance> GuestClearances { get; set; }
         internal DbSet<Feedback> Feedback { get; set; }
         internal DbSet<Notification> Notifications { get; set; }
+        internal DbSet<Word> Words { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -360,6 +362,14 @@ namespace Repository
             modelBuilder.Entity<Notification>()
                 .Property(n => n.NotificationId)
                 .HasMaxLength(36);
+
+            // Words
+            modelBuilder.Entity<Word>()
+                .HasQueryFilter(w => !w.SoftDeleted);
+
+            modelBuilder.Entity<Word>()
+                .Property(w => w.Text)
+                .HasMaxLength(50);
         }
     }
 }

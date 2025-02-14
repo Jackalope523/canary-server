@@ -364,7 +364,8 @@ namespace Repository
                     combined.e.NumberOfGuests,
                     combined.e.DegreeOfPrivacy,
                     combined.e.Visibility,
-                    combined.e.TimeOfCreation
+                    combined.e.TimeOfCreation,
+                    combined.e.Decay
                 )).FirstAsync());
         }
 
@@ -420,7 +421,8 @@ namespace Repository
                     combined.e.NumberOfGuests,
                     combined.e.DegreeOfPrivacy,
                     combined.e.Visibility,
-                    combined.e.TimeOfCreation
+                    combined.e.TimeOfCreation,
+                    combined.e.Decay
                 )).FirstAsync());
         }
 

@@ -23,6 +23,7 @@ namespace Repository
         public bool IsDynamic { get; set; } = DefaultIsDynamic;
         public int NumberOfGuests { get; set; } = DefaultNumberOfGuests;
         public int DegreeOfPrivacy { get; set; } = DefaultDegreeOfPrivacy;
+        public int Decay { get; set; } = DefaultDecay;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -54,7 +55,7 @@ namespace Repository
         public static long? DefaultHostId { get; set; } = null;
         public static Point DefaultLocation { get; set; } = Factory.Create(7.544, 53.483);
         public static string DefaultFriendlyLocation { get; set; } = "Solitude";
-        public static GatheringState DefaultState { get; set; } = GatheringState.Upcoming;
+        public static GatheringState DefaultState { get; set; } = GatheringState.Alive;
         public static GatheringVisibility DefaultVisibility { get; set; } = GatheringVisibility.Visible;
         public static int DefaultGroupMinimum { get; set; } = 0;
         public static int DefaultGroupMaximum { get; set; } = 10;
@@ -62,6 +63,7 @@ namespace Repository
         public static bool DefaultIsDynamic { get; set; } = false;
         public static int DefaultNumberOfGuests { get; set; } = 0;
         public static int DefaultDegreeOfPrivacy { get; set; } = 3;
+        public static int DefaultDecay { get; set; } = 100;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;

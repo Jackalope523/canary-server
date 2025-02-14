@@ -31,6 +31,7 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
+            await RerollUserCodeAsync(toCreate.Id);
 
             return new CoreUser
               (
@@ -192,40 +193,6 @@ namespace Repository
                ctx.Users.
                Where(u => u.Id == id).
                ExecuteDeleteAsync());
-        }
-
-        public async Task DeleteUserAsync(long id)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.Users.
-                Where(u => u.Id == id).
-                ExecuteUpdate(setter => setter.SetProperty(u => u.SoftDeleted, true)));
-
-            List<long> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.Gatherings.
-                Where(e => e.HostId == id && e.State == GatheringState.Upcoming).
-                Select(e => e.Id).
-                ToListAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Gatherings.
-               Where(e => upcomingGatherings.Contains(e.Id)).
-               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
-        
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Telegrams.
-               Where(n => n.NotifierId == id || n.RecipientId == id).
-               ExecuteDelete());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Snapshots.
-               Where(p => p.OwnerId == id).
-               ExecuteDelete());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Subscriptions.
-               Where(s => s.UserId == id).
-               ExecuteDelete());
         }
 
         public async Task<CoreUser> FindUserByIdAsync(long id) 
@@ -483,8 +450,17 @@ namespace Repository
 
         public async Task<string> RerollUserCodeAsync(long userId)
         {
-            string[] adjectives = File.ReadAllLines("./adjectives.txt");
-            string[] nouns = File.ReadAllLines("./nouns.txt");
+            List<string> adjectives = await storeSentry.ExecuteReadAsync(ctx => 
+                                        ctx.Words.
+                                        Where(w => w.Type == Word.WordType.Adjective).
+                                        Select(w => w.Text).
+                                        ToListAsync());
+
+            List<string> nouns = await storeSentry.ExecuteReadAsync(ctx =>
+                                        ctx.Words.
+                                        Where(w => w.Type == Word.WordType.Noun).
+                                        Select(w => w.Text).
+                                        ToListAsync());
 
             bool codeUnique = false;
             Random random = new();
@@ -494,8 +470,8 @@ namespace Repository
 
             while (!codeUnique)
             {
-                randomAdjective = adjectives[random.Next(adjectives.Length)];
-                randomNoun = nouns[random.Next(nouns.Length)];
+                randomAdjective = adjectives[random.Next(adjectives.Count)];
+                randomNoun = nouns[random.Next(nouns.Count)];
                
                 potentialCode = (Char.ToUpper(randomAdjective[0]) + randomAdjective.Substring(1)) + (Char.ToUpper(randomNoun[0]) + randomNoun.Substring(1));
 

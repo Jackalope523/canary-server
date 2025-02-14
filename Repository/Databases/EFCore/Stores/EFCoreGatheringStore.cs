@@ -165,7 +165,8 @@ namespace Repository
                    toCreate.NumberOfGuests,
                    toCreate.DegreeOfPrivacy,
                    toCreate.Visibility,
-                   toCreate.TimeOfCreation
+                   toCreate.TimeOfCreation,
+                   toCreate.Decay
                    );
         }
 
@@ -277,7 +278,8 @@ namespace Repository
                         pair.g.NumberOfGuests,
                         pair.g.DegreeOfPrivacy,
                         pair.g.Visibility,
-                        pair.g.TimeOfCreation
+                        pair.g.TimeOfCreation,
+                        pair.g.Decay
                         )).SingleAsync());
             }
             return gathering;          
@@ -295,7 +297,7 @@ namespace Repository
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
                 ctx.Gatherings
-                .Where(e => (e.State == GatheringState.Upcoming || e.State == GatheringState.Ongoing) && !toExclude.Contains(e.Id)),
+                .Where(e => e.State == GatheringState.Alive && !toExclude.Contains(e.Id)),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new
@@ -325,7 +327,8 @@ namespace Repository
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy,
                     e.Visibility,
-                    e.TimeOfCreation
+                    e.TimeOfCreation,
+                    e.Decay
                 })
             .GroupJoin(
                 ctx.Users,
@@ -362,83 +365,8 @@ namespace Repository
                 joinResult.e.NumberOfGuests,
                 joinResult.e.DegreeOfPrivacy,
                 joinResult.e.Visibility,
-                joinResult.e.TimeOfCreation
-                ))
-            .ToListAsync());
-        }
-        public async Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(long id) 
-        {
-            return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.GatheringLinks
-            .Where(l => l.UserId == id && l.Type == GatheringBond.Watching)
-            .Join(
-                ctx.Gatherings,
-                l => l.GatheringId,
-                e => e.Id,
-                (l, e) => new
-                {
-                    e.Id,
-                    e.Title,
-                    e.HostId,
-                    e.Description,
-                    e.StartTime,
-                    e.Location,
-                    e.FriendlyLocation,
-                    e.EndTime,
-                    e.State,
-                    e.GroupMinimum,
-                    e.GroupMaximum,
-                    e.Extroversion,
-                    e.Athleticisme,
-                    e.Chaos,
-                    e.Competitiveness,
-                    e.Industriousness,
-                    e.NightOwl,
-                    e.Age,
-                    e.Openness,
-                    e.Radius,
-                    e.IsDynamic,
-                    e.SoftDeleted,
-                    e.NumberOfGuests,
-                    e.DegreeOfPrivacy,
-                    e.Visibility,
-                    e.TimeOfCreation
-                })
-            .GroupJoin(
-                ctx.Users,
-                e => e.HostId,
-                u => u.Id,
-                (e, userGroup) => new { e, user = userGroup.FirstOrDefault() })
-            .Select(joinResult => new CoreGathering
-            (
-                joinResult.e.Id,
-                joinResult.user != null ? joinResult.user.Id : 0,
-                joinResult.e.Title,
-                joinResult.e.Description,
-                joinResult.e.StartTime,
-                joinResult.e.Location.Y,
-                joinResult.e.Location.X,
-                joinResult.e.FriendlyLocation,
-                joinResult.e.EndTime,
-                joinResult.e.State,
-                joinResult.e.GroupMinimum,
-                joinResult.e.GroupMaximum,
-                new CharacterShard(
-                    joinResult.e.Age,
-                    joinResult.e.Extroversion,
-                    joinResult.e.Athleticisme,
-                    joinResult.e.Chaos,
-                    joinResult.e.Competitiveness,
-                    joinResult.e.Industriousness,
-                    joinResult.e.NightOwl,
-                    joinResult.e.Openness),
-                joinResult.e.Radius,
-                joinResult.e.IsDynamic,
-                joinResult.e.SoftDeleted,
-                joinResult.e.NumberOfGuests,
-                joinResult.e.DegreeOfPrivacy,
-                joinResult.e.Visibility,
-                joinResult.e.TimeOfCreation
+                joinResult.e.TimeOfCreation,
+                joinResult.e.Decay
                 ))
             .ToListAsync());
         }
@@ -479,7 +407,8 @@ namespace Repository
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy,
                     e.Visibility,
-                    e.TimeOfCreation
+                    e.TimeOfCreation,
+                    e.Decay
                 }
             )
             .GroupJoin(
@@ -518,7 +447,8 @@ namespace Repository
                     combined.e.NumberOfGuests,
                     combined.e.DegreeOfPrivacy,
                     combined.e.Visibility,
-                    combined.e.TimeOfCreation
+                    combined.e.TimeOfCreation,
+                    combined.e.Decay
                 )
             ).ToListAsync());
         }
@@ -562,7 +492,8 @@ namespace Repository
                     combined.e.NumberOfGuests,
                     combined.e.DegreeOfPrivacy,
                     combined.e.Visibility,
-                    combined.e.TimeOfCreation
+                    combined.e.TimeOfCreation,
+                    combined.e.Decay
                 )
             ).SingleAsync());
         }
@@ -574,7 +505,7 @@ namespace Repository
 
             return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Gatherings.
-                Where(e => e.Location.Distance(currentLocation) <= distance && (e.State == GatheringState.Ongoing || e.State == GatheringState.Upcoming) && e.Visibility == GatheringVisibility.Visible).
+                Where(e => e.Location.Distance(currentLocation) <= distance && e.State == GatheringState.Alive && e.Visibility == GatheringVisibility.Visible).
                 Join(
                     ctx.Users, 
                     e => e.HostId, 
@@ -608,7 +539,8 @@ namespace Repository
                         e.NumberOfGuests,
                         e.DegreeOfPrivacy,
                         e.Visibility,
-                        e.TimeOfCreation
+                        e.TimeOfCreation,
+                        e.Decay
                    )).ToListAsync());
         }     
         public async Task<List<CoreUser>> GetGuestListAsync(long id)
@@ -664,8 +596,6 @@ namespace Repository
 
                 switch (link.Type)
                 {
-                    case GatheringBond.Watching:
-                        break;
                     case GatheringBond.Guest:
                         int num = await storeSentry.ExecuteReadAsync(ctx =>
                             ctx.Gatherings.
@@ -742,6 +672,9 @@ namespace Repository
 
                         e.DegreeOfPrivacy = (int)Value;
                         await UpdateClearance(id, prev, e.DegreeOfPrivacy);
+                        break;
+                    case nameof(CoreGathering.Decay):
+                        e.Decay = (int)Value;
                         break;
                     default:
                         throw new InvalidInputException($"Property named \"{Property}\" can not be updated using this method.");
@@ -831,7 +764,8 @@ namespace Repository
                     e.NumberOfGuests,
                     e.DegreeOfPrivacy,
                     e.Visibility,
-                    e.TimeOfCreation
+                    e.TimeOfCreation,
+                    e.Decay
                     )).ToListAsync());
         }      
         public async Task<GatheringBond?> GetUserStateAsync(long userId, long gatheringId)
@@ -872,8 +806,6 @@ namespace Repository
 
             switch (userState)
             {
-                case GatheringBond.Watching:
-                    break;
                 case GatheringBond.Guest:
                     int num = await storeSentry.ExecuteReadAsync(ctx => 
                         ctx.Gatherings.
@@ -945,9 +877,9 @@ namespace Repository
         public async Task TerminateGatheringAsync(long id, DateTimeOffset time)
         {
             List<long> guests = await storeSentry.ExecuteReadAsync(ctx => 
-                ctx.Users.
-                Where(u => u.CurrentGathering == id).
-                Select(u => u.Id).
+                ctx.GatheringLinks.
+                Where(l => l.GatheringId == id && l.Type == GatheringBond.Guest).
+                Select(l => l.UserId).
                 ToListAsync());
 
             List<Task> tasks = new();
