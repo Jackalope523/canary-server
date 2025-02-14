@@ -414,12 +414,8 @@ namespace Core.Entities
 
         public async Task CanEtch(Gathering gathering)
 		{
-			// Verify snapshot is not before gathering starting or user is host
-			Verify(HasAlready(gathering.StartTime) || gathering.IsModifiableBy(this),
-				new UserErrorException(GatheringErrorCode.NOT_STARTED));
-
 			// Verify user can etch into the gathering
-			Verify(await gathering.WasAttendedBy(this) || gathering.IsModifiableBy(this),
+			Verify(await gathering.HasOnGuestList(this) || gathering.IsModifiableBy(this),
 				new UserErrorException(GatheringErrorCode.NOT_GUEST));
 
 			// Verify snapshot is added before gathering is closed
