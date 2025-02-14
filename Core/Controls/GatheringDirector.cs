@@ -612,7 +612,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
 
-			return gathering.IsActive && await gathering.WasAttendedBy(user);
+			return gathering.IsActive && await gathering.HasOnGuestList(user);
         }
 
 		#endregion
