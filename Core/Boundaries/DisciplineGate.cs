@@ -66,7 +66,8 @@ namespace Core.Boundaries
     public interface IDisciplineOperations
     {
         Task ReportUserAsync(long userId, long targetId,
-            UserReportType reportType, string reportDetails);
+            UserReportType reportType, string reportDetails,
+            long? gatheringId = null);
 
         Task ReportGatheringAsync(long userId, long gatheringId,
             GatheringReportType reportType, string reportDetails);

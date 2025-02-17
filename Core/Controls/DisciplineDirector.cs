@@ -20,23 +20,38 @@ namespace Core.Controls
 		#region Operations
 
 		public async Task ReportUserAsync(long userId, long targetId,
-            UserReportType reportType, string reportDetails)
+            UserReportType reportType, string reportDetails,
+            long? gatheringId = null)
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
-            var occuringGathering = Gathering.None; //await targetUser.CurrentGathering;
 
             // Verify user can report
             Verify(await user.CanReport(),
                 new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
 
-            if (occuringGathering.Equals(Gathering.None))
+            // Check if gathering id was supplied
+            if (gatheringId.HasValue)
             {
-                await Reports.ReportUserAsync(userId, targetUser.Id, Time, reportType, reportDetails);
+                // Validate both users were at the gathering
+                var occuringGathering = await GetGatheringAsync(gatheringId.Value);
+
+                bool mutualGuestship = await occuringGathering.HasOnGuestList(user) &&
+                    await occuringGathering.HasOnGuestList(targetUser);
+
+                if (mutualGuestship)
+                {
+                    await Reports.ReportUserAsync(userId, occuringGathering.Id, targetUser.Id, Time, reportType, reportDetails);
+                }
+                else
+                {
+                    // Silently drop if mutual guestship not established
+                    await Reports.ReportUserAsync(userId, targetUser.Id, Time, reportType, reportDetails);
+                }
             }
             else
             {
-                await Reports.ReportUserAsync(userId, occuringGathering.Id, targetUser.Id, Time, reportType, reportDetails);
+                await Reports.ReportUserAsync(userId, targetUser.Id, Time, reportType, reportDetails);
             }
 
             // Compute user's standing
