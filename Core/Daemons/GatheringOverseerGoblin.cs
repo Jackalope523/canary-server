@@ -59,7 +59,7 @@ namespace Core.Daemons
 
                 Gathering gathering = new(coreGathering);
 
-                float goblinFrequency = interval.Minutes / 60;
+                float goblinFrequency = interval.Minutes / 60f;
                 float decayPerHour = 100;
 
                 float newDecay = gathering.Decay - decayPerHour * goblinFrequency;
