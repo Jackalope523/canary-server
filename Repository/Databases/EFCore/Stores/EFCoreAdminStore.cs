@@ -16,14 +16,11 @@ namespace Repository
             return await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.Gatherings
                 .Where(g => g.State == GatheringState.Alive && g.StartTime <= currentTime)
-                .Join(
-                ctx.Users,
-                g => g.HostId,
-                u => u.Id,
-                (g, u) => new CoreGathering
+                .Select(
+                (g) => new CoreGathering
                 (
                     g.Id,
-                    u.Id,
+                    g.HostId ?? 0,
                     g.Title,
                     g.Description,
                     g.StartTime,

@@ -23,7 +23,7 @@ namespace Repository
         public bool IsDynamic { get; set; } = DefaultIsDynamic;
         public int NumberOfGuests { get; set; } = DefaultNumberOfGuests;
         public int DegreeOfPrivacy { get; set; } = DefaultDegreeOfPrivacy;
-        public int Decay { get; set; } = DefaultDecay;
+        public float Decay { get; set; } = DefaultDecay;
 
         // Vector
         public int Extroversion { get; init; } = DefaultExtroversion;
@@ -63,7 +63,7 @@ namespace Repository
         public static bool DefaultIsDynamic { get; set; } = false;
         public static int DefaultNumberOfGuests { get; set; } = 0;
         public static int DefaultDegreeOfPrivacy { get; set; } = 3;
-        public static int DefaultDecay { get; set; } = 100;
+        public static float DefaultDecay { get; set; } = 100;
 
         // Vector
         public static int DefaultExtroversion { get; set; } = 50;

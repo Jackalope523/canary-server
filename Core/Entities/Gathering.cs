@@ -60,7 +60,7 @@ namespace Core.Entities
         public int GroupMaximum { get; set; }
         public DateTimeOffset TimeOfCreation { get; set; }
         public bool IsDeleted { get; set; }
-        public int Decay { get; set; }
+        public float Decay { get; set; }
 
         public int NumberOfGuests { get; set; }
         public float RelativeAngle { get; set; } = 0;

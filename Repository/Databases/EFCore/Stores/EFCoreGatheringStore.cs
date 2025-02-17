@@ -674,7 +674,7 @@ namespace Repository
                         await UpdateClearance(id, prev, e.DegreeOfPrivacy);
                         break;
                     case nameof(CoreGathering.Decay):
-                        e.Decay = (int)Value;
+                        e.Decay = (float)Value;
                         break;
                     default:
                         throw new InvalidInputException($"Property named \"{Property}\" can not be updated using this method.");
