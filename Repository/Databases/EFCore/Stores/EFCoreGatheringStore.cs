@@ -230,97 +230,44 @@ namespace Repository
                 Remove(new Gathering { Id = id }));
         }
 
-        public async Task<CoreGathering> FindOngoingGatheringsForUserAsync(long id) 
-        {
-            long? currentGathering = await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.Users.
-            Where(u => u.Id == id).
-            Select(u => u.CurrentGathering).
-            SingleAsync());
-
-            CoreGathering? gathering = null;
-            if (currentGathering != null)
-            {
-                gathering = await storeSentry.ExecuteReadAsync(ctx =>
-                    ctx.Gatherings.
-                    Where(e => e.Id == currentGathering).
-                    GroupJoin(
-                        ctx.Users,
-                        e => e.HostId,
-                        u => u.Id,
-                        (g, users) => new { g, user = users.FirstOrDefault() }).
-                    Select(pair => new CoreGathering
-                    (
-                        pair.g.Id,
-                        pair.user != null ? pair.user.Id : 0,
-                        pair.g.Title,
-                        pair.g.Description,
-                        pair.g.StartTime,
-                        pair.g.Location.Y,
-                        pair.g.Location.X,
-                        pair.g.FriendlyLocation,
-                        pair.g.EndTime,
-                        pair.g.State,
-                        pair.g.GroupMinimum,
-                        pair.g.GroupMaximum,
-                        new CharacterShard(
-                        pair.g.Extroversion,
-                        pair.g.Athleticisme,
-                        pair.g.Chaos,
-                        pair.g.Competitiveness,
-                        pair.g.Industriousness,
-                        pair.g.NightOwl,
-                        pair.g.Openness,
-                        pair.g.Age),
-                        pair.g.Radius,
-                        pair.g.IsDynamic,
-                        pair.g.SoftDeleted,
-                        pair.g.NumberOfGuests,
-                        pair.g.DegreeOfPrivacy,
-                        pair.g.Visibility,
-                        pair.g.TimeOfCreation,
-                        pair.g.Decay
-                        )).SingleAsync());
-            }
-            return gathering;          
-        }
-        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id) 
+        public async Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long id) 
         {
             List<long> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.UserId == id && l.Type == GatheringBond.Arrived).
-               Select(l => l.GatheringId).
-               ToListAsync());
+              ctx.GatheringLinks.
+              Where(l => l.UserId == id && l.Type == GatheringBond.Left).
+              Select(l => l.GatheringId).
+              ToListAsync());
 
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Arrived && !toExclude.Contains(l.GatheringId))
             .Join(
-                ctx.Gatherings
-                .Where(e => e.State == GatheringState.Alive && !toExclude.Contains(e.Id)),
+                ctx.Gatherings,
                 l => l.GatheringId,
                 e => e.Id,
-                (l, e) => new
-                {
+                (l, e) => new CoreGathering
+                (
                     e.Id,
+                    e.HostId ?? 0,
                     e.Title,
-                    e.HostId,
                     e.Description,
                     e.StartTime,
-                    e.Location,
+                    e.Location.Y,
+                    e.Location.X,
                     e.FriendlyLocation,
                     e.EndTime,
                     e.State,
                     e.GroupMinimum,
                     e.GroupMaximum,
-                    e.Extroversion,
-                    e.Athleticisme,
-                    e.Chaos,
-                    e.Competitiveness,
-                    e.Industriousness,
-                    e.NightOwl,
-                    e.Age,
-                    e.Openness,
+                    new CharacterShard(
+                        e.Age,
+                        e.Extroversion,
+                        e.Athleticisme,
+                        e.Chaos,
+                        e.Competitiveness,
+                        e.Industriousness,
+                        e.NightOwl,
+                        e.Openness),
                     e.Radius,
                     e.IsDynamic,
                     e.SoftDeleted,
@@ -329,46 +276,57 @@ namespace Repository
                     e.Visibility,
                     e.TimeOfCreation,
                     e.Decay
-                })
-            .GroupJoin(
-                ctx.Users,
-                e => e.HostId,
-                u => u.Id,
-                (e, userGroup) => new { e, user = userGroup.FirstOrDefault() })
-            .Select(joinResult => new CoreGathering
-            (
-                joinResult.e.Id,
-                joinResult.user != null ? joinResult.user.Id : 0,  
-                joinResult.e.Title,
-                joinResult.e.Description,
-                joinResult.e.StartTime,
-                joinResult.e.Location.Y,
-                joinResult.e.Location.X,
-                joinResult.e.FriendlyLocation,
-                joinResult.e.EndTime,
-                joinResult.e.State,
-                joinResult.e.GroupMinimum,
-                joinResult.e.GroupMaximum,
-                new CharacterShard(
-                    joinResult.e.Age,
-                    joinResult.e.Extroversion,
-                    joinResult.e.Athleticisme,
-                    joinResult.e.Chaos,
-                    joinResult.e.Competitiveness,
-                    joinResult.e.Industriousness,
-                    joinResult.e.NightOwl,
-                    joinResult.e.Openness
-                    ),
-                joinResult.e.Radius,
-                joinResult.e.IsDynamic,
-                joinResult.e.SoftDeleted,
-                joinResult.e.NumberOfGuests,
-                joinResult.e.DegreeOfPrivacy,
-                joinResult.e.Visibility,
-                joinResult.e.TimeOfCreation,
-                joinResult.e.Decay
-                ))
-            .ToListAsync());
+                )
+            ).ToListAsync());
+        }
+        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id) 
+        {
+            List<long> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
+               ctx.GatheringLinks.
+               Where(l => l.UserId == id && (l.Type == GatheringBond.Arrived || l.Type == GatheringBond.Left)).
+               Select(l => l.GatheringId).
+               ToListAsync());
+
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.GatheringLinks
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Guest && !toExclude.Contains(l.GatheringId))
+            .Join(
+                ctx.Gatherings,
+                l => l.GatheringId,
+                e => e.Id,
+                (l, e) => new CoreGathering
+                (
+                    e.Id,
+                    e.HostId ?? 0,
+                    e.Title,
+                    e.Description,
+                    e.StartTime,
+                    e.Location.Y,
+                    e.Location.X,
+                    e.FriendlyLocation,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
+                    new CharacterShard(
+                        e.Age,
+                        e.Extroversion,
+                        e.Athleticisme,
+                        e.Chaos,
+                        e.Competitiveness,
+                        e.Industriousness,
+                        e.NightOwl,
+                        e.Openness),
+                    e.Radius,
+                    e.IsDynamic,
+                    e.SoftDeleted,
+                    e.NumberOfGuests,
+                    e.DegreeOfPrivacy,
+                    e.Visibility,
+                    e.TimeOfCreation,
+                    e.Decay
+                )
+            ).ToListAsync());
         }
 
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
@@ -380,27 +338,29 @@ namespace Repository
                 ctx.Gatherings,
                 l => l.GatheringId,
                 e => e.Id,
-                (l, e) => new
-                {
+                (l, e) => new CoreGathering
+                (
                     e.Id,
+                    e.HostId ?? 0,
                     e.Title,
-                    e.HostId,
                     e.Description,
                     e.StartTime,
-                    e.Location,
+                    e.Location.Y,
+                    e.Location.X,
                     e.FriendlyLocation,
                     e.EndTime,
                     e.State,
                     e.GroupMinimum,
                     e.GroupMaximum,
-                    e.Extroversion,
-                    e.Athleticisme,
-                    e.Chaos,
-                    e.Competitiveness,
-                    e.Industriousness,
-                    e.NightOwl,
-                    e.Age,
-                    e.Openness,
+                    new CharacterShard(
+                        e.Age,
+                        e.Extroversion,
+                        e.Athleticisme,
+                        e.Chaos,
+                        e.Competitiveness,
+                        e.Industriousness,
+                        e.NightOwl,
+                        e.Openness),
                     e.Radius,
                     e.IsDynamic,
                     e.SoftDeleted,
@@ -409,46 +369,6 @@ namespace Repository
                     e.Visibility,
                     e.TimeOfCreation,
                     e.Decay
-                }
-            )
-            .GroupJoin(
-                ctx.Users,
-                e => e.HostId,
-                u => u.Id,
-                (e, users) => new { e, user = users.FirstOrDefault() }
-            )
-            .Select(
-                combined => new CoreGathering
-                (
-                    combined.e.Id,
-                    combined.user != null ? combined.user.Id : 0,
-                    combined.e.Title,
-                    combined.e.Description,
-                    combined.e.StartTime,
-                    combined.e.Location.Y,
-                    combined.e.Location.X,
-                    combined.e.FriendlyLocation,
-                    combined.e.EndTime,
-                    combined.e.State,
-                    combined.e.GroupMinimum,
-                    combined.e.GroupMaximum,
-                    new CharacterShard(
-                        combined.e.Age,
-                        combined.e.Extroversion,
-                        combined.e.Athleticisme,
-                        combined.e.Chaos,
-                        combined.e.Competitiveness,
-                        combined.e.Industriousness,
-                        combined.e.NightOwl,
-                        combined.e.Openness),
-                    combined.e.Radius,
-                    combined.e.IsDynamic,
-                    combined.e.SoftDeleted,
-                    combined.e.NumberOfGuests,
-                    combined.e.DegreeOfPrivacy,
-                    combined.e.Visibility,
-                    combined.e.TimeOfCreation,
-                    combined.e.Decay
                 )
             ).ToListAsync());
         }
@@ -457,43 +377,38 @@ namespace Repository
             return await storeSentry.ExecuteReadAsync(ctx => 
             ctx.Gatherings.
             Where(e => e.Id == id).
-            GroupJoin(
-                ctx.Users,
-                e => e.HostId,
-                u => u.Id,
-                (e, users) => new { e, user = users.FirstOrDefault() }).
-             Select(
-                combined => new CoreGathering
+            Select(
+                e => new CoreGathering
                 (
-                    combined.e.Id,
-                    combined.user != null ? combined.user.Id : 0,
-                    combined.e.Title,
-                    combined.e.Description,
-                    combined.e.StartTime,
-                    combined.e.Location.Y,
-                    combined.e.Location.X,
-                    combined.e.FriendlyLocation,
-                    combined.e.EndTime,
-                    combined.e.State,
-                    combined.e.GroupMinimum,
-                    combined.e.GroupMaximum,
+                    e.Id,
+                    e.HostId ?? 0,
+                    e.Title,
+                    e.Description,
+                    e.StartTime,
+                    e.Location.Y,
+                    e.Location.X,
+                    e.FriendlyLocation,
+                    e.EndTime,
+                    e.State,
+                    e.GroupMinimum,
+                    e.GroupMaximum,
                     new CharacterShard(
-                        combined.e.Age,
-                        combined.e.Extroversion,
-                        combined.e.Athleticisme,
-                        combined.e.Chaos,
-                        combined.e.Competitiveness,
-                        combined.e.Industriousness,
-                        combined.e.NightOwl,
-                        combined.e.Openness),
-                    combined.e.Radius,
-                    combined.e.IsDynamic,
-                    combined.e.SoftDeleted,
-                    combined.e.NumberOfGuests,
-                    combined.e.DegreeOfPrivacy,
-                    combined.e.Visibility,
-                    combined.e.TimeOfCreation,
-                    combined.e.Decay
+                        e.Age,
+                        e.Extroversion,
+                        e.Athleticisme,
+                        e.Chaos,
+                        e.Competitiveness,
+                        e.Industriousness,
+                        e.NightOwl,
+                        e.Openness),
+                    e.Radius,
+                    e.IsDynamic,
+                    e.SoftDeleted,
+                    e.NumberOfGuests,
+                    e.DegreeOfPrivacy,
+                    e.Visibility,
+                    e.TimeOfCreation,
+                    e.Decay
                 )
             ).SingleAsync());
         }
