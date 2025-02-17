@@ -319,6 +319,15 @@ namespace Frontier.Controllers
             }, allowUnverified: true);
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            return await Execute(async user =>
+            {
+                await accounts.DeleteUserAsync(user.Id);
+            }, allowUnverified: true);
+        }
+
         #endregion
 
         #region Tools

@@ -24,7 +24,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
             var targetUser = await GetUserAsync(targetId);
-            var occuringGathering = await targetUser.CurrentGathering;
+            var occuringGathering = Gathering.None; //await targetUser.CurrentGathering;
 
             // Verify user can report
             Verify(await user.CanReport(),

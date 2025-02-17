@@ -230,7 +230,7 @@ namespace Repository
                 Remove(new Gathering { Id = id }));
         }
 
-        public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
+        public async Task<CoreGathering> FindOngoingGatheringsForUserAsync(long id) 
         {
             long? currentGathering = await storeSentry.ExecuteReadAsync(ctx =>
             ctx.Users.

@@ -92,10 +92,9 @@ namespace Core.Entities
         public Synced<Distance> HauntRadius { get; }
         public Synced<int> HauntStability { get; }
 
-        public Synced<Gathering> CurrentGathering { get; }
         public Synced<List<Gathering>> PastGatherings { get; }
+        public Synced<List<Gathering>> OngoingGatherings { get; }
         public Synced<List<Gathering>> UpcomingGatherings { get; }
-        public Synced<List<Gathering>> SurveyingGatherings { get; }
 
         public Synced<List<User>> Companions { get; }
         public Synced<List<User>> Following { get; }
@@ -134,8 +133,8 @@ namespace Core.Entities
             HauntRadius = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Radius);
             HauntStability = new(async () => (await HauntSync.Value().ConfigureAwait(false)).Stability);
 
-            CurrentGathering = new(() => Terminal.GatheringDirector.RequestCurrentGatheringForUserAsync(this));
             PastGatherings = new(() => Terminal.GatheringDirector.RequestPastGatheringsForUserAsync(this));
+            OngoingGatherings = new(() => Terminal.GatheringDirector.RequestOngoingGatheringsForUserAsync(this));
             UpcomingGatherings = new(() => Terminal.GatheringDirector.RequestUpcomingGatheringsForUserAsync(this));
 
             Companions = new(() => Terminal.NestDirector.RequestCompanionsAsync(this));
@@ -325,10 +324,7 @@ namespace Core.Entities
 
         public async Task<bool> IsAtGathering()
         {
-            if ((await CurrentGathering).Equals(Gathering.None))
-            { return false; }
-
-            return true;
+            return (await OngoingGatherings).Count > 0;
         }
 
 		public async Task<bool> CanView(Gathering gathering)

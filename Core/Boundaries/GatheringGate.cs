@@ -20,14 +20,14 @@ namespace Core.Boundaries
 		DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum, CharacterShard Character,
 		double Radius, bool IsDynamic, bool IsPendingDeletion, int NumberOfGuests,
-		int DegreeOfPrivacy, GatheringVisibility Visibility, DateTimeOffset TimeOfCreation, int Decay)
+		int DegreeOfPrivacy, GatheringVisibility Visibility, DateTimeOffset TimeOfCreation, float Decay)
 		: CoreOnlyData();
 
 	public record GatheringShard(long Id, UserShard Host, string Title, string Description,
         DateTimeOffset StartTime, double Latitude, double Longitude, string FriendlyLocation,
 		DateTimeOffset? TimeEnded, GatheringState State, int GroupMinimum, int GroupMaximum,
         double Radius, int DegreeOfPrivacy, int NumberOfGuests, float RelativeAngle,
-		GatheringVisibility Visibility, int Decay);
+		GatheringVisibility Visibility, float Decay);
 
 	public record GuestListBondPair(UserShard User, GatheringBond Bond);
 
@@ -39,9 +39,9 @@ namespace Core.Boundaries
 	{
         Task<CoreGathering> FindGatheringAsync(long gatheringId);
 		Task<List<CoreGathering>> FindGatheringsAsync(double latitude, double longitude, double distance);
-		Task<CoreGathering> FindCurrentGatheringForUserAsync(long userId);
-		Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long userId);
 		Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long userId);
+		Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long userId);
+		Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long userId);
 		Task<List<CoreGathering>> FindGatheringsByUserAsync(long userId);
 
 		Task<CoreGathering> CreateGatheringAsync(long hostId, string title, string description,

@@ -205,31 +205,25 @@ namespace Core.Controls
             // Check if user is at an gathering
             if (await userIsAtGathering)
             {
-                var currentGathering = await user.CurrentGathering;
+                var ongoingGatherings = await user.OngoingGatherings;
 
-                // Check if user is in the gathering radius
-                if (GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
+                foreach (var current in ongoingGatherings)
                 {
-                    await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.MaximumDecay) });
-                }
-                else
-                {
-                    Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Title);
+                    // Check if user is in the gathering radius
+                    if (GeoLocation.AreInRange(await user.LastKnownLocation, current.Location, current.Radius))
+                    {
+                        await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.InitialDecay) });
+                    }
+                    else
+                    {
+                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, current.Title);
 
-                    // Leave the gathering
-                    await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
+                        // Leave the gathering
+                        await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, current.Id);
 
-                    _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await currentGathering.ToGatheringShard()));
+                        _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await current.ToGatheringShard()));
+                    }
                 }
-
-                /*
-                // Check if user is the host
-                if (currentGathering.IsHostedBy(user) && currentGathering.IsDynamic)
-                {
-                    // Update the position of the gathering
-                    _ = Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
-                }
-                */
             }
             // Check if user is on their way to an gathering
             else if (!await userIsAtGathering &&
@@ -241,7 +235,7 @@ namespace Core.Controls
                 {
                     Log.LogWarning("Guest {name} entered gathering {title} area, marking as arrived...", user.Name, nextGathering.Title);
                     await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
-                    await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.MaximumDecay) });
+                    await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.InitialDecay) });
                 }
             }
         }

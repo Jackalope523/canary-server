@@ -24,7 +24,7 @@ namespace Core.Entities
 		public const int MaximumTitleLength = 30;
         public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
-        public const int MaximumDecay = 100;
+        public const int InitialDecay = 100;
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
@@ -60,7 +60,7 @@ namespace Core.Entities
         public int GroupMaximum { get; set; }
         public DateTimeOffset TimeOfCreation { get; set; }
         public bool IsDeleted { get; set; }
-        public int Decay { get; set; }
+        public float Decay { get; set; }
 
         public int NumberOfGuests { get; set; }
         public float RelativeAngle { get; set; } = 0;
@@ -87,7 +87,7 @@ namespace Core.Entities
         ////////
         // Synced Properties
         //////////////////////
-        ///
+        
         public Synced<User> Host { get; }
 
         public Synced<List<(User User, GatheringBond State)>> AllUsers { get; }

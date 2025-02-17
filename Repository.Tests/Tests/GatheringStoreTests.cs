@@ -414,7 +414,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentGathering, testGathering.Id)));
 
-            CoreGathering gathering = await store.FindCurrentGatheringForUserAsync(testUser.Id);
+            CoreGathering gathering = await store.FindOngoingGatheringsForUserAsync(testUser.Id);
 
             Assert.NotNull(gathering);
             Assert.Equal(testGathering.HostId, gathering.HostId);
