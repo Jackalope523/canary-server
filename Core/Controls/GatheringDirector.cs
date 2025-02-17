@@ -140,12 +140,6 @@ namespace Core.Controls
             // If now
 			if (HasAlready(newGathering.StartTime))
 			{
-				// Ensure user removed from current gathering
-				if (await user.IsAtGathering())
-				{
-					await LeaveGatheringAsync(user.Id, (await user.CurrentGathering).Id);
-				}
-
 				await Gatherings.UpdateGatheringAsync(newGathering.Id, new() { (nameof(CoreGathering.StartTime), Time) });
 				newGathering = await GetGatheringAsync(newGathering.Id);
 			}
@@ -375,24 +369,15 @@ namespace Core.Controls
 			{
                 throw new UserErrorException(GatheringErrorCode.CANNOT_JOIN_GUEST);
             }
-            // Check if user has an active gathering conflict
-            if (HasAlready(gathering.StartTime))
-			{ await ThrowIfUserAtGathering(user); }
-			else
-			{
-				// Check if user has an upcoming conflict
-				var conflict = (await user.UpcomingGatherings).Find(e => IsWithin(e.StartTime - gathering.StartTime, HalfHour));
-				if (conflict != null)
-				{ throw new UserErrorException(GatheringErrorCode.CONFLICT, new { conflict.Id }); }
-			}
+
 			// Check if gathering is active and user is already there
 			if (HasAlready(gathering.StartTime) &&
 				await gathering.IsInRange(user))
 			{
 				// Try to add user to the gathering
-				// TODO Note may be an issue if they never had an initial Guest bond?
+				await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Guest, Time);
 				await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Arrived, Time);
-                await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.MaximumDecay) });
+                await Gatherings.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.InitialDecay) });
             }
 			else
 			{
@@ -619,20 +604,19 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task<Gathering> RequestCurrentGatheringForUserAsync(User user)
+		internal async Task<List<Gathering>> RequestCurrentGatheringsForUserAsync(User user)
 		{
-			CoreGathering currentGathering;
-
-			try
-			{
-				currentGathering = await Gatherings.FindCurrentGatheringForUserAsync(user.Id);
-			}
-			catch { return Gathering.None; }
-
-			return currentGathering != null ? new(currentGathering) : Gathering.None;
+			return (await Gatherings.FindOngoingGatheringsForUserAsync(user.Id))
+				.ConvertAll(gathering => new Gathering(gathering));
 		}
 
 		internal async Task<List<Gathering>> RequestPastGatheringsForUserAsync(User user)
+		{
+			return (await Gatherings.FindPastGatheringsForUserAsync(user.Id))
+				.ConvertAll(gathering => new Gathering(gathering));
+		}
+
+		internal async Task<List<Gathering>> RequestOngoingGatheringsForUserAsync(User user)
 		{
 			return (await Gatherings.FindPastGatheringsForUserAsync(user.Id))
 				.ConvertAll(gathering => new Gathering(gathering));
@@ -737,12 +721,6 @@ namespace Core.Controls
 		#endregion
 
 		#region Tools
-
-		private async Task ThrowIfUserAtGathering(User user)
-		{
-			FailIf(await user.IsAtGathering(),
-                new UserErrorException(GatheringErrorCode.USER_ATTENDING_ELSEWHERE, new { (await user.CurrentGathering).Title }));
-		}
 
 		private List<(User User, GatheringBond Bond)>
 			SelectAsBonds(List<(User User, GatheringBond State)> users, Func<(User User, GatheringBond State), bool> predicate)

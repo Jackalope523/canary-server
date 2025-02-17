@@ -39,9 +39,9 @@ namespace Core.Boundaries
 	{
         Task<CoreGathering> FindGatheringAsync(long gatheringId);
 		Task<List<CoreGathering>> FindGatheringsAsync(double latitude, double longitude, double distance);
-		Task<CoreGathering> FindCurrentGatheringForUserAsync(long userId);
-		Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long userId);
 		Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long userId);
+		Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long userId);
+		Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long userId);
 		Task<List<CoreGathering>> FindGatheringsByUserAsync(long userId);
 
 		Task<CoreGathering> CreateGatheringAsync(long hostId, string title, string description,

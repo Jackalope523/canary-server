@@ -24,7 +24,7 @@ namespace Core.Entities
 		public const int MaximumTitleLength = 30;
         public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
-        public const int MaximumDecay = 100;
+        public const int InitialDecay = 100;
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
@@ -87,7 +87,7 @@ namespace Core.Entities
         ////////
         // Synced Properties
         //////////////////////
-        ///
+        
         public Synced<User> Host { get; }
 
         public Synced<List<(User User, GatheringBond State)>> AllUsers { get; }

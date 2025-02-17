@@ -12,7 +12,7 @@ namespace Core.Daemons
 {
 	public class GatheringOverseerGoblin : BackgroundService
     {
-        private readonly TimeSpan interval = TimeSpan.FromMinutes(15);
+        private readonly TimeSpan interval = TimeSpan.FromMinutes(1);
 
         private CoreTerminal terminal;
 
@@ -48,9 +48,9 @@ namespace Core.Daemons
 
         private async Task CorrodeGatheringsAsync(CancellationToken stoppingToken)
         {
-            var waitingGatherings = await terminal.AdminDatabase.GetAllActiveGatheringsAsync(Psijic.Time);
+            var activeGatherings = await terminal.AdminDatabase.GetAllActiveGatheringsAsync(Psijic.Time);
 
-            foreach (var coreGathering in waitingGatherings)
+            foreach (var coreGathering in activeGatherings)
             {
                 if (stoppingToken.IsCancellationRequested)
                 {
@@ -59,20 +59,20 @@ namespace Core.Daemons
 
                 Gathering gathering = new(coreGathering);
 
-                float frequency = interval.Minutes / 60;
-                int durationMinutes = gathering.Duration.Minutes;
+                float goblinFrequency = interval.Minutes / 60;
+                float decayPerHour = 100;
 
-                int newDecay = (int) (gathering.Decay - 50 * frequency);
+                float newDecay = gathering.Decay - decayPerHour * goblinFrequency;
 
-                // If gathering has expired
-                if (newDecay <= 0)
+                // Apply decay if not expired
+                if (newDecay > 0)
                 {
-                    // Terminate gathering
-                    await terminal.GatheringDirector.TerminateGatheringAsync(gathering.HostId, gathering.Id);
+                    await terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Decay), newDecay) });
                 }
                 else
                 {
-                    await terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Decay), newDecay) });
+                    // Terminate gathering
+                    await terminal.GatheringDirector.TerminateGatheringAsync(gathering.HostId, gathering.Id);
                 }
             }
         }
