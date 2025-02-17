@@ -136,7 +136,7 @@ namespace Frontier.Controllers
 			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails));
+				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails, report.OccuringGatheringId));
 		}
 
 		#endregion
