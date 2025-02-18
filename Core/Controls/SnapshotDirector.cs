@@ -41,7 +41,7 @@ namespace Core.Controls
             if (user.Equals(targetUser))
             {
                 // Check if user attended
-                if (await gathering.WasAttendedBy(user))
+                if (await gathering.HasOnGuestList(user))
                 {
                     gallery = new(await gathering.Snapshots);
                 }
@@ -59,7 +59,7 @@ namespace Core.Controls
             }
             // Check if users are companions or attended a common gathering
             else if (await user.IsCompanionsWith(targetUser) ||
-                (await gathering.WasAttendedBy(user) && await gathering.WasAttendedBy(targetUser)))
+                (await gathering.HasOnGuestList(user) && await gathering.HasOnGuestList(targetUser)))
             {
                 var targetSnapshots = (await gathering.Snapshots)
                     .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
