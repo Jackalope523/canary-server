@@ -176,7 +176,7 @@ namespace Core.Entities
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Title, IsOngoing ? StartTime : EndTime.Value, IsOngoing, lastActiveTime, FriendlyLocation);
+            return new(Id, Title, IsTerminated ? EndTime.Value : StartTime, IsOngoing, lastActiveTime, FriendlyLocation);
         }
 
         public TwigShard ToTwigShard()
