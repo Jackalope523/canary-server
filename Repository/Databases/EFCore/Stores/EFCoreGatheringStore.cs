@@ -230,19 +230,13 @@ namespace Repository
                 Remove(new Gathering { Id = id }));
         }
 
-        public async Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long id) 
+        public async Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long id, DateTimeOffset currentTime) 
         {
-            List<long> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
-              ctx.GatheringLinks.
-              Where(l => l.UserId == id && l.Type == GatheringBond.Left).
-              Select(l => l.GatheringId).
-              ToListAsync());
-
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == id && l.Type == GatheringBond.Arrived && !toExclude.Contains(l.GatheringId))
+            .Where(l => l.UserId == id)
             .Join(
-                ctx.Gatherings,
+                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime < currentTime),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
@@ -277,21 +271,15 @@ namespace Repository
                     e.TimeOfCreation,
                     e.Decay
                 )
-            ).ToListAsync());
+            ).DistinctBy(e => e.Id).ToListAsync());
         }
-        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id) 
+        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id, DateTimeOffset currentTime) 
         {
-            List<long> toExclude = await storeSentry.ExecuteReadAsync(ctx =>
-               ctx.GatheringLinks.
-               Where(l => l.UserId == id && (l.Type == GatheringBond.Arrived || l.Type == GatheringBond.Left)).
-               Select(l => l.GatheringId).
-               ToListAsync());
-
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == id && l.Type == GatheringBond.Guest && !toExclude.Contains(l.GatheringId))
+            .Where(l => l.UserId == id)
             .Join(
-                ctx.Gatherings,
+                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime > currentTime),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
@@ -326,16 +314,16 @@ namespace Repository
                     e.TimeOfCreation,
                     e.Decay
                 )
-            ).ToListAsync());
+            ).DistinctBy(e => e.Id).ToListAsync());
         }
 
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == id && l.Type == GatheringBond.Left)
+            .Where(l => l.UserId == id)
             .Join(
-                ctx.Gatherings,
+                ctx.Gatherings.Where(g => g.State == GatheringState.Ended),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
@@ -370,7 +358,7 @@ namespace Repository
                     e.TimeOfCreation,
                     e.Decay
                 )
-            ).ToListAsync());
+            ).DistinctBy(e => e.Id).ToListAsync());
         }
         public async Task<CoreGathering> FindGatheringAsync(long id)
         {

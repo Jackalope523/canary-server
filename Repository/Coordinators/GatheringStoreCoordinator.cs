@@ -17,14 +17,14 @@ namespace Repository
             return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy, timeOfCreation);
         }
 
-        public async Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long id) 
+        public async Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long id, DateTimeOffset currentTime) 
         {
-            return await store.FindOngoingGatheringsForUserAsync(id);
+            return await store.FindOngoingGatheringsForUserAsync(id, currentTime);
         }
 
-        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id) 
+        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id, DateTimeOffset currentTime) 
         {
-            return await store.FindUpcomingGatheringsForUserAsync(id);
+            return await store.FindUpcomingGatheringsForUserAsync(id, currentTime);
         }
 
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
