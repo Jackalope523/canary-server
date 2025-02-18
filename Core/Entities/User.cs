@@ -413,10 +413,6 @@ namespace Core.Entities
 			// Verify user can etch into the gathering
 			Verify(await gathering.HasOnGuestList(this) || gathering.IsModifiableBy(this),
 				new UserErrorException(GatheringErrorCode.NOT_GUEST));
-
-			// Verify snapshot is added before gathering is closed
-			Verify(gathering.IsActive,
-				new UserErrorException(SnapshotErrorCode.WINDOW_CLOSED));
 		}
 
 		public bool Taken(SnapshotShard snapshot)

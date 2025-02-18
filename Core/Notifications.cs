@@ -269,7 +269,7 @@ namespace Core.Notifications
 
         public static CanaryNotification GatheringUploadClosing(GatheringShard gathering)
             => GatheringReminders(new(gathering.Title,
-                $"Post your remaining photos before the upload window closes.",
+                $"Don't forget to post your remaining photos!",
                 new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.Gallery)));
     }
 

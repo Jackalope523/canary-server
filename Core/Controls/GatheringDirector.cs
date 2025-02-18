@@ -597,7 +597,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var gathering = await GetGatheringAsync(gatheringId);
 
-			return gathering.IsActive && await gathering.HasOnGuestList(user);
+			return await gathering.HasOnGuestList(user);
         }
 
 		#endregion
@@ -606,7 +606,7 @@ namespace Core.Controls
 
 		internal async Task<List<Gathering>> RequestCurrentGatheringsForUserAsync(User user)
 		{
-			return (await Gatherings.FindOngoingGatheringsForUserAsync(user.Id))
+			return (await Gatherings.FindOngoingGatheringsForUserAsync(user.Id, Time))
 				.ConvertAll(gathering => new Gathering(gathering));
 		}
 
@@ -624,7 +624,7 @@ namespace Core.Controls
 
 		internal async Task<List<Gathering>> RequestUpcomingGatheringsForUserAsync(User user)
 		{
-			return (await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id))
+			return (await Gatherings.FindUpcomingGatheringsForUserAsync(user.Id, Time))
 				.ConvertAll(gathering => new Gathering(gathering));
 		}
 		
