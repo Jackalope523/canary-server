@@ -234,7 +234,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == id)
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
                 ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime < currentTime),
                 l => l.GatheringId,
@@ -271,13 +271,13 @@ namespace Repository
                     e.TimeOfCreation,
                     e.Decay
                 )
-            ).DistinctBy(e => e.Id).ToListAsync());
+            ).ToListAsync());
         }
         public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id, DateTimeOffset currentTime) 
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == id)
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
                 ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime > currentTime),
                 l => l.GatheringId,
@@ -314,14 +314,14 @@ namespace Repository
                     e.TimeOfCreation,
                     e.Decay
                 )
-            ).DistinctBy(e => e.Id).ToListAsync());
+            ).ToListAsync());
         }
 
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == id)
+            .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
                 ctx.Gatherings.Where(g => g.State == GatheringState.Ended),
                 l => l.GatheringId,
@@ -358,7 +358,7 @@ namespace Repository
                     e.TimeOfCreation,
                     e.Decay
                 )
-            ).DistinctBy(e => e.Id).ToListAsync());
+            ).ToListAsync());
         }
         public async Task<CoreGathering> FindGatheringAsync(long id)
         {
