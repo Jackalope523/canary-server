@@ -302,9 +302,9 @@ namespace Repository
         {
             return storeSentry.ExecuteReadAsync(ctx => 
                 ctx.GatheringLinks.
-                Where(l => l.UserId == userId && l.Type == GatheringBond.Arrived).
+                Where(l => l.UserId == userId && l.Type == GatheringBond.Guest).
                 Join(
-                      ctx.GatheringLinks.Where(l => l.UserId == targetId && l.Type == GatheringBond.Arrived),
+                      ctx.GatheringLinks.Where(l => l.UserId == targetId && l.Type == GatheringBond.Guest),
                       x => x.GatheringId,
                       y => y.GatheringId,
                       (x,y) => x.GatheringId

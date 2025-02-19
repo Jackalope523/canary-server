@@ -433,7 +433,7 @@ namespace Repository.Tests
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
-            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(testUser.Id)).First();
+            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(testUser.Id, DateTimeOffset.Now)).First();
 
             Assert.NotNull(gathering);
             Assert.Equal(testGathering.HostId, gathering.HostId);
@@ -457,7 +457,7 @@ namespace Repository.Tests
 
             sentry.ExecuteWrite(ctx => ctx.Users.Remove(testUser));
 
-            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(guest.Id)).First();
+            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(guest.Id, DateTimeOffset.Now)).First();
 
             Assert.NotNull(gathering);
             Assert.Equal(0, gathering.HostId);
