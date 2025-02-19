@@ -131,7 +131,7 @@ namespace Core.Controls
 
             Verify(user.Taken(snapshot) ||
                 await user.IsCompanionsWith(snapshotOwner) ||
-                await etchedGathering.WasAttendedBy(user),
+                await etchedGathering.HasOnGuestList(user),
                 new UserErrorException(SnapshotErrorCode.CANNOT_VIEW));
 
             MemoryStream image;
@@ -155,7 +155,7 @@ namespace Core.Controls
 
             Verify(user.Taken(snapshot) ||
                 await user.IsCompanionsWith(snapshotOwner) ||
-                await etchedGathering.WasAttendedBy(user),
+                await etchedGathering.HasOnGuestList(user),
                 new UserErrorException(SnapshotErrorCode.CANNOT_VIEW));
 
             MemoryStream image;
