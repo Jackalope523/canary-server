@@ -315,12 +315,12 @@ namespace Repository
         public async Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId)
         {
             List<long> a = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
-                Where(l => l.UserId == userId && l.Type == GatheringBond.Arrived).
+                Where(l => l.UserId == userId && l.Type == GatheringBond.Guest).
                 Select(l => l.GatheringId).
                 ToListAsync());
 
             List<long> b = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
-                Where(l => l.UserId == targetId && l.Type == GatheringBond.Arrived).
+                Where(l => l.UserId == targetId && l.Type == GatheringBond.Guest).
                 Select(l => l.GatheringId).
                 ToListAsync());
 
@@ -372,12 +372,12 @@ namespace Repository
         public async Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId)
         {
             List<long> a = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
-               Where(l => l.UserId == userId && l.Type == GatheringBond.Arrived).
+               Where(l => l.UserId == userId && l.Type == GatheringBond.Guest).
                Select(l => l.GatheringId).
                ToListAsync());
 
             List<long> b = await storeSentry.ExecuteReadAsync(ctx => ctx.GatheringLinks.
-                Where(l => l.UserId == targetId && l.Type == GatheringBond.Arrived).
+                Where(l => l.UserId == targetId && l.Type == GatheringBond.Guest).
                 Select(l => l.GatheringId).
                 ToListAsync());
 
