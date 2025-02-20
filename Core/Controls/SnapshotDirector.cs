@@ -67,6 +67,17 @@ namespace Core.Controls
                 gallery = new(targetSnapshots);
             }
 
+            // Remove strangers if gallery is in pre mode
+            if (gathering.IsUpcoming)
+            {
+                var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, gallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
+
+                // Remove host from strangers
+                strangers.Remove(gathering.HostId);
+
+                gallery = new(HideStrangersAsync(gallery.Snapshots, strangers));
+            }
+
             // Remove any snapshots from blocked or blocking users
             GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
 
@@ -216,6 +227,28 @@ namespace Core.Controls
 
                 return companionSnapshots;
             }
+        }
+
+        internal List<SnapshotShard>
+            HideStrangersAsync(List<SnapshotShard> snapshots, List<long> strangers)
+        {
+            List<SnapshotShard> collection = new();
+
+            foreach (SnapshotShard snapshot in snapshots)
+            {
+                if (strangers.Contains(snapshot.User.Id))
+                {
+                    collection.Add(new(snapshot.Id, snapshot.GatheringId,
+                        User.Hidden.ToUserShard(),
+                        snapshot.TimeTaken, snapshot.Acclaim));
+                }
+                else
+                {
+                    collection.Add(snapshot);
+                }
+            }
+
+            return collection;
         }
 
         internal async Task<List<SnapshotShard>>

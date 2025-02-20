@@ -68,6 +68,8 @@ namespace Core.Entities
         public bool IsOpen
             => State.Equals(GatheringState.Alive) &&
                 Visibility.Equals(GatheringVisibility.Visible);
+        public bool IsUpcoming
+            => State.Equals(GatheringState.Alive) && HasYet(StartTime);
         public bool IsOngoing
             => State.Equals(GatheringState.Alive) && HasAlready(StartTime);
         public bool IsActive

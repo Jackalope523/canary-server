@@ -39,6 +39,8 @@ namespace Core.Boundaries
         Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId);
         Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId);
         Task<DateTimeOffset> BlockedSince(long userId, long targetId);
+
+        Task<List<long>> ReturnStrangerDangerAsync(long userId, params long[] users);
     }
 
 	public interface INestOperations
