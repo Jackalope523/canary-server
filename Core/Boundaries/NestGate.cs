@@ -16,6 +16,8 @@ namespace Core.Boundaries
     public record BlockedUserShard(long Id, string NameWhenBlocked, DateTimeOffset DateBlocked) :
         UserShard(Id, NameWhenBlocked);
 
+    public record CompanionshipRequestShard(UserShard User, DateTimeOffset Time);
+
 	#endregion
 
 	#region Gates
@@ -47,8 +49,8 @@ namespace Core.Boundaries
         Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId);
 
         Task<List<UserShard>> GetCompanionsAsync(long userId);
-        Task<List<UserShard>> GetIncomingCompanionshipRequestsAsync(long userId);
-        Task<List<UserShard>> GetOutgoingCompanionshipRequestsAsync(long userId);
+        Task<List<CompanionshipRequestShard>> GetIncomingCompanionshipRequestsAsync(long userId);
+        Task<List<CompanionshipRequestShard>> GetOutgoingCompanionshipRequestsAsync(long userId);
         Task<List<UserShard>> GetRecentlyMetAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 

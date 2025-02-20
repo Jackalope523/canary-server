@@ -138,7 +138,7 @@ namespace Core.Controls
                 .ConvertAll(u => u.ToUserShard());
         }
 
-        public async Task<List<UserShard>> GetIncomingCompanionshipRequestsAsync(long userId)
+        public async Task<List<CompanionshipRequestShard>> GetIncomingCompanionshipRequestsAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
@@ -148,10 +148,10 @@ namespace Core.Controls
             // Strip out companions
             return userFollowers.Except(userCompanions)
                 .ToList()
-                .ConvertAll(u => u.ToUserShard());
+                .ConvertAll(u => new CompanionshipRequestShard(u.ToUserShard(), Psijic.Time));
         }
 
-        public async Task<List<UserShard>> GetOutgoingCompanionshipRequestsAsync(long userId)
+        public async Task<List<CompanionshipRequestShard>> GetOutgoingCompanionshipRequestsAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
@@ -161,7 +161,7 @@ namespace Core.Controls
             // Strip out companions
             return userFollowing.Except(userCompanions)
                 .ToList()
-                .ConvertAll(u => u.ToUserShard());
+                .ConvertAll(u => new CompanionshipRequestShard(u.ToUserShard(), Psijic.Time));
         }
 
         public async Task<List<UserShard>> GetRecentlyMetAsync(long userId)
