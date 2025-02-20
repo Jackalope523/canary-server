@@ -405,36 +405,27 @@ namespace Core.Controls
             // Get the user's current status
             var userIntention = await Gatherings.GetUserStateAsync(userId, gatheringId);
 
+			// Check that user was associated
+			Verify(userIntention.HasValue,
+				new UserErrorException(GatheringErrorCode.NOT_GUEST));
+
             // Check that user was not kicked
             FailIf(userIntention.HasValue &&
                 userIntention.Value.Equals(GatheringBond.Kicked),
                 new UserErrorException(GatheringErrorCode.KICKED));
 
-            // Check if user is guest or arrived
-            if (userIntention.Equals(GatheringBond.Arrived))
-			{
-				// Try to remove user from gathering
-				await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Left, Time);
-			}
-			else if (userIntention.Equals(GatheringBond.Guest))
-			{
-				// Check if user previously left gathering
-				if (await gathering.WasAttendedBy(user))
-				{
-					// TODO This should not create false data.
-					await Gatherings.SetUserStateAsync(user.Id, gathering.Id, GatheringBond.Left, Time);
-				}
-				else
-				{
-					// Try to remove user from gathering
-					await Gatherings.DeleteUserStateAsync(user.Id, gathering.Id);
+			// Try to remove user from gathering
+			await Gatherings.DeleteUserStateAsync(user.Id, gathering.Id);
 
-					// Cancel scheduled notifications
-					_ = CancelScheduledNotificationsForGuest(gathering, user);
-				}
-			}
-			else if (userIntention.HasValue)
-			{ throw new InvalidOperationException($"Could not leave gathering, user currently {userIntention.Value} gathering."); }
+            // Delete any snapshots
+            foreach (SnapshotShard snapshot in await gathering.Snapshots)
+            {
+                if (user.Taken(snapshot))
+                { _ = Snapshots.SoftDeleteAsync(snapshot.Id); }
+            }
+
+            // Cancel scheduled notifications
+            _ = CancelScheduledNotificationsForGuest(gathering, user);
 		}
 
 		public async Task<List<GuestListBondPair>>
@@ -581,8 +572,9 @@ namespace Core.Controls
 				{ _ = Snapshots.SoftDeleteAsync(snapshot.Id); }
 			}
 
-			// Cancel any scheduled notifications
-		}
+            // Cancel any scheduled notifications
+            _ = CancelScheduledNotificationsForGuest(gathering, targetUser);
+        }
 
 		public async Task<bool> AuthorisedToJoin(long userId, long gatheringId)
         {

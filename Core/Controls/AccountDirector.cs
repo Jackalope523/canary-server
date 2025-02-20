@@ -219,7 +219,7 @@ namespace Core.Controls
                         Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, current.Title);
 
                         // Leave the gathering
-                        await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, current.Id);
+                        await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, current.Id, GatheringBond.Left, Time);
 
                         _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await current.ToGatheringShard()));
                     }
