@@ -20,7 +20,7 @@ namespace Repository
                 await containerClient.CreateIfNotExistsAsync();
                 blob.Position = 0;
 
-                await containerClient.GetBlobClient(blobName).UploadAsync(blob, overwrite: true);
+                await containerClient.GetBlobClient(blobName + ".jpg").UploadAsync(blob, overwrite: true);
             }
             catch (Exception ex)
             {
@@ -30,8 +30,19 @@ namespace Repository
 
         public async Task<MemoryStream> DownloadBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
             MemoryStream stream = new MemoryStream();
+
+            BlobClient blobClient = new(context.BuildUri(containerName, blobName + ".jpg"), context.credentials());
+
+            if (!(await blobClient.ExistsAsync()))
+            {
+                BlobClient repairClient = new(context.BuildUri(containerName, blobName), context.credentials());
+                await repairClient.DownloadToAsync(stream);
+                stream.Position = 0;
+                await repairClient.DeleteAsync();
+                await blobClient.UploadAsync(stream);
+            }
+
             try
             {
                 await blobClient.DownloadToAsync(stream);
@@ -40,13 +51,18 @@ namespace Repository
             }
             catch (Exception ex)
             {
-                throw new BlobIOException(ex);
+                return await DownloadBlobAsync("utility", "failed_image.jpg");
             }
         }
 
         public async Task DeleteBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
+            BlobClient blobClient = new(context.BuildUri(containerName, blobName + ".jpg"), context.credentials());
+
+            if (!(await blobClient.ExistsAsync()))
+            {
+                blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
+            }
 
             try
             {
