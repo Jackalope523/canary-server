@@ -181,6 +181,15 @@ namespace Frontier.Controllers
 			return await Execute(async user => await gatherings.AuthorisedToUpload(user.Id, gatheringId));
 		}
 
+		[HttpGet("{gatheringId}/report")]
+		public async Task<IActionResult> AvailableGatheringReports(long gatheringId)
+		{
+			return await Execute(async user =>
+			{
+				await reports.GetAvailableReportsForGatheringAsync(user.Id, gatheringId);
+			});
+		}
+
 		[HttpPost("{gatheringId}/report")]
 		public async Task<IActionResult> ReportGathering(long gatheringId, [FromBody] GatheringReportManifest report)
 		{
@@ -242,7 +251,16 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpPost("{gatheringId}/snapshots/{snapshotId}/report")]
+		[HttpGet("{gatheringId}/snapshots/{snapshotId}/report")]
+		public async Task<IActionResult> AvailableSnapshotReports(long gatheringId, long snapshotId)
+        {
+            return await Execute(async user =>
+            {
+                await reports.GetAvailableReportsForSnapshotAsync(user.Id, snapshotId);
+            });
+        }
+
+        [HttpPost("{gatheringId}/snapshots/{snapshotId}/report")]
 		public async Task<IActionResult> ReportSnapshot(long gatheringId, long snapshotId, [FromBody] SnapshotReportManifest report)
 		{
 			// Verify parameters

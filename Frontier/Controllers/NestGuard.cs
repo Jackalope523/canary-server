@@ -128,6 +128,15 @@ namespace Frontier.Controllers
 				await nests.AuthorisedToFollow(user.Id, targetId));
 		}
 
+		[HttpGet("{targetId}/report")]
+		public async Task<IActionResult> ReportUser(long targetId)
+		{
+			return await Execute(async user =>
+				await reports.GetAvailableReportsForUserAsync(user.Id, targetId)
+			);
+		}
+
+
 		[HttpPost("{targetId}/report")]
 		public async Task<IActionResult> ReportUser(long targetId, [FromBody] AccountReportManifest report)
 		{
@@ -136,7 +145,8 @@ namespace Frontier.Controllers
 			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails, report.OccuringGatheringId));
+				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails, report.OccuringGatheringId)
+			);
 		}
 
 		#endregion

@@ -34,6 +34,8 @@ namespace Core.Entities
         public const int ReputationPopulation = 20;
         public const float ReputationIntensity = 2.2f;
 
+        public readonly static TimeSpan DuplicateReportFrequency = TimeSpan.FromDays(14);
+
         public static User Redacted
             => new() { Id = 0 };
 
@@ -429,6 +431,73 @@ namespace Core.Entities
             { return false; }
 
             return true;
+        }
+
+        public async Task<bool> CanReport(User otherUser, UserReportType reportType)
+        {
+            var availableReports = await AvailableReportTypes(otherUser);
+
+            return !availableReports.Contains(reportType);
+        }
+
+        public async Task<List<UserReportType>> AvailableReportTypes(User otherUser)
+        {
+            // Gather recent reports by user against target 
+            var reportedTypesByUser = (await otherUser.Reports)
+                .Where(report => report.ReportingUserId.Equals(Id) &&
+                Psijic.HappenedBefore(Time - DuplicateReportFrequency, report.ReportTime))
+                .Select(report => report.ReportType);
+
+            var reportTypes = Enum.GetValues<UserReportType>().ToList();
+
+            var availableReportTypes = reportTypes.Except(reportedTypesByUser);
+
+            // Return exclusion
+            return availableReportTypes.ToList();
+        }
+
+        public async Task<bool> CanReport(Gathering gathering, GatheringReportType reportType)
+        {
+            var availableReports = await AvailableReportTypes(gathering);
+
+            return !availableReports.Contains(reportType);
+        }
+
+        public async Task<List<GatheringReportType>> AvailableReportTypes(Gathering gathering)
+        {
+            // Gather recent reports by user against target 
+            var reportedTypesByUser = (await gathering.GatheringReports)
+                .Where(report => report.ReportingUserId.Equals(Id))
+                .Select(report => report.ReportType);
+
+            var reportTypes = Enum.GetValues<GatheringReportType>().ToList();
+
+            var availableReportTypes = reportTypes.Except(reportedTypesByUser);
+
+            // Return exclusion
+            return availableReportTypes.ToList();
+        }
+
+        public async Task<bool> CanReport(SnapshotShard snapshot, User snapshotAuthor, SnapshotReportType reportType)
+        {
+            var availableReports = await AvailableReportTypes(snapshot, snapshotAuthor);
+
+            return !availableReports.Contains(reportType);
+        }
+
+        public async Task<List<SnapshotReportType>> AvailableReportTypes(SnapshotShard snapshot, User snapshotAuthor)
+        {
+            // Gather recent reports by user against target 
+            var reportedTypesByUser = (await snapshotAuthor.SnapshotReports)
+                .Where(report => report.ReportedSnapshotId == snapshot.Id && report.ReportingUserId.Equals(Id))
+                .Select(report => report.ReportType);
+
+            var reportTypes = Enum.GetValues<SnapshotReportType>().ToList();
+
+            var availableReportTypes = reportTypes.Except(reportedTypesByUser);
+
+            // Return exclusion
+            return availableReportTypes.ToList();
         }
 
         public async Task<bool> CanFollow(User target, bool hasCode = false)

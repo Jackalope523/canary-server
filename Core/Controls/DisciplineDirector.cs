@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
@@ -15,11 +16,24 @@ namespace Core.Controls
 
 		public DisciplineDirector(CoreTerminal terminal) : base(terminal) { }
 
-		#endregion
+        #endregion
 
-		#region Operations
+        #region Operations
 
-		public async Task ReportUserAsync(long userId, long targetId,
+        public async Task<List<UserReportType>> GetAvailableReportsForUserAsync(long userId, long targetId)
+        {
+            var user = await GetUserAsync(userId);
+            var targetUser = await GetUserAsync(targetId);
+
+            // Verify user can report
+            Verify(await user.CanReport(),
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
+
+            // Gather recent reports by user against target 
+            return await user.AvailableReportTypes(targetUser);
+        }
+
+        public async Task ReportUserAsync(long userId, long targetId,
             UserReportType reportType, string reportDetails,
             long? gatheringId = null)
         {
@@ -29,6 +43,10 @@ namespace Core.Controls
             // Verify user can report
             Verify(await user.CanReport(),
                 new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
+
+            // Prevent double reports
+            Verify(await user.CanReport(targetUser, reportType),
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_DUPLICATE));
 
             // Check if gathering id was supplied
             if (gatheringId.HasValue)
@@ -64,6 +82,19 @@ namespace Core.Controls
             }
         }
 
+        public async Task<List<GatheringReportType>> GetAvailableReportsForGatheringAsync(long userId, long gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetGatheringAsync(gatheringId);
+
+            // Verify user can report
+            Verify(await user.CanReport(),
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
+
+            // Gather recent reports by user against target 
+            return await user.AvailableReportTypes(gathering);
+        }
+
         public async Task ReportGatheringAsync(long userId, long gatheringId,
             GatheringReportType reportType, string reportDetails)
         {
@@ -74,6 +105,10 @@ namespace Core.Controls
             Verify(await user.CanReport(),
                 new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
 
+            // Prevent double reports
+            Verify(await user.CanReport(gathering, reportType),
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_DUPLICATE));
+
             await Reports.ReportGatheringAsync(user.Id, gathering.Id, Time, reportType, reportDetails);
 
             // Check if action is to be taken
@@ -82,8 +117,7 @@ namespace Core.Controls
                 var host = await GetUserAsync(gathering.HostId);
 
                 // Threshold hit, seal gathering
-                // TODO Update to sealed
-                await Terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Hidden) });
+                await Terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Visibility), GatheringVisibility.Sealed) });
 
                 await gathering.NotifyGuests(CanaryNotification.GatheringSealed(await gathering.ToGatheringShard()));
 
@@ -98,6 +132,20 @@ namespace Core.Controls
             }
         }
 
+        public async Task<List<SnapshotReportType>> GetAvailableReportsForSnapshotAsync(long userId, long snapshotId)
+        {
+            var user = await GetUserAsync(userId);
+            var targetSnapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+            User targetUser = await GetUserAsync(targetSnapshot.User.Id);
+
+            // Verify user can report
+            Verify(await user.CanReport(),
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
+
+            // Gather recent reports by user against target 
+            return await user.AvailableReportTypes(targetSnapshot, targetUser);
+        }
+
         public async Task ReportSnapshotAsync(long userId, long snapshotId,
             SnapshotReportType reportType, string reportDetails)
         {
@@ -108,6 +156,10 @@ namespace Core.Controls
             // Verify user can report
             Verify(await user.CanReport(),
                 new UserErrorException(UserErrorCode.CANNOT_REPORT_COOLDOWN));
+
+            // Prevent double reports
+            Verify(await user.CanReport(targetSnapshot, targetUser, reportType),
+                new UserErrorException(UserErrorCode.CANNOT_REPORT_DUPLICATE));
 
             await Reports.ReportSnapshotAsync(user.Id, targetSnapshot.Id, Time, reportType, reportDetails);
 

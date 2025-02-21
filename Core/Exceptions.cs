@@ -118,6 +118,7 @@ namespace Core.Exceptions
     public enum UserErrorCode
     {
         CANNOT_REPORT_COOLDOWN,
+        CANNOT_REPORT_DUPLICATE,
         CANNOT_VIEW,
 
         CANNOT_FOLLOW,
