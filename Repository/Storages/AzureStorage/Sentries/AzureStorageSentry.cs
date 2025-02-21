@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 namespace Repository
 {
@@ -20,7 +21,7 @@ namespace Repository
                 await containerClient.CreateIfNotExistsAsync();
                 blob.Position = 0;
 
-                await containerClient.GetBlobClient(blobName + ".jpg").UploadAsync(blob, overwrite: true);
+                await containerClient.GetBlobClient(blobName).UploadAsync(blob, overwrite: true);
             }
             catch (Exception ex)
             {
@@ -31,17 +32,7 @@ namespace Repository
         public async Task<MemoryStream> DownloadBlobAsync(string containerName, string blobName)
         {
             MemoryStream stream = new MemoryStream();
-
-            BlobClient blobClient = new(context.BuildUri(containerName, blobName + ".jpg"), context.credentials());
-
-            if (!(await blobClient.ExistsAsync()))
-            {
-                BlobClient repairClient = new(context.BuildUri(containerName, blobName), context.credentials());
-                await repairClient.DownloadToAsync(stream);
-                stream.Position = 0;
-                await repairClient.DeleteAsync();
-                await blobClient.UploadAsync(stream);
-            }
+            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
 
             try
             {
@@ -57,16 +48,11 @@ namespace Repository
 
         public async Task DeleteBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(context.BuildUri(containerName, blobName + ".jpg"), context.credentials());
-
-            if (!(await blobClient.ExistsAsync()))
-            {
-                blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
-            }
+            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
 
             try
             {
-                await blobClient.DeleteAsync();
+                await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots);
             }
             catch (Exception ex)
             {
