@@ -450,49 +450,53 @@ namespace Core.Controls
 			// Hide
 
 			// Check if user is host or attendee
-			if (gathering.IsModifiableBy(user) || await gathering.WasAttendedBy(user))
+			if (gathering.IsModifiableBy(user) || await gathering.HasOnGuestList(user))
             {
-				for (int i = 0; i < allGuests.Count; i++)
+				// Check if upcoming
+				if (gathering.IsUpcoming)
 				{
-					User guest = allGuests[i].User;
-					GatheringBond bond = allGuests[i].Bond;
+					// Hide strangers
+					var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, allGuests.ConvertAll(bond => bond.User.Id).ToArray());
 
-					// Might have to hide incoming guest
-					if (bond == GatheringBond.Guest)
-					{
-						bool isCompanion = await user.IsCompanionsWith(guest);
-						bool isHost = gathering.IsModifiableBy(guest);
-						bool isSelf = user.Equals(guest);
+                    for (int i = 0; i < allGuests.Count; i++)
+                    {
+                        (User guest, GatheringBond bond) = allGuests[i];
 
-						// Check if incoming guest is not a companion, host, or self
-						if (!(isCompanion || isHost || isSelf))
-						{
-							allGuests[i] = AsHiddenBondPair(bond);
-						}
-					}
-					// Else, guest is arrived or left (visible)
-				}
+                        bool isHost = gathering.IsModifiableBy(guest);
+                        bool isSelf = user.Equals(guest);
+
+                        // Check if incoming guest is not a companion, host, or self
+                        if (strangers.Contains(guest.Id) && !(isHost || isSelf))
+                        {
+                            allGuests[i] = AsHiddenBondPair(bond);
+                        }
+                        // Else, guest is arrived or left (visible)
+                    }
+                }
+				// Else, everyone is visible
 			}
 			// Check if user can view gathering
 			else if (await gathering.IsVisibleTo(user))
 			{
+                // Hide strangers
+                var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, allGuests.ConvertAll(bond => bond.User.Id).ToArray());
+
                 for (int i = 0; i < allGuests.Count; i++)
                 {
-                    User guest = allGuests[i].User;
+                    (User guest, GatheringBond bond) = allGuests[i];
 
-                    bool isCompanion = await user.IsCompanionsWith(guest);
                     bool isHost = gathering.IsModifiableBy(guest);
                     bool isSelf = user.Equals(guest);
 
-					// Not attending so can only see select people
-                    // Check if guest is not a companion, host, or self
-                    if (!(isCompanion || isHost || isSelf))
+                    // Check if incoming guest is not a companion, host, or self
+                    if (strangers.Contains(guest.Id) && !(isHost || isSelf))
                     {
-                        allGuests[i] = AsHiddenBondPair(allGuests[i].Bond);
+                        allGuests[i] = AsHiddenBondPair(bond);
                     }
+                    // Else, guest is arrived or left (visible)
                 }
             }
-			// User cannot recieve information about gathering
+			// User cannot receive information about gathering
 			else
 			{ throw new UserErrorException(GatheringErrorCode.CANNOT_VIEW); }
 
