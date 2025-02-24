@@ -637,8 +637,8 @@ namespace Repository.Tests
             User companion = _userFactory.Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserLinkType.Follow);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
 
@@ -662,8 +662,8 @@ namespace Repository.Tests
             User companion = _userFactory.Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserLinkType.Follow);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
 
@@ -692,10 +692,10 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion1));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion2));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion1, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkB = _userRelationshipFactory.Create(companion1, testUser, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkC = _userRelationshipFactory.Create(testUser, companion2, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkD = _userRelationshipFactory.Create(companion2, testUser, UserRelationship.UserLinkType.Follow);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion1, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion1, testUser, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkC = _userRelationshipFactory.Create(testUser, companion2, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkD = _userRelationshipFactory.Create(companion2, testUser, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
@@ -723,10 +723,10 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Users.Add(hostCompanion));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companionCompanion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserLinkType.Follow);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
@@ -754,10 +754,10 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Users.Add(hostCompanion));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companionCompanion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserLinkType.Follow);
-            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserLinkType.Follow);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));

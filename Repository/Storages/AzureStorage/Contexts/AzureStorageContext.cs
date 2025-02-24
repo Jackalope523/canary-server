@@ -22,11 +22,11 @@ namespace Repository
 
         public Uri BuildUri(string containerName)
         {
-            return new Uri(string.Format(baseUrl + "/{1}.jpg", storageAccountName, containerName));
+            return new Uri(string.Format(baseUrl + "/{1}", storageAccountName, containerName));
         }
         public Uri BuildUri(string containerName, string blobName)
         {
-            return new Uri(string.Format(baseUrl + "/{1}/{2}.jpg", storageAccountName, containerName, blobName));
+            return new Uri(string.Format(baseUrl + "/{1}/{2}", storageAccountName, containerName, blobName));
         }
     }
 }

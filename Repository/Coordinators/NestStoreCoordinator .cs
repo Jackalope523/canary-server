@@ -67,5 +67,10 @@
         {
             return await store.BlockedSince(userId, targetId);
         }
+
+        public async Task<List<long>> ReturnStrangerDangerAsync(long userId, params long[] users)
+        {
+            return await store.ReturnStrangerDangerAsync(userId, users);
+        }
     }
 }

@@ -32,12 +32,12 @@ namespace Repository
             // Get List of Companions.
             Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserRelationships.
-                Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Follow).Select(l => l.OtherId).
+                Where(l => l.SelfId == id && l.Type == UserRelationship.UserRelationshipType.Follow).Select(l => l.OtherId).
                 ToListAsync());
 
             Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserRelationships.
-                Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Follow).
+                Where(l => l.OtherId == id && l.Type == UserRelationship.UserRelationshipType.Follow).
                 Select(l => l.SelfId).
                 ToListAsync());
 

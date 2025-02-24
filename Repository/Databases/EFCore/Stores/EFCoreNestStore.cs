@@ -3,10 +3,10 @@
 namespace Repository
 {
     public class EFCoreNestStore : QueryStore, INestDatabase
-    {     
-        private static readonly Func<CanaryContext, long, long, UserRelationship.UserLinkType, Task> RemoveLinkOperation =
+    {
+        private static readonly Func<CanaryContext, long, long, UserRelationship.UserRelationshipType, Task> RemoveLinkOperation =
             EF.CompileAsyncQuery(
-                (CanaryContext ctx, long selfId, long otherId, UserRelationship.UserLinkType type) =>
+                (CanaryContext ctx, long selfId, long otherId, UserRelationship.UserRelationshipType type) =>
                 ctx.UserRelationships
                 .Where(l => l.SelfId == selfId && l.OtherId == otherId && l.Type == type)
                 .ExecuteDelete());
@@ -15,14 +15,14 @@ namespace Repository
         {
 
         }
-        
-        public async Task FollowUserAsync(long selfId, long targetId, DateTimeOffset time) 
+
+        public async Task FollowUserAsync(long selfId, long targetId, DateTimeOffset time)
         {
-            long id = await storeSentry.ExecuteReadAsync(ctx => 
+            long id = await storeSentry.ExecuteReadAsync(ctx =>
                 ctx.UserRelationships.
                 Where(l => l.SelfId == selfId && l.OtherId == targetId)
                 .Select(l => l.Id)
-                .SingleOrDefaultAsync()); 
+                .SingleOrDefaultAsync());
 
 
             if (id == 0)
@@ -32,7 +32,7 @@ namespace Repository
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserRelationship.UserLinkType.Follow
+                    Type = UserRelationship.UserRelationshipType.Follow
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Add(toAdd));
@@ -45,18 +45,18 @@ namespace Repository
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserRelationship.UserLinkType.Follow
+                    Type = UserRelationship.UserRelationshipType.Follow
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Update(toUpdate));
             }
         }
-        public async Task UnfollowUserAsync(long selfId, long targetId) 
+        public async Task UnfollowUserAsync(long selfId, long targetId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Follow));
+            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserRelationshipType.Follow));
         }
-        public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time) 
+        public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time)
         {
             long id = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.UserRelationships.
@@ -72,7 +72,7 @@ namespace Repository
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserRelationship.UserLinkType.Block
+                    Type = UserRelationship.UserRelationshipType.Block
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Add(toAdd));
@@ -85,22 +85,22 @@ namespace Repository
                     SelfId = selfId,
                     OtherId = targetId,
                     Time = time,
-                    Type = UserRelationship.UserLinkType.Block
+                    Type = UserRelationship.UserRelationshipType.Block
                 };
 
                 await storeSentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Update(toUpdate));
             }
         }
-        public async Task UnblockUserAsync(long selfId, long targetId) 
+        public async Task UnblockUserAsync(long selfId, long targetId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserLinkType.Block));
+            RemoveLinkOperation(ctx, selfId, targetId, UserRelationship.UserRelationshipType.Block));
         }
 
         public async Task<List<CoreUser>> GetFollowedUsersAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Follow).
+             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserRelationshipType.Follow).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -135,22 +135,22 @@ namespace Repository
                  ).
              ToListAsync());
         }
-        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long id) 
+        public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long id)
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
-            ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Block).
+            ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserRelationshipType.Block).
             Join(
-                ctx.Users, 
-                l => l.OtherId, 
-                u => u.Id, 
-                (l,u) => new BlockedUserShard(u.Id, u.Name, l.Time)
+                ctx.Users,
+                l => l.OtherId,
+                u => u.Id,
+                (l, u) => new BlockedUserShard(u.Id, u.Name, l.Time)
                 ).
             ToListAsync());
         }
         public async Task<List<CoreUser>> GetCompanionsAsync(long id)
         {
             Task<List<CoreUser>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Follow).
+             ctx.UserRelationships.Where(l => l.SelfId == id && l.Type == UserRelationship.UserRelationshipType.Follow).
              Join(
                  ctx.Users,
                  l => l.OtherId,
@@ -186,7 +186,7 @@ namespace Repository
              ToListAsync());
 
             Task<List<CoreUser>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
-             ctx.UserRelationships.Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Follow).
+             ctx.UserRelationships.Where(l => l.OtherId == id && l.Type == UserRelationship.UserRelationshipType.Follow).
              Join(
                  ctx.Users,
                  l => l.SelfId,
@@ -226,8 +226,8 @@ namespace Repository
 
         public async Task<List<CoreUser>> GetUserFollowersAsync(long userId)
         {
-            return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Follow).
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserRelationshipType.Follow).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
@@ -263,8 +263,8 @@ namespace Repository
 
         public async Task<List<CoreUser>> GetUsersBlockingAsync(long userId)
         {
-            return await storeSentry.ExecuteReadAsync(ctx => 
-            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserLinkType.Block).
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.UserRelationships.Where(l => l.OtherId == userId && l.Type == UserRelationship.UserRelationshipType.Block).
             Join(ctx.Users,
             l => l.SelfId,
             u => u.Id,
@@ -300,14 +300,14 @@ namespace Repository
 
         public Task<bool> HaveMutualGathering(long userId, long targetId)
         {
-            return storeSentry.ExecuteReadAsync(ctx => 
+            return storeSentry.ExecuteReadAsync(ctx =>
                 ctx.GatheringLinks.
                 Where(l => l.UserId == userId && l.Type == GatheringBond.Guest).
                 Join(
                       ctx.GatheringLinks.Where(l => l.UserId == targetId && l.Type == GatheringBond.Guest),
                       x => x.GatheringId,
                       y => y.GatheringId,
-                      (x,y) => x.GatheringId
+                      (x, y) => x.GatheringId
                     ).
                 AnyAsync());
         }
@@ -428,11 +428,33 @@ namespace Repository
 
         public async Task<DateTimeOffset> BlockedSince(long userId, long targetId)
         {
-            return await storeSentry.ExecuteReadAsync(ctx => 
+            return await storeSentry.ExecuteReadAsync(ctx =>
                     ctx.UserRelationships.
-                    Where(l => l.SelfId == userId && l.OtherId == targetId && l.Type == UserRelationship.UserLinkType.Block).
+                    Where(l => l.SelfId == userId && l.OtherId == targetId && l.Type == UserRelationship.UserRelationshipType.Block).
                     Select(l => l.Time).
                     SingleAsync());
+        }
+
+        public async Task<List<long>> ReturnStrangerDangerAsync(long userId, params long[] users)
+        {
+            List<long> metUsers = await storeSentry.ExecuteReadAsync(ctx =>
+                                                ctx.GatheringLinks
+                                                .Where(l => l.UserId == userId)
+                                                .Join(
+                                                    ctx.Gatherings.Where(g => g.StartTime < DateTimeOffset.UtcNow),
+                                                    l => l.GatheringId,
+                                                    g => g.Id,
+                                                    (l, g) => g.Id
+                                                    )
+                                                .Join(
+                                                    ctx.GatheringLinks,
+                                                    x => x,
+                                                    l => l.GatheringId,
+                                                    (x, l) => l.UserId
+                                                    )
+                                                .ToListAsync());
+
+            return users.Except(metUsers).ToList();
         }
     }
 }
