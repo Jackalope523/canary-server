@@ -152,7 +152,7 @@ namespace Core.Controls
         }
 
         public async Task<ColumnShard>
-            GetUserColumnAsync(long userId, int depth, int lastDepth)
+            GetWallAsync(long userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
             Dictionary<long, GatheringHeader> gatheringHeaders = new();
@@ -163,10 +163,10 @@ namespace Core.Controls
             // Retrieve companion-populated gathering snapshots after a specified time excluding previously viewed gatherings
             DateTimeOffset depthCharge = Time - TimeSpan.FromDays(depth);
             DateTimeOffset lastDepthCharge = Time - TimeSpan.FromDays(lastDepth);
-            var companionSnapshots = await Snapshots.GenerateColumnForUserAsync(user.Id, depthCharge, lastDepthCharge);
+            var generatedWall = await Snapshots.GenerateColumnForUserAsync(user.Id, depthCharge, lastDepthCharge);
 
             // Get the respective gathering headers for the snapshots
-            foreach (var snapshot in companionSnapshots)
+            foreach (var snapshot in generatedWall)
             {
                 var gatheringId = snapshot.GatheringId;
 
@@ -180,16 +180,11 @@ namespace Core.Controls
                 // Update gathering header active time if snapshot is more recent
                 else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, snapshot.TimeTaken))
                 {
-                    gatheringHeaders[gatheringId] = new(gatheringId,
-                        gatheringHeaders[gatheringId].Title,
-                        gatheringHeaders[gatheringId].Time,
-                        gatheringHeaders[gatheringId].IsActive,
-                        snapshot.TimeTaken,
-                        gatheringHeaders[gatheringId].FriendlyLocation);
+                    gatheringHeaders[gatheringId] = gatheringHeaders[gatheringId] with { LastActiveTime = snapshot.TimeTaken };
                 }
             }
 
-            return new(gatheringHeaders.Values.ToList(), companionSnapshots);
+            return new(gatheringHeaders.Values.ToList(), generatedWall);
         }
 
 		#endregion

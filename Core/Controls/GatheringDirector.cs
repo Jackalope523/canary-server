@@ -292,7 +292,7 @@ namespace Core.Controls
 			_ = Terminal.AccountDirector.UpdateAllAsync(participants, user => new() { (nameof(CoreUser.Character), user.Character) });
 
 			// Schedule photo reminder for attendees
-			_ = User.NotifyAll(CanaryNotification.GatheringUploadClosing(await gathering.ToGatheringShard()), notifyAt: Time + Gathering.MaximumSnapshotLateness * 0.7, users: (await gathering.Left).ToArray());
+			_ = User.NotifyAll(CanaryNotification.GatheringUploadClosing(await gathering.ToGatheringShard()), notifyAt: Time + OneDay * 0.7, users: (await gathering.Left).ToArray());
         }
 
 		public async Task CancelGatheringAsync(long userId, long gatheringId)
@@ -557,10 +557,6 @@ namespace Core.Controls
 			// Verify kicking user is the host
 			Verify(gathering.IsHostedBy(host),
 				new UserErrorException(GatheringErrorCode.CANNOT_KICK_PERMISSION));
-
-			// Verify gathering is active
-			Verify(gathering.IsActive,
-				new UserErrorException(GatheringErrorCode.CANNOT_KICK_ARCHIVED));
 
 			// Verify host is not kicking themself
 			FailIf(host.Equals(targetUser),

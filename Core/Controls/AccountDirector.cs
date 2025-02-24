@@ -273,7 +273,14 @@ namespace Core.Controls
 
 		private async Task<User> GetUser(string phoneNumber)
         {
-            User user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
+            User user;
+
+            try
+            {
+                user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
+            }
+            catch
+            { throw new UserErrorException(AccountErrorCode.NOT_FOUND); }
 
             // Check if user account is locked
             FailIf(user.IsLocked,
