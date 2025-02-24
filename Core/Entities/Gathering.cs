@@ -64,6 +64,8 @@ namespace Core.Entities
         public int NumberOfGuests { get; set; }
         public float RelativeAngle { get; set; } = 0;
 
+        public bool IsActive
+            => State.Equals(GatheringState.Alive);
         public bool IsOpen
             => State.Equals(GatheringState.Alive) &&
                 Visibility.Equals(GatheringVisibility.Visible);
@@ -174,7 +176,7 @@ namespace Core.Entities
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Title, IsTerminated ? EndTime.Value : StartTime, IsOngoing, lastActiveTime, FriendlyLocation);
+            return new(Id, Title, IsTerminated ? EndTime.Value : StartTime, IsActive, lastActiveTime, FriendlyLocation);
         }
 
         public TwigShard ToTwigShard()
