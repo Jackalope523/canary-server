@@ -28,7 +28,6 @@ namespace Core.Entities
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
-        public static readonly TimeSpan MaximumSnapshotLateness = OneDay;
         public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(20);
         public static readonly TimeSpan MaximumStartWait = TimeSpan.FromMinutes(30);
         public static readonly TimeSpan MaximumAutoStart = TimeSpan.FromMinutes(5);
@@ -72,9 +71,6 @@ namespace Core.Entities
             => State.Equals(GatheringState.Alive) && HasYet(StartTime);
         public bool IsOngoing
             => State.Equals(GatheringState.Alive) && HasAlready(StartTime);
-        public bool IsActive
-            => !EndTime.HasValue ||
-                HasYet(EndTime.Value + MaximumSnapshotLateness);
         public bool IsTerminated
             => EndTime.HasValue;
 
@@ -399,10 +395,6 @@ namespace Core.Entities
             // Verify user can etch into the gathering
             Verify(await WasAttendedBy(user) || IsModifiableBy(user),
                 new UserErrorException(GatheringErrorCode.NOT_GUEST));
-
-            // Verify snapshot is added before gathering is closed
-            Verify(IsActive,
-                new UserErrorException(SnapshotErrorCode.WINDOW_CLOSED));
 		}
 
 		public async Task<bool> Reported()
