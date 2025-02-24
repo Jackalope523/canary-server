@@ -136,7 +136,6 @@ namespace Frontier.Controllers
 			);
 		}
 
-
 		[HttpPost("{targetId}/report")]
 		public async Task<IActionResult> ReportUser(long targetId, [FromBody] AccountReportManifest report)
 		{

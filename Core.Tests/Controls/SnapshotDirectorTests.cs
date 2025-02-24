@@ -279,7 +279,7 @@ namespace Core.Tests.Controls
 			var anotherSnapshot = await environment.GenerateSnapshotAsync(gathering, host);
 
 			// Act
-			var column = await director.GetUserColumnAsync(companion.Id, 100, 0);
+			var column = await director.GetWallAsync(companion.Id, 100, 0);
 
 			// Assert
 			Assert.Single(column.Headers);
@@ -307,7 +307,7 @@ namespace Core.Tests.Controls
 			var unseenSnapshot = await environment.GenerateSnapshotAsync(gathering1, host2);
 
 			// Act
-			var column = await director.GetUserColumnAsync(companion.Id, 100, 1);
+			var column = await director.GetWallAsync(companion.Id, 100, 1);
 
 			// Assert
 			Assert.Single(column.Headers);

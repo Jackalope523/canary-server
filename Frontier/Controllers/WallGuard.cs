@@ -30,7 +30,7 @@ namespace Frontier.Controllers
             { return MissingInformation(); }
 
 			return await Execute(async user =>
-				await snapshots.GetUserColumnAsync(user.Id, depth, last_depth));
+				await snapshots.GetWallAsync(user.Id, depth, last_depth));
         }
 
 		#endregion
