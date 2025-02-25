@@ -427,7 +427,7 @@ namespace Core.Entities
             var recentReportCount = (await Reports).Count(report => After(report.ReportTime, Time - FifteenMinutes))
                 + (await GatheringReports).Count(report => After(report.ReportTime, Time - FifteenMinutes));
 
-            if (recentReportCount > 3)
+            if (recentReportCount > 10)
             { return false; }
 
             return true;
