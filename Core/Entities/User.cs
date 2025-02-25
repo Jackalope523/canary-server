@@ -437,7 +437,7 @@ namespace Core.Entities
         {
             var availableReports = await AvailableReportTypes(otherUser);
 
-            return !availableReports.Contains(reportType);
+            return availableReports.Contains(reportType);
         }
 
         public async Task<List<UserReportType>> AvailableReportTypes(User otherUser)
@@ -460,7 +460,7 @@ namespace Core.Entities
         {
             var availableReports = await AvailableReportTypes(gathering);
 
-            return !availableReports.Contains(reportType);
+            return availableReports.Contains(reportType);
         }
 
         public async Task<List<GatheringReportType>> AvailableReportTypes(Gathering gathering)
@@ -482,7 +482,7 @@ namespace Core.Entities
         {
             var availableReports = await AvailableReportTypes(snapshot, snapshotAuthor);
 
-            return !availableReports.Contains(reportType);
+            return availableReports.Contains(reportType);
         }
 
         public async Task<List<SnapshotReportType>> AvailableReportTypes(SnapshotShard snapshot, User snapshotAuthor)
