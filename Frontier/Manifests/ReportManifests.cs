@@ -11,7 +11,7 @@ namespace Frontier.Manifests
 
         public string ReportDetails { get; set; }
 
-        public long OccuringGatheringId { get; set; }
+        public long? OccuringGatheringId { get; set; }
     }
 
     public class GatheringReportManifest
