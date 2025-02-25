@@ -185,7 +185,7 @@ namespace Frontier.Controllers
 		public async Task<IActionResult> AvailableGatheringReports(long gatheringId)
 		{
 			return await Execute(async user =>
-				await reports.GetAvailableReportsForGatheringAsync(user.Id, gatheringId);
+				await reports.GetAvailableReportsForGatheringAsync(user.Id, gatheringId)
 			);
 		}
 
@@ -254,7 +254,7 @@ namespace Frontier.Controllers
 		public async Task<IActionResult> AvailableSnapshotReports(long gatheringId, long snapshotId)
         {
             return await Execute(async user =>
-				await reports.GetAvailableReportsForSnapshotAsync(user.Id, snapshotId);
+				await reports.GetAvailableReportsForSnapshotAsync(user.Id, snapshotId)
             );
         }
 
