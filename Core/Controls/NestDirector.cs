@@ -36,34 +36,39 @@ namespace Core.Controls
             // Check if user is themself
             if (user.Equals(targetUser))
             {
-                // Gather active and upcoming gatherings visible to the user
-                var upcomingAgendaSync = RequestAgenda(user);
+                var pastGatheringsSync = targetUser.PastGatherings;
+                var ongoingGatheringsSync = targetUser.OngoingGatherings;
+                var upcomingGatheringsSync = targetUser.UpcomingGatherings;
 
-                // Get private gatherings and snapshots
+                // Get gatherings and snapshots
+                var twigs = (await pastGatheringsSync)
+                    .Concat(await ongoingGatheringsSync)
+                    .Concat(await upcomingGatheringsSync)
+                    .ToList()
+                    .ConvertAll(e => e.ToTwigShard());
+
                 nest = nest with
                 {
-                    Twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard())
+                    Twigs = twigs
                 };
-
-                nest.Twigs.AddRange((await upcomingAgendaSync).Cards
-                    .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
             }
             // Check if users are companions
             else if (await targetUser.IsCompanionsWith(user))
             {
-                var hasMutualSync = Nests.HaveMutualGathering(user.Id, targetUser.Id);
+                var haveMutualSync = Nests.HaveMutualGathering(user.Id, targetUser.Id);
 
-                // Gather active and upcoming gatherings visible to the user
-                var upcomingAgendaSync = RequestAgenda(targetUser);
-                var siftedAgendaSync = Terminal.GatheringDirector.RemoveUnviewableAgendaCardsAsync(user, await upcomingAgendaSync);
+                var pastGatheringsSync = targetUser.PastGatherings;
+                var ongoingGatheringsSync = targetUser.OngoingGatherings;
+                var upcomingGatheringsSync = targetUser.UpcomingGatherings;
 
-                // Get private gatherings and snapshots
-                var twigs = (await targetUser.PastGatherings).ConvertAll(e => e.ToTwigShard());
+                // Get gatherings and snapshots
+                var twigs = (await pastGatheringsSync)
+                    .Concat(await ongoingGatheringsSync)
+                    .Concat(await upcomingGatheringsSync)
+                    .ToList()
+                    .ConvertAll(e => e.ToTwigShard());
 
-                twigs.AddRange((await siftedAgendaSync).Cards
-                    .ConvertAll(card => new TwigShard(card.GatheringId, card.StartTime)));
-
-                if (await hasMutualSync)
+                if (await haveMutualSync)
                 {
                     nest = new(twigs, (await Nests.GetFirstMutualGathering(user.Id, targetUser.Id)).Id);
                 }
@@ -71,26 +76,32 @@ namespace Core.Controls
                 {
                     nest = new(twigs, default);
                 }
+
+                nest = await RemoveUnviewableNestTwigsAsync(user, nest);
             }
             // User is a stranger
             else
             {
                 // Check if has a mutual gathering
-                var hasMutualSync = Nests.HaveMutualGathering(user.Id, targetUser.Id);
+                var haveMutualSync = Nests.HaveMutualGathering(user.Id, targetUser.Id);
 
                 // Get public hosted gatherings
-                var hostedGatherings = (await Gatherings.FindGatheringsByUserAsync(targetUser.Id)).ConvertAll(e => new Gathering(e));
-                var twigs = hostedGatherings.ConvertAll(e => e.ToTwigShard());
+                var hostedGatherings = (await Gatherings.FindGatheringsByUserAsync(targetUser.Id))
+                    .ConvertAll(e => new Gathering(e));
+
+                var twigs = hostedGatherings
+                    .ConvertAll(e => e.ToTwigShard());
 
                 // Get common gatherings
                 var commonGatherings = (await targetUser.PastGatherings)
                     .Except(hostedGatherings)
                     .Intersect(await user.PastGatherings)
-                    .ToList().ConvertAll(e => e.ToTwigShard());
+                    .ToList()
+                    .ConvertAll(e => e.ToTwigShard());
 
                 twigs.AddRange(commonGatherings);
 
-                if (await hasMutualSync)
+                if (await haveMutualSync)
                 {
                     nest = new(twigs, (await Nests.GetLatestMutualGathering(user.Id, targetUser.Id)).Id);
                 }
@@ -98,6 +109,8 @@ namespace Core.Controls
                 {
                     nest = new(twigs, default);
                 }
+
+                nest = await RemoveUnviewableNestTwigsAsync(user, nest);
             }
 
             return nest;
@@ -123,7 +136,7 @@ namespace Core.Controls
             foreach (var companion in await user.Companions)
             {
                 var companionAgenda = await RequestAgenda(companion);
-                companionAgenda = await Terminal.GatheringDirector.RemoveUnviewableAgendaCardsAsync(user, companionAgenda);
+                companionAgenda = await RemoveUnviewableAgendaCardsAsync(user, companionAgenda);
                 companionGatherings.TryAdd(companion.Id, companionAgenda);
             };
 
@@ -354,9 +367,9 @@ namespace Core.Controls
             return await Nests.HaveMutualGathering(user.Id, target.Id);
         }
 
-		#endregion
+        #endregion
 
-		#region Tools
+        #region Tools
 
         private async Task<AgendaShard> RequestAgenda(User user)
         {
@@ -371,6 +384,38 @@ namespace Core.Controls
                 .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Arrived)));
 
             return agenda;
+        }
+
+        private async Task<AgendaShard>
+            RemoveUnviewableAgendaCardsAsync(User user, AgendaShard agenda)
+        {
+            AgendaShard viewableGatherings = new(new());
+
+            foreach (var card in agenda.Cards)
+            {
+                Gathering gathering = await GetGatheringAsync(card.GatheringId);
+
+                if (await user.CanView(gathering))
+                { viewableGatherings.Cards.Add(card); }
+            }
+
+            return viewableGatherings;
+        }
+
+        private async Task<NestShard>
+            RemoveUnviewableNestTwigsAsync(User user, NestShard nest)
+        {
+            NestShard visibleNest = new(new(), nest.RelativeGatheringId);
+
+            foreach (var card in nest.Twigs)
+            {
+                Gathering gathering = await GetGatheringAsync(card.GatheringId);
+
+                if (await user.CanView(gathering))
+                { visibleNest.Twigs.Add(card); }
+            }
+
+            return visibleNest;
         }
 
         #endregion

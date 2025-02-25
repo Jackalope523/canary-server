@@ -649,22 +649,6 @@ namespace Core.Controls
 			return accessibleGatherings;
 		}
 
-		internal async Task<AgendaShard>
-			RemoveUnviewableAgendaCardsAsync(User user, AgendaShard agenda)
-		{
-			AgendaShard viewableGatherings = new(new());
-
-			foreach (var card in agenda.Cards)
-			{
-				Gathering gathering = await GetGatheringAsync(card.GatheringId);
-
-				if (await user.CanView(gathering))
-				{ viewableGatherings.Cards.Add(card); }
-			}
-
-			return viewableGatherings;
-		}
-
 		internal async Task<List<GatheringShard>>
 			RemoveUnattractiveGatheringsAsync(User user, List<CoreGathering> gatherings, float maximumAngle)
         {
