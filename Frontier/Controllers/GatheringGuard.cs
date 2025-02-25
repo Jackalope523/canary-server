@@ -185,9 +185,8 @@ namespace Frontier.Controllers
 		public async Task<IActionResult> AvailableGatheringReports(long gatheringId)
 		{
 			return await Execute(async user =>
-			{
 				await reports.GetAvailableReportsForGatheringAsync(user.Id, gatheringId);
-			});
+			);
 		}
 
 		[HttpPost("{gatheringId}/report")]
@@ -255,9 +254,8 @@ namespace Frontier.Controllers
 		public async Task<IActionResult> AvailableSnapshotReports(long gatheringId, long snapshotId)
         {
             return await Execute(async user =>
-            {
-                await reports.GetAvailableReportsForSnapshotAsync(user.Id, snapshotId);
-            });
+				await reports.GetAvailableReportsForSnapshotAsync(user.Id, snapshotId);
+            );
         }
 
         [HttpPost("{gatheringId}/snapshots/{snapshotId}/report")]

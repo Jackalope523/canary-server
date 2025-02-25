@@ -129,7 +129,7 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{targetId}/report")]
-		public async Task<IActionResult> ReportUser(long targetId)
+		public async Task<IActionResult> AvailableUserReports(long targetId)
 		{
 			return await Execute(async user =>
 				await reports.GetAvailableReportsForUserAsync(user.Id, targetId)
