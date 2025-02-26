@@ -5,10 +5,10 @@ namespace Core.Notifications
 {
     public enum NotificationGroup
     {
-        SocialInvitation,
+        SocialInvitations,
         CompanionActivity,
         GatheringDiscovery,
-        GatheringReminder,
+        GatheringReminders,
         GatheringActivity,
     }
 
@@ -18,10 +18,10 @@ namespace Core.Notifications
         {
             return group switch
             {
-                NotificationGroup.SocialInvitation => profile.SocialInvitation,
+                NotificationGroup.SocialInvitations => profile.SocialInvitations,
                 NotificationGroup.CompanionActivity => profile.CompanionActivity,
                 NotificationGroup.GatheringDiscovery => profile.GatheringDiscovery,
-                NotificationGroup.GatheringReminder => profile.GatheringReminder,
+                NotificationGroup.GatheringReminders => profile.GatheringReminders,
                 NotificationGroup.GatheringActivity => profile.GatheringActivity,
                 _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
             };
@@ -153,7 +153,7 @@ namespace Core.Notifications
     {
         protected static CanaryNotification SocialInvitation(CanaryNotification notification)
         {
-            notification.Group = NotificationGroup.SocialInvitation;
+            notification.Group = NotificationGroup.SocialInvitations;
             return notification;
         }
 
@@ -233,7 +233,7 @@ namespace Core.Notifications
     {
         protected static CanaryNotification GatheringReminders(CanaryNotification notification)
         {
-            notification.Group = NotificationGroup.GatheringReminder;
+            notification.Group = NotificationGroup.GatheringReminders;
             return notification;
         }
 
