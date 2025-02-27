@@ -377,6 +377,40 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.ToTable("GuestClearances");
                 });
 
+            modelBuilder.Entity("Repository.Notification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("GatheringId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("NotificationId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
+
+                    b.Property<long>("RecipientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GatheringId");
+
+                    b.HasIndex("RecipientId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("Repository.Penalty", b =>
                 {
                     b.Property<long>("Id")
@@ -526,6 +560,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("Chaos")
                         .HasColumnType("int");
 
+                    b.Property<bool>("CompanionActivity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<int>("Competitiveness")
                         .HasColumnType("int");
 
@@ -551,6 +590,21 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<int>("Extroversion")
                         .HasColumnType("int");
 
+                    b.Property<bool>("GatheringActivity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("GatheringDiscovery")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("GatheringReminders")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<Point>("Haunt")
                         .IsRequired()
                         .HasColumnType("geography")
@@ -559,7 +613,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Property<double>("HauntRadius")
                         .HasColumnType("float");
 
-                    b.Property<int>("HauntWheight")
+                    b.Property<int>("HauntWeight")
                         .HasColumnType("int");
 
                     b.Property<int>("Industriousness")
@@ -614,6 +668,11 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("SocialInvitations")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
 
@@ -633,15 +692,19 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             Age = 25,
                             Athleticisme = 50,
                             Chaos = 50,
+                            CompanionActivity = true,
                             Competitiveness = 50,
                             CurrentLocation = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"),
                             CurrentRadius = 10.0,
                             DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "",
                             Extroversion = 50,
+                            GatheringActivity = true,
+                            GatheringDiscovery = true,
+                            GatheringReminders = true,
                             Haunt = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"),
                             HauntRadius = 10.0,
-                            HauntWheight = 0,
+                            HauntWeight = 0,
                             Industriousness = 50,
                             IsEmailConfirmed = false,
                             IsPhoneConfirmed = true,
@@ -655,6 +718,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             Pseudonym = "",
                             Reputation = 50,
                             SecurityStamp = "",
+                            SocialInvitations = true,
                             SoftDeleted = false,
                             TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         },
@@ -666,15 +730,19 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             Age = 25,
                             Athleticisme = 50,
                             Chaos = 50,
+                            CompanionActivity = true,
                             Competitiveness = 50,
                             CurrentLocation = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"),
                             CurrentRadius = 10.0,
                             DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "",
                             Extroversion = 50,
+                            GatheringActivity = true,
+                            GatheringDiscovery = true,
+                            GatheringReminders = true,
                             Haunt = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"),
                             HauntRadius = 10.0,
-                            HauntWheight = 0,
+                            HauntWeight = 0,
                             Industriousness = 50,
                             IsEmailConfirmed = false,
                             IsPhoneConfirmed = true,
@@ -688,6 +756,7 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                             Pseudonym = "",
                             Reputation = 50,
                             SecurityStamp = "",
+                            SocialInvitations = true,
                             SoftDeleted = false,
                             TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
@@ -893,6 +962,25 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Repository.Notification", b =>
+                {
+                    b.HasOne("Repository.Gathering", "Gathering")
+                        .WithMany("Notifications")
+                        .HasForeignKey("GatheringId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Repository.User", "Recipient")
+                        .WithMany("Notifications")
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Gathering");
+
+                    b.Navigation("Recipient");
+                });
+
             modelBuilder.Entity("Repository.Penalty", b =>
                 {
                     b.HasOne("Repository.User", "Penalized")
@@ -1017,6 +1105,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 
                     b.Navigation("GuestClearances");
 
+                    b.Navigation("Notifications");
+
                     b.Navigation("Snapshots");
 
                     b.Navigation("UserReports");
@@ -1044,6 +1134,8 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.Navigation("HostedGatherings");
 
                     b.Navigation("InitiatedUserRelationships");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("Penalties");
 

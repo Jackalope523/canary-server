@@ -12,29 +12,19 @@ namespace Repository
             store = new EFCoreGatheringStore(flag);
         }
 
-        public async Task<CoreGathering> CreateGatheringAsync(long hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy)
+        public async Task<CoreGathering> CreateGatheringAsync(long hostId, string name, string description, DateTimeOffset startTime, double latitude, double longitude, string friendlyLocation, int groupMinimum, int groupMaximum, CharacterShard character, double Radius, bool isDynamic, int degreeOfPrivacy, DateTimeOffset timeOfCreation)
         {
-            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy);
+            return await store.CreateGatheringAsync(hostId, name, description, startTime, latitude, longitude, friendlyLocation, groupMinimum, groupMaximum, character, Radius, isDynamic, degreeOfPrivacy, timeOfCreation);
         }
 
-        public async Task DeleteGatheringAsync(long gatheringId)
+        public async Task<List<CoreGathering>> FindOngoingGatheringsForUserAsync(long id, DateTimeOffset currentTime) 
         {
-            await store.DeleteGatheringAsync(gatheringId);  
+            return await store.FindOngoingGatheringsForUserAsync(id, currentTime);
         }
 
-        public async Task<CoreGathering> FindCurrentGatheringForUserAsync(long id) 
+        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id, DateTimeOffset currentTime) 
         {
-            return await store.FindCurrentGatheringForUserAsync(id);
-        }
-
-        public async Task<List<CoreGathering>> FindUpcomingGatheringsForUserAsync(long id) 
-        {
-            return await store.FindUpcomingGatheringsForUserAsync(id);
-        }
-
-        public async Task<List<CoreGathering>> FindSurveyingGatheringsForUserAsync(long id) 
-        {
-            return await store.FindSurveyingGatheringsForUserAsync(id);
+            return await store.FindUpcomingGatheringsForUserAsync(id, currentTime);
         }
 
         public async Task<List<CoreGathering>> FindPastGatheringsForUserAsync(long id)
@@ -62,7 +52,7 @@ namespace Repository
             await store.UpdateGatheringAsync(id, edits); 
         }   
 
-        public async Task<List<(DateTimeOffset Joined, DateTimeOffset? Left, UserShard User)>> GetGuestHistoryAsync(long id)
+        public async Task<List<(long UserId, DateTimeOffset Joined, DateTimeOffset? Left)>> GetGuestHistoryAsync(long id)
         {
             return await store.GetGuestHistoryAsync(id);
         }   
@@ -82,7 +72,7 @@ namespace Repository
             await store.SetUserStateAsync(userId, gatheringId, userState, time);
         }
 
-        public async Task<List<(UserShard User, GatheringBond State)>> GetAllUsersAsync(long gatheringId)
+        public async Task<List<(long UserId, GatheringBond State)>> GetAllUsersAsync(long gatheringId)
         {
             return await store.GetAllUsersAsync(gatheringId);
         }
@@ -105,6 +95,21 @@ namespace Repository
         public async Task AddGuestAuthorization(long gatheringId, long userId)
         {
             await store.AddGuestAuthorization(gatheringId, userId);
+        }
+
+        public async Task CancelGatheringAsync(long gatheringId)
+        {
+            await store.CancelGatheringAsync(gatheringId);
+        }
+
+        public async Task SoftDeleteAsync(long gatheringId)
+        {
+            await store.SoftDeleteAsync(gatheringId);
+        }
+
+        public async Task HardDeleteAsync(long gatheringId)
+        {
+            await store.HardDeleteAsync(gatheringId);
         }
     }
 }

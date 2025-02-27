@@ -39,14 +39,19 @@
             return await store.GetSnapshotsForGatheringAsync(id);
         }
 
-        public async Task DeleteSnapshotAsync(long snapshotId)
-        {
-            await store.DeleteSnapshotAsync(snapshotId);
-        }
-
         public async Task DeleteSnapshotAcclaimAsync(long snapshotId, long voterId)
         {
             await store.DeleteSnapshotAcclaimAsync(snapshotId, voterId);
+        }
+
+        public async Task SoftDeleteAsync(long snapshotId)
+        {
+            await store.SoftDeleteAsync(snapshotId);
+        }
+
+        public async Task HardDeleteAsync(long snapshotId)
+        {
+            await store.HardDeleteAsync(snapshotId);
         }
     }
 }

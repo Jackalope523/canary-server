@@ -32,12 +32,12 @@ namespace Repository
             // Get List of Companions.
             Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserRelationships.
-                Where(l => l.SelfId == id && l.Type == UserRelationship.UserLinkType.Appreciate).Select(l => l.OtherId).
+                Where(l => l.SelfId == id && l.Type == UserRelationship.UserRelationshipType.Follow).Select(l => l.OtherId).
                 ToListAsync());
 
             Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx => 
                 ctx.UserRelationships.
-                Where(l => l.OtherId == id && l.Type == UserRelationship.UserLinkType.Appreciate).
+                Where(l => l.OtherId == id && l.Type == UserRelationship.UserRelationshipType.Follow).
                 Select(l => l.SelfId).
                 ToListAsync());
 
@@ -175,7 +175,7 @@ namespace Repository
             await storeSentry.ExecuteWriteAsync(ctx => ctx.SnapshotLinks.Update(toAdd));
         }
 
-        private async Task SoftDeleteSnapshot(long id)
+        public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.SnapshotLinks.
@@ -193,7 +193,7 @@ namespace Repository
               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
         }
 
-        private async Task HardDeleteSnapshot(long id)
+        public async Task HardDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx => 
                 ctx.SnapshotLinks.

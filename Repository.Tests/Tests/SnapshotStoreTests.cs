@@ -48,18 +48,6 @@ namespace Repository.Tests
             Assert.Equal(postTime, created.PostedAt);
         }
         [Fact]
-        public async Task DeleteSnapshotAsync_SUCCESS()
-        {
-            Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);
-            await sentry.ExecuteWriteAsync(ctx => ctx.Snapshots.AddAsync(testSnapshot));
-
-            await snapshotStore.DeleteSnapshotAsync(testSnapshot.Id);
-
-            int numPosts = await sentry.ExecuteReadAsync(ctx => ctx.Snapshots.CountAsync());
-
-            Assert.Equal(0, numPosts);
-        }
-        [Fact]
         public async Task GetSnapshotAsync_SUCCESS()
         {
             Snapshot testSnapshot = new SnapshotFactory().Create(subject, testGathering);

@@ -20,30 +20,12 @@ namespace Frontier.Controllers
 	[Authorize]
 	public class AbstractGuard : ControllerBase
 	{
-		#region Schemas
-
-		public enum HollowError
-		{
-			MissingInformation,
-			CouldNotCompleteRequest,
-			IncorrectCode,
-			UserLockedOut,
-			CouldNotLoginUser,
-			CouldNotCreateUser,
-			CouldNotModifyUser,
-			CouldNotFindUser,
-			CouldNotFindGathering,
-		}
-
-		#endregion
-
 		#region Variables
 
 		public EnvironmentOptions env;
 		public ILogger log;
 
 		public IAccountOperations accounts;
-		public IBannerOperations banners;
 		public IGatheringOperations gatherings;
 		public ISnapshotOperations snapshots;
 		public IDisciplineOperations reports;
@@ -65,7 +47,6 @@ namespace Frontier.Controllers
 			log = box.log;
 
 			accounts = box.accounts;
-			banners = box.banners;
 			nests = box.nests;
 			gatherings = box.gatherings;
 			snapshots = box.snapshots;
@@ -98,22 +79,22 @@ namespace Frontier.Controllers
 
                 return result;
             }
-            catch (HollowFailureException ex)
-            {
-				// Get full exception message
-				var message = DrillExceptionDetails(ex);
-
-                // Log failure
-                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
-
-                return StatusCode(500);
-            }
             catch (UserErrorException ex)
             {
                 // Log debug information
                 log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
 
-                return BadRequest(ex.Message);
+                return BadRequest(ex.ToErrorShard());
+            }
+			catch (HollowException ex)
+            {
+                // Get full exception message
+                var message = DrillExceptionDetails(ex);
+
+                // Log failure
+                log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
+
+                return StatusCode(500, ex.ToErrorShard());
             }
             catch (Exception ex)
             {
@@ -124,7 +105,7 @@ namespace Frontier.Controllers
                 log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
 
 
-                return StatusCode(500);
+                return StatusCode(500, HollowException.Default.ToErrorShard());
             }
         }
 
@@ -137,7 +118,7 @@ namespace Frontier.Controllers
 
                 // Ensure outgoing type is generic or manifest
                 if (result is CoreOnlyData)
-                { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}."); }
+                { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}.", code: HollowErrorCode.UNKNOWN); }
 
                 return Ok(result);
 			});
@@ -186,7 +167,7 @@ namespace Frontier.Controllers
 		public void ThrowIfUnverified(CoreUser user)
 		{
 			if (!user.IsPhoneConfirmed)
-			{ throw new InvalidUserException("User has not yet confirmed their phone number."); }
+			{ throw new UserErrorException(AccountErrorCode.UNVERIFIED); }
 		}
 
 		[NonAction]
@@ -218,6 +199,14 @@ namespace Frontier.Controllers
 			}
 
 			return builder.ToString();
+		}
+
+
+		[NonAction]
+		public BadRequestObjectResult MissingInformation()
+		{
+			ErrorShard error = new("HOLLOW.MISSING_INFORMATION");
+			return BadRequest(error);
 		}
 
 		#endregion

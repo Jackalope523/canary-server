@@ -10,6 +10,8 @@ namespace Frontier.Manifests
         public UserReportType ReportType { get; set; }
 
         public string ReportDetails { get; set; }
+
+        public long? OccuringGatheringId { get; set; }
     }
 
     public class GatheringReportManifest

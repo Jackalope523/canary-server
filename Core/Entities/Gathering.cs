@@ -7,6 +7,7 @@ using Core.Boundaries;
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
 using Microsoft.Extensions.Logging;
+using Core.Notifications;
 
 namespace Core.Entities
 {
@@ -23,12 +24,14 @@ namespace Core.Entities
 		public const int MaximumTitleLength = 30;
         public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
+        public const int InitialDecay = 100;
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
-        public static readonly TimeSpan MaximumSnapshotLateness = OneDay;
         public static readonly TimeSpan MaximumEarlyBirdStart = TimeSpan.FromMinutes(20);
+        public static readonly TimeSpan MaximumStartWait = TimeSpan.FromMinutes(30);
         public static readonly TimeSpan MaximumAutoStart = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan MaximumCreationAdvance = TimeSpan.FromDays(14);
 
         public static Gathering None
             => new() { Id = 0, Exists = false };
@@ -39,7 +42,7 @@ namespace Core.Entities
 
         // Core
 		public long Id { get; init; }
-        public User Host { get; set; }
+        public long HostId { get; init; }
         public string Title { get; set; }
         public string Description { get; set; }
         public CharacterVector Character { get; set; }
@@ -51,35 +54,32 @@ namespace Core.Entities
         public int DegreeOfPrivacy { get; set; }
         public DateTimeOffset? EndTime { get; set; }
         public GatheringState State { get; set; }
+        public GatheringVisibility Visibility { get; set; }
         public int GroupMinimum { get; set; }
         public int GroupMaximum { get; set; }
+        public DateTimeOffset TimeOfCreation { get; set; }
         public bool IsDeleted { get; set; }
+        public float Decay { get; set; }
 
         public int NumberOfGuests { get; set; }
         public float RelativeAngle { get; set; } = 0;
 
-        public bool IsWaiting
-            => State.Equals(GatheringState.Upcoming) &&
-                HasAlready(StartTime - MaximumEarlyBirdStart);
-        public bool IsWaitingAuto
-            => State.Equals(GatheringState.Upcoming) &&
-                HasAlready(StartTime - MaximumAutoStart);
-        public bool IsOpen
-            => State.Equals(GatheringState.Upcoming) ||
-                State.Equals(GatheringState.OngoingOpen);
-        public bool IsOngoing
-            => State.Equals(GatheringState.OngoingOpen) ||
-                State.Equals(GatheringState.OngoingHidden);
         public bool IsActive
-            => !EndTime.HasValue ||
-                HasYet(EndTime.Value + MaximumSnapshotLateness);
+            => State.Equals(GatheringState.Alive);
+        public bool IsOpen
+            => State.Equals(GatheringState.Alive) &&
+                Visibility.Equals(GatheringVisibility.Visible);
+        public bool IsUpcoming
+            => State.Equals(GatheringState.Alive) && HasYet(StartTime);
+        public bool IsOngoing
+            => State.Equals(GatheringState.Alive) && HasAlready(StartTime);
         public bool IsTerminated
             => EndTime.HasValue;
 
         public bool Exists { get; set; } = true;
 
         public TimeSpan Duration
-            => State == GatheringState.Upcoming ?
+            => State == GatheringState.Alive ?
                 TimeSpan.Zero
             :
                 (EndTime ?? Time) - StartTime;
@@ -87,15 +87,16 @@ namespace Core.Entities
         ////////
         // Synced Properties
         //////////////////////
+        
+        public Synced<User> Host { get; }
 
         public Synced<List<(User User, GatheringBond State)>> AllUsers { get; }
-        public Synced<List<User>> Surveying { get; }
         public Synced<List<User>> Guests { get; }
         public Synced<List<User>> Arrived { get; }
         public Synced<List<User>> Left { get; }
         public Synced<List<User>> Kicked { get; }
 
-        public Synced<List<(DateTimeOffset Joined, DateTimeOffset? Left, User User)>> GuestHistory { get; }
+        public Synced<List<(User User, DateTimeOffset Joined, DateTimeOffset? Left)>> GuestHistory { get; }
 
         public Synced<List<GatheringReport>> GatheringReports { get; }
 
@@ -107,8 +108,9 @@ namespace Core.Entities
 
         public Gathering()
         {
+            Host = new(() => User.GetUserAsync(HostId));
+
             AllUsers = new(() => Terminal.GatheringDirector.RequestAllUsersFromGatheringAsync(this));
-            Surveying = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Watching)).ConvertAll(user => user.User));
             Guests = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Guest)).ConvertAll(user => user.User));
             Arrived = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Arrived)).ConvertAll(user => user.User));
             Left = new(async () => (await AllUsers.Value().ConfigureAwait(false)).FindAll(user => user.State.Equals(GatheringBond.Left)).ConvertAll(user => user.User));
@@ -122,7 +124,7 @@ namespace Core.Entities
         public Gathering(CoreGathering fromGathering) : this()
         {
             Id = fromGathering.Id;
-            Host = new(fromGathering.Host);
+            HostId = fromGathering.HostId;
             Title = fromGathering.Title;
             Description = fromGathering.Description;
             StartTime = fromGathering.StartTime;
@@ -131,6 +133,7 @@ namespace Core.Entities
             FriendlyLocation = fromGathering.FriendlyLocation;
             EndTime = fromGathering.TimeEnded;
             State = fromGathering.State;
+            Visibility = fromGathering.Visibility;
             GroupMinimum = fromGathering.GroupMinimum;
             GroupMaximum = fromGathering.GroupMaximum;
             Character = new(fromGathering.Character);
@@ -138,55 +141,42 @@ namespace Core.Entities
             IsDynamic = fromGathering.IsDynamic;
             DegreeOfPrivacy = fromGathering.DegreeOfPrivacy;
             IsDeleted = fromGathering.IsPendingDeletion;
+            TimeOfCreation = fromGathering.TimeOfCreation;
             NumberOfGuests = fromGathering.NumberOfGuests;
-        }
-
-        public Gathering(GatheringShard fromGathering) : this()
-        {
-            Id = fromGathering.Id;
-            Host = new(fromGathering.Host);
-            Title = fromGathering.Title;
-            Description = fromGathering.Description;
-            StartTime = fromGathering.StartTime;
-            Location = new()
-                { Latitude = fromGathering.Latitude, Longitude = fromGathering.Longitude };
-            EndTime = fromGathering.TimeEnded;
-            State = fromGathering.State;
-            GroupMinimum = fromGathering.GroupMinimum;
-            GroupMaximum = fromGathering.GroupMaximum;
-            Radius = new() { Kilometres = fromGathering.Radius };
-            DegreeOfPrivacy = fromGathering.DegreeOfPrivacy;
-            NumberOfGuests = fromGathering.NumberOfGuests;
+            Decay = fromGathering.Decay;
         }
 
         public CoreGathering ToCoreGathering()
         {
-            return new(Id, Host.ToUserShard(), Title, Description,
+            return new(Id, HostId, Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum, Character.ToCharacter(),
-                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests, DegreeOfPrivacy);
+                Radius.Kilometres, IsDynamic, IsDeleted, NumberOfGuests,
+                DegreeOfPrivacy, Visibility, TimeOfCreation, Decay);
         }
 
-        public GatheringShard ToGatheringShard()
+        public async Task<GatheringShard> ToGatheringShard()
         {
-            return new(Id, Host.ToUserShard(), Title, Description,
+            return new(Id, (await Host).ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
-                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests, RelativeAngle);
+                Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests, RelativeAngle,
+                Visibility, Decay);
         }
 
-        public GatheringShard ToGatheringShard(User relativeUser)
+        public async Task<GatheringShard> ToGatheringShard(User relativeUser)
         {
-            return new(Id, Host.ToUserShard(), Title, Description,
+            return new(Id, (await Host).ToUserShard(), Title, Description,
                 StartTime, Location.Latitude, Location.Longitude, FriendlyLocation,
                 EndTime, State, GroupMinimum, GroupMaximum,
                 Radius.Kilometres, DegreeOfPrivacy, NumberOfGuests,
-                CharacterVector.AngleBetweenAffected(relativeUser.Character, Character));
+                CharacterVector.AngleBetweenAffected(relativeUser.Character, Character),
+                Visibility, Decay);
         }
 
         public GatheringHeader ToGatheringHeader(DateTimeOffset lastActiveTime)
         {
-            return new(Id, Title, IsOngoing ? StartTime : EndTime.Value, IsOngoing, lastActiveTime, FriendlyLocation);
+            return new(Id, Title, IsTerminated ? EndTime.Value : StartTime, IsActive, lastActiveTime, FriendlyLocation);
         }
 
         public TwigShard ToTwigShard()
@@ -219,7 +209,7 @@ namespace Core.Entities
             if (HappenedBefore(StartTime, Time)) { StartTime = Time; }
 
             // Verify Gathering is within a reasonable time
-            if (After(StartTime, Time + OneWeek)) { issues += "Gathering is too far in the future. "; }
+            if (After(StartTime, Time + MaximumCreationAdvance)) { issues += "Gathering is too far in the future. "; }
 
             // Force degree to be sensible
             DegreeOfPrivacy = Math.Clamp(DegreeOfPrivacy, 1, 3);
@@ -277,12 +267,12 @@ namespace Core.Entities
 			{
 				// User cannot join normal gatherings
                 // Check if user can join companion gatherings and Host is companions with the user
-				if (!(user.CanAttendCompanions && await Host.IsCompanionsWith(user)))
+				if (!(user.CanAttendCompanions && await (await Host).IsCompanionsWith(user)))
 				{ return false; }
 			}
 
 			// Check if user is blocked by or blocking gathering host
-			if (await Host.IsBlockedBy(user) || await Host.IsBlocking(user))
+			if (await (await Host).IsBlockedBy(user) || await (await Host).IsBlocking(user))
 			{ return false; }
 
             // Check if user is within degree of privacy
@@ -319,7 +309,7 @@ namespace Core.Entities
         public bool IsModifiableBy(User user)
         {
 			// Check if user is gathering host
-			if (Host.Id.Equals(user.Id))
+			if (HostId.Equals(user.Id))
 			{ return true; }
 
 			return false;
@@ -328,7 +318,7 @@ namespace Core.Entities
         public bool IsHostedBy(User user)
         {
 			// Check if user is gathering host
-			if (Host.Equals(user))
+			if (HostId.Equals(user.Id))
 			{ return true; }
 
 			return false;
@@ -355,21 +345,6 @@ namespace Core.Entities
         public async Task<bool> IsInRange(User user)
             => GeoLocation.AreInRange(Location, await user.LastKnownLocation, ArrivalDistance);
 
-        public async Task<bool> IsStartable()
-        {
-            // Check if gathering has not yet started
-            if (!IsWaiting)
-            { return false; }
-
-            // Check if host is within range
-            /*
-            if (!await IsInRange(Host))
-            { return false; }
-            */
-
-            return true;
-        }
-
         public bool IsTerminable()
         {
             // Ensure gathering is ongoing
@@ -379,7 +354,7 @@ namespace Core.Entities
             return true;
         }
 
-        public bool IsDeletable()
+        public bool IsCancelable()
         {
             // Ensure gathering has not already occurred
             if (IsOngoing || IsTerminated)
@@ -392,17 +367,12 @@ namespace Core.Entities
 
 		#region Effects
 
-        public async Task Started()
-        {
-            _ = NotifyActive(NotificationGroup.GatheringReminder, $"{Title}", "Gathering is live!", "20");
-        }
-
         public async Task<List<User>> Ended()
         {
             List<User> updatedGuests = new();
 
             // Update all participants' vectors and notify
-			foreach ((var joined, var left, var guest) in await GuestHistory)
+			foreach ((var guest, var joined, var left) in await GuestHistory)
 			{
                 if (left.HasValue)
                 { guest.CalculateCharacter(this, left.Value - joined); }
@@ -412,7 +382,7 @@ namespace Core.Entities
                 updatedGuests.Add(guest);
 
 				// Notify of gathering ending
-				_ = guest.Notify(NotificationGroup.GatheringActivity, $"{Title}", $"Gathering has concluded, thank you for joining.");
+				_ = guest.Notify(CanaryNotification.GatheringTerminated(await ToGatheringShard()));
 			}
 
             return updatedGuests;
@@ -422,15 +392,11 @@ namespace Core.Entities
         {
             // Verify snapshot is not before gathering starting or user is host
             Verify(HasAlready(StartTime) || IsModifiableBy(user),
-                new InvalidGatheringException("Gathering has yet to start."));
+                new UserErrorException(GatheringErrorCode.NOT_STARTED));
 
             // Verify user can etch into the gathering
             Verify(await WasAttendedBy(user) || IsModifiableBy(user),
-                new InvalidGatheringException("User did not attend gathering."));
-
-            // Verify snapshot is added before gathering is closed
-            Verify(IsActive,
-                new InvalidGatheringException("Gathering has already ended."));
+                new UserErrorException(GatheringErrorCode.NOT_GUEST));
 		}
 
 		public async Task<bool> Reported()
@@ -446,26 +412,16 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task NotifyActive(NotificationGroup group, string title, string message, string collapseId = "")
+        public async Task<string> NotifyGuests(CanaryNotification notification, DateTimeOffset? notifyAt = null, bool notifyHost = true)
         {
-            foreach (var user in (await Guests).Concat(await Arrived))
+            var targets = (await Guests).Concat(await Arrived).ToList();
+
+            if (!notifyHost)
             {
-                if (IsHostedBy(user))
-                { continue; }
-
-                _ = user.Notify(group, title, message, collapseId);
+                targets.Remove(await Host);
             }
-        }
 
-        public async Task NotifyGuests(NotificationGroup group, string title, string message, string collapseId = "")
-        {
-            foreach (var guest in await Arrived)
-            {
-                if (IsHostedBy(guest))
-                { continue; }
-
-                _ = guest.Notify(group, title, message, collapseId);
-            }
+            return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, targets.ToArray());
         }
 
 		#endregion

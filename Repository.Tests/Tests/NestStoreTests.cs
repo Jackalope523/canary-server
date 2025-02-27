@@ -38,7 +38,7 @@ namespace Repository.Tests
         {
             DateTimeOffset time = DateTimeOffset.UtcNow;
 
-            await nestStore.AppreciateUserAsync(subject1.Id, subject2.Id, time);
+            await nestStore.FollowUserAsync(subject1.Id, subject2.Id, time);
 
             UserRelationship link = sentry.ExecuteRead(ctx => ctx.UserRelationships.Where(l => l.SelfId == subject1.Id && l.OtherId == subject2.Id).Single());
 
@@ -46,15 +46,15 @@ namespace Repository.Tests
             Assert.Equal(subject1.Id, link.SelfId);
             Assert.Equal(subject2.Id, link.OtherId);
             Assert.Equal(time, link.Time);
-            Assert.Equal(UserRelationship.UserLinkType.Appreciate, link.Type);
+            Assert.Equal(UserRelationship.UserRelationshipType.Follow, link.Type);
         }
         [Fact]
         public async Task UnappreciateUserAsync_SUCCESS()
         {
-            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link));
 
-            await nestStore.UnappreciateUserAsync(subject1.Id, subject2.Id);
+            await nestStore.UnfollowUserAsync(subject1.Id, subject2.Id);
 
             int count = sentry.ExecuteRead(ctx => ctx.UserRelationships.Count());
 
@@ -73,12 +73,12 @@ namespace Repository.Tests
             Assert.Equal(subject1.Id, link.SelfId);
             Assert.Equal(subject2.Id, link.OtherId);
             Assert.Equal(time, link.Time);
-            Assert.Equal(UserRelationship.UserLinkType.Block, link.Type);
+            Assert.Equal(UserRelationship.UserRelationshipType.Block, link.Type);
         }
         [Fact]
         public async Task UnblockUserAsync_SUCCESS()
         {
-            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Block);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserRelationshipType.Block);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link));
 
             await nestStore.UnblockUserAsync(subject1.Id, subject2.Id);
@@ -90,10 +90,10 @@ namespace Repository.Tests
         [Fact]
         public async Task GetAppreciatedUsersAsync_SUCCESS()
         {
-            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserRelationshipType.Follow);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.AddAsync(link));
 
-            UserShard user = (await nestStore.GetAppreciatedUsersAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetFollowedUsersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -102,7 +102,7 @@ namespace Repository.Tests
         [Fact]
         public async Task GetBlockedUsersAsync_SUCCESS()
         {
-            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserLinkType.Block);
+            UserRelationship link = new UserLinkFactory().Create(subject1, subject2, UserRelationship.UserRelationshipType.Block);
             await sentry.ExecuteWriteAsync(ctx => ctx.UserRelationships.Add(link));
 
             UserShard user = (await nestStore.GetBlockedUsersAsync(subject1.Id)).Single();
@@ -115,13 +115,13 @@ namespace Repository.Tests
         public async Task GetCompanionsAsync_SUCCESS()
         {
             UserLinkFactory factory = new UserLinkFactory();
-            UserRelationship link1 = factory.Create(subject1, subject2, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship link2 = factory.Create(subject2, subject1, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship link1 = factory.Create(subject1, subject2, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship link2 = factory.Create(subject2, subject1, UserRelationship.UserRelationshipType.Follow);
 
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link1));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link2));
 
-            UserShard user = (await nestStore.GetCompanionsAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetCompanionsAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -130,10 +130,10 @@ namespace Repository.Tests
         [Fact]
         public async Task GetUsersAppreciatingAsync_SUCCESS()
         {
-            UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link));
 
-            UserShard user = (await nestStore.GetUsersAppreciatingAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetUserFollowersAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);
@@ -142,10 +142,10 @@ namespace Repository.Tests
         [Fact]
         public async Task GetUsersBlockingAsync_SUCCESS()
         {
-            UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserLinkType.Block);
+            UserRelationship link = new UserLinkFactory().Create(subject2, subject1, UserRelationship.UserRelationshipType.Block);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(link));
 
-            UserShard user = (await nestStore.GetUsersBlockingAsync(subject1.Id)).Single();
+            CoreUser user = (await nestStore.GetUsersBlockingAsync(subject1.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(subject2.Id, user.Id);

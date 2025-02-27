@@ -29,11 +29,11 @@ namespace Core.Controls
 
             // Fail if user is blocked
             FailIf(await user.IsBlockedBy(targetUser),
-                new InvalidUserException("User is unable to view target."));
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
             // Fail if user cannot view gathering
             Verify(await user.CanView(gathering),
-                new InvalidUserException("User is unable to view gathering."));
+                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
 
             GalleryShard gallery = new(new());
 
@@ -41,7 +41,7 @@ namespace Core.Controls
             if (user.Equals(targetUser))
             {
                 // Check if user attended
-                if (await gathering.WasAttendedBy(user))
+                if (await gathering.HasOnGuestList(user))
                 {
                     gallery = new(await gathering.Snapshots);
                 }
@@ -59,12 +59,23 @@ namespace Core.Controls
             }
             // Check if users are companions or attended a common gathering
             else if (await user.IsCompanionsWith(targetUser) ||
-                (await gathering.WasAttendedBy(user) && await gathering.WasAttendedBy(targetUser)))
+                (await gathering.HasOnGuestList(user) && await gathering.HasOnGuestList(targetUser)))
             {
                 var targetSnapshots = (await gathering.Snapshots)
                     .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
 
                 gallery = new(targetSnapshots);
+            }
+
+            // Remove strangers if gallery is in pre mode
+            if (gathering.IsUpcoming)
+            {
+                var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, gallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
+
+                // Remove host from strangers
+                strangers.Remove(gathering.HostId);
+
+                gallery = new(HideStrangersAsync(gallery.Snapshots, strangers));
             }
 
             // Remove any snapshots from blocked or blocking users
@@ -91,11 +102,11 @@ namespace Core.Controls
                 // Save image
                 await Terminal.MediaDirector.UploadSnapshotAsync(user.Id, snapshot.Id, image);
             }
-            catch
+            catch (Exception ex)
             {
                 // If failed, remove snapshot
-                await Snapshots.DeleteSnapshotAsync(snapshot.Id);
-                throw new UnexpectedFailureException("Image upload failed.");
+                await Snapshots.HardDeleteAsync(snapshot.Id);
+                throw new UnexpectedFailureException($"Failed to upload snapshot for user {userId} at {gatheringId}.", ex, HollowErrorCode.UPLOAD_FAILED);
             }
 
             return snapshot;
@@ -110,9 +121,9 @@ namespace Core.Controls
 
             // Verify user owns the snapshot or can modify the gathering
             Verify(user.Taken(snapshot) || gatheringTaken.IsModifiableBy(user),
-                new InvalidUserException("User cannot remove snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_DELETE));
 
-            await Snapshots.DeleteSnapshotAsync(snapshot.Id);
+            await Snapshots.SoftDeleteAsync(snapshot.Id);
         }
 
         public async Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim)
@@ -124,10 +135,10 @@ namespace Core.Controls
 
             // Verify user can interact with snapshot
             Verify(await gatheringTaken.WasAttendedBy(user),
-                new InvalidUserException("User cannot interact with snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_INTERACT));
 
             FailIf(user.Taken(snapshot),
-                new InvalidUserException("User cannot rate their own snapshot."));
+                new UserErrorException(SnapshotErrorCode.CANNOT_INTERACT_SELF));
 
             // Check action
             if (acclaim == SnapshotAcclaim.Acclaim)
@@ -141,7 +152,7 @@ namespace Core.Controls
         }
 
         public async Task<ColumnShard>
-            GetUserColumnAsync(long userId, int depth, int lastDepth)
+            GetWallAsync(long userId, int depth, int lastDepth)
         {
             var user = await GetUserAsync(userId);
             Dictionary<long, GatheringHeader> gatheringHeaders = new();
@@ -152,10 +163,10 @@ namespace Core.Controls
             // Retrieve companion-populated gathering snapshots after a specified time excluding previously viewed gatherings
             DateTimeOffset depthCharge = Time - TimeSpan.FromDays(depth);
             DateTimeOffset lastDepthCharge = Time - TimeSpan.FromDays(lastDepth);
-            var companionSnapshots = await Snapshots.GenerateColumnForUserAsync(user.Id, depthCharge, lastDepthCharge);
+            var generatedWall = await Snapshots.GenerateColumnForUserAsync(user.Id, depthCharge, lastDepthCharge);
 
             // Get the respective gathering headers for the snapshots
-            foreach (var snapshot in companionSnapshots)
+            foreach (var snapshot in generatedWall)
             {
                 var gatheringId = snapshot.GatheringId;
 
@@ -169,16 +180,11 @@ namespace Core.Controls
                 // Update gathering header active time if snapshot is more recent
                 else if (HappenedBefore(gatheringHeaders[gatheringId].LastActiveTime, snapshot.TimeTaken))
                 {
-                    gatheringHeaders[gatheringId] = new(gatheringId,
-                        gatheringHeaders[gatheringId].Title,
-                        gatheringHeaders[gatheringId].Time,
-                        gatheringHeaders[gatheringId].IsActive,
-                        snapshot.TimeTaken,
-                        gatheringHeaders[gatheringId].FriendlyLocation);
+                    gatheringHeaders[gatheringId] = gatheringHeaders[gatheringId] with { LastActiveTime = snapshot.TimeTaken };
                 }
             }
 
-            return new(gatheringHeaders.Values.ToList(), companionSnapshots);
+            return new(gatheringHeaders.Values.ToList(), generatedWall);
         }
 
 		#endregion
@@ -218,6 +224,28 @@ namespace Core.Controls
             }
         }
 
+        internal List<SnapshotShard>
+            HideStrangersAsync(List<SnapshotShard> snapshots, List<long> strangers)
+        {
+            List<SnapshotShard> collection = new();
+
+            foreach (SnapshotShard snapshot in snapshots)
+            {
+                if (strangers.Contains(snapshot.User.Id))
+                {
+                    collection.Add(new(snapshot.Id, snapshot.GatheringId,
+                        User.Hidden.ToUserShard(),
+                        snapshot.TimeTaken, snapshot.Acclaim));
+                }
+                else
+                {
+                    collection.Add(snapshot);
+                }
+            }
+
+            return collection;
+        }
+
         internal async Task<List<SnapshotShard>>
             RemoveBlockedSnapshotsAsync(User user, List<SnapshotShard> snapshots)
         {
@@ -225,7 +253,7 @@ namespace Core.Controls
 
             foreach (SnapshotShard snapshot in snapshots)
             {
-                User snapshotOwner = new(snapshot.User);
+                User snapshotOwner = await GetUserAsync(snapshot.User.Id);
 
                 // Check if blocking link exists
                 if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))

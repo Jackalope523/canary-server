@@ -13,19 +13,20 @@ using System.ComponentModel;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
+using Core.Notifications;
 
 namespace Core.Tests
 {
-	public class UserHook : IAccountDatabase
-	{
-		private IAccountDatabase accounts;
-		private ConcurrentBag<long> generatedUserIds;
+    public class UserHook : IAccountDatabase
+    {
+        private IAccountDatabase accounts;
+        private ConcurrentBag<long> generatedUserIds;
 
-		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<long> userIdList)
-		{
-			accounts = accountDatabase;
-			generatedUserIds = userIdList;
-		}
+        public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<long> userIdList)
+        {
+            accounts = accountDatabase;
+            generatedUserIds = userIdList;
+        }
 
         public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character, Guid notificationId)
         {
@@ -48,9 +49,9 @@ namespace Core.Tests
 					generatedUserIds.Add(userCheck.Id);
 				}
 
-				throw new UnexpectedFailureException();
+				throw new UnexpectedFailureException("User exists.");
 			}
-
+            
 			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character, notificationId);
 
 			CoreUser createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
@@ -59,9 +60,19 @@ namespace Core.Tests
 			return createdUser;
         }
 
-        public async Task DeleteUserAsync(long userId)
+        public async Task<bool> UserExistsAsync(string phoneNumber)
         {
-			await accounts.DeleteUserAsync(userId);
+            return await accounts.UserExistsAsync(phoneNumber);
+        }
+
+        public async Task<CoreUser> FindUserByCodeAsync(string code)
+        {
+            return await accounts.FindUserByCodeAsync(code);
+        }
+
+        public async Task<string> RerollUserCodeAsync(long userId)
+        {
+            return await accounts.RerollUserCodeAsync(userId);
         }
 
         public async Task<CoreUser> FindUserByEmailAsync(string normalisedEmail)
@@ -90,6 +101,16 @@ namespace Core.Tests
 			return await accounts.GetUserHauntAsync(userId);
         }
 
+        public async Task HardDeleteAsync(long userId)
+        {
+            await accounts.HardDeleteAsync(userId);
+        }
+
+        public async Task SoftDeleteAsync(long userId)
+        {
+            await accounts.SoftDeleteAsync(userId);
+        }
+
         public async Task UpdateHauntAsync(long userId, double latitude, double longitude, double radius, int stability)
         {
 			await accounts.UpdateHauntAsync(userId, latitude, longitude, radius, stability);
@@ -108,27 +129,50 @@ namespace Core.Tests
 
 	public class NotificationServiceStub : INotificationService
 	{
-		public class NotificationStub
-		{
-			public string Title { get; init; }
-			public string Message { get; init; }
-		}
+		public static ConcurrentDictionary<string, ConcurrentBag<CanaryNotification>> messages = new();
 
-		public static ConcurrentDictionary<string, ConcurrentBag<NotificationStub>> messages = new();
+        public async Task CancelNotification(string notificationId)
+        {
+            // no-op
+            // TODO
+        }
 
-		public Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collapseId = "")
-		{
-			ConcurrentBag<NotificationStub> userBag;
-			var exists = messages.TryGetValue(notificationId, out userBag);
+        public Task<string> DispatchNotification(CanaryNotification notification, params NotificationProfile[] notificationProfiles)
+        {
+            if (notificationProfiles.Length < 1)
+            { return Task.FromResult(""); }
 
-			if (!exists)
-			{ 
-				userBag = new();
-				messages.TryAdd(notificationId, userBag);
-			}
+            ConcurrentBag<CanaryNotification> userBag;
+            var notificationId = notificationProfiles[0].NotificationId.ToString();
+            var exists = messages.TryGetValue(notificationId, out userBag);
 
-			userBag.Add(new NotificationStub() { Title = title, Message = message });
-			return Task.FromResult(0);
-		}
-	}
+            if (!exists)
+            {
+                userBag = new();
+                messages.TryAdd(notificationId.ToString(), userBag);
+            }
+
+            userBag.Add(notification);
+            return Task.FromResult("");
+        }
+
+        public Task<string> ScheduleNotification(CanaryNotification notification, DateTimeOffset dispatchAt, params NotificationProfile[] notificationProfiles)
+        {
+            if (notificationProfiles.Length < 1)
+            { return Task.FromResult(""); }
+
+            ConcurrentBag<CanaryNotification> userBag;
+            var notificationId = notificationProfiles[0].NotificationId.ToString();
+            var exists = messages.TryGetValue(notificationId, out userBag);
+
+            if (!exists)
+            {
+                userBag = new();
+                messages.TryAdd(notificationId.ToString(), userBag);
+            }
+
+            userBag.Add(notification);
+            return Task.FromResult("");
+        }
+    }
 }

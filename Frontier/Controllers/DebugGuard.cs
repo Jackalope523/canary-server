@@ -35,7 +35,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (seed == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformationError(); }
 
 			return await Execute(async () =>
 			{

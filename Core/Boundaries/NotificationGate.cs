@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Notifications;
 
 namespace Core.Boundaries
 {
@@ -18,7 +19,7 @@ namespace Core.Boundaries
 		AccountStatusChanged = 1001,
 
 		// USER SEGMENT (2XXX)
-		UserAppreciated = 2001,
+		UserFollowed = 2001,
 
 		// GATHERING SEGMENT (3XXX)
 		GatheringInvitation = 3001,
@@ -30,33 +31,24 @@ namespace Core.Boundaries
 		GatheringSealed = 3202,
 	}
 
-	public enum NotificationGroup
-	{
-        SocialInvitation,
-		CompanionActivity,
-		GatheringReminder,
-		GatheringActivity,
-		GatheringDiscovery,
-    }
-
-    public static class NotificationGroupExtensions
-    {
-        public static string GetString(this NotificationGroup group)
-        {
-            return group switch
-            {
-                NotificationGroup.SocialInvitation => "preferences/social_invitations",
-                NotificationGroup.CompanionActivity => "preferences/companion_activity",
-                NotificationGroup.GatheringReminder => "preferences/gathering_reminders",
-                NotificationGroup.GatheringActivity => "preferences/gathering_activity",
-                NotificationGroup.GatheringDiscovery => "preferences/gathering_discovery",
-                _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
-            };
-        }
-    }
-
     public record TelegramShard(long Id, long NotifierId, DateTimeOffset Time,
 		TelegramMessage Message, string Context);
+
+	public record NotificationProfile(long UserId, Guid NotificationId,
+		bool SocialInvitations, bool CompanionActivity,
+		bool GatheringReminders, bool GatheringActivity,
+		bool GatheringDiscovery)
+		: CoreOnlyData();
+
+	public record NotificationPreferencesShard(Guid NotificationId,
+		bool SocialInvitations, bool CompanionActivity,
+		bool GatheringReminders, bool GatheringActivity,
+		bool GatheringDiscovery);
+
+	public record HostNotificationSchedule(string GatheringWaitingId);
+
+	public record GuestNotificationSchedule(long UserId,
+		string GatheringUpcomingId, string GatheringImminentId);
 
     #endregion
 
@@ -64,6 +56,14 @@ namespace Core.Boundaries
 
     public interface INotificationDatabase
     {
+		Task<NotificationProfile> GetNotificationProfileAsync(long userId);
+        Task UpdateNotificationProfileAsync(long userId, List<(string Property, object Value)> edits);
+
+		Task<(HostNotificationSchedule HostSchedule, List<GuestNotificationSchedule> GuestSchedules)> GetGatheringNotificationScheduleAsync(long gatheringId);
+		Task UpdateGatheringHostNotificationScheduleAsync(long gatheringId, string gatheringWaitingId);
+		Task UpdateGatheringGuestNotificationSchedulesAsync(long gatheringId, params (long userId, string gatheringUpcomingId, string gatheringImminentId)[] guestSchedules);
+		Task ClearGatheringNotificationScheduleAsync(long gatheringId);
+
         Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType);
 
         Task<List<TelegramShard>> GetTelegramsAsync(long userId);
@@ -74,6 +74,12 @@ namespace Core.Boundaries
 
 	public interface INotificationOperations
 	{
+		Task<NotificationPreferencesShard> GetNotificationPreferencesAsync(long userId);
+		Task UpdateNotificationPreferencesAsync(long userId,
+			bool? socialInvitations = null, bool? companionActivity = null,
+			bool? gatheringReminders = null, bool? gatheringActivity = null,
+			bool? gatheringDiscovery = null);
+
 		Task<List<TelegramShard>> GetTelegramsAsync(long userId);
 		Task ClearTelegramsAsync(long userId);
 		Task ClearTelegramsAsync(long userId, List<long> telegramIds);
@@ -81,8 +87,9 @@ namespace Core.Boundaries
 
 	public interface INotificationService
 	{
-		Task PushNotification(string notificationId, NotificationGroup notificationGroup,
-			string title, string message, string collapseId = "");
+		Task<string> DispatchNotification(CanaryNotification notification, params NotificationProfile[] notificationProfiles);
+		Task<string> ScheduleNotification(CanaryNotification notification, DateTimeOffset dispatchAt, params NotificationProfile[] notificationProfiles);
+		Task CancelNotification(string notificationId);
 	}
 
 	#endregion

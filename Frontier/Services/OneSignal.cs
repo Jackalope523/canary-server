@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Core.Boundaries;
-using Newtonsoft.Json;
+using Core.Notifications;
 using OneSignalApi.Api;
 using OneSignalApi.Client;
 using OneSignalApi.Model;
@@ -32,28 +33,109 @@ namespace Frontier.Services
             instance = new DefaultApi(appConfig);
         }
 
-        public async Task PushNotification(string notificationId, NotificationGroup notificationGroup, string title, string message, string collpaseId = "")
+        public async Task<string> DispatchNotification(CanaryNotification notification, params NotificationProfile[] notificationProfiles)
         {
-            var notification = new Notification(appId: appId)
+            List<string> outgoingIds = RetrieveValidTargets(notification, notificationProfiles);
+
+            // Short-circuit if no valid targets
+            if (outgoingIds.Count == 0)
             {
-                Headings = new StringMap(en: title),
-                Contents = new StringMap(en: message),
-                TargetChannel = Notification.TargetChannelEnum.Push,
+                return "";
+            }
+
+            var notif = new Notification(appId: appId)
+            {
+                Headings = new StringMap(en: notification.Title),
+                Contents = new StringMap(en: notification.Body),
                 ChannelForExternalUserIds = "push",
-                IncludeExternalUserIds = new() { notificationId }, // Deprecated is a mistake
+                IncludeExternalUserIds = outgoingIds, // Deprecated is a mistake, leave as is
 
-                Filters = new()
-                {
-                    new(field: "tag", key: notificationGroup.GetString(), value: "1", relation: Filter.RelationEnum.Equal),
-                },
-
-                CollapseId = collpaseId,
+                AppUrl = notification.AppUrl,
+                CollapseId = notification.CollapseId,
             };
 
-            var response = await instance.CreateNotificationAsync(notification);
 
-            log.LogInformation($"Notification sent to {notificationId}");
-            log.LogInformation($"Delivered to {response.Recipients} recipients");
+            string returnedId = "";
+
+            try
+            {
+                var ret = await instance.CreateNotificationAsync(notif);
+                returnedId = ret.Id;
+            }
+            catch (Exception e)
+            {
+                log.LogError("Error creating notification {e}", e);
+            }
+
+            return returnedId;
+        }
+
+        public async Task<string> ScheduleNotification(CanaryNotification notification, DateTimeOffset dispatchAt, params NotificationProfile[] notificationProfiles)
+        {
+            List<string> outgoingIds = RetrieveValidTargets(notification, notificationProfiles);
+
+            // Short-circuit if no valid targets
+            if (outgoingIds.Count == 0)
+            {
+                return "";
+            }
+
+            var notif = new Notification(appId: appId)
+            {
+                Headings = new StringMap(en: notification.Title),
+                Contents = new StringMap(en: notification.Body),
+                ChannelForExternalUserIds = "push",
+                IncludeExternalUserIds = outgoingIds, // Deprecated is a mistake, leave as is
+
+                AppUrl = notification.AppUrl,
+                CollapseId = notification.CollapseId,
+                SendAfter = dispatchAt.DateTime,
+            };
+
+            string returnedId = "";
+
+            try
+            {
+                var ret = await instance.CreateNotificationAsync(notif);
+                returnedId = ret.Id;
+            }
+            catch (Exception e)
+            {
+                log.LogError("Error creating notification {e}", e);
+            }
+
+            return returnedId;
+        }
+
+        public async Task CancelNotification(string notificationId)
+        {
+            if (string.IsNullOrEmpty(notificationId))
+            { return; }
+
+            await instance.CancelNotificationAsync(appId, notificationId);
+        }
+
+        public List<string> RetrieveValidTargets(CanaryNotification notification, params NotificationProfile[] notificationProfiles)
+        {
+            List<string> targets = new();
+
+            foreach (var profile in notificationProfiles)
+            {
+                // Check valid target
+                if (profile.NotificationId.Equals(Guid.Empty))
+                {
+                    log.LogWarning("Tried to push notification to empty user.\nTitle {title}\nBody {body}", notification.Title, notification.Body);
+                    continue;
+                }
+
+                // Check user preferences
+                if (notification.CheckEnabled(profile))
+                {
+                    targets.Add(profile.NotificationId.ToString());
+                }
+            }
+
+            return targets;
         }
     }
 }

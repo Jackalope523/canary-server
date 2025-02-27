@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Utilities;
 
 namespace Repository
 {
@@ -30,6 +31,7 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
+            await RerollUserCodeAsync(toCreate.Id);
 
             return new CoreUser
               (
@@ -37,7 +39,7 @@ namespace Repository
                   toCreate.PhoneNumber,
                   toCreate.Email,
                   toCreate.Name,
-                  toCreate.Pseudonym,
+                  toCreate.CompanionshipCode,
                   toCreate.DateOfBirth,
                   toCreate.IsPhoneConfirmed,
                   toCreate.IsEmailConfirmed,
@@ -62,37 +64,42 @@ namespace Repository
               );
         }
 
-        private async Task SoftDeleteUser(long id)
+        public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.SnapshotLinks.
-             Where(s => s.UserId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Notifications.
+                Where(n => n.RecipientId == id).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Snapshots.
-             Where(s => s.OwnerId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.SnapshotLinks.
+                Where(s => s.UserId == id).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Telegrams.
-             Where(t => t.NotifierId == id || t.RecipientId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Snapshots.
+                Where(s => s.OwnerId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Subscriptions.
-              Where(s => s.UserId == id).
-              ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Telegrams.
+                Where(t => t.NotifierId == id || t.RecipientId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Penalties.
-              Where(p => p.PenalizedId == id).
-              ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Subscriptions.
+                Where(s => s.UserId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.GuestClearances.
-             Where(c => c.UserId == id).
-             ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+                ctx.Penalties.
+                Where(p => p.PenalizedId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GuestClearances.
+                Where(c => c.UserId == id).
+                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.UserRelationships.
@@ -101,11 +108,6 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.GatheringLinks.
-               Where(l => l.UserId == id).
-               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.BannerLinks.
                Where(l => l.UserId == id).
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
@@ -115,37 +117,42 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
         }
 
-        private async Task HardDeleteUser(long id)
+        public async Task HardDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.SnapshotLinks.
-             Where(s => s.UserId == id).
-             ExecuteDeleteAsync());
+                ctx.Notifications.
+                Where(n => n.RecipientId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Snapshots.
-             Where(s => s.OwnerId == id).
-             ExecuteDeleteAsync());
+                ctx.SnapshotLinks.
+                Where(s => s.UserId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.Telegrams.
-             Where(t => t.NotifierId == id || t.RecipientId == id).
-             ExecuteDeleteAsync());
+                ctx.Snapshots.
+                Where(s => s.OwnerId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Subscriptions.
-              Where(s => s.UserId == id).
-              ExecuteDeleteAsync());
+                ctx.Telegrams.
+                Where(t => t.NotifierId == id || t.RecipientId == id).
+                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Penalties.
-              Where(p => p.PenalizedId == id).
-              ExecuteDeleteAsync());
+               ctx.Subscriptions.
+               Where(s => s.UserId == id).
+               ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-             ctx.GuestClearances.
-             Where(c => c.UserId == id).
-             ExecuteDeleteAsync());
+               ctx.Penalties.
+               Where(p => p.PenalizedId == id).
+               ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GuestClearances.
+               Where(c => c.UserId == id).
+               ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.UserRelationships.
@@ -154,11 +161,6 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.GatheringLinks.
-               Where(l => l.UserId == id).
-               ExecuteDeleteAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.BannerLinks.
                Where(l => l.UserId == id).
                ExecuteDeleteAsync());
 
@@ -173,58 +175,24 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(r => r.SelfId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.GatheringReports.
-              Where(r => r.UserId == id).
-              ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+               ctx.GatheringReports.
+               Where(r => r.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.SnapshotReports.
-              Where(r => r.UserId == id).
-              ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
+               ctx.SnapshotReports.
+               Where(r => r.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-              ctx.Gatherings.
-              Where(g => g.HostId == id).
-              ExecuteUpdate(setter => setter.SetProperty(g => g.HostId, (long?)null)));        
+               ctx.Gatherings.
+               Where(g => g.HostId == id).
+               ExecuteUpdate(setter => setter.SetProperty(g => g.HostId, (long?)null)));        
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Users.
                Where(u => u.Id == id).
                ExecuteDeleteAsync());
-        }
-
-        public async Task DeleteUserAsync(long id)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.Users.
-                Where(u => u.Id == id).
-                ExecuteUpdate(setter => setter.SetProperty(u => u.SoftDeleted, true)));
-
-            List<long> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.Gatherings.
-                Where(e => e.HostId == id && e.State == GatheringState.Upcoming).
-                Select(e => e.Id).
-                ToListAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Gatherings.
-               Where(e => upcomingGatherings.Contains(e.Id)).
-               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
-        
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Telegrams.
-               Where(n => n.NotifierId == id || n.RecipientId == id).
-               ExecuteDelete());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Snapshots.
-               Where(p => p.OwnerId == id).
-               ExecuteDelete());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Subscriptions.
-               Where(s => s.UserId == id).
-               ExecuteDelete());
         }
 
         public async Task<CoreUser> FindUserByIdAsync(long id) 
@@ -241,7 +209,7 @@ namespace Repository
                    u.PhoneNumber,
                    u.Email,
                    u.Name,
-                   u.Pseudonym,
+                   u.CompanionshipCode,
                    u.DateOfBirth,
                    u.IsPhoneConfirmed,
                    u.IsEmailConfirmed,
@@ -286,7 +254,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
-                  u.Pseudonym,
+                  u.CompanionshipCode,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -331,7 +299,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
-                  u.Pseudonym,
+                  u.CompanionshipCode,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -370,7 +338,7 @@ namespace Repository
                 return await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.Users.
                 Where(u => u.Id == id).
-                Select(u => new HauntShard(u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWheight)).
+                Select(u => new HauntShard(u.Haunt.Y, u.Haunt.X, u.HauntRadius, u.HauntWeight)).
                 SingleAsync());
             }
             catch (InvalidOperationException ex)
@@ -453,12 +421,12 @@ namespace Repository
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
             Point newHaunt = new CoordinateFactory().Create(longitude, latitude);
-            User u = new() { Id = id, Haunt = newHaunt , HauntRadius = radius, HauntWheight = stability };
+            User u = new() { Id = id, Haunt = newHaunt , HauntRadius = radius, HauntWeight = stability };
 
             storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.Haunt)).IsModified = true, currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntRadius)).IsModified = true, currentDiscussion);
-            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWheight)).IsModified = true, currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.HauntWeight)).IsModified = true, currentDiscussion);
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
@@ -473,6 +441,87 @@ namespace Repository
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true, currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true, currentDiscussion);
             await storeSentry.EndDiscussionAsync(currentDiscussion);
+        }
+
+        public async Task<bool> UserExistsAsync(string phoneNumber)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Users.AnyAsync(u => u.PhoneNumber == phoneNumber));
+        }
+
+        public async Task<string> RerollUserCodeAsync(long userId)
+        {
+            List<string> adjectives = await storeSentry.ExecuteReadAsync(ctx => 
+                                        ctx.Words.
+                                        Where(w => w.Type == Word.WordType.Adjective).
+                                        Select(w => w.Text).
+                                        ToListAsync());
+
+            List<string> nouns = await storeSentry.ExecuteReadAsync(ctx =>
+                                        ctx.Words.
+                                        Where(w => w.Type == Word.WordType.Noun).
+                                        Select(w => w.Text).
+                                        ToListAsync());
+
+            bool codeUnique = false;
+            Random random = new();
+            string randomAdjective;
+            string randomNoun;
+            string potentialCode = "";
+
+            while (!codeUnique)
+            {
+                randomAdjective = adjectives[random.Next(adjectives.Count)];
+                randomNoun = nouns[random.Next(nouns.Count)];
+               
+                potentialCode = (Char.ToUpper(randomAdjective[0]) + randomAdjective.Substring(1)) + (Char.ToUpper(randomNoun[0]) + randomNoun.Substring(1));
+
+                codeUnique = !(await storeSentry.ExecuteReadAsync(ctx => ctx.Users.AnyAsync(u => u.CompanionshipCode == potentialCode)));
+            }
+
+            User u = new() { Id = userId, CompanionshipCode = potentialCode };
+
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CompanionshipCode)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
+
+            return potentialCode;
+        }
+
+        public async Task<CoreUser> FindUserByCodeAsync(string code)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Users.
+                Where(u => u.CompanionshipCode == code).
+                Select(u => new CoreUser
+                (
+                    u.Id,
+                    u.PhoneNumber,
+                    u.Email,
+                    u.Name,
+                    u.CompanionshipCode,
+                    u.DateOfBirth,
+                    u.IsPhoneConfirmed,
+                    u.IsEmailConfirmed,
+                    u.SoftDeleted,
+                    u.SecurityStamp,
+                    u.LockoutDate,
+                    u.AccessTries,
+                    u.AccountStatus,
+                    u.JoinDate,
+                    u.Reputation,
+                    new CharacterShard(
+                    u.Age,
+                    u.Extroversion,
+                    u.Athleticisme,
+                    u.Chaos,
+                    u.Competitiveness,
+                    u.Industriousness,
+                    u.NightOwl,
+                    u.Openness),
+                    u.TimeOfUserAgreement,
+                    u.NotificationId
+                )).SingleAsync());
         }
     }
 }

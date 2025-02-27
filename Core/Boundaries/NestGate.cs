@@ -16,20 +16,22 @@ namespace Core.Boundaries
     public record BlockedUserShard(long Id, string NameWhenBlocked, DateTimeOffset DateBlocked) :
         UserShard(Id, NameWhenBlocked);
 
+    public record CompanionshipRequestShard(UserShard User, DateTimeOffset Time);
+
 	#endregion
 
 	#region Gates
 
 	public interface INestDatabase
     {
-        Task<List<UserShard>> GetCompanionsAsync(long userId);
-		Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
-        Task<List<UserShard>> GetUsersAppreciatingAsync(long userId);
+        Task<List<CoreUser>> GetCompanionsAsync(long userId);
+		Task<List<CoreUser>> GetFollowedUsersAsync(long userId);
+        Task<List<CoreUser>> GetUserFollowersAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
-        Task<List<UserShard>> GetUsersBlockingAsync(long userId);
+        Task<List<CoreUser>> GetUsersBlockingAsync(long userId);
 
-        Task AppreciateUserAsync(long userId, long targetId, DateTimeOffset time);
-		Task UnappreciateUserAsync(long userId, long targetId);
+        Task FollowUserAsync(long userId, long targetId, DateTimeOffset time);
+		Task UnfollowUserAsync(long userId, long targetId);
 		Task BlockUserAsync(long userId, long targetId, DateTimeOffset time);
 		Task UnblockUserAsync(long userId, long targetId);
 
@@ -37,6 +39,8 @@ namespace Core.Boundaries
         Task<CoreGathering> GetFirstMutualGathering(long userId, long targetId);
         Task<CoreGathering> GetLatestMutualGathering(long userId, long targetId);
         Task<DateTimeOffset> BlockedSince(long userId, long targetId);
+
+        Task<List<long>> ReturnStrangerDangerAsync(long userId, params long[] users);
     }
 
 	public interface INestOperations
@@ -47,15 +51,18 @@ namespace Core.Boundaries
         Task<IDictionary<long, AgendaShard>> GetCompanionAgendasAsync(long userId);
 
         Task<List<UserShard>> GetCompanionsAsync(long userId);
-        Task<List<UserShard>> GetAppreciatedUsersAsync(long userId);
+        Task<List<CompanionshipRequestShard>> GetIncomingCompanionshipRequestsAsync(long userId);
+        Task<List<CompanionshipRequestShard>> GetOutgoingCompanionshipRequestsAsync(long userId);
+        Task<List<UserShard>> GetRecentlyMetAsync(long userId);
         Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId);
 
-        Task AppreciateUserAsync(long userId, long targetId);
-        Task UnappreciateUserAsync(long userId, long targetId);
+        Task AcceptOrRequestCompanionshipAsync(long userId, long targetId);
+        Task RequestCompanionshipAsync(long userId, string code);
+        Task DenyOrRemoveUserAsync(long userId, long targetId);
         Task BlockUserAsync(long userId, long targetId);
         Task UnblockUserAsync(long userId, long targetId);
 
-        Task<bool> AuthorisedToAppreciate(long userId, long targetId);
+        Task<bool> AuthorisedToFollow(long userId, long targetId);
     }
 
 	#endregion

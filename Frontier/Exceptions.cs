@@ -12,4 +12,14 @@ namespace Frontier.Exceptions
         public InvalidEnvironmentException(string message, Exception innerException)
             : base(message, innerException) { }
     }
+
+    [Serializable]
+    public class MissingInformationException : HollowException
+    {
+        public MissingInformationException()
+            : base()
+        {
+            ErrorCode = "HOLLOW.MISSING_INFORMATION";
+        }
+    }
 }

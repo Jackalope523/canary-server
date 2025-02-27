@@ -16,11 +16,6 @@ namespace Repository
             return await store.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character, notificationId);
         }
 
-        public async Task DeleteUserAsync(long id)
-        {
-            await store.DeleteUserAsync(id);
-        }
-
         public async Task<CoreUser> FindUserByIdAsync(long id) 
         {
             return await store.FindUserByIdAsync(id);
@@ -59,6 +54,31 @@ namespace Repository
         public async Task UpdateRecentLocationAsync(long id, double latitude, double longitude, double radius)
         {
             await store.UpdateRecentLocationAsync(id, latitude, longitude, radius);
+        }
+
+        public async Task SoftDeleteAsync(long userId)
+        {
+            await store.SoftDeleteAsync(userId);
+        }
+
+        public async Task HardDeleteAsync(long userId)
+        {
+            await store.HardDeleteAsync(userId);
+        }
+
+        public async Task<bool> UserExistsAsync(string phoneNumber)
+        {
+            return await store.UserExistsAsync(phoneNumber);
+        }
+
+        public async Task<string> RerollUserCodeAsync(long userId)
+        {
+            return await store.RerollUserCodeAsync(userId);
+        }
+
+        public async Task<CoreUser> FindUserByCodeAsync(string code)
+        {
+            return await store.FindUserByCodeAsync(code);
         }
     }
 }

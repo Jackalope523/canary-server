@@ -18,6 +18,7 @@ using PhoneNumbers;
 using System.Timers;
 using Serilog;
 using Microsoft.Extensions.Logging;
+using Core.Notifications;
 
 namespace Core.Tests
 {
@@ -65,7 +66,6 @@ namespace Core.Tests
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
-				harbor.BannerDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -135,7 +135,7 @@ namespace Core.Tests
 					if (user.Equals(otherUser))
 					{ continue; }
 
-					await Terminal.NestDatabase.AppreciateUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
+					await Terminal.NestDatabase.FollowUserAsync(user.Id, otherUser.Id, DateTimeOffset.UtcNow);
 				}
 			}
 		}
@@ -164,7 +164,7 @@ namespace Core.Tests
 			{
 				Title = testGatheringName,
 				Description = testGatheringDescription,
-				Host = host,
+				HostId = host.Id,
 				StartTime = testGatheringStartTime,
 				Location = testGatheringLocation,
 				FriendlyLocation = testGatheringFriendlyLocation,
@@ -175,6 +175,8 @@ namespace Core.Tests
 				DegreeOfPrivacy = 3,
 			};
 
+			gatheringStub.Host.Set(host);
+
 			return gatheringStub;
 		}
 
@@ -183,7 +185,7 @@ namespace Core.Tests
 			return new(await Terminal.GatheringDatabase.CreateGatheringAsync(host.Id, gatheringStub.Title, gatheringStub.Description,
 				gatheringStub.StartTime, gatheringStub.Location.Latitude, gatheringStub.Location.Longitude, gatheringStub.FriendlyLocation,
 				gatheringStub.GroupMinimum, gatheringStub.GroupMaximum, host.Character.ToCharacter(),
-				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic, gatheringStub.DegreeOfPrivacy));
+				gatheringStub.Radius.Kilometres, gatheringStub.IsDynamic, gatheringStub.DegreeOfPrivacy, gatheringStub.StartTime));
 		}
 
 		internal async Task<Gathering> GenerateUpcomingGatheringAsync(User host)
@@ -211,7 +213,6 @@ namespace Core.Tests
 			gatheringStub.StartTime = DateTime.Now - TimeSpan.FromHours(2);
 
 			gatheringStub = await GenerateGatheringUnsafeAsync(gatheringStub, host);
-			await Terminal.GatheringDatabase.UpdateGatheringAsync(gatheringStub.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingOpen) });
 			await Terminal.GatheringDatabase.SetUserStateAsync(host.Id, gatheringStub.Id, GatheringBond.Arrived, DateTimeOffset.UtcNow);
 
 			foreach (var guest in guests)
@@ -323,9 +324,9 @@ namespace Core.Tests
 			return await Terminal.NotificationDatabase.GetTelegramsAsync(user.Id);
 		}
 
-		internal List<NotificationServiceStub.NotificationStub> GetUserMessages(User user)
+		internal List<CanaryNotification> GetUserMessages(User user)
 		{
-			ConcurrentBag<NotificationServiceStub.NotificationStub> userMessages;
+			ConcurrentBag<CanaryNotification> userMessages;
 			var exists = NotificationServiceStub.messages.TryGetValue(user.Id.ToString(), out userMessages);
 			return exists ? userMessages.ToList() : new();
 		}

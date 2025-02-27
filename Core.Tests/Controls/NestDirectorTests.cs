@@ -154,7 +154,7 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task GetAppreciatedUsersAsync_ReturnsUsers()
+		public async Task GetFollowedUsersAsync_ReturnsUsers()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -163,10 +163,10 @@ namespace Core.Tests.Controls
 			await environment.ForceCompanionshipAsync(user, companion, otherCompanion);
 
 			// Act
-			var appreciatedUsers = await director.GetAppreciatedUsersAsync(user.Id);
+			var followedUsers = await director.GetIncomingCompanionshipRequestsAsync(user.Id);
 
 			// Assert
-			Assert.Equal(2, appreciatedUsers.Count);
+			Assert.Equal(2, followedUsers.Count);
 		}
 
 		[Fact]
@@ -186,19 +186,19 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task AppreciateUserAsync_Succeeds()
+		public async Task FollowUserAsync_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var stranger = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			await director.AppreciateUserAsync(user.Id, stranger.Id);
+			await director.AcceptOrRequestCompanionshipAsync(user.Id, stranger.Id);
 			// If no exception is thrown, the test is successful
 		}
 
 		[Fact]
-		public async Task AppreciateUserAsync_Blocked_Fails()
+		public async Task FollowUserAsync_Blocked_Fails()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -206,22 +206,22 @@ namespace Core.Tests.Controls
 			await environment.ForceEnemiesAsync(user, enemy);
 
 			// Act
-			var action = director.AppreciateUserAsync(user.Id, enemy.Id);
+			var action = director.AcceptOrRequestCompanionshipAsync(user.Id, enemy.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await action);
 		}
 
 		[Fact]
-		public async Task UnappreciateUserAsync_AppreciatedUser_Succeeds()
+		public async Task UnfollowUserAsync_FollowedUser_Succeeds()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var weirdDynamics = await environment.GenerateUniqueUserAsync();
-			await director.AppreciateUserAsync(user.Id, weirdDynamics.Id);
+			await director.AcceptOrRequestCompanionshipAsync(user.Id, weirdDynamics.Id);
 
 			// Act
-			await director.UnappreciateUserAsync(user.Id, weirdDynamics.Id);
+			await director.DenyOrRemoveUserAsync(user.Id, weirdDynamics.Id);
 			// If no exception is thrown, the test is successful
 		}
 

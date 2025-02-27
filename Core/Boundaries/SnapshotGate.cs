@@ -31,12 +31,14 @@ namespace Core.Boundaries
         Task<SnapshotShard> GetSnapshotAsync(long snapshotId);
         Task<SnapshotShard> AddSnapshotAsync(long gatheringId, long etcherId,
             DateTimeOffset timeTaken);
-		Task DeleteSnapshotAsync(long snapshotId);
 
 		Task AcclaimSnapshotAsync(long snapshotId, long voterId);
 		Task DeleteSnapshotAcclaimAsync(long snapshotId, long voterId);
 
         Task<List<SnapshotShard>> GenerateColumnForUserAsync(long userId, DateTimeOffset depthCharge, DateTimeOffset lastDepth);
+
+        Task SoftDeleteAsync(long snapshotId);
+        Task HardDeleteAsync(long snapshotId);
     }
 
     public interface ISnapshotOperations
@@ -46,7 +48,7 @@ namespace Core.Boundaries
         Task DeleteSnapshotAsync(long userId, long snapshotId);
         Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim);
 
-        Task<ColumnShard> GetUserColumnAsync(long userId, int depth, int lastDepth);
+        Task<ColumnShard> GetWallAsync(long userId, int depth, int lastDepth);
     }
 
 	#endregion

@@ -79,21 +79,11 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, created.Openness);
 
             Assert.Equal(User.DefaultHaunt, created.Haunt);
-            Assert.Equal(User.DefaultHauntWheight, created.HauntWheight);
+            Assert.Equal(User.DefaultHauntWeight, created.HauntWeight);
             Assert.Equal(User.DefaultHauntRadius, created.HauntRadius);
             Assert.Equal(User.DefaultCurrentLocation, created.CurrentLocation);
             Assert.Equal(User.DefaultCurrentRadius, created.CurrentRadius);
         }       
-
-        [Fact]
-        public async Task DeleteUserAsync_SUCCESS()
-        {
-            await store.DeleteUserAsync(subject.Id);
-
-            int numRecords = await sentry.ExecuteReadAsync(ctx => ctx.Users.CountAsync());
-
-            Assert.Equal(1, numRecords);
-        }     
 
         [Fact]
         public async Task FindUserByIdAsync_SUCCESS()
@@ -241,7 +231,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -285,7 +275,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -330,7 +320,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -374,7 +364,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -416,7 +406,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -458,7 +448,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -502,7 +492,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -546,7 +536,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -590,7 +580,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -634,7 +624,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -678,7 +668,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
@@ -730,10 +720,10 @@ namespace Repository.Tests
 
             Assert.NotEqual(subject.Haunt, updated.Haunt);
             Assert.NotEqual(subject.HauntRadius, updated.HauntRadius);
-            Assert.NotEqual(subject.HauntWheight, updated.HauntWheight);
+            Assert.NotEqual(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(newHaunt, updated.Haunt);
             Assert.Equal(newRadius, updated.HauntRadius);
-            Assert.Equal(newStability, updated.HauntWheight);
+            Assert.Equal(newStability, updated.HauntWeight);
             Assert.Equal(subject.CurrentLocation, updated.CurrentLocation);
             Assert.Equal(subject.CurrentRadius, updated.CurrentRadius);
         }
@@ -782,7 +772,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Openness, updated.Openness);
 
             Assert.Equal(subject.Haunt, updated.Haunt);
-            Assert.Equal(subject.HauntWheight, updated.HauntWheight);
+            Assert.Equal(subject.HauntWeight, updated.HauntWeight);
             Assert.Equal(subject.HauntRadius, updated.HauntRadius);
             Assert.NotEqual(subject.CurrentLocation, updated.CurrentLocation);
             Assert.NotEqual(subject.CurrentRadius, updated.CurrentRadius);
@@ -805,7 +795,7 @@ namespace Repository.Tests
             Assert.Equal(subject.Haunt.Y, latitude);
             Assert.Equal(subject.Haunt.X, longitude);
             Assert.Equal(subject.HauntRadius, radius);
-            Assert.Equal(subject.HauntWheight, stability);
+            Assert.Equal(subject.HauntWeight, stability);
         }
         [Fact]
         public async Task GetUserHauntAsync_UserNotFound()
@@ -828,6 +818,14 @@ namespace Repository.Tests
         {
             Func<Task> action = async () => await store.GetRecentLocationAsync(long.MaxValue);
             await Assert.ThrowsAsync<DatabaseReadException>(action);
+        }
+
+        [Fact]
+        public async Task RerollUserCodeAsync_SUCCESS()
+        {
+            string code = await store.RerollUserCodeAsync(subject.Id);
+
+            _testOutputHelper.WriteLine(code);
         }
 
     }

@@ -71,7 +71,8 @@ namespace Repository.Tests
                     testGathering.Openness),
                 testGathering.Radius,
                 testGathering.IsDynamic,
-                testGathering.DegreeOfPrivacy
+                testGathering.DegreeOfPrivacy,
+                testGathering.TimeOfCreation
                 );
 
             Gathering created = sentry.ExecuteRead(ctx => ctx.Gatherings.Where(e => e.Id == createdShard.Id).Single());
@@ -122,7 +123,8 @@ namespace Repository.Tests
                     testGathering.Openness),
                 testGathering.Radius,
                 testGathering.IsDynamic,
-                2
+                testGathering.DegreeOfPrivacy,
+                testGathering.TimeOfCreation
                 );
 
             Gathering created = sentry.ExecuteRead(ctx => ctx.Gatherings.Where(e => e.Id == createdShard.Id).Single());
@@ -162,8 +164,7 @@ namespace Repository.Tests
 
             Assert.NotNull(found);
             Assert.Equal(testGathering.Id, found.Id);
-            Assert.Equal(testUser.Id, found.Host.Id);
-            Assert.Equal(testUser.Name, found.Host.Name);
+            Assert.Equal(testUser.Id, found.HostId);
             Assert.Equal(testGathering.Title, found.Title);
             Assert.Equal(testGathering.Description, found.Description);
             Assert.Equal(testGathering.StartTime, found.StartTime);
@@ -406,37 +407,36 @@ namespace Repository.Tests
             Assert.Equal(testGathering.Radius, updated.Radius);
             Assert.Equal(testGathering.IsDynamic, updated.IsDynamic);
         }
-        [Fact]
-        public async Task FindCurrentGatheringForUserAsync_SUCCESS()
-        {
-            GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Arrived);
-            sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
-            sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentGathering, testGathering.Id)));
+        //[Fact]
+        //public async Task FindCurrentGatheringForUserAsync_SUCCESS()
+        //{
+        //    GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Arrived);
+        //    sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
+        //    sentry.ExecuteWrite(ctx => ctx.Users.ExecuteUpdate(setter => setter.SetProperty(u => u.CurrentGathering, testGathering.Id)));
 
-            CoreGathering gathering = await store.FindCurrentGatheringForUserAsync(testUser.Id);
+        //    CoreGathering gathering = await store.FindOngoingGatheringsForUserAsync(testUser.Id);
 
-            Assert.NotNull(gathering);
-            Assert.Equal(testGathering.HostId, gathering.Host.Id);
-            Assert.Equal(testUser.Name, gathering.Host.Name);
-            Assert.Equal(testGathering.Title, gathering.Title);
-            Assert.Equal(testGathering.Description, gathering.Description);
-            Assert.Equal(testGathering.StartTime, gathering.StartTime);
-            Assert.Equal(testGathering.Location.Y, gathering.Latitude);
-            Assert.Equal(testGathering.Location.X, gathering.Longitude);
-            Assert.Equal(testGathering.GroupMinimum, gathering.GroupMinimum);
-            Assert.Equal(testGathering.GroupMaximum, gathering.GroupMaximum);
-            Assert.Equal(testGathering.State, gathering.State);
-        }
+        //    Assert.NotNull(gathering);
+        //    Assert.Equal(testGathering.HostId, gathering.HostId);
+        //    Assert.Equal(testGathering.Title, gathering.Title);
+        //    Assert.Equal(testGathering.Description, gathering.Description);
+        //    Assert.Equal(testGathering.StartTime, gathering.StartTime);
+        //    Assert.Equal(testGathering.Location.Y, gathering.Latitude);
+        //    Assert.Equal(testGathering.Location.X, gathering.Longitude);
+        //    Assert.Equal(testGathering.GroupMinimum, gathering.GroupMinimum);
+        //    Assert.Equal(testGathering.GroupMaximum, gathering.GroupMaximum);
+        //    Assert.Equal(testGathering.State, gathering.State);
+        //}
         [Fact]
         public async Task FindUpcomingGatheringsForUserAsync_Standard()
         {
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
-            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(testUser.Id)).First();
+            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(testUser.Id, DateTimeOffset.Now)).First();
 
             Assert.NotNull(gathering);
-            Assert.Equal(testGathering.HostId, gathering.Host.Id);
+            Assert.Equal(testGathering.HostId, gathering.HostId);
             Assert.Equal(testGathering.Title, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
@@ -457,10 +457,10 @@ namespace Repository.Tests
 
             sentry.ExecuteWrite(ctx => ctx.Users.Remove(testUser));
 
-            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(guest.Id)).First();
+            CoreGathering gathering = (await store.FindUpcomingGatheringsForUserAsync(guest.Id, DateTimeOffset.Now)).First();
 
             Assert.NotNull(gathering);
-            Assert.Equal(0, gathering.Host.Id);
+            Assert.Equal(0, gathering.HostId);
             Assert.Equal(testGathering.Title, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
@@ -483,8 +483,7 @@ namespace Repository.Tests
             CoreGathering gathering = (await store.FindPastGatheringsForUserAsync(testUser.Id)).First();
 
             Assert.NotNull(gathering);
-            Assert.Equal(testGathering.HostId, gathering.Host.Id);
-            Assert.Equal(testUser.Name, gathering.Host.Name);
+            Assert.Equal(testGathering.HostId, gathering.HostId);
             Assert.Equal(testGathering.Title, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
@@ -515,13 +514,11 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(arrivalLink));
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(departureLink));
 
-            (DateTimeOffset, DateTimeOffset?, UserShard) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
+            (long, DateTimeOffset, DateTimeOffset?) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
 
-            Assert.NotNull(guest.Item3);
-            Assert.Equal(DateTimeOffset.MinValue, guest.Item1);
-            Assert.Equal(DateTimeOffset.MaxValue, guest.Item2);
-            Assert.Equal(testUser.Id, guest.Item3.Id);
-            Assert.Equal(testUser.Name, guest.Item3.Name);
+            Assert.Equal(testUser.Id, guest.Item1);
+            Assert.Equal(DateTimeOffset.MinValue, guest.Item2);
+            Assert.Equal(DateTimeOffset.MaxValue, guest.Item3);
         }
         [Fact]
         public async Task GetGuestHistoryAsync_NotLeft()
@@ -529,13 +526,11 @@ namespace Repository.Tests
             GatheringLink arrivalLink = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Arrived, DateTimeOffset.MinValue);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(arrivalLink));
 
-            (DateTimeOffset, DateTimeOffset?, UserShard) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
+            (long, DateTimeOffset, DateTimeOffset?) guest = (await store.GetGuestHistoryAsync(testGathering.Id)).First();
 
-            Assert.NotNull(guest.Item3);
-            Assert.Equal(DateTimeOffset.MinValue, guest.Item1);
-            Assert.Null(guest.Item2);
-            Assert.Equal(testUser.Id, guest.Item3.Id);
-            Assert.Equal(testUser.Name, guest.Item3.Name);
+            Assert.Equal(testUser.Id, guest.Item1);
+            Assert.Equal(DateTimeOffset.MinValue, guest.Item2);
+            Assert.Null(guest.Item3);
         }
         [Fact]
         public async Task GetGuestListAsync_SUCCESS()
@@ -543,7 +538,7 @@ namespace Repository.Tests
             GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Guest);
             sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
 
-            UserShard user = (await store.GetGuestListAsync(testGathering.Id)).Single();
+            CoreUser user = (await store.GetGuestListAsync(testGathering.Id)).Single();
 
             Assert.NotNull(user);
             Assert.Equal(testUser.Id, user.Id);
@@ -599,7 +594,7 @@ namespace Repository.Tests
             CoreGathering gathering  = (await store.FindGatheringsByUserAsync(testUser.Id)).Single();
 
             Assert.NotNull(gathering);
-            Assert.Equal(testGathering.HostId, gathering.Host.Id);
+            Assert.Equal(testGathering.HostId, gathering.HostId);
             Assert.Equal(testGathering.Title, gathering.Title);
             Assert.Equal(testGathering.Description, gathering.Description);
             Assert.Equal(testGathering.StartTime, gathering.StartTime);
@@ -633,27 +628,6 @@ namespace Repository.Tests
             Assert.Equal(GatheringBond.Guest, link.Type);
         }
         [Fact]
-        public async Task GetAllUsersAsync_SUCCESS()
-        {
-            GatheringLink link = new GatheringLinkFactory().Create(testUser, testGathering, GatheringBond.Watching, DateTimeOffset.MinValue);
-            sentry.ExecuteWrite(ctx => ctx.GatheringLinks.Add(link));
-
-            (UserShard User, GatheringBond State) = (await store.GetAllUsersAsync(testGathering.Id)).Single();
-
-            Assert.Equal(testUser.Id, User.Id);
-            Assert.Equal(testUser.Name, User.Name);
-            Assert.Equal(GatheringBond.Watching, State);
-        }
-        [Fact]
-        public async Task DeleteGatheringAsync_SUCCESS()
-        {
-            await store.DeleteGatheringAsync(testGathering.Id);
-
-            int count = sentry.ExecuteRead(ctx => ctx.Gatherings.Count());
-
-            Assert.Equal(1, count);
-        }
-        [Fact]
         public async Task PropagateClearance_DEGREE_0()
         {
             /* 
@@ -663,8 +637,8 @@ namespace Repository.Tests
             User companion = _userFactory.Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
 
@@ -688,8 +662,8 @@ namespace Repository.Tests
             User companion = _userFactory.Create();
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion, testUser, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
 
@@ -718,10 +692,10 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion1));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companion2));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion1, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkB = _userRelationshipFactory.Create(companion1, testUser, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkC = _userRelationshipFactory.Create(testUser, companion2, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkD = _userRelationshipFactory.Create(companion2, testUser, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, companion1, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(companion1, testUser, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkC = _userRelationshipFactory.Create(testUser, companion2, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkD = _userRelationshipFactory.Create(companion2, testUser, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
@@ -749,10 +723,10 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Users.Add(hostCompanion));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companionCompanion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
@@ -780,10 +754,10 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Users.Add(hostCompanion));
             sentry.ExecuteWrite(ctx => ctx.Users.Add(companionCompanion));
 
-            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserLinkType.Appreciate);
-            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserLinkType.Appreciate);
+            UserRelationship linkA = _userRelationshipFactory.Create(testUser, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkB = _userRelationshipFactory.Create(hostCompanion, testUser, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkC = _userRelationshipFactory.Create(companionCompanion, hostCompanion, UserRelationship.UserRelationshipType.Follow);
+            UserRelationship linkD = _userRelationshipFactory.Create(hostCompanion, companionCompanion, UserRelationship.UserRelationshipType.Follow);
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkA));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkC));
