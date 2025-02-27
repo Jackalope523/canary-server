@@ -76,8 +76,8 @@ namespace Core.Boundaries
 	{
 		Task<NotificationPreferencesShard> GetNotificationPreferencesAsync(long userId);
 		Task UpdateNotificationPreferencesAsync(long userId,
-			bool? socialInvitation = null, bool? companionActivity = null,
-			bool? gatheringReminder = null, bool? gatheringActivity = null,
+			bool? socialInvitations = null, bool? companionActivity = null,
+			bool? gatheringReminders = null, bool? gatheringActivity = null,
 			bool? gatheringDiscovery = null);
 
 		Task<List<TelegramShard>> GetTelegramsAsync(long userId);
