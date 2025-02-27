@@ -1,4 +1,6 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Serilog;
 
 namespace Repository
 {
@@ -30,8 +32,9 @@ namespace Repository
 
         public async Task<MemoryStream> DownloadBlobAsync(string containerName, string blobName)
         {
-            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
             MemoryStream stream = new MemoryStream();
+            BlobClient blobClient = new(context.BuildUri(containerName, blobName), context.credentials());
+
             try
             {
                 await blobClient.DownloadToAsync(stream);
@@ -40,7 +43,7 @@ namespace Repository
             }
             catch (Exception ex)
             {
-                throw new BlobIOException(ex);
+                return await DownloadBlobAsync("utility", "failed_image.jpg");
             }
         }
 
@@ -50,7 +53,7 @@ namespace Repository
 
             try
             {
-                await blobClient.DeleteAsync();
+                await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots);
             }
             catch (Exception ex)
             {

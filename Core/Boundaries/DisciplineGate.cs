@@ -65,12 +65,16 @@ namespace Core.Boundaries
 
     public interface IDisciplineOperations
     {
+        Task<List<UserReportType>> GetAvailableReportsForUserAsync(long userId, long targetId);
         Task ReportUserAsync(long userId, long targetId,
-            UserReportType reportType, string reportDetails);
+            UserReportType reportType, string reportDetails,
+            long? gatheringId = null);
 
+        Task<List<GatheringReportType>> GetAvailableReportsForGatheringAsync(long userId, long gatheringId);
         Task ReportGatheringAsync(long userId, long gatheringId,
             GatheringReportType reportType, string reportDetails);
 
+        Task<List<SnapshotReportType>> GetAvailableReportsForSnapshotAsync(long userId, long snapshotId);
         Task ReportSnapshotAsync(long userId, long snapshotId,
             SnapshotReportType reportType, string reportDetails);
     }

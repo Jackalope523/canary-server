@@ -17,16 +17,16 @@ using Core.Notifications;
 
 namespace Core.Tests
 {
-	public class UserHook : IAccountDatabase
-	{
-		private IAccountDatabase accounts;
-		private ConcurrentBag<long> generatedUserIds;
+    public class UserHook : IAccountDatabase
+    {
+        private IAccountDatabase accounts;
+        private ConcurrentBag<long> generatedUserIds;
 
-		public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<long> userIdList)
-		{
-			accounts = accountDatabase;
-			generatedUserIds = userIdList;
-		}
+        public UserHook(IAccountDatabase accountDatabase, ConcurrentBag<long> userIdList)
+        {
+            accounts = accountDatabase;
+            generatedUserIds = userIdList;
+        }
 
         public async Task<CoreUser> CreateUserAsync(string phoneNumber, string email, string normalisedEmail, string name, DateTimeOffset dateOfBirth, DateTimeOffset joinDate, CharacterShard character, Guid notificationId)
         {
@@ -49,15 +49,30 @@ namespace Core.Tests
 					generatedUserIds.Add(userCheck.Id);
 				}
 
-				throw new UnexpectedFailureException();
+				throw new UnexpectedFailureException("User exists.");
 			}
-
+            
 			await accounts.CreateUserAsync(phoneNumber, email, normalisedEmail, name, dateOfBirth, joinDate, character, notificationId);
 
 			CoreUser createdUser = await accounts.FindUserByPhoneNumberAsync(phoneNumber);
 			generatedUserIds.Add(createdUser.Id);
 
 			return createdUser;
+        }
+
+        public async Task<bool> UserExistsAsync(string phoneNumber)
+        {
+            return await accounts.UserExistsAsync(phoneNumber);
+        }
+
+        public async Task<CoreUser> FindUserByCodeAsync(string code)
+        {
+            return await accounts.FindUserByCodeAsync(code);
+        }
+
+        public async Task<string> RerollUserCodeAsync(long userId)
+        {
+            return await accounts.RerollUserCodeAsync(userId);
         }
 
         public async Task<CoreUser> FindUserByEmailAsync(string normalisedEmail)

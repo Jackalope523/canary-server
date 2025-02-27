@@ -15,6 +15,8 @@ using Frontier.Controllers;
 using Microsoft.Extensions.Logging;
 using Core;
 using Core.Daemons;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 namespace Frontier
 {
@@ -152,7 +154,6 @@ namespace Frontier
                 coreLogger,
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
-                harbor.BannerDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -165,7 +166,6 @@ namespace Frontier
 
             GuardBox box = new(environment, frontierLogger,
                 terminal.AccountOperations,
-                terminal.BannerOperations,
                 terminal.NestOperations,
                 terminal.GatheringOperations,
                 terminal.SnapshotOperations,
@@ -200,6 +200,10 @@ namespace Frontier
                 .AddUserStore<UserAccountStore>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
+            
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(@"/home/data-protection-keys"))
+                .SetApplicationName("Hollow-" + env);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

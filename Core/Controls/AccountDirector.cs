@@ -22,6 +22,11 @@ namespace Core.Controls
 
 		#region Operations
 
+        public async Task<bool> GetUserExistsAsync(string phoneNumber)
+        {
+            return await Accounts.UserExistsAsync(phoneNumber);
+        }
+
 		public async Task<CoreUser> GetCoreUserAsync(long userId)
         {
             return (await GetUserAsync(userId)).ToCoreUser();
@@ -31,7 +36,7 @@ namespace Core.Controls
 		{
             // Verify phone number is valid
             Verify(ContentValidation.TryNormalisePhoneNumber(phoneNumber, out string normalisedPhoneNumber),
-                new InvalidInformationException($"{nameof(phoneNumber)} must be a valid phone number."));
+                new UserErrorException(AccountErrorCode.INVALID_PHONE_NUMBER));
 
             return (await GetUser(normalisedPhoneNumber)).ToCoreUser();
 		}
@@ -46,18 +51,8 @@ namespace Core.Controls
             return (await GetUserAsync(userId)).ToUserShard();
         }
 
-        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth, string code = "")
+        public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
-            CoreBanner banner;
-
-            // Verify banner code
-            try
-            {
-                banner = await Banners.FindBannerByCodeAsync(code.ToLower());
-            }
-            catch
-            { throw new InvalidInformationException("Incorrect code."); }
-
             // Create user
             User newUser = new()
             {
@@ -70,7 +65,7 @@ namespace Core.Controls
 
             // Validate and normalise user
             Verify(newUser.ValidateAndNormalise(out string issues),
-                new InvalidInformationException($"Invalid account details provided. Issues: {issues}"));
+                new UserErrorException(AccountErrorCode.INVALID_DETAILS, new { issues }));
 
             // Verify phone number is not in use
             await ThrowIfPhoneNumberTaken(newUser.PhoneNumber);
@@ -84,9 +79,6 @@ namespace Core.Controls
                 newUser.Name, newUser.DateOfBirth, Time,
                 CharacterVector.Default(newUser.GetAge()).ToCharacter(),
                 Guid.NewGuid());
-
-            // Add user to banner
-            await Banners.AddUserToBannerAsync(user.Id, banner.Id, Time);
         }
 
         public async Task EditUserAsync(long userId,
@@ -109,7 +101,7 @@ namespace Core.Controls
 
             // Validate and Normalise
             Verify(user.ValidateAndNormalise(out string issues),
-                new InvalidInformationException($"Invalid details provided. Issues: {issues}"));
+                new UserErrorException(AccountErrorCode.INVALID_DETAILS, new { issues }));
 
             List<(string Property, object Value)> edits = new();
 
@@ -157,7 +149,7 @@ namespace Core.Controls
             await Accounts.UpdateUserAsync(user.Id, edits);
 		}
 
-        public async Task UpdateUserAgreement(long userId)
+        public async Task UpdateUserAgreementAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
@@ -172,8 +164,16 @@ namespace Core.Controls
             await Terminal.MediaDirector.UploadAvatarAsync(user.Id, image);
         }
 
+        public async Task<string> RerollCodeAsync(long userId)
+        {
+            var user = await GetUserAsync(userId);
+
+            return await Accounts.RerollUserCodeAsync(user.Id);
+        }
+
         public async Task DeleteUserAsync(long userId)
         {
+            // TODO Gracefully delete data
             await Accounts.SoftDeleteAsync(userId);
         }
 
@@ -205,56 +205,37 @@ namespace Core.Controls
             // Check if user is at an gathering
             if (await userIsAtGathering)
             {
-                var currentGathering = await user.CurrentGathering;
+                var ongoingGatherings = await user.OngoingGatherings;
 
-                // Check if user left the gathering radius
-                if (!GeoLocation.AreInRange(await user.LastKnownLocation, currentGathering.Location, currentGathering.Radius))
+                foreach (var current in ongoingGatherings)
                 {
-                    // Check if user is a guest or the host
-                    if (currentGathering.IsHostedBy(user))
+                    // Check if user is in the gathering radius
+                    if (GeoLocation.AreInRange(await user.LastKnownLocation, current.Location, current.Radius))
                     {
-                        Log.LogWarning("Host {name} left gathering {title} area, hiding...", user.Name, currentGathering.Title);
-
-                        // Hide the gathering if user is the host
-                        await Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { (nameof(CoreGathering.State), GatheringState.OngoingHidden)});
-
-                        _ = user.Notify(CanaryNotification.HostLeavingGatheringArea(await currentGathering.ToGatheringShard()));
+                        await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.InitialDecay) });
                     }
                     else
                     {
-                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, currentGathering.Title);
+                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, current.Title);
 
-                        // Leave the gathering if user is a guest
-                        await Terminal.GatheringDirector.LeaveGatheringAsync(user.Id, currentGathering.Id);
+                        // Leave the gathering
+                        await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, current.Id, GatheringBond.Left, Time);
 
-                        _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await currentGathering.ToGatheringShard()));
+                        _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await current.ToGatheringShard()));
                     }
-                }
-
-                // Check if user is the host
-                if (currentGathering.IsHostedBy(user) && currentGathering.IsDynamic)
-                {
-                    // Update the position of the gathering
-                    _ = Gatherings.UpdateGatheringAsync(currentGathering.Id, new() { ("Location", ((await user.LastKnownLocation).Latitude, (await user.LastKnownLocation).Longitude)) });
                 }
             }
             // Check if user is on their way to an gathering
             else if (!await userIsAtGathering &&
                 !nextGathering.Equals(Gathering.None))
             {
-                // Check if user is host and can start gathering
-                if (nextGathering.IsWaitingAuto &&
-                    nextGathering.IsHostedBy(user))
-                {
-                    Log.LogWarning("Host {name} entered gathering {title} area, starting...", user.Name, nextGathering.Title);
-                    await Terminal.GatheringDirector.StartGatheringAsync(user.Id, nextGathering.Id);
-                }
                 // Check if user is close enough to be arrived
-                else if (nextGathering.IsOngoing &&
+                if (nextGathering.IsOngoing &&
                     await nextGathering.IsInRange(user))
                 {
                     Log.LogWarning("Guest {name} entered gathering {title} area, marking as arrived...", user.Name, nextGathering.Title);
                     await Gatherings.SetUserStateAsync(user.Id, nextGathering.Id, GatheringBond.Arrived, Time);
+                    await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.InitialDecay) });
                 }
             }
         }
@@ -292,11 +273,18 @@ namespace Core.Controls
 
 		private async Task<User> GetUser(string phoneNumber)
         {
-            User user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
+            User user;
+
+            try
+            {
+                user = new(await Accounts.FindUserByPhoneNumberAsync(phoneNumber));
+            }
+            catch
+            { throw new UserErrorException(AccountErrorCode.NOT_FOUND); }
 
             // Check if user account is locked
             FailIf(user.IsLocked,
-                new InvalidUserException("User account is locked."));
+                new UserErrorException(AccountErrorCode.LOCKED));
 
             return user;
         }
@@ -313,7 +301,7 @@ namespace Core.Controls
 			catch { }
 
             FailIf(numberTaken,
-                new InvalidUserException("Phone Number already registered."));
+                new UserErrorException(AccountErrorCode.PHONE_NUMBER_EXISTS));
 		}
 
         private async Task ThrowIfEmailTaken(string normalisedEmail)
@@ -328,7 +316,7 @@ namespace Core.Controls
 			catch { }
 
 			FailIf(emailTaken,
-                new InvalidUserException("Email already registered."));
+                new UserErrorException(AccountErrorCode.EMAIL_EXISTS));
         }
 
 		#endregion

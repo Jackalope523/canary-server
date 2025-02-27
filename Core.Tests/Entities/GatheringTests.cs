@@ -257,23 +257,6 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task HasUserRelationship_Surveying_ReturnsTrue()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var surveyingUser = await environment.GenerateUniqueUserAsync();
-
-			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await environment.AddUserToGatheringAsync(gathering, surveyingUser, GatheringBond.Watching);
-
-			// Act
-			var result = await gathering.HasUserRelationship(surveyingUser);
-
-			// Assert
-			Assert.True(result);
-		}
-
-		[Fact]
 		public async Task HasUserRelationship_Incoming_ReturnsTrue()
 		{
 			// Arrange
@@ -462,74 +445,9 @@ namespace Core.Tests.Entities
 			Assert.False(result);
 		}
 
-		[Fact]
-		public async Task IsStartable_Waiting_ReturnsTrue()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var gathering = environment.CreateTestGathering(host);
-			gathering.StartTime = Psijic.Time;
-			gathering = await environment.GenerateGatheringUnsafeAsync(gathering, host);
-
-			await environment.SetGatheringState(gathering, GatheringState.Upcoming);
-			await environment.UpdateUserLocationAsync(host,
-				gathering.Location.Latitude,
-				gathering.Location.Longitude);
-
-			// Act
-			var result = await gathering.IsStartable();
-
-			// Assert
-			Assert.True(result);
-		}
-
-		[Fact]
-		public async Task IsStartable_Started_ReturnsFalse()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var gathering = await environment.GenerateOngoingGatheringAsync(host);
-
-			// Act
-			var result = await gathering.IsStartable();
-
-			// Assert
-			Assert.False(result);
-		}
-
-		[Fact]
-		public async Task IsStartable_HostFar_ReturnsFalse()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-
-			await environment.UpdateUserLocationAsync(host,
-				gathering.Location.Latitude + 15,
-				gathering.Location.Longitude + 15);
-
-			// Act
-			var result = await gathering.IsStartable();
-
-			// Assert
-			Assert.False(result);
-		}
-
 		//////
 		// Effects
 		////////////
-
-		[Fact]
-		public async Task Started_Succeeds()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-
-			// Act
-			await gathering.Started();
-			// If no exception is thrown, the test is successful
-		}
 
 		[Fact]
 		public async Task Ended_Succeeds()

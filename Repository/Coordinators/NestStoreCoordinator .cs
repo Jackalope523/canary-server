@@ -9,13 +9,13 @@
             store = new EFCoreNestStore(flag);
         }
         
-        public async Task AppreciateUserAsync(long selfId, long targetId, DateTimeOffset time) 
+        public async Task FollowUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
-            await store.AppreciateUserAsync(selfId, targetId, time);
+            await store.FollowUserAsync(selfId, targetId, time);
         }
-        public async Task UnappreciateUserAsync(long selfId, long targetId) 
+        public async Task UnfollowUserAsync(long selfId, long targetId) 
         {
-            await store.UnappreciateUserAsync(selfId, targetId);
+            await store.UnfollowUserAsync(selfId, targetId);
         }
         public async Task BlockUserAsync(long selfId, long targetId, DateTimeOffset time) 
         {
@@ -25,9 +25,10 @@
         {
             await store.UnblockUserAsync(selfId, targetId);
         }
-        public async Task<List<CoreUser>> GetAppreciatedUsersAsync(long id) 
+
+        public async Task<List<CoreUser>> GetFollowedUsersAsync(long id) 
         {
-            return await store.GetAppreciatedUsersAsync(id);
+            return await store.GetFollowedUsersAsync(id);
         }
         public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long id) 
         {
@@ -38,9 +39,9 @@
             return await store.GetCompanionsAsync(id);
         }
 
-        public async Task<List<CoreUser>> GetUsersAppreciatingAsync(long userId)
+        public async Task<List<CoreUser>> GetUserFollowersAsync(long userId)
         {
-            return await store.GetUsersAppreciatingAsync(userId);
+            return await store.GetUserFollowersAsync(userId);
         }
 
         public async Task<List<CoreUser>> GetUsersBlockingAsync(long userId)
@@ -65,6 +66,11 @@
         public async Task<DateTimeOffset> BlockedSince(long userId, long targetId)
         {
             return await store.BlockedSince(userId, targetId);
+        }
+
+        public async Task<List<long>> ReturnStrangerDangerAsync(long userId, params long[] users)
+        {
+            return await store.ReturnStrangerDangerAsync(userId, users);
         }
     }
 }

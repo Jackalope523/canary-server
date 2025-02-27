@@ -48,7 +48,7 @@ namespace Core.Boundaries
         Task DeleteSnapshotAsync(long userId, long snapshotId);
         Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim);
 
-        Task<ColumnShard> GetUserColumnAsync(long userId, int depth, int lastDepth);
+        Task<ColumnShard> GetWallAsync(long userId, int depth, int lastDepth);
     }
 
 	#endregion

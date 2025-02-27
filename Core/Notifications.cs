@@ -5,10 +5,10 @@ namespace Core.Notifications
 {
     public enum NotificationGroup
     {
-        SocialInvitation,
+        SocialInvitations,
         CompanionActivity,
         GatheringDiscovery,
-        GatheringReminder,
+        GatheringReminders,
         GatheringActivity,
     }
 
@@ -18,10 +18,10 @@ namespace Core.Notifications
         {
             return group switch
             {
-                NotificationGroup.SocialInvitation => profile.SocialInvitations,
+                NotificationGroup.SocialInvitations => profile.SocialInvitations,
                 NotificationGroup.CompanionActivity => profile.CompanionActivity,
                 NotificationGroup.GatheringDiscovery => profile.GatheringDiscovery,
-                NotificationGroup.GatheringReminder => profile.GatheringReminders,
+                NotificationGroup.GatheringReminders => profile.GatheringReminders,
                 NotificationGroup.GatheringActivity => profile.GatheringActivity,
                 _ => throw new ArgumentOutOfRangeException(nameof(group), group, null)
             };
@@ -106,9 +106,19 @@ namespace Core.Notifications
     {
         public string RelativePath { get; private set; }
 
-        public NestDeepLink(long userId)
+        public NestDeepLink(long userId,
+            string lastMet = null)
         {
-            RelativePath = $"{IDeepLink.BasePath}nest/{userId}";
+            RelativePath = $"nest/{userId}";
+
+            string options = "";
+
+            options += IDeepLink.ParseOption("lastMet", lastMet);
+
+            if (!string.IsNullOrEmpty(options))
+            {
+                RelativePath += $"?{options.Remove(RelativePath.Length - 1)}";
+            }
         }
     }
 
@@ -143,14 +153,14 @@ namespace Core.Notifications
     {
         protected static CanaryNotification SocialInvitation(CanaryNotification notification)
         {
-            notification.Group = NotificationGroup.SocialInvitation;
+            notification.Group = NotificationGroup.SocialInvitations;
             return notification;
         }
 
-        public static CanaryNotification CompanionshipRequest(UserShard addingUser)
+        public static CanaryNotification CompanionshipRequest(UserShard addingUser, string lastMet = null)
             => SocialInvitation(new("Companion Request",
-                $"{addingUser} sent you a companionship request.",
-                new NestDeepLink(addingUser.Id),
+                $"{addingUser.Name} sent you a companionship request.",
+                new NestDeepLink(addingUser.Id, lastMet),
                 "1"));
 
         public static CanaryNotification CompanionshipForged(UserShard addingUser)
@@ -223,7 +233,7 @@ namespace Core.Notifications
     {
         protected static CanaryNotification GatheringReminders(CanaryNotification notification)
         {
-            notification.Group = NotificationGroup.GatheringReminder;
+            notification.Group = NotificationGroup.GatheringReminders;
             return notification;
         }
 
@@ -259,7 +269,7 @@ namespace Core.Notifications
 
         public static CanaryNotification GatheringUploadClosing(GatheringShard gathering)
             => GatheringReminders(new(gathering.Title,
-                $"Post your remaining photos before the upload window closes.",
+                $"Don't forget to post your remaining photos!",
                 new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.Gallery)));
     }
 

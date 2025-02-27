@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Utilities;
 
 namespace Repository
 {
@@ -30,6 +31,7 @@ namespace Repository
             };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Users.Add(toCreate));
+            await RerollUserCodeAsync(toCreate.Id);
 
             return new CoreUser
               (
@@ -37,7 +39,7 @@ namespace Repository
                   toCreate.PhoneNumber,
                   toCreate.Email,
                   toCreate.Name,
-                  toCreate.Pseudonym,
+                  toCreate.CompanionshipCode,
                   toCreate.DateOfBirth,
                   toCreate.IsPhoneConfirmed,
                   toCreate.IsEmailConfirmed,
@@ -110,11 +112,6 @@ namespace Repository
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.BannerLinks.
-               Where(l => l.UserId == id).
-               ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Users.
                Where(u => u.Id == id).
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
@@ -168,11 +165,6 @@ namespace Repository
                ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.BannerLinks.
-               Where(l => l.UserId == id).
-               ExecuteDeleteAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Feedback.
                Where(r => r.UserId == id).
                ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
@@ -203,40 +195,6 @@ namespace Repository
                ExecuteDeleteAsync());
         }
 
-        public async Task DeleteUserAsync(long id)
-        {
-            await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.Users.
-                Where(u => u.Id == id).
-                ExecuteUpdate(setter => setter.SetProperty(u => u.SoftDeleted, true)));
-
-            List<long> upcomingGatherings = await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.Gatherings.
-                Where(e => e.HostId == id && e.State == GatheringState.Upcoming).
-                Select(e => e.Id).
-                ToListAsync());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Gatherings.
-               Where(e => upcomingGatherings.Contains(e.Id)).
-               ExecuteUpdate(setter => setter.SetProperty(e => e.SoftDeleted, true)));
-        
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Telegrams.
-               Where(n => n.NotifierId == id || n.RecipientId == id).
-               ExecuteDelete());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Snapshots.
-               Where(p => p.OwnerId == id).
-               ExecuteDelete());
-
-            await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Subscriptions.
-               Where(s => s.UserId == id).
-               ExecuteDelete());
-        }
-
         public async Task<CoreUser> FindUserByIdAsync(long id) 
         {            
             CoreUser user;
@@ -251,7 +209,7 @@ namespace Repository
                    u.PhoneNumber,
                    u.Email,
                    u.Name,
-                   u.Pseudonym,
+                   u.CompanionshipCode,
                    u.DateOfBirth,
                    u.IsPhoneConfirmed,
                    u.IsEmailConfirmed,
@@ -296,7 +254,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
-                  u.Pseudonym,
+                  u.CompanionshipCode,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -341,7 +299,7 @@ namespace Repository
                   u.PhoneNumber,
                   u.Email,
                   u.Name,
-                  u.Pseudonym,
+                  u.CompanionshipCode,
                   u.DateOfBirth,
                   u.IsPhoneConfirmed,
                   u.IsEmailConfirmed,
@@ -483,6 +441,87 @@ namespace Repository
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentLocation)).IsModified = true, currentDiscussion);
             storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CurrentRadius)).IsModified = true, currentDiscussion);
             await storeSentry.EndDiscussionAsync(currentDiscussion);
+        }
+
+        public async Task<bool> UserExistsAsync(string phoneNumber)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.Users.AnyAsync(u => u.PhoneNumber == phoneNumber));
+        }
+
+        public async Task<string> RerollUserCodeAsync(long userId)
+        {
+            List<string> adjectives = await storeSentry.ExecuteReadAsync(ctx => 
+                                        ctx.Words.
+                                        Where(w => w.Type == Word.WordType.Adjective).
+                                        Select(w => w.Text).
+                                        ToListAsync());
+
+            List<string> nouns = await storeSentry.ExecuteReadAsync(ctx =>
+                                        ctx.Words.
+                                        Where(w => w.Type == Word.WordType.Noun).
+                                        Select(w => w.Text).
+                                        ToListAsync());
+
+            bool codeUnique = false;
+            Random random = new();
+            string randomAdjective;
+            string randomNoun;
+            string potentialCode = "";
+
+            while (!codeUnique)
+            {
+                randomAdjective = adjectives[random.Next(adjectives.Count)];
+                randomNoun = nouns[random.Next(nouns.Count)];
+               
+                potentialCode = (Char.ToUpper(randomAdjective[0]) + randomAdjective.Substring(1)) + (Char.ToUpper(randomNoun[0]) + randomNoun.Substring(1));
+
+                codeUnique = !(await storeSentry.ExecuteReadAsync(ctx => ctx.Users.AnyAsync(u => u.CompanionshipCode == potentialCode)));
+            }
+
+            User u = new() { Id = userId, CompanionshipCode = potentialCode };
+
+            Discussion currentDiscussion = storeSentry.BeginDiscussion();
+            storeSentry.DiscussWrite(ctx => ctx.Users.Attach(u), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.Entry(u).Property(nameof(u.CompanionshipCode)).IsModified = true, currentDiscussion);
+            await storeSentry.EndDiscussionAsync(currentDiscussion);
+
+            return potentialCode;
+        }
+
+        public async Task<CoreUser> FindUserByCodeAsync(string code)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.Users.
+                Where(u => u.CompanionshipCode == code).
+                Select(u => new CoreUser
+                (
+                    u.Id,
+                    u.PhoneNumber,
+                    u.Email,
+                    u.Name,
+                    u.CompanionshipCode,
+                    u.DateOfBirth,
+                    u.IsPhoneConfirmed,
+                    u.IsEmailConfirmed,
+                    u.SoftDeleted,
+                    u.SecurityStamp,
+                    u.LockoutDate,
+                    u.AccessTries,
+                    u.AccountStatus,
+                    u.JoinDate,
+                    u.Reputation,
+                    new CharacterShard(
+                    u.Age,
+                    u.Extroversion,
+                    u.Athleticisme,
+                    u.Chaos,
+                    u.Competitiveness,
+                    u.Industriousness,
+                    u.NightOwl,
+                    u.Openness),
+                    u.TimeOfUserAgreement,
+                    u.NotificationId
+                )).SingleAsync());
         }
     }
 }

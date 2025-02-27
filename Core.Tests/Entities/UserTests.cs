@@ -129,7 +129,7 @@ namespace Core.Tests.Entities
 		}
 
 		[Fact]
-		public async Task IsAppreciating_AppreciatedUser_ReturnsTrue()
+		public async Task IsFollowing_FollowedUser_ReturnsTrue()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
@@ -137,24 +137,24 @@ namespace Core.Tests.Entities
 			await environment.ForceCompanionshipAsync(user, companion);
 
 			// Act
-			var isAppreciating = await user.IsAppreciating(companion);
+			var isFollowing = await user.IsFollowing(companion);
 
 			// Assert
-			Assert.True(isAppreciating);
+			Assert.True(isFollowing);
 		}
 
 		[Fact]
-		public async Task IsAppreciating_Neutral_ReturnsFalse()
+		public async Task IsFollowing_Neutral_ReturnsFalse()
 		{
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var randomUser = await environment.GenerateUniqueUserAsync();
 
 			// Act
-			var isAppreciating = await user.IsAppreciating(randomUser);
+			var isFollowing = await user.IsFollowing(randomUser);
 
 			// Assert
-			Assert.False(isAppreciating);
+			Assert.False(isFollowing);
 		}
 
 		[Fact]
@@ -466,7 +466,7 @@ namespace Core.Tests.Entities
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			TelegramMessage message = TelegramMessage.UserAppreciated;
+			TelegramMessage message = TelegramMessage.UserFollowed;
 			string context = "action";
 
 			// Act

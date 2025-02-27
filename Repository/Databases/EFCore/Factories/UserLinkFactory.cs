@@ -19,7 +19,7 @@
         }
         #endregion
 
-        internal UserRelationship Create(User self, User other, UserRelationship.UserLinkType type)
+        internal UserRelationship Create(User self, User other, UserRelationship.UserRelationshipType type)
         {
             return Create(new UserRelationship
             {

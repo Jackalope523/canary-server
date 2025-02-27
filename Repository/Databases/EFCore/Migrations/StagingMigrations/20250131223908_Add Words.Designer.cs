@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
@@ -12,9 +13,11 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     [DbContext(typeof(AzureStagingContext))]
-    partial class AzureStagingContextModelSnapshot : ModelSnapshot
+    [Migration("20250131223908_Add Words")]
+    partial class AddWords
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,9 +140,6 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.Property<int>("Competitiveness")
                         .HasColumnType("int");
-
-                    b.Property<float>("Decay")
-                        .HasColumnType("real");
 
                     b.Property<int>("DegreeOfPrivacy")
                         .HasColumnType("int");

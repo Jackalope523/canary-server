@@ -19,7 +19,6 @@ namespace Core.Controls
 		protected ILogger Log { get; private set; }
 
 		protected IAccountDatabase Accounts { get; private set; }
-		protected IBannerDatabase Banners { get; private set; }
 		protected IGatheringDatabase Gatherings { get; private set; }
 		protected ISnapshotDatabase Snapshots { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
@@ -41,7 +40,6 @@ namespace Core.Controls
 			Log = Terminal.Log;
 			
 			Accounts = Terminal.AccountDatabase;
-			Banners = Terminal.BannerDatabase;
 			Gatherings = Terminal.GatheringDatabase;
 			Snapshots = Terminal.SnapshotDatabase;
 			Reports = Terminal.DisciplineDatabase;
@@ -62,11 +60,11 @@ namespace Core.Controls
 			
 			// Fail if user account is locked
 			FailIf(user.IsLocked,
-				new InvalidUserException("User account is locked."));
+				new UserErrorException(AccountErrorCode.LOCKED));
 
 			// Fail if user account is pending deletion
 			FailIf(user.IsDeleted,
-				new InvalidUserException("User account is deleted"));
+				new UserErrorException(AccountErrorCode.DELETED));
 
             return user;
         }
