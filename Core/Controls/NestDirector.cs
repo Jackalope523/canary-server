@@ -373,15 +373,14 @@ namespace Core.Controls
 
         private async Task<AgendaShard> RequestAgenda(User user)
         {
-            _ = user.UpcomingGatherings.Sync();
             _ = user.OngoingGatherings.Sync();
+            _ = user.UpcomingGatherings.Sync();
 
             // Gather all user gathering data
-            AgendaShard agenda = new((await user.UpcomingGatherings)
+            AgendaShard agenda = new((await user.OngoingGatherings)
+                .Concat(await user.UpcomingGatherings)
+                .ToList()
                 .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Guest)));
-
-            agenda.Cards.AddRange((await user.OngoingGatherings)
-                .ConvertAll(gathering => new CardShard(gathering.Id, gathering.StartTime, GatheringBond.Arrived)));
 
             return agenda;
         }
