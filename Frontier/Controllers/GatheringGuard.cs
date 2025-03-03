@@ -38,7 +38,7 @@ namespace Frontier.Controllers
 			// Verify parameters
             if (gatheringDetails == null || !ModelState.IsValid ||
 				gatheringDetails.Image == null || gatheringDetails.Image.Length == 0)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
 			return await Execute(async user =>
             {
@@ -61,7 +61,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (gatheringDetails == null)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 			{
@@ -84,16 +84,6 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpGet("{gatheringId}/start")]
-		public async Task<IActionResult> StartGathering(long gatheringId)
-		{
-			return await Execute(async user =>
-			{
-				// Start gathering
-				await gatherings.StartGatheringAsync(user.Id, gatheringId);
-			});
-		}
-
         [HttpDelete("{gatheringId}/edit")]
         public async Task<IActionResult> EndGathering(long gatheringId)
 		{
@@ -105,12 +95,12 @@ namespace Frontier.Controllers
         }
 
         [HttpDelete("{gatheringId}")]
-        public async Task<IActionResult> DeleteGathering(long gatheringId)
+        public async Task<IActionResult> CancelGathering(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
-				// Delete gathering
-				await gatherings.DeleteGatheringAsync(user.Id, gatheringId);
+				// Cancel gathering
+				await gatherings.CancelGatheringAsync(user.Id, gatheringId);
 			});
         }
 
@@ -123,26 +113,6 @@ namespace Frontier.Controllers
 			});
         }
 
-		[HttpPost("{gatheringId}/survey")]
-		public async Task<IActionResult> SurveyGathering(long gatheringId)
-		{
-			return await Execute(async user =>
-			{
-				// Watch gathering
-				await gatherings.WatchGatheringAsync(user.Id, gatheringId);
-			});
-		}
-
-		[HttpPut("{gatheringId}/survey")]
-		public async Task<IActionResult> UnsurveyGathering(long gatheringId)
-		{
-			return await Execute(async user =>
-			{
-				// Unwatch gathering
-				await gatherings.UnwatchGatheringAsync(user.Id, gatheringId);
-			});
-		}
-
 		[HttpPost("{gatheringId}")]
         public async Task<IActionResult> JoinGathering(long gatheringId)
 		{
@@ -150,16 +120,6 @@ namespace Frontier.Controllers
 			{
 				// Join gathering
 				await gatherings.JoinGatheringAsync(user.Id, gatheringId);
-			});
-		}
-
-		[HttpGet("{gatheringId}/checkin")]
-        public async Task<IActionResult> CheckInToGathering(long gatheringId, float latitude, float longitude)
-		{
-			return await Execute(async user =>
-			{
-				// Check in to gathering
-				await gatherings.CheckInToGatheringAsync(user.Id, latitude, longitude);
 			});
 		}
 
@@ -209,22 +169,10 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpGet("{gatheringId}/authorisation/start")]
-		public async Task<IActionResult> CheckStartAuthorisation(long gatheringId)
-		{
-			return await Execute(async user => await gatherings.AuthorisedToStart(user.Id, gatheringId));
-		}
-
 		[HttpGet("{gatheringId}/authorisation/join")]
 		public async Task<IActionResult> CheckJoinAuthorisation(long gatheringId)
 		{
 			return await Execute(async user => await gatherings.AuthorisedToJoin(user.Id, gatheringId));
-		}
-
-		[HttpGet("{gatheringId}/authorisation/checkin")]
-		public async Task<IActionResult> CheckCheckInAuthorisation(long gatheringId)
-		{
-			return await Execute(async user => await gatherings.AuthorisedToCheckIn(user.Id, gatheringId));
 		}
 
 		[HttpGet("{gatheringId}/authorisation/upload")]
@@ -233,12 +181,20 @@ namespace Frontier.Controllers
 			return await Execute(async user => await gatherings.AuthorisedToUpload(user.Id, gatheringId));
 		}
 
+		[HttpGet("{gatheringId}/report")]
+		public async Task<IActionResult> AvailableGatheringReports(long gatheringId)
+		{
+			return await Execute(async user =>
+				await reports.GetAvailableReportsForGatheringAsync(user.Id, gatheringId)
+			);
+		}
+
 		[HttpPost("{gatheringId}/report")]
 		public async Task<IActionResult> ReportGathering(long gatheringId, [FromBody] GatheringReportManifest report)
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 			{
@@ -247,11 +203,11 @@ namespace Frontier.Controllers
 		}
 
 		[HttpGet("{gatheringId}/snapshots")]
-		public async Task<IActionResult> GetGallery(long gatheringId, long targetId)
+		public async Task<IActionResult> GetGallery(long gatheringId, long target_id)
 		{
 			return await Execute(async user =>
 			{
-				return await snapshots.GetGalleryAsync(user.Id, targetId, gatheringId);
+				return await snapshots.GetGalleryAsync(user.Id, target_id, gatheringId);
 			});
 		}
 
@@ -261,7 +217,7 @@ namespace Frontier.Controllers
             // Verify parameters
             if (snapshot == null || !ModelState.IsValid ||
                 snapshot.Image == null || snapshot.Image.Length == 0)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
 			return await Execute(async user =>
             {
@@ -286,7 +242,7 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (details == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
 			{
@@ -294,12 +250,20 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpPost("{gatheringId}/snapshots/{snapshotId}/report")]
+		[HttpGet("{gatheringId}/snapshots/{snapshotId}/report")]
+		public async Task<IActionResult> AvailableSnapshotReports(long gatheringId, long snapshotId)
+        {
+            return await Execute(async user =>
+				await reports.GetAvailableReportsForSnapshotAsync(user.Id, snapshotId)
+            );
+        }
+
+        [HttpPost("{gatheringId}/snapshots/{snapshotId}/report")]
 		public async Task<IActionResult> ReportSnapshot(long gatheringId, long snapshotId, [FromBody] SnapshotReportManifest report)
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
             {

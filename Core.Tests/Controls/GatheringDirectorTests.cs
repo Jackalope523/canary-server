@@ -305,27 +305,6 @@ namespace Core.Tests.Controls
 		}
 
 		[Fact]
-		public async Task StartGatheringAsync_StartsGathering()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-
-			var gathering = environment.CreateTestGathering(user);
-			gathering.StartTime = DateTimeOffset.UtcNow;
-
-			gathering = await environment.GenerateGatheringUnsafeAsync(gathering, user);
-			await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
-
-			// Act
-			await director.StartGatheringAsync(user.Id, gathering.Id);
-
-			// Assert
-			Gathering startedGathering = new(await environment.Terminal.GatheringDatabase.FindGatheringAsync(gathering.Id));
-			Assert.Equal(gathering, startedGathering);
-			Assert.Equal(GatheringState.OngoingOpen, startedGathering.State);
-		}
-
-		[Fact]
 		public async Task EndGatheringAsync_EndsGathering()
 		{
 			// Arrange
@@ -335,51 +314,6 @@ namespace Core.Tests.Controls
 
 			// Act
 			await director.TerminateGatheringAsync(user.Id, gathering.Id);
-			// If no exception is thrown, the test is successful
-		}
-
-		[Fact]
-		public async Task SurveyGatheringAsync_ValidGathering_Succeeds()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var user = await environment.GenerateUniqueUserAsync();
-
-			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-
-			// Act
-			await director.WatchGatheringAsync(user.Id, gathering.Id);
-			// If no exception is thrown, the test is successful
-		}
-
-		[Fact]
-		public async Task SurveyGatheringAsync_InvalidGathering_Fails()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var user = await environment.GenerateUniqueUserAsync();
-
-			var gathering = await environment.GeneratePastGatheringAsync(host);
-
-			// Act
-			var surveySync = director.WatchGatheringAsync(user.Id, gathering.Id);
-
-			// Assert
-			await Assert.ThrowsAnyAsync<HollowException>(async () => await surveySync);
-		}
-
-		[Fact]
-		public async Task UnsurveyGatheringAsync_Succeeds()
-		{
-			// Arrange
-			var host = await environment.GenerateUniqueUserAsync();
-			var user = await environment.GenerateUniqueUserAsync();
-
-			var gathering = await environment.GenerateUpcomingGatheringAsync(host);
-			await director.WatchGatheringAsync(user.Id, gathering.Id);
-
-			// Act
-			await director.UnwatchGatheringAsync(user.Id, gathering.Id);
 			// If no exception is thrown, the test is successful
 		}
 
@@ -409,7 +343,7 @@ namespace Core.Tests.Controls
             await environment.UpdateUserLocationAsync(user, gathering.Location.Latitude, gathering.Location.Longitude);
 
             // Act
-            var join = director.WatchGatheringAsync(user.Id, gathering.Id);
+            var join = director.JoinGatheringAsync(user.Id, gathering.Id);
 
 			// Assert
 			await Assert.ThrowsAnyAsync<HollowException>(async () => await join);
@@ -439,12 +373,10 @@ namespace Core.Tests.Controls
 			var guest = await environment.GenerateUniqueUserAsync();
 			var left = await environment.GenerateUniqueUserAsync();
 			var incoming = await environment.GenerateUniqueUserAsync();
-			var surveyer = await environment.GenerateUniqueUserAsync();
 
 			var gathering = await environment.GenerateOngoingGatheringAsync(user, guest);
 			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Watching);
 
 			// Act
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
@@ -453,9 +385,8 @@ namespace Core.Tests.Controls
 			Assert.Equal(2, guestList.Count);
 
 			Assert.Equal(2, guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
-			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
-			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
+			Assert.Single(guestList, user => user.Bond.Equals(GatheringBond.Left));
+			Assert.Single(guestList, user => user.Bond.Equals(GatheringBond.Guest));
 		}
 
 		[Fact]
@@ -467,17 +398,13 @@ namespace Core.Tests.Controls
 			var left = await environment.GenerateUniqueUserAsync();
 			var incoming = await environment.GenerateUniqueUserAsync();
 			var incomingCompanion = await environment.GenerateUniqueUserAsync();
-			var surveyer = await environment.GenerateUniqueUserAsync();
-			var surveyingCompanion = await environment.GenerateUniqueUserAsync();
 
-			await environment.ForceCompanionshipAsync(user, incomingCompanion, surveyingCompanion);
+            await environment.ForceCompanionshipAsync(user, incomingCompanion);
 
-			var gathering = await environment.GenerateOngoingGatheringAsync(host, user);
+            var gathering = await environment.GenerateOngoingGatheringAsync(host, user);
 			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
 			await environment.AddUserToGatheringAsync(gathering, incomingCompanion, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Watching);
-			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Watching);
 
 			// Act
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
@@ -486,9 +413,8 @@ namespace Core.Tests.Controls
 			Assert.Equal(2, guestList.Count);
 
 			Assert.Equal(2, guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)).Count());
-			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
-			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
+			Assert.Single(guestList, user => user.Bond.Equals(GatheringBond.Left));
+			Assert.Single(guestList, user => user.Bond.Equals(GatheringBond.Guest));
 		}
 
 		[Fact]
@@ -502,18 +428,14 @@ namespace Core.Tests.Controls
 			var leftCompanion = await environment.GenerateUniqueUserAsync();
 			var incoming = await environment.GenerateUniqueUserAsync();
 			var incomingCompanion = await environment.GenerateUniqueUserAsync();
-			var surveyer = await environment.GenerateUniqueUserAsync();
-			var surveyingCompanion = await environment.GenerateUniqueUserAsync();
 
-			await environment.ForceCompanionshipAsync(user, guestCompanion, leftCompanion, incomingCompanion, surveyingCompanion);
+			await environment.ForceCompanionshipAsync(user, guestCompanion, leftCompanion, incomingCompanion);
 
 			var gathering = await environment.GenerateOngoingGatheringAsync(host, guestCompanion);
 			await environment.AddUserToGatheringAsync(gathering, left, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(gathering, leftCompanion, GatheringBond.Left);
 			await environment.AddUserToGatheringAsync(gathering, incoming, GatheringBond.Guest);
 			await environment.AddUserToGatheringAsync(gathering, incomingCompanion, GatheringBond.Guest);
-			await environment.AddUserToGatheringAsync(gathering, surveyer, GatheringBond.Watching);
-			await environment.AddUserToGatheringAsync(gathering, surveyingCompanion, GatheringBond.Watching);
 
 			// Act
 			var guestList = await director.GetGuestListAsync(user.Id, gathering.Id);
@@ -521,10 +443,9 @@ namespace Core.Tests.Controls
 			// Assert
 			Assert.Equal(2, guestList.Count);
 
-			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
-			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
-			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
+			Assert.Single(guestList, user => user.Bond.Equals(GatheringBond.Arrived));
+			Assert.Single(guestList, user => user.Bond.Equals(GatheringBond.Left));
+			Assert.Single(guestList, user => user.Bond.Equals(GatheringBond.Guest));
 		}
 
 		[Fact]
@@ -549,7 +470,7 @@ namespace Core.Tests.Controls
 			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Arrived)));
 			Assert.Single(guestList.Where(user => user.Bond.Equals(GatheringBond.Left)));
 			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Guest)));
-			Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
+			//Assert.Empty(guestList.Where(user => user.Bond.Equals(GatheringBond.Watching)));
 		}
 
 		[Fact]

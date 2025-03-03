@@ -2,12 +2,12 @@
 {
     public class UserRelationship : Entity
     {
-        public enum UserLinkType { Appreciate, Block }
+        public enum UserRelationshipType { Follow, Block }
 
         public long SelfId { get; init; }
         public long OtherId { get; init; }
         public DateTimeOffset Time { get; init; }
-        public UserLinkType Type { get; set; }
+        public UserRelationshipType Type { get; set; }
 
         // Navigation Properties
         public User? Self { get; init; }

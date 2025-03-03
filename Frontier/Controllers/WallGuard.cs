@@ -23,14 +23,14 @@ namespace Frontier.Controllers
 		#region Actions
 
 		[HttpGet]
-        public async Task<IActionResult> GetWall(int depth, int lastDepth)
+        public async Task<IActionResult> GetWall(int depth, int last_depth)
         {
 			// Verify parameters
             if (!ModelState.IsValid)
-            { return BadRequest(HollowError.MissingInformation.ToString()); }
+            { return MissingInformation(); }
 
 			return await Execute(async user =>
-				await snapshots.GetUserColumnAsync(user.Id, depth, lastDepth));
+				await snapshots.GetWallAsync(user.Id, depth, last_depth));
         }
 
 		#endregion

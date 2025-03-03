@@ -28,7 +28,7 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			TelegramMessage message = TelegramMessage.UserAppreciated;
+			TelegramMessage message = TelegramMessage.UserFollowed;
 			string action = "action";
 			int messageCount = 3;
 
@@ -47,7 +47,7 @@ namespace Core.Tests.Controls
 			// Arrange
 			var user = await environment.GenerateUniqueUserAsync();
 			var noter = await environment.GenerateUniqueUserAsync();
-			TelegramMessage message = TelegramMessage.UserAppreciated;
+			TelegramMessage message = TelegramMessage.UserFollowed;
 			string context = "action";
 
 			// Act
@@ -67,7 +67,7 @@ namespace Core.Tests.Controls
 			var userA = await environment.GenerateUniqueUserAsync();
 			var userB = await environment.GenerateUniqueUserAsync();
 			await environment.ForceEnemiesAsync(userA, userB);
-			TelegramMessage message = TelegramMessage.UserAppreciated;
+			TelegramMessage message = TelegramMessage.UserFollowed;
 			string context = "action";
 
 			// Act

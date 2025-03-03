@@ -18,7 +18,6 @@ namespace Repository
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
         public IMediaDatabase MediaDatabaseAccess { get; private set; }
         public IKeyDatabase KeyDatabaseAccess { get; private set; }
-        public IBannerDatabase BannerDatabaseAccess { get; private set; }
         public IDebugDatabase DebugDatabaseAccess { get; private set; }
         public IMiscellaneousDatabase MiscellaneousDatabaseAccess { get; private set; }
 
@@ -31,7 +30,6 @@ namespace Repository
             SnapshotDatabaseAccess = new SnapshotStoreCoordinator(flag);
             ReportDatabaseAccess = new DisciplineStoreCoordinator(flag);
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
-            BannerDatabaseAccess = new BannerStoreCoordinator(flag);
             KeyDatabaseAccess = new KeyStoreCoordinator();
             MediaDatabaseAccess = new MediaStoreCoordinator(flag);
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);

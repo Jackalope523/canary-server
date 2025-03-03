@@ -25,7 +25,7 @@ namespace Core
 		#region Initialisation
 
 		public static DebugTerminal CreateDebugTerminal(ILogger logger,
-            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase, IBannerDatabase bannerDatabase,
+            IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
             IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
@@ -40,7 +40,6 @@ namespace Core
 
 					AccountDatabase = accountDatabase,
 					AdminDatabase = adminDatabase,
-					BannerDatabase = bannerDatabase,
 					GatheringDatabase = gatheringDatabase,
 					SnapshotDatabase = snapshotDatabase,
 					DisciplineDatabase = disciplineDatabase,

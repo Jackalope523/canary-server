@@ -820,5 +820,13 @@ namespace Repository.Tests
             await Assert.ThrowsAsync<DatabaseReadException>(action);
         }
 
+        [Fact]
+        public async Task RerollUserCodeAsync_SUCCESS()
+        {
+            string code = await store.RerollUserCodeAsync(subject.Id);
+
+            _testOutputHelper.WriteLine(code);
+        }
+
     }
 }

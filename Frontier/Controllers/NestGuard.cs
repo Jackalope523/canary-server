@@ -36,36 +36,64 @@ namespace Frontier.Controllers
                 await nests.GetCompanionsAsync(user.Id));
         }
 
-        [HttpGet("appreciating")]
-        public async Task<IActionResult> GetAppreciated()
+        [HttpGet("companions/incoming")]
+        public async Task<IActionResult> GetIncomingCompanionshipRequests()
 		{
 			return await Execute(async user =>
-				await nests.GetAppreciatedUsersAsync(user.Id));
+				await nests.GetIncomingCompanionshipRequestsAsync(user.Id));
 		}
 
-		[HttpPost("appreciating")]
-		public async Task<IActionResult> AppreciateUser([FromBody] TargetManifest info)
+        [HttpGet("companions/outgoing")]
+        public async Task<IActionResult> GetOutgoingCompanionshipRequests()
+		{
+			return await Execute(async user =>
+				await nests.GetOutgoingCompanionshipRequestsAsync(user.Id));
+		}
+
+        [HttpGet("companions/recent")]
+        public async Task<IActionResult> GetRecentlyMet()
+		{
+			return await Execute(async user =>
+				await nests.GetRecentlyMetAsync(user.Id));
+		}
+
+		[HttpPost("companions")]
+		public async Task<IActionResult> AcceptOrRequestUser(long? target_id = null, string code = null)
 		{
 			// Verify parameters
-			if (info == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			if (!ModelState.IsValid)
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await nests.AppreciateUserAsync(user.Id, info.TargetId));
+			{
+				if (target_id.HasValue)
+				{ await nests.AcceptOrRequestCompanionshipAsync(user.Id, target_id.Value); }
+				else if (!string.IsNullOrEmpty(code))
+				{ await nests.RequestCompanionshipAsync(user.Id, code); }
+				else
+				{ throw new MissingInformationException(); }
+			});
 		}
 
-		[HttpPut("appreciating")]
-		public async Task<IActionResult> UnappreciateUser([FromBody] TargetManifest info)
+		[HttpPut("companions")]
+		public async Task<IActionResult> DenyOrRemoveUser(long target_id)
 		{
 			// Verify parameters
-			if (info == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			if (!ModelState.IsValid)
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await nests.UnappreciateUserAsync(user.Id, info.TargetId));
-		}
+				await nests.DenyOrRemoveUserAsync(user.Id, target_id));
+        }
 
-		[HttpGet("blocked")]
+        [HttpPost("code")]
+        public async Task<IActionResult> RerollUserCode()
+        {
+            return await Execute(async user =>
+                await accounts.RerollCodeAsync(user.Id));
+        }
+
+        [HttpGet("blocked")]
 		public async Task<IActionResult> GetBlocked()
 		{
 			return await Execute(async user =>
@@ -73,31 +101,39 @@ namespace Frontier.Controllers
 		}
 
 		[HttpPost("blocked")]
-		public async Task<IActionResult> BlockUser([FromBody] TargetManifest info)
+		public async Task<IActionResult> BlockUser(long target_id)
 		{
 			// Verify parameters
-			if (info == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			if (!ModelState.IsValid)
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await nests.BlockUserAsync(user.Id, info.TargetId));
+				await nests.BlockUserAsync(user.Id, target_id));
 		}
 
 		[HttpPut("blocked")]
-		public async Task<IActionResult> UnblockUser([FromBody] TargetManifest info)
+		public async Task<IActionResult> UnblockUser(long target_id)
 		{
-			if (info == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			if (!ModelState.IsValid)
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await nests.UnblockUserAsync(user.Id, info.TargetId));
+				await nests.UnblockUserAsync(user.Id, target_id));
 		}
 
-		[HttpGet("{targetId}/authorisation/appreciate")]
-		public async Task<IActionResult> CheckAppreciateAuthorisation(long targetId)
+		[HttpGet("{targetId}/authorisation/follow")]
+		public async Task<IActionResult> CheckFollowAuthorisation(long targetId)
 		{
 			return await Execute(async user =>
-				await nests.AuthorisedToAppreciate(user.Id, targetId));
+				await nests.AuthorisedToFollow(user.Id, targetId));
+		}
+
+		[HttpGet("{targetId}/report")]
+		public async Task<IActionResult> AvailableUserReports(long targetId)
+		{
+			return await Execute(async user =>
+				await reports.GetAvailableReportsForUserAsync(user.Id, targetId)
+			);
 		}
 
 		[HttpPost("{targetId}/report")]
@@ -105,10 +141,11 @@ namespace Frontier.Controllers
 		{
 			// Verify parameters
 			if (report == null || !ModelState.IsValid)
-			{ return BadRequest(HollowError.MissingInformation.ToString()); }
+			{ return MissingInformation(); }
 
 			return await Execute(async user =>
-				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails));
+				await reports.ReportUserAsync(user.Id, targetId, report.ReportType, report.ReportDetails, report.OccuringGatheringId)
+			);
 		}
 
 		#endregion

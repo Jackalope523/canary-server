@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
+using System;
 
 namespace Repository
 {
@@ -17,11 +18,10 @@ namespace Repository
         internal DbSet<Telegram> Telegrams { get; set; }
         internal DbSet<Subscription> Subscriptions { get; set; }
         internal DbSet<Penalty> Penalties { get; set; }
-        internal DbSet<Banner> Banners { get; set; }
-        internal DbSet<BannerLink> BannerLinks { get; set; }
         internal DbSet<GuestClearance> GuestClearances { get; set; }
         internal DbSet<Feedback> Feedback { get; set; }
         internal DbSet<Notification> Notifications { get; set; }
+        internal DbSet<Word> Words { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,7 +59,7 @@ namespace Repository
                 .HasMaxLength(100);
 
             modelBuilder.Entity<User>()
-                .Property(u => u.Pseudonym)
+                .Property(u => u.CompanionshipCode)
                 .HasMaxLength(100);
 
             modelBuilder.Entity<User>()
@@ -183,14 +183,34 @@ namespace Repository
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
-                .HasMany(u => u.BannerLinks)
-                .WithOne(l => l.User)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<User>()
                .HasMany(u => u.Notifications)
                .WithOne(n => n.Recipient)
                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.Snapshots)
+               .WithOne(r => r.Owner)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.Subscriptions)
+               .WithOne(s => s.User)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Feedback)
+             .WithOne(f => f.User)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Penalties)
+             .WithOne(p => p.Penalized)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.GuestClearances)
+             .WithOne(c => c.User)
+             .OnDelete(DeleteBehavior.Restrict);
 
             // Gathering
             modelBuilder.Entity<Gathering>()
@@ -296,27 +316,6 @@ namespace Repository
                 .WithOne(l => l.Snapshot)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Banner
-            modelBuilder.Entity<Banner>()
-                .HasQueryFilter(b => !b.SoftDeleted);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Name)
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Description)
-                .HasMaxLength(1000);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Code)
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<Banner>().Property(b => b.Color)
-                .HasMaxLength(7);
-
-            modelBuilder.Entity<Banner>()
-                .HasMany(b => b.Links)
-                .WithOne(l => l.Banner)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Feedback
             modelBuilder.Entity<Feedback>()
                 .HasQueryFilter(f => !f.SoftDeleted);
@@ -344,10 +343,6 @@ namespace Repository
             modelBuilder.Entity<GatheringLink>()
                 .HasQueryFilter(l => !l.SoftDeleted);
 
-            // Banner Link
-            modelBuilder.Entity<BannerLink>()
-                .HasQueryFilter(l => !l.SoftDeleted);
-
             // Guest Clearance
             modelBuilder.Entity<GuestClearance>()
                 .HasQueryFilter(c => !c.SoftDeleted);
@@ -367,6 +362,14 @@ namespace Repository
             modelBuilder.Entity<Notification>()
                 .Property(n => n.NotificationId)
                 .HasMaxLength(36);
+
+            // Words
+            modelBuilder.Entity<Word>()
+                .HasQueryFilter(w => !w.SoftDeleted);
+
+            modelBuilder.Entity<Word>()
+                .Property(w => w.Text)
+                .HasMaxLength(50);
         }
     }
 }

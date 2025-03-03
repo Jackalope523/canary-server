@@ -29,7 +29,7 @@ namespace Core.Controls
             {
                 -7 => await Keys.GetAppleAccountCodeAsync(),
                 -8 => await Keys.GetGoogleAccountCodeAsync(),
-                _ => throw new InvalidUserException("User does not exist")
+                _ => throw new UndefinedBehaviourException($"Tried to access non-existent classified account code for {userId}")
             };
         }
 
