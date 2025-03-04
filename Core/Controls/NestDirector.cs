@@ -155,26 +155,18 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            var userFollowers = await user.Followers;
-            var userCompanions = await user.Companions;
+            var requests = await Nests.GetIncomingRequestsAsync(user.Id);
 
-            // Strip out companions
-            return userFollowers.Except(userCompanions)
-                .ToList()
-                .ConvertAll(u => new CompanionshipRequestShard(u.ToUserShard(), Psijic.Time));
+            return requests;
         }
 
         public async Task<List<CompanionshipRequestShard>> GetOutgoingCompanionshipRequestsAsync(long userId)
         {
             var user = await GetUserAsync(userId);
 
-            var userFollowing = await user.Following;
-            var userCompanions = await user.Companions;
+            var requests = await Nests.GetOutgoingRequestsAsync(user.Id);
 
-            // Strip out companions
-            return userFollowing.Except(userCompanions)
-                .ToList()
-                .ConvertAll(u => new CompanionshipRequestShard(u.ToUserShard(), Psijic.Time));
+            return requests;
         }
 
         public async Task<List<UserShard>> GetRecentlyMetAsync(long userId)
