@@ -173,26 +173,10 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            // Get last gathering
-            var lastGathering = await user.LastGathering();
+            var recentlyMet = await Nests.GetRecentlyMetAsync(user.Id);
 
-            var neutralGuests = await Task.WhenAll((await lastGathering.Left)
-                .Select(async guest =>
-                    {
-                        if (await user.IsNeutralOrUnrequitedWith(guest))
-                        {
-                            return guest;
-                        }
-
-                        return User.Hidden;
-                    }
-                ));
-
-            // Remove all Hidden users and self
-            return neutralGuests
-                .Where(guest => !guest.Equals(User.Hidden) && !guest.Equals(user))
-                .ToList()
-                .ConvertAll(u => u.ToUserShard());
+            return recentlyMet
+                .ConvertAll(u => new User(u).ToUserShard());
         }
 
         public async Task<List<BlockedUserShard>> GetBlockedUsersAsync(long userId)
