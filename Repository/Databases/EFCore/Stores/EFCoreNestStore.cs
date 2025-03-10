@@ -459,8 +459,18 @@ namespace Repository
 
         public async Task<List<CompanionshipRequestShard>> GetIncomingRequestsAsync(long userId)
         {
+            List<long> following = await storeSentry.ExecuteReadAsync(ctx =>
+                                            ctx.UserRelationships
+                                            .Where(l => l.SelfId == userId && l.Type == UserRelationship.UserRelationshipType.Follow)
+                                            .Select(l => l.Id)
+                                            .ToListAsync());
+
             return await storeSentry.ExecuteReadAsync(ctx => ctx.UserRelationships
-            .Where(r => r.OtherId == userId && r.Type == UserRelationship.UserRelationshipType.Follow)
+            .Where( r => 
+                r.OtherId == userId &&
+                r.Type == UserRelationship.UserRelationshipType.Follow &&
+                !following.Contains(r.Id)
+            )
             .Join(
                 ctx.Users,
                 r => r.SelfId,
@@ -472,8 +482,18 @@ namespace Repository
 
         public async Task<List<CompanionshipRequestShard>> GetOutgoingRequestsAsync(long userId)
         {
+            List<long> followingMe = await storeSentry.ExecuteReadAsync(ctx =>
+                                         ctx.UserRelationships
+                                         .Where(l => l.OtherId == userId && l.Type == UserRelationship.UserRelationshipType.Follow)
+                                         .Select(l => l.Id)
+                                         .ToListAsync());
+
             return await storeSentry.ExecuteReadAsync(ctx => ctx.UserRelationships
-            .Where(r => r.SelfId == userId && r.Type == UserRelationship.UserRelationshipType.Follow)
+            .Where(r => 
+                    r.SelfId == userId && 
+                    r.Type == UserRelationship.UserRelationshipType.Follow &&
+                    !followingMe.Contains(r.Id)
+            )
             .Join(
                 ctx.Users,
                 r => r.OtherId,
@@ -487,7 +507,7 @@ namespace Repository
         {
             return await storeSentry.ExecuteReadAsync(ctx =>
             ctx.GatheringLinks
-            .Where(l => l.UserId == userId)
+            .Where(l => l.UserId == userId && l.Type == GatheringBond.Left)
             .Join(
                 ctx.Gatherings.Where(g => g.StartTime < DateTimeOffset.UtcNow),
                 l => l.GatheringId,
@@ -495,7 +515,7 @@ namespace Repository
                 (l, g) => g.Id
             )
             .Join(
-                ctx.GatheringLinks.Where(l => l.UserId != userId),
+                ctx.GatheringLinks.Where(l => l.UserId != userId && l.Type == GatheringBond.Left),
                 x => x,
                 l => l.GatheringId,
                 (x, l) => l.UserId
@@ -533,6 +553,7 @@ namespace Repository
                     u.NotificationId
                     )
             )
+            .Take(15)
             .ToListAsync());
         }
     }
