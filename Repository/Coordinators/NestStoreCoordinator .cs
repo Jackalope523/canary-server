@@ -72,5 +72,20 @@
         {
             return await store.ReturnStrangerDangerAsync(userId, users);
         }
+
+        public async Task<List<CompanionshipRequestShard>> GetIncomingRequestsAsync(long userId)
+        {
+            return await store.GetIncomingRequestsAsync(userId);
+        }
+
+        public async Task<List<CompanionshipRequestShard>> GetOutgoingRequestsAsync(long userId)
+        {
+            return await store.GetOutgoingRequestsAsync(userId);
+        }
+
+        public async Task<List<CoreUser>> GetRecentlyMetAsync(long userId)
+        {
+            return await store.GetRecentlyMetAsync(userId);
+        }
     }
 }

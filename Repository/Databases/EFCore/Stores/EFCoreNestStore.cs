@@ -447,7 +447,7 @@ namespace Repository
                                                     (l, g) => g.Id
                                                     )
                                                 .Join(
-                                                    ctx.GatheringLinks,
+                                                    ctx.GatheringLinks.Where(l => l.UserId != userId),
                                                     x => x,
                                                     l => l.GatheringId,
                                                     (x, l) => l.UserId
@@ -455,6 +455,85 @@ namespace Repository
                                                 .ToListAsync());
 
             return users.Except(metUsers).ToList();
+        }
+
+        public async Task<List<CompanionshipRequestShard>> GetIncomingRequestsAsync(long userId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.UserRelationships
+            .Where(r => r.OtherId == userId && r.Type == UserRelationship.UserRelationshipType.Follow)
+            .Join(
+                ctx.Users,
+                r => r.SelfId,
+                u => u.Id,
+                (r,u) => new CompanionshipRequestShard(new UserShard(u.Id, u.Name), r.Time)
+            )
+            .ToListAsync());
+        }
+
+        public async Task<List<CompanionshipRequestShard>> GetOutgoingRequestsAsync(long userId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx => ctx.UserRelationships
+            .Where(r => r.SelfId == userId && r.Type == UserRelationship.UserRelationshipType.Follow)
+            .Join(
+                ctx.Users,
+                r => r.OtherId,
+                u => u.Id,
+                (r, u) => new CompanionshipRequestShard(new UserShard(u.Id, u.Name), r.Time)
+            )
+            .ToListAsync());
+        }
+
+        public async Task<List<CoreUser>> GetRecentlyMetAsync(long userId)
+        {
+            return await storeSentry.ExecuteReadAsync(ctx =>
+            ctx.GatheringLinks
+            .Where(l => l.UserId == userId)
+            .Join(
+                ctx.Gatherings.Where(g => g.StartTime < DateTimeOffset.UtcNow),
+                l => l.GatheringId,
+                g => g.Id,
+                (l, g) => g.Id
+            )
+            .Join(
+                ctx.GatheringLinks.Where(l => l.UserId != userId),
+                x => x,
+                l => l.GatheringId,
+                (x, l) => l.UserId
+            )
+            .Join(
+                ctx.Users,
+                id => id,
+                u => u.Id,
+                (id, u) => new CoreUser(
+                    u.Id,
+                    u.PhoneNumber,
+                    u.Email,
+                    u.Name,
+                    u.CompanionshipCode,
+                    u.DateOfBirth,
+                    u.IsPhoneConfirmed,
+                    u.IsEmailConfirmed,
+                    u.SoftDeleted,
+                    u.SecurityStamp,
+                    u.LockoutDate,
+                    u.AccessTries,
+                    u.AccountStatus,
+                    u.JoinDate,
+                    u.Reputation,
+                    new CharacterShard(
+                        u.Age,
+                        u.Extroversion,
+                        u.Athleticisme,
+                        u.Chaos,
+                        u.Competitiveness,
+                        u.Industriousness,
+                        u.NightOwl,
+                        u.Openness),
+                    u.TimeOfUserAgreement,
+                    u.NotificationId
+                    )
+            )
+            .ToListAsync());
         }
     }
 }
