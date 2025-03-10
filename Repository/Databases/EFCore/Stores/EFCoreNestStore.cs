@@ -553,6 +553,7 @@ namespace Repository
                     u.NotificationId
                     )
             )
+            .Take(15)
             .ToListAsync());
         }
     }
