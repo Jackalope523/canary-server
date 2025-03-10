@@ -146,7 +146,7 @@ namespace Core.Controls
 			else
 			{
 				// Schedule notifications
-				await ScheduleNotifications(newGathering);
+				_ = ScheduleNotifications(newGathering);
 			}
 
             // Notify companions of gathering
