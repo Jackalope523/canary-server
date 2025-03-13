@@ -1,5 +1,6 @@
 using System;
 using Core.Boundaries;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Frontier.Stores;
 using Frontier.Services;
@@ -204,6 +205,12 @@ namespace Frontier
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(@"/home/data-protection-keys"))
                 .SetApplicationName("Hollow-" + env);
+
+            /////////
+            // Sockets
+            //////////////////////////
+            
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -229,6 +236,7 @@ namespace Frontier
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<MessagingHub>("/Messaging");
             });
         }
 
