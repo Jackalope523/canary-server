@@ -146,7 +146,7 @@ namespace Core.Controls
 			else
 			{
 				// Schedule notifications
-				await ScheduleNotifications(newGathering);
+				_ = ScheduleNotifications(newGathering);
 			}
 
             // Notify companions of gathering
@@ -596,12 +596,6 @@ namespace Core.Controls
 
 		#region Favours
 
-		internal async Task<List<Gathering>> RequestCurrentGatheringsForUserAsync(User user)
-		{
-			return (await Gatherings.FindOngoingGatheringsForUserAsync(user.Id, Time))
-				.ConvertAll(gathering => new Gathering(gathering));
-		}
-
 		internal async Task<List<Gathering>> RequestPastGatheringsForUserAsync(User user)
 		{
 			return (await Gatherings.FindPastGatheringsForUserAsync(user.Id))
@@ -610,7 +604,7 @@ namespace Core.Controls
 
 		internal async Task<List<Gathering>> RequestOngoingGatheringsForUserAsync(User user)
 		{
-			return (await Gatherings.FindPastGatheringsForUserAsync(user.Id))
+			return (await Gatherings.FindOngoingGatheringsForUserAsync(user.Id, Time))
 				.ConvertAll(gathering => new Gathering(gathering));
 		}
 
