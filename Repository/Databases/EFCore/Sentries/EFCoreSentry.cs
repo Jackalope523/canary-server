@@ -142,6 +142,19 @@ namespace Repository
             }
         }
 
+        public T DiscussRead<T>(Func<CanaryContext, T> read, Discussion discussion)
+        {
+            try
+            {
+                return read.Invoke(discussion.SharedContext);
+            }
+            catch (Exception ex)
+            {
+                discussion.EndNow();
+                throw new DatabaseReadException(ex);
+            }
+        }
+
         public async Task DiscussWriteAsync(Func<CanaryContext, Task> write, Discussion discussion)
         {
             try

@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Utilities;
-using System.Linq;
 
 namespace Repository
 {
@@ -13,78 +10,79 @@ namespace Repository
 
         }
 
-        internal async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
+        internal void PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
         {
             if (degree == -1) return;
 
-            long id = await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.GuestClearances.
-                Where(c => c.GatheringId == gatheringId && c.UserId == userId).
-                Select(c => c.Id).
-                SingleOrDefaultAsync());
+            long foundInCache = storeSentry.DiscussRead(ctx =>
+                                        ctx.GuestClearances.Local.
+                                        Where(c => c.GatheringId == gatheringId && c.UserId == userId).
+                                        Select(c => c.UserId).
+                                        SingleOrDefault(), discussion);
 
-            if (id == 0)
+            long foundInDatabase = storeSentry.DiscussRead(ctx =>
+                                        ctx.GuestClearances.
+                                        Where(c => c.GatheringId == gatheringId && c.UserId == userId).
+                                        Select(c => c.UserId).
+                                        SingleOrDefault(), discussion);
+
+            if (foundInCache == 0 && foundInDatabase == 0)
             {
-               storeSentry.DiscussWrite(ctx =>
-               ctx.GuestClearances.
-               Add(new GuestClearance
-               {
-                   UserId = userId,
-                   GatheringId = gatheringId,
-                   Degree = degree,
-               }
-               ), discussion);
+                storeSentry.DiscussWrite(ctx =>
+                ctx.GuestClearances.
+                Add(new GuestClearance
+                {
+                    UserId = userId,
+                    GatheringId = gatheringId,
+                    Degree = degree,
+                }
+                ), discussion);
             }
             else return;
 
-            Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+            List<long> appreciating = storeSentry.ExecuteRead(ctx =>
                 ctx.UserRelationships.
                 Where(l => !exclusionList.Contains(l.OtherId) && l.SelfId == userId && l.Type == UserRelationship.UserRelationshipType.Follow).
                 Select(l => l.OtherId).
-                ToListAsync());
+                ToList());
 
-            Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+            List<long> appreciatingMe = storeSentry.ExecuteRead(ctx =>
                 ctx.UserRelationships.
                 Where(l => !exclusionList.Contains(l.SelfId) && l.OtherId == userId && l.Type == UserRelationship.UserRelationshipType.Follow).
                 Select(l => l.SelfId).
-                ToListAsync());
+                ToList());
 
-            List<long> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
+            List<long> companions = appreciating.Intersect(appreciatingMe).ToList();
 
-            List<Task> tasks = new();
             foreach (long companion in companions)
             {
-                tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).Append(userId).ToList(), discussion));
+                PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).Append(userId).ToList(), discussion);
             }
-            await Task.WhenAll(tasks);
         }
 
-        private async Task UpdateClearance(long gatheringId, int previousDegreeOfPrivacy, int newDegreeOfPrivacy)
+        private void UpdateClearance(long gatheringId, int previousDegreeOfPrivacy, int newDegreeOfPrivacy)
         {
             if (previousDegreeOfPrivacy < newDegreeOfPrivacy)
             {
-                List<long> edgeUsers = await storeSentry.ExecuteReadAsync(ctx =>
+                List<long> edgeUsers = storeSentry.ExecuteRead(ctx =>
                     ctx.GuestClearances.
                     Where(c => c.GatheringId == gatheringId && c.Degree == previousDegreeOfPrivacy).
                     Select(c => c.UserId).
-                    ToListAsync());
+                    ToList());
 
-
-                List<Task> tasks = new();
+                Discussion discussion = storeSentry.BeginDiscussion();
                 foreach (long user in edgeUsers)
                 {
-                    Discussion discussion = storeSentry.BeginDiscussion();
-                    tasks.Add(PropagateClearance(user, gatheringId, newDegreeOfPrivacy - previousDegreeOfPrivacy, new(edgeUsers), discussion));
-                    storeSentry.EndDiscussion(discussion);
+                    PropagateClearance(user, gatheringId, newDegreeOfPrivacy - previousDegreeOfPrivacy, new(edgeUsers), discussion);
                 }
-                await Task.WhenAll(tasks);
+                storeSentry.EndDiscussion(discussion);
             }
             else if (previousDegreeOfPrivacy > newDegreeOfPrivacy)
             {
-                await storeSentry.ExecuteWriteAsync(ctx =>
+                storeSentry.ExecuteWrite(ctx =>
                     ctx.GuestClearances.
                     Where(c => c.GatheringId == gatheringId && c.Degree > newDegreeOfPrivacy).
-                    ExecuteDeleteAsync());
+                    ExecuteDelete());
             }
             else
             {
@@ -132,7 +130,7 @@ namespace Repository
             if (degreeOfPrivacy < 3)
             {
                 Discussion discussion = storeSentry.BeginDiscussion();
-                await PropagateClearance(hostId, toCreate.Id, degreeOfPrivacy, new(), discussion);
+                PropagateClearance(hostId, toCreate.Id, degreeOfPrivacy, new(), discussion);
                 storeSentry.EndDiscussion(discussion);
             }
 
@@ -574,7 +572,7 @@ namespace Repository
                                         SingleAsync());
 
                         e.DegreeOfPrivacy = (int)Value;
-                        await UpdateClearance(id, prev, e.DegreeOfPrivacy);
+                        UpdateClearance(id, prev, e.DegreeOfPrivacy);
                         break;
                     case nameof(CoreGathering.Decay):
                         e.Decay = (float)Value;
