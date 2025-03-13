@@ -22,6 +22,11 @@ namespace Repository
         internal DbSet<Feedback> Feedback { get; set; }
         internal DbSet<Notification> Notifications { get; set; }
         internal DbSet<Word> Words { get; set; }
+        //internal DbSet<Message> Messages { get; set; }
+        //internal DbSet<Conversation> Conversations { get; set; }
+        //internal DbSet<MessageLinks> MessageLinks { get; set; }
+        //internal DbSet<ConversationLink> ConversationLinks { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -370,6 +375,16 @@ namespace Repository
             modelBuilder.Entity<Word>()
                 .Property(w => w.Text)
                 .HasMaxLength(50);
+
+            // Messages
+
+            // Conversations
+
+            // Message Links
+
+            // Conversation Links
+
+
         }
     }
 }

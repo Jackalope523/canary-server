@@ -8,6 +8,7 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Web' " />
   <ItemGroup>
 	  <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.2" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
