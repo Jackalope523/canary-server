@@ -210,7 +210,7 @@ namespace Frontier
             // Sockets
             //////////////////////////
             
-            //services.AddSignalR();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -236,7 +236,7 @@ namespace Frontier
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapHub<MessagingHub>("/Messaging");
+                endpoints.MapHub<MessagingHub>("/Messaging");
             });
         }
 
