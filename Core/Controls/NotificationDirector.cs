@@ -61,52 +61,7 @@ namespace Core.Controls
                 edits.Add((nameof(NotificationProfile.GatheringDiscovery), gatheringDiscovery.Value));
             }
 
-			await Telegrams.UpdateNotificationProfileAsync(user.Id, edits);
-		}
-
-        public async Task<List<TelegramShard>> GetTelegramsAsync(long userId)
-		{
-			var user = await GetUserAsync(userId);
-
-			return await Telegrams.GetTelegramsAsync(user.Id);
-		}
-
-		public async Task ClearTelegramsAsync(long userId)
-		{
-			var user = await GetUserAsync(userId);
-
-			var telegrams = await Telegrams.GetTelegramsAsync(user.Id);
-
-			foreach (var telegram in telegrams)
-			{
-				try
-				{
-					await Telegrams.DeleteTelegramAsync(telegram.Id);
-				}
-				catch { }
-			}
-		}
-
-		public async Task ClearTelegramsAsync(long userId, List<long> telegramIds)
-		{
-			var user = await GetUserAsync(userId);
-
-			var telegrams = await Telegrams.GetTelegramsAsync(user.Id);
-
-			foreach (var id in telegramIds)
-			{
-				// Check if user owns telegram
-				// TODO Potential flag for abuse
-				if (telegrams.Exists(t => t.Id.Equals(id)))
-				{
-					try
-					{
-						await Telegrams.DeleteTelegramAsync(id);
-					}
-					catch { }
-				}
-
-			}
+			await Notifications.UpdateNotificationProfileAsync(user.Id, edits);
 		}
 
 		#endregion
@@ -115,16 +70,7 @@ namespace Core.Controls
 
 		internal async Task<NotificationProfile> RequestNotificationProfileAsync(User user)
 		{
-			return await Telegrams.GetNotificationProfileAsync(user.Id);
-		}
-
-		internal async Task PostTelegramAsync(User user, User notifier, TelegramMessage message, string context)
-		{
-			// Check if notifier can notify user
-			if (await notifier.IsBlocking(user) || await notifier.IsBlockedBy(user))
-			{ return; }
-
-			await Telegrams.SaveTelegramAsync(user.Id, notifier.Id, Time, message, context);
+			return await Notifications.GetNotificationProfileAsync(user.Id);
 		}
 
 		internal async Task<string> NotifyUserAsync(User user, CanaryNotification notification, DateTimeOffset? notifyAt = null)

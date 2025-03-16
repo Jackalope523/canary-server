@@ -104,7 +104,6 @@ namespace Core.Entities
         public Synced<List<User>> Blocking { get; }
         public Synced<List<User>> BlockedBy { get; }
 
-        public Synced<List<TelegramShard>> Notes { get; }
         public Synced<List<PenaltyShard>> Penalties { get; }
 
         private Synced<(List<UserReport> UserReports, List<GatheringReport> GatheringReports, List<SnapshotReport> SnapshotReports)> ReportsSync { get; }
@@ -145,7 +144,6 @@ namespace Core.Entities
             Blocking = new(() => Terminal.NestDirector.RequestBlockedUsersAsync(this));
             BlockedBy = new(() => Terminal.NestDirector.RequestUsersBlockingAsync(this));
 
-            Notes = new(() => Terminal.NotificationDirector.GetTelegramsAsync(Id));
             Penalties = new(() => Terminal.DisciplineDirector.RequestPenaltiesForUserAsync(this));
 
             ReportsSync = new(() => Terminal.DisciplineDirector.RequestAllReportsAsync(this));
@@ -580,7 +578,7 @@ namespace Core.Entities
 
             // Notify user of change
             if (!currentStatus.Equals(nextStatus))
-            { _ = PostTelegram(Hollow, TelegramMessage.AccountStatusChanged);  }
+            { } // todo
 
             return nextStatus;
         }
@@ -588,12 +586,6 @@ namespace Core.Entities
 		#endregion
 
 		#region Actions
-
-        public async Task PostTelegram(User notifier, TelegramMessage message, string context = "")
-        {
-            await Terminal.NotificationDirector.PostTelegramAsync(this, notifier,
-                message, context);
-        }
 
         public async Task<string> Notify(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {

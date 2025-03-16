@@ -31,7 +31,7 @@ namespace Frontier.Controllers
 		public IDisciplineOperations reports;
 		public IKeyOperations keys;
 		public IMediaOperations media;
-		public INotificationOperations telegrams;
+		public INotificationOperations notifications;
 		public INestOperations nests;
 		public IMiscellaneousOperations miscellaneous;
 
@@ -53,7 +53,7 @@ namespace Frontier.Controllers
 			keys = box.keys;
 			reports = box.reports;
 			media = box.media;
-			telegrams = box.telegrams;
+			notifications = box.notifications;
 			miscellaneous = box.miscellaneous;
 
 			userManager = aspUserManager;

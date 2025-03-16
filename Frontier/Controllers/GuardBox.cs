@@ -13,7 +13,7 @@ namespace Frontier.Controllers
 		public IKeyOperations keys;
 		public IDisciplineOperations reports;
 		public IMediaOperations media;
-		public INotificationOperations telegrams;
+		public INotificationOperations notifications;
 		public INestOperations nests;
         public IMiscellaneousOperations miscellaneous;
 
@@ -34,7 +34,7 @@ namespace Frontier.Controllers
 			keys = keyOperations;
 			reports = disciplineOperations;
 			media = mediaOperations;
-			telegrams = notificationOperations;
+			notifications = notificationOperations;
 			miscellaneous = miscellaneousOperations;
 		}
 	}

@@ -544,8 +544,8 @@ namespace Core.Controls
 			Verify(await inviter.IsCompanionsWith(invitee),
 				new UserErrorException(GatheringErrorCode.CANNOT_INVITE_NEUTRAL));
 
-			_ = invitee.PostTelegram(inviter, TelegramMessage.GatheringInvitation, $"{gathering.Id}");
 			_ = invitee.Notify(CanaryNotification.GatheringInvitation(inviter.ToUserShard(), await gathering.ToGatheringShard()));
+			// todo message
 		}
 
 		public async Task KickUserAsync(long hostId, long targetId, long gatheringId)
@@ -725,7 +725,7 @@ namespace Core.Controls
 
 		private async Task CancelScheduledNotifications(Gathering gathering)
 		{
-			var (HostSchedule, GuestSchedules) = await Telegrams.GetGatheringNotificationScheduleAsync(gathering.Id);
+			var (HostSchedule, GuestSchedules) = await Notifications.GetGatheringNotificationScheduleAsync(gathering.Id);
 
             // Cancel host notification
             try
@@ -740,12 +740,12 @@ namespace Core.Controls
 			// Cancel guest notifications
 			await CancelScheduledNotificationBatch(gathering, GuestSchedules);
 
-			await Telegrams.ClearGatheringNotificationScheduleAsync(gathering.Id);
+			await Notifications.ClearGatheringNotificationScheduleAsync(gathering.Id);
 		}
 
         private async Task CancelScheduledNotificationsForGuest(Gathering gathering, User guest)
         {
-            var (_, GuestSchedules) = await Telegrams.GetGatheringNotificationScheduleAsync(gathering.Id);
+            var (_, GuestSchedules) = await Notifications.GetGatheringNotificationScheduleAsync(gathering.Id);
 
             var schedule = GuestSchedules.Find(s => s.UserId.Equals(guest.Id));
 
@@ -814,7 +814,7 @@ namespace Core.Controls
             var schedules = (await gathering.Guests).Select(guest => (guest.Id, upcomingNotificationId, imminentNotificationId));
 
 			if (upcomingNotificationId != "" || imminentNotificationId != "")
-			{ await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, schedules.ToArray()); }
+			{ await Notifications.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, schedules.ToArray()); }
         }
 
 		private async Task ScheduleNotificationsForGuest(Gathering gathering, User guest)
@@ -836,7 +836,7 @@ namespace Core.Controls
 
 			// Track notification ids
 			if (upcomingNotificationId != "" || imminentNotificationId != "")
-			{ await Telegrams.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, (guest.Id, upcomingNotificationId, imminentNotificationId)); }
+			{ await Notifications.UpdateGatheringGuestNotificationSchedulesAsync(gathering.Id, (guest.Id, upcomingNotificationId, imminentNotificationId)); }
         }
 
         #endregion

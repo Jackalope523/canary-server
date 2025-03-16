@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Frontier
 {
-    public class MessagingHub : Hub
+    public class MessageGuard : Hub
     {
         // ADDING AND REMOVING USERS TO GROUPS
         // CATCH UP MESSAGES

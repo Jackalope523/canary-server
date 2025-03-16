@@ -133,10 +133,6 @@ namespace Core
         public GatheringOverseerGoblin CreateRepositoryCleanupService()
          => new(this);
 
-
-        public TelegramCleanupGoblin CreateTelegramCleanupService()
-         => new(this);
-
         #endregion
     }
 }

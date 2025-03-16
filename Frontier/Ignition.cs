@@ -183,7 +183,6 @@ namespace Frontier
             ////////////
 
             services.AddHostedService(services => terminal.CreateRepositoryCleanupService());
-            services.AddHostedService(services => terminal.CreateTelegramCleanupService());
 
             /////////
             // Authentication Schema 
@@ -206,9 +205,9 @@ namespace Frontier
                 .PersistKeysToFileSystem(new DirectoryInfo(@"/home/data-protection-keys"))
                 .SetApplicationName("Hollow-" + env);
 
-            /////////
+            /////
             // Sockets
-            //////////////////////////
+            ////////////
             
             services.AddSignalR();
         }
@@ -236,7 +235,7 @@ namespace Frontier
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<MessagingHub>("/Messaging");
+                endpoints.MapHub<MessageGuard>("/message");
             });
         }
 

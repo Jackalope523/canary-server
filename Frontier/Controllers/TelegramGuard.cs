@@ -24,28 +24,19 @@ namespace Frontier.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetTelegrams()
 		{
-			return await Execute(async user =>
-			{
-				return await telegrams.GetTelegramsAsync(user.Id);
-			});
+			return await Execute(async user => new { });
         }
 
 		[HttpPut]
 		public async Task<IActionResult> ClearTelegram([FromBody] List<long> telegramIds)
 		{
-			return await Execute(async user =>
-			{
-				await telegrams.ClearTelegramsAsync(user.Id, telegramIds);
-			});
+			return await Execute(async user => "");
         }
 
 		[HttpDelete]
 		public async Task<IActionResult> ClearTelegrams()
 		{
-			return await Execute(async user =>
-			{
-				await telegrams.ClearTelegramsAsync(user.Id);
-			});
+			return await Execute(async user => "");
         }
 
 		#endregion

@@ -214,7 +214,7 @@ namespace Core.Controls
             }
             else
             {
-                _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
+                // todo user followed message?
             }
 
             _ = targetUser.Notify(targetNotification);
@@ -253,7 +253,7 @@ namespace Core.Controls
             }
             else
             {
-                _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
+                // todo user followed message?
             }
 
             _ = targetUser.Notify(targetNotification);
