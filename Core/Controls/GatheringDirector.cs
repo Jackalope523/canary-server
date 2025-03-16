@@ -616,15 +616,19 @@ namespace Core.Controls
 		
 		internal async Task<List<(User User, GatheringBond State)>> RequestAllUsersFromGatheringAsync(Gathering gathering)
 		{
-			return (await Gatherings.GetAllUsersAsync(gathering.Id))
-				.ConvertAll(userDetails => (User.GetUserAsync(userDetails.UserId).Result, userDetails.State));
+			var users = await Gatherings.GetAllUsersAsync(gathering.Id);
+
+			return (await Psijic.Once(users.Select(async userDetails => (await User.GetUserAsync(userDetails.UserId), userDetails.State)).ToArray()))
+				.ToList();
 		}
 
 		internal async Task<List<(User User, DateTimeOffset Joined, DateTimeOffset? Left)>>
 			RequestGuestHistoryAsync(Gathering gathering)
 		{
-			return (await Gatherings.GetGuestHistoryAsync(gathering.Id))
-				.ConvertAll(userDetails => (User.GetUserAsync(userDetails.UserId).Result, userDetails.Joined, userDetails.Left));
+			var guests = await Gatherings.GetGuestHistoryAsync(gathering.Id);
+
+            return (await Psijic.Once(guests.Select(async userDetails => (await User.GetUserAsync(userDetails.UserId), userDetails.Joined, userDetails.Left)).ToArray()))
+                .ToList();
 		}
 
 		internal async Task<List<GatheringShard>>

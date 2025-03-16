@@ -97,6 +97,9 @@ namespace Core.Entities
 		public static async Task Once(params Task[] tasks)
 			=> await Task.WhenAll(tasks);
 
+		public static async Task<T[]> Once<T>(params Task<T>[] tasks)
+			=> await Task.WhenAll(tasks);
+
 		#endregion
 	}
 }
