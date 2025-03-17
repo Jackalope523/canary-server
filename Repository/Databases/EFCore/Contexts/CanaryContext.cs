@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Repository.Entities;
 using System;
 
@@ -24,8 +25,9 @@ namespace Repository
         internal DbSet<Word> Words { get; set; }
         internal DbSet<Message> Messages { get; set; }
         internal DbSet<Conversation> Conversations { get; set; }
-        internal DbSet<MessageLinks> MessageLinks { get; set; }
+        internal DbSet<MessageLink> MessageLinks { get; set; }
         internal DbSet<ConversationLink> ConversationLinks { get; set; }
+        internal DbSet<Connection> Connections { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -377,12 +379,22 @@ namespace Repository
                 .HasMaxLength(50);
 
             // Messages
+            modelBuilder.Entity<Word>()
+                .HasQueryFilter(w => !w.SoftDeleted);
 
             // Conversations
+            modelBuilder.Entity<Word>()
+                .HasQueryFilter(w => !w.SoftDeleted);
 
             // Message Links
+            modelBuilder.Entity<Word>()
+                .HasQueryFilter(w => !w.SoftDeleted);
 
             // Conversation Links
+            modelBuilder.Entity<Word>()
+                .HasQueryFilter(w => !w.SoftDeleted);
+
+       
 
 
         }

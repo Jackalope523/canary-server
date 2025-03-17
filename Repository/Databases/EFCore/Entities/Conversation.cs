@@ -1,6 +1,7 @@
 ﻿namespace Repository
 {
-    public class Conversation
+    public class Conversation : Entity
     {
+
     }
 }
