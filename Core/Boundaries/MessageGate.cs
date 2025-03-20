@@ -23,7 +23,7 @@ namespace Core.Boundaries
 	public enum MessageType
 	{
 		Activity,
-		Message,
+		Text,
 		Photo,
 		ShareGathering,
 		GatheringInvite,
@@ -82,7 +82,7 @@ namespace Core.Boundaries
 		Task GetMessagesAsync(long userId, long conversationId);
 		Task UserReadAsync(long userId, long conversationId);
 		Task UserComposingAsync(long userId, long conversationId);
-		Task SendMessageAsync(long userId, long conversationId, string message);
+		Task SendTextAsync(long userId, long conversationId, string text);
 		Task SendPhotoAsync(long userId, long conversationId, MemoryStream photo);
 		Task ShareGatheringAsync(long userId, long conversationId, long gatheringId);
 		Task ShareSnapshotAsync(long userId, long conversationId, long snapshotId);
