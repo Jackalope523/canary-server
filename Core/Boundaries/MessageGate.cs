@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Core.Boundaries
 {
@@ -17,8 +16,8 @@ namespace Core.Boundaries
 
 	public enum MembershipType
 	{
-		Admin,
 		Regular,
+		Owner,
 	}
 
 	public enum MessageType
@@ -55,6 +54,7 @@ namespace Core.Boundaries
 		Task AddConnectionAsync(long userId, string connectionId);
 		Task DeleteConnectionAsync(string connectionId);
 
+		Task<CoreConversation> GetConversationAsync(long conversationId);
 		Task<List<CoreConversation>> GetConversationsForUserAsync(long userId);
 		Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId);
 		Task<CoreMembership> GetMembershipAsync(long conversationId, long userId);
@@ -73,23 +73,34 @@ namespace Core.Boundaries
 
 	public interface IMessageOperations
 	{
-		Task<List<ConversationShard>> GetConversationsAsync(long userId);
-
 		Task UserConnectedAsync(long userId, string connectionId);
 		Task UserDisconnectedAsync(long userId, string connectionId);
 
-		Task ProcessMessageAsync(long userId);
-		Task UserComposingAsync(long userId);
+		Task<List<ConversationShard>> GetConversationsAsync(long userId);
+		Task<List<MembershipShard>> GetConversationMembersAsync(long userId, long conversationId);
 
-		Task CreateGroupChatAsync(long userId);
-		Task DeleteGroupChatAsync(long userId);
-		Task InviteToGroupChatAsync(long userId);
-		Task LeaveGroupChatAsync(long userId);
+		Task GetMessagesAsync(long userId, long conversationId);
+		Task UserReadAsync(long userId, long conversationId);
+		Task UserComposingAsync(long userId, long conversationId);
+		Task SendMessageAsync(long userId, long conversationId, string message);
+		Task SendPhotoAsync(long userId, long conversationId, MemoryStream photo);
+		Task ShareGatheringAsync(long userId, long conversationId, long gatheringId);
+		Task ShareSnapshotAsync(long userId, long conversationId, long snapshotId);
+		Task ShareNestAsync(long userId, long conversationId, long nestId);
+
+		Task<ConversationShard> CreateGroupChatAsync(long userId, params long[] participantIds);
+		Task EditGroupChatAsync(long userId, long conversationId,
+			string title = "");
+		Task DeleteGroupChatAsync(long userId, long conversationId);
+
+		Task LeaveGroupChatAsync(long userId, long conversationId, long targetId);
+		Task SummonUserAsync(long userId, long conversationId, long targetId);
+		Task KickUserAsync(long userId, long conversationId, long targetId);
 	}
 
 	public interface IMessageSocket
 	{
-
+		Task BroadcastAsync();
 	}
 
 	#endregion
