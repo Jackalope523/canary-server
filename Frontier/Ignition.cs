@@ -34,10 +34,21 @@ namespace Frontier
 
             try
             {
-                CreateHostBuilder(args)
+                var app = CreateHostBuilder(args)
                     .UseSerilog()
-                    .Build()
-                    .Run();
+                    .Build();
+
+                // Inject socket
+
+                var loggerFactory = new LoggerFactory()
+                    .AddSerilog(Log.Logger);
+
+                var socketLogger = loggerFactory.CreateLogger("Socket");
+                var hubContext = app.Services.GetRequiredService<IHubContext<MessageHub, IClientSocket>>();
+
+                SocketService.Initialise(socketLogger, hubContext);
+
+                app.Run();
             }
             catch (Exception ex)
             {
@@ -145,6 +156,9 @@ namespace Frontier
             services.AddTransient<INotificationService, OneSignalService>(service => pushNotifications);
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();
+            services.AddTransient<ISocketService, SocketService>();
+
+            SocketService socket = new();
 
             //////
             // Connections
@@ -153,6 +167,7 @@ namespace Frontier
             CoreTerminal terminal = CoreTerminal.CreateTerminal(
                 environment,
                 coreLogger,
+
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
@@ -160,12 +175,18 @@ namespace Frontier
                 harbor.ReportDatabaseAccess,
                 harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
+                harbor.MessageDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
                 harbor.MiscellaneousDatabaseAccess,
-                pushNotifications);
+                pushNotifications,
+                socket
+            );
 
-            GuardBox box = new(environment, frontierLogger,
+            GuardBox box = new(
+                environment,
+                frontierLogger,
+
                 terminal.AccountOperations,
                 terminal.NestOperations,
                 terminal.GatheringOperations,
@@ -173,8 +194,10 @@ namespace Frontier
                 terminal.KeyOperations,
                 terminal.DisciplineOperations,
                 terminal.MediaOperations,
+                terminal.MessageOperations,
                 terminal.NotificationOperations,
-                terminal.MiscellaneousOperations);
+                terminal.MiscellaneousOperations
+            );
 
             services.AddSingleton(box);
 
@@ -235,7 +258,7 @@ namespace Frontier
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<MessageGuard>("/message");
+                endpoints.MapHub<MessageHub>("/messages/hub");
             });
         }
 

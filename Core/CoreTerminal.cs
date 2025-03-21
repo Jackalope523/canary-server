@@ -36,8 +36,9 @@ namespace Core
         public IDisciplineDatabase DisciplineDatabase { get; init; }
         public IKeyDatabase KeyDatabase { get; init; }
         public IMediaDatabase MediaDatabase { get; init; }
-        public INotificationDatabase NotificationDatabase { get; init; }
+        public IMessageDatabase MessageDatabase { get; init; }
         public INestDatabase NestDatabase { get; init; }
+        public INotificationDatabase NotificationDatabase { get; init; }
         public IMiscellaneousDatabase MiscellaneousDatabase { get; init; }
 
         public IAccountOperations AccountOperations
@@ -52,14 +53,17 @@ namespace Core
             => KeyDirector;
         public IMediaOperations MediaOperations
             => MediaDirector;
-        public INotificationOperations NotificationOperations
-            => NotificationDirector;
+        public IMessageOperations MessageOperations
+            => MessageDirector;
         public INestOperations NestOperations
             => NestDirector;
+        public INotificationOperations NotificationOperations
+            => NotificationDirector;
         public IMiscellaneousOperations MiscellaneousOperations
             => MiscellaneousDirector;
 
         public INotificationService NotificationService { get; init; }
+        public ISocketService SocketService { get; init; }
 
         internal AccountDirector AccountDirector { get; private set; }
         internal GatheringDirector GatheringDirector { get; private set; }
@@ -67,8 +71,9 @@ namespace Core
         internal DisciplineDirector DisciplineDirector { get; private set; }
         internal KeyDirector KeyDirector { get; private set; }
         internal MediaDirector MediaDirector { get; private set; }
-        internal NotificationDirector NotificationDirector { get; private set; }
+        internal MessageDirector MessageDirector { get; private set; }
         internal NestDirector NestDirector { get; private set; }
+        internal NotificationDirector NotificationDirector { get; private set; }
         internal MiscellaneousDirector MiscellaneousDirector { get; private set; }
 
         #endregion
@@ -79,9 +84,10 @@ namespace Core
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
-            IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase, IMiscellaneousDatabase miscellaneousDatabase,
-            INotificationService notificationService)
+            IMediaDatabase mediaDatabase, IMessageDatabase messageDatabase,
+            INotificationDatabase notificationDatabase, INestDatabase nestDatabase,
+            IMiscellaneousDatabase miscellaneousDatabase,
+            INotificationService notificationService, ISocketService socketService)
         {
             lock (initLock)
             {
@@ -97,11 +103,13 @@ namespace Core
                     DisciplineDatabase = disciplineDatabase,
                     KeyDatabase = keyDatabase,
                     MediaDatabase = mediaDatabase,
-                    NotificationDatabase = notificationDatabase,
+                    MessageDatabase = messageDatabase,
                     NestDatabase = nestDatabase,
+                    NotificationDatabase = notificationDatabase,
                     MiscellaneousDatabase = miscellaneousDatabase,
 
                     NotificationService = notificationService,
+                    SocketService = socketService,
                 };
 
                 Terminal.CreateManagers();
@@ -121,8 +129,9 @@ namespace Core
             DisciplineDirector = new DisciplineDirector(this);
             KeyDirector = new KeyDirector(this);
             MediaDirector = new MediaDirector(this);
-            NotificationDirector = new NotificationDirector(this);
+            MessageDirector = new MessageDirector(this);
             NestDirector = new NestDirector(this);
+            NotificationDirector = new NotificationDirector(this);
             MiscellaneousDirector = new MiscellaneousDirector(this);
         }
 

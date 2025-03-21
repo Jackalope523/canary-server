@@ -78,8 +78,8 @@ namespace Core.Boundaries
 
 		Task<List<ConversationShard>> GetConversationsAsync(long userId);
 		Task<List<MembershipShard>> GetConversationMembersAsync(long userId, long conversationId);
+		Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId);
 
-		Task GetMessagesAsync(long userId, long conversationId);
 		Task UserReadAsync(long userId, long conversationId);
 		Task UserComposingAsync(long userId, long conversationId);
 		Task SendTextAsync(long userId, long conversationId, string text);
@@ -93,14 +93,20 @@ namespace Core.Boundaries
 			string title = "");
 		Task DeleteGroupChatAsync(long userId, long conversationId);
 
-		Task LeaveGroupChatAsync(long userId, long conversationId, long targetId);
+		Task LeaveGroupChatAsync(long userId, long conversationId);
 		Task SummonUserAsync(long userId, long conversationId, long targetId);
 		Task KickUserAsync(long userId, long conversationId, long targetId);
 	}
 
-	public interface IMessageSocket
+	public interface ISocketService
 	{
 		Task BroadcastAsync();
+	}
+
+	public interface IClientSocket
+	{
+		Task ReceiveMessage();
+		Task UserIsComposing(long userId, bool isComposing);
 	}
 
 	#endregion

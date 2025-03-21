@@ -28,9 +28,11 @@ namespace Core
             IAccountDatabase accountDatabase, IAdminDatabase adminDatabase,
             IGatheringDatabase gatheringDatabase, ISnapshotDatabase snapshotDatabase,
             IDisciplineDatabase disciplineDatabase, IKeyDatabase keyDatabase,
-            IMediaDatabase mediaDatabase, INotificationDatabase notificationDatabase,
-            INestDatabase nestDatabase, IMiscellaneousDatabase miscellaneousDatabase,
-            INotificationService notificationService, IDebugDatabase debugDatabase)
+            IMediaDatabase mediaDatabase, IMessageDatabase messageDatabase,
+			INotificationDatabase notificationDatabase, INestDatabase nestDatabase,
+			IMiscellaneousDatabase miscellaneousDatabase,
+            INotificationService notificationService, ISocketService socketService,
+			IDebugDatabase debugDatabase)
 		{
 			lock (initLock)
 			{
@@ -45,11 +47,13 @@ namespace Core
 					DisciplineDatabase = disciplineDatabase,
 					KeyDatabase = keyDatabase,
 					MediaDatabase = mediaDatabase,
-					NotificationDatabase = notificationDatabase,
+					MessageDatabase = messageDatabase,
 					NestDatabase = nestDatabase,
+					NotificationDatabase = notificationDatabase,
 					MiscellaneousDatabase = miscellaneousDatabase,
 
-                    NotificationService = notificationService,
+					NotificationService = notificationService,
+					SocketService = socketService,
 					DebugDatabase = debugDatabase,
                 };
 

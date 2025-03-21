@@ -13,8 +13,9 @@ namespace Frontier.Controllers
 		public IKeyOperations keys;
 		public IDisciplineOperations reports;
 		public IMediaOperations media;
-		public INotificationOperations notifications;
+		public IMessageOperations messages;
 		public INestOperations nests;
+		public INotificationOperations notifications;
         public IMiscellaneousOperations miscellaneous;
 
         public GuardBox(EnvironmentOptions environment, ILogger logger,
@@ -22,6 +23,7 @@ namespace Frontier.Controllers
 			INestOperations nestOperations, IGatheringOperations gatheringOperations,
 			ISnapshotOperations snapshotOperations, IKeyOperations keyOperations,
 			IDisciplineOperations disciplineOperations,IMediaOperations mediaOperations,
+			IMessageOperations messageOperations,
 			INotificationOperations notificationOperations, IMiscellaneousOperations miscellaneousOperations)
 		{
 			env = environment;
@@ -34,6 +36,7 @@ namespace Frontier.Controllers
 			keys = keyOperations;
 			reports = disciplineOperations;
 			media = mediaOperations;
+			messages = messageOperations;
 			notifications = notificationOperations;
 			miscellaneous = miscellaneousOperations;
 		}
