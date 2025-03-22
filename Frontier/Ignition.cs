@@ -260,7 +260,7 @@ namespace Frontier
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<HollowHub>("/messages/hub");
+                endpoints.MapHub<HollowHub>("/hub");
             });
         }
 
