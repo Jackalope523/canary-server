@@ -18,9 +18,16 @@ namespace Frontier.Services
             hub = hubContext;
         }
 
-        public async Task BroadcastAsync()
+        public async Task BroadcastAsync(Func<IClientSocket, Task> operation, params string[] connectionIds)
         {
-            await hub.Clients.All.ReceiveMessage();
+            try
+            {
+                await operation(hub.Clients.Clients(connectionIds));
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Error broadcasting {op} to {con}. {e}", nameof(operation), connectionIds, ex);
+            }
         }
 	}
 }

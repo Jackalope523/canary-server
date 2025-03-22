@@ -20,7 +20,7 @@ namespace Core.Boundaries
 
     public interface ISocketService
     {
-        Task BroadcastAsync();
+        Task BroadcastAsync(Func<IClientSocket, Task> operation, params string[] connectionIds);
     }
 
     public interface IClientSocket : IMessageSocket
