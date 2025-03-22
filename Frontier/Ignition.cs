@@ -44,9 +44,9 @@ namespace Frontier
                     .AddSerilog(Log.Logger);
 
                 var socketLogger = loggerFactory.CreateLogger("Socket");
-                var hubContext = app.Services.GetRequiredService<IHubContext<MessageHub, IClientSocket>>();
+                var hubContext = app.Services.GetRequiredService<IHubContext<HollowHub, IClientSocket>>();
 
-                SocketService.Initialise(socketLogger, hubContext);
+                SocketConnection.Initialise(socketLogger, hubContext);
 
                 app.Run();
             }
@@ -156,9 +156,9 @@ namespace Frontier
             services.AddTransient<INotificationService, OneSignalService>(service => pushNotifications);
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();
-            services.AddTransient<ISocketService, SocketService>();
+            services.AddTransient<ISocketService, SocketConnection>();
 
-            SocketService socket = new();
+            SocketConnection socket = new();
 
             //////
             // Connections
@@ -170,6 +170,7 @@ namespace Frontier
 
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
+                harbor.ConnectionDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
@@ -188,6 +189,7 @@ namespace Frontier
                 frontierLogger,
 
                 terminal.AccountOperations,
+                terminal.ConnectionOperations,
                 terminal.NestOperations,
                 terminal.GatheringOperations,
                 terminal.SnapshotOperations,
@@ -258,7 +260,7 @@ namespace Frontier
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<MessageHub>("/messages/hub");
+                endpoints.MapHub<HollowHub>("/messages/hub");
             });
         }
 

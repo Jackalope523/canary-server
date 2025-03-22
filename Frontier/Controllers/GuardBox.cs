@@ -8,6 +8,7 @@ namespace Frontier.Controllers
 		public ILogger log;
 
 		public IAccountOperations accounts;
+		public IConnectionOperations connections;
 		public IGatheringOperations gatherings;
 		public ISnapshotOperations snapshots;
 		public IKeyOperations keys;
@@ -19,7 +20,7 @@ namespace Frontier.Controllers
         public IMiscellaneousOperations miscellaneous;
 
         public GuardBox(EnvironmentOptions environment, ILogger logger,
-			IAccountOperations accountOperations,
+			IAccountOperations accountOperations, IConnectionOperations connectionOperations,
 			INestOperations nestOperations, IGatheringOperations gatheringOperations,
 			ISnapshotOperations snapshotOperations, IKeyOperations keyOperations,
 			IDisciplineOperations disciplineOperations,IMediaOperations mediaOperations,
@@ -30,6 +31,7 @@ namespace Frontier.Controllers
 			log = logger;
 
 			accounts = accountOperations;
+			connections = connectionOperations;
 			nests = nestOperations;
 			gatherings = gatheringOperations;
 			snapshots = snapshotOperations;

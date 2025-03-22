@@ -10,6 +10,7 @@ namespace Repository
         internal static ILogger logger;
 
         public IAccountDatabase AccountDatabaseAccess { get; private set; }
+        public IConnectionDatabase ConnectionDatabaseAccess { get; private set; }
         public INestDatabase NestDatabaseAccess { get; private set; }
         public INotificationDatabase NotificationDatabaseAccess { get; private set; }
         public IGatheringDatabase GatheringDatabaseAccess { get; private set; }
@@ -25,6 +26,7 @@ namespace Repository
         public Harbor(Flag flag)
         {
             AccountDatabaseAccess = new AccountStoreCoordinator(flag);
+            ConnectionDatabaseAccess = new();
             NestDatabaseAccess = new NestStoreCoordinator(flag);
             NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
             GatheringDatabaseAccess = new GatheringStoreCoordinator(flag);

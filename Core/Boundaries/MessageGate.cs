@@ -49,11 +49,6 @@ namespace Core.Boundaries
 
     public interface IMessageDatabase
     {
-		Task<List<string>> GetConnectionsAsync(long userId);
-		Task<Dictionary<long, List<string>>> GetConnectionsAsync(params long[] userIds);
-		Task AddConnectionAsync(long userId, string connectionId);
-		Task DeleteConnectionAsync(string connectionId);
-
 		Task<CoreConversation> GetConversationAsync(long conversationId);
 		Task<List<CoreConversation>> GetConversationsForUserAsync(long userId);
 		Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId);
@@ -73,9 +68,6 @@ namespace Core.Boundaries
 
 	public interface IMessageOperations
 	{
-		Task UserConnectedAsync(long userId, string connectionId);
-		Task UserDisconnectedAsync(long userId, string connectionId);
-
 		Task<List<ConversationShard>> GetConversationsAsync(long userId);
 		Task<List<MembershipShard>> GetConversationMembersAsync(long userId, long conversationId);
 		Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId);
@@ -98,14 +90,9 @@ namespace Core.Boundaries
 		Task KickUserAsync(long userId, long conversationId, long targetId);
 	}
 
-	public interface ISocketService
+	public interface IMessageSocket
 	{
-		Task BroadcastAsync();
-	}
-
-	public interface IClientSocket
-	{
-		Task ReceiveMessage();
+		Task ReceiveMessage(MessageShard message);
 		Task UserIsComposing(long userId, bool isComposing);
 	}
 

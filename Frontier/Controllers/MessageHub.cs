@@ -1,48 +1,14 @@
-﻿using Frontier.Controllers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Frontier
+namespace Frontier.Controllers
 {
-    public class MessageHub : Hub<IClientSocket>
+    public partial class HollowHub : Hub<IClientSocket>
     {
-        public IMessageOperations messages;
-        public UserManager<CoreUser> userManager;
-
-        public MessageHub(GuardBox box, UserManager<CoreUser> aspUserManager)
-        {
-            messages = box.messages;
-            userManager = aspUserManager;
-        }
-
-        public override async Task OnConnectedAsync()
-        {
-            await base.OnConnectedAsync();
-
-            var user = await GetCurrentUserAsync();
-            var connectionId = Context.ConnectionId;
-
-            await messages.UserConnectedAsync(user.Id, connectionId);
-        }
-
-        public override async Task OnDisconnectedAsync(Exception? exception)
-        {
-            await base.OnDisconnectedAsync(exception);
-
-            var user = await GetCurrentUserAsync();
-            var connectionId = Context.ConnectionId;
-
-            await messages.UserDisconnectedAsync(user.Id, connectionId);
-        }
-
-        // Methods
-
         public async Task UserRead(long conversationId)
         {
             var user = await GetCurrentUserAsync();
@@ -91,8 +57,5 @@ namespace Frontier
 
             await messages.ShareNestAsync(user.Id, conversationId, nestId);
         }
-
-        private async Task<CoreUser> GetCurrentUserAsync()
-            => await userManager.GetUserAsync(Context.User);
     }
 }

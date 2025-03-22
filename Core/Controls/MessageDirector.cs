@@ -18,16 +18,6 @@ namespace Core.Controls
 
         #region Operations
 
-        public async Task UserConnectedAsync(long userId, string connectionId)
-        {
-            await Messages.AddConnectionAsync(userId, connectionId);
-        }
-
-        public async Task UserDisconnectedAsync(long userId, string connectionId)
-        {
-            await Messages.DeleteConnectionAsync(connectionId);
-        }
-
         public Task<List<ConversationShard>> GetConversationsAsync(long userId)
         {
             throw new System.NotImplementedException();

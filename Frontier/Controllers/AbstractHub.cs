@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-
-using Core.Boundaries;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using Frontier.Manifests;
-using System.Collections.Generic;
 using System.Text;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Identity;
+
 using Core;
 
 namespace Frontier.Controllers
 {
-	[ApiController]
-	[Authorize]
-	public class AbstractGuard : ControllerBase
+	public partial class HollowHub : Hub<IClientSocket>
 	{
 		#region Variables
 
@@ -43,7 +33,7 @@ namespace Frontier.Controllers
 
 		#region Initialisation
 
-		public AbstractGuard(GuardBox box, UserManager<CoreUser> aspUserManager)
+		public HollowHub(GuardBox box, UserManager<CoreUser> aspUserManager)
 		{
 			env = box.env;
 			log = box.log;
@@ -67,28 +57,20 @@ namespace Frontier.Controllers
 
         #region Favours
 
-
-        [NonAction]
-        public async Task<IActionResult> ExecuteUnsafe(Func<Task<IActionResult>> action)
+        protected async Task<T> ExecuteUnsafe<T>(Func<Task<T>> action)
         {
             try
             {
-                var result = await action.Invoke();
-
-                // Check if there is a result
-                if (result == null)
-                {
-                    Ok();
-                }
-
-                return result;
+                return await action.Invoke();
             }
             catch (UserErrorException ex)
             {
                 // Log debug information
                 log.LogDebug("\nUser Exception\n{message}\n{trace}", ex.Message, ex.StackTrace);
 
-                return BadRequest(ex.ToErrorShard());
+				string error = Newtonsoft.Json.JsonConvert.SerializeObject(ex.ToErrorShard());
+
+                throw new HubException(error);
             }
 			catch (HollowException ex)
             {
@@ -98,7 +80,9 @@ namespace Frontier.Controllers
                 // Log failure
                 log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
 
-                return StatusCode(500, ex.ToErrorShard());
+                string error = Newtonsoft.Json.JsonConvert.SerializeObject(ex.ToErrorShard());
+
+                throw new HubException(error);
             }
             catch (Exception ex)
             {
@@ -108,13 +92,13 @@ namespace Frontier.Controllers
                 // Log failure
                 log.LogError("\nHollow Exception\n{message}\n{trace}", message, ex.StackTrace);
 
+                string error = Newtonsoft.Json.JsonConvert.SerializeObject(HollowException.Default.ToErrorShard());
 
-                return StatusCode(500, HollowException.Default.ToErrorShard());
+                throw new HubException(error);
             }
         }
 
-        [NonAction]
-		public async Task<IActionResult> Execute(Func<Task<object>> action)
+		protected async Task<T> Execute<T>(Func<Task<T>> action)
 		{
 			return await ExecuteUnsafe(async () =>
 			{
@@ -124,33 +108,28 @@ namespace Frontier.Controllers
                 if (result is CoreOnlyData)
                 { throw new UnexpectedFailureException($"Server tried sending Core-Only object {result.GetType()}.", code: HollowErrorCode.UNKNOWN); }
 
-                return Ok(result);
+                return result;
 			});
 		}
 
-		[NonAction]
-		public async Task<IActionResult> Execute(Func<Task> action)
+		protected async Task Execute(Func<Task> action)
 		{
-			return await Execute(async () =>
+			await Execute(async () =>
 			{
 				await action.Invoke();
-				return "";
 			});
 		}
 
-		[NonAction]
-		public async Task<IActionResult> Execute(Func<CoreUser, Task> action, bool allowUnverified = false)
+		protected async Task Execute(Func<CoreUser, Task> action, bool allowUnverified = false)
 		{
-			return await Execute(async user =>
+			await Execute(async user =>
 			{
 				await action.Invoke(user);
-				return "";
 			},
 			allowUnverified);
 		}
 
-		[NonAction]
-		public async Task<IActionResult> Execute(Func<CoreUser, Task<object>> action, bool allowUnverified = false)
+		protected async Task<T> Execute<T>(Func<CoreUser, Task<T>> action, bool allowUnverified = false)
 		{
 			return await Execute(async () =>
 			{
@@ -163,19 +142,16 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[NonAction]
-		public async Task<CoreUser> GetCurrentUserAsync()
-			=> await userManager.GetUserAsync(HttpContext.User);
+		protected async Task<CoreUser> GetCurrentUserAsync()
+			=> await userManager.GetUserAsync(Context.User);
 
-		[NonAction]
-		public void ThrowIfUnverified(CoreUser user)
+		protected void ThrowIfUnverified(CoreUser user)
 		{
 			if (!user.IsPhoneConfirmed)
 			{ throw new UserErrorException(AccountErrorCode.UNVERIFIED); }
 		}
 
-		[NonAction]
-		public string DrillExceptionDetails(Exception ex)
+		protected string DrillExceptionDetails(Exception ex)
 		{
 			StringBuilder builder = new();
 
@@ -189,14 +165,30 @@ namespace Frontier.Controllers
 			return builder.ToString();
 		}
 
+        #endregion
 
-		[NonAction]
-		public BadRequestObjectResult MissingInformation()
-		{
-			ErrorShard error = new("HOLLOW.MISSING_INFORMATION");
-			return BadRequest(error);
-		}
+        #region Socket
 
-		#endregion
-	}
+        public override async Task OnConnectedAsync()
+        {
+            await base.OnConnectedAsync();
+
+            var user = await GetCurrentUserAsync();
+            var connectionId = Context.ConnectionId;
+
+            await connections.UserConnectedAsync(user.Id, connectionId);
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            await base.OnDisconnectedAsync(exception);
+
+            var user = await GetCurrentUserAsync();
+            var connectionId = Context.ConnectionId;
+
+            await connections.UserDisconnectedAsync(user.Id, connectionId);
+        }
+
+        #endregion
+    }
 }

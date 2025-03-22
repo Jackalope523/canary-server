@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Core.Boundaries;
 using Microsoft.AspNetCore.SignalR;
+
+using Core.Boundaries;
+using Frontier.Controllers;
 
 namespace Frontier.Services
 {
-	public class SocketService : ISocketService
+	public class SocketConnection : ISocketService
     {
         private static ILogger log;
-        private static IHubContext<MessageHub, IClientSocket> hub;
+        private static IHubContext<HollowHub, IClientSocket> hub;
 
-        public static void Initialise(ILogger logger, IHubContext<MessageHub, IClientSocket> hubContext)
+        public static void Initialise(ILogger logger, IHubContext<HollowHub, IClientSocket> hubContext)
         {
             log = logger;
             hub = hubContext;
