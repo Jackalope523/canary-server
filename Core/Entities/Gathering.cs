@@ -106,6 +106,11 @@ namespace Core.Entities
 
         #region Initialisation & Extraction
 
+        public static async Task<Gathering> GetGatheringAsync(long id)
+        {
+            return new(await Terminal.GatheringDatabase.FindGatheringAsync(id));
+        }
+
         public Gathering()
         {
             Host = new(() => User.GetUserAsync(HostId));

@@ -31,11 +31,12 @@ namespace Core.Boundaries
 		Nest,
 	}
 
-	public record CoreConversation(long Id, ConversationType Type, string Title = default)
+	public record CoreConversation(long Id, ConversationType Type, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
-	public record ConversationShard(long Id, ConversationType Type, bool IsMuted, bool HasUnread, string Title = default);
+	public record ConversationShard(long Id, ConversationType Type, string Title = default,
+		long? GatheringId = null, bool? IsMuted = null, bool? HasUnread = null);
 
-	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted, bool IsConnected)
+	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted)
 		: CoreOnlyData();
 	public record MembershipShard(long UserId, MembershipType Type, DateTimeOffset LastSeen);
 
@@ -92,7 +93,7 @@ namespace Core.Boundaries
 
 	public interface IMessageSocket
 	{
-		Task ReceiveMessage(MessageShard message);
+		Task ReceiveMessage(long conversationId, MessageShard message);
 		Task UserIsComposing(long userId, bool isComposing);
 	}
 

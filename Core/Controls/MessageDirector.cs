@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Core.Boundaries;
 using System.Collections.Concurrent;
 using Core.Entities;
+using System.Linq;
 
 
 namespace Core.Controls
@@ -102,7 +103,39 @@ namespace Core.Controls
 
         #region Favours
 
-        public bool IsUserOnline(User user) => UserConnections.ContainsKey(user.Id);
+        public async Task<List<(Conversation, CoreMembership)>> RequestConversationsForUserAsync(User user)
+        {
+            var conversations = await Messages.GetConversationsForUserAsync(user.Id);
+            var pairs = await Psijic.Once(conversations
+                .Select(async c => (new Conversation(c), await Messages.GetMembershipAsync(c.Id, user.Id))));
+
+            return pairs.ToList();
+        }
+
+        public async Task<List<(User, CoreMembership)>> RequestConversationMembersAsync(Conversation conversation)
+        {
+            var members = await Messages.GetConversationMembersAsync(conversation.Id);
+            var pairs = await Psijic.Once(members
+                .Select(async m => (await User.GetUserAsync(m.UserId), m)));
+
+            return pairs.ToList();
+        }
+
+        public async Task<List<CoreMessage>> RequestConversationMessagesAsync(Conversation conversation)
+        {
+            return await Messages.GetMessagesForConversationAsync(conversation.Id);
+        }
+
+        public async Task SendClientMessageAsync(Conversation conversation, MessageShard message, params User[] users)
+        {
+            string[] connectionIds = (await Psijic.Once(users
+                .Select(async u => await u.Connections)))
+                .SelectMany(c => c)
+                .ToArray();
+
+            await Terminal.SocketService.BroadcastAsync(client => client.ReceiveMessage(conversation.Id, message),
+                connectionIds);
+        }
 
         #endregion
     }
