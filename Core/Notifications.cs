@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Reflection;
 using Core.Boundaries;
+using Microsoft.VisualBasic;
 
 namespace Core.Notifications
 {
     public enum NotificationGroup
     {
+        None,
         SocialInvitations,
         CompanionActivity,
         GatheringDiscovery,
@@ -18,6 +21,7 @@ namespace Core.Notifications
         {
             return group switch
             {
+                NotificationGroup.None => true,
                 NotificationGroup.SocialInvitations => profile.SocialInvitations,
                 NotificationGroup.CompanionActivity => profile.CompanionActivity,
                 NotificationGroup.GatheringDiscovery => profile.GatheringDiscovery,
@@ -128,9 +132,22 @@ namespace Core.Notifications
         }
     }
 
+    public struct MessageDeepLink : IDeepLink
+    {
+        public string RelativePath { get; private set; }
+
+        public MessageDeepLink(long conversationId)
+        {
+            string path = $"chat/{conversationId}";
+
+            RelativePath = IDeepLink.FormatPath(path);
+        }
+    }
+
     public partial class CanaryNotification
     {
         public string Title { get; set; }
+        public string Subtitle { get; set; }
         public string Body { get; set; }
         public string AppUrl { get; set; }
         public string CollapseId { get; set; }
@@ -143,6 +160,13 @@ namespace Core.Notifications
             Body = body;
             AppUrl = deepLink != null ? deepLink.RelativePath : "";
             CollapseId = collapseId;
+            Group = NotificationGroup.None;
+        }
+
+        protected CanaryNotification(string title, string subtitle, string body, IDeepLink deepLink = null, string collapseId = "")
+            : this(title, body, deepLink, collapseId)
+        {
+            Subtitle = subtitle;
         }
 
         public bool CheckEnabled(NotificationProfile profile)
@@ -327,5 +351,51 @@ namespace Core.Notifications
                 "You missed the gathering.",
                 new GatheringDeepLink(gathering.Id),
                 "20"));
+    }
+
+    //////
+    // Messages
+    /////////////
+
+    public partial class CanaryNotification
+    {
+        protected static CanaryNotification Message(CanaryNotification notification)
+        {
+            return notification;
+        }
+
+        public static CanaryNotification IndividualMessage(ConversationShard conversation, UserShard sender, MessageShard message)
+            => Message(new(sender.Name,
+                ParseMessage(message),
+                new MessageDeepLink(conversation.Id),
+                $"chat:{conversation.Id}"));
+
+        public static CanaryNotification GroupMessage(ConversationShard conversation, UserShard sender, MessageShard message)
+            => Message(new(sender.Name,
+                conversation.Title,
+                ParseMessage(message),
+                new MessageDeepLink(conversation.Id),
+                $"chat:{conversation.Id}"));
+
+        public static CanaryNotification GatheringMessage(GatheringShard gathering, ConversationShard conversation, UserShard sender, MessageShard message)
+            => Message(new(sender.Name,
+                gathering.Title,
+                ParseMessage(message),
+                new MessageDeepLink(conversation.Id),
+                $"chat:{conversation.Id}"));
+
+        private static string ParseMessage(MessageShard message)
+        {
+            return message.Type switch
+            {
+                MessageType.Text => message.Value.ToString(),
+                MessageType.Photo => "Sent a photo.",
+                MessageType.GatheringInvite => "Invited you to a gathering.",
+                MessageType.ShareGathering => "Shared a gathering.",
+                MessageType.Snapshot => "Shared a snapshot.",
+                MessageType.Nest => "Shared a nest.",
+                _ => "",
+            };
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace Core.Controls
             // Fail if user is blocked
             FailIf(await user.IsBlockedBy(targetUser),
                 new UserErrorException(UserErrorCode.CANNOT_VIEW));
-
+            
             NestShard nest = new(new());
 
             // Check if user is themself
