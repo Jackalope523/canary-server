@@ -633,7 +633,8 @@ namespace Core.Entities
                 {
                     ConversationType.Individual => CanaryNotification.IndividualMessage(conversation, sender.ToUserShard(), msg),
                     ConversationType.Group => CanaryNotification.GroupMessage(conversation, sender.ToUserShard(), msg),
-                    ConversationType.Gathering => CanaryNotification.GatheringMessage(conversation, sender.ToUserShard(), msg),
+                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await conversation.Gathering).ToGatheringShard(), conversation, sender.ToUserShard(), msg),
+                    _ => throw new UnexpectedFailureException("ConversationType does not exist"),
                 };
 
                 await Notify(notification);
