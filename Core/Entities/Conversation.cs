@@ -131,11 +131,13 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task MessageMembersAsync(User sender, CoreMessage message)
+        public async Task MessageOrNotifyOthersAsync(User sender, CoreMessage message)
         {
             MessageShard msg = message.ToShard();
 
-            var (onlineMembers, offlineMembers) = await (await Members).PartitionAsync(async (member) => await member.User.IsOnline());
+            var otherMembers = (await Members).Where(m => !m.User.Equals(sender)).ToList();
+
+            var (onlineMembers, offlineMembers) = await otherMembers.PartitionAsync(async (member) => await member.User.IsOnline());
 
             if (onlineMembers.Count > 0)
             {
