@@ -140,29 +140,25 @@ namespace Core.Entities
 
         public async Task MessageOthersAsync(User sender, MessageShard message)
         {
-            MessageShard msg = message.ToShard();
-
             var otherMembers = (await Members).Where(m => !m.User.Equals(sender));
 
             var (onlineMembers, _) = await otherMembers.PartitionAsync(async (member) => await member.User.IsOnline());
 
             if (onlineMembers.Any())
             {
-                await Terminal.MessageDirector.SendClientMessageAsync(this, msg, onlineMembers.Select(u => u.User).ToArray());
+                await Terminal.MessageDirector.SendClientMessageAsync(this, message, onlineMembers.Select(u => u.User).ToArray());
             }
         }
 
         public async Task MessageOrNotifyOthersAsync(User sender, MessageShard message)
         {
-            MessageShard msg = message.ToShard();
-
             var otherMembers = (await Members).Where(m => !m.User.Equals(sender));
 
             var (onlineMembers, offlineMembers) = await otherMembers.PartitionAsync(async (member) => await member.User.IsOnline());
 
             if (onlineMembers.Any())
             {
-                await Terminal.MessageDirector.SendClientMessageAsync(this, msg, onlineMembers.Select(u => u.User).ToArray());
+                await Terminal.MessageDirector.SendClientMessageAsync(this, message, onlineMembers.Select(u => u.User).ToArray());
             }
 
             if (offlineMembers.Any())
@@ -176,9 +172,9 @@ namespace Core.Entities
 
                 CanaryNotification notification = Type switch
                 {
-                    ConversationType.Individual => CanaryNotification.IndividualMessage(shard, sender.ToUserShard(), msg),
-                    ConversationType.Group => CanaryNotification.GroupMessage(shard, sender.ToUserShard(), msg),
-                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await Gathering).ToGatheringShard(), shard, sender.ToUserShard(), msg),
+                    ConversationType.Individual => CanaryNotification.IndividualMessage(shard, sender.ToUserShard(), message),
+                    ConversationType.Group => CanaryNotification.GroupMessage(shard, sender.ToUserShard(), message),
+                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await Gathering).ToGatheringShard(), shard, sender.ToUserShard(), message),
                     _ => throw new UnexpectedFailureException("ConversationType does not exist"),
                 };
 

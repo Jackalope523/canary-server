@@ -49,8 +49,7 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            return (await conversation.Messages)
-                .ConvertAll(m => m.ToShard());
+            return await conversation.Messages;
         }
 
         public async Task UserReadAsync(long userId, long conversationId)

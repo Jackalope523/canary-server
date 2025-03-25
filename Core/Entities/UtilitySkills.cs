@@ -131,10 +131,5 @@ namespace Core.Entities
         {
             return new(membership.UserId, membership.Type, membership.LastSeen);
         }
-
-        public static MessageShard ToShard(this MessageShard message)
-        {
-            return new(message.SequenceId, message.UserId, message.Timestamp, message.Type, message.Value);
-        }
     }
 }

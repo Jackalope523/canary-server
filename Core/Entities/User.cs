@@ -621,19 +621,17 @@ namespace Core.Entities
 
         public async Task MessageOrNotifyAsync(Conversation conversation, User sender, MessageShard message)
         {
-            MessageShard msg = message.ToShard();
-
             if (await IsOnline())
             {
-                await Terminal.MessageDirector.SendClientMessageAsync(conversation, msg, this);
+                await Terminal.MessageDirector.SendClientMessageAsync(conversation, message, this);
             }
             else
             {
                 CanaryNotification notification = conversation.Type switch
                 {
-                    ConversationType.Individual => CanaryNotification.IndividualMessage(conversation, sender.ToUserShard(), msg),
-                    ConversationType.Group => CanaryNotification.GroupMessage(conversation, sender.ToUserShard(), msg),
-                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await conversation.Gathering).ToGatheringShard(), conversation, sender.ToUserShard(), msg),
+                    ConversationType.Individual => CanaryNotification.IndividualMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
+                    ConversationType.Group => CanaryNotification.GroupMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
+                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await conversation.Gathering).ToGatheringShard(), conversation.ToConversationShard(), sender.ToUserShard(), message),
                     _ => throw new UnexpectedFailureException("ConversationType does not exist"),
                 };
 
