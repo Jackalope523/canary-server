@@ -205,7 +205,7 @@ namespace Core.Controls
 
             // Validate conversation
             Verify(editedConversation.ValidateAndNormalise(out string issues),
-                new UserErrorException(, new { issues }));
+                new UserErrorException(ConversationErrorCode.INVALID_DETAILS, new { issues }));
 
             List<(string Property, object Value)> edits = new();
             List<object> editMessages = new();
@@ -259,7 +259,7 @@ namespace Core.Controls
             await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
 
             var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
-            _ = conversation.MessageOthersAsync(User.Hollow.Id, activityMessage);
+            _ = conversation.MessageOthersAsync(User.Hollow, activityMessage);
         }
 
         public async Task SummonUserAsync(long userId, long conversationId, long targetId)
@@ -280,7 +280,7 @@ namespace Core.Controls
             await Messages.AddUsersToConversationAsync(conversation.Id, summoned.Id);
 
             var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
-            _ = conversation.MessageOthersAsync(User.Hollow.Id, activityMessage);
+            _ = conversation.MessageOthersAsync(User.Hollow, activityMessage);
         }
 
         public async Task KickUserAsync(long userId, long conversationId, long targetId)
@@ -300,7 +300,7 @@ namespace Core.Controls
             await Messages.RemoveUserFromConversationAsync(conversation.Id, targetId);
 
             var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
-            _ = conversation.MessageOthersAsync(User.Hollow.Id, activityMessage);
+            _ = conversation.MessageOthersAsync(User.Hollow, activityMessage);
         }
 
         #endregion

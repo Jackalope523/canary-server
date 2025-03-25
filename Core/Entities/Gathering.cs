@@ -202,7 +202,6 @@ namespace Core.Entities
             if (string.IsNullOrEmpty(Title)) { issues += "Title cannot be empty. "; }
 
             Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
-            if (string.IsNullOrEmpty(Description)) { issues += "Description cannot be empty. "; }
 
             FriendlyLocation = ContentValidation.NormaliseText(FriendlyLocation, MaximumLocationLength);
             if (string.IsNullOrEmpty(FriendlyLocation)) { issues += "Friendly location cannot be empty. "; }

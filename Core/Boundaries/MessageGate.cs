@@ -31,6 +31,9 @@ namespace Core.Boundaries
 		Nest,
 	}
 
+	public enum ActivityMessage
+	{ }
+
 	public record CoreConversation(long Id, ConversationType Type, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
 	public record ConversationShard(long Id, ConversationType Type, string Title = default,

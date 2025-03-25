@@ -200,6 +200,7 @@ namespace Core.Exceptions
         CANNOT_INVITE_NEUTRAL,
         CANNOT_KICK_PERMISSION,
 
+        INVALID_DETAILS,
         CANNOT_EDIT_PERMISSION,
         CANNOT_DELETE_PERMISSION,
     }
