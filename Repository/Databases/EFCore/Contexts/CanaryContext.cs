@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Repository.Entities;
-using System;
 
 namespace Repository
 {
@@ -25,7 +23,6 @@ namespace Repository
         internal DbSet<Word> Words { get; set; }
         internal DbSet<Message> Messages { get; set; }
         internal DbSet<Conversation> Conversations { get; set; }
-        internal DbSet<MessageLink> MessageLinks { get; set; }
         internal DbSet<ConversationLink> ConversationLinks { get; set; }
         internal DbSet<Connection> Connections { get; set; }
 
@@ -219,6 +216,16 @@ namespace Repository
              .WithOne(c => c.User)
              .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.ConversationLinks)
+             .WithOne(l => l.User)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Messages)
+             .WithOne(m => m.User)
+             .OnDelete(DeleteBehavior.Restrict);
+
             // Gathering
             modelBuilder.Entity<Gathering>()
                 .HasQueryFilter(g => !g.SoftDeleted);
@@ -378,25 +385,42 @@ namespace Repository
                 .Property(w => w.Text)
                 .HasMaxLength(50);
 
-            // Messages
-            modelBuilder.Entity<Word>()
-                .HasQueryFilter(w => !w.SoftDeleted);
-
             // Conversations
-            modelBuilder.Entity<Word>()
+            modelBuilder.Entity<Conversation>()
                 .HasQueryFilter(w => !w.SoftDeleted);
 
-            // Message Links
-            modelBuilder.Entity<Word>()
+            modelBuilder.Entity<Conversation>()
+                .HasMany(c => c.ConversationLinks)
+                .WithOne(l => l.Conversation)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Conversation>()
+                .HasMany(c => c.Messages)
+                .WithOne(m => m.Conversation)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Messages
+            modelBuilder.Entity<Message>()
                 .HasQueryFilter(w => !w.SoftDeleted);
+
+            modelBuilder.Entity<Message>()
+                .HasDiscriminator(m => m.Type);
+
+            modelBuilder.Entity<GatheringInviteMessage>()
+                .Property(g => g.GatheringId)
+                .HasColumnName("GatheringId");
+
+            modelBuilder.Entity<GatheringShareMessage>()
+                .Property(g => g.GatheringId)
+                .HasColumnName("GatheringId");
 
             // Conversation Links
-            modelBuilder.Entity<Word>()
+            modelBuilder.Entity<ConversationLink>()
                 .HasQueryFilter(w => !w.SoftDeleted);
 
-       
-
-
+            modelBuilder.Entity<ConversationLink>()
+                .HasIndex(l => new { l.UserId, l.ConversationId })
+                .IsUnique();
         }
     }
 }

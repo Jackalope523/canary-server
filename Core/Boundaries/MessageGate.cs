@@ -63,7 +63,7 @@ namespace Core.Boundaries
 		Task RemoveUserFromConversationAsync(long conversationId, long userId);
 
 		Task<List<CoreMessage>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10);
-        Task AddMessageAsync(long conversationId, long userId, long sequenceId, DateTimeOffset timestamp, MessageType type, string value);
+        Task AddMessageAsync(long conversationId, long userId, long sequenceId, DateTimeOffset timestamp, MessageType type, object value);
     }
 
 	public interface IMessageOperations

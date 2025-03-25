@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
+using Repository.Databases.EFCore.Entities.Messages;
 using Repository.Entities;
 
 namespace Repository
@@ -65,6 +66,8 @@ namespace Repository
         public List<Feedback>? Feedback { get; set; }
         public List<GuestClearance>? GuestClearances { get; set; }
         public List<Notification>? Notifications { get; set; }
+        public List<ConversationLink>? ConversationLinks { get; set; }
+        public List<Message>? Messages { get; set; }
 
 
         // Default Values

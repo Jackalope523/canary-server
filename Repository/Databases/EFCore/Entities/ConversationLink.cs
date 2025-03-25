@@ -6,6 +6,7 @@
 
         public long? UserId { get; set; }
         public long ConversationId { get; set; }
+        public DateTimeOffset LastOpened { get; set; }
         public ConversationLinkType Type { get; set; }
 
         // Navigation Properties
