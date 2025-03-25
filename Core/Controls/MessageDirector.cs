@@ -258,7 +258,7 @@ namespace Core.Controls
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
 
-            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, );
+            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
             _ = conversation.MessageOthersAsync(User.Hollow.Id, activityMessage);
         }
 
@@ -279,7 +279,7 @@ namespace Core.Controls
 
             await Messages.AddUsersToConversationAsync(conversation.Id, summoned.Id);
 
-            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, );
+            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
             _ = conversation.MessageOthersAsync(User.Hollow.Id, activityMessage);
         }
 
@@ -299,7 +299,7 @@ namespace Core.Controls
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, targetId);
 
-            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, );
+            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
             _ = conversation.MessageOthersAsync(User.Hollow.Id, activityMessage);
         }
 
