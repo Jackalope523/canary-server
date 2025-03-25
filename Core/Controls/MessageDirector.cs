@@ -325,7 +325,7 @@ namespace Core.Controls
             return pairs.ToList();
         }
 
-        public async Task<List<CoreMessage>> RequestConversationMessagesAsync(Conversation conversation)
+        public async Task<List<MessageShard>> RequestConversationMessagesAsync(Conversation conversation)
         {
             return await Messages.GetMessagesForConversationAsync(conversation.Id);
         }

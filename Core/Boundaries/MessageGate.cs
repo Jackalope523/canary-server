@@ -43,9 +43,7 @@ namespace Core.Boundaries
 		: CoreOnlyData();
 	public record MembershipShard(long UserId, MembershipType Type, DateTimeOffset LastSeen);
 
-	public record CoreMessage(long id, long UserId, DateTimeOffset Timestamp, MessageType Type, object Value)
-		: CoreOnlyData();
-	public record MessageShard(int SequenceId, long UserId, DateTimeOffset Timestamp, MessageType Type, object Value);
+	public record MessageShard(long Id, long UserId, DateTimeOffset Timestamp, MessageType Type, object Value);
 
     #endregion
 
@@ -66,8 +64,8 @@ namespace Core.Boundaries
 		Task UpdateMembershipAsync(long conversationId, long userId, List<(string Property, object Value)> edits);
 		Task RemoveUserFromConversationAsync(long conversationId, long userId);
 
-		Task<List<CoreMessage>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10);
-        Task<CoreMessage> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value);
+		Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10);
+        Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value);
     }
 
 	public interface IMessageOperations

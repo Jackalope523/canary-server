@@ -11,7 +11,7 @@ namespace Repository
             store = new EFMessageStore(flag);
         }
 
-        public async Task<CoreMessage> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
+        public async Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
         {
             return await store.AddMessageAsync(conversationId, userId, timestamp, type, value);
         }
@@ -51,7 +51,7 @@ namespace Repository
             return await store.GetMembershipAsync(conversationId, userId);
         }
 
-        public async Task<List<CoreMessage>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10)
+        public async Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10)
         {
             return await store.GetMessagesForConversationAsync(conversationId, startSeqId, endSeqId);
         }

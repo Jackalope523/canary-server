@@ -619,7 +619,7 @@ namespace Core.Entities
             return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, (await Companions).ToArray());
         }
 
-        public async Task MessageOrNotifyAsync(Conversation conversation, User sender, CoreMessage message)
+        public async Task MessageOrNotifyAsync(Conversation conversation, User sender, MessageShard message)
         {
             MessageShard msg = message.ToShard();
 

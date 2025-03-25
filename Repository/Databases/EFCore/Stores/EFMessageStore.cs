@@ -7,7 +7,7 @@
         }
 
 
-        public async Task<CoreMessage> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
+        public async Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
         {
             Message toAdd;
 
@@ -72,7 +72,7 @@
             }
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.Messages.Add(toAdd));
-            return new CoreMessage(toAdd.Id, toAdd.UserId, toAdd.Timestamp, type, value);
+            return new MessageShard(toAdd.Id, toAdd.UserId, toAdd.Timestamp, type, value);
         }
 
         public Task AddUsersToConversationAsync(long conversationId, params long[] userIds)
@@ -110,7 +110,7 @@
             throw new NotImplementedException();
         }
 
-        public Task<List<CoreMessage>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10)
+        public Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10)
         {
             throw new NotImplementedException();
         }

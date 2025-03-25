@@ -40,7 +40,7 @@ namespace Core.Entities
         //////////////////////
         
         public Synced<List<(User User, CoreMembership Membership)>> Members { get; }
-        public Synced<List<CoreMessage>> Messages { get; }
+        public Synced<List<MessageShard>> Messages { get; }
 
         public Synced<Gathering> Gathering { get; }
 
@@ -138,7 +138,7 @@ namespace Core.Entities
 
         #region Actions
 
-        public async Task MessageOthersAsync(User sender, CoreMessage message)
+        public async Task MessageOthersAsync(User sender, MessageShard message)
         {
             MessageShard msg = message.ToShard();
 
@@ -152,7 +152,7 @@ namespace Core.Entities
             }
         }
 
-        public async Task MessageOrNotifyOthersAsync(User sender, CoreMessage message)
+        public async Task MessageOrNotifyOthersAsync(User sender, MessageShard message)
         {
             MessageShard msg = message.ToShard();
 
