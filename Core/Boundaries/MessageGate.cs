@@ -95,7 +95,7 @@ namespace Core.Boundaries
 	public interface IMessageSocket
 	{
 		Task ReceiveMessage(long conversationId, MessageShard message);
-		Task UserIsComposing(long userId, bool isComposing);
+		Task UserIsComposing(long userId, long conversationId, bool isComposing);
 	}
 
 	#endregion

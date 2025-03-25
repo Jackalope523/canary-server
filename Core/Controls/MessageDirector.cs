@@ -2,14 +2,12 @@
 using System.IO;
 using System.Threading.Tasks;
 using Core.Boundaries;
-using System.Collections.Concurrent;
 using Core.Entities;
 using System.Linq;
 
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
 using static Core.Entities.Smithing;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Core.Controls
 {
@@ -37,7 +35,7 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             return (await conversation.Members)
                 .ConvertAll(m => m.Membership.ToShard());
@@ -49,7 +47,7 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             return (await conversation.Messages)
                 .ConvertAll(m => m.ToShard());
@@ -61,7 +59,7 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.LastSeen), Time) });
         }
@@ -72,7 +70,7 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             _ = conversation.IndicateUserComposingAsync(user, isComposing);
         }
@@ -83,7 +81,7 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Text, text);
 
@@ -96,7 +94,7 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Photo, photo);
 
@@ -109,7 +107,7 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             var gathering = await GetGatheringAsync(gatheringId);
 
@@ -124,12 +122,12 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             var gathering = await GetGatheringAsync(gatheringId);
 
             Verify(await user.CanView(gathering),
-                new UserErrorException());
+                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
 
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.ShareGathering, gathering.Id);
 
@@ -142,14 +140,16 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+            User snapshotOwner = await GetUserAsync(snapshot.User.Id);
+            var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
-            Verify(user.Taken(snapshot),
-                new UserErrorException());
-
-            // todo verifications
+            Verify(user.Taken(snapshot) ||
+                await user.IsCompanionsWith(snapshotOwner) ||
+                await etchedGathering.HasOnGuestList(user),
+                new UserErrorException(SnapshotErrorCode.CANNOT_VIEW));
 
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Snapshot, snapshot.Id);
 
@@ -162,11 +162,12 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             var nest = await GetUserAsync(nestId);
 
-            // todo verifications
+            FailIf(await user.IsBlockedBy(nest),
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Nest, nest.Id);
 
@@ -192,10 +193,10 @@ namespace Core.Controls
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             Verify(await conversation.IsModifiableBy(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.CANNOT_EDIT_PERMISSION));
 
             Conversation editedConversation = new(conversation.ToCoreConversation())
             {
@@ -232,14 +233,14 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(await conversation.HasMember(user),
-                new UserErrorException());
-
             Verify(conversation.Type == ConversationType.Group,
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             Verify(await conversation.IsModifiableBy(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.CANNOT_DELETE_PERMISSION));
 
             await Messages.DeleteConversationAsync(conversation.Id);
         }
@@ -249,11 +250,11 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(await conversation.HasMember(user),
-                new UserErrorException());
-
             Verify(conversation.Type == ConversationType.Group,
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
 
@@ -264,17 +265,19 @@ namespace Core.Controls
         public async Task SummonUserAsync(long userId, long conversationId, long targetId)
         {
             var user = await GetUserAsync(userId);
+            var summoned = await GetUserAsync(targetId);
             var conversation = await GetConversationAsync(conversationId);
 
+            Verify(conversation.Type == ConversationType.Group,
+                new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
+
             Verify(await conversation.HasMember(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            FailIf(conversation.GatheringId.HasValue,
-                new UserErrorException());
+            Verify(await user.IsCompanionsWith(summoned),
+                new UserErrorException(ConversationErrorCode.CANNOT_INVITE_NEUTRAL));
 
-            // todo other verifications
-
-            await Messages.AddUsersToConversationAsync(conversation.Id, targetId);
+            await Messages.AddUsersToConversationAsync(conversation.Id, summoned.Id);
 
             var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, );
             _ = conversation.MessageOthersAsync(User.Hollow.Id, activityMessage);
@@ -285,14 +288,14 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(await conversation.HasMember(user),
-                new UserErrorException());
-
             Verify(conversation.Type == ConversationType.Group,
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             Verify(await conversation.IsModifiableBy(user),
-                new UserErrorException());
+                new UserErrorException(ConversationErrorCode.CANNOT_KICK_PERMISSION));
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, targetId);
 
@@ -342,7 +345,7 @@ namespace Core.Controls
 
         #region Tools
 
-        public async Task<Conversation> GetConversationAsync(long conversationId)
+        private async Task<Conversation> GetConversationAsync(long conversationId)
         {
             return new(await Messages.GetConversationAsync(conversationId));
         }

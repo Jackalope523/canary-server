@@ -199,7 +199,7 @@ namespace Core.Entities
                     .SelectMany(c => c)
                     .ToArray();
 
-                await Terminal.SocketService.BroadcastAsync(client => client.UserIsComposing(user.Id, isComposing), connections);
+                await Terminal.SocketService.BroadcastAsync(client => client.UserIsComposing(user.Id, Id, isComposing), connections);
             }
         }
 
