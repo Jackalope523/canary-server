@@ -40,7 +40,7 @@ namespace Core.Boundaries
 		: CoreOnlyData();
 	public record MembershipShard(long UserId, MembershipType Type, DateTimeOffset LastSeen);
 
-	public record CoreMessage(int SequenceId, long UserId, DateTimeOffset Timestamp, MessageType Type, object Value)
+	public record CoreMessage(long id, long UserId, DateTimeOffset Timestamp, MessageType Type, object Value)
 		: CoreOnlyData();
 	public record MessageShard(int SequenceId, long UserId, DateTimeOffset Timestamp, MessageType Type, object Value);
 

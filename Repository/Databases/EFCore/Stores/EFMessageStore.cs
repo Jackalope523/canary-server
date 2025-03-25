@@ -6,7 +6,8 @@
         {
         }
 
-        public async Task AddMessageAsync(long conversationId, long userId, long sequenceId, DateTimeOffset timestamp, MessageType type, object value)
+
+        public async Task<CoreMessage> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
         {
             Message toAdd;
 
@@ -70,11 +71,8 @@
                     throw new InvalidInputException("Message of type \"" + type.ToString() + "\" is not supported in this method.");
             }
 
-            if (toAdd != null)
-            {
-                await storeSentry.ExecuteWriteAsync(ctx => ctx.Messages.Add(toAdd));
-            }
-
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Messages.Add(toAdd));
+            return new CoreMessage(toAdd.Id, toAdd.UserId, toAdd.Timestamp, type, value);
         }
 
         public Task AddUsersToConversationAsync(long conversationId, params long[] userIds)

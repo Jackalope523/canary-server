@@ -1,4 +1,6 @@
-﻿namespace Repository
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace Repository
 {
     class MessageStoreCoordinator : IMessageDatabase
     {
@@ -9,9 +11,9 @@
             store = new EFMessageStore(flag);
         }
 
-        public async Task AddMessageAsync(long conversationId, long userId, long sequenceId, DateTimeOffset timestamp, MessageType type, object value)
+        public async Task<CoreMessage> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
         {
-            await store.AddMessageAsync(conversationId, userId, sequenceId, timestamp, type, value);
+            return await store.AddMessageAsync(conversationId, userId, timestamp, type, value);
         }
 
         public async Task AddUsersToConversationAsync(long conversationId, params long[] userIds)
