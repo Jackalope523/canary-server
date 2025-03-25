@@ -9,6 +9,7 @@ using static Core.Entities.Psijic;
 using Microsoft.Extensions.Logging;
 using Core.Notifications;
 using Microsoft.VisualBasic;
+using System.Reflection;
 
 namespace Core.Entities
 {
@@ -30,7 +31,7 @@ namespace Core.Entities
 
 		public long Id { get; init; }
         public ConversationType Type { get; init; }
-        string Title { get; set; }
+        public string Title { get; set; }
 
         public long? GatheringId { get; init; }
 
@@ -83,6 +84,12 @@ namespace Core.Entities
                 IsMuted: userMembership.Membership.IsMuted); // todo fill already read indicator
         }
 
+        public ConversationShard ToConversationShard(CoreMembership relativeTo)
+        {
+            return new(Id, Type, Title, GatheringId,
+                IsMuted: relativeTo.IsMuted); // todo fill already read indicator
+        }
+
 		#endregion
 
 		#region Composition
@@ -123,28 +130,42 @@ namespace Core.Entities
             return (await Members).Exists(u => u.User.Equals(user));
         }
 
-		#endregion
+        #endregion
 
-		#region Effects
+        #region Effects
 
         #endregion
 
         #region Actions
 
+        public async Task MessageOthersAsync(User sender, CoreMessage message)
+        {
+            MessageShard msg = message.ToShard();
+
+            var otherMembers = (await Members).Where(m => !m.User.Equals(sender));
+
+            var (onlineMembers, _) = await otherMembers.PartitionAsync(async (member) => await member.User.IsOnline());
+
+            if (onlineMembers.Any())
+            {
+                await Terminal.MessageDirector.SendClientMessageAsync(this, msg, onlineMembers.Select(u => u.User).ToArray());
+            }
+        }
+
         public async Task MessageOrNotifyOthersAsync(User sender, CoreMessage message)
         {
             MessageShard msg = message.ToShard();
 
-            var otherMembers = (await Members).Where(m => !m.User.Equals(sender)).ToList();
+            var otherMembers = (await Members).Where(m => !m.User.Equals(sender));
 
             var (onlineMembers, offlineMembers) = await otherMembers.PartitionAsync(async (member) => await member.User.IsOnline());
 
-            if (onlineMembers.Count > 0)
+            if (onlineMembers.Any())
             {
                 await Terminal.MessageDirector.SendClientMessageAsync(this, msg, onlineMembers.Select(u => u.User).ToArray());
             }
 
-            if (offlineMembers.Count > 0)
+            if (offlineMembers.Any())
             {
                 var subscribedMembers = offlineMembers
                     .Where(member => !member.Membership.IsMuted)
@@ -162,6 +183,23 @@ namespace Core.Entities
                 };
 
                 await User.NotifyAll(notification, subscribedMembers);
+            }
+        }
+
+        public async Task IndicateUserComposingAsync(User user, bool isComposing)
+        {
+            var otherMembers = (await Members).Where(m => !m.User.Equals(user));
+
+            var (onlineMembers, _) = await otherMembers.PartitionAsync(async (member) => await member.User.IsOnline());
+
+            if (onlineMembers.Any())
+            {
+                var connections = (await Psijic.Once(onlineMembers
+                    .Select(async u => await u.User.Connections)))
+                    .SelectMany(c => c)
+                    .ToArray();
+
+                await Terminal.SocketService.BroadcastAsync(client => client.UserIsComposing(user.Id, isComposing), connections);
             }
         }
 

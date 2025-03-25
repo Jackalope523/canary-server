@@ -64,7 +64,7 @@ namespace Core.Boundaries
 		Task RemoveUserFromConversationAsync(long conversationId, long userId);
 
 		Task<List<CoreMessage>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10);
-        Task AddMessageAsync(long conversationId, long userId, long sequenceId, DateTimeOffset timestamp, MessageType type, string value);
+        Task<CoreMessage> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value);
     }
 
 	public interface IMessageOperations
@@ -74,9 +74,10 @@ namespace Core.Boundaries
 		Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId);
 
 		Task UserReadAsync(long userId, long conversationId);
-		Task UserComposingAsync(long userId, long conversationId);
+		Task UserComposingAsync(long userId, long conversationId, bool isComposing);
 		Task SendTextAsync(long userId, long conversationId, string text);
 		Task SendPhotoAsync(long userId, long conversationId, MemoryStream photo);
+		Task InviteToGatheringAsync(long userId, long conversationId, long gatheringId);
 		Task ShareGatheringAsync(long userId, long conversationId, long gatheringId);
 		Task ShareSnapshotAsync(long userId, long conversationId, long snapshotId);
 		Task ShareNestAsync(long userId, long conversationId, long nestId);

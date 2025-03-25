@@ -16,11 +16,11 @@ namespace Frontier.Controllers
             await messages.UserReadAsync(user.Id, conversationId);
         }
 
-        public async Task UserComposing(long conversationId)
+        public async Task UserComposing(long conversationId, bool isComposing)
         {
             var user = await GetCurrentUserAsync();
 
-            await messages.UserComposingAsync(user.Id, conversationId);
+            await messages.UserComposingAsync(user.Id, conversationId, isComposing);
         }
 
         public async Task SendText(long conversationId, string text)

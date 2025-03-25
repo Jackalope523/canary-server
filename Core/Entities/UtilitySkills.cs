@@ -108,8 +108,8 @@ namespace Core.Entities
 
 	internal static class Smithing
     {
-        public static async Task<(List<T> TrueList, List<T> FalseList)> PartitionAsync<T>(
-            this List<T> source, Func<T, Task<bool>> predicate)
+        public static async Task<(IEnumerable<T> TrueList, IEnumerable<T> FalseList)> PartitionAsync<T>(
+            this IEnumerable<T> source, Func<T, Task<bool>> predicate)
         {
             var results = await Psijic.Once(source.Select(async item => (Item: item, Result: await predicate(item))));
 
@@ -125,6 +125,11 @@ namespace Core.Entities
             }
 
             return (trueList, falseList);
+        }
+
+        public static MembershipShard ToShard(this CoreMembership membership)
+        {
+            return new(membership.UserId, membership.Type, membership.LastSeen);
         }
 
         public static MessageShard ToShard(this CoreMessage message)

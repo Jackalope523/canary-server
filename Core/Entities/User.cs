@@ -118,7 +118,7 @@ namespace Core.Entities
 
         public Synced<List<string>> Connections { get; }
 
-        public Synced<List<(Conversation, CoreMembership)>> Conversations { get; }
+        public Synced<List<(Conversation Conversation, CoreMembership Membership)>> Conversations { get; }
 
         #endregion
 

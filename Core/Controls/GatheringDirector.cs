@@ -246,22 +246,25 @@ namespace Core.Controls
 				edits.Add((nameof(CoreGathering.GroupMaximum), editedGathering.GroupMaximum));
 			}
 
-			// Push update
-			await Gatherings.UpdateGatheringAsync(originalGathering.Id, edits);
-
-			// Update hero image if provided
-			if (heroImage != null && heroImage.Length > 0)
+			if (edits.Count > 0)
 			{
-				await Terminal.MediaDirector.UploadHeroAsync(originalGathering.Id, heroImage);
-            }
+				// Push update
+				await Gatherings.UpdateGatheringAsync(originalGathering.Id, edits);
 
-			_ = originalGathering.NotifyGuests(CanaryNotification.GatheringEdited(await originalGathering.ToGatheringShard()), notifyHost: false);
+				// Update hero image if provided
+				if (heroImage != null && heroImage.Length > 0)
+				{
+					await Terminal.MediaDirector.UploadHeroAsync(originalGathering.Id, heroImage);
+				}
 
-			// Reschedule notifications if required
-			if (IsNotNull(startTime))
-			{
-				_ = RescheduleSchedule(editedGathering);
-            }
+				_ = originalGathering.NotifyGuests(CanaryNotification.GatheringEdited(await originalGathering.ToGatheringShard()), notifyHost: false);
+
+				// Reschedule notifications if required
+				if (IsNotNull(startTime))
+				{
+					_ = RescheduleSchedule(editedGathering);
+				}
+			}
         }
 
 		public async Task TerminateGatheringAsync(long userId, long gatheringId)
