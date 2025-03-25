@@ -1,8 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Core.Boundaries;
-
-using static Core.Entities.Arbiter;
+using Core.Entities;
 
 namespace Core.Controls
 {
@@ -30,6 +30,10 @@ namespace Core.Controls
 
         #region Favours
 
+        public async Task<List<string>> RequestUserConnectionsAsync(User user)
+        {
+            return await Connections.GetConnectionsAsync(user.Id);
+        }
 
         #endregion
     }

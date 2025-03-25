@@ -22,6 +22,11 @@ namespace Core.Entities
             return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, users);
         }
 
+        public static async Task<string> NotifyAll(CanaryNotification notification, params User[] users)
+        {
+            return await NotifyAll(notification, null, users);
+        }
+
         #endregion
 
         #region Variables
@@ -111,6 +116,9 @@ namespace Core.Entities
         public Synced<List<GatheringReport>> GatheringReports { get; }
         public Synced<List<SnapshotReport>> SnapshotReports { get; }
 
+        public Synced<List<string>> Connections { get; }
+
+        public Synced<List<(Conversation Conversation, CoreMembership Membership)>> Conversations { get; }
 
         #endregion
 
@@ -150,6 +158,10 @@ namespace Core.Entities
             Reports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).UserReports);
             GatheringReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).GatheringReports);
             SnapshotReports = new(async () => (await ReportsSync.Value().ConfigureAwait(false)).SnapshotReports);
+
+            Connections = new(() => Terminal.ConnectionDirector.RequestUserConnectionsAsync(this));
+
+            Conversations = new(() => Terminal.MessageDirector.RequestConversationsForUserAsync(this));
         }
 
         public User(CoreUser fromUser) : this()
@@ -325,6 +337,11 @@ namespace Core.Entities
         public async Task<bool> IsAtGathering()
         {
             return (await OngoingGatherings).Count > 0;
+        }
+
+        public async Task<bool> IsOnline()
+        {
+            return (await Connections).Count > 0;
         }
 
 		public async Task<bool> CanView(Gathering gathering)
@@ -600,6 +617,28 @@ namespace Core.Entities
         public async Task<string> NotifyCompanions(CanaryNotification notification, DateTimeOffset? notifyAt = null)
         {
             return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, (await Companions).ToArray());
+        }
+
+        public async Task MessageOrNotifyAsync(Conversation conversation, User sender, CoreMessage message)
+        {
+            MessageShard msg = message.ToShard();
+
+            if (await IsOnline())
+            {
+                await Terminal.MessageDirector.SendClientMessageAsync(conversation, msg, this);
+            }
+            else
+            {
+                CanaryNotification notification = conversation.Type switch
+                {
+                    ConversationType.Individual => CanaryNotification.IndividualMessage(conversation, sender.ToUserShard(), msg),
+                    ConversationType.Group => CanaryNotification.GroupMessage(conversation, sender.ToUserShard(), msg),
+                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await conversation.Gathering).ToGatheringShard(), conversation, sender.ToUserShard(), msg),
+                    _ => throw new UnexpectedFailureException("ConversationType does not exist"),
+                };
+
+                await Notify(notification);
+            }
         }
 
 		#endregion

@@ -94,6 +94,12 @@ namespace Core.Exceptions
             ErrorCode = $"SNAPSHOT.{code}";
             Details = details;
         }
+
+        public UserErrorException(ConversationErrorCode code, object details = null)
+        {
+            ErrorCode = $"CONVERSATION.{code}";
+            Details = details;
+        }
     }
 
     #endregion
@@ -184,6 +190,18 @@ namespace Core.Exceptions
         CANNOT_INTERACT_SELF,
 
         WINDOW_CLOSED,
+    }
+
+    public enum ConversationErrorCode
+    {
+        NOT_MEMBER,
+        NOT_GROUP_CHAT,
+
+        CANNOT_INVITE_NEUTRAL,
+        CANNOT_KICK_PERMISSION,
+
+        CANNOT_EDIT_PERMISSION,
+        CANNOT_DELETE_PERMISSION,
     }
 
     public enum HollowErrorCode
