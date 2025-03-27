@@ -152,20 +152,20 @@ namespace Frontier.Controllers
         }
 
 		[HttpPost("{gatheringId}/invite")]
-		public async Task<IActionResult> InviteUser(long gatheringId, long targetId)
+		public async Task<IActionResult> InviteUser(long gatheringId, long target_id)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.InviteUserAsync(user.Id, targetId, gatheringId);
+				await gatherings.InviteUserAsync(user.Id, target_id, gatheringId);
 			});
         }
 
 		[HttpPut("{gatheringId}/guests")]
-		public async Task<IActionResult> KickUser(long gatheringId, long targetId)
+		public async Task<IActionResult> KickUser(long gatheringId, long target_id)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.KickUserAsync(user.Id, targetId, gatheringId);
+				await gatherings.KickUserAsync(user.Id, target_id, gatheringId);
 			});
 		}
 
