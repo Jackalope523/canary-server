@@ -37,12 +37,15 @@ namespace Repository
 
         // Navigation Properties
         public User? Host { get; set; }
+        public Conversation? Conversation { get; set; }
         public List<GatheringLink>? GatheringLink { get; set; }
         public List<GatheringReport>? GatheringReports { get; set; }
         public List<UserReport>? UserReports { get; set; }
         public List<Snapshot>? Snapshots { get; set; }
         public List<GuestClearance>? GuestClearances { get; set; }
         public List<Notification>? Notifications { get; set; }
+        public List<GatheringShareMessage>? Shares { get; set; }
+        public List<GatheringInviteMessage>? Invites { get; set; }
 
         // Default Values
         private static readonly CoordinateFactory Factory = new();

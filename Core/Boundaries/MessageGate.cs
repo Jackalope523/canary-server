@@ -31,7 +31,7 @@ namespace Core.Boundaries
 		Nest,
 	}
 
-	public enum ActivityMessage
+	public enum ActivityMessageType
 	{ }
 
 	public record CoreConversation(long Id, ConversationType Type, string Title = default, long? GatheringId = null)

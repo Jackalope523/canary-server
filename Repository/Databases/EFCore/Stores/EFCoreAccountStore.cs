@@ -67,6 +67,16 @@ namespace Repository
         public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.ConversationLinks.
+               Where(l => l.UserId == id).
+               ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Connections.
+               Where(c => c.UserId == id).
+               ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.Notifications.
                 Where(n => n.RecipientId == id).
                 ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
@@ -103,7 +113,7 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.UserRelationships.
-               Where(l => l.SelfId == id).
+               Where(l => l.SelfId == id || l.OtherId == id).
                ExecuteUpdate(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
@@ -119,6 +129,16 @@ namespace Repository
 
         public async Task HardDeleteAsync(long id)
         {
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Connections.
+                Where(c => c.UserId == id).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.ConversationLinks.
+               Where(l => l.UserId == id).
+               ExecuteDeleteAsync());
+
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.Notifications.
                 Where(n => n.RecipientId == id).
@@ -163,6 +183,16 @@ namespace Repository
                ctx.GatheringLinks.
                Where(l => l.UserId == id).
                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.ProfileMessages.
+               Where(m => m.ProfileId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.ProfileId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Messages.
+               Where(m => m.UserId == id).
+               ExecuteUpdate(setter => setter.SetProperty(r => r.UserId, (long?)null)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                ctx.Feedback.
@@ -235,7 +265,7 @@ namespace Repository
             }
             catch (InvalidOperationException ex)
             {
-                throw new UserNotFoundException("Unable to find a user bearing supplied Id.", ex);
+                throw new UserNotFoundException("Unable to find a user bearing supplied Id. It has possibly been soft deleted.", ex);
             }
 
             return user;

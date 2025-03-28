@@ -2,12 +2,11 @@
 {
     public class ConversationLink : Entity
     {
-        public enum ConversationLinkType { Member, Admin }
-
-        public long? UserId { get; set; }
+        public long UserId { get; set; }
         public long ConversationId { get; set; }
-        public DateTimeOffset LastOpened { get; set; }
-        public ConversationLinkType Type { get; set; }
+        public DateTimeOffset LastSeen { get; set; }
+        public MembershipType Type { get; set; }
+        public bool Muted { get; set; }
 
         // Navigation Properties
         public User? User { get; set; }

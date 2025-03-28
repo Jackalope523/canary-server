@@ -29,7 +29,6 @@ namespace Repository
                 NotifierId = Notifier.Id,
                 RecipientId = Recipient.Id,
                 Time = DateTimeOffset.MinValue,
-                Message = TelegramMessage.UserFollowed,
                 Action = "Action " + Count(),
                 Read = false
             });

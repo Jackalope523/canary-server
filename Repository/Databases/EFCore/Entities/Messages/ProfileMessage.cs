@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    class ProfileMessage : Message
+    public class ProfileMessage : Message
     {
         public long ProfileId { get; set; }
 

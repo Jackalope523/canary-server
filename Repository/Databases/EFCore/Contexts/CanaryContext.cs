@@ -21,10 +21,16 @@ namespace Repository
         internal DbSet<Feedback> Feedback { get; set; }
         internal DbSet<Notification> Notifications { get; set; }
         internal DbSet<Word> Words { get; set; }
-        internal DbSet<Message> Messages { get; set; }
         internal DbSet<Conversation> Conversations { get; set; }
         internal DbSet<ConversationLink> ConversationLinks { get; set; }
         internal DbSet<Connection> Connections { get; set; }
+        internal DbSet<Message> Messages { get; set; }
+        internal DbSet<TextMessage> TextMessages { get; set; }
+        internal DbSet<ImageMessage> ImageMessages { get; set; }
+        internal DbSet<GatheringShareMessage> GatheringShareMessages { get; set; }
+        internal DbSet<GatheringInviteMessage> GatheringInviteMessages { get; set; }
+        internal DbSet<ProfileMessage> ProfileMessages { get; set; }
+        internal DbSet<ActivityMessage> ActivityMessages { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -226,6 +232,16 @@ namespace Repository
              .WithOne(m => m.User)
              .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Shares)
+             .WithOne(m => m.Profile)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Connections)
+             .WithOne(c => c.User)
+             .OnDelete(DeleteBehavior.Restrict);
+
             // Gathering
             modelBuilder.Entity<Gathering>()
                 .HasQueryFilter(g => !g.SoftDeleted);
@@ -274,6 +290,21 @@ namespace Repository
             modelBuilder.Entity<Gathering>()
                .HasMany(u => u.Notifications)
                .WithOne(n => n.Gathering)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+               .HasMany(g => g.Shares)
+               .WithOne(m => m.Gathering)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+               .HasMany(g => g.Invites)
+               .WithOne(m => m.Gathering)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+               .HasOne(g => g.Conversation)
+               .WithOne(c => c.Gathering)
                .OnDelete(DeleteBehavior.Restrict);
 
             // Telegram
@@ -341,17 +372,9 @@ namespace Repository
             modelBuilder.Entity<SnapshotLink>()
                 .HasQueryFilter(l => !l.SoftDeleted);
 
-            modelBuilder.Entity<SnapshotLink>()
-                .HasIndex(l => new { l.UserId, l.SnapshotId })
-                .IsUnique();;
-
             // User Relationship
             modelBuilder.Entity<UserRelationship>()
                 .HasQueryFilter(r => !r.SoftDeleted);
-
-            modelBuilder.Entity<UserRelationship>()
-                .HasIndex(l => new { l.SelfId, l.OtherId })
-                .IsUnique();
 
             // Gathering Link
             modelBuilder.Entity<GatheringLink>()
@@ -360,10 +383,6 @@ namespace Repository
             // Guest Clearance
             modelBuilder.Entity<GuestClearance>()
                 .HasQueryFilter(c => !c.SoftDeleted);
-
-            modelBuilder.Entity<GuestClearance>()
-                .HasIndex(l => new { l.UserId, l.GatheringId})
-                .IsUnique();
 
             // Penalty
             modelBuilder.Entity<Penalty>()
@@ -399,12 +418,22 @@ namespace Repository
                 .WithOne(m => m.Conversation)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Conversation>()
+                .Property(c => c.Title)
+                .HasMaxLength(200);
+
             // Messages
             modelBuilder.Entity<Message>()
                 .HasQueryFilter(w => !w.SoftDeleted);
 
             modelBuilder.Entity<Message>()
-                .HasDiscriminator(m => m.Type);
+                .HasDiscriminator<MessageType>("MessageType")
+                .HasValue<TextMessage>(MessageType.Text)
+                .HasValue<ImageMessage>(MessageType.Photo)
+                .HasValue<ActivityMessage>(MessageType.Activity)
+                .HasValue<ProfileMessage>(MessageType.Nest)
+                .HasValue<GatheringInviteMessage>(MessageType.GatheringInvite)
+                .HasValue<GatheringShareMessage>(MessageType.ShareGathering);
 
             modelBuilder.Entity<GatheringInviteMessage>()
                 .Property(g => g.GatheringId)
@@ -414,13 +443,25 @@ namespace Repository
                 .Property(g => g.GatheringId)
                 .HasColumnName("GatheringId");
 
+            modelBuilder.Entity<TextMessage>()
+                .Property(m => m.Text)
+                .HasMaxLength(10000);
+
+            modelBuilder.Entity<ImageMessage>()
+                .Property(m => m.ImageURL)
+                .HasMaxLength(300);
+
             // Conversation Links
             modelBuilder.Entity<ConversationLink>()
                 .HasQueryFilter(w => !w.SoftDeleted);
 
-            modelBuilder.Entity<ConversationLink>()
-                .HasIndex(l => new { l.UserId, l.ConversationId })
-                .IsUnique();
+            // Connections
+            modelBuilder.Entity<Connection>()
+              .HasQueryFilter(c => !c.SoftDeleted);
+
+            modelBuilder.Entity<Connection>()
+             .Property(c => c.ConnectionId)
+             .HasMaxLength(36);
         }
     }
 }

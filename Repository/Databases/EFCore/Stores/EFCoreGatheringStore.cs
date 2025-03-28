@@ -175,6 +175,27 @@ namespace Repository
                 Where(n => n.GatheringId == id).
                 ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
+            List<long> toDelete = await storeSentry.ExecuteReadAsync(ctx => 
+                                    ctx.Conversations.
+                                    Where(c => c.GatheringId == id).
+                                    Select(c => c.Id).
+                                    ToListAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.ConversationLinks.
+                Where(l => toDelete.Contains(L.ConversationId)).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Messages.
+               Where(m => toDelete.Contains(m.ConversationId)).
+               ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Conversations.
+               Where(n => n.GatheringId == id).
+               ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.GatheringLinks.
                 Where(l => l.GatheringId == id).
@@ -203,6 +224,27 @@ namespace Repository
                 Where(l => l.GatheringId == id).
                 ExecuteDeleteAsync());
 
+            List<long> toDelete = await storeSentry.ExecuteReadAsync(ctx =>
+                                    ctx.Conversations.
+                                    Where(c => c.GatheringId == id).
+                                    Select(c => c.Id).
+                                    ToListAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.ConversationLinks.
+                Where(l => toDelete.Contains(l.ConversationId)).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Messages.
+                Where(M => toDelete.Contains(M.ConversationId)).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Conversations.
+                Where(l => l.GatheringId == id).
+                ExecuteDeleteAsync());
+
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.GatheringLinks.
                 Where(l => l.GatheringId == id).
@@ -215,6 +257,16 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.UserReports.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GatheringInviteMessages.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GatheringShareMessages.
                 Where(r => r.GatheringId == id).
                 ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
 

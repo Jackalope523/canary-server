@@ -1,10 +1,10 @@
 ﻿namespace Repository
 {
-    class ImageMessage : Message
+    public class ImageMessage : Message
     {
-        public string ImageURL { get; set; }
+        public string ImageURL { get; set; } = DefaultImageURL;
 
         // Default Values
-
+        public static string DefaultImageURL = "";
     }
 }

@@ -66,15 +66,18 @@ namespace Core.Tests
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
+				harbor.ConnectionDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
 				harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
+				harbor.MessageDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
 				harbor.MiscellaneousDatabaseAccess,
-				new NotificationServiceStub());
+				new NotificationServiceStub(),
+				null);
 			
 		}
 

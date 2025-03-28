@@ -26,7 +26,7 @@ namespace Repository
         public Harbor(Flag flag)
         {
             AccountDatabaseAccess = new AccountStoreCoordinator(flag);
-            ConnectionDatabaseAccess = new();
+            ConnectionDatabaseAccess = new ConnectionStoreCoordinator(flag);
             NestDatabaseAccess = new NestStoreCoordinator(flag);
             NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
             GatheringDatabaseAccess = new GatheringStoreCoordinator(flag);
@@ -35,7 +35,7 @@ namespace Repository
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             KeyDatabaseAccess = new KeyStoreCoordinator();
             MediaDatabaseAccess = new MediaStoreCoordinator(flag);
-            MessageDatabaseAccess = new();
+            MessageDatabaseAccess = new MessageStoreCoordinator(flag);
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
             MiscellaneousDatabaseAccess = new MiscellaneousStoreCoordinator(flag);
         }

@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    class SnapshotMessage : Message
+    public class SnapshotMessage : Message
     {
         public long SnapshotId { get; set; }
 

@@ -1,7 +1,7 @@
 ﻿namespace Repository
 {
-    class ActivityMessage : Message
-    {
-    
+    public class ActivityMessage : Message
+    { 
+        public ActivityMessageType ActivityType { get; set; }
     }
 }

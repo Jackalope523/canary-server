@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    class TextMessage : Message
+    public class TextMessage : Message
     {
         public string Text { get; set; } = DefaultText;
 

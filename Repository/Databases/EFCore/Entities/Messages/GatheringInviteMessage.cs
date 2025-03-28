@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    class GatheringInviteMessage : Message
+    public class GatheringInviteMessage : Message
     {
         public long GatheringId { get; set; }
 

@@ -5,7 +5,7 @@
         public long NotifierId { get; set; }
         public long RecipientId { get; set; }
         public DateTimeOffset Time { get; set; }
-        public TelegramMessage Message { get; set; }
+        //public TelegramMessage Message { get; set; }
         public string Action { get; set; }
         public bool Read { get; set; }
 
