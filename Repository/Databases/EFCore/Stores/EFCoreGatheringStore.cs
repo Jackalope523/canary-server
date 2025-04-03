@@ -183,7 +183,7 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.ConversationLinks.
-                Where(l => toDelete.Contains(L.ConversationId)).
+                Where(l => toDelete.Contains(l.ConversationId)).
                 ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
