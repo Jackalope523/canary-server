@@ -97,7 +97,7 @@ namespace Core.Controls
             _ = conversation.IndicateUserComposingAsync(user, isComposing);
         }
 
-        public async Task SendTextAsync(long userId, long conversationId, string text)
+        public async Task<MessageShard> SendTextAsync(long userId, long conversationId, string text)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -108,9 +108,11 @@ namespace Core.Controls
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Text, text);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
+
+            return message;
         }
 
-        public async Task SendPhotoAsync(long userId, long conversationId, MemoryStream photo)
+        public async Task<MessageShard> SendPhotoAsync(long userId, long conversationId, MemoryStream photo)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -121,9 +123,11 @@ namespace Core.Controls
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Photo, photo);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
+
+            return message;
         }
 
-        public async Task InviteToGatheringAsync(long userId, long conversationId, long gatheringId)
+        public async Task<MessageShard> InviteToGatheringAsync(long userId, long conversationId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -136,9 +140,11 @@ namespace Core.Controls
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.GatheringInvite, gathering.Id);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
+
+            return message;
         }
 
-        public async Task ShareGatheringAsync(long userId, long conversationId, long gatheringId)
+        public async Task<MessageShard> ShareGatheringAsync(long userId, long conversationId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -154,9 +160,11 @@ namespace Core.Controls
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.ShareGathering, gathering.Id);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
+
+            return message;
         }
 
-        public async Task ShareSnapshotAsync(long userId, long conversationId, long snapshotId)
+        public async Task<MessageShard> ShareSnapshotAsync(long userId, long conversationId, long snapshotId)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -176,9 +184,11 @@ namespace Core.Controls
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Snapshot, snapshot.Id);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
+
+            return message;
         }
 
-        public async Task ShareNestAsync(long userId, long conversationId, long nestId)
+        public async Task<MessageShard> ShareNestAsync(long userId, long conversationId, long nestId)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -194,6 +204,8 @@ namespace Core.Controls
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Nest, nest.Id);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
+
+            return message;
         }
 
         public async Task<ConversationShard> CreateGroupChatAsync(long userId, params long[] participantIds)

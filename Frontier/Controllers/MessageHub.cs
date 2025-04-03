@@ -23,39 +23,39 @@ namespace Frontier.Controllers
             await messages.UserComposingAsync(user.Id, conversationId, isComposing);
         }
 
-        public async Task SendText(long conversationId, string text)
+        public async Task<MessageShard> SendText(long conversationId, string text)
         {
             var user = await GetCurrentUserAsync();
 
-            await messages.SendTextAsync(user.Id, conversationId, text);
+            return await messages.SendTextAsync(user.Id, conversationId, text);
         }
 
-        public async Task SendPhoto(long conversationId, MemoryStream photo)
+        public async Task<MessageShard> SendPhoto(long conversationId, MemoryStream photo)
         {
             var user = await GetCurrentUserAsync();
 
-            await messages.SendPhotoAsync(user.Id, conversationId, photo);
+            return await messages.SendPhotoAsync(user.Id, conversationId, photo);
         }
 
-        public async Task ShareGathering(long conversationId, long gatheringId)
+        public async Task<MessageShard> ShareGathering(long conversationId, long gatheringId)
         {
             var user = await GetCurrentUserAsync();
 
-            await messages.ShareGatheringAsync(user.Id, conversationId, gatheringId);
+            return await messages.ShareGatheringAsync(user.Id, conversationId, gatheringId);
         }
 
-        public async Task ShareSnapshot(long conversationId, long snapshotId)
+        public async Task<MessageShard> ShareSnapshot(long conversationId, long snapshotId)
         {
             var user = await GetCurrentUserAsync();
 
-            await messages.ShareSnapshotAsync(user.Id, conversationId, snapshotId);
+            return await messages.ShareSnapshotAsync(user.Id, conversationId, snapshotId);
         }
 
-        public async Task ShareNest(long conversationId, long nestId)
+        public async Task<MessageShard> ShareNest(long conversationId, long nestId)
         {
             var user = await GetCurrentUserAsync();
 
-            await messages.ShareNestAsync(user.Id, conversationId, nestId);
+            return await messages.ShareNestAsync(user.Id, conversationId, nestId);
         }
     }
 }

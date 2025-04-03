@@ -80,12 +80,12 @@ namespace Core.Boundaries
 
 		Task UserReadAsync(long userId, long conversationId);
 		Task UserComposingAsync(long userId, long conversationId, bool isComposing);
-		Task SendTextAsync(long userId, long conversationId, string text);
-		Task SendPhotoAsync(long userId, long conversationId, MemoryStream photo);
-		Task InviteToGatheringAsync(long userId, long conversationId, long gatheringId);
-		Task ShareGatheringAsync(long userId, long conversationId, long gatheringId);
-		Task ShareSnapshotAsync(long userId, long conversationId, long snapshotId);
-		Task ShareNestAsync(long userId, long conversationId, long nestId);
+		Task<MessageShard> SendTextAsync(long userId, long conversationId, string text);
+		Task<MessageShard> SendPhotoAsync(long userId, long conversationId, MemoryStream photo);
+		Task<MessageShard> InviteToGatheringAsync(long userId, long conversationId, long gatheringId);
+		Task<MessageShard> ShareGatheringAsync(long userId, long conversationId, long gatheringId);
+		Task<MessageShard> ShareSnapshotAsync(long userId, long conversationId, long snapshotId);
+		Task<MessageShard> ShareNestAsync(long userId, long conversationId, long nestId);
 
 		Task<ConversationShard> CreateGroupChatAsync(long userId, params long[] participantIds);
 		Task EditGroupChatAsync(long userId, long conversationId,
