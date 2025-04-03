@@ -1,0 +1,18 @@
+﻿using Core.Boundaries;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Frontier.Manifests
+{
+	public class GroupChatManifest
+    {
+        public string Title { get; set; }
+
+        [Required]
+        public long[] ParticipantIds { get; set; }
+    }
+}

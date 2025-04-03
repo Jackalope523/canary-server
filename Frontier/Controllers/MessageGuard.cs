@@ -54,11 +54,14 @@ namespace Frontier.Controllers
         }
 
         [HttpPost]
-		public async Task<IActionResult> CreateGroupChat(string title = null)
+		public async Task<IActionResult> CreateGroupChat([FromBody] GroupChatManifest manifest)
         {
+            if (manifest == null || !ModelState.IsValid)
+            { return MissingInformation(); }
+
             return await Execute(async user =>
             {
-                return await messages.CreateGroupChatAsync(user.Id);
+                return await messages.CreateGroupChatAsync(user.Id, manifest.ParticipantIds);
             });
         }
 
