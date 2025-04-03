@@ -29,7 +29,30 @@ namespace Core.Controls
                 .ConvertAll(c => c.Conversation.ToConversationShard(c.Membership));
         }
 
-        public async Task<List<MembershipShard>> GetConversationMembersAsync(long userId, long conversationId)
+        public async Task<ConversationShard> GetConversationWithAsync(long userId, long targetId)
+        {
+            var user = await GetUserAsync(userId);
+            var target = await GetUserAsync(targetId);
+
+            // todo checks
+
+            Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(userId, targetId));
+
+            return conversation.ToConversationShard();
+        }
+
+        public async Task<ConversationShard> GetConversationAsync(long userId, long conversationId)
+        {
+            var user = await GetUserAsync(userId);
+            var conversation = await GetConversationAsync(conversationId);
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(ConversationErrorCode.NOT_MEMBER));
+
+            return conversation.ToConversationShard();
+        }
+
+        public async Task<List<MembershipShard>> GetMembersAsync(long userId, long conversationId)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -179,7 +202,7 @@ namespace Core.Controls
 
             var conversationId = await Messages.CreateConversationAsync(ConversationType.Group);
 
-            // todo add applicable users
+            // todo only add applicable users
 
             var newConversation = await GetConversationAsync(conversationId);
 

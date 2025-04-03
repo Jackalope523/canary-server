@@ -35,7 +35,25 @@ namespace Frontier.Controllers
             });
         }
 
+        [HttpGet]
+		public async Task<IActionResult> GetConversationWith(long target_id)
+        {
+            return await Execute(async user =>
+            {
+                return await messages.GetConversationWithAsync(user.Id, target_id);
+            });
+        }
+
         [HttpGet("{conversationId}")]
+        public async Task<IActionResult> GetConversation(long conversationId)
+        {
+            return await Execute(async user =>
+            {
+                return await messages.GetConversationAsync(user.Id, conversationId);
+            });
+        }
+
+        [HttpGet("{conversationId}/messages")]
 		public async Task<IActionResult> GetConversationMessages(long conversationId)
         {
             return await Execute(async user =>
@@ -49,12 +67,12 @@ namespace Frontier.Controllers
         {
             return await Execute(async user =>
             {
-                return await messages.GetConversationMembersAsync(user.Id, conversationId);
+                return await messages.GetMembersAsync(user.Id, conversationId);
             });
         }
 
         [HttpPost]
-		public async Task<IActionResult> CreateGroupChat([FromBody] GroupChatManifest manifest)
+		public async Task<IActionResult> CreateGroupChat([FromForm] GroupChatManifest manifest)
         {
             if (manifest == null || !ModelState.IsValid)
             { return MissingInformation(); }

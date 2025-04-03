@@ -52,6 +52,7 @@ namespace Core.Boundaries
     public interface IMessageDatabase
     {
 		Task<CoreConversation> GetConversationAsync(long conversationId);
+		Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB);
 		Task<List<CoreConversation>> GetConversationsForUserAsync(long userId);
 		Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId);
 		Task<CoreMembership> GetMembershipAsync(long conversationId, long userId);
@@ -71,7 +72,10 @@ namespace Core.Boundaries
 	public interface IMessageOperations
 	{
 		Task<List<ConversationShard>> GetConversationsAsync(long userId);
-		Task<List<MembershipShard>> GetConversationMembersAsync(long userId, long conversationId);
+		Task<ConversationShard> GetConversationWithAsync(long userId, long targetId);
+
+		Task<ConversationShard> GetConversationAsync(long userId, long conversationId);
+		Task<List<MembershipShard>> GetMembersAsync(long userId, long conversationId);
 		Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId);
 
 		Task UserReadAsync(long userId, long conversationId);
