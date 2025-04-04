@@ -27,20 +27,18 @@ namespace Frontier.Controllers
         #region Actions
 
         [HttpGet]
-		public async Task<IActionResult> GetConversations()
+        public async Task<IActionResult> GetConversation([FromQuery] long? target_id)
         {
             return await Execute(async user =>
             {
-                return await messages.GetConversationsAsync(user.Id);
-            });
-        }
-
-        [HttpGet]
-		public async Task<IActionResult> GetConversationWith(long target_id)
-        {
-            return await Execute(async user =>
-            {
-                return await messages.GetConversationWithAsync(user.Id, target_id);
+                if (target_id.HasValue)
+                {
+                    return await messages.GetConversationWithAsync(user.Id, target_id.Value);
+                }
+                else
+                {
+                    return await messages.GetConversationsAsync(user.Id);
+                }
             });
         }
 
