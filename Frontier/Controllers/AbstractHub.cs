@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 using Core;
 
 namespace Frontier.Controllers
 {
+	[Authorize]
 	public partial class HollowHub : Hub<IClientSocket>
 	{
 		#region Variables
