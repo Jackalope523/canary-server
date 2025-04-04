@@ -276,5 +276,10 @@ namespace Repository
             }
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
+
+        public async Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

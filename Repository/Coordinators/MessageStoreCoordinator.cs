@@ -56,6 +56,11 @@ namespace Repository
             return await store.GetMessagesForConversationAsync(conversationId, startSeqId, endSeqId);
         }
 
+        public async Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
+        {
+            return await store.GetOrCreateIndividualConversationBetween(userIdA, userIdB);
+        }
+
         public async Task RemoveUserFromConversationAsync(long conversationId, long userId)
         {
             await store.RemoveUserFromConversationAsync(conversationId, userId);
