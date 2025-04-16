@@ -176,13 +176,13 @@ namespace Repository
                 ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             List<long> toDelete = await storeSentry.ExecuteReadAsync(ctx => 
-                                    ctx.Conversations.
+                                    ctx.GatheringChats.
                                     Where(c => c.GatheringId == id).
                                     Select(c => c.Id).
                                     ToListAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.ConversationLinks.
+                ctx.ChatLinks.
                 Where(l => toDelete.Contains(l.ConversationId)).
                 ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
@@ -192,7 +192,7 @@ namespace Repository
                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Conversations.
+               ctx.GatheringChats.
                Where(n => n.GatheringId == id).
                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
@@ -225,13 +225,13 @@ namespace Repository
                 ExecuteDeleteAsync());
 
             List<long> toDelete = await storeSentry.ExecuteReadAsync(ctx =>
-                                    ctx.Conversations.
+                                    ctx.GatheringChats.
                                     Where(c => c.GatheringId == id).
                                     Select(c => c.Id).
                                     ToListAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.ConversationLinks.
+                ctx.ChatLinks.
                 Where(l => toDelete.Contains(l.ConversationId)).
                 ExecuteDeleteAsync());
 
@@ -241,7 +241,7 @@ namespace Repository
                 ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-                ctx.Conversations.
+                ctx.GatheringChats.
                 Where(l => l.GatheringId == id).
                 ExecuteDeleteAsync());
 

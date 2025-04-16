@@ -21,8 +21,11 @@ namespace Repository
         internal DbSet<Feedback> Feedback { get; set; }
         internal DbSet<Notification> Notifications { get; set; }
         internal DbSet<Word> Words { get; set; }
-        internal DbSet<Conversation> Conversations { get; set; }
-        internal DbSet<ConversationLink> ConversationLinks { get; set; }
+        internal DbSet<Chat> Chats { get; set; }
+        internal DbSet<PrivateChat> PrivateChats { get; set; }
+        internal DbSet<GroupChat> GroupChats { get; set; }
+        internal DbSet<GatheringChat> GatheringChats { get; set; }
+        internal DbSet<ChatLink> ChatLinks { get; set; }
         internal DbSet<Connection> Connections { get; set; }
         internal DbSet<Message> Messages { get; set; }
         internal DbSet<TextMessage> TextMessages { get; set; }
@@ -223,7 +226,7 @@ namespace Repository
              .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
-             .HasMany(u => u.ConversationLinks)
+             .HasMany(u => u.ChatLinks)
              .WithOne(l => l.User)
              .OnDelete(DeleteBehavior.Restrict);
 
@@ -303,7 +306,7 @@ namespace Repository
                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Gathering>()
-               .HasOne(g => g.Conversation)
+               .HasOne(g => g.Chat)
                .WithOne(c => c.Gathering)
                .OnDelete(DeleteBehavior.Restrict);
 
@@ -404,30 +407,36 @@ namespace Repository
                 .Property(w => w.Text)
                 .HasMaxLength(50);
 
-            // Conversations
-            modelBuilder.Entity<Conversation>()
+            // Chats
+            modelBuilder.Entity<Chat>()
                 .HasQueryFilter(w => !w.SoftDeleted);
 
-            modelBuilder.Entity<Conversation>()
-                .HasMany(c => c.ConversationLinks)
-                .WithOne(l => l.Conversation)
+            modelBuilder.Entity<Chat>()
+                .HasMany(c => c.ChatLinks)
+                .WithOne(l => l.Chat)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Conversation>()
+            modelBuilder.Entity<Chat>()
                 .HasMany(c => c.Messages)
-                .WithOne(m => m.Conversation)
+                .WithOne(m => m.Chat)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Conversation>()
+            modelBuilder.Entity<GroupChat>()
                 .Property(c => c.Title)
                 .HasMaxLength(200);
+
+            modelBuilder.Entity<Chat>()
+               .HasDiscriminator<ChatType>("Type")
+               .HasValue<PrivateChat>(ChatType.Individual)
+               .HasValue<GroupChat>(ChatType.Group)
+               .HasValue<GatheringChat>(ChatType.Gathering);
 
             // Messages
             modelBuilder.Entity<Message>()
                 .HasQueryFilter(w => !w.SoftDeleted);
 
             modelBuilder.Entity<Message>()
-                .HasDiscriminator<MessageType>("MessageType")
+                .HasDiscriminator<MessageType>("Type")
                 .HasValue<TextMessage>(MessageType.Text)
                 .HasValue<ImageMessage>(MessageType.Photo)
                 .HasValue<ActivityMessage>(MessageType.Activity)
@@ -451,8 +460,8 @@ namespace Repository
                 .Property(m => m.ImageURL)
                 .HasMaxLength(300);
 
-            // Conversation Links
-            modelBuilder.Entity<ConversationLink>()
+            // Chat Links
+            modelBuilder.Entity<ChatLink>()
                 .HasQueryFilter(w => !w.SoftDeleted);
 
             // Connections

@@ -9,6 +9,6 @@
 
         // Navigation Properties
         public User? User { get; set; }
-        public Conversation? Conversation { get; set; }
+        public Chat? Chat { get; set; }
     }
 }

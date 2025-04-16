@@ -37,7 +37,7 @@ namespace Repository
 
         // Navigation Properties
         public User? Host { get; set; }
-        public Conversation? Conversation { get; set; }
+        public GatheringChat? Chat { get; set; }
         public List<GatheringLink>? GatheringLink { get; set; }
         public List<GatheringReport>? GatheringReports { get; set; }
         public List<UserReport>? UserReports { get; set; }

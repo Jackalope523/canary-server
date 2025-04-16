@@ -629,9 +629,9 @@ namespace Core.Entities
             {
                 CanaryNotification notification = conversation.Type switch
                 {
-                    ConversationType.Individual => CanaryNotification.IndividualMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
-                    ConversationType.Group => CanaryNotification.GroupMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
-                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await conversation.Gathering).ToGatheringShard(), conversation.ToConversationShard(), sender.ToUserShard(), message),
+                    ChatType.Individual => CanaryNotification.IndividualMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
+                    ChatType.Group => CanaryNotification.GroupMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
+                    ChatType.Gathering => CanaryNotification.GatheringMessage(await (await conversation.Gathering).ToGatheringShard(), conversation.ToConversationShard(), sender.ToUserShard(), message),
                     _ => throw new UnexpectedFailureException("ConversationType does not exist"),
                 };
 

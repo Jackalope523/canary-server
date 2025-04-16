@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using static Repository.ConversationLink;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.VisualBasic;
 
 namespace Repository
 {
@@ -86,9 +86,9 @@ namespace Repository
             foreach (long userId in userIds)
             {
                 storeSentry.DiscussWrite(ctx => 
-                    ctx.ConversationLinks.
+                    ctx.ChatLinks.
                     Add(
-                        new ConversationLink 
+                        new ChatLink 
                         { 
                             ConversationId = conversationId, 
                             UserId = userId,
@@ -101,15 +101,6 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(discussion);
         }
 
-        public async Task<long> CreateConversationAsync(ConversationType type, string title)
-        {
-            Conversation toAdd = new() { Title = title, Type = type };
-
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Conversations.Add(toAdd));
-
-            return toAdd.Id;
-        }
-
         public async Task DeleteConversationAsync(long conversationId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
@@ -118,30 +109,33 @@ namespace Repository
                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.ConversationLinks.
+               ctx.ChatLinks.
                Where(l => l.ConversationId == conversationId).
                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.Conversations.
+               ctx.Chats.
                Where(c => c.Id == conversationId).
                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
         }
 
         public async Task<CoreConversation> GetConversationAsync(long conversationId)
         {
-            Conversation conversation = await storeSentry.ExecuteReadAsync(ctx =>
-                                            ctx.Conversations.
+            Chat conversation = await storeSentry.ExecuteReadAsync(ctx =>
+                                            ctx.Chats.
                                             Where(c => c.Id == conversationId).
                                             SingleAsync());
 
-            return new CoreConversation(conversation.Id, conversation.Type, conversation.Title, conversation.GatheringId);
+            string? title = conversation.Type == ChatType.Group ? ((GroupChat)conversation).Title : null;
+            long gatheringId = conversation.Type == ChatType.Gathering ? ((GatheringChat)conversation).GatheringId : 0;
+
+            return new CoreConversation(conversation.Id, conversation.Type, title, gatheringId);
         }
 
         public async Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-                    ctx.ConversationLinks.
+                    ctx.ChatLinks.
                     Where(l => l.ConversationId == conversationId).
                     Select(l => new CoreMembership(l.UserId, l.Type, l.LastSeen, l.Muted)).
                     ToListAsync());
@@ -149,22 +143,44 @@ namespace Repository
 
         public async Task<List<CoreConversation>> GetConversationsForUserAsync(long userId)
         {
-            return await storeSentry.ExecuteReadAsync(ctx =>
-                    ctx.ConversationLinks.
-                    Where(l => l.UserId == userId).
-                    Join(
-                        ctx.Conversations,
-                        l => l.ConversationId,
-                        c => c.Id,
-                        (l, c) => new CoreConversation(c.Id, c.Type, c.Title, c.GatheringId)
-                        ).
-                    ToListAsync());
+            List<Chat> conversations = await storeSentry.ExecuteReadAsync(ctx =>
+                                                    ctx.ChatLinks.
+                                                    Where(l => l.UserId == userId).
+                                                    Join(
+                                                        ctx.Chats,
+                                                        l => l.ConversationId,
+                                                        c => c.Id,
+                                                        (l, c) => c
+                                                    ).
+                                                    ToListAsync());
+
+            List<CoreConversation> toReturn = new();
+            foreach (Chat conversation in conversations)
+            {
+                CoreConversation coreConversation = new(conversation.Id, conversation.Type, null, 0);
+                switch (conversation)
+                {
+                    case PrivateChat privateChat:
+                        toReturn.Add(coreConversation);
+                        break;
+                    case GroupChat groupChat:
+                        toReturn.Add(coreConversation with { Title = groupChat.Title });
+                        break;
+                    case GatheringChat gatheringChat:
+                        toReturn.Add(coreConversation with { GatheringId = gatheringChat.GatheringId });
+                        break;
+                    default:
+                        throw new ArgumentException("Message of type " + conversation.GetType().Name + " is not supported by this method.");
+                }
+            }
+
+            return toReturn;
         }
 
         public async Task<CoreMembership> GetMembershipAsync(long conversationId, long userId)
         {
             return await storeSentry.ExecuteReadAsync(ctx => 
-                    ctx.ConversationLinks.
+                    ctx.ChatLinks.
                     Where(l => l.ConversationId == conversationId && l.UserId == userId).
                     Select(l => new CoreMembership(l.UserId, l.Type, l.LastSeen, l.Muted)).
                     SingleAsync());
@@ -212,7 +228,7 @@ namespace Repository
         public async Task RemoveUserFromConversationAsync(long conversationId, long userId)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.ConversationLinks.
+               ctx.ChatLinks.
                Where(l => l.ConversationId == conversationId && l.UserId == userId).
                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
         }
@@ -221,8 +237,8 @@ namespace Repository
         {
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
-            Conversation c = new() { Id = conversationId };
-            storeSentry.DiscussWrite(ctx => ctx.Conversations.Attach(c), currentDiscussion);
+            GroupChat c = new() { Id = conversationId };
+            storeSentry.DiscussWrite(ctx => ctx.Chats.Attach(c), currentDiscussion);
 
             foreach ((string Property, object Value) in edits)
             {
@@ -231,14 +247,8 @@ namespace Repository
                     case nameof(CoreConversation.Title):
                         c.Title = (string)Value;
                         break;
-                    case nameof(CoreConversation.Type):
-                        c.Type = (ConversationType)Value;
-                        break;
-                    case nameof(CoreConversation.GatheringId):
-                        c.GatheringId = (long)Value;
-                        break;
                     default:
-                        throw new InvalidInputException($"Property named \"{Property}\" can not be updated using this method.");
+                        throw new ArgumentException("Property named \"" + Property + "\" can not be updated using this method.");
                 }
                 storeSentry.DiscussWrite(ctx => ctx.Entry(c).Property(Property).IsModified = true, currentDiscussion);
             }
@@ -249,12 +259,12 @@ namespace Repository
         {
             Discussion currentDiscussion = storeSentry.BeginDiscussion();
 
-            ConversationLink l = await storeSentry.ExecuteReadAsync(ctx => 
-                                    ctx.ConversationLinks.
+            ChatLink l = await storeSentry.ExecuteReadAsync(ctx => 
+                                    ctx.ChatLinks.
                                     Where(l => l.ConversationId == conversationId && l.UserId == userId).
                                     SingleAsync());
 
-            storeSentry.DiscussWrite(ctx => ctx.ConversationLinks.Attach(l), currentDiscussion);
+            storeSentry.DiscussWrite(ctx => ctx.ChatLinks.Attach(l), currentDiscussion);
 
             foreach ((string Property, object Value) in edits)
             {
@@ -277,9 +287,55 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
+        public async Task<long> CreateConversationAsync(ChatType type, string title)
+        {
+            if (type != ChatType.Group)
+            {
+                throw new ArgumentException("Message of type " + type.ToString() + " is not supported by this method.");
+            }
+
+            GroupChat toAdd = new() { Title = title, Type = type };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.GroupChats.Add(toAdd));
+
+            return toAdd.Id;
+        }
+
         public async Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
         {
-            throw new NotImplementedException();
+            List<CoreConversation> conversations = await storeSentry.ExecuteReadAsync(ctx => 
+                ctx.PrivateChats.
+                Join(
+                    ctx.ChatLinks.Where(l => l.UserId == userIdA || l.UserId == userIdB),
+                    c => c.Id,
+                    m => m.ConversationId,
+                    (c, m) => new CoreConversation(c.Id, c.Type, null, 0)
+                ).
+                ToListAsync());
+
+            List<long> seen = new();
+            foreach (CoreConversation c in conversations)
+            {
+                if (seen.Contains(c.Id))
+                {
+                    return c;
+                }
+                else
+                {
+                    seen.Add(c.Id);
+                }
+            }
+
+            PrivateChat toAdd = new() { Type = ChatType.Individual };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.PrivateChats.Add(toAdd));
+
+            ChatLink membershipA = new() { UserId = userIdA, ConversationId = toAdd.Id, Type = MembershipType.Owner, LastSeen = DateTimeOffset.UtcNow };
+            ChatLink membershipB = new() { UserId = userIdB, ConversationId = toAdd.Id, Type = MembershipType.Owner, LastSeen = DateTimeOffset.UtcNow };
+
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.ChatLinks.AddRange(membershipA, membershipB));
+
+            return new CoreConversation(toAdd.Id, toAdd.Type);
         }
     }
 }

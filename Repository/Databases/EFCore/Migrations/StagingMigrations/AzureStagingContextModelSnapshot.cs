@@ -46,7 +46,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Connections");
+                    b.ToTable("Connections", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Conversation", b =>
@@ -57,17 +57,26 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("GatheringId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Conversations");
+                    b.HasIndex("GatheringId")
+                        .IsUnique()
+                        .HasFilter("[GatheringId] IS NOT NULL");
+
+                    b.ToTable("Conversations", (string)null);
                 });
 
             modelBuilder.Entity("Repository.ConversationLink", b =>
@@ -81,8 +90,14 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Property<long>("ConversationId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTimeOffset>("LastOpened")
+                    b.Property<DateTimeOffset?>("HiddenFrom")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("LastSeen")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("Muted")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
@@ -90,18 +105,16 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long?>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ConversationId");
 
-                    b.HasIndex("UserId", "ConversationId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("ConversationLinks");
+                    b.ToTable("ConversationLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -127,7 +140,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
@@ -164,7 +177,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Telegrams");
+                    b.ToTable("Telegrams", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Feedback", b =>
@@ -193,7 +206,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback");
+                    b.ToTable("Feedback", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
@@ -294,7 +307,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings");
+                    b.ToTable("Gatherings", (string)null);
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -326,7 +339,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks");
+                    b.ToTable("GatheringLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
@@ -363,7 +376,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports");
+                    b.ToTable("GatheringReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
@@ -393,10 +406,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("GatheringId");
 
-                    b.HasIndex("UserId", "GatheringId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
-                    b.ToTable("GuestClearances");
+                    b.ToTable("GuestClearances", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Message", b =>
@@ -422,7 +434,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -431,7 +443,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
 
                     b.HasDiscriminator<int>("MessageType");
 
@@ -469,7 +481,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Penalty", b =>
@@ -496,7 +508,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties");
+                    b.ToTable("Penalties", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -525,7 +537,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots");
+                    b.ToTable("Snapshots", (string)null);
                 });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
@@ -555,10 +567,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId", "SnapshotId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotLinks");
+                    b.ToTable("SnapshotLinks", (string)null);
                 });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
@@ -595,7 +606,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotReports");
+                    b.ToTable("SnapshotReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -742,7 +753,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new
@@ -850,10 +861,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId", "OtherId")
-                        .IsUnique();
+                    b.HasIndex("SelfId");
 
-                    b.ToTable("UserRelationships");
+                    b.ToTable("UserRelationships", (string)null);
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -895,7 +905,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports");
+                    b.ToTable("UserReports", (string)null);
                 });
 
             modelBuilder.Entity("Repository.Word", b =>
@@ -919,7 +929,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Words");
+                    b.ToTable("Words", (string)null);
                 });
 
             modelBuilder.Entity("Repository.ActivityMessage", b =>
@@ -1007,6 +1017,16 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Repository.Conversation", b =>
+                {
+                    b.HasOne("Repository.Gathering", "Gathering")
+                        .WithOne("Conversation")
+                        .HasForeignKey("Repository.Conversation", "GatheringId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Gathering");
+                });
+
             modelBuilder.Entity("Repository.ConversationLink", b =>
                 {
                     b.HasOne("Repository.Conversation", "Conversation")
@@ -1018,7 +1038,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("ConversationLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Conversation");
 
@@ -1142,8 +1163,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Messages")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Conversation");
 
@@ -1322,6 +1342,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
+                    b.Navigation("Conversation");
+
                     b.Navigation("GatheringLink");
 
                     b.Navigation("GatheringReports");

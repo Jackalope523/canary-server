@@ -7,7 +7,7 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-	public enum ConversationType
+	public enum ChatType
 	{
 		Individual,
 		Group,
@@ -34,9 +34,9 @@ namespace Core.Boundaries
 	public enum ActivityMessageType
 	{ }
 
-	public record CoreConversation(long Id, ConversationType Type, string Title = default, long? GatheringId = null)
+	public record CoreConversation(long Id, ChatType Type, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
-	public record ConversationShard(long Id, ConversationType Type, string Title = default,
+	public record ConversationShard(long Id, ChatType Type, string Title = default,
 		long? GatheringId = null, bool? IsMuted = null, bool? HasUnread = null);
 
 	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted)
@@ -57,7 +57,7 @@ namespace Core.Boundaries
 		Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId);
 		Task<CoreMembership> GetMembershipAsync(long conversationId, long userId);
 
-		Task<long> CreateConversationAsync(ConversationType type, string title = default);
+		Task<long> CreateConversationAsync(ChatType type, string title = default);
 		Task UpdateConversationAsync(long conversationId, List<(string Property, object Value)> edits);
 		Task DeleteConversationAsync(long conversationId);
 

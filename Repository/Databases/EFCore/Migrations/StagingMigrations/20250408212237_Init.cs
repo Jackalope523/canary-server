@@ -9,40 +9,22 @@ using NetTopologySuite.Geometries;
 namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Banners",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Color = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Banners", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     NormalisedEmail = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Pseudonym = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CompanionshipCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     JoinDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Reputation = table.Column<int>(type: "int", nullable: false),
@@ -54,7 +36,6 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     AccountStatus = table.Column<int>(type: "int", nullable: false),
                     CurrentGathering = table.Column<long>(type: "bigint", nullable: true),
                     TimeOfUserAgreement = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Extroversion = table.Column<int>(type: "int", nullable: false),
                     Athleticisme = table.Column<int>(type: "int", nullable: false),
                     Openness = table.Column<int>(type: "int", nullable: false),
@@ -65,9 +46,16 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     Age = table.Column<int>(type: "int", nullable: false),
                     Haunt = table.Column<Point>(type: "geography", nullable: false),
                     HauntRadius = table.Column<double>(type: "float", nullable: false),
-                    HauntWheight = table.Column<int>(type: "int", nullable: false),
+                    HauntWeight = table.Column<int>(type: "int", nullable: false),
                     CurrentLocation = table.Column<Point>(type: "geography", nullable: false),
-                    CurrentRadius = table.Column<double>(type: "float", nullable: false)
+                    CurrentRadius = table.Column<double>(type: "float", nullable: false),
+                    NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SocialInvitations = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    CompanionActivity = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    GatheringReminders = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    GatheringActivity = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    GatheringDiscovery = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,27 +63,35 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BannerLinks",
+                name: "Words",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
-                    BannerId = table.Column<long>(type: "bigint", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    Text = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BannerLinks", x => x.Id);
+                    table.PrimaryKey("PK_Words", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Connections",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    ConnectionId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Connections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BannerLinks_Banners_BannerId",
-                        column: x => x.BannerId,
-                        principalTable: "Banners",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_BannerLinks_Users_UserId",
+                        name: "FK_Connections_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -108,10 +104,10 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: true),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
+                    Comments = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -130,14 +126,15 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    TimeOfCreation = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     HostId = table.Column<long>(type: "bigint", nullable: true),
                     Location = table.Column<Point>(type: "geography", nullable: false),
                     FriendlyLocation = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
+                    Visibility = table.Column<int>(type: "int", nullable: false),
                     GroupMinimum = table.Column<int>(type: "int", nullable: false),
                     GroupMaximum = table.Column<int>(type: "int", nullable: false),
                     EndTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -145,6 +142,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     IsDynamic = table.Column<bool>(type: "bit", nullable: false),
                     NumberOfGuests = table.Column<int>(type: "int", nullable: false),
                     DegreeOfPrivacy = table.Column<int>(type: "int", nullable: false),
+                    Decay = table.Column<float>(type: "real", nullable: false),
                     Extroversion = table.Column<int>(type: "int", nullable: false),
                     Athleticisme = table.Column<int>(type: "int", nullable: false),
                     Openness = table.Column<int>(type: "int", nullable: false),
@@ -152,7 +150,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     Competitiveness = table.Column<int>(type: "int", nullable: false),
                     Industriousness = table.Column<int>(type: "int", nullable: false),
                     NightOwl = table.Column<int>(type: "int", nullable: false),
-                    Age = table.Column<int>(type: "int", nullable: false)
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -171,10 +170,10 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     PenalizedId = table.Column<long>(type: "bigint", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -193,9 +192,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    DeviceToken = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
+                    DeviceToken = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -214,13 +213,12 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     NotifierId = table.Column<long>(type: "bigint", nullable: false),
                     RecipientId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Message = table.Column<int>(type: "int", nullable: false),
                     Action = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Read = table.Column<bool>(type: "bit", nullable: false)
+                    Read = table.Column<bool>(type: "bit", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -245,11 +243,11 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     SelfId = table.Column<long>(type: "bigint", nullable: false),
                     OtherId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false)
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -269,16 +267,38 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Conversations",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Conversations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Conversations_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GatheringLinks",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     GatheringId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false)
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -304,11 +324,11 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: true),
                     GatheringId = table.Column<long>(type: "bigint", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false)
+                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -333,11 +353,11 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     GatheringId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Degree = table.Column<int>(type: "int", nullable: false)
+                    Degree = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -357,15 +377,44 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RecipientId = table.Column<long>(type: "bigint", nullable: false),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: false),
+                    NotificationId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Users_RecipientId",
+                        column: x => x.RecipientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Snapshots",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     OwnerId = table.Column<long>(type: "bigint", nullable: false),
                     GatheringId = table.Column<long>(type: "bigint", nullable: false),
-                    PostedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    PostedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -391,12 +440,12 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     SelfId = table.Column<long>(type: "bigint", nullable: true),
                     OtherId = table.Column<long>(type: "bigint", nullable: false),
                     GatheringId = table.Column<long>(type: "bigint", nullable: true),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false)
+                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -422,16 +471,94 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ConversationLinks",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    ConversationId = table.Column<long>(type: "bigint", nullable: false),
+                    LastSeen = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    HiddenFrom = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Muted = table.Column<bool>(type: "bit", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ConversationLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ConversationLinks_Conversations_ConversationId",
+                        column: x => x.ConversationId,
+                        principalTable: "Conversations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ConversationLinks_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: true),
+                    ConversationId = table.Column<long>(type: "bigint", nullable: false),
+                    Timestamp = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    MessageType = table.Column<int>(type: "int", nullable: false),
+                    ActivityType = table.Column<int>(type: "int", nullable: true),
+                    GatheringId = table.Column<long>(type: "bigint", nullable: true),
+                    ImageURL = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    ProfileId = table.Column<long>(type: "bigint", nullable: true),
+                    Text = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: true),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_Conversations_ConversationId",
+                        column: x => x.ConversationId,
+                        principalTable: "Conversations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_Gatherings_GatheringId",
+                        column: x => x.GatheringId,
+                        principalTable: "Gatherings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_ProfileId",
+                        column: x => x.ProfileId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SnapshotLinks",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     SnapshotId = table.Column<long>(type: "bigint", nullable: false),
                     Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false)
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -457,11 +584,11 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: true),
                     SnapshotId = table.Column<long>(type: "bigint", nullable: false),
                     FilingDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false)
+                    Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -482,22 +609,34 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessTries", "AccountStatus", "Age", "Athleticisme", "Chaos", "Competitiveness", "CurrentGathering", "CurrentLocation", "CurrentRadius", "DateOfBirth", "Email", "Extroversion", "Haunt", "HauntRadius", "HauntWheight", "Industriousness", "IsEmailConfirmed", "IsPhoneConfirmed", "JoinDate", "LockoutDate", "Name", "NightOwl", "NormalisedEmail", "NotificationId", "Openness", "PhoneNumber", "Pseudonym", "Reputation", "SecurityStamp", "SoftDeleted", "TimeOfUserAgreement" },
+                columns: new[] { "Id", "AccessTries", "AccountStatus", "Age", "Athleticisme", "Chaos", "CompanionActivity", "CompanionshipCode", "Competitiveness", "CurrentGathering", "CurrentLocation", "CurrentRadius", "DateOfBirth", "Email", "Extroversion", "GatheringActivity", "GatheringDiscovery", "GatheringReminders", "Haunt", "HauntRadius", "HauntWeight", "Industriousness", "IsEmailConfirmed", "IsPhoneConfirmed", "JoinDate", "LockoutDate", "Name", "NightOwl", "NormalisedEmail", "NotificationId", "Openness", "PhoneNumber", "Reputation", "SecurityStamp", "SocialInvitations", "SoftDeleted", "TimeOfUserAgreement" },
                 values: new object[,]
                 {
-                    { -8L, 3, 0, 25, 50, 50, 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Google Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003008", "", 50, "", false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
-                    { -7L, 3, 0, 25, 50, 50, 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Apple Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003007", "", 50, "", false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
+                    { -8L, 3, 0, 25, 50, 50, true, "", 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, true, true, true, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Google Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003008", 50, "", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { -7L, 3, 0, 25, 50, 50, true, "", 50, null, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"), 10.0, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "", 50, true, true, true, (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"), 10.0, 0, 50, false, true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Apple Test Account", 50, "", new Guid("00000000-0000-0000-0000-000000000000"), 50, "11002003007", 50, "", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BannerLinks_BannerId",
-                table: "BannerLinks",
-                column: "BannerId");
+                name: "IX_Connections_UserId",
+                table: "Connections",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BannerLinks_UserId",
-                table: "BannerLinks",
+                name: "IX_ConversationLinks_ConversationId",
+                table: "ConversationLinks",
+                column: "ConversationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConversationLinks_UserId",
+                table: "ConversationLinks",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Conversations_GatheringId",
+                table: "Conversations",
+                column: "GatheringId",
+                unique: true,
+                filter: "[GatheringId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Feedback_UserId",
@@ -535,10 +674,39 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 column: "GatheringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GuestClearances_UserId_GatheringId",
+                name: "IX_GuestClearances_UserId",
                 table: "GuestClearances",
-                columns: new[] { "UserId", "GatheringId" },
-                unique: true);
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_ConversationId",
+                table: "Messages",
+                column: "ConversationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_GatheringId",
+                table: "Messages",
+                column: "GatheringId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_ProfileId",
+                table: "Messages",
+                column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_UserId",
+                table: "Messages",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_GatheringId",
+                table: "Notifications",
+                column: "GatheringId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_RecipientId",
+                table: "Notifications",
+                column: "RecipientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Penalties_PenalizedId",
@@ -551,10 +719,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 column: "SnapshotId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SnapshotLinks_UserId_SnapshotId",
+                name: "IX_SnapshotLinks_UserId",
                 table: "SnapshotLinks",
-                columns: new[] { "UserId", "SnapshotId" },
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SnapshotReports_SnapshotId",
@@ -597,10 +764,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 column: "OtherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRelationships_SelfId_OtherId",
+                name: "IX_UserRelationships_SelfId",
                 table: "UserRelationships",
-                columns: new[] { "SelfId", "OtherId" },
-                unique: true);
+                column: "SelfId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserReports_GatheringId",
@@ -622,7 +788,10 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BannerLinks");
+                name: "Connections");
+
+            migrationBuilder.DropTable(
+                name: "ConversationLinks");
 
             migrationBuilder.DropTable(
                 name: "Feedback");
@@ -635,6 +804,12 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
             migrationBuilder.DropTable(
                 name: "GuestClearances");
+
+            migrationBuilder.DropTable(
+                name: "Messages");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "Penalties");
@@ -658,7 +833,10 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 name: "UserReports");
 
             migrationBuilder.DropTable(
-                name: "Banners");
+                name: "Words");
+
+            migrationBuilder.DropTable(
+                name: "Conversations");
 
             migrationBuilder.DropTable(
                 name: "Snapshots");

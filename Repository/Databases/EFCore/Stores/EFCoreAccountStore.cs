@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
+using Serilog;
 
 namespace Repository
 {
@@ -67,7 +68,7 @@ namespace Repository
         public async Task SoftDeleteAsync(long id)
         {
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.ConversationLinks.
+               ctx.ChatLinks.
                Where(l => l.UserId == id).
                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
@@ -135,7 +136,7 @@ namespace Repository
                 ExecuteDeleteAsync());
 
             await storeSentry.ExecuteWriteAsync(ctx =>
-               ctx.ConversationLinks.
+               ctx.ChatLinks.
                Where(l => l.UserId == id).
                ExecuteDeleteAsync());
 
@@ -226,7 +227,7 @@ namespace Repository
         }
 
         public async Task<CoreUser> FindUserByIdAsync(long id) 
-        {            
+        {
             CoreUser user;
             try 
             {

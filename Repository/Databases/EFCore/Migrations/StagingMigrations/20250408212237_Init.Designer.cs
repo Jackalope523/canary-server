@@ -13,8 +13,8 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     [DbContext(typeof(AzureStagingContext))]
-    [Migration("20250326195121_Add Messaging")]
-    partial class AddMessaging
+    [Migration("20250408212237_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,15 +60,24 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("GatheringId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("GatheringId")
+                        .IsUnique()
+                        .HasFilter("[GatheringId] IS NOT NULL");
 
                     b.ToTable("Conversations");
                 });
@@ -84,8 +93,14 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Property<long>("ConversationId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTimeOffset>("LastOpened")
+                    b.Property<DateTimeOffset?>("HiddenFrom")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("LastSeen")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("Muted")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
@@ -93,16 +108,14 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long?>("UserId")
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ConversationId");
 
-                    b.HasIndex("UserId", "ConversationId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ConversationLinks");
                 });
@@ -396,8 +409,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("GatheringId");
 
-                    b.HasIndex("UserId", "GatheringId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("GuestClearances");
                 });
@@ -425,7 +437,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -558,8 +570,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId", "SnapshotId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("SnapshotLinks");
                 });
@@ -853,8 +864,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId", "OtherId")
-                        .IsUnique();
+                    b.HasIndex("SelfId");
 
                     b.ToTable("UserRelationships");
                 });
@@ -1010,6 +1020,16 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Repository.Conversation", b =>
+                {
+                    b.HasOne("Repository.Gathering", "Gathering")
+                        .WithOne("Conversation")
+                        .HasForeignKey("Repository.Conversation", "GatheringId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Gathering");
+                });
+
             modelBuilder.Entity("Repository.ConversationLink", b =>
                 {
                     b.HasOne("Repository.Conversation", "Conversation")
@@ -1021,7 +1041,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("ConversationLinks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Conversation");
 
@@ -1145,8 +1166,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.HasOne("Repository.User", "User")
                         .WithMany("Messages")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Conversation");
 
@@ -1325,6 +1345,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
+                    b.Navigation("Conversation");
+
                     b.Navigation("GatheringLink");
 
                     b.Navigation("GatheringReports");

@@ -30,7 +30,7 @@ namespace Core.Entities
 		///////////////
 
 		public long Id { get; init; }
-        public ConversationType Type { get; init; }
+        public ChatType Type { get; init; }
         public string Title { get; set; }
 
         public long? GatheringId { get; init; }
@@ -117,7 +117,7 @@ namespace Core.Entities
             // Check if user has priviledges
             var userMembership = (await Members).Find(member => member.User.Equals(user));
 
-            if (Type == ConversationType.Individual ||
+            if (Type == ChatType.Individual ||
                 userMembership.Membership.Type.Equals(MembershipType.Owner))
 			{ return true; }
 
@@ -172,9 +172,9 @@ namespace Core.Entities
 
                 CanaryNotification notification = Type switch
                 {
-                    ConversationType.Individual => CanaryNotification.IndividualMessage(shard, sender.ToUserShard(), message),
-                    ConversationType.Group => CanaryNotification.GroupMessage(shard, sender.ToUserShard(), message),
-                    ConversationType.Gathering => CanaryNotification.GatheringMessage(await (await Gathering).ToGatheringShard(), shard, sender.ToUserShard(), message),
+                    ChatType.Individual => CanaryNotification.IndividualMessage(shard, sender.ToUserShard(), message),
+                    ChatType.Group => CanaryNotification.GroupMessage(shard, sender.ToUserShard(), message),
+                    ChatType.Gathering => CanaryNotification.GatheringMessage(await (await Gathering).ToGatheringShard(), shard, sender.ToUserShard(), message),
                     _ => throw new UnexpectedFailureException("ConversationType does not exist"),
                 };
 

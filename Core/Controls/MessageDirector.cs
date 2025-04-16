@@ -212,7 +212,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            var conversationId = await Messages.CreateConversationAsync(ConversationType.Group);
+            var conversationId = await Messages.CreateConversationAsync(ChatType.Group);
 
             // todo only add applicable users
 
@@ -267,7 +267,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(conversation.Type == ConversationType.Group,
+            Verify(conversation.Type == ChatType.Group,
                 new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
 
             Verify(await conversation.HasMember(user),
@@ -284,7 +284,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(conversation.Type == ConversationType.Group,
+            Verify(conversation.Type == ChatType.Group,
                 new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
 
             Verify(await conversation.HasMember(user),
@@ -302,7 +302,7 @@ namespace Core.Controls
             var summoned = await GetUserAsync(targetId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(conversation.Type == ConversationType.Group,
+            Verify(conversation.Type == ChatType.Group,
                 new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
 
             Verify(await conversation.HasMember(user),
@@ -322,7 +322,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(conversation.Type == ConversationType.Group,
+            Verify(conversation.Type == ChatType.Group,
                 new UserErrorException(ConversationErrorCode.NOT_GROUP_CHAT));
 
             Verify(await conversation.HasMember(user),
