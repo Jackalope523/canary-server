@@ -27,18 +27,47 @@ namespace Frontier.Controllers
         #region Actions
 
         [HttpGet]
-        public async Task<IActionResult> GetConversation([FromQuery] long? target_id)
+        public async Task<IActionResult> GetConversations()
         {
             return await Execute(async user =>
             {
-                if (target_id.HasValue)
-                {
-                    return await messages.GetConversationWithAsync(user.Id, target_id.Value);
-                }
-                else
-                {
-                    return await messages.GetConversationsAsync(user.Id);
-                }
+                return await messages.GetConversationsAsync(user.Id);
+            });
+        }
+
+        [HttpGet("user/{targetId}")]
+        public async Task<IActionResult> GetConversationWith(long targetId)
+        {
+            return await Execute(async user =>
+            {
+                return await messages.GetConversationWithAsync(user.Id, targetId);
+            });
+        }
+
+        [HttpPost("user/{targetId}")]
+        public async Task<IActionResult> GetOrCreateConversationWith(long targetId)
+        {
+            return await Execute(async user =>
+            {
+                return await messages.GetOrCreateConversationWithAsync(user.Id, targetId);
+            });
+        }
+
+        [HttpGet("gathering/{gatheringId}")]
+        public async Task<IActionResult> GetGatheringConversation(long gatheringId)
+        {
+            return await Execute(async user =>
+            {
+                return await messages.GetGatheringConversationAsync(user.Id, gatheringId);
+            });
+        }
+
+        [HttpPost("gathering/{gatheringId}")]
+        public async Task<IActionResult> GetOrCreateGatheringConversation(long gatheringId)
+        {
+            return await Execute(async user =>
+            {
+                return await messages.GetOrCreateGatheringConversationAsync(user.Id, gatheringId);
             });
         }
 

@@ -29,6 +29,37 @@ namespace Core.Controls
                 .ConvertAll(c => c.Conversation.ToConversationShard(c.Membership));
         }
 
+        public async Task<ConversationShard> GetGatheringConversationAsync(long userId, long gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetUserAsync(gatheringId);
+
+            // todo checks
+
+            var exists = await Messages.GatheringConversationExists(gathering.Id);
+
+            Conversation conversation = Conversation.None;
+
+            if (exists)
+            {
+                conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id));
+            }
+
+            return conversation.ToConversationShard();
+        }
+
+        public async Task<ConversationShard> GetOrCreateGatheringConversationAsync(long userId, long gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetUserAsync(gatheringId);
+
+            // todo checks
+
+            Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id));
+
+            return conversation.ToConversationShard();
+        }
+
         public async Task<ConversationShard> GetConversationWithAsync(long userId, long targetId)
         {
             var user = await GetUserAsync(userId);
@@ -36,7 +67,26 @@ namespace Core.Controls
 
             // todo checks
 
-            Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(userId, targetId));
+            var exists = await Messages.IndividualConversationBetweenExists(user.Id, target.Id);
+
+            Conversation conversation = Conversation.None;
+
+            if (exists)
+            {
+                conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id));
+            }
+
+            return conversation.ToConversationShard();
+        }
+
+        public async Task<ConversationShard> GetOrCreateConversationWithAsync(long userId, long targetId)
+        {
+            var user = await GetUserAsync(userId);
+            var target = await GetUserAsync(targetId);
+
+            // todo checks
+
+            Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id));
 
             return conversation.ToConversationShard();
         }

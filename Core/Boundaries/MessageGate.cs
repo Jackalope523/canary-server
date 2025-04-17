@@ -79,7 +79,11 @@ namespace Core.Boundaries
 	public interface IMessageOperations
 	{
 		Task<List<ConversationShard>> GetConversationsAsync(long userId);
+
 		Task<ConversationShard> GetConversationWithAsync(long userId, long targetId);
+		Task<ConversationShard> GetOrCreateConversationWithAsync(long userId, long targetId);
+		Task<ConversationShard> GetGatheringConversationAsync(long userId, long gatheringId);
+		Task<ConversationShard> GetOrCreateGatheringConversationAsync(long userId, long gatheringId);
 
 		Task<ConversationShard> GetConversationAsync(long userId, long conversationId);
 		Task<List<MembershipShard>> GetMembersAsync(long userId, long conversationId);

@@ -25,11 +25,14 @@ namespace Core.Entities
 
 		public const int MaximumTitleLength = 30;
 
-		///////
-		// Properties
-		///////////////
+        public static Conversation None
+            => new() { Id = -1, Type = ChatType.Individual, Title = "" };
 
-		public long Id { get; init; }
+        ///////
+        // Properties
+        ///////////////
+
+        public long Id { get; init; }
         public ChatType Type { get; init; }
         public string Title { get; set; }
 
