@@ -21,14 +21,19 @@ namespace Repository
             await store.AddUsersToConversationAsync(conversationId, userIds);
         }
 
-        public async Task<long> CreateGroupChatConversationAsync(ChatType type, string title = null)
+        public async Task<long> CreateGroupChatConversationAsync(string title = null)
         {
-            return await store.CreateGroupChatConversationAsync(type, title);
+            return await store.CreateGroupChatConversationAsync(title);
         }
 
         public async Task DeleteConversationAsync(long conversationId)
         {
             await store.DeleteConversationAsync(conversationId);
+        }
+
+        public async Task<bool> GatheringConversationExists(long gatheringId)
+        {
+            return await store.GatheringConversationExists(gatheringId);
         }
 
         public async Task<CoreConversation> GetConversationAsync(long conversationId)
@@ -56,9 +61,19 @@ namespace Repository
             return await store.GetMessagesForConversationAsync(conversationId, startSeqId, endSeqId);
         }
 
+        public async Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId)
+        {
+            return await store.GetOrCreateGatheringConversation(gatheringId);
+        }
+
         public async Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
         {
             return await store.GetOrCreateIndividualConversationBetween(userIdA, userIdB);
+        }
+
+        public async Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB)
+        {
+            return await store.IndividualConversationBetweenExists(userIdA, userIdB);
         }
 
         public async Task RemoveUserFromConversationAsync(long conversationId, long userId)
