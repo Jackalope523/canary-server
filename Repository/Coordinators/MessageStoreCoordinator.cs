@@ -21,9 +21,9 @@ namespace Repository
             await store.AddUsersToConversationAsync(conversationId, userIds);
         }
 
-        public async Task<long> CreateConversationAsync(ChatType type, string title = null)
+        public async Task<long> CreateGroupChatConversationAsync(ChatType type, string title = null)
         {
-            return await store.CreateConversationAsync(type, title);
+            return await store.CreateGroupChatConversationAsync(type, title);
         }
 
         public async Task DeleteConversationAsync(long conversationId)

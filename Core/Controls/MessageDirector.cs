@@ -212,7 +212,7 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            var conversationId = await Messages.CreateConversationAsync(ChatType.Group);
+            var conversationId = await Messages.CreateGroupChatConversationAsync();
 
             // todo only add applicable users
 

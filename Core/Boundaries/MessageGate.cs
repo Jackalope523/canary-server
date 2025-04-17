@@ -52,12 +52,19 @@ namespace Core.Boundaries
     public interface IMessageDatabase
     {
 		Task<CoreConversation> GetConversationAsync(long conversationId);
+
+		Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB);
 		Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB);
+
+		Task<bool> GatheringConversationExists(long gatheringId);
+		Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId);
+
+		Task<long> CreateGroupChatConversationAsync(string title = default);
+
 		Task<List<CoreConversation>> GetConversationsForUserAsync(long userId);
 		Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId);
 		Task<CoreMembership> GetMembershipAsync(long conversationId, long userId);
 
-		Task<long> CreateConversationAsync(ChatType type, string title = default);
 		Task UpdateConversationAsync(long conversationId, List<(string Property, object Value)> edits);
 		Task DeleteConversationAsync(long conversationId);
 

@@ -287,7 +287,7 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
-        public async Task<long> CreateConversationAsync(ChatType type, string title)
+        public async Task<long> CreateGroupChatConversationAsync(ChatType type, string title)
         {
             if (type != ChatType.Group)
             {
