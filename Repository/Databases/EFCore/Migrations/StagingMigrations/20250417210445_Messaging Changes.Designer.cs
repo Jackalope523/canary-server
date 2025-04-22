@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
@@ -12,9 +13,11 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     [DbContext(typeof(AzureStagingContext))]
-    partial class AzureStagingContextModelSnapshot : ModelSnapshot
+    [Migration("20250417210445_Messaging Changes")]
+    partial class MessagingChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Chats", (string)null);
+                    b.ToTable("Chats");
 
                     b.HasDiscriminator<int>("Type");
 
@@ -84,7 +87,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ChatLinks", (string)null);
+                    b.ToTable("ChatLinks");
                 });
 
             modelBuilder.Entity("Repository.Connection", b =>
@@ -110,7 +113,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Connections", (string)null);
+                    b.ToTable("Connections");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -136,7 +139,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Subscriptions", (string)null);
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("Repository.Entities.Telegram", b =>
@@ -173,7 +176,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Telegrams", (string)null);
+                    b.ToTable("Telegrams");
                 });
 
             modelBuilder.Entity("Repository.Feedback", b =>
@@ -202,7 +205,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback", (string)null);
+                    b.ToTable("Feedback");
                 });
 
             modelBuilder.Entity("Repository.Gathering", b =>
@@ -303,7 +306,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("HostId");
 
-                    b.ToTable("Gatherings", (string)null);
+                    b.ToTable("Gatherings");
                 });
 
             modelBuilder.Entity("Repository.GatheringLink", b =>
@@ -335,7 +338,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringLinks", (string)null);
+                    b.ToTable("GatheringLinks");
                 });
 
             modelBuilder.Entity("Repository.GatheringReport", b =>
@@ -372,7 +375,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GatheringReports", (string)null);
+                    b.ToTable("GatheringReports");
                 });
 
             modelBuilder.Entity("Repository.GuestClearance", b =>
@@ -404,7 +407,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GuestClearances", (string)null);
+                    b.ToTable("GuestClearances");
                 });
 
             modelBuilder.Entity("Repository.Message", b =>
@@ -439,7 +442,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
 
                     b.HasDiscriminator<int>("Type");
 
@@ -477,7 +480,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Repository.Penalty", b =>
@@ -504,7 +507,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("PenalizedId");
 
-                    b.ToTable("Penalties", (string)null);
+                    b.ToTable("Penalties");
                 });
 
             modelBuilder.Entity("Repository.Snapshot", b =>
@@ -533,7 +536,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Snapshots", (string)null);
+                    b.ToTable("Snapshots");
                 });
 
             modelBuilder.Entity("Repository.SnapshotLink", b =>
@@ -565,7 +568,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotLinks", (string)null);
+                    b.ToTable("SnapshotLinks");
                 });
 
             modelBuilder.Entity("Repository.SnapshotReport", b =>
@@ -602,7 +605,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SnapshotReports", (string)null);
+                    b.ToTable("SnapshotReports");
                 });
 
             modelBuilder.Entity("Repository.User", b =>
@@ -749,7 +752,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -859,7 +862,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserRelationships", (string)null);
+                    b.ToTable("UserRelationships");
                 });
 
             modelBuilder.Entity("Repository.UserReport", b =>
@@ -901,7 +904,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("SelfId");
 
-                    b.ToTable("UserReports", (string)null);
+                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("Repository.Word", b =>
@@ -925,7 +928,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Words", (string)null);
+                    b.ToTable("Words");
                 });
 
             modelBuilder.Entity("Repository.GatheringChat", b =>
