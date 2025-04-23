@@ -36,7 +36,7 @@ namespace Frontier.Manifests
 		public DateTime DateOfBirth { get; set; }
     }
 
-	public class AvatarManifest
+	public class ImageManifest
 	{
 		[Required]
 		public IFormFile Image { get; set; }

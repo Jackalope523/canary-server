@@ -30,13 +30,6 @@ namespace Frontier.Controllers
             return await messages.SendTextAsync(user.Id, conversationId, text);
         }
 
-        public async Task<MessageShard> SendPhoto(long conversationId, MemoryStream photo)
-        {
-            var user = await GetCurrentUserAsync();
-
-            return await messages.SendPhotoAsync(user.Id, conversationId, photo);
-        }
-
         public async Task<MessageShard> ShareGathering(long conversationId, long gatheringId)
         {
             var user = await GetCurrentUserAsync();

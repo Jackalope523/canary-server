@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.IO;
+using System;
 
 namespace Core.Boundaries
 {
@@ -26,17 +27,28 @@ namespace Core.Boundaries
         Task<MemoryStream> DownloadSnapshotAsync(long snapshotId, long ownerId);
         Task UploadSnapshotAsync(long snapshotId, long ownerId, MemoryStream image);
         Task DeleteSnapshotAsync(long snapshotId, long ownerId);
+
+        Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId);
+        Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image);
+        Task DeletePhotoAsync(long conversationId, Guid photoId);
+        Task<long> GetPhotoConversationIdAsync(Guid photoId);
     }
 
     public interface IMediaOperations
     {
         Task<MemoryStream> GetAssetAsync(string asset);
+
         Task<MemoryStream> GetAvatarAsync(long userId, long targetId);
         Task<ImageMetadataShard> GetAvatarMetadataAsync(long userId, long targetId);
+
         Task<MemoryStream> GetHeaderAsync(long userId, long gatheringId);
         Task<ImageMetadataShard> GetHeaderMetadataAsync(long userId, long gatheringId);
+
         Task<MemoryStream> GetSnapshotAsync(long userId, long snapshotId);
         Task<ImageMetadataShard> GetSnapshotMetadataAsync(long userId, long snapshotId);
+
+        Task<MemoryStream> GetPhotoAsync(long userId, Guid photoId);
+        Task<ImageMetadataShard> GetPhotoMetadataAsync(long userId, Guid photoId);
     }
 
     #endregion

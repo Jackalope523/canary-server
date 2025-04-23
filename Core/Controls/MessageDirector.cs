@@ -170,7 +170,9 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Photo, photo);
+            var photoId = await Media.UploadPhotoAsync(conversation.Id, photo);
+
+            var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Photo, photoId);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
 
@@ -428,11 +430,6 @@ namespace Core.Controls
         #endregion
 
         #region Tools
-
-        private async Task<Conversation> GetConversationAsync(long conversationId)
-        {
-            return new(await Messages.GetConversationAsync(conversationId));
-        }
 
         #endregion
     }

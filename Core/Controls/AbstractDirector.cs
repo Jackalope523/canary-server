@@ -83,7 +83,12 @@ namespace Core.Controls
             return new(await Gatherings.FindGatheringAsync(gatheringId));
         }
 
-		#endregion
-	}
+        protected async Task<Conversation> GetConversationAsync(long conversationId)
+        {
+            return new(await Messages.GetConversationAsync(conversationId));
+        }
+
+        #endregion
+    }
 }
 

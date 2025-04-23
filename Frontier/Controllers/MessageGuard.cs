@@ -156,6 +156,23 @@ namespace Frontier.Controllers
             });
         }
 
+        [HttpGet("{conversationId}/message")]
+        public async Task<IActionResult> SendPhoto(long conversationId, [FromForm] ImageManifest photo)
+        {
+            // Verify parameters
+            if (photo == null || !ModelState.IsValid ||
+                photo.Image == null || photo.Image.Length == 0)
+            { return MissingInformation(); }
+
+            return await Execute(async user =>
+            {
+                using var stream = new MemoryStream();
+                await photo.Image.CopyToAsync(stream);
+
+                return await messages.SendPhotoAsync(user.Id, conversationId, stream);
+            });
+        }
+
         #endregion
     }
 }

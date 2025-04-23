@@ -302,7 +302,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("avatar")]
-        public async Task<IActionResult> ModifyAvatar([FromForm] AvatarManifest avatar)
+        public async Task<IActionResult> ModifyAvatar([FromForm] ImageManifest avatar)
         {
             // Verify parameters
             if (avatar == null || !ModelState.IsValid ||
