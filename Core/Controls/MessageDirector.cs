@@ -51,7 +51,7 @@ namespace Core.Controls
         public async Task<ConversationShard> GetOrCreateGatheringConversationAsync(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
-            var gathering = await GetUserAsync(gatheringId);
+            var gathering = await GetGatheringAsync(gatheringId);
 
             // todo checks
 
@@ -267,6 +267,7 @@ namespace Core.Controls
             var conversationId = await Messages.CreateGroupChatConversationAsync();
 
             // todo only add applicable users
+            // remove dupes
 
             var newConversation = await GetConversationAsync(conversationId);
 
