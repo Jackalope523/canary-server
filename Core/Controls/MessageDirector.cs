@@ -32,7 +32,7 @@ namespace Core.Controls
         public async Task<ConversationShard> GetGatheringConversationAsync(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
-            var gathering = await GetUserAsync(gatheringId);
+            var gathering = await GetGatheringAsync(gatheringId);
 
             // todo checks
 
