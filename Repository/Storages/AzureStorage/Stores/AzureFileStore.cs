@@ -61,5 +61,25 @@ namespace Repository
         {
             await sentry.DeleteBlobAsync("gathering" + gatheringId.ToString(), "hero.jpg");
         }
+
+        public Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeletePhotoAsync(long conversationId, Guid photoId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<long> GetPhotoConversationIdAsync(Guid photoId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

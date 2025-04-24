@@ -1,4 +1,5 @@
-﻿namespace Repository
+﻿
+namespace Repository
 {
     internal class MediaStoreCoordinator: IMediaDatabase
     {
@@ -57,6 +58,26 @@
         public async Task DeleteHeroAsync(long gatheringId)
         {
             await store.DeleteHeroAsync(gatheringId);
+        }
+
+        public async Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId)
+        {
+            return await store.DownloadPhotoAsync(conversationId, photoId);
+        }
+
+        public async Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image)
+        {
+            return await store.UploadPhotoAsync(conversationId, image);
+        }
+
+        public async Task DeletePhotoAsync(long conversationId, Guid photoId)
+        {
+            await store.DeletePhotoAsync(conversationId, photoId);
+        }
+
+        public async Task<long> GetPhotoConversationIdAsync(Guid photoId)
+        {
+            return await store.GetPhotoConversationIdAsync(photoId);
         }
     }
 }
