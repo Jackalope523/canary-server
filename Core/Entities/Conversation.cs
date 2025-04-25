@@ -64,6 +64,7 @@ namespace Core.Entities
             Id = fromConversation.Id;
             Type = fromConversation.Type;
             Title = fromConversation.Title;
+            GatheringId = fromConversation.GatheringId;
         }
 
         public CoreConversation ToCoreConversation()
@@ -84,7 +85,8 @@ namespace Core.Entities
             var userMembership = (await Members).Find(member => member.User.Equals(relativeTo));
 
             return new(Id, Type, Title, GatheringId,
-                IsMuted: userMembership.Membership.IsMuted); // todo fill already read indicator
+                IsMuted: userMembership.Membership.IsMuted,
+                HasUnread: null); // todo fill already read indicator
         }
 
         public ConversationShard ToConversationShard(CoreMembership relativeTo)
