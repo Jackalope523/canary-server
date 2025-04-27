@@ -380,9 +380,6 @@ namespace Core.Entities
                 { guest.CalculateCharacter(this, Time - joined); }
 
                 updatedGuests.Add(guest);
-
-				// Notify of gathering ending
-				_ = guest.Notify(CanaryNotification.GatheringTerminated(await ToGatheringShard()));
 			}
 
             return updatedGuests;

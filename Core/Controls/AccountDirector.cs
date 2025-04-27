@@ -220,8 +220,6 @@ namespace Core.Controls
 
                         // Leave the gathering
                         await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, current.Id, GatheringBond.Left, Time);
-
-                        _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await current.ToGatheringShard()));
                     }
                 }
             }

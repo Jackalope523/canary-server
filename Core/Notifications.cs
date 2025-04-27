@@ -328,18 +328,6 @@ namespace Core.Notifications
                 new GatheringDeepLink(gathering.Id, immediate: true),
                 "30"));
 
-        public static CanaryNotification AttendeeLeavingGatheringArea(GatheringShard gathering)
-            => GatheringActivity(new(gathering.Title,
-                $"You are leaving the gathering area.",
-                new GatheringDeepLink(gathering.Id),
-                "30"));
-
-        public static CanaryNotification GatheringTerminated(GatheringShard gathering)
-            => GatheringActivity(new(gathering.Title,
-                $"Has ended. Thanks for joining!",
-                new GatheringDeepLink(gathering.Id),
-                "30"));
-
         public static CanaryNotification HostMissedGathering(GatheringShard gathering)
             => GatheringActivity(new(gathering.Title,
                 $"Was cancelled due to an absent host.",
