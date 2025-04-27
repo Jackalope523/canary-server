@@ -17,46 +17,50 @@ namespace Repository
         {
             if (degree == -1) return;
 
-            long id = await storeSentry.ExecuteReadAsync(ctx =>
-                ctx.GuestClearances.
-                Where(c => c.GatheringId == gatheringId && c.UserId == userId).
-                Select(c => c.Id).
-                SingleOrDefaultAsync());
+            long foundInCache = storeSentry.DiscussRead(ctx =>
+                                        ctx.GuestClearances.Local.
+                                        Where(c => c.GatheringId == gatheringId && c.UserId == userId).
+                                        Select(c => c.UserId).
+                                        SingleOrDefault(), discussion);
 
-            if (id == 0)
+            long foundInDatabase = storeSentry.DiscussRead(ctx =>
+                                        ctx.GuestClearances.
+                                        Where(c => c.GatheringId == gatheringId && c.UserId == userId).
+                                        Select(c => c.UserId).
+                                        SingleOrDefault(), discussion);
+
+            if (foundInCache == 0 && foundInDatabase == 0)
             {
-               storeSentry.DiscussWrite(ctx =>
-               ctx.GuestClearances.
-               Add(new GuestClearance
-               {
-                   UserId = userId,
-                   GatheringId = gatheringId,
-                   Degree = degree,
-               }
-               ), discussion);
+                storeSentry.DiscussWrite(ctx =>
+                ctx.GuestClearances.
+                Add(new GuestClearance
+                {
+                    UserId = userId,
+                    GatheringId = gatheringId,
+                    Degree = degree,
+                }
+                ), discussion);
             }
             else return;
 
-            Task<List<long>> appreciating = storeSentry.ExecuteReadAsync(ctx =>
+            List<long> appreciating = storeSentry.ExecuteRead(ctx =>
                 ctx.UserRelationships.
                 Where(l => !exclusionList.Contains(l.OtherId) && l.SelfId == userId && l.Type == UserRelationship.UserRelationshipType.Follow).
                 Select(l => l.OtherId).
-                ToListAsync());
+                ToList());
 
-            Task<List<long>> appreciatingMe = storeSentry.ExecuteReadAsync(ctx =>
+            List<long> appreciatingMe = storeSentry.ExecuteRead(ctx =>
                 ctx.UserRelationships.
                 Where(l => !exclusionList.Contains(l.SelfId) && l.OtherId == userId && l.Type == UserRelationship.UserRelationshipType.Follow).
                 Select(l => l.SelfId).
-                ToListAsync());
+                ToList());
 
-            List<long> companions = (await appreciating).Intersect(await appreciatingMe).ToList();
+            List<long> companions = appreciating.Intersect(appreciatingMe).ToList();
 
-            List<Task> tasks = new();
             foreach (long companion in companions)
             {
-                tasks.Add(PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).Append(userId).ToList(), discussion));
+                PropagateClearance(companion, gatheringId, degree - 1, companions.Union(exclusionList).Append(userId).ToList(), discussion);
             }
-            await Task.WhenAll(tasks);
         }
 
         private async Task UpdateClearance(long gatheringId, int previousDegreeOfPrivacy, int newDegreeOfPrivacy)
@@ -236,7 +240,7 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
-                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime < currentTime),
+                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime <= currentTime),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
@@ -323,7 +327,7 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
-                ctx.Gatherings.Where(g => g.State == GatheringState.Ended),
+                ctx.Gatherings.Where(g => g.State == GatheringState.Alive || g.State == GatheringState.Ended),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering

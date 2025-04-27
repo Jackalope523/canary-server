@@ -135,10 +135,23 @@ namespace Repository
             {
                 write.Invoke(discussion.SharedContext);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 discussion.EndNow();
                 throw new DatabaseWriteException(ex);
+            }
+        }
+
+        public T DiscussRead<T>(Func<CanaryContext, T> read, Discussion discussion)
+        {
+            try
+            {
+                return read.Invoke(discussion.SharedContext);
+            }
+            catch (Exception ex)
+            {
+                discussion.EndNow();
+                throw new DatabaseReadException(ex);
             }
         }
 
@@ -180,5 +193,3 @@ namespace Repository
         }
     }
 }
-
-

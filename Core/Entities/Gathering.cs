@@ -24,7 +24,7 @@ namespace Core.Entities
 		public const int MaximumTitleLength = 30;
         public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
-        public const int InitialDecay = 100;
+        public const float InitialDecay = 100;
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
