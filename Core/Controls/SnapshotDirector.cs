@@ -67,6 +67,9 @@ namespace Core.Controls
                 gallery = new(targetSnapshots);
             }
 
+            // Remove any snapshots from blocked or blocking users
+            GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
+
             // Remove strangers if gallery is in pre mode
             if (gathering.IsUpcoming)
             {
@@ -77,9 +80,6 @@ namespace Core.Controls
 
                 gallery = new(HideStrangersAsync(gallery.Snapshots, strangers));
             }
-
-            // Remove any snapshots from blocked or blocking users
-            GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
 
             return filteredGallery;
         }
