@@ -85,8 +85,10 @@ namespace Frontier.Controllers
                     code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
                 }
 
-                // Send user an SMS with code
-                await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                bool useWhatsApp = credentials.UseWhatsApp ?? false;
+
+                // Send user code
+                await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}", whatsapp: useWhatsApp);
             });
         }
 
@@ -253,7 +255,7 @@ namespace Frontier.Controllers
                     // Send an SMS to new user with a generated change number token
                     var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
                     var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-                    await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                    await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
                 }
                 else
                 {
@@ -268,7 +270,7 @@ namespace Frontier.Controllers
                     else
                     {
                         var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-                        await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                        await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
                     }
                 }
             });

@@ -20,6 +20,8 @@ namespace Frontier.Manifests
 		public string PhoneNumber { get; set; }
 
 		public string Code { get; set; }
+
+		public bool? UseWhatsApp { get; set; }
     }
 
     public class AccountSignUpManifest
