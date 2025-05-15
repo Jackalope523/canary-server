@@ -32,6 +32,10 @@ namespace Core.Boundaries
         Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image);
         Task DeletePhotoAsync(long conversationId, Guid photoId);
         Task<long> GetPhotoConversationIdAsync(Guid photoId);
+
+        Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId, Guid photoId);
+        Task<Guid> UploadGroupChatHeaderAsync(long conversationId, MemoryStream image);
+        Task DeleteGroupChatHeaderAsync(long conversationId, Guid photoId);
     }
 
     public interface IMediaOperations
@@ -49,6 +53,9 @@ namespace Core.Boundaries
 
         Task<MemoryStream> GetPhotoAsync(long userId, Guid photoId);
         Task<ImageMetadataShard> GetPhotoMetadataAsync(long userId, Guid photoId);
+
+        Task<MemoryStream> GetGroupChatHeaderAsync(long userId, long conversationId);
+        Task<ImageMetadataShard> GetGroupChatHeaderMetadataAsync(long userId, long conversationId);
     }
 
     #endregion
