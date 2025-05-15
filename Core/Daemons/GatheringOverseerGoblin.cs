@@ -29,7 +29,7 @@ namespace Core.Daemons
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                log.LogInformation("Gravekeeper goblin clocking in at {time}.", Time);
+                log.LogInformation("{goblin} clocking in at {time}.", nameof(GatheringOverseerGoblin), Time);
 
                 try
                 {
@@ -40,7 +40,7 @@ namespace Core.Daemons
                     log.LogError("{goblin} had trouble: {error}", nameof(GatheringOverseerGoblin), e);
                 }
 
-                log.LogInformation("Gravekeeper goblin clocking out at {time}.", Time);
+                log.LogInformation("{goblin} clocking out at {time}.", nameof(GatheringOverseerGoblin), Time);
 
                 await Task.Delay(interval, stoppingToken);
             }
@@ -64,15 +64,22 @@ namespace Core.Daemons
 
                 float newDecay = gathering.Decay - decayPerHour * goblinFrequency;
 
-                // Apply decay if not expired
-                if (newDecay > 0)
+                try
                 {
-                    await terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Decay), newDecay) });
+                    // Apply decay if not expired
+                    if (newDecay > 0)
+                    {
+                        await terminal.GatheringDatabase.UpdateGatheringAsync(gathering.Id, new() { (nameof(CoreGathering.Decay), newDecay) });
+                    }
+                    else
+                    {
+                        // Terminate gathering
+                        await terminal.GatheringDirector.TerminateGatheringAsync(gathering.HostId, gathering.Id);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    // Terminate gathering
-                    await terminal.GatheringDirector.TerminateGatheringAsync(gathering.HostId, gathering.Id);
+                    log.LogError("{goblin} had trouble corroding {title}: {error}", nameof(GatheringOverseerGoblin), coreGathering.Title, e);
                 }
             }
         }
