@@ -100,7 +100,7 @@ namespace Core.Boundaries
 
 		Task<ConversationShard> CreateGroupChatAsync(long userId, params long[] participantIds);
 		Task EditGroupChatAsync(long userId, long conversationId,
-			string title = "");
+			string title = "", MemoryStream header = null);
 		Task DeleteGroupChatAsync(long userId, long conversationId);
 
 		Task LeaveGroupChatAsync(long userId, long conversationId);

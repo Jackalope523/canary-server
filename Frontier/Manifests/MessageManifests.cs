@@ -8,11 +8,18 @@ using System.Threading.Tasks;
 
 namespace Frontier.Manifests
 {
-	public class GroupChatManifest
+	public class GroupChatCreationManifest
     {
         public string Title { get; set; }
 
         [Required]
         public long[] ParticipantIds { get; set; }
+    }
+
+	public class GroupChatEditManifest
+    {
+        public string Title { get; set; }
+
+        public IFormFile Image { get; set; }
     }
 }

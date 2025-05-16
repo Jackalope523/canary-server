@@ -99,7 +99,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost]
-		public async Task<IActionResult> CreateGroupChat([FromForm] GroupChatManifest manifest)
+		public async Task<IActionResult> CreateGroupChat([FromForm] GroupChatCreationManifest manifest)
         {
             if (manifest == null || !ModelState.IsValid)
             { return MissingInformation(); }
@@ -111,12 +111,19 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("{conversationId}")]
-		public async Task<IActionResult> EditGroupChat(long conversationId, string title = null)
+		public async Task<IActionResult> EditGroupChat(long conversationId, [FromForm] GroupChatEditManifest details)
         {
             return await Execute(async user =>
             {
+                using var stream = new MemoryStream();
+                if (details.Image != null && details.Image.Length > 0)
+                {
+                    await details.Image.CopyToAsync(stream);
+                }
+
                 await messages.EditGroupChatAsync(user.Id, conversationId,
-                    title);
+                    title: details.Title,
+                    header: stream);
             });
         }
 

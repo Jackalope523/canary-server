@@ -274,7 +274,8 @@ namespace Core.Controls
             return newConversation.ToConversationShard();
         }
 
-        public async Task EditGroupChatAsync(long userId, long conversationId, string title = "")
+        public async Task EditGroupChatAsync(long userId, long conversationId,
+            string title = "", MemoryStream header = null)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -303,10 +304,19 @@ namespace Core.Controls
                 editMessages.Add(editedConversation.Title); // todo activity messages
             }
 
-            if (edits.Count > 0)
+            if (header != null && header.Length > 0)
+            {
+                await Terminal.MediaDirector.UploadGroupChatHeaderAsync(conversation.Id, header);
+                editMessages.Add("Header"); // todo activity messages
+            }
+
+            if (edits.Any())
             {
                 await Messages.UpdateConversationAsync(conversation.Id, edits);
+            }
 
+            if (editMessages.Any())
+            {
                 foreach (var value in editMessages)
                 {
                     var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, value);
