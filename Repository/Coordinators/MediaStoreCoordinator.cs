@@ -45,19 +45,19 @@ namespace Repository
             await store.DeleteAvatarAsync(userId);
         }
 
-        public async Task<MemoryStream> DownloadHeroAsync(long gatheringId)
+        public async Task<MemoryStream> DownloadGatheringHeaderAsync(long gatheringId)
         {
-            return await store.DownloadHeroAsync(gatheringId);
+            return await store.DownloadGatheringHeaderAsync(gatheringId);
         }
 
-        public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
+        public async Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image)
         {
-            await store.UploadHeroAsync(gatheringId, image);
+            await store.UploadGatheringHeaderAsync(gatheringId, image);
         }
 
-        public async Task DeleteHeroAsync(long gatheringId)
+        public async Task DeleteGatheringHeaderAsync(long gatheringId)
         {
-            await store.DeleteHeroAsync(gatheringId);
+            await store.DeleteGatheringHeaderAsync(gatheringId);
         }
 
         public async Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId)

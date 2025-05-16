@@ -80,7 +80,7 @@ namespace Frontier.Controllers
 					radius: gatheringDetails.Radius, isDynamic: gatheringDetails.IsDynamic,
 					degreeOfPrivacy: gatheringDetails.DegreeOfPrivacy,
 					groupMinimum: gatheringDetails.GroupMinimum, groupMaximum: gatheringDetails.GroupMaximum,
-					heroImage: stream);
+					header: stream);
 			});
 		}
 

@@ -83,7 +83,7 @@ namespace Core.Boundaries
 			string gatheringTitle = "", string gatheringDescription = "",
 			DateTimeOffset? startTime = null, double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? degreeOfPrivacy = null,
-			int? groupMinimum = null, int? groupMaximum = null, MemoryStream heroImage = null);
+			int? groupMinimum = null, int? groupMaximum = null, MemoryStream header = null);
 		Task TerminateGatheringAsync(long userId, long gatheringId);
 		Task CancelGatheringAsync(long userId, long gatheringId);
 

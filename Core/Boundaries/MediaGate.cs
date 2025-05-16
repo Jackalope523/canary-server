@@ -20,9 +20,9 @@ namespace Core.Boundaries
         Task UploadAvatarAsync(long userId, MemoryStream image);
         Task DeleteAvatarAsync(long userId);
 
-        Task<MemoryStream> DownloadHeroAsync(long gatheringId);
-        Task UploadHeroAsync(long gatheringId, MemoryStream image);
-        Task DeleteHeroAsync(long gatheringId);
+        Task<MemoryStream> DownloadGatheringHeaderAsync(long gatheringId);
+        Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image);
+        Task DeleteGatheringHeaderAsync(long gatheringId);
 
         Task<MemoryStream> DownloadSnapshotAsync(long snapshotId, long ownerId);
         Task UploadSnapshotAsync(long snapshotId, long ownerId, MemoryStream image);

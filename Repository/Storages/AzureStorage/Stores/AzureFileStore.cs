@@ -47,17 +47,17 @@ namespace Repository
             await sentry.DeleteBlobAsync("user" + userId.ToString(), "avatar.jpg");
         }
 
-        public async Task<MemoryStream> DownloadHeroAsync(long gatheringId)
+        public async Task<MemoryStream> DownloadGatheringHeaderAsync(long gatheringId)
         {
             return await sentry.DownloadBlobAsync("gathering" + gatheringId.ToString(), "hero.jpg");
         }
 
-        public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
+        public async Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image)
         {
             await sentry.UploadBlobAsync("gathering" + gatheringId.ToString(), "hero.jpg", image);
         }
 
-        public async Task DeleteHeroAsync(long gatheringId)
+        public async Task DeleteGatheringHeaderAsync(long gatheringId)
         {
             await sentry.DeleteBlobAsync("gathering" + gatheringId.ToString(), "hero.jpg");
         }

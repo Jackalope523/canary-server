@@ -128,7 +128,7 @@ namespace Core.Controls
 			try
 			{
 				// Upload hero
-				await Terminal.MediaDirector.UploadHeroAsync(newGathering.Id, heroImage);
+				await Terminal.MediaDirector.UploadGatheringHeaderAsync(newGathering.Id, heroImage);
 			}
 			catch (Exception ex)
 			{
@@ -161,7 +161,7 @@ namespace Core.Controls
 			double? latitude = null, double? longitude = null, string friendlyLocation = "",
 			double? radius = null, bool? isDynamic = null, int? degreeOfPrivacy = null,
 			int? groupMinimum = null, int? groupMaximum = null,
-			MemoryStream heroImage = null)
+			MemoryStream header = null)
 		{
 			var user = await GetUserAsync(userId);
 			var originalGathering = await GetGatheringAsync(gatheringId);
@@ -244,18 +244,17 @@ namespace Core.Controls
 			if (IsNotNull(groupMaximum))
 			{
 				edits.Add((nameof(CoreGathering.GroupMaximum), editedGathering.GroupMaximum));
-			}
+            }
 
-			if (edits.Count > 0)
+            if (header != null && header.Length > 0)
+            {
+                await Terminal.MediaDirector.UploadGatheringHeaderAsync(originalGathering.Id, header);
+            }
+
+            if (edits.Count > 0)
 			{
 				// Push update
 				await Gatherings.UpdateGatheringAsync(originalGathering.Id, edits);
-
-				// Update hero image if provided
-				if (heroImage != null && heroImage.Length > 0)
-				{
-					await Terminal.MediaDirector.UploadHeroAsync(originalGathering.Id, heroImage);
-				}
 
 				_ = originalGathering.NotifyGuests(CanaryNotification.GatheringEdited(await originalGathering.ToGatheringShard()), notifyHost: false);
 

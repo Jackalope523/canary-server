@@ -82,7 +82,7 @@ namespace Core.Controls
 
             try
             {
-                image = await Media.DownloadHeroAsync(gathering.Id);
+                image = await Media.DownloadGatheringHeaderAsync(gathering.Id);
             }
             catch (Exception ex)
             { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
@@ -102,7 +102,7 @@ namespace Core.Controls
 
             try
             {
-                image = await Media.DownloadHeroAsync(gathering.Id);
+                image = await Media.DownloadGatheringHeaderAsync(gathering.Id);
             }
             catch (Exception ex)
             { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
@@ -285,11 +285,11 @@ namespace Core.Controls
             { throw new UnexpectedFailureException($"Failed to upload avatar for {userId}", ex, HollowErrorCode.UPLOAD_FAILED); }
 		}
 
-		public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
+		public async Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image)
 		{
             try
             {
-                await Media.UploadHeroAsync(gatheringId, image);
+                await Media.UploadGatheringHeaderAsync(gatheringId, image);
             }
             catch (Exception ex)
             { throw new UnexpectedFailureException($"Failed to upload gathering header for {gatheringId}", ex, HollowErrorCode.UPLOAD_FAILED); }
