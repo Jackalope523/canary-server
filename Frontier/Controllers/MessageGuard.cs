@@ -156,7 +156,7 @@ namespace Frontier.Controllers
             });
         }
 
-        [HttpPost("{conversationId}/message")]
+        [HttpPost("{conversationId}/photo")]
         public async Task<IActionResult> SendPhoto(long conversationId, [FromForm] ImageManifest photo)
         {
             // Verify parameters
