@@ -21,6 +21,25 @@ namespace Core.Controls
 
 		#region Operations
 
+        public async Task<SnapshotShard> GetSnapshotAsync(long userId, long snapshotId)
+        {
+            var user = await GetUserAsync(userId);
+            var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+
+            var snapshotOwner = await GetUserAsync(snapshot.User.Id);
+            var gathering = await GetGatheringAsync(snapshot.GatheringId);
+
+            // Fail if user is blocked
+            FailIf(await user.IsBlockedBy(snapshotOwner),
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
+
+            // Fail if user cannot view gathering
+            Verify(await user.CanView(gathering),
+                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
+
+            return snapshot;
+        }
+
         public async Task<GalleryShard> GetGalleryAsync(long userId, long targetId, long gatheringId)
         {
             var user = await GetUserAsync(userId);
