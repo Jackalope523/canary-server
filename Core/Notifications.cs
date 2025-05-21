@@ -102,7 +102,7 @@ namespace Core.Notifications
             string options = "";
 
             options += IDeepLink.ParseOption("focus", focus);
-            options += IDeepLink.ParseOption("invitedBy", invitedBy);
+            options += IDeepLink.ParseOption("invited_by", invitedBy);
             options += IDeepLink.ParseOption("immediate", immediate);
             options += IDeepLink.ParseOption("sealed", @sealed);
 
@@ -126,7 +126,7 @@ namespace Core.Notifications
 
             string options = "";
 
-            options += IDeepLink.ParseOption("lastMet", lastMet);
+            options += IDeepLink.ParseOption("last_met", lastMet);
 
             RelativePath = IDeepLink.FormatPath(path, options);
         }
