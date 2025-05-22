@@ -546,11 +546,13 @@ namespace Core.Controls
 			Verify(await inviter.IsCompanionsWith(invitee),
 				new UserErrorException(GatheringErrorCode.CANNOT_INVITE_NEUTRAL));
 
-			_ = invitee.Notify(CanaryNotification.GatheringInvitation(inviter.ToUserShard(), await gathering.ToGatheringShard()));
-			// todo message
-		}
+			Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(inviter.Id, invitee.Id));
+            var message = await Messages.AddMessageAsync(conversation.Id, inviter.Id, Time, MessageType.GatheringInvite, gathering.Id);
 
-		public async Task KickUserAsync(long hostId, long targetId, long gatheringId)
+            _ = conversation.MessageOrNotifyOthersAsync(inviter, message);
+        }
+
+        public async Task KickUserAsync(long hostId, long targetId, long gatheringId)
 		{
 			var host = await GetUserAsync(hostId);
 			var targetUser = await GetUserAsync(targetId);

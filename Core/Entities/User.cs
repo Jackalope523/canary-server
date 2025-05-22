@@ -619,26 +619,6 @@ namespace Core.Entities
             return await Terminal.NotificationDirector.NotifyUsersAsync(notification, notifyAt, (await Companions).ToArray());
         }
 
-        public async Task MessageOrNotifyAsync(Conversation conversation, User sender, MessageShard message)
-        {
-            if (await IsOnline())
-            {
-                await Terminal.MessageDirector.SendClientMessageAsync(conversation, message, this);
-            }
-            else
-            {
-                CanaryNotification notification = conversation.Type switch
-                {
-                    ChatType.Individual => CanaryNotification.IndividualMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
-                    ChatType.Group => CanaryNotification.GroupMessage(conversation.ToConversationShard(), sender.ToUserShard(), message),
-                    ChatType.Gathering => CanaryNotification.GatheringMessage(await (await conversation.Gathering).ToGatheringShard(), conversation.ToConversationShard(), sender.ToUserShard(), message),
-                    _ => throw new UnexpectedFailureException("ConversationType does not exist"),
-                };
-
-                await Notify(notification);
-            }
-        }
-
 		#endregion
 
 		#region Dissimilation

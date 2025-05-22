@@ -188,7 +188,7 @@ namespace Core.Controls
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             var gathering = await GetGatheringAsync(gatheringId);
-
+            
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.GatheringInvite, gathering.Id);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
