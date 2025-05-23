@@ -272,11 +272,14 @@ namespace Core.Controls
 
             foreach (SnapshotShard snapshot in snapshots)
             {
-                User snapshotOwner = await GetUserAsync(snapshot.User.Id);
+                if (user.Id != snapshot.User.Id)
+                {
+                    User snapshotOwner = await GetUserAsync(snapshot.User.Id);
 
-                // Check if blocking link exists
-                if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))
-                { continue; }
+                    // Check if blocking link exists
+                    if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))
+                    { continue; }
+                }
 
                 accessibleSnapshots.Add(snapshot);
             }
