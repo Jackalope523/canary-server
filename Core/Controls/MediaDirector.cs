@@ -315,11 +315,11 @@ namespace Core.Controls
             { throw new UnexpectedFailureException($"Failed to upload photo for {conversationId}", ex, HollowErrorCode.UPLOAD_FAILED); }
         }
 
-        public async Task<Guid> UploadGroupChatHeaderAsync(long conversationId, MemoryStream image)
+        public async Task UploadGroupChatHeaderAsync(long conversationId, MemoryStream image)
 		{
             try
             {
-			    return await Media.UploadGroupChatHeaderAsync(conversationId, image);
+			    await Media.UploadGroupChatHeaderAsync(conversationId, image);
             }
             catch (Exception ex)
             { throw new UnexpectedFailureException($"Failed to upload group chat header for {conversationId}", ex, HollowErrorCode.UPLOAD_FAILED); }
