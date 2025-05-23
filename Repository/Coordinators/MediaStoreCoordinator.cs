@@ -79,5 +79,20 @@ namespace Repository
         {
             return await store.GetPhotoConversationIdAsync(photoId);
         }
+
+        public async Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId)
+        {
+            return await store.DownloadGroupChatHeaderAsync(conversationId);
+        }
+
+        public async Task UploadGroupChatHeaderAsync(long conversationId, MemoryStream image)
+        {
+            await store.UploadGroupChatHeaderAsync(conversationId, image);
+        }
+
+        public async Task DeleteGroupChatHeaderAsync(long conversationId)
+        {
+            await store.DeleteGroupChatHeaderAsync(conversationId);
+        }
     }
 }

@@ -34,7 +34,7 @@ namespace Core.Boundaries
         Task<long> GetPhotoConversationIdAsync(Guid photoId);
 
         Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId);
-        Task<Guid> UploadGroupChatHeaderAsync(long conversationId, MemoryStream image);
+        Task UploadGroupChatHeaderAsync(long conversationId, MemoryStream image);
         Task DeleteGroupChatHeaderAsync(long conversationId);
     }
 

@@ -7,6 +7,12 @@ namespace Repository
     {
         private readonly AzureStorageSentry sentry;
 
+        private readonly string userContainerPrefix = "user";
+        private readonly string gatheringContainerPrefix = "user";
+        private readonly string conversationContainerPrefix = "user";
+
+        private readonly string imageFileSuffix = ".jpg";
+
         public AzureFileStore(Harbor.Flag flag) 
         {
             sentry = new(flag);
@@ -14,72 +20,91 @@ namespace Repository
 
         public async Task<MemoryStream> DownloadAssetAsync(string asset)
         {
-            return await sentry.DownloadBlobAsync("assets", asset + ".jpg");
+            return await sentry.DownloadBlobAsync("assets", asset + imageFileSuffix);
         }
 
         public async Task UploadSnapshotAsync(long snapshotId, long ownerId, MemoryStream image)
         {
-            await sentry.UploadBlobAsync("user" + ownerId.ToString(), snapshotId.ToString() + ".jpg", image);
+            await sentry.UploadBlobAsync(userContainerPrefix + ownerId.ToString(), snapshotId.ToString() + imageFileSuffix, image);
         }
 
         public async Task<MemoryStream> DownloadSnapshotAsync(long snapshotId, long ownerId)
         {
-            return await sentry.DownloadBlobAsync("user" + ownerId.ToString(), snapshotId.ToString() + ".jpg");
+            return await sentry.DownloadBlobAsync(userContainerPrefix + ownerId.ToString(), snapshotId.ToString() + imageFileSuffix);
         }
 
         public async Task DeleteSnapshotAsync(long snapshotId, long ownerId)
         {
-            await sentry.DeleteBlobAsync("user" + ownerId.ToString(), snapshotId.ToString() + ".jpg");
+            await sentry.DeleteBlobAsync(userContainerPrefix + ownerId.ToString(), snapshotId.ToString() + imageFileSuffix);
         }
 
         public async Task<MemoryStream> DownloadAvatarAsync(long userId)
         {
-            return await sentry.DownloadBlobAsync("user" + userId.ToString(), "avatar.jpg");
+            return await sentry.DownloadBlobAsync(userContainerPrefix + userId.ToString(), "avatar" + imageFileSuffix);
         }
 
         public async Task UploadAvatarAsync(long userId, MemoryStream image)
         {
-            await sentry.UploadBlobAsync("user" + userId.ToString(), "avatar.jpg", image);
+            await sentry.UploadBlobAsync(userContainerPrefix + userId.ToString(), "avatar" + imageFileSuffix, image);
         }
 
         public async Task DeleteAvatarAsync(long userId)
         {
-            await sentry.DeleteBlobAsync("user" + userId.ToString(), "avatar.jpg");
+            await sentry.DeleteBlobAsync(userContainerPrefix + userId.ToString(), "avatar" + imageFileSuffix);
         }
 
         public async Task<MemoryStream> DownloadGatheringHeaderAsync(long gatheringId)
         {
-            return await sentry.DownloadBlobAsync("gathering" + gatheringId.ToString(), "hero.jpg");
+            return await sentry.DownloadBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero" + imageFileSuffix);
         }
 
         public async Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image)
         {
-            await sentry.UploadBlobAsync("gathering" + gatheringId.ToString(), "hero.jpg", image);
+            await sentry.UploadBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero" + imageFileSuffix, image);
         }
 
         public async Task DeleteGatheringHeaderAsync(long gatheringId)
         {
-            await sentry.DeleteBlobAsync("gathering" + gatheringId.ToString(), "hero.jpg");
+            await sentry.DeleteBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero" + imageFileSuffix);
         }
 
-        public Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId)
+        public async Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId)
+        {
+            return await sentry.DownloadBlobAsync(conversationContainerPrefix + conversationId.ToString(), photoId.ToString() + imageFileSuffix);
+        }
+
+        public async Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image)
+        {
+            Guid photoId = new();
+
+            await sentry.UploadBlobAsync(conversationContainerPrefix + conversationId.ToString(), photoId.ToString() + imageFileSuffix, image);
+
+            return photoId;
+        }
+
+        public async Task DeletePhotoAsync(long conversationId, Guid photoId)
+        {
+            await sentry.DeleteBlobAsync(conversationContainerPrefix + conversationId.ToString(), photoId.ToString() + imageFileSuffix);
+        }
+
+        public async Task<long> GetPhotoConversationIdAsync(Guid photoId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image)
+        public async Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId)
         {
-            throw new NotImplementedException();
+            return await sentry.DownloadBlobAsync(conversationContainerPrefix + conversationId.ToString(), "header" + imageFileSuffix);
         }
 
-        public Task DeletePhotoAsync(long conversationId, Guid photoId)
+        public async Task UploadGroupChatHeaderAsync(long conversationId, MemoryStream image)
         {
-            throw new NotImplementedException();
+            await sentry.UploadBlobAsync(conversationContainerPrefix + conversationId.ToString(), "header" + imageFileSuffix, image);
         }
 
-        public Task<long> GetPhotoConversationIdAsync(Guid photoId)
+        public async Task DeleteGroupChatHeaderAsync(long conversationId)
         {
-            throw new NotImplementedException();
+            await sentry.DeleteBlobAsync(conversationContainerPrefix + conversationId.ToString(), "header" + imageFileSuffix);
         }
     }
 }
