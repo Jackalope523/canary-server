@@ -86,19 +86,19 @@ namespace Core.Controls
                 gallery = new(targetSnapshots);
             }
 
+            // Remove any snapshots from blocked or blocking users
+            GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
+
             // Remove strangers if gallery is in pre mode
             if (gathering.IsUpcoming)
             {
-                var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, gallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
+                var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, filteredGallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
 
                 // Remove host from strangers
                 strangers.Remove(gathering.HostId);
 
-                gallery = new(HideStrangersAsync(gallery.Snapshots, strangers));
+                filteredGallery = new(HideStrangersAsync(filteredGallery.Snapshots, strangers));
             }
-
-            // Remove any snapshots from blocked or blocking users
-            GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
 
             return filteredGallery;
         }
