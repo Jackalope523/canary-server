@@ -8,8 +8,8 @@ namespace Repository
         private readonly AzureStorageSentry sentry;
 
         private readonly string userContainerPrefix = "user";
-        private readonly string gatheringContainerPrefix = "user";
-        private readonly string conversationContainerPrefix = "user";
+        private readonly string gatheringContainerPrefix = "gathering";
+        private readonly string conversationContainerPrefix = "conversation";
 
         private readonly string imageFileSuffix = ".jpg";
 
@@ -55,17 +55,17 @@ namespace Repository
 
         public async Task<MemoryStream> DownloadGatheringHeaderAsync(long gatheringId)
         {
-            return await sentry.DownloadBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero.jpg");
+            return await sentry.DownloadBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero" + imageFileSuffix);
         }
 
         public async Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image)
         {
-            await sentry.UploadBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero.jpg", image);
+            await sentry.UploadBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero" + imageFileSuffix, image);
         }
 
         public async Task DeleteGatheringHeaderAsync(long gatheringId)
         {
-            await sentry.DeleteBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero.jpg");
+            await sentry.DeleteBlobAsync(gatheringContainerPrefix + gatheringId.ToString(), "hero" + imageFileSuffix);
         }
 
         public async Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId)

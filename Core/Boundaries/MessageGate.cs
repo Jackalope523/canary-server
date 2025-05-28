@@ -72,7 +72,7 @@ namespace Core.Boundaries
 		Task UpdateMembershipAsync(long conversationId, long userId, List<(string Property, object Value)> edits);
 		Task RemoveUserFromConversationAsync(long conversationId, long userId);
 
-		Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, long pageNumber);
+		Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber);
         Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value);
     }
 

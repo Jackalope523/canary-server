@@ -56,9 +56,9 @@ namespace Repository
             return await store.GetMembershipAsync(conversationId, userId);
         }
 
-        public async Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10)
+        public async Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber)
         {
-            return await store.GetMessagesForConversationAsync(conversationId, startSeqId, endSeqId);
+            return await store.GetMessagesForConversationAsync(conversationId, pageNumber);
         }
 
         public async Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId)

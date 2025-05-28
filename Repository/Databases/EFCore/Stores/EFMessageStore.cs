@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System.Drawing.Printing;
 
 namespace Repository
 {
@@ -155,6 +157,7 @@ namespace Repository
             List<CoreConversation> toReturn = new();
             foreach (Chat conversation in conversations)
             {
+                Log.Error("LOOP RUN");
                 CoreConversation coreConversation = new(conversation.Id, conversation.Type, null, 0);
                 switch (conversation)
                 {
@@ -184,12 +187,17 @@ namespace Repository
                     SingleAsync());
         }
 
-        public async Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int startSeqId = 0, int endSeqId = 10)
+        public async Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber)
         {
-            List<Message> messages =  await storeSentry.ExecuteReadAsync(ctx =>
-                                        ctx.Messages.
-                                        Where(m => m.ConversationId == conversationId).
-                                        ToListAsync());
+            int pageSize = 10;
+
+            List<Message> messages = await storeSentry.ExecuteReadAsync(ctx =>
+                                        ctx.Messages
+                                        .Where(m => m.ConversationId == conversationId)
+                                        .OrderBy(m => m.Timestamp)
+                                        .Skip((pageNumber - 1) * pageSize)
+                                        .Take(pageSize)
+                                        .ToListAsync());
 
             List<MessageShard> toReturn = new();
             foreach (Message message in messages)
@@ -403,5 +411,7 @@ namespace Repository
 
             return toAdd.Id;
         }
+
+     
     }
 }
