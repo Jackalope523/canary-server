@@ -32,6 +32,33 @@ namespace Frontier.Controllers
 			});
         }
 
+		[HttpGet("upcoming")]
+        public async Task<IActionResult> GetUpcomingGatherings()
+        {
+			return await Execute(async user =>
+			{
+				return await gatherings.GetUpcomingGatheringsAsync(user.Id);
+			});
+        }
+
+		[HttpGet("ongoing")]
+        public async Task<IActionResult> GetOngoingGatherings()
+        {
+			return await Execute(async user =>
+			{
+				return await gatherings.GetOngoingGatheringsAsync(user.Id);
+			});
+        }
+
+		[HttpGet("past")]
+        public async Task<IActionResult> GetPastGatherings()
+        {
+			return await Execute(async user =>
+			{
+				return await gatherings.GetPastGatheringsAsync(user.Id);
+			});
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateGathering([FromForm] GatheringCreationManifest gatheringDetails)
         {

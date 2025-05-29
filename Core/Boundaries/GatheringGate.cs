@@ -70,6 +70,10 @@ namespace Core.Boundaries
 	public interface IGatheringOperations
 	{
 		Task<GatheringShard> GetGatheringInformationAsync(long userId, long gatheringId);
+		Task<List<TwigShard>> GetUpcomingGatheringsAsync(long userId);
+		Task<List<TwigShard>> GetOngoingGatheringsAsync(long userId);
+		Task<List<TwigShard>> GetPastGatheringsAsync(long userId);
+
 		Task<List<GatheringShard>> GetGatheringsInAreaAsync(long userId,
 			double latitude, double longitude, double distance);
 		Task<List<GatheringShard>> GetPersonalisedGatheringsInAreaAsync(long userId,

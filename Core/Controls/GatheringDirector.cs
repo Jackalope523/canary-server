@@ -36,6 +36,27 @@ namespace Core.Controls
 			return await targetGathering.ToGatheringShard();
 		}
 
+		public async Task<List<TwigShard>> GetUpcomingGatheringsAsync(long userId)
+        {
+			var user = await GetUserAsync(userId);
+
+			return (await user.UpcomingGatherings).ConvertAll(g => g.ToTwigShard());
+		}
+
+		public async Task<List<TwigShard>> GetOngoingGatheringsAsync(long userId)
+        {
+			var user = await GetUserAsync(userId);
+
+			return (await user.OngoingGatherings).ConvertAll(g => g.ToTwigShard());
+		}
+
+		public async Task<List<TwigShard>> GetPastGatheringsAsync(long userId)
+        {
+			var user = await GetUserAsync(userId);
+
+			return (await user.PastGatherings).ConvertAll(g => g.ToTwigShard());
+		}
+
 		public async Task<List<GatheringShard>> GetGatheringsInAreaAsync(long userId,
 			double latitude, double longitude, double distance)
 		{
