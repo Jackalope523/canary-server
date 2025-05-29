@@ -188,6 +188,41 @@ namespace Core.Entities
             }
         }
 
+        public async Task BulkMessageOrNotifyOthersAsync(User sender, List<MessageShard> messages)
+        {
+            var otherMembers = (await Members).Where(m => !m.User.Equals(sender));
+
+            var (onlineMembers, offlineMembers) = await otherMembers.PartitionAsync(async (member) => await member.User.IsOnline());
+
+            if (onlineMembers.Any())
+            {
+                await Terminal.MessageDirector.SendClientMessagesAsync(this, messages.ToArray(), onlineMembers.Select(u => u.User).ToArray());
+            }
+
+            if (offlineMembers.Any())
+            {
+                var subscribedMembers = offlineMembers
+                    .Where(member => !member.Membership.IsMuted)
+                    .Select(u => u.User)
+                    .ToArray();
+
+                var shard = ToConversationShard();
+
+                if (messages.Any())
+                {
+                    CanaryNotification notification = Type switch
+                    {
+                        ChatType.Individual => CanaryNotification.IndividualMessage(shard, sender.ToUserShard(), messages.First()),
+                        ChatType.Group => CanaryNotification.GroupMessage(shard, sender.ToUserShard(), messages.First()),
+                        ChatType.Gathering => CanaryNotification.GatheringMessage(await (await Gathering).ToGatheringShard(), shard, sender.ToUserShard(), messages.First()),
+                        _ => throw new UnexpectedFailureException("ConversationType does not exist"),
+                    };
+
+                    await User.NotifyAll(notification, subscribedMembers);
+                }
+            }
+        }
+
         public async Task IndicateUserComposingAsync(User user, bool isComposing)
         {
             var otherMembers = (await Members).Where(m => !m.User.Equals(user));

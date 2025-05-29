@@ -30,25 +30,25 @@ namespace Frontier.Controllers
             return await messages.SendTextAsync(user.Id, conversationId, text);
         }
 
-        public async Task<MessageShard> ShareGathering(long conversationId, long gatheringId)
+        public async Task<MessageShard[]> ShareGathering(long conversationId, long[] gatheringIds)
         {
             var user = await GetCurrentUserAsync();
 
-            return await messages.ShareGatheringAsync(user.Id, conversationId, gatheringId);
+            return await messages.ShareGatheringAsync(user.Id, conversationId, gatheringIds);
         }
 
-        public async Task<MessageShard> ShareSnapshot(long conversationId, long snapshotId)
+        public async Task<MessageShard[]> ShareSnapshot(long conversationId, long[] snapshotIds)
         {
             var user = await GetCurrentUserAsync();
 
-            return await messages.ShareSnapshotAsync(user.Id, conversationId, snapshotId);
+            return await messages.ShareSnapshotAsync(user.Id, conversationId, snapshotIds);
         }
 
-        public async Task<MessageShard> ShareNest(long conversationId, long nestId)
+        public async Task<MessageShard[]> ShareNest(long conversationId, long[] nestIds)
         {
             var user = await GetCurrentUserAsync();
 
-            return await messages.ShareNestAsync(user.Id, conversationId, nestId);
+            return await messages.ShareNestAsync(user.Id, conversationId, nestIds);
         }
     }
 }

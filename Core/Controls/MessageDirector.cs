@@ -196,7 +196,7 @@ namespace Core.Controls
             return message;
         }
 
-        public async Task<MessageShard> ShareGatheringAsync(long userId, long conversationId, long gatheringId)
+        public async Task<MessageShard[]> ShareGatheringAsync(long userId, long conversationId, long[] gatheringIds)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -204,19 +204,24 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            var gathering = await GetGatheringAsync(gatheringId);
+            List<MessageShard> messages = new();
 
-            Verify(await user.CanView(gathering),
-                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
+            foreach (var gatheringId in gatheringIds)
+            {
+                var gathering = await GetGatheringAsync(gatheringId);
 
-            var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.ShareGathering, gathering.Id);
+                Verify(await user.CanView(gathering),
+                    new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
 
-            _ = conversation.MessageOrNotifyOthersAsync(user, message);
+                messages.Add(await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.ShareGathering, gathering.Id));
+            }
 
-            return message;
+            _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
+
+            return messages.ToArray();
         }
 
-        public async Task<MessageShard> ShareSnapshotAsync(long userId, long conversationId, long snapshotId)
+        public async Task<MessageShard[]> ShareSnapshotAsync(long userId, long conversationId, long[] snapshotIds)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -224,23 +229,29 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
-            User snapshotOwner = await GetUserAsync(snapshot.User.Id);
-            var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
+            List<MessageShard> messages = new();
+            var time = Time;
 
-            Verify(user.Taken(snapshot) ||
-                await user.IsCompanionsWith(snapshotOwner) ||
-                await etchedGathering.HasOnGuestList(user),
-                new UserErrorException(SnapshotErrorCode.CANNOT_VIEW));
+            foreach (var snapshotId in snapshotIds)
+            {
+                var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+                User snapshotOwner = await GetUserAsync(snapshot.User.Id);
+                var etchedGathering = await GetGatheringAsync(snapshot.GatheringId);
 
-            var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Snapshot, snapshot.Id);
+                Verify(user.Taken(snapshot) ||
+                    await user.IsCompanionsWith(snapshotOwner) ||
+                    await etchedGathering.HasOnGuestList(user),
+                    new UserErrorException(SnapshotErrorCode.CANNOT_VIEW));
 
-            _ = conversation.MessageOrNotifyOthersAsync(user, message);
+                messages.Add(await Messages.AddMessageAsync(conversation.Id, user.Id, time, MessageType.Snapshot, snapshot.Id));
+            }
 
-            return message;
+            _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
+
+            return messages.ToArray();
         }
 
-        public async Task<MessageShard> ShareNestAsync(long userId, long conversationId, long nestId)
+        public async Task<MessageShard[]> ShareNestAsync(long userId, long conversationId, long[] nestIds)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -248,16 +259,21 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            var nest = await GetUserAsync(nestId);
+            List<MessageShard> messages = new();
 
-            FailIf(await user.IsBlockedBy(nest),
-                new UserErrorException(UserErrorCode.CANNOT_VIEW));
+            foreach (var nestId in nestIds)
+            {
+                var nest = await GetUserAsync(nestId);
 
-            var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Nest, nest.Id);
+                FailIf(await user.IsBlockedBy(nest),
+                    new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
-            _ = conversation.MessageOrNotifyOthersAsync(user, message);
+                messages.Add(await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Nest, nest.Id));
+            }
 
-            return message;
+            _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
+
+            return messages.ToArray();
         }
 
         public async Task<ConversationShard> CreateGroupChatAsync(long userId, params long[] participantIds)
@@ -435,6 +451,17 @@ namespace Core.Controls
                 .ToArray();
 
             await Terminal.SocketService.BroadcastAsync(client => client.ReceiveMessage(conversation.Id, message),
+                connectionIds);
+        }
+
+        public async Task SendClientMessagesAsync(Conversation conversation, MessageShard[] messages, params User[] users)
+        {
+            string[] connectionIds = (await Psijic.Once(users
+                .Select(async u => await u.Connections)))
+                .SelectMany(c => c)
+                .ToArray();
+
+            await Terminal.SocketService.BroadcastAsync(client => client.ReceiveMessages(conversation.Id, messages),
                 connectionIds);
         }
 
