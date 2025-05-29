@@ -298,12 +298,5 @@ namespace Core.Entities
         }
 
         #endregion
-
-        #region Dissimilation
-
-        public TaskAwaiter<T> GetAwaiter(int page)
-            => Value(page).GetAwaiter();
-
-        #endregion
     }
 }

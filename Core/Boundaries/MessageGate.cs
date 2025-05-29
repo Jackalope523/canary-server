@@ -36,7 +36,7 @@ namespace Core.Boundaries
 
 	public record CoreConversation(long Id, ChatType Type, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
-	public record ConversationShard(long Id, long PageCount, ChatType Type, string Title = default,
+	public record ConversationShard(long Id, ChatType Type, long PageCount, string Title = default,
 		long? GatheringId = null, bool? IsMuted = null, bool? HasUnread = null);
 
 	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted)
@@ -87,7 +87,7 @@ namespace Core.Boundaries
 
 		Task<ConversationShard> GetConversationAsync(long userId, long conversationId);
 		Task<List<MembershipShard>> GetMembersAsync(long userId, long conversationId);
-		Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId, long pageNumber);
+		Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId, int pageNumber);
 
 		Task UserReadAsync(long userId, long conversationId);
 		Task UserComposingAsync(long userId, long conversationId, bool isComposing);

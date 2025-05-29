@@ -33,6 +33,7 @@ namespace Core.Entities
         ///////////////
 
         public long Id { get; init; }
+        public long PageCount { get; init; }
         public ChatType Type { get; init; }
         public string Title { get; set; }
 
@@ -43,7 +44,7 @@ namespace Core.Entities
         //////////////////////
         
         public Synced<List<(User User, CoreMembership Membership)>> Members { get; }
-        public Synced<List<MessageShard>> Messages { get; }
+        public PagedSync<List<MessageShard>> Messages { get; }
 
         public Synced<Gathering> Gathering { get; }
 
@@ -54,7 +55,7 @@ namespace Core.Entities
         public Conversation()
         {
             Members = new(() => Terminal.MessageDirector.RequestConversationMembersAsync(this));
-            Messages = new(() => Terminal.MessageDirector.RequestConversationMessagesAsync(this));
+            Messages = new((int page) => Terminal.MessageDirector.RequestConversationMessagesAsync(this, page));
 
             Gathering = new(() => GatheringId.HasValue ? Entities.Gathering.GetGatheringAsync(GatheringId.Value) : Task.FromResult(Entities.Gathering.None));
         }
@@ -74,7 +75,7 @@ namespace Core.Entities
 
         public ConversationShard ToConversationShard()
         {
-            return new(Id, Type, Title, GatheringId);
+            return new(Id, Type, PageCount, Title, GatheringId);
         }
 
         public async Task<ConversationShard> ToConversationShard(User relativeTo)
@@ -84,14 +85,14 @@ namespace Core.Entities
 
             var userMembership = (await Members).Find(member => member.User.Equals(relativeTo));
 
-            return new(Id, Type, Title, GatheringId,
+            return new(Id, Type, PageCount, Title, GatheringId,
                 IsMuted: userMembership.Membership.IsMuted,
                 HasUnread: null); // todo fill already read indicator
         }
 
         public ConversationShard ToConversationShard(CoreMembership relativeTo)
         {
-            return new(Id, Type, Title, GatheringId,
+            return new(Id, Type, PageCount, Title, GatheringId,
                 IsMuted: relativeTo.IsMuted); // todo fill already read indicator
         }
 

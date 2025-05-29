@@ -114,7 +114,7 @@ namespace Core.Controls
                 .ConvertAll(m => m.Membership.ToShard());
         }
 
-        public async Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId)
+        public async Task<List<MessageShard>> GetMessagesAsync(long userId, long conversationId, int pageNumber)
         {
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
@@ -122,7 +122,7 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            return await conversation.Messages;
+            return await conversation.Messages.Value(pageNumber);
         }
 
         public async Task UserReadAsync(long userId, long conversationId)
@@ -422,9 +422,9 @@ namespace Core.Controls
             return pairs.ToList();
         }
 
-        public async Task<List<MessageShard>> RequestConversationMessagesAsync(Conversation conversation)
+        public async Task<List<MessageShard>> RequestConversationMessagesAsync(Conversation conversation, int page)
         {
-            return await Messages.GetMessagesForConversationAsync(conversation.Id);
+            return await Messages.GetMessagesForConversationAsync(conversation.Id, page);
         }
 
         public async Task SendClientMessageAsync(Conversation conversation, MessageShard message, params User[] users)

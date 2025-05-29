@@ -81,11 +81,11 @@ namespace Frontier.Controllers
         }
 
         [HttpGet("{conversationId}/messages")]
-		public async Task<IActionResult> GetConversationMessages(long conversationId)
+		public async Task<IActionResult> GetConversationMessages(long conversationId, int page_number)
         {
             return await Execute(async user =>
             {
-                return await messages.GetMessagesAsync(user.Id, conversationId);
+                return await messages.GetMessagesAsync(user.Id, conversationId, page_number);
             });
         }
 
