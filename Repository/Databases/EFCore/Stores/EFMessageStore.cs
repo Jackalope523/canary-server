@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Index.HPRtree;
 using Serilog;
 using System.Drawing.Printing;
 
@@ -6,6 +7,8 @@ namespace Repository
 {
     class EFMessageStore : QueryStore, IMessageDatabase
     {
+        private int pageSize = 10;
+
         public EFMessageStore(Harbor.Flag flag) : base(flag)
         {
         }
@@ -189,8 +192,6 @@ namespace Repository
 
         public async Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber)
         {
-            int pageSize = 10;
-
             List<Message> messages = await storeSentry.ExecuteReadAsync(ctx =>
                                         ctx.Messages
                                         .Where(m => m.ConversationId == conversationId)
@@ -412,6 +413,14 @@ namespace Repository
             return toAdd.Id;
         }
 
-     
+        public async Task<int> GetConversationPageCountAsync(long conversationId)
+        {
+            int messageCount = await storeSentry.ExecuteReadAsync(ctx => 
+                                ctx.Messages.
+                                Where(m => m.ConversationId == conversationId).
+                                CountAsync());
+
+            return (messageCount + pageSize - 1) / pageSize;
+        }
     }
 }

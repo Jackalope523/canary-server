@@ -46,6 +46,11 @@ namespace Repository
             return await store.GetConversationMembersAsync(conversationId);
         }
 
+        public async Task<int> GetConversationPageCountAsync(long conversationId)
+        {
+            return await store.GetConversationPageCountAsync(conversationId);
+        }
+
         public async Task<List<CoreConversation>> GetConversationsForUserAsync(long userId)
         {
             return await store.GetConversationsForUserAsync(userId);
