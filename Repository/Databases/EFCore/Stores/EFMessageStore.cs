@@ -160,7 +160,6 @@ namespace Repository
             List<CoreConversation> toReturn = new();
             foreach (Chat conversation in conversations)
             {
-                Log.Error("LOOP RUN");
                 CoreConversation coreConversation = new(conversation.Id, conversation.Type, null, 0);
                 switch (conversation)
                 {
@@ -196,7 +195,7 @@ namespace Repository
                                         ctx.Messages
                                         .Where(m => m.ConversationId == conversationId)
                                         .OrderBy(m => m.Timestamp)
-                                        .Skip((pageNumber - 1) * pageSize)
+                                        .Skip((pageNumber) * pageSize)
                                         .Take(pageSize)
                                         .ToListAsync());
 
