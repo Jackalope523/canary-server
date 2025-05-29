@@ -33,7 +33,6 @@ namespace Core.Entities
         ///////////////
 
         public long Id { get; init; }
-        public long PageCount { get; init; }
         public ChatType Type { get; init; }
         public string Title { get; set; }
 
@@ -43,6 +42,7 @@ namespace Core.Entities
         // Synced Properties
         //////////////////////
         
+        public Synced<int> PageCount { get; }
         public Synced<List<(User User, CoreMembership Membership)>> Members { get; }
         public PagedSync<List<MessageShard>> Messages { get; }
 
@@ -54,6 +54,7 @@ namespace Core.Entities
 
         public Conversation()
         {
+            PageCount = new(() => Terminal.MessageDirector.RequestConversationPageCountAsync(this));
             Members = new(() => Terminal.MessageDirector.RequestConversationMembersAsync(this));
             Messages = new((int page) => Terminal.MessageDirector.RequestConversationMessagesAsync(this, page));
 
@@ -73,9 +74,9 @@ namespace Core.Entities
             return new(Id, Type, Title);
         }
 
-        public ConversationShard ToConversationShard()
+        public async Task<ConversationShard> ToConversationShard()
         {
-            return new(Id, Type, PageCount, Title, GatheringId);
+            return new(Id, Type, await PageCount, Title, GatheringId);
         }
 
         public async Task<ConversationShard> ToConversationShard(User relativeTo)
@@ -85,14 +86,14 @@ namespace Core.Entities
 
             var userMembership = (await Members).Find(member => member.User.Equals(relativeTo));
 
-            return new(Id, Type, PageCount, Title, GatheringId,
+            return new(Id, Type, await PageCount, Title, GatheringId,
                 IsMuted: userMembership.Membership.IsMuted,
                 HasUnread: null); // todo fill already read indicator
         }
 
-        public ConversationShard ToConversationShard(CoreMembership relativeTo)
+        public async Task<ConversationShard> ToConversationShard(CoreMembership relativeTo)
         {
-            return new(Id, Type, PageCount, Title, GatheringId,
+            return new(Id, Type, await PageCount, Title, GatheringId,
                 IsMuted: relativeTo.IsMuted); // todo fill already read indicator
         }
 
@@ -174,7 +175,7 @@ namespace Core.Entities
                     .Select(u => u.User)
                     .ToArray();
 
-                var shard = ToConversationShard();
+                var shard = await ToConversationShard();
 
                 CanaryNotification notification = Type switch
                 {
@@ -206,7 +207,7 @@ namespace Core.Entities
                     .Select(u => u.User)
                     .ToArray();
 
-                var shard = ToConversationShard();
+                var shard = await ToConversationShard();
 
                 if (messages.Any())
                 {
@@ -232,7 +233,7 @@ namespace Core.Entities
             if (onlineMembers.Any())
             {
                 var connections = (await Psijic.Once(onlineMembers
-                    .Select(async u => await u.User.Connections)))
+                    .Select(u => u.User.Connections.Value())))
                     .SelectMany(c => c)
                     .ToArray();
 

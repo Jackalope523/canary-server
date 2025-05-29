@@ -25,8 +25,10 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            return (await user.Conversations)
-                .ConvertAll(c => c.Conversation.ToConversationShard(c.Membership));
+            var conversations = await Psijic.Once((await user.Conversations)
+                .Select(c => c.Conversation.ToConversationShard(c.Membership)));
+
+            return conversations.ToList();
         }
 
         public async Task<ConversationShard> GetGatheringConversationAsync(long userId, long gatheringId)
@@ -45,7 +47,7 @@ namespace Core.Controls
                 conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id));
             }
 
-            return conversation.ToConversationShard();
+            return await conversation.ToConversationShard();
         }
 
         public async Task<ConversationShard> GetOrCreateGatheringConversationAsync(long userId, long gatheringId)
@@ -57,7 +59,7 @@ namespace Core.Controls
 
             Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id));
 
-            return conversation.ToConversationShard();
+            return await conversation.ToConversationShard();
         }
 
         public async Task<ConversationShard> GetConversationWithAsync(long userId, long targetId)
@@ -76,7 +78,7 @@ namespace Core.Controls
                 conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id));
             }
 
-            return conversation.ToConversationShard();
+            return await conversation.ToConversationShard();
         }
 
         public async Task<ConversationShard> GetOrCreateConversationWithAsync(long userId, long targetId)
@@ -88,7 +90,7 @@ namespace Core.Controls
 
             Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id));
 
-            return conversation.ToConversationShard();
+            return await conversation.ToConversationShard();
         }
 
         public async Task<ConversationShard> GetConversationAsync(long userId, long conversationId)
@@ -99,7 +101,7 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
-            return conversation.ToConversationShard();
+            return await conversation.ToConversationShard();
         }
 
         public async Task<List<MembershipShard>> GetMembersAsync(long userId, long conversationId)
@@ -287,7 +289,7 @@ namespace Core.Controls
 
             var newConversation = await GetConversationAsync(conversationId);
 
-            return newConversation.ToConversationShard();
+            return await newConversation.ToConversationShard();
         }
 
         public async Task EditGroupChatAsync(long userId, long conversationId,
@@ -427,6 +429,11 @@ namespace Core.Controls
                 .Select(async c => (new Conversation(c), await Messages.GetMembershipAsync(c.Id, user.Id))));
 
             return pairs.ToList();
+        }
+
+        public async Task<int> RequestConversationPageCountAsync(Conversation conversation)
+        {
+            return await Messages.GetConversationPageCountAsync(conversation.Id);
         }
 
         public async Task<List<(User, CoreMembership)>> RequestConversationMembersAsync(Conversation conversation)

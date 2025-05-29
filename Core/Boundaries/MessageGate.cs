@@ -36,7 +36,7 @@ namespace Core.Boundaries
 
 	public record CoreConversation(long Id, ChatType Type, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
-	public record ConversationShard(long Id, ChatType Type, long PageCount, string Title = default,
+	public record ConversationShard(long Id, ChatType Type, int PageCount, string Title = default,
 		long? GatheringId = null, bool? IsMuted = null, bool? HasUnread = null);
 
 	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted)
@@ -52,6 +52,7 @@ namespace Core.Boundaries
     public interface IMessageDatabase
     {
 		Task<CoreConversation> GetConversationAsync(long conversationId);
+		Task<int> GetConversationPageCountAsync(long conversationId);
 
 		Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB);
 		Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB);

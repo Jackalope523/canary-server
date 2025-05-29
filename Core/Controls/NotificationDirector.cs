@@ -91,7 +91,7 @@ namespace Core.Controls
 
 		internal async Task<string> NotifyUsersAsync(CanaryNotification notification, DateTimeOffset? notifyAt = null, params User[] users)
 		{
-			var profiles = await Task.WhenAll(users.Select(async user => await user.NotificationProfile));
+			var profiles = await Task.WhenAll(users.Select(user => user.NotificationProfile.Value()));
 
 			string notificationId;
 

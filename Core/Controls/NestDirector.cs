@@ -330,7 +330,7 @@ namespace Core.Controls
         {
             var users = await Nests.GetBlockedUsersAsync(user.Id);
 
-            return (await Psijic.Once(users.Select(async u => await User.GetUserAsync(u.Id)).ToArray()))
+            return (await Psijic.Once(users.Select(u => User.GetUserAsync(u.Id)).ToArray()))
                 .ToList();
         }
 
