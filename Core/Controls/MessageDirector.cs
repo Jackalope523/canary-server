@@ -207,6 +207,7 @@ namespace Core.Controls
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             List<MessageShard> messages = new();
+            var time = Time;
 
             foreach (var gatheringId in gatheringIds)
             {
@@ -215,7 +216,7 @@ namespace Core.Controls
                 Verify(await user.CanView(gathering),
                     new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
 
-                messages.Add(await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.ShareGathering, gathering.Id));
+                messages.Add(await Messages.AddMessageAsync(conversation.Id, user.Id, time, MessageType.ShareGathering, gathering.Id));
             }
 
             _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
@@ -262,6 +263,7 @@ namespace Core.Controls
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             List<MessageShard> messages = new();
+            var time = Time;
 
             foreach (var nestId in nestIds)
             {
@@ -270,7 +272,7 @@ namespace Core.Controls
                 FailIf(await user.IsBlockedBy(nest),
                     new UserErrorException(UserErrorCode.CANNOT_VIEW));
 
-                messages.Add(await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Nest, nest.Id));
+                messages.Add(await Messages.AddMessageAsync(conversation.Id, user.Id, time, MessageType.Nest, nest.Id));
             }
 
             _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
