@@ -369,6 +369,7 @@ namespace Frontier.Controllers
 
                 string staticCode = userId switch
                 {
+                    -2 => appleAccountCode,
                     -7 => appleAccountCode,
                     -8 => googleAccountCode,
                     _ => throw new UserErrorException(AccountErrorCode.NOT_FOUND)
