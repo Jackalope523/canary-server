@@ -359,7 +359,7 @@ namespace Frontier.Controllers
 
             public bool IsOperable(long userId)
             {
-                return userId == -7 || userId == -8;
+                return userId == -2 || userId == -7 || userId == -8;
             }
 
             public bool CheckStaticCode(long userId, string code)
