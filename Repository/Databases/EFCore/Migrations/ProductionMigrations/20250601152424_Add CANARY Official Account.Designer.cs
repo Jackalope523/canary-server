@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
@@ -12,9 +13,11 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
     [DbContext(typeof(AzureProductionContext))]
-    partial class AzureProductionContextModelSnapshot : ModelSnapshot
+    [Migration("20250601152424_Add CANARY Official Account")]
+    partial class AddCANARYOfficialAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -628,44 +631,6 @@ namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
                     b.ToTable("Users");
 
                     b.HasData(
-                        new
-                        {
-                            Id = -2L,
-                            AccessTries = 3,
-                            AccountStatus = 0,
-                            Age = 25,
-                            Athleticisme = 50,
-                            Chaos = 50,
-                            CompanionActivity = true,
-                            CompanionshipCode = "",
-                            Competitiveness = 50,
-                            CurrentLocation = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.544 53.483)"),
-                            CurrentRadius = 10.0,
-                            DateOfBirth = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Email = "",
-                            Extroversion = 50,
-                            GatheringActivity = true,
-                            GatheringDiscovery = true,
-                            GatheringReminders = true,
-                            Haunt = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (7.54 53.483)"),
-                            HauntRadius = 10.0,
-                            HauntWeight = 0,
-                            Industriousness = 50,
-                            IsEmailConfirmed = false,
-                            IsPhoneConfirmed = true,
-                            JoinDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Name = "CANARY",
-                            NightOwl = 50,
-                            NormalisedEmail = "",
-                            NotificationId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            Openness = 50,
-                            PhoneNumber = "15734922666",
-                            Reputation = 50,
-                            SecurityStamp = "",
-                            SocialInvitations = true,
-                            SoftDeleted = false,
-                            TimeOfUserAgreement = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
-                        },
                         new
                         {
                             Id = -7L,

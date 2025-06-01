@@ -38,6 +38,15 @@ namespace Repository
                 .HasQueryFilter(u => !u.SoftDeleted);
 
             modelBuilder.Entity<User>()
+               .HasData(new User()
+               {
+                   Id = -2,
+                   PhoneNumber = "15734922666",
+                   Name = "CANARY",
+                   IsPhoneConfirmed = true,
+               });
+
+            modelBuilder.Entity<User>()
                 .HasData(new User()
                 {
                     Id = -7,
