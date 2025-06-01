@@ -52,7 +52,7 @@ namespace Core.Boundaries
     public interface IMessageDatabase
     {
 		Task<CoreConversation> GetConversationAsync(long conversationId);
-		Task<int> GetConversationPageCountAsync(long conversationId);
+		Task<int> GetLastPageNumber(long conversationId);
 
 		Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB);
 		Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB);

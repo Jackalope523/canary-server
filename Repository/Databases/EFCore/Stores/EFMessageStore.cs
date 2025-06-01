@@ -412,7 +412,7 @@ namespace Repository
             return toAdd.Id;
         }
 
-        public async Task<int> GetConversationPageCountAsync(long conversationId)
+        public async Task<int> GetLastPageNumber(long conversationId)
         {
             int messageCount = await storeSentry.ExecuteReadAsync(ctx => 
                                 ctx.Messages.

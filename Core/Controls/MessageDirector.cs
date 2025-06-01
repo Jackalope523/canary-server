@@ -433,7 +433,7 @@ namespace Core.Controls
 
         public async Task<int> RequestConversationPageCountAsync(Conversation conversation)
         {
-            return await Messages.GetConversationPageCountAsync(conversation.Id);
+            return await Messages.GetLastPageNumber(conversation.Id);
         }
 
         public async Task<List<(User, CoreMembership)>> RequestConversationMembersAsync(Conversation conversation)
