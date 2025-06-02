@@ -121,7 +121,7 @@ namespace Repository
                 TimeOfCreation = timeOfCreation
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Gatherings.AddAsync(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Gatherings.Add(toCreate));
 
             GatheringLink hostLink = new() 
             { 

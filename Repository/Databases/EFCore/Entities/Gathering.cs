@@ -4,36 +4,36 @@ namespace Repository
 {
     public class Gathering : Entity
     {
-        public string Title { get; set; } = DefaultTitle;
-        public string Description { get; set; } = DefaultDescription;
-        public DateTimeOffset StartTime { get; set; } = DefaultStartTime;
-        public DateTimeOffset TimeOfCreation { get; set; } = DefaultTimeOfCreation;
-        public long? HostId { get; set; } = DefaultHostId;
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset TimeOfCreation { get; set; }
+        public long? HostId { get; set; }
 
         // X = Longitude Y = Latitude
-        public Point Location { get; set; } = DefaultLocation;
-        public string FriendlyLocation { get; set; } = DefaultFriendlyLocation;
+        public Point Location { get; set; }
+        public string FriendlyLocation { get; set; }
 
-        public GatheringState State { get; set; } = DefaultState;
-        public GatheringVisibility Visibility { get; set; } = DefaultVisibility;
-        public int GroupMinimum { get; set; } = DefaultGroupMinimum;
-        public int GroupMaximum { get; set; } = DefaultGroupMaximum;
+        public GatheringState State { get; set; }
+        public GatheringVisibility Visibility { get; set; }
+        public int GroupMinimum { get; set; }
+        public int GroupMaximum { get; set; }
         public DateTimeOffset? EndTime { get; set; }
-        public double Radius { get; set; } = DefaultRadius;
-        public bool IsDynamic { get; set; } = DefaultIsDynamic;
-        public int NumberOfGuests { get; set; } = DefaultNumberOfGuests;
-        public int DegreeOfPrivacy { get; set; } = DefaultDegreeOfPrivacy;
-        public float Decay { get; set; } = DefaultDecay;
+        public double Radius { get; set; }
+        public bool IsDynamic { get; set; }
+        public int NumberOfGuests { get; set; }
+        public int DegreeOfPrivacy { get; set; }
+        public float Decay { get; set; }
 
         // Vector
-        public int Extroversion { get; init; } = DefaultExtroversion;
-        public int Athleticisme { get; init; } = DefaultAthleticisme;
-        public int Openness { get; init; } = DefaultOpenness;
-        public int Chaos { get; init; } = DefaultChaos;
-        public int Competitiveness { get; init; } = DefaultCompetitiveness;
-        public int Industriousness { get; init; } = DefaultIndustriousness;
-        public int NightOwl { get; init; } = DefaultNightOwl;
-        public int Age { get; init; } = DefaultAge;
+        public int Extroversion { get; init; }
+        public int Athleticisme { get; init; }
+        public int Openness { get; init; }
+        public int Chaos { get; init; }
+        public int Competitiveness { get; init; }
+        public int Industriousness { get; init; }
+        public int NightOwl { get; init; }
+        public int Age { get; init; }
 
         // Navigation Properties
         public User? Host { get; set; }
