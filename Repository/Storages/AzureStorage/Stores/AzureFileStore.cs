@@ -75,7 +75,7 @@ namespace Repository
 
         public async Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image)
         {
-            Guid photoId = new();
+            Guid photoId = Guid.NewGuid();
 
             await sentry.UploadBlobAsync(conversationContainerPrefix + conversationId.ToString(), photoId.ToString() + imageFileSuffix, image);
 
