@@ -87,11 +87,6 @@ namespace Repository
             await sentry.DeleteBlobAsync(conversationContainerPrefix + conversationId.ToString(), photoId.ToString() + imageFileSuffix);
         }
 
-        public async Task<long> GetPhotoConversationIdAsync(Guid photoId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId)
         {
             return await sentry.DownloadBlobAsync(conversationContainerPrefix + conversationId.ToString(), "header" + imageFileSuffix);

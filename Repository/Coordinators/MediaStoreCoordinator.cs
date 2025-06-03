@@ -75,11 +75,6 @@ namespace Repository
             await store.DeletePhotoAsync(conversationId, photoId);
         }
 
-        public async Task<long> GetPhotoConversationIdAsync(Guid photoId)
-        {
-            return await store.GetPhotoConversationIdAsync(photoId);
-        }
-
         public async Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId)
         {
             return await store.DownloadGroupChatHeaderAsync(conversationId);
