@@ -31,7 +31,6 @@ namespace Core.Boundaries
         Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId);
         Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image);
         Task DeletePhotoAsync(long conversationId, Guid photoId);
-        Task<long> GetPhotoConversationIdAsync(Guid photoId);
 
         Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId);
         Task UploadGroupChatHeaderAsync(long conversationId, MemoryStream image);
@@ -51,11 +50,11 @@ namespace Core.Boundaries
         Task<MemoryStream> GetSnapshotAsync(long userId, long snapshotId);
         Task<ImageMetadataShard> GetSnapshotMetadataAsync(long userId, long snapshotId);
 
-        Task<MemoryStream> GetPhotoAsync(long userId, Guid photoId);
-        Task<ImageMetadataShard> GetPhotoMetadataAsync(long userId, Guid photoId);
-
         Task<MemoryStream> GetGroupChatHeaderAsync(long userId, long conversationId);
         Task<ImageMetadataShard> GetGroupChatHeaderMetadataAsync(long userId, long conversationId);
+
+        Task<MemoryStream> GetPhotoAsync(long userId, long conversationId, Guid photoId);
+        Task<ImageMetadataShard> GetPhotoMetadataAsync(long userId, long conversationId, Guid photoId);
     }
 
     #endregion

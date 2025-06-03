@@ -181,11 +181,9 @@ namespace Core.Controls
             return new(await hashSync, shouldConceal);
         }
 
-        public async Task<MemoryStream> GetPhotoAsync(long userId, Guid photoId)
+        public async Task<MemoryStream> GetPhotoAsync(long userId, long conversationId, Guid photoId)
         {
             var user = await GetUserAsync(userId);
-
-            var conversationId = await Media.GetPhotoConversationIdAsync(photoId);
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
@@ -203,11 +201,9 @@ namespace Core.Controls
             return image;
         }
 
-        public async Task<ImageMetadataShard> GetPhotoMetadataAsync(long userId, Guid photoId)
+        public async Task<ImageMetadataShard> GetPhotoMetadataAsync(long userId, long conversationId, Guid photoId)
         {
             var user = await GetUserAsync(userId);
-
-            var conversationId = await Media.GetPhotoConversationIdAsync(photoId);
             var conversation = await GetConversationAsync(conversationId);
 
             Verify(await conversation.HasMember(user),
