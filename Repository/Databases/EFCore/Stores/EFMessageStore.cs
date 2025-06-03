@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Index.HPRtree;
-using Serilog;
-using System.Drawing.Printing;
 
 namespace Repository
 {
@@ -35,7 +32,7 @@ namespace Repository
                         ConversationId = conversationId,
                         UserId = userId,
                         Timestamp = timestamp,
-                        ImageURL = (string)value,
+                        StorageId = (Guid)value
                     };
                     break;
                 case MessageType.ShareGathering:
@@ -209,7 +206,7 @@ namespace Repository
                         toReturn.Add(messageShard with { Value = textMessage.Text });
                         break;
                     case ImageMessage imageMessage:
-                        toReturn.Add(messageShard with { Value = imageMessage.ImageURL });
+                        toReturn.Add(messageShard with { Value = imageMessage.StorageId });
                         break;
                     case GatheringShareMessage gatheringShareMessage:
                         toReturn.Add(messageShard with { Value = gatheringShareMessage.GatheringId });
@@ -419,7 +416,9 @@ namespace Repository
                                 Where(m => m.ConversationId == conversationId).
                                 CountAsync());
 
-            return (messageCount + pageSize - 1) / pageSize;
+            int totalPages = (messageCount + pageSize - 1) / pageSize;
+
+            return Math.Max(0, totalPages - 1);
         }
     }
 }

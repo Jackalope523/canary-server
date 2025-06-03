@@ -456,10 +456,6 @@ namespace Repository
                 .Property(m => m.Text)
                 .HasMaxLength(10000);
 
-            modelBuilder.Entity<ImageMessage>()
-                .Property(m => m.ImageURL)
-                .HasMaxLength(300);
-
             // Chat Links
             modelBuilder.Entity<ChatLink>()
                 .HasQueryFilter(w => !w.SoftDeleted);
