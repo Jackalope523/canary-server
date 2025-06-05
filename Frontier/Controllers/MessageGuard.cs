@@ -35,6 +35,15 @@ namespace Frontier.Controllers
             });
         }
 
+        [HttpGet("announcements")]
+        public async Task<IActionResult> GetAnnouncements(string locale = "en")
+        {
+            return await Execute(async user =>
+            {
+                return await messages.GetAnnouncementsAsync(user.Id, locale);
+            });
+        }
+
         [HttpGet("user/{targetId}")]
         public async Task<IActionResult> GetConversationWith(long targetId)
         {

@@ -31,6 +31,20 @@ namespace Core.Controls
             return conversations.ToList();
         }
 
+        public async Task<ConversationShard> GetAnnouncementsAsync(long userId, string locale)
+        {
+            var user = await GetUserAsync(userId);
+
+            Conversation conversation = new()
+            {
+                Id = -2,
+                Type = ChatType.Broadcast,
+                Title = "CANARY Team",
+            };
+
+            return new ConversationShard(conversation.Id, conversation.Type, 0, conversation.Title);
+        }
+
         public async Task<ConversationShard> GetGatheringConversationAsync(long userId, long gatheringId)
         {
             var user = await GetUserAsync(userId);

@@ -12,6 +12,7 @@ namespace Core.Boundaries
 		Individual,
 		Group,
 		Gathering,
+		Broadcast,
 	}
 
 	public enum MembershipType
@@ -80,6 +81,7 @@ namespace Core.Boundaries
 	public interface IMessageOperations
 	{
 		Task<List<ConversationShard>> GetConversationsAsync(long userId);
+		Task<ConversationShard> GetAnnouncementsAsync(long userId, string locale);
 
 		Task<ConversationShard> GetConversationWithAsync(long userId, long targetId);
 		Task<ConversationShard> GetOrCreateConversationWithAsync(long userId, long targetId);
