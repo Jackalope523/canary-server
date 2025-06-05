@@ -299,9 +299,6 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            var conversationId = await Messages.CreateGroupChatConversationAsync();
-            var conversation = await GetConversationAsync(conversationId);
-
             HashSet<long> uniqueIds = new(participantIds.Append(user.Id));
             
             foreach (var id in uniqueIds)
@@ -311,7 +308,10 @@ namespace Core.Controls
                 // todo checks
             }
 
+            var conversation = await GetConversationAsync(await Messages.CreateGroupChatConversationAsync());
+
             await Messages.AddUsersToConversationAsync(conversation.Id, uniqueIds.ToArray());
+            await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.Type), MembershipType.Owner) });
 
             return await conversation.ToConversationShard();
         }
