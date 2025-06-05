@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Core.Boundaries;
 using Core.Entities;
@@ -299,13 +300,20 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
 
             var conversationId = await Messages.CreateGroupChatConversationAsync();
+            var conversation = await GetConversationAsync(conversationId);
 
-            // todo only add applicable users
-            // remove dupes
+            HashSet<long> uniqueIds = new(participantIds.Append(user.Id));
+            
+            foreach (var id in uniqueIds)
+            {
+                var target = await GetUserAsync(id);
 
-            var newConversation = await GetConversationAsync(conversationId);
+                // todo checks
+            }
 
-            return await newConversation.ToConversationShard();
+            await Messages.AddUsersToConversationAsync(conversation.Id, uniqueIds.ToArray());
+
+            return await conversation.ToConversationShard();
         }
 
         public async Task EditGroupChatAsync(long userId, long conversationId,
