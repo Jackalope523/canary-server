@@ -147,6 +147,10 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
+            // todo temp because don't want to track individual seens
+            if (conversation.Type == ChatType.Broadcast)
+            { return; }
+
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
@@ -472,6 +476,11 @@ namespace Core.Controls
         public async Task<List<MessageShard>> RequestConversationMessagesAsync(Conversation conversation, int page)
         {
             return await Messages.GetMessagesForConversationAsync(conversation.Id, page);
+        }
+
+        public async Task<MessageShard> RequestLastMessageAsync(Conversation conversation)
+        {
+            return await Messages.GetLastMessageAsync(conversation.Id);
         }
 
         public async Task SendClientMessageAsync(Conversation conversation, MessageShard message, params User[] users)

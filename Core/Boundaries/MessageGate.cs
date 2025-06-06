@@ -75,6 +75,7 @@ namespace Core.Boundaries
 		Task RemoveUserFromConversationAsync(long conversationId, long userId);
 
 		Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber);
+		Task<MessageShard> GetLastMessageAsync(long conversationId);
         Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value);
     }
 
