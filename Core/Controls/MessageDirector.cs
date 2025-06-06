@@ -176,6 +176,9 @@ namespace Core.Controls
             Verify(await conversation.HasMember(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
+            FailIf(string.IsNullOrWhiteSpace(text),
+                new UserErrorException(ConversationErrorCode.EMPTY_MESSAGE));
+
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Text, text);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);

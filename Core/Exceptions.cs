@@ -194,6 +194,8 @@ namespace Core.Exceptions
 
     public enum ConversationErrorCode
     {
+        EMPTY_MESSAGE,
+
         NOT_MEMBER,
         NOT_GROUP_CHAT,
 
