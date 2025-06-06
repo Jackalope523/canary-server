@@ -106,8 +106,10 @@ namespace Core.Entities
             issues = "";
 
             // Sanitise
-            Title = ContentValidation.NormaliseText(Title, MaximumTitleLength);
-            if (string.IsNullOrEmpty(Title)) { issues += "Title cannot be empty. "; }
+            if (!string.IsNullOrEmpty(Title))
+            {
+                Title = ContentValidation.NormaliseText(Title, MaximumTitleLength);
+            }
 
             return issues.Equals("");
         }
