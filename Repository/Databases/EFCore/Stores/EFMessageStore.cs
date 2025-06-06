@@ -71,6 +71,15 @@ namespace Repository
                         ProfileId = (long)value
                     };
                     break;
+                case MessageType.Activity:
+                    toAdd = new ActivityMessage()
+                    {
+                        ConversationId = conversationId,
+                        UserId = userId,
+                        Timestamp = timestamp,
+                        ActivityType = (ActivityMessageType)value
+                    };
+                    break;
                 default:
                     throw new InvalidInputException("Message of type \"" + type.ToString() + "\" is not supported in this method.");
             }
@@ -219,6 +228,9 @@ namespace Repository
                         break;
                     case SnapshotMessage snapshotMessage:
                         toReturn.Add(messageShard with { Value = snapshotMessage.SnapshotId });
+                        break;
+                    case ActivityMessage activityMessage:
+                        toReturn.Add(messageShard with { Value = activityMessage.ActivityType });
                         break;
                     default:
                         throw new ArgumentException("Message of type " + message.GetType().Name + " is not supported by this method.");
@@ -419,6 +431,36 @@ namespace Repository
             int totalPages = (messageCount + pageSize - 1) / pageSize;
 
             return Math.Max(0, totalPages - 1);
+        }
+
+        public async Task<MessageShard> GetLastMessageAsync(long conversationId)
+        {
+            Message? message =  await storeSentry.ExecuteReadAsync(ctx => 
+                                    ctx.Messages
+                                    .Where(m => m.ConversationId == conversationId)
+                                    .OrderByDescending(m => m.Timestamp)
+                                    .FirstOrDefaultAsync());
+
+            MessageShard messageShard = new(message.Id, message.UserId ?? 0, message.Timestamp, message.Type, null);
+            switch (message)
+            {
+                case TextMessage textMessage:
+                    return messageShard with { Value = textMessage.Text };
+                case ImageMessage imageMessage:
+                    return messageShard with { Value = imageMessage.StorageId };
+                case GatheringShareMessage gatheringShareMessage:
+                    return messageShard with { Value = gatheringShareMessage.GatheringId };
+                case GatheringInviteMessage gatheringInviteMessage:
+                    return messageShard with { Value = gatheringInviteMessage.GatheringId };
+                case ProfileMessage profileMessage:
+                    return messageShard with { Value = profileMessage.ProfileId };
+                case SnapshotMessage snapshotMessage:
+                    return messageShard with { Value = snapshotMessage.SnapshotId };
+                case ActivityMessage activityMessage:
+                    return messageShard with { Value = activityMessage.ActivityType };
+                default:
+                    throw new ArgumentException("Message of type " + message.GetType().Name + " is not supported by this method.");
+            }
         }
     }
 }

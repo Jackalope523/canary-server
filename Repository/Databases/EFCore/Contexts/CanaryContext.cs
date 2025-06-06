@@ -46,6 +46,15 @@ namespace Repository
                 .HasQueryFilter(u => !u.SoftDeleted);
 
             modelBuilder.Entity<User>()
+              .HasData(new User()
+              {
+                  Id = -2,
+                  PhoneNumber = "15734922666",
+                  Name = "CANARY",
+                  IsPhoneConfirmed = true,
+
+              });
+            modelBuilder.Entity<User>()
                 .HasData(new User()
                 {
                     Id = -7,
@@ -429,7 +438,15 @@ namespace Repository
                .HasDiscriminator<ChatType>("Type")
                .HasValue<PrivateChat>(ChatType.Individual)
                .HasValue<GroupChat>(ChatType.Group)
-               .HasValue<GatheringChat>(ChatType.Gathering);
+               .HasValue<GatheringChat>(ChatType.Gathering)
+               .HasValue<BroadcastChat>(ChatType.Broadcast);
+
+            modelBuilder.Entity<BroadcastChat>()
+                .HasData(new BroadcastChat()
+                {
+                    Id = -2,
+                    Type = ChatType.Broadcast,
+                });
 
             // Messages
             modelBuilder.Entity<Message>()
@@ -459,6 +476,16 @@ namespace Repository
             // Chat Links
             modelBuilder.Entity<ChatLink>()
                 .HasQueryFilter(w => !w.SoftDeleted);
+
+            modelBuilder.Entity<ChatLink>()
+                .HasData(new ChatLink()
+                {
+                    Id = -2,
+                    UserId = -2,
+                    ConversationId = -2,
+                    Type = MembershipType.Owner,
+                    Muted = false,
+                });
 
             // Connections
             modelBuilder.Entity<Connection>()

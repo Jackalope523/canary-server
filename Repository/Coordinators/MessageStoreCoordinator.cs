@@ -11,89 +11,94 @@ namespace Repository
             store = new EFMessageStore(flag);
         }
 
-        public async Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
+        public Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value)
         {
-            return await store.AddMessageAsync(conversationId, userId, timestamp, type, value);
+            return store.AddMessageAsync(conversationId, userId, timestamp, type, value);
         }
 
-        public async Task AddUsersToConversationAsync(long conversationId, params long[] userIds)
+        public Task AddUsersToConversationAsync(long conversationId, params long[] userIds)
         {
-            await store.AddUsersToConversationAsync(conversationId, userIds);
+            return store.AddUsersToConversationAsync(conversationId, userIds);
         }
 
-        public async Task<long> CreateGroupChatConversationAsync(string title = null)
+        public Task<long> CreateGroupChatConversationAsync(string title = null)
         {
-            return await store.CreateGroupChatConversationAsync(title);
+            return store.CreateGroupChatConversationAsync(title);
         }
 
-        public async Task DeleteConversationAsync(long conversationId)
+        public Task DeleteConversationAsync(long conversationId)
         {
-            await store.DeleteConversationAsync(conversationId);
+            return store.DeleteConversationAsync(conversationId);
         }
 
-        public async Task<bool> GatheringConversationExists(long gatheringId)
+        public Task<bool> GatheringConversationExists(long gatheringId)
         {
-            return await store.GatheringConversationExists(gatheringId);
+            return store.GatheringConversationExists(gatheringId);
         }
 
-        public async Task<CoreConversation> GetConversationAsync(long conversationId)
+        public Task<CoreConversation> GetConversationAsync(long conversationId)
         {
-            return await store.GetConversationAsync(conversationId);
+            return store.GetConversationAsync(conversationId);
         }
 
-        public async Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId)
+        public Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId)
         {
-            return await store.GetConversationMembersAsync(conversationId);
+            return store.GetConversationMembersAsync(conversationId);
         }
 
-        public async Task<int> GetLastPageNumber(long conversationId)
+        public Task<int> GetLastPageNumber(long conversationId)
         {
-            return await store.GetLastPageNumber(conversationId);
+            return store.GetLastPageNumber(conversationId);
         }
 
-        public async Task<List<CoreConversation>> GetConversationsForUserAsync(long userId)
+        public Task<List<CoreConversation>> GetConversationsForUserAsync(long userId)
         {
-            return await store.GetConversationsForUserAsync(userId);
+            return store.GetConversationsForUserAsync(userId);
         }
 
-        public async Task<CoreMembership> GetMembershipAsync(long conversationId, long userId)
+        public Task<CoreMembership> GetMembershipAsync(long conversationId, long userId)
         {
-            return await store.GetMembershipAsync(conversationId, userId);
+            return store.GetMembershipAsync(conversationId, userId);
         }
 
-        public async Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber)
+        public Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber)
         {
-            return await store.GetMessagesForConversationAsync(conversationId, pageNumber);
+            return store.GetMessagesForConversationAsync(conversationId, pageNumber);
         }
 
-        public async Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId)
+        public Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId)
         {
-            return await store.GetOrCreateGatheringConversation(gatheringId);
+            return store.GetOrCreateGatheringConversation(gatheringId);
         }
 
-        public async Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
+        public Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
         {
-            return await store.GetOrCreateIndividualConversationBetween(userIdA, userIdB);
+            return store.GetOrCreateIndividualConversationBetween(userIdA, userIdB);
         }
 
-        public async Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB)
+        public Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB)
         {
-            return await store.IndividualConversationBetweenExists(userIdA, userIdB);
+            return store.IndividualConversationBetweenExists(userIdA, userIdB);
         }
 
-        public async Task RemoveUserFromConversationAsync(long conversationId, long userId)
+        public Task RemoveUserFromConversationAsync(long conversationId, long userId)
         {
-            await store.RemoveUserFromConversationAsync(conversationId, userId);
+            return store.RemoveUserFromConversationAsync(conversationId, userId);
         }
 
-        public async Task UpdateConversationAsync(long conversationId, List<(string Property, object Value)> edits)
+        public Task UpdateConversationAsync(long conversationId, List<(string Property, object Value)> edits)
         {
-            await store.UpdateConversationAsync(conversationId, edits);
+            return store.UpdateConversationAsync(conversationId, edits);
         }
 
-        public async Task UpdateMembershipAsync(long conversationId, long userId, List<(string Property, object Value)> edits)
+        public Task UpdateMembershipAsync(long conversationId, long userId, List<(string Property, object Value)> edits)
         {
-            await store.UpdateMembershipAsync(conversationId, userId, edits);
+            return store.UpdateMembershipAsync(conversationId, userId, edits);
+        }
+
+        public Task<MessageShard> GetLastMessageAsync(long conversationId)
+        {
+            return store.GetLastMessageAsync(conversationId);
         }
     }
 }
