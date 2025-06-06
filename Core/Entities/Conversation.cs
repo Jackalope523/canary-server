@@ -135,6 +135,9 @@ namespace Core.Entities
 
         public async Task<bool> HasMember(User user)
         {
+            if (Type == ChatType.Broadcast)
+            { return true; }
+
             // Check if user is affiliated with conversation
             return (await Members).Exists(u => u.User.Equals(user));
         }
