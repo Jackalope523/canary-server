@@ -113,7 +113,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(await conversation.HasMember(user),
+            Verify(await conversation.VisibleTo(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             return await conversation.ToConversationShard();
@@ -124,7 +124,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(await conversation.HasMember(user),
+            Verify(await conversation.VisibleTo(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             return (await conversation.Members)
@@ -136,7 +136,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            Verify(await conversation.HasMember(user),
+            Verify(await conversation.VisibleTo(user),
                 new UserErrorException(ConversationErrorCode.NOT_MEMBER));
 
             return await conversation.Messages.Value(pageNumber);
@@ -147,7 +147,7 @@ namespace Core.Controls
             var user = await GetUserAsync(userId);
             var conversation = await GetConversationAsync(conversationId);
 
-            // todo temp because don't want to track individual seens
+            // We don't want to track individual seens
             if (conversation.Type == ChatType.Broadcast)
             { return; }
 
