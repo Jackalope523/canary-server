@@ -142,11 +142,16 @@ namespace Core.Entities
 			return false;
         }
 
-        public async Task<bool> HasMember(User user)
+        public async Task<bool> VisibleTo(User user)
         {
             if (Type == ChatType.Broadcast)
             { return true; }
 
+            return await HasMember(user);
+        }
+
+        public async Task<bool> HasMember(User user)
+        {
             // Check if user is affiliated with conversation
             return (await Members).Exists(u => u.User.Equals(user));
         }
