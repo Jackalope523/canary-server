@@ -462,5 +462,12 @@ namespace Repository
                     throw new ArgumentException("Message of type " + message.GetType().Name + " is not supported by this method.");
             }
         }
+
+        public Task<int> GetMessageCountSinceAsync(long conversationId, DateTimeOffset timestamp)
+        {
+            return storeSentry.ExecuteReadAsync(ctx => 
+                    ctx.Messages
+                    .CountAsync(m => m.ConversationId == conversationId && m.Timestamp >= timestamp));
+        }
     }
 }
