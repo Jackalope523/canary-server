@@ -433,7 +433,7 @@ namespace Repository
             return Math.Max(0, totalPages - 1);
         }
 
-        public async Task<MessageShard> GetLastMessageAsync(long conversationId)
+        public async Task<MessageShard> GetCountMessagesSinceAsync(long conversationId)
         {
             Message? message =  await storeSentry.ExecuteReadAsync(ctx => 
                                     ctx.Messages

@@ -86,24 +86,22 @@ namespace Core.Entities
 
             var userMembership = (await Members).Find(member => member.User.Equals(relativeTo));
 
-            var lastMessage = await Terminal.MessageDirector.RequestLastMessageAsync(this);
-            var lastRead = userMembership.Membership.LastSeen;
-            var hasUnread = lastRead < lastMessage.Timestamp;
+            var lastSeen = userMembership.Membership.LastSeen;
+            var unreadCount = await Terminal.MessageDirector.RequestMessageCountSinceAsync(this, lastSeen);
 
             return new(Id, Type, await PageCount, Title, GatheringId,
                 IsMuted: userMembership.Membership.IsMuted,
-                HasUnread: hasUnread);
+                Unread: unreadCount);
         }
 
         public async Task<ConversationShard> ToConversationShard(CoreMembership relativeTo)
         {
-            var lastMessage = await Terminal.MessageDirector.RequestLastMessageAsync(this);
-            var lastRead = relativeTo.LastSeen;
-            var hasUnread = lastRead < lastMessage.Timestamp;
+            var lastSeen = relativeTo.LastSeen;
+            var unreadCount = await Terminal.MessageDirector.RequestMessageCountSinceAsync(this, lastSeen);
 
             return new(Id, Type, await PageCount, Title, GatheringId,
                 IsMuted: relativeTo.IsMuted,
-                HasUnread: hasUnread);
+                Unread: unreadCount);
         }
 
 		#endregion

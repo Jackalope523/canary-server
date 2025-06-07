@@ -9,6 +9,7 @@ using System.Linq;
 using static Core.Entities.Arbiter;
 using static Core.Entities.Psijic;
 using static Core.Entities.Smithing;
+using System;
 
 namespace Core.Controls
 {
@@ -481,9 +482,9 @@ namespace Core.Controls
             return await Messages.GetMessagesForConversationAsync(conversation.Id, page);
         }
 
-        public async Task<MessageShard> RequestLastMessageAsync(Conversation conversation)
+        public async Task<int> RequestMessageCountSinceAsync(Conversation conversation, DateTimeOffset timestamp)
         {
-            return await Messages.GetLastMessageAsync(conversation.Id);
+            return await Messages.GetMessageCountSinceAsync(conversation.Id, timestamp);
         }
 
         public async Task SendClientMessageAsync(Conversation conversation, MessageShard message, params User[] users)

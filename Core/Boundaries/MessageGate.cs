@@ -37,8 +37,8 @@ namespace Core.Boundaries
 
 	public record CoreConversation(long Id, ChatType Type, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
-	public record ConversationShard(long Id, ChatType Type, int PageCount, string Title = default,
-		long? GatheringId = null, bool? IsMuted = null, bool? HasUnread = null);
+	public record ConversationShard(long Id, ChatType Type, int LastPage, string Title = default,
+		long? GatheringId = null, bool? IsMuted = null, int? Unread = null);
 
 	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted)
 		: CoreOnlyData();
@@ -75,7 +75,7 @@ namespace Core.Boundaries
 		Task RemoveUserFromConversationAsync(long conversationId, long userId);
 
 		Task<List<MessageShard>> GetMessagesForConversationAsync(long conversationId, int pageNumber);
-		Task<MessageShard> GetLastMessageAsync(long conversationId);
+		Task<int> GetMessageCountSinceAsync(long conversationId, DateTimeOffset timestamp);
         Task<MessageShard> AddMessageAsync(long conversationId, long userId, DateTimeOffset timestamp, MessageType type, object value);
     }
 

@@ -96,9 +96,9 @@ namespace Repository
             return store.UpdateMembershipAsync(conversationId, userId, edits);
         }
 
-        public Task<MessageShard> GetLastMessageAsync(long conversationId)
+        public Task<MessageShard> GetCountMessagesSinceAsync(long conversationId)
         {
-            return store.GetLastMessageAsync(conversationId);
+            return store.GetCountMessagesSinceAsync(conversationId);
         }
     }
 }
