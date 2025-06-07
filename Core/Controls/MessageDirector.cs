@@ -184,6 +184,8 @@ namespace Core.Controls
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
 
+            await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.LastSeen), Time) });
+
             return message;
         }
 
@@ -201,6 +203,8 @@ namespace Core.Controls
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
 
+            await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.LastSeen), Time) });
+
             return message;
         }
 
@@ -217,6 +221,8 @@ namespace Core.Controls
             var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.GatheringInvite, gathering.Id);
 
             _ = conversation.MessageOrNotifyOthersAsync(user, message);
+
+            await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.LastSeen), Time) });
 
             return message;
         }
@@ -243,6 +249,8 @@ namespace Core.Controls
             }
 
             _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
+
+            await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.LastSeen), Time) });
 
             return messages.ToArray();
         }
@@ -274,6 +282,8 @@ namespace Core.Controls
 
             _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
 
+            await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.LastSeen), Time) });
+
             return messages.ToArray();
         }
 
@@ -299,6 +309,8 @@ namespace Core.Controls
             }
 
             _ = conversation.BulkMessageOrNotifyOthersAsync(user, messages);
+
+            await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.LastSeen), Time) });
 
             return messages.ToArray();
         }
