@@ -21,9 +21,9 @@ namespace Repository
             return store.AddUsersToConversationAsync(conversationId, userIds);
         }
 
-        public Task<long> CreateGroupChatConversationAsync(string title = null)
+        public Task<long> CreateGroupChatConversationAsync(string title = null, DateTimeOffset currentTime)
         {
-            return store.CreateGroupChatConversationAsync(title);
+            return store.CreateGroupChatConversationAsync(title, currentTime);
         }
 
         public Task DeleteConversationAsync(long conversationId)
@@ -66,14 +66,14 @@ namespace Repository
             return store.GetMessagesForConversationAsync(conversationId, pageNumber);
         }
 
-        public Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId)
+        public Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId, DateTimeOffset currentTime)
         {
-            return store.GetOrCreateGatheringConversation(gatheringId);
+            return store.GetOrCreateGatheringConversation(gatheringId, currentTime);
         }
 
-        public Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
+        public Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB, DateTimeOffset currentTime)
         {
-            return store.GetOrCreateIndividualConversationBetween(userIdA, userIdB);
+            return store.GetOrCreateIndividualConversationBetween(userIdA, userIdB, currentTime);
         }
 
         public Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB)

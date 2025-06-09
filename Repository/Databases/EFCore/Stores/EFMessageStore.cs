@@ -138,7 +138,7 @@ namespace Repository
             string? title = conversation.Type == ChatType.Group ? ((GroupChat)conversation).Title : null;
             long gatheringId = conversation.Type == ChatType.Gathering ? ((GatheringChat)conversation).GatheringId : 0;
 
-            return new CoreConversation(conversation.Id, conversation.Type, title, gatheringId);
+            return new CoreConversation(conversation.Id, conversation.Type, conversation.CreatedAt, title, gatheringId);
         }
 
         public async Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId)
@@ -166,7 +166,7 @@ namespace Repository
             List<CoreConversation> toReturn = new();
             foreach (Chat conversation in conversations)
             {
-                CoreConversation coreConversation = new(conversation.Id, conversation.Type, null, 0);
+                CoreConversation coreConversation = new(conversation.Id, conversation.Type, conversation.CreatedAt, null, 0);
                 switch (conversation)
                 {
                     case PrivateChat privateChat:
@@ -302,21 +302,21 @@ namespace Repository
             await storeSentry.EndDiscussionAsync(currentDiscussion);
         }
 
-        public async Task<long> CreateGroupChatConversationAsync(ChatType type, string title)
+        public async Task<long> CreateGroupChatConversationAsync(ChatType type, string title, DateTimeOffset currentTime)
         {
             if (type != ChatType.Group)
             {
                 throw new ArgumentException("Message of type " + type.ToString() + " is not supported by this method.");
             }
 
-            GroupChat toAdd = new() { Title = title, Type = type };
+            GroupChat toAdd = new() { Title = title, Type = type, CreatedAt = currentTime};
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.GroupChats.Add(toAdd));
 
             return toAdd.Id;
         }
 
-        public async Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB)
+        public async Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB, DateTimeOffset currentTime)
         {
             List<CoreConversation> conversations = await storeSentry.ExecuteReadAsync(ctx => 
                 ctx.PrivateChats.
@@ -324,7 +324,7 @@ namespace Repository
                     ctx.ChatLinks.Where(l => l.UserId == userIdA || l.UserId == userIdB),
                     c => c.Id,
                     m => m.ConversationId,
-                    (c, m) => new CoreConversation(c.Id, c.Type, null, 0)
+                    (c, m) => new CoreConversation(c.Id, c.Type, c.CreatedAt, null, 0)
                 ).
                 ToListAsync());
 
@@ -341,7 +341,7 @@ namespace Repository
                 }
             }
 
-            PrivateChat toAdd = new() { Type = ChatType.Individual };
+            PrivateChat toAdd = new() { Type = ChatType.Individual, CreatedAt = currentTime };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.PrivateChats.Add(toAdd));
 
@@ -350,7 +350,7 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.ChatLinks.AddRange(membershipA, membershipB));
 
-            return new CoreConversation(toAdd.Id, toAdd.Type);
+            return new CoreConversation(toAdd.Id, toAdd.Type, toAdd.CreatedAt);
         }
 
         public async Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB)
@@ -361,7 +361,7 @@ namespace Repository
                     ctx.ChatLinks.Where(l => l.UserId == userIdA || l.UserId == userIdB),
                     c => c.Id,
                     l => l.ConversationId,
-                    (c, l) => new CoreConversation(c.Id, c.Type, null, 0)
+                    (c, l) => new CoreConversation(c.Id, c.Type, c.CreatedAt, null, 0)
                 ).
                 ToListAsync());
 
@@ -379,12 +379,12 @@ namespace Repository
             return chatId != 0;
         }
 
-        public async Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId)
+        public async Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId, DateTimeOffset currentTime)
         {
             CoreConversation? conversation = await storeSentry.ExecuteReadAsync(ctx =>
                ctx.GatheringChats.
                Where(c => c.GatheringId == gatheringId).
-               Select(c => new CoreConversation(c.Id, c.Type, null, c.GatheringId)).
+               Select(c => new CoreConversation(c.Id, c.Type, c.CreatedAt, null, c.GatheringId)).
                SingleOrDefaultAsync());
 
             if (conversation != null)
@@ -392,7 +392,7 @@ namespace Repository
                 return conversation;
             }
 
-            GatheringChat toAdd = new() { Type = ChatType.Gathering, GatheringId = gatheringId };
+            GatheringChat toAdd = new() { Type = ChatType.Gathering, CreatedAt = currentTime, GatheringId = gatheringId };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.GatheringChats.Add(toAdd));
 
@@ -409,12 +409,12 @@ namespace Repository
             }
             await storeSentry.ExecuteWriteAsync(ctx => ctx.ChatLinks.AddRange(links));
 
-            return new CoreConversation(toAdd.Id, toAdd.Type, null, toAdd.GatheringId);
+            return new CoreConversation(toAdd.Id, toAdd.Type, toAdd.CreatedAt, null, toAdd.GatheringId);
         }
 
-        public async Task<long> CreateGroupChatConversationAsync(string title)
+        public async Task<long> CreateGroupChatConversationAsync(string title, DateTimeOffset currentTime)
         {
-            GroupChat toAdd = new() { Type = ChatType.Group, Title = title };
+            GroupChat toAdd = new() { Type = ChatType.Group, Title = title, CreatedAt = currentTime };
 
             await storeSentry.ExecuteWriteAsync(ctx => ctx.GroupChats.Add(toAdd));
 

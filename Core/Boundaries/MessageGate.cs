@@ -56,12 +56,12 @@ namespace Core.Boundaries
 		Task<int> GetLastPageNumber(long conversationId);
 
 		Task<bool> IndividualConversationBetweenExists(long userIdA, long userIdB);
-		Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB);
+		Task<CoreConversation> GetOrCreateIndividualConversationBetween(long userIdA, long userIdB, DateTimeOffset currentTime);
 
 		Task<bool> GatheringConversationExists(long gatheringId);
-		Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId);
+		Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId, DateTimeOffset currentTime);
 
-		Task<long> CreateGroupChatConversationAsync(string title = default);
+		Task<long> CreateGroupChatConversationAsync(string title = default, DateTimeOffset currentTime);
 
 		Task<List<CoreConversation>> GetConversationsForUserAsync(long userId);
 		Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId);
