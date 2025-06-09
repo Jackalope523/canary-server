@@ -44,7 +44,7 @@ namespace Core.Boundaries
     public interface ISnapshotOperations
     {
         Task<SnapshotShard> GetSnapshotAsync(long userId, long snapshotId);
-        Task<GalleryShard> GetGalleryAsync(long userId, long targetId, long gatheringId);
+        Task<GalleryShard> GetGalleryAsync(long userId, long gatheringId);
         Task<SnapshotShard> AddSnapshotAsync(long userId, long gatheringId, MemoryStream image);
         Task DeleteSnapshotAsync(long userId, long snapshotId);
         Task AcclaimSnapshotAsync(long userId, long snapshotId, SnapshotAcclaim acclaim);
