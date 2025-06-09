@@ -35,7 +35,7 @@ namespace Core.Boundaries
 	public enum ActivityMessageType
 	{ }
 
-	public record CoreConversation(long Id, ChatType Type, string Title = default, long? GatheringId = null)
+	public record CoreConversation(long Id, ChatType Type, DateTimeOffset DateCreated, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
 	public record ConversationShard(long Id, ChatType Type, int LastPage, string Title = default,
 		long? GatheringId = null, bool? IsMuted = null, int? Unread = null);

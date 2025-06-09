@@ -34,6 +34,7 @@ namespace Core.Entities
 
         public long Id { get; init; }
         public ChatType Type { get; init; }
+        public DateTimeOffset DateCreated { get; init; }
         public string Title { get; set; }
 
         public long? GatheringId { get; init; }
@@ -65,13 +66,14 @@ namespace Core.Entities
         {
             Id = fromConversation.Id;
             Type = fromConversation.Type;
+            DateCreated = fromConversation.DateCreated;
             Title = fromConversation.Title;
             GatheringId = fromConversation.GatheringId;
         }
 
         public CoreConversation ToCoreConversation()
         {
-            return new(Id, Type, Title);
+            return new(Id, Type, DateCreated, Title);
         }
 
         public async Task<ConversationShard> ToConversationShard()
