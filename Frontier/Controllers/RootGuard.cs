@@ -30,7 +30,11 @@ namespace Frontier.Controllers
 		[HttpGet("req")]
 		public IActionResult CanaryMinimumVersion()
 		{
-			return Ok(new CanaryDetailsManifest() { MinimumVersion = "2.0.0" });
+			return Ok(new CanaryDetailsManifest() {
+				MinimumVersion = "3.0.0",
+				ServerVersion = "RoyalFrost",
+				PageSize = 10,
+			});
 		}
 
 		[HttpPost("feedback")]
