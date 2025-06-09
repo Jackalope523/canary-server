@@ -567,7 +567,7 @@ namespace Core.Controls
 			Verify(await inviter.IsCompanionsWith(invitee),
 				new UserErrorException(GatheringErrorCode.CANNOT_INVITE_NEUTRAL));
 
-			Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(inviter.Id, invitee.Id));
+			Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(inviter.Id, invitee.Id, Time));
             var message = await Messages.AddMessageAsync(conversation.Id, inviter.Id, Time, MessageType.GatheringInvite, gathering.Id);
 
             _ = conversation.MessageOrNotifyOthersAsync(inviter, message);

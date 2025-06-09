@@ -60,7 +60,7 @@ namespace Core.Controls
 
             if (exists)
             {
-                conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id));
+                conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id, Time));
             }
 
             return await conversation.ToConversationShard();
@@ -73,7 +73,7 @@ namespace Core.Controls
 
             // todo checks
 
-            Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id));
+            Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id, Time));
 
             return await conversation.ToConversationShard();
         }
@@ -91,7 +91,7 @@ namespace Core.Controls
 
             if (exists)
             {
-                conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id));
+                conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id, Time));
             }
 
             return await conversation.ToConversationShard();
@@ -104,7 +104,7 @@ namespace Core.Controls
 
             // todo checks
 
-            Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id));
+            Conversation conversation = new(await Messages.GetOrCreateIndividualConversationBetween(user.Id, target.Id, Time));
 
             return await conversation.ToConversationShard();
         }
@@ -328,7 +328,7 @@ namespace Core.Controls
                 // todo checks
             }
 
-            var conversation = await GetConversationAsync(await Messages.CreateGroupChatConversationAsync());
+            var conversation = await GetConversationAsync(await Messages.CreateGroupChatConversationAsync(Time));
 
             await Messages.AddUsersToConversationAsync(conversation.Id, uniqueIds.ToArray());
             await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.Type), MembershipType.Owner) });
