@@ -92,7 +92,7 @@ namespace Core.Entities
             var unreadCount = await Terminal.MessageDirector.RequestMessageCountSinceAsync(this, lastSeen);
 
             return new(Id, Type, await PageCount, Title, GatheringId,
-                IsMuted: userMembership.Membership.IsMuted,
+                Muted: userMembership.Membership.Muted,
                 Unread: unreadCount);
         }
 
@@ -102,7 +102,7 @@ namespace Core.Entities
             var unreadCount = await Terminal.MessageDirector.RequestMessageCountSinceAsync(this, lastSeen);
 
             return new(Id, Type, await PageCount, Title, GatheringId,
-                IsMuted: relativeTo.IsMuted,
+                Muted: relativeTo.Muted,
                 Unread: unreadCount);
         }
 
@@ -190,7 +190,7 @@ namespace Core.Entities
             if (offlineMembers.Any())
             {
                 var subscribedMembers = offlineMembers
-                    .Where(member => !member.Membership.IsMuted)
+                    .Where(member => !member.Membership.Muted)
                     .Select(u => u.User)
                     .ToArray();
 
@@ -222,7 +222,7 @@ namespace Core.Entities
             if (offlineMembers.Any())
             {
                 var subscribedMembers = offlineMembers
-                    .Where(member => !member.Membership.IsMuted)
+                    .Where(member => !member.Membership.Muted)
                     .Select(u => u.User)
                     .ToArray();
 

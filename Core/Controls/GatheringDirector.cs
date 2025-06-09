@@ -418,6 +418,14 @@ namespace Core.Controls
 
 				_ = User.NotifyAll(CanaryNotification.CompanionJoined(user.ToUserShard(), await gathering.ToGatheringShard()), users: activeCompanions.ToArray());
             }
+
+			// Add member to chat
+			if (await Messages.GatheringConversationExists(gathering.Id))
+			{
+				var conversation = await Messages.GetOrCreateGatheringConversation(gathering.Id, Time);
+
+				await Messages.AddUsersToConversationAsync(conversation.Id, user.Id);
+			}
 		}
 
 		public async Task LeaveGatheringAsync(long userId, long gatheringId)
@@ -449,7 +457,15 @@ namespace Core.Controls
 
             // Cancel scheduled notifications
             _ = CancelScheduledNotificationsForGuest(gathering, user);
-		}
+
+            // Remove member from chat
+            if (await Messages.GatheringConversationExists(gathering.Id))
+            {
+                var conversation = await Messages.GetOrCreateGatheringConversation(gathering.Id, Time);
+
+                await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
+            }
+        }
 
 		public async Task<List<GuestListBondPair>>
 			GetGuestListAsync(long userId, long gatheringId)
@@ -576,7 +592,7 @@ namespace Core.Controls
         public async Task KickUserAsync(long hostId, long targetId, long gatheringId)
 		{
 			var host = await GetUserAsync(hostId);
-			var targetUser = await GetUserAsync(targetId);
+			var target = await GetUserAsync(targetId);
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify kicking user is the host
@@ -584,21 +600,29 @@ namespace Core.Controls
 				new UserErrorException(GatheringErrorCode.CANNOT_KICK_PERMISSION));
 
 			// Verify host is not kicking themself
-			FailIf(host.Equals(targetUser),
+			FailIf(host.Equals(target),
 				new UserErrorException(GatheringErrorCode.CANNOT_KICK_SELF));
 
 			// Kick target user from gathering
-			await Gatherings.SetUserStateAsync(targetUser.Id, gathering.Id, GatheringBond.Kicked, Time);
+			await Gatherings.SetUserStateAsync(target.Id, gathering.Id, GatheringBond.Kicked, Time);
 
 			// Remove target user's snapshots from gathering
 			foreach (SnapshotShard snapshot in await gathering.Snapshots)
 			{
-				if (targetUser.Taken(snapshot))
+				if (target.Taken(snapshot))
 				{ _ = Snapshots.SoftDeleteAsync(snapshot.Id); }
 			}
 
             // Cancel any scheduled notifications
-            _ = CancelScheduledNotificationsForGuest(gathering, targetUser);
+            _ = CancelScheduledNotificationsForGuest(gathering, target);
+
+            // Remove member from chat
+            if (await Messages.GatheringConversationExists(gathering.Id))
+            {
+                var conversation = await Messages.GetOrCreateGatheringConversation(gathering.Id, Time);
+
+                await Messages.RemoveUserFromConversationAsync(conversation.Id, target.Id);
+            }
         }
 
 		public async Task<bool> AuthorisedToJoin(long userId, long gatheringId)

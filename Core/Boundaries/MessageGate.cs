@@ -38,9 +38,9 @@ namespace Core.Boundaries
 	public record CoreConversation(long Id, ChatType Type, DateTimeOffset DateCreated, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
 	public record ConversationShard(long Id, ChatType Type, int LastPage, string Title = default,
-		long? GatheringId = null, bool? IsMuted = null, int? Unread = null);
+		long? GatheringId = null, bool? Muted = null, int? Unread = null);
 
-	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted)
+	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool Muted)
 		: CoreOnlyData();
 	public record MembershipShard(long UserId, MembershipType Type, DateTimeOffset LastSeen);
 
