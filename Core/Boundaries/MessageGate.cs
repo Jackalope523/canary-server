@@ -61,7 +61,7 @@ namespace Core.Boundaries
 		Task<bool> GatheringConversationExists(long gatheringId);
 		Task<CoreConversation> GetOrCreateGatheringConversation(long gatheringId, DateTimeOffset currentTime);
 
-		Task<long> CreateGroupChatConversationAsync(string title = default, DateTimeOffset currentTime);
+		Task<long> CreateGroupChatConversationAsync(DateTimeOffset currentTime, string title = default);
 
 		Task<List<CoreConversation>> GetConversationsForUserAsync(long userId);
 		Task<List<CoreMembership>> GetConversationMembersAsync(long conversationId);

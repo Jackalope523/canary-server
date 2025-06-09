@@ -21,9 +21,9 @@ namespace Repository
             return store.AddUsersToConversationAsync(conversationId, userIds);
         }
 
-        public Task<long> CreateGroupChatConversationAsync(string title = null, DateTimeOffset currentTime)
+        public Task<long> CreateGroupChatConversationAsync(DateTimeOffset currentTime, string title = null)
         {
-            return store.CreateGroupChatConversationAsync(title, currentTime);
+            return store.CreateGroupChatConversationAsync(currentTime, title);
         }
 
         public Task DeleteConversationAsync(long conversationId)

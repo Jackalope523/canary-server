@@ -412,7 +412,7 @@ namespace Repository
             return new CoreConversation(toAdd.Id, toAdd.Type, toAdd.CreatedAt, null, toAdd.GatheringId);
         }
 
-        public async Task<long> CreateGroupChatConversationAsync(string title, DateTimeOffset currentTime)
+        public async Task<long> CreateGroupChatConversationAsync(DateTimeOffset currentTime, string title)
         {
             GroupChat toAdd = new() { Type = ChatType.Group, Title = title, CreatedAt = currentTime };
 
