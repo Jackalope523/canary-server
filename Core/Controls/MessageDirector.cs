@@ -358,18 +358,18 @@ namespace Core.Controls
                 new UserErrorException(ConversationErrorCode.INVALID_DETAILS, new { issues }));
 
             List<(string Property, object Value)> edits = new();
-            List<object> editMessages = new();
+            List<ActivityMessage> editMessages = new();
 
             if (!string.IsNullOrEmpty(title))
             {
                 edits.Add((nameof(CoreConversation.Title), editedConversation.Title));
-                editMessages.Add(editedConversation.Title); // todo activity messages
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "title"));
             }
 
             if (header != null && header.Length > 0)
             {
                 await Terminal.MediaDirector.UploadGroupChatHeaderAsync(conversation.Id, header);
-                editMessages.Add("Header"); // todo activity messages
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "header"));
             }
 
             if (edits.Any())
@@ -381,7 +381,7 @@ namespace Core.Controls
             {
                 foreach (var value in editMessages)
                 {
-                    var message = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, value);
+                    var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, value);
                     _ = conversation.MessageOthersAsync(User.Hollow, message);
                 }
             }
@@ -417,8 +417,10 @@ namespace Core.Controls
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
 
-            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
-            _ = conversation.MessageOthersAsync(User.Hollow, activityMessage);
+            ActivityMessage activityMessage = new(ActivityMessageType.Left, ActorId: user.Id);
+            var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
+
+            _ = conversation.MessageOthersAsync(User.Hollow, message);
         }
 
         public async Task SummonUserAsync(long userId, long conversationId, long targetId)
@@ -438,8 +440,10 @@ namespace Core.Controls
 
             await Messages.AddUsersToConversationAsync(conversation.Id, summoned.Id);
 
-            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
-            _ = conversation.MessageOthersAsync(User.Hollow, activityMessage);
+            ActivityMessage activityMessage = new(ActivityMessageType.Summoned, ActorId: user.Id, TargetId: summoned.Id);
+            var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
+
+            _ = conversation.MessageOthersAsync(User.Hollow, message);
         }
 
         public async Task KickUserAsync(long userId, long conversationId, long targetId)
@@ -458,8 +462,10 @@ namespace Core.Controls
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, targetId);
 
-            var activityMessage = await Messages.AddMessageAsync(conversation.Id, user.Id, Time, MessageType.Activity, null);
-            _ = conversation.MessageOthersAsync(User.Hollow, activityMessage);
+            ActivityMessage activityMessage = new(ActivityMessageType.Kicked, ActorId: user.Id, TargetId: targetId);
+            var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
+
+            _ = conversation.MessageOthersAsync(User.Hollow, message);
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using Core.Boundaries;
 using Core.Entities;
 using Core.Notifications;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -224,23 +225,28 @@ namespace Core.Controls
 				new UserErrorException(GatheringErrorCode.INVALID_DETAILS, new { issues }));
 
 			List<(string Property, object Value)> edits = new();
+            List<ActivityMessage> editMessages = new();
 
-			// Gather individual edits
-			if (!string.IsNullOrEmpty(gatheringName))
+            // Gather individual edits
+            if (!string.IsNullOrEmpty(gatheringName))
 			{
 				edits.Add((nameof(CoreGathering.Title), editedGathering.Title));
-			}
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "title"));
+            }
 			if (!string.IsNullOrEmpty(gatheringDescription))
 			{
 				edits.Add((nameof(CoreGathering.Description), editedGathering.Description));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "description"));
 			}
 			if (IsNotNull(startTime))
 			{
 				edits.Add((nameof(CoreGathering.StartTime), editedGathering.StartTime));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "time"));
 			}
 			if (IsNotNull(latitude) && IsNotNull(longitude))
 			{
 				edits.Add(("Location", (editedGathering.Location.Latitude, editedGathering.Location.Longitude)));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "location"));
 			}
 			if (!string.IsNullOrEmpty(friendlyLocation))
 			{
@@ -257,6 +263,7 @@ namespace Core.Controls
 			if (IsNotNull(degreeOfPrivacy))
 			{
 				edits.Add((nameof(CoreGathering.DegreeOfPrivacy), editedGathering.DegreeOfPrivacy));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "visibility"));
 			}
 			if (IsNotNull(groupMinimum))
 			{
@@ -270,9 +277,10 @@ namespace Core.Controls
             if (header != null && header.Length > 0)
             {
                 await Terminal.MediaDirector.UploadGatheringHeaderAsync(originalGathering.Id, header);
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "header"));
             }
 
-            if (edits.Count > 0)
+            if (edits.Any())
 			{
 				// Push update
 				await Gatherings.UpdateGatheringAsync(originalGathering.Id, edits);
@@ -285,6 +293,17 @@ namespace Core.Controls
 					_ = RescheduleSchedule(editedGathering);
 				}
 			}
+
+            if (editMessages.Any() && await Messages.GatheringConversationExists(originalGathering.Id))
+            {
+				Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(originalGathering.Id, Time));
+
+                foreach (var value in editMessages)
+                {
+                    var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, value);
+                    _ = conversation.MessageOthersAsync(User.Hollow, message);
+                }
+            }
         }
 
 		public async Task TerminateGatheringAsync(long userId, long gatheringId)
@@ -422,10 +441,15 @@ namespace Core.Controls
 			// Add member to chat
 			if (await Messages.GatheringConversationExists(gathering.Id))
 			{
-				var conversation = await Messages.GetOrCreateGatheringConversation(gathering.Id, Time);
+				Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id, Time));
 
 				await Messages.AddUsersToConversationAsync(conversation.Id, user.Id);
-			}
+
+                ActivityMessage activityMessage = new(ActivityMessageType.Joined, ActorId: user.Id);
+                var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
+
+                _ = conversation.MessageOthersAsync(User.Hollow, message);
+            }
 		}
 
 		public async Task LeaveGatheringAsync(long userId, long gatheringId)
@@ -461,9 +485,14 @@ namespace Core.Controls
             // Remove member from chat
             if (await Messages.GatheringConversationExists(gathering.Id))
             {
-                var conversation = await Messages.GetOrCreateGatheringConversation(gathering.Id, Time);
+                Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id, Time));
 
                 await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
+
+                ActivityMessage activityMessage = new(ActivityMessageType.Left, ActorId: user.Id);
+                var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
+
+                _ = conversation.MessageOthersAsync(User.Hollow, message);
             }
         }
 
