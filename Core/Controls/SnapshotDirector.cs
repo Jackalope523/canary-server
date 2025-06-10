@@ -61,8 +61,8 @@ namespace Core.Controls
                 {
                     var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, filteredGallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
 
-                    // Remove host from strangers
                     strangers.Remove(gathering.HostId);
+                    strangers.Remove(user.Id);
 
                     gallery = new(HideStrangersAsync(filteredGallery.Snapshots, strangers));
                 }
