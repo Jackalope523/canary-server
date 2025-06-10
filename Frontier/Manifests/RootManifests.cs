@@ -9,6 +9,8 @@ namespace Frontier.Manifests
 	public class CanaryDetailsManifest
     {
         public string MinimumVersion { get; set; }
+        public string ServerVersion { get; set; }
+        public int PageSize { get; set; }
     }
 
 	public class FeedbackManifest

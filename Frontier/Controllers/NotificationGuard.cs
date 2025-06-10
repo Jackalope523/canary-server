@@ -26,7 +26,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				return await telegrams.GetNotificationPreferencesAsync(user.Id);
+				return await notifications.GetNotificationPreferencesAsync(user.Id);
 			});
         }
 
@@ -38,7 +38,7 @@ namespace Frontier.Controllers
 		{
 			return await Execute(async user =>
 			{
-				await telegrams.UpdateNotificationPreferencesAsync(user.Id,
+				await notifications.UpdateNotificationPreferencesAsync(user.Id,
 					socialInvitations: social_invitations, companionActivity: companion_activity,
 					gatheringReminders: gathering_reminders, gatheringActivity: gathering_activity,
 					gatheringDiscovery: gathering_discovery);

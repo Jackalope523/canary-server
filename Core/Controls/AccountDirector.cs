@@ -214,13 +214,6 @@ namespace Core.Controls
                     {
                         await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.InitialDecay) });
                     }
-                    else
-                    {
-                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, current.Title);
-
-                        // Leave the gathering
-                        await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, current.Id, GatheringBond.Left, Time);
-                    }
                 }
             }
             // Check if user is on their way to an gathering

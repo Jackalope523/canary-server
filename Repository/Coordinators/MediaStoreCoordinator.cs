@@ -1,4 +1,5 @@
-﻿namespace Repository
+﻿
+namespace Repository
 {
     internal class MediaStoreCoordinator: IMediaDatabase
     {
@@ -44,19 +45,49 @@
             await store.DeleteAvatarAsync(userId);
         }
 
-        public async Task<MemoryStream> DownloadHeroAsync(long gatheringId)
+        public async Task<MemoryStream> DownloadGatheringHeaderAsync(long gatheringId)
         {
-            return await store.DownloadHeroAsync(gatheringId);
+            return await store.DownloadGatheringHeaderAsync(gatheringId);
         }
 
-        public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
+        public async Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image)
         {
-            await store.UploadHeroAsync(gatheringId, image);
+            await store.UploadGatheringHeaderAsync(gatheringId, image);
         }
 
-        public async Task DeleteHeroAsync(long gatheringId)
+        public async Task DeleteGatheringHeaderAsync(long gatheringId)
         {
-            await store.DeleteHeroAsync(gatheringId);
+            await store.DeleteGatheringHeaderAsync(gatheringId);
+        }
+
+        public async Task<MemoryStream> DownloadPhotoAsync(long conversationId, Guid photoId)
+        {
+            return await store.DownloadPhotoAsync(conversationId, photoId);
+        }
+
+        public async Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image)
+        {
+            return await store.UploadPhotoAsync(conversationId, image);
+        }
+
+        public async Task DeletePhotoAsync(long conversationId, Guid photoId)
+        {
+            await store.DeletePhotoAsync(conversationId, photoId);
+        }
+
+        public async Task<MemoryStream> DownloadGroupChatHeaderAsync(long conversationId)
+        {
+            return await store.DownloadGroupChatHeaderAsync(conversationId);
+        }
+
+        public async Task UploadGroupChatHeaderAsync(long conversationId, MemoryStream image)
+        {
+            await store.UploadGroupChatHeaderAsync(conversationId, image);
+        }
+
+        public async Task DeleteGroupChatHeaderAsync(long conversationId)
+        {
+            await store.DeleteGroupChatHeaderAsync(conversationId);
         }
     }
 }

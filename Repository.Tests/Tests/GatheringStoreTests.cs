@@ -643,7 +643,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
 
             Discussion discussion = sentry.BeginDiscussion();
-            await store.PropagateClearance(testUser.Id, testGathering.Id, 0, new(), discussion);
+            store.PropagateClearance(testUser.Id, testGathering.Id, 0, new(), discussion);
             discussion.End();
 
             int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
@@ -668,7 +668,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkB));
 
             Discussion discussion = sentry.BeginDiscussion();
-            await store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
+            store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
             discussion.End();
 
             int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
@@ -702,7 +702,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkD));
 
             Discussion discussion = sentry.BeginDiscussion();
-            await store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
+            store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
             discussion.End();
 
             int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
@@ -733,7 +733,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkD));
 
             Discussion discussion = sentry.BeginDiscussion();
-            await store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
+            store.PropagateClearance(testUser.Id, testGathering.Id, 1, new(), discussion);
             discussion.End();
 
             int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());
@@ -764,7 +764,7 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.UserRelationships.Add(linkD));
 
             Discussion discussion = sentry.BeginDiscussion();
-            await store.PropagateClearance(testUser.Id, testGathering.Id, 2, new(), discussion);
+            store.PropagateClearance(testUser.Id, testGathering.Id, 2, new(), discussion);
             discussion.End();
 
             int count = sentry.ExecuteRead(ctx => ctx.GuestClearances.Count());

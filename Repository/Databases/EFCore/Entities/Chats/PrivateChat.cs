@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    public class ConversationLink
+    public class PrivateChat : Chat
     {
     }
 }

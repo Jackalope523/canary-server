@@ -24,23 +24,25 @@ namespace Frontier.Services
             log.LogInformation("Twilio set up successfully.");
 		}
 
-		public async Task SendSMSAsync(string phoneNumber, string message)
+		public async Task SendTextMessageAsync(string phoneNumber, string message, bool whatsapp = false)
         {
-            log.LogInformation("Want to send SMS to {phoneNumber}", phoneNumber);
+            string formattedPhoneNumber = $"{(whatsapp ? "whatsapp:" : "")}+{phoneNumber}";
+
+            log.LogInformation("Want to send SMS to {phoneNumber}", formattedPhoneNumber);
 
             if (env.IsProduction)
             {
-                log.LogInformation("Sending SMS to {phoneNumber}: {message}", phoneNumber, message);
+                log.LogInformation("Sending SMS to {phoneNumber}: {message}", formattedPhoneNumber, message);
 
 				await MessageResource.CreateAsync(
                     messagingServiceSid: messagingServiceSid,
-                    to: new Twilio.Types.PhoneNumber($"+{phoneNumber}"),
+                    to: new Twilio.Types.PhoneNumber(formattedPhoneNumber),
                     body: message);
             }
             else
             {
-                log.LogInformation("Dropped SMS to {phoneNumber}: {message}", phoneNumber, message);
+                log.LogInformation("Dropped SMS to {phoneNumber}: {message}", formattedPhoneNumber, message);
             }
-		}
-	}
+        }
+    }
 }

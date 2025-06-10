@@ -1,6 +1,6 @@
 ﻿namespace Repository
 {
-    public class MessageLinks
+    internal class BroadcastChat : Chat
     {
     }
 }

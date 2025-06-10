@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Reflection;
 using Core.Boundaries;
+using Microsoft.VisualBasic;
 
 namespace Core.Notifications
 {
     public enum NotificationGroup
     {
+        None,
         SocialInvitations,
         CompanionActivity,
         GatheringDiscovery,
@@ -18,6 +21,7 @@ namespace Core.Notifications
         {
             return group switch
             {
+                NotificationGroup.None => true,
                 NotificationGroup.SocialInvitations => profile.SocialInvitations,
                 NotificationGroup.CompanionActivity => profile.CompanionActivity,
                 NotificationGroup.GatheringDiscovery => profile.GatheringDiscovery,
@@ -65,14 +69,26 @@ namespace Core.Notifications
 
             return $"{option}={value.Value}&";
         }
+
+        public static string FormatPath(string path, string options = "")
+        {
+            if (string.IsNullOrEmpty(options))
+            {
+                return $"{BasePath}{path}";
+            }
+            else
+            {
+                return $"{BasePath}{path}?{options.Remove(options.Length - 1)}";
+            }
+        }
     }
 
     public struct GatheringDeepLink : IDeepLink
     {
         public enum FocusTarget
         {
-            GuestList,
-            Gallery,
+            guestlist,
+            gallery,
         }
 
         public string RelativePath { get; private set; }
@@ -81,25 +97,22 @@ namespace Core.Notifications
             FocusTarget? focus = null, string invitedBy = null,
             bool? immediate = null, bool? @sealed = null)
         {
-            RelativePath = $"{IDeepLink.BasePath}gathering/{gatheringId}";
+            string path = $"gathering/{gatheringId}";
             
             string options = "";
 
             options += IDeepLink.ParseOption("focus", focus);
-            options += IDeepLink.ParseOption("invitedBy", invitedBy);
+            options += IDeepLink.ParseOption("invited_by", invitedBy);
             options += IDeepLink.ParseOption("immediate", immediate);
             options += IDeepLink.ParseOption("sealed", @sealed);
 
-            if (!string.IsNullOrEmpty(options))
-            {
-                RelativePath += $"?{options.Remove(options.Length - 1)}";
-            }
+            RelativePath = IDeepLink.FormatPath(path, options);
         }
     }
 
     public struct DiscoveryDeepLink : IDeepLink
     {
-        public string RelativePath => $"{IDeepLink.BasePath}discovery";
+        public string RelativePath => IDeepLink.FormatPath("discovery");
     }
 
     public struct NestDeepLink : IDeepLink
@@ -109,22 +122,32 @@ namespace Core.Notifications
         public NestDeepLink(long userId,
             string lastMet = null)
         {
-            RelativePath = $"nest/{userId}";
+            string path = $"nest/{userId}";
 
             string options = "";
 
-            options += IDeepLink.ParseOption("lastMet", lastMet);
+            options += IDeepLink.ParseOption("last_met", lastMet);
 
-            if (!string.IsNullOrEmpty(options))
-            {
-                RelativePath += $"?{options.Remove(RelativePath.Length - 1)}";
-            }
+            RelativePath = IDeepLink.FormatPath(path, options);
+        }
+    }
+
+    public struct MessageDeepLink : IDeepLink
+    {
+        public string RelativePath { get; private set; }
+
+        public MessageDeepLink(long conversationId)
+        {
+            string path = $"chat/{conversationId}";
+
+            RelativePath = IDeepLink.FormatPath(path);
         }
     }
 
     public partial class CanaryNotification
     {
         public string Title { get; set; }
+        public string Subtitle { get; set; }
         public string Body { get; set; }
         public string AppUrl { get; set; }
         public string CollapseId { get; set; }
@@ -137,6 +160,13 @@ namespace Core.Notifications
             Body = body;
             AppUrl = deepLink != null ? deepLink.RelativePath : "";
             CollapseId = collapseId;
+            Group = NotificationGroup.None;
+        }
+
+        protected CanaryNotification(string title, string subtitle, string body, IDeepLink deepLink = null, string collapseId = "")
+            : this(title, body, deepLink, collapseId)
+        {
+            Subtitle = subtitle;
         }
 
         public bool CheckEnabled(NotificationProfile profile)
@@ -191,7 +221,7 @@ namespace Core.Notifications
         public static CanaryNotification CompanionJoined(UserShard companion, GatheringShard gathering)
             => CompanionActivity(new(gathering.Title,
                 $"{companion.Name} joined the gathering.",
-                new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.GuestList),
+                new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.guestlist),
                 $"{gathering.Id}:10"));
 
         public static CanaryNotification CompanionGatheringCreated(UserShard companion, GatheringShard gathering)
@@ -270,7 +300,7 @@ namespace Core.Notifications
         public static CanaryNotification GatheringUploadClosing(GatheringShard gathering)
             => GatheringReminders(new(gathering.Title,
                 $"Don't forget to post your remaining photos!",
-                new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.Gallery)));
+                new GatheringDeepLink(gathering.Id, focus: GatheringDeepLink.FocusTarget.gallery)));
     }
 
     /////////
@@ -292,24 +322,6 @@ namespace Core.Notifications
                 $"Was reported too many times and was sealed as a result.",
                 new GatheringDeepLink(gathering.Id, @sealed: true)));
 
-        public static CanaryNotification GatheringWaiting(GatheringShard gathering)
-            => GatheringActivity(new(gathering.Title,
-                $"Your gathering is waiting to start!",
-                new GatheringDeepLink(gathering.Id, immediate: true),
-                "20"));
-
-        public static CanaryNotification GatheringAutoCancellationWarning(GatheringShard gathering)
-            => GatheringActivity(new(gathering.Title,
-                $"Is going to be cancelled if you do not start it.",
-                new GatheringDeepLink(gathering.Id, immediate: true),
-                "20"));
-
-        public static CanaryNotification GatheringAutoCancelled(GatheringShard gathering)
-            => GatheringActivity(new(gathering.Title,
-                $"Was cancelled due to your absence.",
-                new GatheringDeepLink(gathering.Id),
-               "20"));
-
         public static CanaryNotification GatheringHeartbeat(GatheringShard gathering) // TODO Slot in
             => GatheringActivity(new(gathering.Title,
                 $"Is the gathering still ongoing?",
@@ -322,22 +334,68 @@ namespace Core.Notifications
 
         // Attendee
 
-        public static CanaryNotification AttendeeArrived(GatheringShard gathering) // TODO Slot in
+        public static CanaryNotification AttendeeLeavingGatheringArea(GatheringShard gathering)
             => GatheringActivity(new(gathering.Title,
-                "You have entered the gathering area, get on now!",
-                new GatheringDeepLink(gathering.Id, immediate: true),
+                $"You are leaving the gathering area.",
+                new GatheringDeepLink(gathering.Id),
                 "30"));
 
-        public static CanaryNotification HostMissedGathering(GatheringShard gathering)
+        public static CanaryNotification GatheringTerminated(GatheringShard gathering)
             => GatheringActivity(new(gathering.Title,
-                $"Was cancelled due to an absent host.",
+                $"Has ended. Thanks for joining!",
                 new GatheringDeepLink(gathering.Id),
-               "20"));
+                "30"));
 
         public static CanaryNotification UserMissedGathering(GatheringShard gathering)
             => GatheringActivity(new(gathering.Title,
                 "You missed the gathering.",
                 new GatheringDeepLink(gathering.Id),
                 "20"));
+    }
+
+    //////
+    // Messages
+    /////////////
+
+    public partial class CanaryNotification
+    {
+        protected static CanaryNotification Message(CanaryNotification notification)
+        {
+            return notification;
+        }
+
+        public static CanaryNotification IndividualMessage(ConversationShard conversation, UserShard sender, MessageShard message)
+            => Message(new(sender.Name,
+                ParseMessage(message),
+                new MessageDeepLink(conversation.Id),
+                $"chat:{conversation.Id}"));
+
+        public static CanaryNotification GroupMessage(ConversationShard conversation, UserShard sender, MessageShard message)
+            => Message(new(sender.Name,
+                conversation.Title,
+                ParseMessage(message),
+                new MessageDeepLink(conversation.Id),
+                $"chat:{conversation.Id}"));
+
+        public static CanaryNotification GatheringMessage(GatheringShard gathering, ConversationShard conversation, UserShard sender, MessageShard message)
+            => Message(new(sender.Name,
+                gathering.Title,
+                ParseMessage(message),
+                new MessageDeepLink(conversation.Id),
+                $"chat:{conversation.Id}"));
+
+        private static string ParseMessage(MessageShard message)
+        {
+            return message.Type switch
+            {
+                MessageType.Text => message.Value.ToString(),
+                MessageType.Photo => "Sent a photo.",
+                MessageType.GatheringInvite => "Invited you to a gathering.",
+                MessageType.ShareGathering => "Shared a gathering.",
+                MessageType.Snapshot => "Shared a snapshot.",
+                MessageType.Nest => "Shared a nest.",
+                _ => "",
+            };
+        }
     }
 }

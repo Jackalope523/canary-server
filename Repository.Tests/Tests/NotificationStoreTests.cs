@@ -35,39 +35,5 @@ namespace Repository.Tests
             sentry.ExecuteWrite(ctx => ctx.Subscriptions.ExecuteDelete());
             sentry.ExecuteWrite(ctx => ctx.Users.ExecuteDelete());
         }
-
-        [Fact]
-        public async Task GetNotesAsync_SUCCESS()
-        {
-            Telegram note = new NoteFactory().Create(subject1, subject2);
-            sentry.ExecuteWrite(ctx => ctx.Telegrams.Add(note));
-
-            TelegramShard found = (await store.GetTelegramsAsync(subject2.Id)).Single();
-
-            Assert.NotNull(found);
-            Assert.Equal(subject1.Id, found.NotifierId);
-            Assert.Equal(note.Time, found.Time);
-            Assert.Equal(note.Message, found.Message);
-        }
-        [Fact]
-        public async Task SaveNoteAsync_SUCCESS()
-        {
-            DateTimeOffset time = DateTimeOffset.MinValue;
-            TelegramMessage message = TelegramMessage.GatheringInvitation;
-            string action = "action";
-
-            await store.SaveTelegramAsync(subject2.Id, subject1.Id, DateTimeOffset.MinValue, message, action);
-
-            Entities.Telegram saved = sentry.ExecuteRead(ctx => ctx.Telegrams.Single());
-
-            Assert.NotNull(saved);
-            Assert.Equal(subject1.Id, saved.NotifierId);
-            Assert.Equal(subject2.Id, saved.RecipientId);
-            Assert.Equal(time, saved.Time);
-            Assert.Equal(message, saved.Message);
-            Assert.Equal(action, saved.Action);
-            Assert.False(saved.Read);
-        }
-        
     }
 }

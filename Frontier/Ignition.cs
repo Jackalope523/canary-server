@@ -34,10 +34,21 @@ namespace Frontier
 
             try
             {
-                CreateHostBuilder(args)
+                var app = CreateHostBuilder(args)
                     .UseSerilog()
-                    .Build()
-                    .Run();
+                    .Build();
+
+                // Inject socket
+
+                var loggerFactory = new LoggerFactory()
+                    .AddSerilog(Log.Logger);
+
+                var socketLogger = loggerFactory.CreateLogger("Socket");
+                var hubContext = app.Services.GetRequiredService<IHubContext<HollowHub, IClientSocket>>();
+
+                SocketConnection.Initialise(socketLogger, hubContext);
+
+                app.Run();
             }
             catch (Exception ex)
             {
@@ -145,6 +156,9 @@ namespace Frontier
             services.AddTransient<INotificationService, OneSignalService>(service => pushNotifications);
             services.AddTransient<ISMSService, TwilioService>();
             services.AddTransient<IEmailService, SendGridService>();
+            services.AddTransient<ISocketService, SocketConnection>();
+
+            SocketConnection socket = new();
 
             //////
             // Connections
@@ -153,28 +167,39 @@ namespace Frontier
             CoreTerminal terminal = CoreTerminal.CreateTerminal(
                 environment,
                 coreLogger,
+
                 harbor.AccountDatabaseAccess,
                 harbor.AdminDatabaseAccess,
+                harbor.ConnectionDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
                 harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
+                harbor.MessageDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
                 harbor.MiscellaneousDatabaseAccess,
-                pushNotifications);
+                pushNotifications,
+                socket
+            );
 
-            GuardBox box = new(environment, frontierLogger,
+            GuardBox box = new(
+                environment,
+                frontierLogger,
+
                 terminal.AccountOperations,
+                terminal.ConnectionOperations,
                 terminal.NestOperations,
                 terminal.GatheringOperations,
                 terminal.SnapshotOperations,
                 terminal.KeyOperations,
                 terminal.DisciplineOperations,
                 terminal.MediaOperations,
+                terminal.MessageOperations,
                 terminal.NotificationOperations,
-                terminal.MiscellaneousOperations);
+                terminal.MiscellaneousOperations
+            );
 
             services.AddSingleton(box);
 
@@ -183,7 +208,6 @@ namespace Frontier
             ////////////
 
             services.AddHostedService(services => terminal.CreateRepositoryCleanupService());
-            services.AddHostedService(services => terminal.CreateTelegramCleanupService());
 
             /////////
             // Authentication Schema 
@@ -206,11 +230,11 @@ namespace Frontier
                 .PersistKeysToFileSystem(new DirectoryInfo(@"/home/data-protection-keys"))
                 .SetApplicationName("Hollow-" + env);
 
-            /////////
+            /////
             // Sockets
-            //////////////////////////
+            ////////////
             
-            //services.AddSignalR();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -236,7 +260,7 @@ namespace Frontier
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapHub<MessagingHub>("/Messaging");
+                endpoints.MapHub<HollowHub>("/hub");
             });
         }
 
