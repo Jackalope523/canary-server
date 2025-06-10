@@ -333,6 +333,9 @@ namespace Core.Controls
             await Messages.AddUsersToConversationAsync(conversation.Id, uniqueIds.ToArray());
             await Messages.UpdateMembershipAsync(conversation.Id, user.Id, new() { (nameof(CoreMembership.Type), MembershipType.Owner) });
 
+            ActivityMessageShard activity = new(ActivityMessageType.Initiated, ActorId: user.Id);
+            await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activity);
+            
             return await conversation.ToConversationShard();
         }
 
