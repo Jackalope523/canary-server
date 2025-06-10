@@ -402,10 +402,16 @@ namespace Repository
                                     Select(l => l.UserId).
                                     ToListAsync());
 
+            long? hostId = await storeSentry.ExecuteReadAsync(ctx =>
+                             ctx.Gatherings.
+                             Where(g => g.Id == gatheringId).
+                             Select(g => g.HostId).
+                             SingleAsync());
+
             List<ChatLink> links = new();
             foreach (long userId in guestList)
             {
-                links.Add(new() { UserId = userId, ConversationId = toAdd.Id, Type = MembershipType.Regular, LastSeen = DateTimeOffset.UtcNow });
+                links.Add(new() { UserId = userId, ConversationId = toAdd.Id, Type = hostId == userId ? MembershipType.Owner : MembershipType.Regular, LastSeen = DateTimeOffset.UtcNow });
             }
             await storeSentry.ExecuteWriteAsync(ctx => ctx.ChatLinks.AddRange(links));
 
