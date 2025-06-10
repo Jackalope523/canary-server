@@ -135,7 +135,7 @@ namespace Repository
             {
                 write.Invoke(discussion.SharedContext);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 discussion.EndNow();
                 throw new DatabaseWriteException(ex);
@@ -193,5 +193,3 @@ namespace Repository
         }
     }
 }
-
-

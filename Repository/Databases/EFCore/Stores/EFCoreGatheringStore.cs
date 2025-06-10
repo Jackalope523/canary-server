@@ -286,7 +286,7 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
-                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime < currentTime),
+                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime <= currentTime),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
@@ -373,7 +373,7 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
-                ctx.Gatherings.Where(g => g.State == GatheringState.Ended),
+                ctx.Gatherings.Where(g => g.State == GatheringState.Alive || g.State == GatheringState.Ended),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering

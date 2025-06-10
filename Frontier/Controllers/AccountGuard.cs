@@ -361,7 +361,7 @@ namespace Frontier.Controllers
 
             public bool IsOperable(long userId)
             {
-                return userId == -7 || userId == -8;
+                return userId == -2 || userId == -7 || userId == -8;
             }
 
             public bool CheckStaticCode(long userId, string code)
@@ -371,6 +371,7 @@ namespace Frontier.Controllers
 
                 string staticCode = userId switch
                 {
+                    -2 => appleAccountCode,
                     -7 => appleAccountCode,
                     -8 => googleAccountCode,
                     _ => throw new UserErrorException(AccountErrorCode.NOT_FOUND)
