@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Boundaries;
 
 namespace Core.Entities
 {
@@ -97,6 +98,38 @@ namespace Core.Entities
 		public static async Task Once(params Task[] tasks)
 			=> await Task.WhenAll(tasks);
 
-		#endregion
-	}
+		public static async Task<T[]> Once<T>(params Task<T>[] tasks)
+			=> await Task.WhenAll(tasks);
+
+        public static async Task<IEnumerable<T>> Once<T>(IEnumerable<Task<T>> tasks)
+            => await Task.WhenAll(tasks);
+        #endregion
+    }
+
+	internal static class Smithing
+    {
+        public static async Task<(IEnumerable<T> TrueList, IEnumerable<T> FalseList)> PartitionAsync<T>(
+            this IEnumerable<T> source, Func<T, Task<bool>> predicate)
+        {
+            var results = await Psijic.Once(source.Select(async item => (Item: item, Result: await predicate(item))));
+
+            List<T> trueList = new();
+            List<T> falseList = new();
+
+            foreach (var (item, result) in results)
+            {
+                if (result)
+                { trueList.Add(item); }
+                else
+                { falseList.Add(item); }
+            }
+
+            return (trueList, falseList);
+        }
+
+        public static MembershipShard ToShard(this CoreMembership membership)
+        {
+            return new(membership.UserId, membership.Type, membership.LastSeen);
+        }
+    }
 }

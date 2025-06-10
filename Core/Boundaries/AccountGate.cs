@@ -88,7 +88,7 @@ namespace Core.Boundaries
 
 	public interface ISMSService
 	{
-		Task SendSMSAsync(string phoneNumber, string message);
+		Task SendTextMessageAsync(string phoneNumber, string message, bool whatsapp = false);
 	}
 
 	#endregion

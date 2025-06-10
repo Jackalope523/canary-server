@@ -106,6 +106,11 @@ namespace Core.Entities
 
         #region Initialisation & Extraction
 
+        public static async Task<Gathering> GetGatheringAsync(long id)
+        {
+            return new(await Terminal.GatheringDatabase.FindGatheringAsync(id));
+        }
+
         public Gathering()
         {
             Host = new(() => User.GetUserAsync(HostId));
@@ -196,8 +201,8 @@ namespace Core.Entities
             Title = ContentValidation.NormaliseText(Title, MaximumTitleLength);
             if (string.IsNullOrEmpty(Title)) { issues += "Title cannot be empty. "; }
 
-            Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
-            if (string.IsNullOrEmpty(Description)) { issues += "Description cannot be empty. "; }
+            if (!string.IsNullOrEmpty(Description))
+            { Description = ContentValidation.NormaliseText(Description, MaximumDescLength); }
 
             FriendlyLocation = ContentValidation.NormaliseText(FriendlyLocation, MaximumLocationLength);
             if (string.IsNullOrEmpty(FriendlyLocation)) { issues += "Friendly location cannot be empty. "; }

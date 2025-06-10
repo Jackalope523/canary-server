@@ -82,7 +82,7 @@ namespace Core.Controls
 
             try
             {
-                image = await Media.DownloadHeroAsync(gathering.Id);
+                image = await Media.DownloadGatheringHeaderAsync(gathering.Id);
             }
             catch (Exception ex)
             { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
@@ -102,7 +102,7 @@ namespace Core.Controls
 
             try
             {
-                image = await Media.DownloadHeroAsync(gathering.Id);
+                image = await Media.DownloadGatheringHeaderAsync(gathering.Id);
             }
             catch (Exception ex)
             { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
@@ -181,6 +181,92 @@ namespace Core.Controls
             return new(await hashSync, shouldConceal);
         }
 
+        public async Task<MemoryStream> GetPhotoAsync(long userId, long conversationId, Guid photoId)
+        {
+            var user = await GetUserAsync(userId);
+            var conversation = await GetConversationAsync(conversationId);
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
+
+            MemoryStream image;
+
+            try
+            {
+                image = await Media.DownloadPhotoAsync(conversation.Id, photoId);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
+
+            return image;
+        }
+
+        public async Task<ImageMetadataShard> GetPhotoMetadataAsync(long userId, long conversationId, Guid photoId)
+        {
+            var user = await GetUserAsync(userId);
+            var conversation = await GetConversationAsync(conversationId);
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
+
+            MemoryStream image;
+
+            try
+            {
+                image = await Media.DownloadPhotoAsync(conversation.Id, photoId);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
+
+            // Get image hash
+            var hashSync = ComputeHashAsync(image);
+
+            return new(await hashSync, false);
+        }
+
+        public async Task<MemoryStream> GetGroupChatHeaderAsync(long userId, long conversationId)
+        {
+            var user = await GetUserAsync(userId);
+            var conversation = await GetConversationAsync(conversationId);
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
+
+            MemoryStream image;
+
+            try
+            {
+                image = await Media.DownloadGroupChatHeaderAsync(conversation.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
+
+            return image;
+        }
+
+        public async Task<ImageMetadataShard> GetGroupChatHeaderMetadataAsync(long userId, long conversationId)
+        {
+            var user = await GetUserAsync(userId);
+            var conversation = await GetConversationAsync(conversationId);
+
+            Verify(await conversation.HasMember(user),
+                new UserErrorException(UserErrorCode.CANNOT_VIEW));
+
+            MemoryStream image;
+
+            try
+            {
+                image = await Media.DownloadGroupChatHeaderAsync(conversation.Id);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException("", ex, HollowErrorCode.DOWNLOAD_FAILED); }
+
+            // Get image hash
+            var hashSync = ComputeHashAsync(image);
+
+            return new(await hashSync, false);
+        }
+
         #endregion
 
         #region Favours
@@ -195,25 +281,44 @@ namespace Core.Controls
             { throw new UnexpectedFailureException($"Failed to upload avatar for {userId}", ex, HollowErrorCode.UPLOAD_FAILED); }
 		}
 
-		public async Task UploadHeroAsync(long gatheringId, MemoryStream image)
+		public async Task UploadGatheringHeaderAsync(long gatheringId, MemoryStream image)
 		{
             try
             {
-                await Media.UploadHeroAsync(gatheringId, image);
+                await Media.UploadGatheringHeaderAsync(gatheringId, image);
             }
             catch (Exception ex)
-            { throw new UnexpectedFailureException($"Failed to upload header for {gatheringId}", ex, HollowErrorCode.UPLOAD_FAILED);
-    }
-}
+            { throw new UnexpectedFailureException($"Failed to upload gathering header for {gatheringId}", ex, HollowErrorCode.UPLOAD_FAILED); }
+        }
 
         public async Task UploadSnapshotAsync(long userId, long snapshotId, MemoryStream image)
-		{
+        {
             try
             {
-			    await Media.UploadSnapshotAsync(snapshotId, userId, image);
+                await Media.UploadSnapshotAsync(snapshotId, userId, image);
             }
             catch (Exception ex)
             { throw new UnexpectedFailureException($"Failed to upload snapshot for {snapshotId}", ex, HollowErrorCode.UPLOAD_FAILED); }
+        }
+
+        public async Task<Guid> UploadPhotoAsync(long conversationId, MemoryStream image)
+		{
+            try
+            {
+			    return await Media.UploadPhotoAsync(conversationId, image);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException($"Failed to upload photo for {conversationId}", ex, HollowErrorCode.UPLOAD_FAILED); }
+        }
+
+        public async Task UploadGroupChatHeaderAsync(long conversationId, MemoryStream image)
+		{
+            try
+            {
+			    await Media.UploadGroupChatHeaderAsync(conversationId, image);
+            }
+            catch (Exception ex)
+            { throw new UnexpectedFailureException($"Failed to upload group chat header for {conversationId}", ex, HollowErrorCode.UPLOAD_FAILED); }
         }
 
         #endregion

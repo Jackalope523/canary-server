@@ -32,6 +32,33 @@ namespace Frontier.Controllers
 			});
         }
 
+		[HttpGet("upcoming")]
+        public async Task<IActionResult> GetUpcomingGatherings()
+        {
+			return await Execute(async user =>
+			{
+				return await gatherings.GetUpcomingGatheringsAsync(user.Id);
+			});
+        }
+
+		[HttpGet("ongoing")]
+        public async Task<IActionResult> GetOngoingGatherings()
+        {
+			return await Execute(async user =>
+			{
+				return await gatherings.GetOngoingGatheringsAsync(user.Id);
+			});
+        }
+
+		[HttpGet("past")]
+        public async Task<IActionResult> GetPastGatherings()
+        {
+			return await Execute(async user =>
+			{
+				return await gatherings.GetPastGatheringsAsync(user.Id);
+			});
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateGathering([FromForm] GatheringCreationManifest gatheringDetails)
         {
@@ -47,7 +74,7 @@ namespace Frontier.Controllers
 
                 // Create a new gathering
                 return await gatherings.CreateGatheringAsync(user.Id,
-                    gatheringDetails.Title, gatheringDetails.Description,
+                    gatheringDetails.Title, gatheringDetails.Description ?? "",
                     gatheringDetails.StartTime,
                     gatheringDetails.Latitude, gatheringDetails.Longitude, gatheringDetails.FriendlyLocation,
                     gatheringDetails.Radius, gatheringDetails.IsDynamic, gatheringDetails.DegreeOfPrivacy,
@@ -80,7 +107,7 @@ namespace Frontier.Controllers
 					radius: gatheringDetails.Radius, isDynamic: gatheringDetails.IsDynamic,
 					degreeOfPrivacy: gatheringDetails.DegreeOfPrivacy,
 					groupMinimum: gatheringDetails.GroupMinimum, groupMaximum: gatheringDetails.GroupMaximum,
-					heroImage: stream);
+					header: stream);
 			});
 		}
 
@@ -152,20 +179,20 @@ namespace Frontier.Controllers
         }
 
 		[HttpPost("{gatheringId}/invite")]
-		public async Task<IActionResult> InviteUser(long gatheringId, long targetId)
+		public async Task<IActionResult> InviteUser(long gatheringId, long target_id)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.InviteUserAsync(user.Id, targetId, gatheringId);
+				await gatherings.InviteUserAsync(user.Id, target_id, gatheringId);
 			});
         }
 
 		[HttpPut("{gatheringId}/guests")]
-		public async Task<IActionResult> KickUser(long gatheringId, long targetId)
+		public async Task<IActionResult> KickUser(long gatheringId, long target_id)
 		{
 			return await Execute(async user =>
 			{
-				await gatherings.KickUserAsync(user.Id, targetId, gatheringId);
+				await gatherings.KickUserAsync(user.Id, target_id, gatheringId);
 			});
 		}
 
@@ -202,12 +229,21 @@ namespace Frontier.Controllers
 			});
 		}
 
-		[HttpGet("{gatheringId}/snapshots")]
-		public async Task<IActionResult> GetGallery(long gatheringId, long target_id)
+		[HttpGet("snapshot/{snapshotId}")]
+        public async Task<IActionResult> GetSnapshot(long snapshotId)
+        {
+            return await Execute(async user =>
+            {
+                return await snapshots.GetSnapshotAsync(user.Id, snapshotId);
+            });
+        }
+
+        [HttpGet("{gatheringId}/snapshots")]
+		public async Task<IActionResult> GetGallery(long gatheringId)
 		{
 			return await Execute(async user =>
 			{
-				return await snapshots.GetGalleryAsync(user.Id, target_id, gatheringId);
+				return await snapshots.GetGalleryAsync(user.Id, gatheringId);
 			});
 		}
 

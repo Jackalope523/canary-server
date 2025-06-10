@@ -459,24 +459,5 @@ namespace Core.Tests.Entities
 		//////
 		// Actions
 		////////////
-
-		[Fact]
-		public async Task PostNote_Succeeds()
-		{
-			// Arrange
-			var user = await environment.GenerateUniqueUserAsync();
-			var noter = await environment.GenerateUniqueUserAsync();
-			TelegramMessage message = TelegramMessage.UserFollowed;
-			string context = "action";
-
-			// Act
-			await user.PostTelegram(noter, message, context);
-
-			// Assert
-			var notes = await environment.GetNotesAsync(user);
-			Assert.Single(notes);
-			Assert.Equal(message, notes[0].Message);
-			Assert.Equal(context, notes[0].Context);
-		}
 	}
 }

@@ -65,7 +65,10 @@ namespace Repository
         public List<Feedback>? Feedback { get; set; }
         public List<GuestClearance>? GuestClearances { get; set; }
         public List<Notification>? Notifications { get; set; }
-
+        public List<ChatLink>? ChatLinks { get; set; }
+        public List<Message>? Messages { get; set; }
+        public List<ProfileMessage>? Shares { get; set; }
+        public List<Connection>? Connections { get; set; }
 
         // Default Values
         public static string DefaultPhoneNumber { get; set; } = "";

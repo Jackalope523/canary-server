@@ -13,8 +13,8 @@ using Repository;
 namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 {
     [DbContext(typeof(AzureStagingContext))]
-    [Migration("20250213161748_Decay")]
-    partial class Decay
+    [Migration("20250603174116_Drop ImageUrl from ImageMessage")]
+    partial class DropImageUrlfromImageMessage
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,96 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Repository.Chat", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Chats");
+
+                    b.HasDiscriminator<int>("Type");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Repository.ChatLink", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ConversationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("HiddenFrom")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("LastSeen")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("Muted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatLinks");
+                });
+
+            modelBuilder.Entity("Repository.Connection", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ConnectionId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Connections");
+                });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
                 {
@@ -64,9 +154,6 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Message")
-                        .HasColumnType("int");
 
                     b.Property<long>("NotifierId")
                         .HasColumnType("bigint");
@@ -141,8 +228,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Property<int>("Competitiveness")
                         .HasColumnType("int");
 
-                    b.Property<int>("Decay")
-                        .HasColumnType("int");
+                    b.Property<float>("Decay")
+                        .HasColumnType("real");
 
                     b.Property<int>("DegreeOfPrivacy")
                         .HasColumnType("int");
@@ -318,10 +405,48 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("GatheringId");
 
-                    b.HasIndex("UserId", "GatheringId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("GuestClearances");
+                });
+
+            modelBuilder.Entity("Repository.Message", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ConversationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Messages");
+
+                    b.HasDiscriminator<int>("Type");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Repository.Notification", b =>
@@ -441,8 +566,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("SnapshotId");
 
-                    b.HasIndex("UserId", "SnapshotId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("SnapshotLinks");
                 });
@@ -736,8 +860,7 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.HasIndex("OtherId");
 
-                    b.HasIndex("SelfId", "OtherId")
-                        .IsUnique();
+                    b.HasIndex("SelfId");
 
                     b.ToTable("UserRelationships");
                 });
@@ -806,6 +929,139 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.HasKey("Id");
 
                     b.ToTable("Words");
+                });
+
+            modelBuilder.Entity("Repository.GatheringChat", b =>
+                {
+                    b.HasBaseType("Repository.Chat");
+
+                    b.Property<long>("GatheringId")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("GatheringId")
+                        .IsUnique()
+                        .HasFilter("[GatheringId] IS NOT NULL");
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("Repository.GroupChat", b =>
+                {
+                    b.HasBaseType("Repository.Chat");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("Repository.PrivateChat", b =>
+                {
+                    b.HasBaseType("Repository.Chat");
+
+                    b.HasDiscriminator().HasValue(0);
+                });
+
+            modelBuilder.Entity("Repository.ActivityMessage", b =>
+                {
+                    b.HasBaseType("Repository.Message");
+
+                    b.Property<int>("ActivityType")
+                        .HasColumnType("int");
+
+                    b.HasDiscriminator().HasValue(0);
+                });
+
+            modelBuilder.Entity("Repository.GatheringInviteMessage", b =>
+                {
+                    b.HasBaseType("Repository.Message");
+
+                    b.Property<long>("GatheringId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("bigint")
+                        .HasColumnName("GatheringId");
+
+                    b.HasIndex("GatheringId");
+
+                    b.HasDiscriminator().HasValue(4);
+                });
+
+            modelBuilder.Entity("Repository.GatheringShareMessage", b =>
+                {
+                    b.HasBaseType("Repository.Message");
+
+                    b.Property<long>("GatheringId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("bigint")
+                        .HasColumnName("GatheringId");
+
+                    b.HasIndex("GatheringId");
+
+                    b.HasDiscriminator().HasValue(3);
+                });
+
+            modelBuilder.Entity("Repository.ImageMessage", b =>
+                {
+                    b.HasBaseType("Repository.Message");
+
+                    b.Property<Guid>("StorageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("Repository.ProfileMessage", b =>
+                {
+                    b.HasBaseType("Repository.Message");
+
+                    b.Property<long>("ProfileId")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("ProfileId");
+
+                    b.HasDiscriminator().HasValue(6);
+                });
+
+            modelBuilder.Entity("Repository.TextMessage", b =>
+                {
+                    b.HasBaseType("Repository.Message");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(10000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("Repository.ChatLink", b =>
+                {
+                    b.HasOne("Repository.Chat", "Chat")
+                        .WithMany("ChatLinks")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany("ChatLinks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Connection", b =>
+                {
+                    b.HasOne("Repository.User", "User")
+                        .WithMany("Connections")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>
@@ -910,6 +1166,23 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                         .IsRequired();
 
                     b.Navigation("Gathering");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Message", b =>
+                {
+                    b.HasOne("Repository.Chat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Repository.User", "User")
+                        .WithMany("Messages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Chat");
 
                     b.Navigation("User");
                 });
@@ -1044,15 +1317,72 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Navigation("Self");
                 });
 
+            modelBuilder.Entity("Repository.GatheringChat", b =>
+                {
+                    b.HasOne("Repository.Gathering", "Gathering")
+                        .WithOne("Chat")
+                        .HasForeignKey("Repository.GatheringChat", "GatheringId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Gathering");
+                });
+
+            modelBuilder.Entity("Repository.GatheringInviteMessage", b =>
+                {
+                    b.HasOne("Repository.Gathering", "Gathering")
+                        .WithMany("Invites")
+                        .HasForeignKey("GatheringId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Gathering");
+                });
+
+            modelBuilder.Entity("Repository.GatheringShareMessage", b =>
+                {
+                    b.HasOne("Repository.Gathering", "Gathering")
+                        .WithMany("Shares")
+                        .HasForeignKey("GatheringId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Gathering");
+                });
+
+            modelBuilder.Entity("Repository.ProfileMessage", b =>
+                {
+                    b.HasOne("Repository.User", "Profile")
+                        .WithMany("Shares")
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("Repository.Chat", b =>
+                {
+                    b.Navigation("ChatLinks");
+
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("Repository.Gathering", b =>
                 {
+                    b.Navigation("Chat");
+
                     b.Navigation("GatheringLink");
 
                     b.Navigation("GatheringReports");
 
                     b.Navigation("GuestClearances");
 
+                    b.Navigation("Invites");
+
                     b.Navigation("Notifications");
+
+                    b.Navigation("Shares");
 
                     b.Navigation("Snapshots");
 
@@ -1068,6 +1398,10 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
             modelBuilder.Entity("Repository.User", b =>
                 {
+                    b.Navigation("ChatLinks");
+
+                    b.Navigation("Connections");
+
                     b.Navigation("Feedback");
 
                     b.Navigation("GatheringLinks");
@@ -1080,6 +1414,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.Navigation("InitiatedUserRelationships");
 
+                    b.Navigation("Messages");
+
                     b.Navigation("Notifications");
 
                     b.Navigation("Penalties");
@@ -1091,6 +1427,8 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.Navigation("ReporterList");
 
                     b.Navigation("SentTelegrams");
+
+                    b.Navigation("Shares");
 
                     b.Navigation("SnapshotLinks");
 

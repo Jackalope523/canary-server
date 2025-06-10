@@ -30,7 +30,7 @@ namespace Core.Controls
             // Fail if user is blocked
             FailIf(await user.IsBlockedBy(targetUser),
                 new UserErrorException(UserErrorCode.CANNOT_VIEW));
-
+            
             NestShard nest = new(new());
 
             // Check if user is themself
@@ -214,7 +214,7 @@ namespace Core.Controls
             }
             else
             {
-                _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
+                // todo user followed message?
             }
 
             _ = targetUser.Notify(targetNotification);
@@ -253,7 +253,7 @@ namespace Core.Controls
             }
             else
             {
-                _ = targetUser.PostTelegram(user, TelegramMessage.UserFollowed, "");
+                // todo user followed message?
             }
 
             _ = targetUser.Notify(targetNotification);
@@ -328,8 +328,10 @@ namespace Core.Controls
 
 		internal async Task<List<User>> RequestBlockedUsersAsync(User user)
         {
-            return (await Nests.GetBlockedUsersAsync(user.Id))
-				.ConvertAll(u => User.GetUserAsync(u.Id).Result);
+            var users = await Nests.GetBlockedUsersAsync(user.Id);
+
+            return (await Psijic.Once(users.Select(u => User.GetUserAsync(u.Id)).ToArray()))
+                .ToList();
         }
 
 		internal async Task<List<User>> RequestUsersBlockingAsync(User user)

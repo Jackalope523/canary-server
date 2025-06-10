@@ -21,15 +21,29 @@ namespace Core.Controls
 
 		#region Operations
 
-        public async Task<GalleryShard> GetGalleryAsync(long userId, long targetId, long gatheringId)
+        public async Task<SnapshotShard> GetSnapshotAsync(long userId, long snapshotId)
         {
             var user = await GetUserAsync(userId);
-            var targetUser = await GetUserAsync(targetId);
-            var gathering = await GetGatheringAsync(gatheringId);
+            var snapshot = await Snapshots.GetSnapshotAsync(snapshotId);
+
+            var snapshotOwner = await GetUserAsync(snapshot.User.Id);
+            var gathering = await GetGatheringAsync(snapshot.GatheringId);
 
             // Fail if user is blocked
-            FailIf(await user.IsBlockedBy(targetUser),
+            FailIf(await user.IsBlockedBy(snapshotOwner),
                 new UserErrorException(UserErrorCode.CANNOT_VIEW));
+
+            // Fail if user cannot view gathering
+            Verify(await user.CanView(gathering),
+                new UserErrorException(GatheringErrorCode.CANNOT_VIEW));
+
+            return snapshot;
+        }
+
+        public async Task<GalleryShard> GetGalleryAsync(long userId, long gatheringId)
+        {
+            var user = await GetUserAsync(userId);
+            var gathering = await GetGatheringAsync(gatheringId);
 
             // Fail if user cannot view gathering
             Verify(await user.CanView(gathering),
@@ -37,51 +51,35 @@ namespace Core.Controls
 
             GalleryShard gallery = new(new());
 
-            // Check if user is themself
-            if (user.Equals(targetUser))
+            if (await gathering.HasOnGuestList(user))
             {
-                // Check if user attended
-                if (await gathering.HasOnGuestList(user))
-                {
-                    gallery = new(await gathering.Snapshots);
-                }
-                // Check if any companions attended
-                else
-                {
-                    var companionIds = (await user.Companions)
-                        .ConvertAll(companion => companion.Id);
+                // Remove any snapshots from blocked or blocking users
+                GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, await gathering.Snapshots));
 
-                    var companionSnapshots = (await gathering.Snapshots)
-                        .Where(snapshot => companionIds.Contains(snapshot.User.Id)).ToList();
+                // Remove strangers if gallery is in pre mode
+                if (gathering.IsUpcoming)
+                {
+                    var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, filteredGallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
 
-                    gallery = new(companionSnapshots);
+                    strangers.Remove(gathering.HostId);
+                    strangers.Remove(user.Id);
+
+                    gallery = new(HideStrangersAsync(filteredGallery.Snapshots, strangers));
                 }
             }
-            // Check if users are companions or attended a common gathering
-            else if (await user.IsCompanionsWith(targetUser) ||
-                (await gathering.HasOnGuestList(user) && await gathering.HasOnGuestList(targetUser)))
+            // Check if any companions attended
+            else
             {
-                var targetSnapshots = (await gathering.Snapshots)
-                    .Where(snapshot => snapshot.User.Id.Equals(targetUser.Id)).ToList();
+                var companionIds = (await user.Companions)
+                    .ConvertAll(companion => companion.Id);
 
-                gallery = new(targetSnapshots);
+                var companionSnapshots = (await gathering.Snapshots)
+                    .Where(snapshot => companionIds.Contains(snapshot.User.Id)).ToList();
+
+                gallery = new(companionSnapshots);
             }
 
-            // Remove any snapshots from blocked or blocking users
-            GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, gallery.Snapshots));
-
-            // Remove strangers if gallery is in pre mode
-            if (gathering.IsUpcoming)
-            {
-                var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, gallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
-
-                // Remove host from strangers
-                strangers.Remove(gathering.HostId);
-
-                gallery = new(HideStrangersAsync(gallery.Snapshots, strangers));
-            }
-
-            return filteredGallery;
+            return gallery;
         }
 
 
@@ -253,11 +251,14 @@ namespace Core.Controls
 
             foreach (SnapshotShard snapshot in snapshots)
             {
-                User snapshotOwner = await GetUserAsync(snapshot.User.Id);
+                if (user.Id != snapshot.User.Id)
+                {
+                    User snapshotOwner = await GetUserAsync(snapshot.User.Id);
 
-                // Check if blocking link exists
-                if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))
-                { continue; }
+                    // Check if blocking link exists
+                    if (await user.IsBlocking(snapshotOwner) || await user.IsBlockedBy(snapshotOwner))
+                    { continue; }
+                }
 
                 accessibleSnapshots.Add(snapshot);
             }

@@ -14,7 +14,7 @@ namespace Frontier.Tests
 		static ILogger log = LoggerFactory.Create((ILoggingBuilder obj) => NoOp()).CreateLogger("testing");
 		static GuardBox testBox = new(
 			new() { Flag = Core.EnvironmentFlag.Development },
-			log, null, null, null, null, null, null, null, null, null);
+			log, null, null, null, null, null, null, null, null, null, null, null);
 
 		AbstractGuard testGuard = new(testBox, null);
 

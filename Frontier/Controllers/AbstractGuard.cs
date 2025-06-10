@@ -26,13 +26,15 @@ namespace Frontier.Controllers
 		public ILogger log;
 
 		public IAccountOperations accounts;
+		public IConnectionOperations connections;
 		public IGatheringOperations gatherings;
 		public ISnapshotOperations snapshots;
 		public IDisciplineOperations reports;
 		public IKeyOperations keys;
 		public IMediaOperations media;
-		public INotificationOperations telegrams;
+		public IMessageOperations messages;
 		public INestOperations nests;
+		public INotificationOperations notifications;
 		public IMiscellaneousOperations miscellaneous;
 
 		public UserManager<CoreUser> userManager;
@@ -47,13 +49,15 @@ namespace Frontier.Controllers
 			log = box.log;
 
 			accounts = box.accounts;
+			connections = box.connections;
 			nests = box.nests;
 			gatherings = box.gatherings;
 			snapshots = box.snapshots;
 			keys = box.keys;
 			reports = box.reports;
 			media = box.media;
-			telegrams = box.telegrams;
+			messages = box.messages;
+			notifications = box.notifications;
 			miscellaneous = box.miscellaneous;
 
 			userManager = aspUserManager;
@@ -168,22 +172,6 @@ namespace Frontier.Controllers
 		{
 			if (!user.IsPhoneConfirmed)
 			{ throw new UserErrorException(AccountErrorCode.UNVERIFIED); }
-		}
-
-		[NonAction]
-		public async Task<MemoryStream> StreamFirstFile()
-		{
-			foreach (var file in Request.Form.Files)
-			{
-				if (file.Length > 0)
-				{
-					using var ms = new MemoryStream();
-					await file.CopyToAsync(ms);
-					return ms;
-				}
-			}
-
-			return null;
 		}
 
 		[NonAction]

@@ -176,5 +176,27 @@ namespace Repository.Exceptions
         {
         }
     }
+
+    [Serializable]
+    public class DatabaseCorruptionException : HollowFailureException
+    {
+        private static readonly string defaultMessage = "Data found in impossible configuration.";
+        public DatabaseCorruptionException()
+        {
+        }
+
+        public DatabaseCorruptionException(string message)
+            : base(message)
+        {
+        }
+        public DatabaseCorruptionException(Exception inner)
+            : base(defaultMessage, inner)
+        {
+        }
+        public DatabaseCorruptionException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
     #endregion
 }

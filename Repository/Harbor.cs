@@ -10,6 +10,7 @@ namespace Repository
         internal static ILogger logger;
 
         public IAccountDatabase AccountDatabaseAccess { get; private set; }
+        public IConnectionDatabase ConnectionDatabaseAccess { get; private set; }
         public INestDatabase NestDatabaseAccess { get; private set; }
         public INotificationDatabase NotificationDatabaseAccess { get; private set; }
         public IGatheringDatabase GatheringDatabaseAccess { get; private set; }
@@ -17,6 +18,7 @@ namespace Repository
         public IDisciplineDatabase ReportDatabaseAccess { get; private set; }
         public IAdminDatabase AdminDatabaseAccess { get; private set; }
         public IMediaDatabase MediaDatabaseAccess { get; private set; }
+        public IMessageDatabase MessageDatabaseAccess { get; private set; }
         public IKeyDatabase KeyDatabaseAccess { get; private set; }
         public IDebugDatabase DebugDatabaseAccess { get; private set; }
         public IMiscellaneousDatabase MiscellaneousDatabaseAccess { get; private set; }
@@ -24,6 +26,7 @@ namespace Repository
         public Harbor(Flag flag)
         {
             AccountDatabaseAccess = new AccountStoreCoordinator(flag);
+            ConnectionDatabaseAccess = new ConnectionStoreCoordinator(flag);
             NestDatabaseAccess = new NestStoreCoordinator(flag);
             NotificationDatabaseAccess = new NotificationStoreCoordinator(flag);
             GatheringDatabaseAccess = new GatheringStoreCoordinator(flag);
@@ -32,6 +35,7 @@ namespace Repository
             AdminDatabaseAccess = new AdminStoreCoordinator(flag);
             KeyDatabaseAccess = new KeyStoreCoordinator();
             MediaDatabaseAccess = new MediaStoreCoordinator(flag);
+            MessageDatabaseAccess = new MessageStoreCoordinator(flag);
             DebugDatabaseAccess = new DebugStoreCoordinator(flag);
             MiscellaneousDatabaseAccess = new MiscellaneousStoreCoordinator(flag);
         }
