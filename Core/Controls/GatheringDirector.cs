@@ -1,6 +1,7 @@
 ﻿using Core.Boundaries;
 using Core.Entities;
 using Core.Notifications;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -224,23 +225,28 @@ namespace Core.Controls
 				new UserErrorException(GatheringErrorCode.INVALID_DETAILS, new { issues }));
 
 			List<(string Property, object Value)> edits = new();
+            List<ActivityMessage> editMessages = new();
 
-			// Gather individual edits
-			if (!string.IsNullOrEmpty(gatheringName))
+            // Gather individual edits
+            if (!string.IsNullOrEmpty(gatheringName))
 			{
 				edits.Add((nameof(CoreGathering.Title), editedGathering.Title));
-			}
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "title"));
+            }
 			if (!string.IsNullOrEmpty(gatheringDescription))
 			{
 				edits.Add((nameof(CoreGathering.Description), editedGathering.Description));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "description"));
 			}
 			if (IsNotNull(startTime))
 			{
 				edits.Add((nameof(CoreGathering.StartTime), editedGathering.StartTime));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "time"));
 			}
 			if (IsNotNull(latitude) && IsNotNull(longitude))
 			{
 				edits.Add(("Location", (editedGathering.Location.Latitude, editedGathering.Location.Longitude)));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "location"));
 			}
 			if (!string.IsNullOrEmpty(friendlyLocation))
 			{
@@ -257,6 +263,7 @@ namespace Core.Controls
 			if (IsNotNull(degreeOfPrivacy))
 			{
 				edits.Add((nameof(CoreGathering.DegreeOfPrivacy), editedGathering.DegreeOfPrivacy));
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "visibility"));
 			}
 			if (IsNotNull(groupMinimum))
 			{
@@ -270,9 +277,10 @@ namespace Core.Controls
             if (header != null && header.Length > 0)
             {
                 await Terminal.MediaDirector.UploadGatheringHeaderAsync(originalGathering.Id, header);
+                editMessages.Add(new(ActivityMessageType.Edited, ActorId: user.Id, Info: "header"));
             }
 
-            if (edits.Count > 0)
+            if (edits.Any())
 			{
 				// Push update
 				await Gatherings.UpdateGatheringAsync(originalGathering.Id, edits);
@@ -285,6 +293,17 @@ namespace Core.Controls
 					_ = RescheduleSchedule(editedGathering);
 				}
 			}
+
+            if (editMessages.Any() && await Messages.GatheringConversationExists(originalGathering.Id))
+            {
+				Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(originalGathering.Id, Time));
+
+                foreach (var value in editMessages)
+                {
+                    var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, value);
+                    _ = conversation.MessageOthersAsync(User.Hollow, message);
+                }
+            }
         }
 
 		public async Task TerminateGatheringAsync(long userId, long gatheringId)
@@ -418,6 +437,19 @@ namespace Core.Controls
 
 				_ = User.NotifyAll(CanaryNotification.CompanionJoined(user.ToUserShard(), await gathering.ToGatheringShard()), users: activeCompanions.ToArray());
             }
+
+			// Add member to chat
+			if (await Messages.GatheringConversationExists(gathering.Id))
+			{
+				Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id, Time));
+
+				await Messages.AddUsersToConversationAsync(conversation.Id, user.Id);
+
+                ActivityMessage activityMessage = new(ActivityMessageType.Joined, ActorId: user.Id);
+                var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
+
+                _ = conversation.MessageOthersAsync(User.Hollow, message);
+            }
 		}
 
 		public async Task LeaveGatheringAsync(long userId, long gatheringId)
@@ -449,7 +481,20 @@ namespace Core.Controls
 
             // Cancel scheduled notifications
             _ = CancelScheduledNotificationsForGuest(gathering, user);
-		}
+
+            // Remove member from chat
+            if (await Messages.GatheringConversationExists(gathering.Id))
+            {
+                Conversation conversation = new(await Messages.GetOrCreateGatheringConversation(gathering.Id, Time));
+
+                await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
+
+                ActivityMessage activityMessage = new(ActivityMessageType.Left, ActorId: user.Id);
+                var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
+
+                _ = conversation.MessageOthersAsync(User.Hollow, message);
+            }
+        }
 
 		public async Task<List<GuestListBondPair>>
 			GetGuestListAsync(long userId, long gatheringId)
@@ -576,7 +621,7 @@ namespace Core.Controls
         public async Task KickUserAsync(long hostId, long targetId, long gatheringId)
 		{
 			var host = await GetUserAsync(hostId);
-			var targetUser = await GetUserAsync(targetId);
+			var target = await GetUserAsync(targetId);
 			var gathering = await GetGatheringAsync(gatheringId);
 
 			// Verify kicking user is the host
@@ -584,21 +629,29 @@ namespace Core.Controls
 				new UserErrorException(GatheringErrorCode.CANNOT_KICK_PERMISSION));
 
 			// Verify host is not kicking themself
-			FailIf(host.Equals(targetUser),
+			FailIf(host.Equals(target),
 				new UserErrorException(GatheringErrorCode.CANNOT_KICK_SELF));
 
 			// Kick target user from gathering
-			await Gatherings.SetUserStateAsync(targetUser.Id, gathering.Id, GatheringBond.Kicked, Time);
+			await Gatherings.SetUserStateAsync(target.Id, gathering.Id, GatheringBond.Kicked, Time);
 
 			// Remove target user's snapshots from gathering
 			foreach (SnapshotShard snapshot in await gathering.Snapshots)
 			{
-				if (targetUser.Taken(snapshot))
+				if (target.Taken(snapshot))
 				{ _ = Snapshots.SoftDeleteAsync(snapshot.Id); }
 			}
 
             // Cancel any scheduled notifications
-            _ = CancelScheduledNotificationsForGuest(gathering, targetUser);
+            _ = CancelScheduledNotificationsForGuest(gathering, target);
+
+            // Remove member from chat
+            if (await Messages.GatheringConversationExists(gathering.Id))
+            {
+                var conversation = await Messages.GetOrCreateGatheringConversation(gathering.Id, Time);
+
+                await Messages.RemoveUserFromConversationAsync(conversation.Id, target.Id);
+            }
         }
 
 		public async Task<bool> AuthorisedToJoin(long userId, long gatheringId)

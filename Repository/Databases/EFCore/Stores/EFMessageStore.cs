@@ -285,7 +285,7 @@ namespace Repository
             {
                 switch (Property)
                 {
-                    case nameof(CoreMembership.IsMuted):
+                    case nameof(CoreMembership.Muted):
                         l.Muted = (bool)Value;
                         break;
                     case nameof(CoreMembership.LastSeen):

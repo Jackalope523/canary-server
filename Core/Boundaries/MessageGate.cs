@@ -33,14 +33,19 @@ namespace Core.Boundaries
 	}
 
 	public enum ActivityMessageType
-	{ }
+	{
+        Initiated = 0, Edited = 1,
+        Joined = 10, Left = 11, Summoned = 12, Kicked = 13,
+    }
 
-	public record CoreConversation(long Id, ChatType Type, DateTimeOffset DateCreated, string Title = default, long? GatheringId = null)
+	public record ActivityMessage(ActivityMessageType Activity, long? ActorId = null, long? TargetId = null, string Info = null);
+
+    public record CoreConversation(long Id, ChatType Type, DateTimeOffset DateCreated, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();
 	public record ConversationShard(long Id, ChatType Type, int LastPage, string Title = default,
-		long? GatheringId = null, bool? IsMuted = null, int? Unread = null);
+		long? GatheringId = null, bool? Muted = null, int? Unread = null);
 
-	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool IsMuted)
+	public record CoreMembership(long UserId, MembershipType Type, DateTimeOffset LastSeen, bool Muted)
 		: CoreOnlyData();
 	public record MembershipShard(long UserId, MembershipType Type, DateTimeOffset LastSeen);
 
