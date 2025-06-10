@@ -38,7 +38,7 @@ namespace Core.Boundaries
         Joined = 10, Left = 11, Summoned = 12, Kicked = 13,
     }
 
-	public record ActivityMessage(ActivityMessageType Activity, long? ActorId = null, long? TargetId = null, string Info = null);
+	public record ActivityMessageShard(ActivityMessageType Activity, long? ActorId = null, long? TargetId = null, string Info = null);
 
     public record CoreConversation(long Id, ChatType Type, DateTimeOffset DateCreated, string Title = default, long? GatheringId = null)
 		: CoreOnlyData();

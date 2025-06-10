@@ -72,12 +72,16 @@ namespace Repository
                     };
                     break;
                 case MessageType.Activity:
+                    ActivityMessageShard activityMessageShard = (ActivityMessageShard)value;
                     toAdd = new ActivityMessage()
                     {
                         ConversationId = conversationId,
                         UserId = userId,
                         Timestamp = timestamp,
-                        ActivityType = (ActivityMessageType)value
+                        ActivityType = activityMessageShard.Activity,
+                        ActorId = activityMessageShard.ActorId,
+                        TargetId = activityMessageShard.TargetId,
+                        Info = activityMessageShard.Info,
                     };
                     break;
                 default:
@@ -230,7 +234,7 @@ namespace Repository
                         toReturn.Add(messageShard with { Value = snapshotMessage.SnapshotId });
                         break;
                     case ActivityMessage activityMessage:
-                        toReturn.Add(messageShard with { Value = activityMessage.ActivityType });
+                        toReturn.Add(messageShard with { Value = new ActivityMessageShard(activityMessage.ActivityType, activityMessage.ActorId, activityMessage.TargetId, activityMessage.Info) });
                         break;
                     default:
                         throw new ArgumentException("Message of type " + message.GetType().Name + " is not supported by this method.");
@@ -439,7 +443,7 @@ namespace Repository
             return Math.Max(0, totalPages - 1);
         }
 
-        public async Task<MessageShard> GetCountMessagesSinceAsync(long conversationId)
+        public async Task<MessageShard> GetMessagesSinceAsync(long conversationId)
         {
             Message? message =  await storeSentry.ExecuteReadAsync(ctx => 
                                     ctx.Messages
@@ -463,7 +467,7 @@ namespace Repository
                 case SnapshotMessage snapshotMessage:
                     return messageShard with { Value = snapshotMessage.SnapshotId };
                 case ActivityMessage activityMessage:
-                    return messageShard with { Value = activityMessage.ActivityType };
+                    return messageShard with { Value = new ActivityMessageShard(activityMessage.ActivityType, activityMessage.ActorId, activityMessage.TargetId, activityMessage.Info) };
                 default:
                     throw new ArgumentException("Message of type " + message.GetType().Name + " is not supported by this method.");
             }

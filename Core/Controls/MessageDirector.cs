@@ -358,7 +358,7 @@ namespace Core.Controls
                 new UserErrorException(ConversationErrorCode.INVALID_DETAILS, new { issues }));
 
             List<(string Property, object Value)> edits = new();
-            List<ActivityMessage> editMessages = new();
+            List<ActivityMessageShard> editMessages = new();
 
             if (!string.IsNullOrEmpty(title))
             {
@@ -417,7 +417,7 @@ namespace Core.Controls
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, user.Id);
 
-            ActivityMessage activityMessage = new(ActivityMessageType.Left, ActorId: user.Id);
+            ActivityMessageShard activityMessage = new(ActivityMessageType.Left, ActorId: user.Id);
             var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
 
             _ = conversation.MessageOthersAsync(User.Hollow, message);
@@ -440,7 +440,7 @@ namespace Core.Controls
 
             await Messages.AddUsersToConversationAsync(conversation.Id, summoned.Id);
 
-            ActivityMessage activityMessage = new(ActivityMessageType.Summoned, ActorId: user.Id, TargetId: summoned.Id);
+            ActivityMessageShard activityMessage = new(ActivityMessageType.Summoned, ActorId: user.Id, TargetId: summoned.Id);
             var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
 
             _ = conversation.MessageOthersAsync(User.Hollow, message);
@@ -462,7 +462,7 @@ namespace Core.Controls
 
             await Messages.RemoveUserFromConversationAsync(conversation.Id, targetId);
 
-            ActivityMessage activityMessage = new(ActivityMessageType.Kicked, ActorId: user.Id, TargetId: targetId);
+            ActivityMessageShard activityMessage = new(ActivityMessageType.Kicked, ActorId: user.Id, TargetId: targetId);
             var message = await Messages.AddMessageAsync(conversation.Id, User.Hollow.Id, Time, MessageType.Activity, activityMessage);
 
             _ = conversation.MessageOthersAsync(User.Hollow, message);
