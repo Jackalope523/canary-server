@@ -37,14 +37,9 @@ namespace Core.Controls
         {
             var user = await GetUserAsync(userId);
 
-            Conversation conversation = new()
-            {
-                Id = -2,
-                Type = ChatType.Broadcast,
-                Title = "CANARY Team",
-            };
+            var conversation = await GetConversationAsync(-2);
 
-            return new ConversationShard(conversation.Id, conversation.Type, 0, conversation.Title);
+            return await conversation.ToConversationShard();
         }
 
         public async Task<ConversationShard> GetGatheringConversationAsync(long userId, long gatheringId)
