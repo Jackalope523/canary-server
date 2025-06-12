@@ -261,17 +261,20 @@ namespace Frontier.Controllers
                 {
                     // Account already exists
                     var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
+                    string code;
 
-                    // Fail if account is already confirmed
+                    // Login
                     if (await userManager.IsPhoneNumberConfirmedAsync(user))
-                    { throw HollowException.Default; }
-
+                    {
+                        code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+                    }
                     // Account is not activated, send an SMS with a generated change number token
                     else
                     {
-                        var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-                        await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                        code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
                     }
+
+                    await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
                 }
             });
         }
