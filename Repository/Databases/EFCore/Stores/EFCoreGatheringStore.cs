@@ -373,7 +373,7 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
-                ctx.Gatherings.Where(g => g.State == GatheringState.Alive || g.State == GatheringState.Ended),
+                ctx.Gatherings.Where(g => g.State == GatheringState.Cancelled || g.State == GatheringState.Ended),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
