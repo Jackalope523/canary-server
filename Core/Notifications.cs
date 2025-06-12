@@ -150,21 +150,21 @@ namespace Core.Notifications
         public string Subtitle { get; set; }
         public string Body { get; set; }
         public string AppUrl { get; set; }
-        public string CollapseId { get; set; }
+        public string ThreadId { get; set; }
 
         public NotificationGroup Group { get; set; }
 
-        protected CanaryNotification(string title, string body, IDeepLink deepLink = null, string collapseId = "")
+        protected CanaryNotification(string title, string body, IDeepLink deepLink = null, string threadId = "")
         {
             Title = title;
             Body = body;
             AppUrl = deepLink != null ? deepLink.RelativePath : "";
-            CollapseId = collapseId;
+            ThreadId = threadId;
             Group = NotificationGroup.None;
         }
 
-        protected CanaryNotification(string title, string subtitle, string body, IDeepLink deepLink = null, string collapseId = "")
-            : this(title, body, deepLink, collapseId)
+        protected CanaryNotification(string title, string subtitle, string body, IDeepLink deepLink = null, string threadId = "")
+            : this(title, body, deepLink, threadId)
         {
             Subtitle = subtitle;
         }

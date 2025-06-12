@@ -52,7 +52,7 @@ namespace Frontier.Services
                 IncludeExternalUserIds = outgoingIds, // Deprecated is a mistake, leave as is
 
                 AppUrl = notification.AppUrl,
-                CollapseId = notification.CollapseId,
+                ThreadId = notification.ThreadId,
             };
 
 
@@ -90,7 +90,7 @@ namespace Frontier.Services
                 IncludeExternalUserIds = outgoingIds, // Deprecated is a mistake, leave as is
 
                 AppUrl = notification.AppUrl,
-                CollapseId = notification.CollapseId,
+                CollapseId = notification.ThreadId,
                 SendAfter = dispatchAt.DateTime,
             };
 
