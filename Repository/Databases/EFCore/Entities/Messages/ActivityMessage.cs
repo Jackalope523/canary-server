@@ -5,7 +5,7 @@
         public ActivityMessageType ActivityType { get; set; }
         public long? ActorId { get; set; }
         public long? TargetId { get; set; }
-        public string Info { get; set; }
+        public string Text { get; set; }
 
         //Navigation Properties
         public User? Actor { get; set; }

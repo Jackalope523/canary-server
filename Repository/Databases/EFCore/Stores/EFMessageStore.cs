@@ -81,7 +81,7 @@ namespace Repository
                         ActivityType = activityMessageShard.Activity,
                         ActorId = activityMessageShard.ActorId,
                         TargetId = activityMessageShard.TargetId,
-                        Info = activityMessageShard.Info,
+                        Text = activityMessageShard.Info,
                     };
                     break;
                 default:
@@ -234,7 +234,7 @@ namespace Repository
                         toReturn.Add(messageShard with { Value = snapshotMessage.SnapshotId });
                         break;
                     case ActivityMessage activityMessage:
-                        toReturn.Add(messageShard with { Value = new ActivityMessageShard(activityMessage.ActivityType, activityMessage.ActorId, activityMessage.TargetId, activityMessage.Info) });
+                        toReturn.Add(messageShard with { Value = new ActivityMessageShard(activityMessage.ActivityType, activityMessage.ActorId, activityMessage.TargetId, activityMessage.Text) });
                         break;
                     default:
                         throw new ArgumentException("Message of type " + message.GetType().Name + " is not supported by this method.");
@@ -467,7 +467,7 @@ namespace Repository
                 case SnapshotMessage snapshotMessage:
                     return messageShard with { Value = snapshotMessage.SnapshotId };
                 case ActivityMessage activityMessage:
-                    return messageShard with { Value = new ActivityMessageShard(activityMessage.ActivityType, activityMessage.ActorId, activityMessage.TargetId, activityMessage.Info) };
+                    return messageShard with { Value = new ActivityMessageShard(activityMessage.ActivityType, activityMessage.ActorId, activityMessage.TargetId, activityMessage.Text) };
                 default:
                     throw new ArgumentException("Message of type " + message.GetType().Name + " is not supported by this method.");
             }

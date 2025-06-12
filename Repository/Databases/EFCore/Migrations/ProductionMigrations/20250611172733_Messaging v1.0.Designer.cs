@@ -3,18 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Repository;
 
 #nullable disable
 
-namespace Repository.Databases.EFCore.Migrations.StagingMigrations
+namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
-    [DbContext(typeof(AzureStagingContext))]
-    partial class AzureStagingContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AzureProductionContext))]
+    [Migration("20250611172733_Messaging v1.0")]
+    partial class Messagingv10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

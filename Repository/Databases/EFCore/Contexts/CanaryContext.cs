@@ -54,14 +54,6 @@ namespace Repository
                   IsPhoneConfirmed = true,
 
               });
-            modelBuilder.Entity<User>()
-               .HasData(new User()
-               {
-                   Id = -2,
-                   PhoneNumber = "15734922666",
-                   Name = "CANARY",
-                   IsPhoneConfirmed = true,
-               });
 
             modelBuilder.Entity<User>()
                 .HasData(new User()
@@ -441,6 +433,12 @@ namespace Repository
 
             modelBuilder.Entity<GroupChat>()
                 .Property(c => c.Title)
+                .HasColumnName("Title")
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<BroadcastChat>()
+                .Property(c => c.Title)
+                .HasColumnName("Title")
                 .HasMaxLength(200);
 
             modelBuilder.Entity<Chat>()
@@ -455,6 +453,7 @@ namespace Repository
                 {
                     Id = -2,
                     Type = ChatType.Broadcast,
+                    Title = "CANARY Team"
                 });
 
             // Messages
@@ -480,7 +479,13 @@ namespace Repository
 
             modelBuilder.Entity<TextMessage>()
                 .Property(m => m.Text)
-                .HasMaxLength(10000);
+                .HasColumnName("Text")
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<ActivityMessage>()
+               .Property(m => m.Text)
+               .HasColumnName("Text")
+               .HasMaxLength(2000);
 
             // Chat Links
             modelBuilder.Entity<ChatLink>()
