@@ -88,7 +88,14 @@ namespace Frontier.Controllers
                 bool useWhatsApp = credentials.UseWhatsApp ?? false;
 
                 // Send user code
-                await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}", whatsapp: useWhatsApp);
+                if (useWhatsApp)
+                {
+                    await smsService.SendWhatsAppAuthMessageAsync(user.PhoneNumber, code);
+                }
+                else
+                {
+                    await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                }
             });
         }
 
