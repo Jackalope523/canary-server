@@ -54,17 +54,17 @@ namespace Core.Controls
             if (await gathering.HasOnGuestList(user))
             {
                 // Remove any snapshots from blocked or blocking users
-                GalleryShard filteredGallery = new(await RemoveBlockedSnapshotsAsync(user, await gathering.Snapshots));
+                gallery = new(await RemoveBlockedSnapshotsAsync(user, await gathering.Snapshots));
 
                 // Remove strangers if gallery is in pre mode
                 if (gathering.IsUpcoming)
                 {
-                    var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, filteredGallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
+                    var strangers = await Nests.ReturnStrangerDangerAsync(user.Id, gallery.Snapshots.Select(snapshot => snapshot.User.Id).ToArray());
 
                     strangers.Remove(gathering.HostId);
                     strangers.Remove(user.Id);
 
-                    gallery = new(HideStrangersAsync(filteredGallery.Snapshots, strangers));
+                    gallery = new(HideStrangersAsync(gallery.Snapshots, strangers));
                 }
             }
             // Check if any companions attended
