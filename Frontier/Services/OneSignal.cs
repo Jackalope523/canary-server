@@ -46,12 +46,13 @@ namespace Frontier.Services
             var notif = new Notification(appId: appId)
             {
                 Headings = new StringMap(en: notification.Title),
+                Subtitle = new StringMap(en: notification.Subtitle),
                 Contents = new StringMap(en: notification.Body),
                 ChannelForExternalUserIds = "push",
                 IncludeExternalUserIds = outgoingIds, // Deprecated is a mistake, leave as is
 
                 AppUrl = notification.AppUrl,
-                CollapseId = notification.CollapseId,
+                ThreadId = notification.ThreadId,
             };
 
 
@@ -83,12 +84,13 @@ namespace Frontier.Services
             var notif = new Notification(appId: appId)
             {
                 Headings = new StringMap(en: notification.Title),
+                Subtitle = new StringMap(en: notification.Subtitle),
                 Contents = new StringMap(en: notification.Body),
                 ChannelForExternalUserIds = "push",
                 IncludeExternalUserIds = outgoingIds, // Deprecated is a mistake, leave as is
 
                 AppUrl = notification.AppUrl,
-                CollapseId = notification.CollapseId,
+                CollapseId = notification.ThreadId,
                 SendAfter = dispatchAt.DateTime,
             };
 

@@ -20,6 +20,8 @@ namespace Frontier.Manifests
 		public string PhoneNumber { get; set; }
 
 		public string Code { get; set; }
+
+		public bool? UseWhatsApp { get; set; }
     }
 
     public class AccountSignUpManifest
@@ -36,7 +38,7 @@ namespace Frontier.Manifests
 		public DateTime DateOfBirth { get; set; }
     }
 
-	public class AvatarManifest
+	public class ImageManifest
 	{
 		[Required]
 		public IFormFile Image { get; set; }

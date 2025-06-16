@@ -19,13 +19,15 @@ namespace Core.Controls
 		protected ILogger Log { get; private set; }
 
 		protected IAccountDatabase Accounts { get; private set; }
+		protected IConnectionDatabase Connections { get; private set; }
 		protected IGatheringDatabase Gatherings { get; private set; }
 		protected ISnapshotDatabase Snapshots { get; private set; }
 		protected IDisciplineDatabase Reports { get; private set; }
 		protected IKeyDatabase Keys { get; private set; }
 		protected IMediaDatabase Media { get; private set; }
-		protected INotificationDatabase Telegrams { get; private set; }
+		protected IMessageDatabase Messages { get; private set; }
 		protected INestDatabase Nests { get; private set; }
+		protected INotificationDatabase Notifications { get; private set; }
         protected IMiscellaneousDatabase Miscellaneous { get; private set; }
 
         #endregion
@@ -40,13 +42,15 @@ namespace Core.Controls
 			Log = Terminal.Log;
 			
 			Accounts = Terminal.AccountDatabase;
+			Connections = Terminal.ConnectionDatabase;
 			Gatherings = Terminal.GatheringDatabase;
 			Snapshots = Terminal.SnapshotDatabase;
 			Reports = Terminal.DisciplineDatabase;
 			Keys = Terminal.KeyDatabase;
 			Media = Terminal.MediaDatabase;
-			Telegrams = Terminal.NotificationDatabase;
+			Messages = Terminal.MessageDatabase;
 			Nests = Terminal.NestDatabase;
+			Notifications = Terminal.NotificationDatabase;
 			Miscellaneous = Terminal.MiscellaneousDatabase;
         }
 
@@ -79,7 +83,12 @@ namespace Core.Controls
             return new(await Gatherings.FindGatheringAsync(gatheringId));
         }
 
-		#endregion
-	}
+        protected async Task<Conversation> GetConversationAsync(long conversationId)
+        {
+            return new(await Messages.GetConversationAsync(conversationId));
+        }
+
+        #endregion
+    }
 }
 

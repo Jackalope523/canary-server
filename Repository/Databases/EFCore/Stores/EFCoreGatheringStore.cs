@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Utilities;
-using System.Linq;
 
 namespace Repository
 {
@@ -13,7 +10,7 @@ namespace Repository
 
         }
 
-        internal async Task PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
+        internal void PropagateClearance(long userId, long gatheringId, int degree, List<long> exclusionList, Discussion discussion)
         {
             if (degree == -1) return;
 
@@ -63,32 +60,29 @@ namespace Repository
             }
         }
 
-        private async Task UpdateClearance(long gatheringId, int previousDegreeOfPrivacy, int newDegreeOfPrivacy)
+        private void UpdateClearance(long gatheringId, int previousDegreeOfPrivacy, int newDegreeOfPrivacy)
         {
             if (previousDegreeOfPrivacy < newDegreeOfPrivacy)
             {
-                List<long> edgeUsers = await storeSentry.ExecuteReadAsync(ctx =>
+                List<long> edgeUsers = storeSentry.ExecuteRead(ctx =>
                     ctx.GuestClearances.
                     Where(c => c.GatheringId == gatheringId && c.Degree == previousDegreeOfPrivacy).
                     Select(c => c.UserId).
-                    ToListAsync());
+                    ToList());
 
-
-                List<Task> tasks = new();
+                Discussion discussion = storeSentry.BeginDiscussion();
                 foreach (long user in edgeUsers)
                 {
-                    Discussion discussion = storeSentry.BeginDiscussion();
-                    tasks.Add(PropagateClearance(user, gatheringId, newDegreeOfPrivacy - previousDegreeOfPrivacy, new(edgeUsers), discussion));
-                    storeSentry.EndDiscussion(discussion);
+                    PropagateClearance(user, gatheringId, newDegreeOfPrivacy - previousDegreeOfPrivacy, new(edgeUsers), discussion);
                 }
-                await Task.WhenAll(tasks);
+                storeSentry.EndDiscussion(discussion);
             }
             else if (previousDegreeOfPrivacy > newDegreeOfPrivacy)
             {
-                await storeSentry.ExecuteWriteAsync(ctx =>
+                storeSentry.ExecuteWrite(ctx =>
                     ctx.GuestClearances.
                     Where(c => c.GatheringId == gatheringId && c.Degree > newDegreeOfPrivacy).
-                    ExecuteDeleteAsync());
+                    ExecuteDelete());
             }
             else
             {
@@ -121,7 +115,7 @@ namespace Repository
                 TimeOfCreation = timeOfCreation
             };
 
-            await storeSentry.ExecuteWriteAsync(ctx => ctx.Gatherings.AddAsync(toCreate));
+            await storeSentry.ExecuteWriteAsync(ctx => ctx.Gatherings.Add(toCreate));
 
             GatheringLink hostLink = new() 
             { 
@@ -136,7 +130,7 @@ namespace Repository
             if (degreeOfPrivacy < 3)
             {
                 Discussion discussion = storeSentry.BeginDiscussion();
-                await PropagateClearance(hostId, toCreate.Id, degreeOfPrivacy, new(), discussion);
+                PropagateClearance(hostId, toCreate.Id, degreeOfPrivacy, new(), discussion);
                 storeSentry.EndDiscussion(discussion);
             }
 
@@ -181,6 +175,27 @@ namespace Repository
                 Where(n => n.GatheringId == id).
                 ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
 
+            List<long> toDelete = await storeSentry.ExecuteReadAsync(ctx => 
+                                    ctx.GatheringChats.
+                                    Where(c => c.GatheringId == id).
+                                    Select(c => c.Id).
+                                    ToListAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.ChatLinks.
+                Where(l => toDelete.Contains(l.ConversationId)).
+                ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.Messages.
+               Where(m => toDelete.Contains(m.ConversationId)).
+               ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+               ctx.GatheringChats.
+               Where(n => n.GatheringId == id).
+               ExecuteUpdateAsync(setter => setter.SetProperty(s => s.SoftDeleted, true)));
+
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.GatheringLinks.
                 Where(l => l.GatheringId == id).
@@ -209,6 +224,27 @@ namespace Repository
                 Where(l => l.GatheringId == id).
                 ExecuteDeleteAsync());
 
+            List<long> toDelete = await storeSentry.ExecuteReadAsync(ctx =>
+                                    ctx.GatheringChats.
+                                    Where(c => c.GatheringId == id).
+                                    Select(c => c.Id).
+                                    ToListAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.ChatLinks.
+                Where(l => toDelete.Contains(l.ConversationId)).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.Messages.
+                Where(M => toDelete.Contains(M.ConversationId)).
+                ExecuteDeleteAsync());
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GatheringChats.
+                Where(l => l.GatheringId == id).
+                ExecuteDeleteAsync());
+
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.GatheringLinks.
                 Where(l => l.GatheringId == id).
@@ -221,6 +257,16 @@ namespace Repository
 
             await storeSentry.ExecuteWriteAsync(ctx =>
                 ctx.UserReports.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GatheringInviteMessages.
+                Where(r => r.GatheringId == id).
+                ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
+
+            await storeSentry.ExecuteWriteAsync(ctx =>
+                ctx.GatheringShareMessages.
                 Where(r => r.GatheringId == id).
                 ExecuteUpdate(setter => setter.SetProperty(r => r.GatheringId, (long?)null)));
 
@@ -240,7 +286,7 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
-                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime < currentTime),
+                ctx.Gatherings.Where(g => g.State == GatheringState.Alive && g.StartTime <= currentTime),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
@@ -327,7 +373,7 @@ namespace Repository
             ctx.GatheringLinks
             .Where(l => l.UserId == id && l.Type == GatheringBond.Guest)
             .Join(
-                ctx.Gatherings.Where(g => g.State == GatheringState.Ended),
+                ctx.Gatherings.Where(g => g.State == GatheringState.Cancelled || g.State == GatheringState.Ended),
                 l => l.GatheringId,
                 e => e.Id,
                 (l, e) => new CoreGathering
@@ -578,7 +624,7 @@ namespace Repository
                                         SingleAsync());
 
                         e.DegreeOfPrivacy = (int)Value;
-                        await UpdateClearance(id, prev, e.DegreeOfPrivacy);
+                        UpdateClearance(id, prev, e.DegreeOfPrivacy);
                         break;
                     case nameof(CoreGathering.Decay):
                         e.Decay = (float)Value;

@@ -66,15 +66,18 @@ namespace Core.Tests
 				new LoggerFactory().CreateLogger(""),
                 new UserHook(harbor.AccountDatabaseAccess, generatedUserIds),
 				harbor.AdminDatabaseAccess,
+				harbor.ConnectionDatabaseAccess,
                 harbor.GatheringDatabaseAccess,
                 harbor.SnapshotDatabaseAccess,
                 harbor.ReportDatabaseAccess,
 				harbor.KeyDatabaseAccess,
                 harbor.MediaDatabaseAccess,
+				harbor.MessageDatabaseAccess,
                 harbor.NotificationDatabaseAccess,
                 harbor.NestDatabaseAccess,
 				harbor.MiscellaneousDatabaseAccess,
-				new NotificationServiceStub());
+				new NotificationServiceStub(),
+				null);
 			
 		}
 
@@ -313,16 +316,6 @@ namespace Core.Tests
 		///////////
 		// Notification Helpers
 		/////////////////////////
-		
-		internal async Task SaveNoteAsync(User user, User notifier, TelegramMessage message, string action)
-		{
-			await Terminal.NotificationDatabase.SaveTelegramAsync(user.Id, notifier.Id, new DateTime(0), message, action);
-		}
-
-		internal async Task<List<TelegramShard>> GetNotesAsync(User user)
-		{
-			return await Terminal.NotificationDatabase.GetTelegramsAsync(user.Id);
-		}
 
 		internal List<CanaryNotification> GetUserMessages(User user)
 		{

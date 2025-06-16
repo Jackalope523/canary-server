@@ -85,8 +85,17 @@ namespace Frontier.Controllers
                     code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
                 }
 
-                // Send user an SMS with code
-                await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                bool useWhatsApp = credentials.UseWhatsApp ?? false;
+
+                // Send user code
+                if (useWhatsApp)
+                {
+                    await smsService.SendWhatsAppAuthMessageAsync(user.PhoneNumber, code);
+                }
+                else
+                {
+                    await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                }
             });
         }
 
@@ -253,23 +262,26 @@ namespace Frontier.Controllers
                     // Send an SMS to new user with a generated change number token
                     var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
                     var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-                    await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                    await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
                 }
                 else
                 {
                     // Account already exists
                     var user = await accounts.GetCoreUserAsync(details.PhoneNumber);
+                    string code;
 
-                    // Fail if account is already confirmed
+                    // Login
                     if (await userManager.IsPhoneNumberConfirmedAsync(user))
-                    { throw HollowException.Default; }
-
+                    {
+                        code = await userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultPhoneProvider);
+                    }
                     // Account is not activated, send an SMS with a generated change number token
                     else
                     {
-                        var code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
-                        await smsService.SendSMSAsync(user.PhoneNumber, $"Your Canary code is {code}");
+                        code = await userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
                     }
+
+                    await smsService.SendTextMessageAsync(user.PhoneNumber, $"Your Canary code is {code}");
                 }
             });
         }
@@ -302,7 +314,7 @@ namespace Frontier.Controllers
         }
 
         [HttpPost("avatar")]
-        public async Task<IActionResult> ModifyAvatar([FromForm] AvatarManifest avatar)
+        public async Task<IActionResult> ModifyAvatar([FromForm] ImageManifest avatar)
         {
             // Verify parameters
             if (avatar == null || !ModelState.IsValid ||
@@ -359,7 +371,7 @@ namespace Frontier.Controllers
 
             public bool IsOperable(long userId)
             {
-                return userId == -7 || userId == -8;
+                return userId == -2 || userId == -7 || userId == -8;
             }
 
             public bool CheckStaticCode(long userId, string code)
@@ -369,6 +381,7 @@ namespace Frontier.Controllers
 
                 string staticCode = userId switch
                 {
+                    -2 => appleAccountCode,
                     -7 => appleAccountCode,
                     -8 => googleAccountCode,
                     _ => throw new UserErrorException(AccountErrorCode.NOT_FOUND)

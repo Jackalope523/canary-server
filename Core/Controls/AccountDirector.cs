@@ -53,7 +53,6 @@ namespace Core.Controls
 
         public async Task CreateUserAsync(string phoneNumber, string email, string name, DateTimeOffset dateOfBirth)
         {
-            // Create user
             User newUser = new()
             {
                 PhoneNumber = phoneNumber,
@@ -213,15 +212,6 @@ namespace Core.Controls
                     if (GeoLocation.AreInRange(await user.LastKnownLocation, current.Location, current.Radius))
                     {
                         await Gatherings.UpdateGatheringAsync(nextGathering.Id, new() { (nameof(CoreGathering.Decay), Gathering.InitialDecay) });
-                    }
-                    else
-                    {
-                        Log.LogWarning("Guest {name} left gathering {title} area, marking as left...", user.Name, current.Title);
-
-                        // Leave the gathering
-                        await Terminal.GatheringDatabase.SetUserStateAsync(user.Id, current.Id, GatheringBond.Left, Time);
-
-                        _ = user.Notify(CanaryNotification.AttendeeLeavingGatheringArea(await current.ToGatheringShard()));
                     }
                 }
             }

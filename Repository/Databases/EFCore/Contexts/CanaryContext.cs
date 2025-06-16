@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Entities;
-using System;
 
 namespace Repository
 {
@@ -22,6 +21,20 @@ namespace Repository
         internal DbSet<Feedback> Feedback { get; set; }
         internal DbSet<Notification> Notifications { get; set; }
         internal DbSet<Word> Words { get; set; }
+        internal DbSet<Chat> Chats { get; set; }
+        internal DbSet<PrivateChat> PrivateChats { get; set; }
+        internal DbSet<GroupChat> GroupChats { get; set; }
+        internal DbSet<GatheringChat> GatheringChats { get; set; }
+        internal DbSet<ChatLink> ChatLinks { get; set; }
+        internal DbSet<Connection> Connections { get; set; }
+        internal DbSet<Message> Messages { get; set; }
+        internal DbSet<TextMessage> TextMessages { get; set; }
+        internal DbSet<ImageMessage> ImageMessages { get; set; }
+        internal DbSet<GatheringShareMessage> GatheringShareMessages { get; set; }
+        internal DbSet<GatheringInviteMessage> GatheringInviteMessages { get; set; }
+        internal DbSet<ProfileMessage> ProfileMessages { get; set; }
+        internal DbSet<ActivityMessage> ActivityMessages { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +44,16 @@ namespace Repository
             // User
             modelBuilder.Entity<User>()
                 .HasQueryFilter(u => !u.SoftDeleted);
+
+            modelBuilder.Entity<User>()
+              .HasData(new User()
+              {
+                  Id = -2,
+                  PhoneNumber = "15734922666",
+                  Name = "CANARY",
+                  IsPhoneConfirmed = true,
+
+              });
 
             modelBuilder.Entity<User>()
                 .HasData(new User()
@@ -212,6 +235,26 @@ namespace Repository
              .WithOne(c => c.User)
              .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.ChatLinks)
+             .WithOne(l => l.User)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Messages)
+             .WithOne(m => m.User)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Shares)
+             .WithOne(m => m.Profile)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+             .HasMany(u => u.Connections)
+             .WithOne(c => c.User)
+             .OnDelete(DeleteBehavior.Restrict);
+
             // Gathering
             modelBuilder.Entity<Gathering>()
                 .HasQueryFilter(g => !g.SoftDeleted);
@@ -260,6 +303,21 @@ namespace Repository
             modelBuilder.Entity<Gathering>()
                .HasMany(u => u.Notifications)
                .WithOne(n => n.Gathering)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+               .HasMany(g => g.Shares)
+               .WithOne(m => m.Gathering)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+               .HasMany(g => g.Invites)
+               .WithOne(m => m.Gathering)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gathering>()
+               .HasOne(g => g.Chat)
+               .WithOne(c => c.Gathering)
                .OnDelete(DeleteBehavior.Restrict);
 
             // Telegram
@@ -327,17 +385,9 @@ namespace Repository
             modelBuilder.Entity<SnapshotLink>()
                 .HasQueryFilter(l => !l.SoftDeleted);
 
-            modelBuilder.Entity<SnapshotLink>()
-                .HasIndex(l => new { l.UserId, l.SnapshotId })
-                .IsUnique();;
-
             // User Relationship
             modelBuilder.Entity<UserRelationship>()
                 .HasQueryFilter(r => !r.SoftDeleted);
-
-            modelBuilder.Entity<UserRelationship>()
-                .HasIndex(l => new { l.SelfId, l.OtherId })
-                .IsUnique();
 
             // Gathering Link
             modelBuilder.Entity<GatheringLink>()
@@ -346,10 +396,6 @@ namespace Repository
             // Guest Clearance
             modelBuilder.Entity<GuestClearance>()
                 .HasQueryFilter(c => !c.SoftDeleted);
-
-            modelBuilder.Entity<GuestClearance>()
-                .HasIndex(l => new { l.UserId, l.GatheringId})
-                .IsUnique();
 
             // Penalty
             modelBuilder.Entity<Penalty>()
@@ -370,6 +416,98 @@ namespace Repository
             modelBuilder.Entity<Word>()
                 .Property(w => w.Text)
                 .HasMaxLength(50);
+
+            // Chats
+            modelBuilder.Entity<Chat>()
+                .HasQueryFilter(w => !w.SoftDeleted);
+
+            modelBuilder.Entity<Chat>()
+                .HasMany(c => c.ChatLinks)
+                .WithOne(l => l.Chat)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Chat>()
+                .HasMany(c => c.Messages)
+                .WithOne(m => m.Chat)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<GroupChat>()
+                .Property(c => c.Title)
+                .HasColumnName("Title")
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<BroadcastChat>()
+                .Property(c => c.Title)
+                .HasColumnName("Title")
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Chat>()
+               .HasDiscriminator<ChatType>("Type")
+               .HasValue<PrivateChat>(ChatType.Individual)
+               .HasValue<GroupChat>(ChatType.Group)
+               .HasValue<GatheringChat>(ChatType.Gathering)
+               .HasValue<BroadcastChat>(ChatType.Broadcast);
+
+            modelBuilder.Entity<BroadcastChat>()
+                .HasData(new BroadcastChat()
+                {
+                    Id = -2,
+                    Type = ChatType.Broadcast,
+                    Title = "CANARY Team"
+                });
+
+            // Messages
+            modelBuilder.Entity<Message>()
+                .HasQueryFilter(w => !w.SoftDeleted);
+
+            modelBuilder.Entity<Message>()
+                .HasDiscriminator<MessageType>("Type")
+                .HasValue<TextMessage>(MessageType.Text)
+                .HasValue<ImageMessage>(MessageType.Photo)
+                .HasValue<ActivityMessage>(MessageType.Activity)
+                .HasValue<ProfileMessage>(MessageType.Nest)
+                .HasValue<GatheringInviteMessage>(MessageType.GatheringInvite)
+                .HasValue<GatheringShareMessage>(MessageType.ShareGathering);
+
+            modelBuilder.Entity<GatheringInviteMessage>()
+                .Property(g => g.GatheringId)
+                .HasColumnName("GatheringId");
+
+            modelBuilder.Entity<GatheringShareMessage>()
+                .Property(g => g.GatheringId)
+                .HasColumnName("GatheringId");
+
+            modelBuilder.Entity<TextMessage>()
+                .Property(m => m.Text)
+                .HasColumnName("Text")
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<ActivityMessage>()
+               .Property(m => m.Text)
+               .HasColumnName("Text")
+               .HasMaxLength(2000);
+
+            // Chat Links
+            modelBuilder.Entity<ChatLink>()
+                .HasQueryFilter(w => !w.SoftDeleted);
+
+            modelBuilder.Entity<ChatLink>()
+                .HasData(new ChatLink()
+                {
+                    Id = -2,
+                    UserId = -2,
+                    ConversationId = -2,
+                    Type = MembershipType.Owner,
+                    Muted = false,
+                });
+
+            // Connections
+            modelBuilder.Entity<Connection>()
+              .HasQueryFilter(c => !c.SoftDeleted);
+
+            modelBuilder.Entity<Connection>()
+             .Property(c => c.ConnectionId)
+             .HasMaxLength(36);
         }
     }
 }

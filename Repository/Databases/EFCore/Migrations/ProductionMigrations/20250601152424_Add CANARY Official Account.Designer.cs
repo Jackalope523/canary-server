@@ -10,11 +10,11 @@ using Repository;
 
 #nullable disable
 
-namespace Repository.Databases.EFCore.Migrations.StagingMigrations
+namespace Repository.Databases.EFCore.Migrations.ProductionMigrations
 {
-    [DbContext(typeof(AzureStagingContext))]
-    [Migration("20250131202236_Companions v2.0")]
-    partial class Companionsv20
+    [DbContext(typeof(AzureProductionContext))]
+    [Migration("20250601152424_Add CANARY Official Account")]
+    partial class AddCANARYOfficialAccount
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,6 +140,9 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
 
                     b.Property<int>("Competitiveness")
                         .HasColumnType("int");
+
+                    b.Property<float>("Decay")
+                        .HasColumnType("real");
 
                     b.Property<int>("DegreeOfPrivacy")
                         .HasColumnType("int");
@@ -779,6 +782,30 @@ namespace Repository.Databases.EFCore.Migrations.StagingMigrations
                     b.HasIndex("SelfId");
 
                     b.ToTable("UserReports");
+                });
+
+            modelBuilder.Entity("Repository.Word", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Words");
                 });
 
             modelBuilder.Entity("Repository.Entities.Subscription", b =>

@@ -24,7 +24,7 @@ namespace Core.Entities
 		public const int MaximumTitleLength = 30;
         public const int MaximumDescLength = 300;
         public const int MaximumLocationLength = 80;
-        public const int InitialDecay = 100;
+        public const float InitialDecay = 100;
 
         public static readonly Distance MaximumJoinDistance = new() { Kilometres = 200 };
         public static readonly Distance ArrivalDistance = new() { Metres = 75 };
@@ -105,6 +105,11 @@ namespace Core.Entities
         #endregion
 
         #region Initialisation & Extraction
+
+        public static async Task<Gathering> GetGatheringAsync(long id)
+        {
+            return new(await Terminal.GatheringDatabase.FindGatheringAsync(id));
+        }
 
         public Gathering()
         {
@@ -196,8 +201,8 @@ namespace Core.Entities
             Title = ContentValidation.NormaliseText(Title, MaximumTitleLength);
             if (string.IsNullOrEmpty(Title)) { issues += "Title cannot be empty. "; }
 
-            Description = ContentValidation.NormaliseText(Description, MaximumDescLength);
-            if (string.IsNullOrEmpty(Description)) { issues += "Description cannot be empty. "; }
+            if (!string.IsNullOrEmpty(Description))
+            { Description = ContentValidation.NormaliseText(Description, MaximumDescLength); }
 
             FriendlyLocation = ContentValidation.NormaliseText(FriendlyLocation, MaximumLocationLength);
             if (string.IsNullOrEmpty(FriendlyLocation)) { issues += "Friendly location cannot be empty. "; }
@@ -380,9 +385,6 @@ namespace Core.Entities
                 { guest.CalculateCharacter(this, Time - joined); }
 
                 updatedGuests.Add(guest);
-
-				// Notify of gathering ending
-				_ = guest.Notify(CanaryNotification.GatheringTerminated(await ToGatheringShard()));
 			}
 
             return updatedGuests;

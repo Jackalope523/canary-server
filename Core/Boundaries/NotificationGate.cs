@@ -9,31 +9,6 @@ namespace Core.Boundaries
 {
     #region Schemas
 
-	public enum TelegramMessage
-	{
-		// APP SEGMENT (0XXX)
-		UserAgreementsUpdated = 0001,
-		ServerMaintenance = 0002,
-
-		// ACCOUNT SEGMENT (1XXX)
-		AccountStatusChanged = 1001,
-
-		// USER SEGMENT (2XXX)
-		UserFollowed = 2001,
-
-		// GATHERING SEGMENT (3XXX)
-		GatheringInvitation = 3001,
-
-		GatheringClosingSoon = 3100,
-
-		GatheringMissedHost = 3200,
-		GatheringMissedAttendee = 3201,
-		GatheringSealed = 3202,
-	}
-
-    public record TelegramShard(long Id, long NotifierId, DateTimeOffset Time,
-		TelegramMessage Message, string Context);
-
 	public record NotificationProfile(long UserId, Guid NotificationId,
 		bool SocialInvitations, bool CompanionActivity,
 		bool GatheringReminders, bool GatheringActivity,
@@ -63,13 +38,6 @@ namespace Core.Boundaries
 		Task UpdateGatheringHostNotificationScheduleAsync(long gatheringId, string gatheringWaitingId);
 		Task UpdateGatheringGuestNotificationSchedulesAsync(long gatheringId, params (long userId, string gatheringUpcomingId, string gatheringImminentId)[] guestSchedules);
 		Task ClearGatheringNotificationScheduleAsync(long gatheringId);
-
-        Task<List<TelegramShard>> GetAllTelegramsAsync(TelegramMessage messageType);
-
-        Task<List<TelegramShard>> GetTelegramsAsync(long userId);
-		Task SaveTelegramAsync(long recipientId, long notifierId, DateTimeOffset time,
-			TelegramMessage message, string context);
-		Task DeleteTelegramAsync(long telegramId);
 	}
 
 	public interface INotificationOperations
@@ -79,10 +47,6 @@ namespace Core.Boundaries
 			bool? socialInvitations = null, bool? companionActivity = null,
 			bool? gatheringReminders = null, bool? gatheringActivity = null,
 			bool? gatheringDiscovery = null);
-
-		Task<List<TelegramShard>> GetTelegramsAsync(long userId);
-		Task ClearTelegramsAsync(long userId);
-		Task ClearTelegramsAsync(long userId, List<long> telegramIds);
 	}
 
 	public interface INotificationService
