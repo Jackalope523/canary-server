@@ -1,4 +1,4 @@
-# Canary — Server
+# Canary Server
 
 Back-end REST + real-time API for **[Canary](https://almostcanary.com)**, a location-based social platform for spontaneous, real-world meetups. Members discover **Gatherings** happening near them, join in person (arrival is geofenced), capture **Snapshots** into a shared gallery, and message each other in real time. Gatherings are **ephemeral** — they decay on a fixed cadence and expire on their own, so the map only ever shows what's actually happening now.
 
